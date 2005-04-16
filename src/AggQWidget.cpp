@@ -188,9 +188,6 @@ void AggQWidget::resizeEvent ( QResizeEvent * event )
                       aggFlipY ?  mainQImage->bytesPerLine() : 
                                  -mainQImage->bytesPerLine() );
 	
-    // Do the stuff that X11 does...
-///TODO: trans_affine_resizing( oldSize, newSize );
-
     // Notice other agg paintable elements 
     aggResizeEvent( event ); 
 }
