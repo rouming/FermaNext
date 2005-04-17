@@ -1,8 +1,6 @@
 
 #include "AggQWidget.h"
 
-using namespace agg;
-
 #include <qpainter.h>
 #include <qsize.h>
 #include <platform/agg_platform_support.h>
@@ -33,11 +31,18 @@ bool AggCtrlContainer::removeCtrl ( agg::ctrl& c )
 
 bool AggCtrlContainer::inRect ( double x, double y )
 {
+    const agg::ctrl* ctrl = whoIsInRect( x, y );
+    if ( ctrl != 0 ) return true;
+    return false;
+}
+
+const agg::ctrl* AggCtrlContainer::whoIsInRect ( double x, double y )
+{
     CtrlList::iterator iter = ctrls.begin();
     for ( ; iter != ctrls.end(); ++iter )
         if( (*iter)->in_rect(x, y) )
-            return true;
-    return false;
+            return *iter;
+    return 0;
 }
 
 bool AggCtrlContainer::currentCtrl ( double x, double y )
@@ -64,40 +69,41 @@ const agg::ctrl& AggCtrlContainer::currentCtrl ()
 }
 
 
-bool AggCtrlContainer::mousePressEvent ( double x, double y )
+const agg::ctrl* AggCtrlContainer::mousePressEvent ( double x, double y )
 {
     CtrlList::iterator iter = ctrls.begin();
     for ( ; iter != ctrls.end(); ++iter )
         if( (*iter)->on_mouse_button_down(x, y) ) 
-            return true;
-    return false;
+            return *iter;
+    return 0;
 }
 
-bool AggCtrlContainer::mouseReleaseEvent ( double x, double y )
+const agg::ctrl* AggCtrlContainer::mouseReleaseEvent ( double x, double y )
 {
-    bool flag = false;
+    const agg::ctrl* releasedCtrl = 0;
     CtrlList::iterator iter = ctrls.begin();
     for ( ; iter != ctrls.end(); ++iter )
         if( (*iter)->on_mouse_button_up(x, y) ) 
-            flag = true;
-    return flag;
+            releasedCtrl = *iter;
+    return releasedCtrl;
 }
 
-bool AggCtrlContainer::mouseMoveEvent ( double x, double y, bool buttonFlag )
+const agg::ctrl* AggCtrlContainer::mouseMoveEvent ( double x, double y, bool buttonFlag )
 {
     CtrlList::iterator iter = ctrls.begin();
     for ( ; iter != ctrls.end(); ++iter )
         if( (*iter)->on_mouse_move(x, y, buttonFlag) ) 
-            return true;
-    return false;
+            return *iter;
+    return 0;
 }
 
-bool AggCtrlContainer::arrowKeysPressEvent ( bool left, bool right, 
-                                             bool down, bool up )
+const agg::ctrl* AggCtrlContainer::arrowKeysPressEvent ( bool left, bool right, 
+                                                         bool down, bool up )
 {
-    if ( current != 0 )
-        return current->on_arrow_keys( left, right, down, up );
-    return false;
+    if ( current != 0 && 
+         current->on_arrow_keys( left, right, down, up ) )
+        return current;
+    return 0;
 }
 
 
@@ -165,16 +171,16 @@ void AggQWidget::paintEvent ( QPaintEvent* event )
     // This conversion was taken from the original agg_plarform_support.cpp
     QImage tmpImg( mainQImage->width(), mainQImage->height(), 32 );
 					
-    rendering_buffer rbufTmp;
+    agg::rendering_buffer rbufTmp;
     rbufTmp.attach( tmpImg.bits(), tmpImg.width(), tmpImg.height(), 
                     aggFlipY ? tmpImg.bytesPerLine() : -tmpImg.bytesPerLine() );
     
         
-    color_conv(&rbufTmp, &aggBuffer, color_conv_rgb24_to_rgba32());
+    agg::color_conv(&rbufTmp, &aggBuffer, agg::color_conv_rgb24_to_rgba32());
     bitBlt( this, 0,0, &tmpImg );  
 }
 
-void AggQWidget::resizeEvent ( QResizeEvent * event )
+void AggQWidget::resizeEvent ( QResizeEvent* event )
 {
     const QSize& oldSize = event->oldSize();
     const QSize& newSize = event->size();
@@ -183,7 +189,7 @@ void AggQWidget::resizeEvent ( QResizeEvent * event )
     // Resize the internal buffer and reattach the main 
     // AGG rendering_buffer to the QImage 
     mainQImage->create( newSize, 32 );
-	aggBuffer.attach( mainQImage->bits(), mainQImage->width(), 
+    aggBuffer.attach( mainQImage->bits(), mainQImage->width(), 
                       mainQImage->height(), 
                       aggFlipY ?  mainQImage->bytesPerLine() : 
                                  -mainQImage->bytesPerLine() );
@@ -192,64 +198,70 @@ void AggQWidget::resizeEvent ( QResizeEvent * event )
     aggResizeEvent( event ); 
 }
 
-void AggQWidget::keyPressEvent ( QKeyEvent * event )
+void AggQWidget::keyPressEvent ( QKeyEvent* ke )
 {
     bool up    = false;
     bool down  = false;
     bool left  = false;
     bool right = false;
 
-    switch( event->key() )
+    switch( ke->key() )
     {
-	    case Key_Up:    up    = true; break;
+        case Key_Up:    up    = true; break;
         case Key_Down:  down  = true; break;
         case Key_Left:  left  = true; break;
         case Key_Right: right = true; break;
         default:    break;
-	}
+    }
 				
-	if( ctrlContainer.arrowKeysPressEvent( left, right, down, up ) )
+    const agg::ctrl* ctrl = ctrlContainer.arrowKeysPressEvent( left, right, down, up );
+    if( ctrl != 0 )
     {
-        //m_ptr->on_ctrl_change();
-        //m_ptr->force_redraw();
+        aggCtrlChangedEvent( ctrl );
+        // Force repaint
+        QWidget::update();
     }
     else
     {
-        //m_ptr->on_key(QCursor::pos().x(),
-       //flipY ? mainQWidget()->height() - QCursor::pos().y() : 
-               //QCursor::pos().y(), ke->key(), // Note: I don't know if this maps directly to AGG...
-        //0);
+        aggKeyPressEvent( ke );
     }    
 }
 
 void AggQWidget::mouseMoveEvent ( QMouseEvent* me )
 {			
     uint flags = 0;
-    if ( me->button() & Qt::ShiftButton)   flags |= kbd_shift;
-    if ( me->button() & Qt::ControlButton) flags |= kbd_ctrl;
-    if ( me->button() == Qt::LeftButton)   flags |= mouse_left;
-    if ( me->button() == Qt::RightButton)  flags |= mouse_right;
+    if ( me->button() & Qt::ShiftButton)   flags |= agg::kbd_shift;
+    if ( me->button() & Qt::ControlButton) flags |= agg::kbd_ctrl;
+    if ( me->button() == Qt::LeftButton)   flags |= agg::mouse_left;
+    if ( me->button() == Qt::RightButton)  flags |= agg::mouse_right;
     // for some reason, Qt doesnt set the button on mouse move
     // events, even though I know I'm holding the button down!
     // Since I know that I wont get mouse move events unless
     // the mouse is pressed, I'll make a 90%-correct assumption
     // here and just set the flag anyway.
-    if( !flags ) flags |= mouse_left; 
+    if( !flags ) flags |= agg::mouse_left; 
 				
     int curX = me->pos().x();
     int curY = flipY() ? height() - me->pos().y() : me->pos().y();
 		
-    if ( ctrlContainer.mouseMoveEvent( curX, curY, 
-                                      (flags & mouse_left) != 0 ) )
+
+    const agg::ctrl* ctrl = ctrlContainer.mouseMoveEvent( curX, curY,
+                                                          (flags & agg::mouse_left) != 0 );
+    if ( ctrl != 0 )
     {
-        //m_ptr->on_ctrl_change();
-        //m_ptr->force_redraw();
+        aggCtrlChangedEvent( ctrl );
+        // Force repaint
+        QWidget::update();
+
     }
     else
     {
-        if ( !ctrlContainer.inRect(curX, curY) )
-        {
-            //aggMouseMoveEvent(curX, curY, flags);
+        ctrl = ctrlContainer.whoIsInRect(curX, curY);
+        if ( ctrl == 0 )
+        {            
+            QPoint  newPos( curX, curY );
+            QMouseEvent newEvent( me->type(), newPos, me->button(), me->state() );
+            aggMouseMoveEvent( &newEvent );
         }
     } 
 } 
@@ -257,66 +269,79 @@ void AggQWidget::mouseMoveEvent ( QMouseEvent* me )
 void AggQWidget::mouseReleaseEvent ( QMouseEvent* me )
 {
     uint flags = 0;
-    if ( me->button() & Qt::ShiftButton)   flags |= kbd_shift;
-    if ( me->button() & Qt::ControlButton) flags |= kbd_ctrl;
-    if ( me->button() == Qt::LeftButton)   flags |= mouse_left;
-    if ( me->button() == Qt::RightButton)  flags |= mouse_right;
+    if ( me->button() & Qt::ShiftButton)   flags |= agg::kbd_shift;
+    if ( me->button() & Qt::ControlButton) flags |= agg::kbd_ctrl;
+    if ( me->button() == Qt::LeftButton)   flags |= agg::mouse_left;
+    if ( me->button() == Qt::RightButton)  flags |= agg::mouse_right;
 				
     int curX = me->pos().x();
     int curY = flipY() ? height() - me->pos().y() : me->pos().y();
 
-    if ( flags & mouse_left )
+    if ( flags & agg::mouse_left )
     {
-        if ( ctrlContainer.mouseReleaseEvent(curX, curY) )
+        const agg::ctrl* ctrl = ctrlContainer.mouseReleaseEvent(curX, curY);
+        if ( ctrl != 0 )
         {
-         //   m_ptr->on_ctrl_change();
-            //m_ptr->force_redraw();
+            aggCtrlChangedEvent( ctrl );
+            // Force repaint
+            QWidget::update();
+
         }
     }
-    if ( flags & (mouse_left | mouse_right) )
+    if ( flags & (agg::mouse_left | agg::mouse_right) )
     {
-        //m_ptr->on_mouse_button_up(curX, curY, flags);
+        QPoint  newPos( curX, curY );
+        QMouseEvent newEvent( me->type(), newPos, me->button(), me->state() );
+        aggMouseReleaseEvent( &newEvent );
     }
 }
 
 void AggQWidget::mousePressEvent ( QMouseEvent* me )
 {
     uint flags = 0;
-    if ( me->button() & Qt::ShiftButton)   flags |= kbd_shift;
-    if ( me->button() & Qt::ControlButton) flags |= kbd_ctrl;
-    if ( me->button() == Qt::LeftButton)   flags |= mouse_left;
-    if ( me->button() == Qt::RightButton)  flags |= mouse_right;
+    if ( me->button() & Qt::ShiftButton)   flags |= agg::kbd_shift;
+    if ( me->button() & Qt::ControlButton) flags |= agg::kbd_ctrl;
+    if ( me->button() == Qt::LeftButton)   flags |= agg::mouse_left;
+    if ( me->button() == Qt::RightButton)  flags |= agg::mouse_right;
 				
     int curX = me->pos().x();
     int curY = flipY() ? height() - me->pos().y() : me->pos().y();
 
-    if ( flags & mouse_left )
+    if ( flags & agg::mouse_left )
     {
-        if( ctrlContainer.mousePressEvent(curX, curY) )
+        const agg::ctrl* ctrl = ctrlContainer.mousePressEvent(curX, curY);
+        if( ctrl != 0 )
         {
             ctrlContainer.currentCtrl(curX, curY);
-            //m_ptr->on_ctrl_change();
-            //m_ptr->force_redraw();
+            aggCtrlChangedEvent( ctrl );            
+            // Force repaint
+            QWidget::update();
         }
         else
         {
-            if ( ctrlContainer.inRect(curX, curY) )
-            {
-		        if ( ctrlContainer.currentCtrl(curX, curY) )
+            const agg::ctrl* ctrl = ctrlContainer.whoIsInRect(curX, curY);
+            if ( ctrl != 0 )
+            {                
+                if ( ctrlContainer.currentCtrl(curX, curY) )
                 {
-                    //m_ptr->on_ctrl_change();
-					//m_ptr->force_redraw();
-			    }
+                    aggCtrlChangedEvent( ctrl );  
+				    // Force repaint
+                    QWidget::update();
+                }
             }
             else
             {
-                //m_ptr->on_mouse_button_down(cur_x, cur_y, flags);
+                QPoint  newPos( curX, curY );
+                QMouseEvent newEvent( me->type(), newPos, me->button(), me->state() );
+                aggMousePressEvent( &newEvent );                
             }    
         }
-	}
-    if ( flags & mouse_right )
+    }
+    if ( flags & agg::mouse_right )
     {
-        //m_ptr->on_mouse_button_down(cur_x, cur_y, flags);
+        QPoint  newPos( curX, curY );
+        QMouseEvent newEvent( me->type(), newPos, me->button(), me->state() );
+        aggMousePressEvent( &newEvent );
     }
 }
  
@@ -330,6 +355,7 @@ void AggQWidget::aggResizeEvent ( QResizeEvent* )   {}
 void AggQWidget::aggKeyPressEvent ( QKeyEvent* )    {}
 void AggQWidget::aggMouseMoveEvent ( QMouseEvent* ) {}
 void AggQWidget::aggMouseReleaseEvent ( QMouseEvent* ) {}
-void AggQWidget::aggMousePressEvent ( QMouseEvent* )   {}    
+void AggQWidget::aggMousePressEvent ( QMouseEvent* )   {}
+void AggQWidget::aggCtrlChangedEvent ( const agg::ctrl* ) {}
 
 
