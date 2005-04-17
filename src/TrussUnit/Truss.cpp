@@ -72,8 +72,8 @@ Truss::Truss ()
 
 Truss::~Truss ()
 {
-    NodesList::iterator itNodes;
-    PivotsList::iterator itPivots;
+    NodeList::iterator itNodes;
+    PivotList::iterator itPivots;
     for ( itNodes = nodes.begin(); itNodes != nodes.end();  ++itNodes )
         delete *itNodes;
     for ( itPivots = pivots.begin(); itPivots != pivots.end();  ++itPivots )
@@ -95,7 +95,7 @@ Truss::Pivot& Truss::createPivot ()
 }
 
 Truss::Pivot& Truss::createPivot ( const Node& first, 
-                                           const Node& last )
+                                   const Node& last )
 {
     Pivot* pivot = new Pivot( first, last );
     pivots.push_back(pivot);
@@ -104,7 +104,7 @@ Truss::Pivot& Truss::createPivot ( const Node& first,
 
 bool Truss::removePivot ( const Pivot& pivot )
 {
-    PivotsList::iterator iter = pivots.begin();
+    PivotList::iterator iter = pivots.begin();
     for ( ; iter != pivots.end(); ++iter )
         if ( (*iter) == &pivot ) {
             delete *iter;
@@ -116,7 +116,7 @@ bool Truss::removePivot ( const Pivot& pivot )
 
 bool Truss::removeNode ( const Node& node )
 {
-    NodesList::iterator iter = nodes.begin();
+    NodeList::iterator iter = nodes.begin();
     for ( ; iter != nodes.end(); ++iter )
         if ( (*iter) == &node ) {
             delete *iter;
