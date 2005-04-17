@@ -11,22 +11,22 @@ public:
     class Node;
     class Pivot;
 
-    typedef std::vector<Node*>  NodesList;
-    typedef std::vector<Pivot*> PivotsList;
+    typedef std::vector<Node*>  NodeList;
+    typedef std::vector<Pivot*> PivotList;
 
     Truss ();
     virtual ~Truss ();
 
-    Node& createNode ();
-    Pivot& createPivot ();
-    Pivot& createPivot ( const Node& first, const Node& last );
+    virtual Node& createNode ();
+    virtual Pivot& createPivot ();
+    virtual Pivot& createPivot ( const Node& first, const Node& last );
     
-    bool removeNode ( const Node& );
-    bool removePivot ( const Pivot& );
+    virtual bool removeNode ( const Node& );
+    virtual bool removePivot ( const Pivot& );
 
 private:
-    NodesList  nodes;
-    PivotsList pivots;
+    NodeList  nodes;
+    PivotList pivots;
 };
 
 class Truss::Node
@@ -43,8 +43,8 @@ protected:
     Node ( int x, int y, Fixation );
 
 public:
-    void setFixation ( Fixation );
-    Fixation getFixation () const;
+    virtual void setFixation ( Fixation );
+    virtual Fixation getFixation () const;
 
 private:
     int x, y;
@@ -59,11 +59,11 @@ protected:
     Pivot ( const Node& first, const Node& last );        
 
 public:
-    void setFirstNode ( const Node& );
-    const Node& getFirstNode () const;
+    virtual void setFirstNode ( const Node& );
+    virtual const Node& getFirstNode () const;
 
-    void setLastNode ( const Node& );
-    const Node& getLastNode () const;
+    virtual void setLastNode ( const Node& );
+    virtual const Node& getLastNode () const;
 
 private:
     const Node *first, *last;
