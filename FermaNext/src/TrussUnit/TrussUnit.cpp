@@ -27,12 +27,12 @@ void PaintableTrussElement::setEnabled ( bool e_ )
     if ( !enabled ) visible = false;
 }
 
-bool PaintableTrussElement::isVisible ()
+bool PaintableTrussElement::isVisible () const
 {
     return visible;
 }
 
-bool PaintableTrussElement::isEnabled ()
+bool PaintableTrussElement::isEnabled () const
 {
     return enabled;
 }

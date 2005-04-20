@@ -6,71 +6,73 @@
  * Node
  *****************************************************************************/
 
-Truss::Node::Node () : 
+Node::Node () : 
     x(0), y(0), fix(FixationLack)
 {}
 
-Truss::Node::Node ( int x_, int y_ ) :
+Node::Node ( int x_, int y_ ) :
     x(x_), y(y_), fix(FixationLack)
 {}
 
-Truss::Node::Node ( int x_, int y_, Fixation fix_ ) :
+Node::Node ( int x_, int y_, Fixation fix_ ) :
     x(x_), y(y_), fix(fix_)
 {}
 
-void Truss::Node::setFixation ( Truss::Node::Fixation fix_ )
+void Node::setFixation ( Node::Fixation fix_ )
 {
     fix = fix_;
 }
 
-Truss::Node::Fixation Truss::Node::getFixation () const
+Node::Fixation Node::getFixation () const
 {
     return fix;
 }
 
-
 /*****************************************************************************
  * Pivot
  *****************************************************************************/
-
-Truss::Pivot::Pivot () :
+/*
+Pivot<class Node>::Pivot () :
     first(NULL),
     last(NULL)
 {}
 
-Truss::Pivot::Pivot ( const Node& first_, const Node& last_ ) :
+Pivot<class Node>::Pivot ( const Node& first_, const Node& last_ ) :
     first(&first_),
     last(&last_)
 {}
 
-void Truss::Pivot::setFirstNode ( const Truss::Node& first_ )
+void Pivot<class Node>::setFirstNode ( const Node& first_ )
 {
     first = &first_;
 }
 
-const Truss::Node& Truss::Pivot::getFirstNode () const
+const Node& Pivot<class Node>::getFirstNode () const
 {
     return *first;
 }
 
-void Truss::Pivot::setLastNode ( const Truss::Node& last_ )
+void Pivot<class Node>::setLastNode ( const Node& last_ )
 {
     last = &last_;
 }
 
-const Truss::Node& Truss::Pivot::getLastNode () const
+const Node& Pivot<class Node>::getLastNode () const
 {
     return *last;
 }
+*/
 
 /*****************************************************************************
  * Truss
  *****************************************************************************/
-
-Truss::Truss ()
+/*
+template <class Node, class Pivot>
+Truss<Node, Pivot>::Truss ()
 {}
 
-Truss::~Truss ()
+template <class Node, class Pivot>
+Truss<Node, Pivot>::~Truss ()
 {
     NodeList::iterator itNodes;
     PivotList::iterator itPivots;
@@ -80,29 +82,33 @@ Truss::~Truss ()
         delete *itPivots;
 }
 
-Truss::Node& Truss::createNode ()
+template <class Node, class Pivot>
+Node& Truss<Node, Pivot>::createNode ()
 {
     Node* node = new Node;
     nodes.push_back(node);
     return *node;
 }
 
-Truss::Pivot& Truss::createPivot ()
+template <class Node, class Pivot>
+Pivot& Truss<Node, Pivot>::createPivot ()
 {
     Pivot* pivot = new Pivot;
     pivots.push_back(pivot);
     return *pivot;
 }
 
-Truss::Pivot& Truss::createPivot ( const Node& first, 
-                                   const Node& last )
+template <class Node, class Pivot>
+Pivot& Truss<class Node, class Pivot>::createPivot ( const Node& first, 
+                                                     const Node& last )
 {
     Pivot* pivot = new Pivot( first, last );
     pivots.push_back(pivot);
     return *pivot;    
 }
 
-bool Truss::removePivot ( const Pivot& pivot )
+template <class Node, class Pivot>
+bool Truss<class Node, class Pivot>::removePivot ( const Pivot& pivot )
 {
     PivotList::iterator iter = pivots.begin();
     for ( ; iter != pivots.end(); ++iter )
@@ -114,7 +120,8 @@ bool Truss::removePivot ( const Pivot& pivot )
     return false;    
 }
 
-bool Truss::removeNode ( const Node& node )
+template <class Node, class Pivot>
+bool Truss<class Node, class Pivot>::removeNode ( const Node& node )
 {
     NodeList::iterator iter = nodes.begin();
     for ( ; iter != nodes.end(); ++iter )
@@ -126,6 +133,7 @@ bool Truss::removeNode ( const Node& node )
     return false;    
 }
 
+ */
 /****************************************************************************/
 
 
