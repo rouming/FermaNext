@@ -54,8 +54,7 @@ public:
     AggQWidget ( QWidget* parent = 0, bool flip_y = false );
     ~AggQWidget ();
 
-//protected:
-public:
+protected:
     virtual agg::rendering_buffer& getAggRenderingBuffer ();
     virtual agg::trans_affine  getAggResizeMatrix ();
     virtual QImage& getMainImage ();
