@@ -94,6 +94,10 @@ SOURCE=..\common\AggQWidget.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\ObjectStateManager.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Truss.cpp
 # End Source File
 # Begin Source File
@@ -119,6 +123,14 @@ SOURCE=.\TrussUnitDesignerWidget.cpp
 # Begin Source File
 
 SOURCE=..\common\AggQWidget.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\ObjectStateManager.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\StatefulObject.h
 # End Source File
 # Begin Source File
 
