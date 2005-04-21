@@ -10,12 +10,14 @@ template <class Node, class Pivot> class Truss
 public:        
     typedef std::vector<Node*>  NodeList;
     typedef std::vector<Pivot*> PivotList;
+    typedef typename NodeList::iterator NodeListIter;
+    typedef typename PivotList::iterator PivotListIter;
 
     inline Truss () {}
     inline ~Truss ()
     {
-        NodeList::iterator itNodes;
-        PivotList::iterator itPivots;
+        NodeListIter itNodes;
+        PivotListIter itPivots;
         for ( itNodes = nodes.begin(); itNodes != nodes.end();  ++itNodes )
             delete *itNodes;
         for ( itPivots = pivots.begin(); itPivots != pivots.end();  ++itPivots )
@@ -45,7 +47,7 @@ public:
 
     inline bool removePivot ( const Pivot& pivot )
     {
-        PivotList::iterator iter = pivots.begin();
+        PivotListIter iter = pivots.begin();
         for ( ; iter != pivots.end(); ++iter ) 
             if ( (*iter) == &pivot ) {
                 delete *iter;
@@ -57,7 +59,7 @@ public:
 
     inline bool removeNode ( const Node& node )
     {
-        NodeList::iterator iter = nodes.begin();
+        NodeListIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
             if ( (*iter) == &node ) {
                 delete *iter;
@@ -90,7 +92,7 @@ private:
 
 template <class Node> class Pivot
 {
-    friend class Truss;
+    friend class Truss<class N, class P>;
 protected:
     Pivot () : first(NULL), last(NULL) {}
     Pivot ( const Node& first, const Node& last ) :  
@@ -114,8 +116,8 @@ private:
 
 
 class Node
-{    
-    friend class Truss;
+{
+    friend class Truss<class N, class P>;
 public:
     typedef enum { FixationLack = 0,
                    XFixation, 
