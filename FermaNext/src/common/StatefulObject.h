@@ -18,9 +18,9 @@ template <class Obj>
 class ConcreteObjectState : virtual public ObjectState
 {
     Obj* obj;
-    const Obj* state;    
+    Obj* state;    
 public:
-    ConcreteObjectState ( Obj* obj_, const Obj* state_ ) : 
+    ConcreteObjectState ( Obj* obj_, Obj* state_ ) : 
         obj(obj_), state(state_) 
     {}
 

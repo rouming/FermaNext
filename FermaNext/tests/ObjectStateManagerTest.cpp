@@ -4,96 +4,110 @@
 
 #include <iostream>
 
-class Node : public StatefulObject<Node>
+int objects = 0;
+
+class SomeObject : public StatefulObject<SomeObject>
 {
 protected:
-    Node* self ()  { return this; }
+    SomeObject* self ()  { return this; }
 public:
-    Node (int x_): x(x_) { }
-    Node ( const Node& node ) 
+    SomeObject (int val_): val(val_) { ++objects; }
+    ~SomeObject () { --objects; }
+    SomeObject ( const SomeObject& obj ) 
     { 
-        x = node.x;
+        ++objects;
+        val = obj.val;
     } 
-    void loadState ( const Node& node )
+    void loadState ( const SomeObject& obj )
     {
-        x = node.x;
+        val = obj.val;
     }
-    int x;
+    int value () const { return val; }
+    void value ( int val_ ) { val = val_; }    
+private:
+    int val;
 };
 
 int main ()
 {
     const size_t STACK_SIZE = 10;
-    ObjectStateManager m(0);
+    size_t i = 0;
+    ObjectStateManager m;
 
-    Node node(666);
-    node.saveState(m);
+    SomeObject obj(666);
+    obj.saveState(m);
 
     //Changes
-    for ( size_t i=0; i < STACK_SIZE; ++i ) {
-        node.x = i+1;
-        node.saveState(m);
+    for ( i=0; i < STACK_SIZE; ++i ) {
+        obj.value(i+1);
+        obj.saveState(m);
     }
-    std::cout << "Last change: " << node.x << "\n";
+    std::cout << "Last change: " << obj.value() << "\n";
 
     //Full Undo
-    for ( size_t i=0; i < STACK_SIZE-1; ++i ) {
+    for ( i=0; i < STACK_SIZE-1; ++i ) {
         m.undo();
-        std::cout << "Undo" << i+1 << ": " << node.x << "\n";
+        std::cout << "Undo" << i+1 << ": " << obj.value() << "\n";
     }
-    //Check bounds
-    m.undo(); m.undo(); m.undo(); m.undo(); m.undo(); m.undo();    
 
     //Rollback to initial
     m.undo();
-    std::cout << "Initial: " << node.x << "\n";
+
+    //Check bounds
+    try {
+        m.undo();    
+    } catch ( ObjectStateManager::UndoException& ) { }
+
+    std::cout << "Initial: " << obj.value() << "\n";
 
     //Full Redo
-    for ( size_t i=0; i < STACK_SIZE; ++i ) {
+    for (  i=0; i < STACK_SIZE; ++i ) {
         m.redo();
-        std::cout << "Redo" << i+1 << ": " << node.x << "\n";
+        std::cout << "Redo" << i+1 << ": " << obj.value() << "\n";
     }
 
     //Check bounds
-    m.redo(); m.redo(); m.redo(); m.redo(); m.redo(); 
+    try {
+        m.redo(); 
+    } catch ( ObjectStateManager::RedoException& ) { }
 
     //Half Undo
-    for ( size_t i=0; i < STACK_SIZE/2; ++i ) {
+    for (  i=0; i < STACK_SIZE/2; ++i ) {
         m.undo();
-        std::cout << "Undo" << i+1 << ": " << node.x << "\n";
+        std::cout << "Undo" << i+1 << ": " << obj.value() << "\n";
     }    
 
     //Half Redo
-    for ( size_t i=0; i < STACK_SIZE/2; ++i ) {
+    for (  i=0; i < STACK_SIZE/2; ++i ) {
         m.redo();
-        std::cout << "Redo" << i+1 << ": " << node.x << "\n";
+        std::cout << "Redo" << i+1 << ": " << obj.value() << "\n";
     }
 
     //Half Undo
-    for ( size_t i=0; i < STACK_SIZE/2; ++i ) {
+    for (  i=0; i < STACK_SIZE/2; ++i ) {
         m.undo();
-        std::cout << "Undo" << i+1 << ": " << node.x << "\n";
+        std::cout << "Undo" << i+1 << ": " << obj.value() << "\n";
     }
 
     //New Changes
-    for ( size_t i=0; i < STACK_SIZE/2; ++i ) {
-        node.x = (i+1)*10;
-        node.saveState(m);
+    for (  i=0; i < STACK_SIZE/2; ++i ) {
+        obj.value((i+1)*10);
+        obj.saveState(m);
     }
-    std::cout << "Last new change: " << node.x << "\n";
+    std::cout << "Last new change: " << obj.value() << "\n";
 
 
     //Full Undo
-    for ( size_t i=0; i < STACK_SIZE-1; ++i ) {
+    for (  i=0; i < STACK_SIZE-1; ++i ) {
         m.undo();
-        std::cout << "Undo" << i+1 << ": " << node.x << "\n";
+        std::cout << "Undo" << i+1 << ": " << obj.value() << "\n";
     }
 
     //Rollback to initial
     m.undo();
-    std::cout << "Initial: " << node.x << "\n";
+    std::cout << "Initial: " << obj.value() << "\n";
 
 
-    
+    return 0;    
 }
 
