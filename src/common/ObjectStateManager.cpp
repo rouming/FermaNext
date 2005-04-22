@@ -34,8 +34,19 @@ void ObjectStateManager::saveState ( ObjectState* st ) throw (UnknownException)
             states.erase( eraseIter, states.end() );
         }
     }
+    QObject::connect(st, SIGNAL(onDisable(ObjectState*)), 
+                         SLOT(removeState(ObjectState*)));
     states.push_back(st);
     currentState = st;    
+}
+
+void ObjectStateManager::removeState ( ObjectState* st )
+{
+    StatesIter iter = std::find( states.begin(), states.end(), st );
+    if ( iter != states.end() ) {
+        delete *iter;
+        states.erase(iter);
+    }
 }
 
 void ObjectStateManager::undo () throw (UnknownException, UndoException) 
