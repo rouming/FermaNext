@@ -29,7 +29,7 @@ class TrussUnit : public Truss<TrussNode, TrussPivot>,
 {
 public:
     TrussUnit ();
-    ~TrussUnit ();
+    virtual ~TrussUnit ();
     void paint ( agg::rendering_buffer& ) const;
 };
 
