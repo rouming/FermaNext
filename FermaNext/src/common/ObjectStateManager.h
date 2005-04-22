@@ -3,13 +3,15 @@
 #define STATEMANAGER_H
 
 #include <vector>
+#include <qobject.h>
 
 class ObjectState;
 
 const size_t DEF_STACK_SIZE = 256;
 
-class ObjectStateManager 
+class ObjectStateManager : public QObject
 {
+    Q_OBJECT
 public:
     // Some state manager exceptions
     class UndoException {};
@@ -25,6 +27,9 @@ public:
     virtual void saveState ( ObjectState* st ) throw (UnknownException);
     virtual void undo () throw (UnknownException, UndoException);
     virtual void redo () throw (UnknownException, RedoException);
+
+protected slots:
+    void removeState ( ObjectState* );
 
 private:
     States states;
