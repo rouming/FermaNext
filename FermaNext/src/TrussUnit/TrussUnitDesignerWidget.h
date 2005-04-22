@@ -13,6 +13,9 @@ public:
     TrussUnitDesignerWidget ();
     virtual TrussUnit& createTrussUnit ();
     virtual bool removeTrussUnit ( const TrussUnit& );
+	virtual TrussUnit* whoIsInRect ( double x, double y );
+	virtual void initTruss();
+	virtual void onDraw();
 
     // Handlers on events
     void aggPaintEvent ( QPaintEvent* );
