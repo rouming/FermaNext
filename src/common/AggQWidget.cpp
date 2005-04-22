@@ -160,7 +160,7 @@ void AggQWidget::flipY ( bool flip )
 
 /*****************************************************************************
  * Private QT event handlers. Override AGG handlers instead.
-/****************************************************************************/
+ ****************************************************************************/
 
 void AggQWidget::paintEvent ( QPaintEvent* event )
 {
@@ -182,9 +182,7 @@ void AggQWidget::paintEvent ( QPaintEvent* event )
 
 void AggQWidget::resizeEvent ( QResizeEvent* event )
 {
-    const QSize& oldSize = event->oldSize();
     const QSize& newSize = event->size();
-
 
     // Resize the internal buffer and reattach the main 
     // AGG rendering_buffer to the QImage 
@@ -348,7 +346,7 @@ void AggQWidget::mousePressEvent ( QMouseEvent* me )
 
 /*****************************************************************************
  * Override this AGG event handlers in descendant classes.
-/****************************************************************************/
+ ****************************************************************************/
 
 void AggQWidget::aggPaintEvent ( QPaintEvent* )     {}
 void AggQWidget::aggResizeEvent ( QResizeEvent* )   {}

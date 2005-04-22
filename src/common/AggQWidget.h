@@ -22,20 +22,19 @@ private:
 public:
     AggCtrlContainer ();
 
-    virtual void addCtrl ( agg::ctrl& );    
-    virtual bool removeCtrl ( agg::ctrl& );    
-    virtual bool inRect ( double x, double y );
-    virtual const agg::ctrl* whoIsInRect ( double x, double y );
-    virtual bool currentCtrl ( double x, double y );
-    virtual const agg::ctrl& currentCtrl ();
+    void addCtrl ( agg::ctrl& );    
+    bool removeCtrl ( agg::ctrl& );    
+    bool inRect ( double x, double y );
+    const agg::ctrl* whoIsInRect ( double x, double y );
+    bool currentCtrl ( double x, double y );
+    const agg::ctrl& currentCtrl ();
 
     // Events
-    virtual const agg::ctrl* mousePressEvent ( double x, double y );
-    virtual const agg::ctrl* mouseReleaseEvent ( double x, double y );
-    virtual const agg::ctrl* mouseMoveEvent ( double x, double y,
-                                              bool button_flag );
-    virtual const agg::ctrl* arrowKeysPressEvent ( bool left, bool right,
-                                                   bool down, bool up );
+    const agg::ctrl* mousePressEvent ( double x, double y );
+    const agg::ctrl* mouseReleaseEvent ( double x, double y );
+    const agg::ctrl* mouseMoveEvent ( double x, double y, bool button_flag );
+    const agg::ctrl* arrowKeysPressEvent ( bool left, bool right,
+                                           bool down, bool up );
 };
 
 class AggQWidget : public QWidget
@@ -52,7 +51,7 @@ private:
 
 public:
     AggQWidget ( QWidget* parent = 0, bool flip_y = false );
-    ~AggQWidget ();
+    virtual ~AggQWidget ();
 
 protected:
     virtual agg::rendering_buffer& getAggRenderingBuffer ();

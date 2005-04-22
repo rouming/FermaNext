@@ -94,17 +94,9 @@ void TrussUnitDesignerWidget::aggPaintEvent ( QPaintEvent* pe )
 
             agg::scanline_p8 sl;
 
-        double scaling_koeff_x = 20;
-        double scaling_koeff_y = 10;
-
-        double x_start = scaling_koeff_x;
-        double x_end   = width() - 15.0;
-        double y_start = scaling_koeff_y;
-        double y_end   = height() - 10.0;
-
-                agg::ellipse ell(X, Y, 5.0 * 1, 5.0 * 1, 32);
-                ras.add_path(ell);
-                agg::render_scanlines(ras, sl, solid);
+            agg::ellipse ell(X, Y, 5.0 * 1, 5.0 * 1, 32);
+            ras.add_path(ell);
+            agg::render_scanlines(ras, sl, solid);
 
 
 
