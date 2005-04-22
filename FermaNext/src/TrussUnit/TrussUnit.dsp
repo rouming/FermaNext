@@ -127,10 +127,46 @@ SOURCE=..\common\AggQWidget.h
 # Begin Source File
 
 SOURCE=..\common\ObjectStateManager.h
+
+!IF  "$(CFG)" == "TrussUnit - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\common
+WkspDir=.
+InputPath=..\common\ObjectStateManager.h
+InputName=ObjectStateManager
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	%qtdir%\bin\moc.exe $(InputDir)\$(InputName).h -o $(WkspDir)\build\moc_$(InputName).cpp
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\common\StatefulObject.h
+
+!IF  "$(CFG)" == "TrussUnit - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\common
+WkspDir=.
+InputPath=..\common\StatefulObject.h
+InputName=StatefulObject
+
+"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	%qtdir%\bin\moc.exe $(InputDir)\$(InputName).h -o $(WkspDir)\build\moc_$(InputName).cpp
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -143,6 +179,18 @@ SOURCE=.\TrussUnit.h
 # Begin Source File
 
 SOURCE=.\TrussUnitDesignerWidget.h
+# End Source File
+# End Group
+# Begin Group "Moc Files"
+
+# PROP Default_Filter "cpp"
+# Begin Source File
+
+SOURCE=..\..\build\moc_ObjectStateManager.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\moc_StatefulObject.cpp
 # End Source File
 # End Group
 # End Target
