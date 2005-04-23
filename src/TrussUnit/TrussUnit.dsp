@@ -133,14 +133,15 @@ SOURCE=..\common\ObjectStateManager.h
 !ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\common
-WkspDir=.
+InputDir=\temp\FermaNext\src\common
+ProjDir=.
 InputPath=..\common\ObjectStateManager.h
 InputName=ObjectStateManager
 
-"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	%qtdir%\bin\moc.exe $(InputDir)\$(InputName).h -o $(WkspDir)\build\moc_$(InputName).cpp
-
+"$(ProjDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST $(ProjDir)\mocs mkdir $(ProjDir)\mocs 
+	%qtdir%\bin\moc.exe -o $(ProjDir)\mocs\moc_$(InputName).cpp $(InputDir)\$(InputName).h 
+	
 # End Custom Build
 
 !ENDIF 
@@ -155,14 +156,15 @@ SOURCE=..\common\StatefulObject.h
 !ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\common
-WkspDir=.
+InputDir=\temp\FermaNext\src\common
+ProjDir=.
 InputPath=..\common\StatefulObject.h
 InputName=StatefulObject
 
-"$(InputDir)\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	%qtdir%\bin\moc.exe $(InputDir)\$(InputName).h -o $(WkspDir)\build\moc_$(InputName).cpp
-
+"$(ProjDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST $(ProjDir)\mocs mkdir $(ProjDir)\mocs 
+	%qtdir%\bin\moc.exe -o $(ProjDir)\mocs\moc_$(InputName).cpp $(InputDir)\$(InputName).h 
+	
 # End Custom Build
 
 !ENDIF 
@@ -186,11 +188,11 @@ SOURCE=.\TrussUnitDesignerWidget.h
 # PROP Default_Filter "cpp"
 # Begin Source File
 
-SOURCE=..\..\build\moc_ObjectStateManager.cpp
+SOURCE=.\mocs\moc_ObjectStateManager.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\build\moc_StatefulObject.cpp
+SOURCE=.\mocs\moc_StatefulObject.cpp
 # End Source File
 # End Group
 # End Target
