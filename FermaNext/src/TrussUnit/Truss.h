@@ -4,84 +4,182 @@
 
 #include <vector>
 #include <algorithm>
+#include <qobject.h>
 
-template <class Node, class Pivot> class Truss
+// Basic classes for truss unit construction. 
+template <class N, class P> class Truss;
+template <class N> class Pivot;
+class Node;
+
+
+// Emitters for truss unit basic classes. 
+// All signals logic was moved to this classes 
+// because of Qt rejection to moc templates.
+
+class TrussEmitter : public QObject
+{
+    Q_OBJECT
+signals: 
+    // Nodes signals
+    void beforeNodeCreation ();
+    void afterNodeCreation ( const Node& );
+    void beforeNodeRemoval ( const Node& );
+    void afterNodeRemoval ();
+
+    // Pivots signals
+    void beforePivotCreation ();
+    void afterPivotCreation ( const Node&, const Node& );
+    void beforePivotRemoval ( const Node&, const Node& );
+    void afterPivotRemoval ();
+
+    void beforeStateLoaded ();
+    void afterStateLoaded ();
+};
+
+class PivotEmitter : public QObject
+{
+    Q_OBJECT
+signals: 
+    void onFirstNodeChange ( const Node& );
+    void onLastNodeChange ( const Node& );
+
+    void beforeStateLoaded ();
+    void afterStateLoaded ();
+};
+
+
+template <class N, class P> class Truss : public TrussEmitter
 {
 public:        
-    typedef std::vector<Node*>  NodeList;
-    typedef std::vector<Pivot*> PivotList;
+    typedef std::vector<N*>  NodeList;
+    typedef std::vector<P*> PivotList;
     typedef typename NodeList::iterator NodeListIter;
     typedef typename PivotList::iterator PivotListIter;
 
     inline Truss () {}
-    inline ~Truss ()
+
+    inline Truss ( const Truss& t ) 
+    {
+      copy(t);
+    }
+
+    inline copy ( const Truss& t )
+    {
+        clear();
+        NodeListIter itNodes;
+        PivotListIter itPivots;
+        for ( itNodes = t.nodes.begin(); 
+              itNodes != t.nodes.end();  
+              ++itNodes )
+            nodes.pushBack( new N(*itNodes) );
+
+        for ( itPivots = t.pivots.begin(); 
+              itPivots != t.pivots.end();  
+              ++itPivots )
+            pivot.pushBack( new P(*itPivots) );
+    }
+
+    inline clear () 
     {
         NodeListIter itNodes;
         PivotListIter itPivots;
-        for ( itNodes = nodes.begin(); itNodes != nodes.end();  ++itNodes )
+        for ( itNodes = nodes.begin(); 
+              itNodes != nodes.end(); 
+              ++itNodes )
             delete *itNodes;
-        for ( itPivots = pivots.begin(); itPivots != pivots.end();  ++itPivots )
+        for ( itPivots = pivots.begin(); 
+              itPivots != pivots.end();  
+              ++itPivots )
             delete *itPivots;
+        nodes.clear();
+        pivots.clear();
     }
 
-    inline Node& createNode ()
+    inline ~Truss ()
     {
-        Node* node = new Node;
+        clear();
+    }
+
+    inline N& createNode ()
+    {
+        emit beforePivotCreation();
+        N* node = new N;        
         nodes.push_back(node);
+        emit afterNodeCreation(*node);
         return *node;
     }
 
-    inline Pivot& createPivot ()
+    inline P& createPivot ()
     {
-        Pivot* pivot = new Pivot;
+        emit beforePivotCreation();
+        P* pivot = new P;        
         pivots.push_back(pivot);
+        emit afterPivotCreation(*pivot->first, *pivot->last);
         return *pivot;
     }
 
-    inline Pivot& createPivot ( const Node& first, const Node& last )
+    inline P& createPivot ( const N& first, const N& last )
     {
-        Pivot* pivot = new Pivot( first, last );
+        emit beforePivotCreation();
+        P* pivot = new P( first, last );        
         pivots.push_back(pivot);
+        emit afterPivotCreation(*pivot->first, *pivot->last);
         return *pivot;    
     }
 
-    inline bool removePivot ( const Pivot& pivot )
+    inline bool removePivot ( const P& pivot )
     {
         PivotListIter iter = pivots.begin();
         for ( ; iter != pivots.end(); ++iter ) 
-            if ( (*iter) == &pivot ) {
-                delete *iter;
-                pivots.erase(iter);
+            if ( (*iter) == &pivot ) {  
+                removePivot(iter);
                 return true;
             }
         return false;    
     }
 
-    inline bool removeNode ( const Node& node )
+    inline bool removeNode ( const N& node )
     {
         NodeListIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
             if ( (*iter) == &node ) {
-                delete *iter;
-                nodes.erase(iter);
+                removeNode(iter);
                 return true;
             }            
         return false;    
     }
 
+    inline void loadState ( const Truss& t )
+    {
+        emit beforeStateLoaded();
+        copy(t);
+        emit afterStateLoaded();
+    }
 
-    /*
-    Truss ();
-    virtual ~Truss ();
+protected:
+    inline void removeNode ( NodeListIter& iter )
+    {
+        if ( iter == nodes.end() )
+            return;
+        Node* n = *iter;
+        emit beforeNodeRemoval(*n);
+        delete n;
+        nodes.erase(iter);
+        emit afterNodeRemoval();
+    }
 
-    virtual Node& createNode ();
-    virtual Pivot& createPivot ();
-    virtual Pivot& createPivot ( const Node& first, const Node& last );
-    
-    virtual bool removeNode ( const Node& );
-    virtual bool removePivot ( const Pivot& );
-    */
-    
+    inline void removePivot ( PivotListIter& iter )
+    {
+        if ( iter == pivots.end() )
+            return;
+        Pivot* p = *iter;
+        emit beforePivotRemoval(*p->first, *p->last);
+        delete p;
+        pivots.erase(iter);
+        emit afterPivotRemoval();
+    }
+
+
 
 private:
     NodeList  nodes;
@@ -90,47 +188,82 @@ private:
 
 
 
-template <class Node> class Pivot
+template <class N> class Pivot : public PivotEmitter
 {
     friend class Truss<class N, class P>;
+
 protected:
-    Pivot () : first(NULL), last(NULL) {}
-    Pivot ( const Node& first, const Node& last ) :  
+    Pivot () : first(0), last(0) {}
+    Pivot ( const N& first, const N& last ) :  
+       nodesDelegated(true),
        first(&first_),
-       last(&last_) {}
+       last(&last_) 
+    {}
+    Pivot ( const Pivot& p ) :
+       nodesDelegated(false),
+       first(new N(p.first)),
+       last(new N(p.last))
+    {}
+    virtual ~Pivot ()
+    {
+        if ( !nodesDelegated ) {
+            delete first;
+            delete last;
+        }
+    }
 
 public:
-    virtual void setFirstNode ( const Node& first_ ) 
-    { first = &first_; }
-    virtual const Node& getFirstNode () const
+    virtual const N& getFirstNode () const
     { return *first; }
-    virtual void setLastNode ( const Node& last_ )
-    { last = &last_; }
-    virtual const Node& getLastNode () const
+    virtual const N& getLastNode () const
     { return *last; }
 
+    virtual void loadState ( const Pivot& p )
+    {    
+        emit beforeStateLoaded();        
+        first->loadState(*p.first);
+        emit onFirstNodeChange(*p.first);        
+        last->loadState(*p.last);
+        emit onLastNodeChange(*p.last);
+        emit afterStateLoaded();
+    }
+
 private:
-    const Node *first, *last;
+    bool nodesDelegated;
+    N *first, *last;
 };
 
 
 
-class Node
+class Node : public QObject
 {
+    Q_OBJECT
     friend class Truss<class N, class P>;
+
 public:
-    typedef enum { FixationLack = 0,
-                   XFixation, 
-                   YFixation, 
-                   XYFixation } Fixation;
+    typedef enum { Unfixed = 0,
+                   FixationByX, 
+                   FixationByY, 
+                   FixationByXY } Fixation;
+
+signals:
+    void onFixationChange ( Fixation );
+    void onPositionChange ( int, int );
+
+    void beforeStateLoaded ();
+    void afterStateLoaded ();
+    
 protected:
     Node ();
     Node ( int x, int y );
     Node ( int x, int y, Fixation );
+    Node ( const Node& );
 
 public:
     virtual void setFixation ( Fixation );
     virtual Fixation getFixation () const;
+
+    virtual void loadState ( const Node& );
 
 private:
     int x, y;
