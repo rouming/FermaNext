@@ -139,8 +139,8 @@ InputPath=..\common\ObjectStateManager.h
 InputName=ObjectStateManager
 
 "$(ProjDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST $(ProjDir)\mocs mkdir $(ProjDir)\mocs 
-	%qtdir%\bin\moc.exe -o $(ProjDir)\mocs\moc_$(InputName).cpp $(InputDir)\$(InputName).h 
+	IF NOT EXIST "$(ProjDir)\mocs" mkdir "$(ProjDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(ProjDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
 	
 # End Custom Build
 
@@ -162,8 +162,8 @@ InputPath=..\common\StatefulObject.h
 InputName=StatefulObject
 
 "$(ProjDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST $(ProjDir)\mocs mkdir $(ProjDir)\mocs 
-	%qtdir%\bin\moc.exe -o $(ProjDir)\mocs\moc_$(InputName).cpp $(InputDir)\$(InputName).h 
+	IF NOT EXIST "$(ProjDir)\mocs" mkdir "$(ProjDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(ProjDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
 	
 # End Custom Build
 
@@ -185,8 +185,8 @@ InputPath=.\Truss.h
 InputName=Truss
 
 "$(ProjDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST $(ProjDir)\mocs mkdir $(ProjDir)\mocs 
-	%qtdir%\bin\moc.exe -o $(ProjDir)\mocs\moc_$(InputName).cpp $(InputDir)\$(InputName).h 
+	IF NOT EXIST "$(ProjDir)\mocs" mkdir "$(ProjDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(ProjDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
 	
 # End Custom Build
 
