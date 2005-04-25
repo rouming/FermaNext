@@ -133,7 +133,7 @@ SOURCE=..\common\ObjectStateManager.h
 !ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\temp\FermaNext\src\common
+InputDir=\ferma\Source\FermaNext\src\common
 ProjDir=.
 InputPath=..\common\ObjectStateManager.h
 InputName=ObjectStateManager
@@ -156,7 +156,7 @@ SOURCE=..\common\StatefulObject.h
 !ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\temp\FermaNext\src\common
+InputDir=\ferma\Source\FermaNext\src\common
 ProjDir=.
 InputPath=..\common\StatefulObject.h
 InputName=StatefulObject
@@ -173,6 +173,25 @@ InputName=StatefulObject
 # Begin Source File
 
 SOURCE=.\Truss.h
+
+!IF  "$(CFG)" == "TrussUnit - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+ProjDir=.
+InputPath=.\Truss.h
+InputName=Truss
+
+"$(ProjDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST $(ProjDir)\mocs mkdir $(ProjDir)\mocs 
+	%qtdir%\bin\moc.exe -o $(ProjDir)\mocs\moc_$(InputName).cpp $(InputDir)\$(InputName).h 
+	
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -193,6 +212,10 @@ SOURCE=.\mocs\moc_ObjectStateManager.cpp
 # Begin Source File
 
 SOURCE=.\mocs\moc_StatefulObject.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mocs\moc_Truss.cpp
 # End Source File
 # End Group
 # End Target
