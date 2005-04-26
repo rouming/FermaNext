@@ -152,11 +152,14 @@ void TrussUnit::paint ( agg::rendering_buffer& buffer ) const
 	double headW = getHeadlineWidth ();
 	pixfmt pixf(buffer);
 	base_renderer rb(pixf);
-	rb.copy_bar ( _x1, _y1, _x2, _y2, getBorderColor() );
-	rb.copy_bar ( _x1  + bordW, _y1 + headW, _x2 - bordW, _y2 - bordW, 
-			getCanvasColor() );
-	rb.copy_bar ( _x1 + bordW, _y1 + bordW, _x2 - bordW, _y1 + bordW + headW, 
-				getHeadlineColor() );
+	rb.copy_bar( (int)_x1, (int)_y1, (int)_x2, (int)_y2, 
+                     getBorderColor() );
+	rb.copy_bar( (int)(_x1  + bordW), (int)(_y1 + headW), 
+                     (int)(_x2 - bordW), (int)(_y2 - bordW),
+                     getCanvasColor() );
+	rb.copy_bar( (int)(_x1 + bordW), (int)(_y1 + bordW), 
+                     (int)(_x2 - bordW), (int)(_y1 + bordW + headW), 
+                     getHeadlineColor() );
 }
 
 /****************************************************************************/
