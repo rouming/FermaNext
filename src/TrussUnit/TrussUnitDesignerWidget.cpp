@@ -172,14 +172,14 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
 		double dx, dy;
 		dx = me->x() - clickX;
 		dy = flipY() ? height() - me->y() - clickY : me->y() - clickY;
-		X1 = selectedTruss->getX1() + dx;
-		Y1 = selectedTruss->getY1() + dy;
-		X2 = selectedTruss->getX2() + dx;
-		Y2 = selectedTruss->getY2() + dy;
+		X1 = (int)(selectedTruss->getX1() + dx);
+		Y1 = (int)(selectedTruss->getY1() + dy);
+		X2 = (int)(selectedTruss->getX2() + dx);
+		Y2 = (int)(selectedTruss->getY2() + dy);
 		selectedTruss->setPosition ( X1, Y1, X2, Y2 );
 		update();
-		clickX += dx;
-		clickY += dy;
+		clickX += (int)dx;
+		clickY += (int)dy;
 	}
 }
 

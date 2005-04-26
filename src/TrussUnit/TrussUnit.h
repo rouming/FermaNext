@@ -63,12 +63,17 @@ private:
 class TrussNode: public Node, public PaintableTrussElement
 {    
 public:
+    TrussNode ();
+    TrussNode ( const TrussNode& );
     void paint ( agg::rendering_buffer& ) const;
 };
 
 class TrussPivot : public Pivot<TrussNode>, public PaintableTrussElement
 {
 public:
+    TrussPivot ();
+    TrussPivot ( TrussNode&, TrussNode& );
+    TrussPivot ( const TrussPivot& );
     void paint ( agg::rendering_buffer& ) const;
 };
 
