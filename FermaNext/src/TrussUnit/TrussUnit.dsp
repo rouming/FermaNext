@@ -116,6 +116,10 @@ SOURCE=.\TrussUnit.cpp
 
 SOURCE=.\TrussUnitDesignerWidget.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\TrussUnitDesignerWindow.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -134,13 +138,12 @@ SOURCE=..\common\ObjectStateManager.h
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
 InputDir=\ferma\Source\FermaNext\src\common
-ProjDir=.
 InputPath=..\common\ObjectStateManager.h
 InputName=ObjectStateManager
 
-"$(ProjDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(ProjDir)\mocs" mkdir "$(ProjDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(ProjDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
 	
 # End Custom Build
 
@@ -157,13 +160,12 @@ SOURCE=..\common\StatefulObject.h
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
 InputDir=\ferma\Source\FermaNext\src\common
-ProjDir=.
 InputPath=..\common\StatefulObject.h
 InputName=StatefulObject
 
-"$(ProjDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(ProjDir)\mocs" mkdir "$(ProjDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(ProjDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
 	
 # End Custom Build
 
@@ -180,13 +182,12 @@ SOURCE=.\Truss.h
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
 InputDir=.
-ProjDir=.
 InputPath=.\Truss.h
 InputName=Truss
 
-"$(ProjDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(ProjDir)\mocs" mkdir "$(ProjDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(ProjDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
 	
 # End Custom Build
 
@@ -201,21 +202,47 @@ SOURCE=.\TrussUnit.h
 
 SOURCE=.\TrussUnitDesignerWidget.h
 # End Source File
+# Begin Source File
+
+SOURCE=.\TrussUnitDesignerWindow.h
+
+!IF  "$(CFG)" == "TrussUnit - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\TrussUnitDesignerWindow.h
+InputName=TrussUnitDesignerWindow
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # End Group
 # Begin Group "Moc Files"
 
 # PROP Default_Filter "cpp"
 # Begin Source File
 
-SOURCE=.\mocs\moc_ObjectStateManager.cpp
+SOURCE=..\common\mocs\moc_ObjectStateManager.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\mocs\moc_StatefulObject.cpp
+SOURCE=..\common\mocs\moc_StatefulObject.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\mocs\moc_Truss.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mocs\moc_TrussUnitDesignerWindow.cpp
 # End Source File
 # End Group
 # End Target
