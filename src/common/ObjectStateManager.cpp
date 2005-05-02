@@ -4,6 +4,9 @@
 
 #include <algorithm>
 
+/*****************************************************************************
+ * Object State Manager
+ *****************************************************************************/
 
 ObjectStateManager::ObjectStateManager () :    
     currentState(0)
@@ -76,3 +79,5 @@ void ObjectStateManager::redo () throw (UnknownException, RedoException)
     currentState = *iter;
     currentState->submitState();
 }
+
+/*****************************************************************************/

@@ -11,8 +11,8 @@ class TrussUnitDesignerWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    TrussUnitDesignerWindow ( const QString& name );
-
+    TrussUnitDesignerWindow ( const QString& caption, QWidget* p = 0, 
+                              const char* n = 0, WFlags f =WType_TopLevel );
 
 private:
     QVBoxLayout vbox;

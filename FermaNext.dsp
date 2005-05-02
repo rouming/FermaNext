@@ -70,7 +70,7 @@ LINK32=link.exe
 # ADD BASE F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /Od /I "src" /I "src\common" /I "src\TrussUnit" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /GZ -Zm200 /c
+# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /Od /I "src" /I "src\common" /I "src\TrussUnit" /I "src\gui" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /GZ -Zm200 /c
 # ADD BASE RSC /l 0x419 /d "_DEBUG"
 # ADD RSC /l 0x419 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -96,16 +96,46 @@ SOURCE=.\src\FermaNext.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\gui\FermaNextMainFrame.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\common\FermaNextProject.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\src\common\FermaNextWorkspace.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\src\gui\ProjectToolBox.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
+# Begin Source File
+
+SOURCE=.\src\gui\FermaNextMainFrame.h
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.\src\gui
+InputPath=.\src\gui\FermaNextMainFrame.h
+InputName=FermaNextMainFrame
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # Begin Source File
 
 SOURCE=.\src\common\FermaNextProject.h
@@ -150,6 +180,28 @@ InputName=FermaNextWorkspace
 !ENDIF 
 
 # End Source File
+# Begin Source File
+
+SOURCE=.\src\gui\ProjectToolBox.h
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.\src\gui
+InputPath=.\src\gui\ProjectToolBox.h
+InputName=ProjectToolBox
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # End Group
 # Begin Group "Resource Files"
 
@@ -160,11 +212,19 @@ InputName=FermaNextWorkspace
 # PROP Default_Filter "cpp"
 # Begin Source File
 
+SOURCE=.\src\gui\mocs\moc_FermaNextMainFrame.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\common\mocs\moc_FermaNextProject.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\src\common\mocs\moc_FermaNextWorkspace.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\gui\mocs\moc_ProjectToolBox.cpp
 # End Source File
 # End Group
 # End Target

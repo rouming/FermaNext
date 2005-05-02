@@ -1,14 +1,19 @@
 
 #include <qapplication.h>
-#include "TrussUnit.h"
-#include "TrussUnitDesignerWindow.h"
+#include "FermaNextMainFrame.h"
+
+/*****************************************************************************
+ * Main 
+ *****************************************************************************/
 
 int main ( int argc, char* argv[] )
 {
     QApplication app(argc, argv);
-    TrussUnitDesignerWindow w("FFF");        
-    w.resize( 800, 600 );    
-    w.show();
-    app.setMainWidget(&w);    
+    FermaNextMainFrame ferma; 
+    ferma.showMaximized();
+    app.setMainWidget(&ferma);   
     return app.exec();
 }
+
+/*****************************************************************************/
+

@@ -10,7 +10,7 @@ class TrussUnitDesignerWidget : public AggQWidget
 public:
     typedef std::vector<TrussUnit*>  TrussUnitList;
 
-    TrussUnitDesignerWidget ();
+    TrussUnitDesignerWidget ( QWidget* parent = 0 );
     virtual TrussUnit& createTrussUnit ();
     virtual bool removeTrussUnit ( const TrussUnit& );
 	virtual TrussUnit* whoIsInRect ( double x, double y );
