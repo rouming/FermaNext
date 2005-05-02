@@ -64,7 +64,8 @@ TrussUnit* selectedTruss;
  * Truss Designer Widget
  *****************************************************************************/
 
-TrussUnitDesignerWidget::TrussUnitDesignerWidget ()
+TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
+    AggQWidget(p)
 {}
 
 TrussUnit& TrussUnitDesignerWidget::createTrussUnit ()
