@@ -12,7 +12,9 @@ TrussNode::TrussNode ( const TrussNode& n ) :
     Node(n)
 {}
 
-void TrussNode::paint ( agg::rendering_buffer& buffer ) const
+void TrussNode::paint ( base_renderer& baseRend, solid_renderer& solidRen, 
+                 agg::rasterizer_scanline_aa<>& ras, agg::scanline_p8& sl, 
+                 agg::ellipse& ell ) const
 {
     // implementation goes here!
 }

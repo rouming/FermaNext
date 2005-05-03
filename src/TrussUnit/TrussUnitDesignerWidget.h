@@ -8,13 +8,18 @@
 class TrussUnitDesignerWidget : public AggQWidget
 {
 public:
+    bool init; //temp
     typedef std::vector<TrussUnit*>  TrussUnitList;
 
     TrussUnitDesignerWidget ( QWidget* parent = 0 );
     virtual TrussUnit& createTrussUnit ();
     virtual bool removeTrussUnit ( const TrussUnit& );
-	virtual TrussUnit* whoIsInRect ( double x, double y );
-	virtual void initTruss();
+    virtual bool isHorResize ( int x, int y );
+    virtual bool isVerResize ( int x, int y );
+    virtual bool isBDiagResize ( int x, int y );
+    virtual bool isFDiagResize ( int x, int y );
+    virtual TrussUnit* whoIsInRect ( int x, int y );
+	virtual void initTruss(); //temp
 	virtual void onDraw();
 
     // Handlers on events
@@ -27,7 +32,12 @@ public:
     void aggCtrlChangedEvent ( const agg::ctrl* );
 
 private:
-    TrussUnitList trussUnits;    
+    TrussUnitList trussUnits;
+    TrussUnit* selectedTruss;
+    enum winBehaviours { nothing = 0, onDrag, onHorResize, onVerResize, 
+        onBDiagResize, onFDiagResize };
+    int behaviour;
+    int clickX, clickY;
 };
 
 #endif //TRUSSDESIGNERWIDGET_H

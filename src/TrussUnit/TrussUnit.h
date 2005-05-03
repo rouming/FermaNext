@@ -4,13 +4,27 @@
 
 #include "Truss.h"
 #include <vector>
-#include <agg_rendering_buffer.h>
-#include "agg_pixfmt_rgb.h"
-#include "agg_renderer_base.h"
+#include <qpoint.h> 
 
-typedef agg::pixfmt_bgr24 pixfmt;
+#include "agg_basics.h"
+#include "agg_rendering_buffer.h"
+#include "agg_rasterizer_scanline_aa.h"
+#include "agg_scanline_p.h"
+#include "agg_renderer_scanline.h"
+#include "agg_pixfmt_rgb.h"
+#include "agg_gamma_lut.h"
+#include "agg_ellipse.h"
+#include "agg_rounded_rect.h"
+#include "agg_conv_stroke.h"
+#include "agg_span_gradient.h"
+#include "agg_span_interpolator_linear.h"
+typedef agg::rasterizer_scanline_aa<>                scanline_rasterizer;
+typedef agg::gamma_lut<agg::int8u, agg::int8u, 8, 8> gamma_lut_type;
+typedef agg::pixfmt_rgb24_gamma<gamma_lut_type> pixfmt;
 typedef pixfmt::color_type color_type;
 typedef agg::renderer_base<pixfmt> base_renderer;
+typedef agg::renderer_scanline_aa_solid<base_renderer>  solid_renderer;
+typedef agg::renderer_scanline_bin_solid<base_renderer> draft_renderer;
 
 class TrussNode;
 class TrussPivot;
@@ -24,10 +38,12 @@ public:
     virtual void setEnabled ( bool );
     virtual bool isVisible () const;
     virtual bool isEnabled () const;
-    virtual void paint ( agg::rendering_buffer& ) const = 0;
+    virtual void paint ( base_renderer& baseRend, solid_renderer& solidRen, 
+                 agg::rasterizer_scanline_aa<>& ras, agg::scanline_p8& sl, 
+                 agg::ellipse& ell ) const = 0;
 private:
     bool visible;
-    bool enabled;    
+    bool enabled; 
 };
 
 class TrussUnit : public Truss<TrussNode, TrussPivot>, 
@@ -36,28 +52,41 @@ class TrussUnit : public Truss<TrussNode, TrussPivot>,
 public:
     TrussUnit ();
     virtual ~TrussUnit ();
-	void setPosition ( double x1, double y1, double x2, double y2 );
-	double getX1 () const;
-	double getY1 () const;
-	double getX2 () const;
-	double getY2 () const;
-	double getHeadlineWidth () const;
-	double getBorderWidth () const;
-	bool inCanvasRect( double x, double y);
-	bool inHeadlineRect( double x, double y);
-	void setHeadlineWidth ( double width);
-	void setBorderWidth ( double width);
-	void setCanvasColor ( int r, int g, int b );
-	void setHeadlineColor ( int r, int g, int b );
-	void setBorderColor ( int r, int g, int b );
+    void setPosition ( QPoint point1, QPoint point2 );
+    QPoint getPoint1 () const;
+    QPoint getPoint2 () const;
+	int getHeadlineWidth () const;
+	int getBorderWidth () const;
+    int getMinResizeVal () const;
+    bool inWindowRect ( int x, int y );
+	bool inCanvasRect ( int  x, int  y );
+	bool inHeadlineRect ( int  x, int  y );
+    bool inHorResizeRect ( int x, int y );
+    bool inVerResizeRect ( int x, int y );
+    bool inBDiagResizeRect ( int x, int y );
+    bool inFDiagResizeRect ( int x, int y );
 	color_type getCanvasColor () const;
 	color_type getHeadlineColor () const;
 	color_type getBorderColor () const;
-    void paint ( agg::rendering_buffer& ) const;
+	void setHeadlineWidth ( int  width );
+	void setBorderWidth ( int  width );
+    void setMinResizeVal ( int value );
+	void setCanvasColor ( int r, int g, int b );
+	void setHeadlineColor ( int r, int g, int b );
+	void setBorderColor ( int r, int g, int b );
+    void setResEllRad ( int radius );
+    void setWinRoundRad ( int radius );
+    void setResEllColor ( int r, int g, int b );
+//    void setResEllHighlight ( bool );
+//    void setHighlightPos ( int x, int y );
+    void paint ( base_renderer& baseRend, solid_renderer& solidRen, 
+                 agg::rasterizer_scanline_aa<>& ras, agg::scanline_p8& sl, 
+                 agg::ellipse& ell ) const;
 private:
-	double _x1, _x2, _y1, _y2;
-	double headWidth, borderWidth;
-	color_type canvColor, headColor, borderColor;
+	int  headWidth, borderWidth, resEllRad, winRoundRad, minResizeVal;
+//    bool resEllHighlight;
+    QPoint _point1, _point2;//, highlightPoint;
+	color_type canvColor, headColor, borderColor, resEllColor;
 };
 
 class TrussNode: public Node, public PaintableTrussElement
@@ -65,7 +94,9 @@ class TrussNode: public Node, public PaintableTrussElement
 public:
     TrussNode ();
     TrussNode ( const TrussNode& );
-    void paint ( agg::rendering_buffer& ) const;
+    void paint ( base_renderer& baseRend, solid_renderer& solidRen, 
+                 agg::rasterizer_scanline_aa<>& ras, agg::scanline_p8& sl, 
+                 agg::ellipse& ell ) const;
 };
 
 class TrussPivot : public Pivot<TrussNode>, public PaintableTrussElement
@@ -74,8 +105,9 @@ public:
     TrussPivot ();
     TrussPivot ( TrussNode&, TrussNode& );
     TrussPivot ( const TrussPivot& );
-    void paint ( agg::rendering_buffer& ) const;
+    void paint ( base_renderer& baseRend, solid_renderer& solidRen, 
+                 agg::rasterizer_scanline_aa<>& ras, agg::scanline_p8& sl, 
+                 agg::ellipse& ell ) const;
 };
-
 
 #endif //TRUSSUNIT_H

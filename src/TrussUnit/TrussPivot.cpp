@@ -16,7 +16,9 @@ TrussPivot::TrussPivot ( const TrussPivot& p ) :
     Pivot<TrussNode>(p)
 {}
 
-void TrussPivot::paint ( agg::rendering_buffer& buffer ) const
+void TrussPivot::paint ( base_renderer& baseRend, solid_renderer& solidRen, 
+                 agg::rasterizer_scanline_aa<>& ras, agg::scanline_p8& sl, 
+                 agg::ellipse& ell ) const
 {
     // implementation goes here!
 }
