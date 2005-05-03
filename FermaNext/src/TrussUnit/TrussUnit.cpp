@@ -42,72 +42,127 @@ bool PaintableTrussElement::isEnabled () const
  *****************************************************************************/
 
 TrussUnit::TrussUnit ()
-{}
+{
+//    resEllHighlight = false;
+}
 
 TrussUnit::~TrussUnit ()
 {}
 
-void TrussUnit::setPosition ( double x1, double y1, double x2, double y2 )
+void TrussUnit::setPosition ( QPoint point1, QPoint point2 )
 {
-	_x1 = x1;
-	_y1 = y1;
-	_x2 = x2;
-	_y2 = y2;
+    _point1 = point1;
+    _point2 = point2;
 }
 
-double TrussUnit::getX1 () const
+QPoint TrussUnit::getPoint1 () const
 {
-	return _x1;
+    return _point1;
 }
 
-double TrussUnit::getY1 () const
+QPoint TrussUnit::getPoint2 () const
 {
-	return _y1;
+    return _point2;
 }
 
-double TrussUnit::getX2 () const
-{
-	return _x2;
-}
-
-double TrussUnit::getY2 () const
-{
-	return _y2;
-}
-
-double TrussUnit::getHeadlineWidth () const
+int TrussUnit::getHeadlineWidth () const
 {
 	return headWidth;
 }
 
-double TrussUnit::getBorderWidth () const
+int TrussUnit::getBorderWidth () const
 {
 	return borderWidth;
 }
 
-void TrussUnit::setHeadlineWidth ( double width )
+int TrussUnit::getMinResizeVal () const
 {
-	headWidth = width;
+    return minResizeVal;
 }
 
-void TrussUnit::setBorderWidth ( double width )
+bool TrussUnit::inWindowRect ( int x, int y )
 {
-	borderWidth = width;
+	if ( x >= _point1.x() && x <= _point2.x() && y >= _point1.y() && y <= _point2.y() )
+	{
+		return true;
+	}
+	return false;
 }
 
-void TrussUnit::setCanvasColor ( int r, int g, int b )
+bool TrussUnit::inCanvasRect ( int x, int y )
 {
-	canvColor = agg::rgba(r, g, b);
+	int bordW = getBorderWidth ();
+	int headW = getHeadlineWidth ();
+    if ( x >= _point1.x() + bordW && x <= _point2.x() - bordW && 
+        y >= _point1.y() + bordW + headW && y <= _point2.y() - bordW )
+	{
+		return true;
+	}
+	return false;
 }
 
-void TrussUnit::setHeadlineColor ( int r, int g, int b )
+bool TrussUnit::inHeadlineRect ( int x, int y )
 {
-	headColor = agg::rgba(r, g, b);
+	int bordW = getBorderWidth ();
+	int headW = getHeadlineWidth ();
+	if ( x >= _point1.x() + bordW && x <= _point2.x() - bordW && y >= 
+		_point1.y() + bordW && y <= _point1.y() + bordW + headW)
+	{
+		return true;
+	}
+	return false;
 }
 
-void TrussUnit::setBorderColor ( int r, int g, int b )
+bool TrussUnit::inHorResizeRect ( int x, int y )
 {
-	borderColor = agg::rgba(r, g, b);
+    int bordW = getBorderWidth ();
+    if ( x >= _point1.x() && x <= _point1.x() + bordW && 
+        y >= _point1.y() + winRoundRad && y <= _point2.y() - winRoundRad ||
+        x >= _point2.x() - bordW && x <= _point2.x() && 
+        y >= _point1.y() + winRoundRad && y <= _point2.y() - winRoundRad )
+    {
+        return true;
+    }
+    return false;
+}
+
+bool TrussUnit::inVerResizeRect ( int x, int y )
+{
+    int bordW = getBorderWidth ();
+    if ( x >= _point1.x() + winRoundRad && x <= _point2.x() - winRoundRad && 
+        y >= _point1.y() && y <= _point1.y() + bordW ||
+        x >= _point1.x() + winRoundRad && x <= _point2.x() - winRoundRad && 
+        y >= _point2.y() - bordW && y <= _point2.y() )
+    {
+        return true;
+    }
+    return false;
+}
+
+bool TrussUnit::inBDiagResizeRect ( int x, int y )
+{
+    int bordW = getBorderWidth ();
+    if ( sqrt( (x - (_point2.x() - bordW)) * (x - (_point2.x() - bordW)) +
+        (y - (_point1.y() + bordW)) * (y - (_point1.y() + bordW)) ) <= resEllRad + 2 ||
+        sqrt( (x - (_point1.x() + bordW)) * (x - (_point1.x() + bordW)) +
+        (y - (_point2.y() - bordW)) * (y - (_point2.y() - bordW)) ) <= resEllRad + 2 )
+    {
+        return true;
+    }
+    return false;
+}
+
+bool TrussUnit::inFDiagResizeRect ( int x, int y )
+{
+    int bordW = getBorderWidth ();
+    if ( sqrt( (x - (_point1.x() + bordW)) * (x - (_point1.x() + bordW)) +
+        (y - (_point1.y() + bordW)) * (y - (_point1.y() + bordW)) ) <= resEllRad + 2 ||
+        sqrt( (x - (_point2.x() - bordW)) * (x - (_point2.x() - bordW)) +
+        (y - (_point2.y() - bordW)) * (y - (_point2.y() - bordW)) ) <= resEllRad + 2 )
+    {
+        return true;
+    }
+    return false;
 }
 
 color_type TrussUnit::getCanvasColor () const
@@ -125,41 +180,110 @@ color_type TrussUnit::getBorderColor () const
 	return borderColor;
 }
 
-bool TrussUnit::inCanvasRect ( double x, double y )
+void TrussUnit::setHeadlineWidth ( int width )
 {
-	if ( x >= _x1 && x <= _x2 && y >= _y1 && y <= _y2 )
-	{
-		return true;
-	}
-	return false;
+	headWidth = width;
 }
 
-bool TrussUnit::inHeadlineRect ( double x, double y )
+void TrussUnit::setBorderWidth ( int width )
 {
-	double bordW = getBorderWidth ();
-	double headW = getHeadlineWidth ();
-	if ( x >= _x1 + bordW && x <= _x2 - bordW && y >= 
-		_y1 + bordW && y <= _y1 - bordW + headW)
-	{
-		return true;
-	}
-	return false;
+	borderWidth = width;
 }
 
-void TrussUnit::paint ( agg::rendering_buffer& buffer ) const
+void TrussUnit::setResEllRad ( int radius )
 {
-	double bordW = getBorderWidth ();
-	double headW = getHeadlineWidth ();
-	pixfmt pixf(buffer);
-	base_renderer rb(pixf);
-	rb.copy_bar( (int)_x1, (int)_y1, (int)_x2, (int)_y2, 
-                     getBorderColor() );
-	rb.copy_bar( (int)(_x1  + bordW), (int)(_y1 + headW), 
-                     (int)(_x2 - bordW), (int)(_y2 - bordW),
-                     getCanvasColor() );
-	rb.copy_bar( (int)(_x1 + bordW), (int)(_y1 + bordW), 
-                     (int)(_x2 - bordW), (int)(_y1 + bordW + headW), 
-                     getHeadlineColor() );
+    resEllRad = radius;
+}
+
+void TrussUnit::setWinRoundRad ( int radius )
+{
+    winRoundRad = radius;
+}
+
+void TrussUnit::setMinResizeVal ( int value )
+{
+    minResizeVal = value;
+}
+
+void TrussUnit::setCanvasColor ( int r, int g, int b )
+{
+	canvColor = agg::rgba(r, g, b);
+}
+
+void TrussUnit::setHeadlineColor ( int r, int g, int b )
+{
+	headColor = agg::rgba(r, g, b);
+}
+
+void TrussUnit::setBorderColor ( int r, int g, int b )
+{
+	borderColor = agg::rgba(r, g, b);
+}
+
+void TrussUnit::setResEllColor ( int r , int g, int b )
+{
+    resEllColor = agg::rgba(r, g, b);
+}
+/*
+void TrussUnit::setResEllHighlight ( bool h )
+{
+    resEllHighlight = h;
+}
+
+void TrussUnit::setHighlightPos ( int x, int y )
+{
+    highlightPoint.setX ( x );
+    highlightPoint.setY ( y );
+}
+*/
+void TrussUnit::paint ( base_renderer& baseRend, solid_renderer& solidRen, 
+                 agg::rasterizer_scanline_aa<>& ras, agg::scanline_p8& sl, 
+                 agg::ellipse& ell ) const
+{
+	int bordW = getBorderWidth ();
+	int headW = getHeadlineWidth ();
+
+    solidRen.color ( resEllColor );
+    ell.init ( _point1.x() + bordW, _point1.y() + bordW, resEllRad, resEllRad, 16 );
+    ras.add_path ( ell );
+    ell.init ( _point2.x() - bordW, _point1.y() + bordW, resEllRad, resEllRad, 16 );
+    ras.add_path ( ell );
+    ell.init ( _point1.x() + bordW, _point2.y() - bordW, resEllRad, resEllRad, 16 );
+    ras.add_path ( ell );
+    agg::render_scanlines ( ras, sl, solidRen );
+    ell.init ( _point2.x() - bordW, _point2.y() - bordW, resEllRad, resEllRad, 16 );
+    ras.add_path(ell);
+    agg::render_scanlines ( ras, sl, solidRen );
+    agg::rounded_rect border ( _point1.x(), _point1.y(), 
+                              _point2.x(), _point2.y(), winRoundRad );
+    border.normalize_radius();
+    solidRen.color ( agg::rgba8(255,255,255) );
+    agg::conv_stroke<agg::rounded_rect> stroke(border);
+    stroke.width(1.0);
+    ras.add_path ( stroke );
+    agg::render_scanlines(ras, sl, solidRen);
+    ras.add_path ( border );
+    solidRen.color ( borderColor );
+    agg::render_scanlines(ras, sl, solidRen);
+    agg::rounded_rect canvas ( _point1.x()  + bordW, _point1.y() + bordW + headW, 
+        _point2.x() - bordW, _point2.y() - bordW - headW/2, winRoundRad/3 );
+    ras.add_path ( canvas );
+    solidRen.color ( canvColor );
+    agg::render_scanlines(ras, sl, solidRen);
+    agg::rounded_rect headline ( _point1.x()  + 3*bordW, _point1.y() + bordW, 
+        _point2.x() - 3*bordW, _point1.y() + headW, winRoundRad/2 );
+    ras.add_path ( headline );
+    solidRen.color ( headColor );
+    agg::render_scanlines(ras, sl, solidRen);
+/*
+    if ( resEllHighlight )
+    {
+        ell.init ( highlightPoint.x(), highlightPoint.y(), resEllRad, resEllRad, 16 );
+        ras.add_path(ell);
+        solidRen.color ( agg::rgba8(155,255,155,80)  );
+        agg::render_scanlines ( ras, sl, solidRen );
+    }
+*/
 }
 
 /****************************************************************************/
