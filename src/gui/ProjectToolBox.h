@@ -68,8 +68,8 @@ private:
     typedef QMap<FermaNextProject*, QWidget*> ProjectMap;
     typedef QMap<FermaNextProject*, QWidget*>::iterator ProjectMapIter;
 
-    ProjectRemover* lastRemover;
     ProjectMap projects;
+    ProjectRemover* lastRemover;
     FermaNextProject* currentPrj;
     FermaNextWorkspace& workspace;
 };

@@ -35,6 +35,8 @@ private:
     
     FermaNextProject ( const QString& name, QWorkspace* qWsp = 0 );
 
+
+private:
     QString name;
     ObjectStateManager stateManager;
 
@@ -43,7 +45,8 @@ private:
     // Nobody should call getWindow after deletion has happened.
     TrussUnitDesignerWindow* designerWindow;
 
-    // If Qt has already destroyed designer window it should not be destroyed twice.
+    // If Qt has already destroyed designer window it should not be
+    // destroyed twice.
     bool windowIsAlreadyDestroyed;
 };
 

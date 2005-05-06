@@ -3,14 +3,14 @@
 
 #include <qworkspace.h>
 
-FermaNextWorkspace* FermaNextWorkspace::instance = 0;
-QMutex FermaNextWorkspace::mutex;
-
 const QString untitledName( QObject::tr("Unnamed workspace") );
 
 /*****************************************************************************
  * FermaNext Workspace
  *****************************************************************************/
+
+FermaNextWorkspace* FermaNextWorkspace::instance = 0;
+QMutex FermaNextWorkspace::mutex;
 
 FermaNextWorkspace::FermaNextWorkspace () :
     name(untitledName),
