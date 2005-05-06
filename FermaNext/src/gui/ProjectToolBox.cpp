@@ -34,12 +34,12 @@ FermaNextProject& ProjectRemover::getProjectToRemove ()
  * Project ToolBox
  *****************************************************************************/
 
-ProjectToolBox::ProjectToolBox ( FermaNextWorkspace& ws, 
-                                 QWidget* parent, const char* name, WFlags f ) :
+ProjectToolBox::ProjectToolBox ( FermaNextWorkspace& ws, QWidget* parent, 
+                                 const char* name, WFlags f ) :
     QToolBox(parent, name, f),
-    workspace(ws),
+    lastRemover(0),
     currentPrj(0),
-    lastRemover(0)
+    workspace(ws)
 {    
     // Fill in toolbox by existent projects
     if ( workspace.countProjects() ) {
@@ -244,7 +244,6 @@ void ProjectToolBox::activateSelected ( int index )
     QWidget* page = currentItem();
     QValueList<FermaNextProject*> keys = projects.keys();
     QValueList<FermaNextProject*>::iterator i = keys.begin();
-    FermaNextProject* prj = 0;
     for ( ; i != keys.end(); ++i ) {
         if ( page == projects[*i] ) 
             (*i)->getWindow().show();

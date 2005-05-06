@@ -8,8 +8,8 @@
  *****************************************************************************/
 
 FermaNextProject::FermaNextProject ( const QString& name_, QWorkspace* qWsp ) :
-    designerWindow( new TrussUnitDesignerWindow(name_, qWsp, name_, 0) ),
     name(name_),
+    designerWindow( new TrussUnitDesignerWindow(name_, qWsp, name_, 0) ),
     windowIsAlreadyDestroyed(false)
 {
     connect( designerWindow, SIGNAL(destroyed()), SLOT(markWindowDestroyed()) );

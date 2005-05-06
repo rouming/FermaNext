@@ -50,9 +50,9 @@ signals:
 private:
     static FermaNextWorkspace* instance;
     static QMutex mutex;
+    QString name;
     QWorkspace* qWsp;
     ProjectList projects;    
-    QString name;
 };
 
 #endif //FERMANEXTWORKSPACE_H
