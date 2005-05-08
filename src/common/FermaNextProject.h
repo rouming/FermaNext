@@ -21,7 +21,7 @@ public:
     virtual const QString& getName () const;
     virtual void setName ( const QString& );
 
-    virtual TrussUnitDesignerWindow& getWindow ();
+    virtual void activate ( bool );    
     virtual ObjectStateManager& getStateManager ();    
 
 signals:
@@ -29,14 +29,16 @@ signals:
 
 private slots:
     void markWindowDestroyed ();
-
+    
 private:
     friend class FermaNextWorkspace;
     
+    bool eventFilter( QObject* o, QEvent* e );
     FermaNextProject ( const QString& name, QWorkspace* qWsp = 0 );
 
 
 private:
+    bool maximizedDesginerWindow;
     QString name;
     ObjectStateManager stateManager;
 

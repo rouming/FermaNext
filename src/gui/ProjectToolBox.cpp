@@ -7,6 +7,7 @@
 #include <qlistview.h>
 #include <qheader.h>
 #include <qmessagebox.h>
+#include <qiconset.h>
 
 /*****************************************************************************
  * Project Remover
@@ -34,6 +35,8 @@ FermaNextProject& ProjectRemover::getProjectToRemove ()
  * Project ToolBox
  *****************************************************************************/
 
+const QString imagesPath( "images");
+
 ProjectToolBox::ProjectToolBox ( FermaNextWorkspace& ws, QWidget* parent, 
                                  const char* name, WFlags f ) :
     QToolBox(parent, name, f),
@@ -60,13 +63,15 @@ ProjectToolBox::ProjectToolBox ( FermaNextWorkspace& ws, QWidget* parent,
 int ProjectToolBox::addProject ( FermaNextProject& prj )
 {
     if ( currentPrj != 0 )
-        currentPrj->getWindow().hide();
+        currentPrj->activate(false);
     currentPrj = &prj;
     QWidget* page = createSubsidiaryWidget(prj);
     projects[&prj] = page;
-    int result = addItem( page, prj.getName() );
+
+    QIconSet iconSet( QPixmap::fromMimeSource( imagesPath + "/project_toolbox.png" ) );
+    int result = addItem( page, iconSet, prj.getName() );
     setCurrentItem(page);
-    prj.getWindow().showMaximized();
+    prj.activate(true);
     return result;
 }
 
@@ -245,11 +250,17 @@ void ProjectToolBox::activateSelected ( int index )
     QValueList<FermaNextProject*> keys = projects.keys();
     QValueList<FermaNextProject*>::iterator i = keys.begin();
     for ( ; i != keys.end(); ++i ) {
-        if ( page == projects[*i] ) 
-            (*i)->getWindow().show();
-        else                     
-            (*i)->getWindow().hide();
-    }    
+        if ( page == projects[*i] )             
+            (*i)->activate(true);        
+        else
+            (*i)->activate(false);
+    }
+
+    QIconSet activeIconSet( QPixmap::fromMimeSource( imagesPath + "/project_toolbox.png" ) );
+    QIconSet disablesIconSet( QPixmap::fromMimeSource( imagesPath + "/project_d.png" ) );
+    for ( int ind = 0; ind < count(); ++ind )
+        setItemIconSet ( ind, disablesIconSet );
+    setItemIconSet ( index, activeIconSet );        
 }
 
 void ProjectToolBox::clear ()
