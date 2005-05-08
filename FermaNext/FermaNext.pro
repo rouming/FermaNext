@@ -1,5 +1,4 @@
 
-DESTDIR = build
 TARGET = FermaNext
 
 CONFIG += qt warn_on thread debug
