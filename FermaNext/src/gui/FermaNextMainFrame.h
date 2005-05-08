@@ -21,6 +21,43 @@ public slots:
     void someProjectCreated ();
 
     void createProject ();
+    
+protected:
+    void init ();
+    void setupFileActions ();
+    void setupEditActions();
+    void setupProjectActions();
+    void setupWindowActions();
+    void setupHelpActions();
+
+protected slots:
+    void fileNew ();
+    void fileOpen ();
+    void fileSave ();
+    void fileSaveAs ();
+    void fileClose ();
+    void fileOpenWsp ();
+    void fileSaveWsp ();
+    void fileSaveWspAs ();
+    void fileCloseWsp ();
+    void fileSaveAll ();
+    void filePageSetup ();
+    void filePrintPreview ();
+    void filePrint ();
+    void fileRecentPrjs ();
+    void fileRecentWsps ();
+    void fileExit ();
+
+    void editUndo ();
+    void editRedo ();
+    void editCopy ();
+    void editPaste ();
+    void editCut ();
+    void editDelete ();
+    void editSelectAll ();
+
+    void helpContents ();
+    void helpAbout ();
 
 private:    
     QWorkspace* workspaceWidget;
