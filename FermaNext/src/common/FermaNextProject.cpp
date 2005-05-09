@@ -17,7 +17,21 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWorkspace* qWsp ) :
 {
     designerWindow->setIcon( QPixmap::fromMimeSource( imagesPath + "/project.png" ) );
     designerWindow->installEventFilter(this);
+
+    // Should be connected to avoid double deletion.
     connect( designerWindow, SIGNAL(destroyed()), SLOT(markWindowDestroyed()) );
+
+    // Catch trusses creation or deletion.
+    connect( &trussManager, SIGNAL(onTrussUnitCreate(TrussUnit&)), 
+             designerWindow, SLOT(addTrussUnit(TrussUnit&)) );
+    connect( &trussManager, SIGNAL(onTrussUnitRemove(TrussUnit&)), 
+             designerWindow, SLOT(removeTrussUnit(TrussUnit&)) );    
+
+    //TODO: remove this block in future
+	for( uint i = 0; i <3; i++)
+	{
+        trussManager.createTrussUnit().setTrussName ( "Truss unit" );
+	}
 }
 
 FermaNextProject::~FermaNextProject ()

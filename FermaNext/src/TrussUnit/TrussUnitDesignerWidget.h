@@ -5,15 +5,17 @@
 #include "AggQWidget.h"
 #include "TrussUnit.h"
 
+typedef std::vector<TrussUnit*>  TrussUnitList;
+typedef std::vector<TrussUnit*>::iterator  TrussUnitListIter;
+
 class TrussUnitDesignerWidget : public AggQWidget
 {
+    Q_OBJECT
 public:
-    bool init; //temp
-    typedef std::vector<TrussUnit*>  TrussUnitList;
+    bool init; //temp    
 
     TrussUnitDesignerWidget ( QWidget* parent = 0 );
-    virtual TrussUnit& createTrussUnit ();
-    virtual bool removeTrussUnit ( const TrussUnit& );
+    
     virtual bool isHorResize ( int x, int y );
     virtual bool isVerResize ( int x, int y );
     virtual bool isBDiagResize ( int x, int y );
@@ -30,6 +32,10 @@ public:
     void aggMouseReleaseEvent ( QMouseEvent* );
     void aggMousePressEvent ( QMouseEvent* );
     void aggCtrlChangedEvent ( const agg::ctrl* );
+
+public slots:
+    virtual void addTrussUnit ( TrussUnit& );
+    virtual bool removeTrussUnit ( const TrussUnit& );
 
 private:
     TrussUnitList trussUnits;

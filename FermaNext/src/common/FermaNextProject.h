@@ -7,6 +7,7 @@
 #include <qmainwindow.h>
 
 #include "TrussUnitDesignerWindow.h"
+#include "TrussUnitManager.h"
 #include "ObjectStateManager.h"
 
 class FermaNextWorkspace;
@@ -41,6 +42,7 @@ private:
     bool maximizedDesginerWindow;
     QString name;
     ObjectStateManager stateManager;
+    TrussUnitManager trussManager;
 
     // We own this object by pointer, because it should be destroyed
     // by Qt deletion mechanism when all the application closes.
