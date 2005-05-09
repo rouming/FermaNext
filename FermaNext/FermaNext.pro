@@ -1,10 +1,10 @@
 
 TARGET = FermaNext
 
-CONFIG += qt warn_on thread debug
+CONFIG += qt warn_on thread release
 
 MOC_DIR = mocs
-OBJECTS_DIR = Debug
+OBJECTS_DIR = obj
 
 win32 {
   LIBS = LibAgg.lib
@@ -31,6 +31,7 @@ SOURCES = src/FermaNext.cpp \
           src/TrussUnit/TrussUnitDesignerWidget.cpp \
           src/TrussUnit/TrussPivot.cpp \
           src/TrussUnit/TrussUnitDesignerWindow.cpp \
+          src/TrussUnit/TrussUnitManager.cpp
 
 HEADERS = src/common/AggQWidget.h \
           src/common/FermaNextWorkspace.h \
@@ -45,5 +46,6 @@ HEADERS = src/common/AggQWidget.h \
           src/TrussUnit/TrussUnit.h \
           src/TrussUnit/TrussUnitDesignerWidget.h \
           src/TrussUnit/TrussUnitDesignerWindow.h \
+          src/TrussUnit/TrussUnitManager.h
 
 
