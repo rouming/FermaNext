@@ -2,6 +2,7 @@
 #include "TrussUnitDesignerWidget.h"
 #include <algorithm>
 #include <vector>
+#include <string>
 #include <math.h>
 #include <qsize.h>
 #include <qwidget.h>
@@ -121,55 +122,85 @@ bool TrussUnitDesignerWidget::isFDiagResize ( int x, int y )
 
 void TrussUnitDesignerWidget::onDraw ()
 {
-    gamma_lut_type gamma ( 1 );
-    pixfmt pixf ( getAggRenderingBuffer(), gamma );
-    base_renderer baseRen ( pixf );
-    solid_renderer solidRen ( baseRen );
-    baseRen.clear ( agg::rgba (10, 10, 10) );
-    agg::rasterizer_scanline_aa<> ras;
-    agg::scanline_p8 sl;
+    pixfmt pixf ( getAggRenderingBuffer() );
+    base_renderer baseRend ( pixf );
+    solid_renderer solidRend ( baseRend );
+    baseRend.clear ( agg::rgba (10, 10, 10) );
+    agg::rasterizer_scanline_aa<>& ras = getAggRasterizerScanline ();
+    agg::scanline_p8& sl = getAggScanline ();
     agg::ellipse ell;
-    ras.gamma(agg::gamma_none());
-	TrussUnitList::iterator iter = trussUnits.begin();
-	for ( ; iter != trussUnits.end() - 1; ++iter )
-		(*iter)->paint( baseRen, solidRen, ras, sl, ell );
-	(*iter)->setBorderColor ( 20,40,50 );
-    (*iter)->setHeadlineColor ( 55, 155, 165 );
-    (*iter)->setResEllColor ( 120, 120, 120 );
-    trussUnits.back()->paint( baseRen, solidRen, ras, sl, ell );
-	(*iter)->setBorderColor ( 20,25,30 );
-    (*iter)->setHeadlineColor ( 75, 105, 95 );
-    (*iter)->setResEllColor ( 50, 50, 50 );
+    glyph_gen glyph(0);
+    text_renderer textRend ( baseRend, glyph );
+    glyph.font ( agg::verdana18_bold );
+    TrussUnitList::iterator iter = trussUnits.begin();
+    for ( ; iter != trussUnits.end() - 1; ++iter )
+    {
+         TrussUnit* trussUnit = (*iter);
+         trussUnit->paint( baseRend, solidRend, textRend, ras, sl, ell );
+    }
+    TrussUnit* trussUnit = (*iter);
+    trussUnit->setBorderColor ( 25,55,65 );
+    trussUnit->setHeadlineColor ( 55, 155, 165 );
+    trussUnit->setResEllColor ( 120, 120, 120 );
+    trussUnits.back()->paint ( baseRend, solidRend, textRend, ras, sl, ell );
+    trussUnit->setBorderColor ( 20,35,40 );
+    trussUnit->setHeadlineColor ( 75, 105, 95 );
+    trussUnit->setResEllColor ( 50, 50, 50 );
 }
 
-void TrussUnitDesignerWidget::initTruss ()
+void TrussUnitDesignerWidget::initTruss ()  //temp method. Later to remove.
 {
 	QWidget::setMouseTracking(true);
     flipY( true );
-    QPoint point1, point2;
+    QPoint pos1, pos2, pivotPnt1, pivotPnt2;
+    std::string str ("Truss Unit"); 
 	uint i;
 	for(i = 0; i <3; i++)
 	{
-		createTrussUnit();
+		createTrussUnit().setTrussName ( str );
 	}
 	TrussUnitList::iterator iter = trussUnits.begin();
 	for ( ; iter != trussUnits.end(); ++iter )
 	{
-        point1.setX(X1); 
-        point1.setY(Y1); 
-        point2.setX(X2);
-        point2.setY(Y2);
+        TrussUnit* trussUnit = (*iter);
+        pos1.setX ( X1 ); 
+        pos1.setY ( Y1 ); 
+        pos2.setX ( X2 );
+        pos2.setY ( Y2 );
         behaviour = nothing;
-        (*iter)->setResEllRad ( 3 );
-        (*iter)->setMinResizeVal ( 150 );
-        (*iter)->setWinRoundRad ( 25 );
-		(*iter)->setPosition ( point1, point2 );
-		(*iter)->setHeadlineWidth ( 30 );
-		(*iter)->setBorderWidth ( 4 );
-	    (*iter)->setBorderColor ( 20,25,30 );
-	    (*iter)->setCanvasColor ( 1, 1, 1 );
-        (*iter)->setHeadlineColor ( 75, 105, 95 );
-        (*iter)->setResEllColor ( 50, 50, 50 );
+        trussUnit->setTrussArea ( 300, 300 );
+        trussUnit->createNode ( 280, 30 );
+        pivotPnt1.setX ( 0 );
+        pivotPnt1.setY ( 0 );
+        pivotPnt2.setX ( 130 );
+        pivotPnt2.setY ( 130 );
+        trussUnit->createPivot ( pivotPnt1, pivotPnt2, 5 );
+        pivotPnt1.setX ( 252 );
+        pivotPnt1.setY ( 300 );
+        trussUnit->createPivot ( pivotPnt1, pivotPnt2, 5 );
+        pivotPnt1.setX ( 0 );
+        pivotPnt1.setY ( 300 );
+        trussUnit->createPivot ( pivotPnt1, pivotPnt2, 5 );
+        pivotPnt2.setX ( 250 );
+        pivotPnt2.setY ( 300 );
+        trussUnit->createPivot ( pivotPnt1, pivotPnt2, 5 );
+        pivotPnt2.setX ( 0 );
+        pivotPnt2.setY ( 0 );
+        trussUnit->createPivot ( pivotPnt1, pivotPnt2, 5 );
+        trussUnit->setLineWidth ( 1 );
+        trussUnit->setNodesRadius ( 5 );
+        trussUnit->setPivotsWidth ( 3 );
+        trussUnit->setResEllRad ( 3 );
+        trussUnit->setMinResizeVal ( 300 );
+        trussUnit->setWinRoundRad ( 25 );
+		trussUnit->setPosition ( pos1, pos2 );
+		trussUnit->setHeadlineWidth ( 30 );
+		trussUnit->setBorderWidth ( 4 );
+	    trussUnit->setBorderColor ( 20,35,40 );
+	    trussUnit->setCanvasColor ( 8, 10, 12 );
+        trussUnit->setHeadlineColor ( 75, 105, 95 );
+        trussUnit->setResEllColor ( 50, 50, 50 );
+        trussUnit->setTrussNodesPosition ();
 		X1 = X1 + 180;
 		X2 = X2 + 180;
 	}
@@ -217,6 +248,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                point2.setX( point1.x() + resizeLimit );
         }
         selectedTruss->setPosition ( point1, point2 );
+        selectedTruss->setTrussNodesPosition ();
         update();
 		clickX += dx;
         return;
@@ -242,6 +274,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                point2.setY( point1.y() + resizeLimit );
         }
         selectedTruss->setPosition ( point1, point2 );
+        selectedTruss->setTrussNodesPosition ();
         update();
 		clickY += dy;
         return;
@@ -281,6 +314,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                point2.setY( point1.y() + resizeLimit );
         }
         selectedTruss->setPosition ( point1, point2 );
+        selectedTruss->setTrussNodesPosition ();
         update();
         clickX += dx;
 		clickY += dy;
@@ -321,6 +355,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                point2.setY( point1.y() + selectedTruss->getMinResizeVal () );
         }
         selectedTruss->setPosition ( point1, point2 );
+        selectedTruss->setTrussNodesPosition ();
         update();
         clickX += dx;
 		clickY += dy;
@@ -338,6 +373,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         point2.setX ( point2.x() + dx );
         point2.setY ( point2.y() + dy );
 		selectedTruss->setPosition ( point1, point2 );
+        selectedTruss->setTrussNodesPosition ();
 		update();
 		clickX += dx;
 		clickY += dy;

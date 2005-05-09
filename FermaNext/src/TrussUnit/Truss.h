@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <qobject.h>
+#include <qpoint.h>
 
 // Basic classes for truss unit construction. 
 template <class N, class P> class Truss;
@@ -106,24 +107,44 @@ public:
         clear();
     }
 
-    virtual N& createNode ()
+    virtual N& createNode ( int x, int y )
     {
         emit beforePivotCreation();
         N* node = new N;
+        node->setX ( x );
+        node->setY ( y );
         nodes.push_back(node);
         emit afterNodeCreation(*node);
         return *node;
     }
 
-    virtual P& createPivot ()
+    virtual P& createPivot ( QPoint p1 , QPoint p2, int nodeRadius )
     {
+        N& first = nodeComparison ( p1, nodeRadius );
+        N& last = nodeComparison ( p2, nodeRadius );
         emit beforePivotCreation();
-        P* pivot = new P;        
+        P* pivot = new P ( first, last );        
         pivots.push_back(pivot);
         emit afterPivotCreation(pivot->getFirstNode(), 
                                 pivot->getLastNode());
         return *pivot;
     }
+
+    virtual N& nodeComparison ( QPoint point, int nodeRadius )
+    {
+        NodeList::iterator iter = nodes.begin();
+        for ( ; iter != nodes.end(); ++iter )
+        {
+            N* node = *iter;
+            int x1 = node->getX ();
+            int y1 = node->getY ();
+            if ( ( (point.x() - x1) * (point.x() - x1) + 
+                   (point.y() - y1) * (point.y() - y1) ) <  4 * nodeRadius * nodeRadius )
+                return *node;
+        }
+        N& newNode = createNode ( point.x(), point.y() );
+        return newNode;
+    }   
 
     virtual P& createPivot ( N& first, N& last )
     {
@@ -187,9 +208,7 @@ protected:
         emit afterPivotRemoval();
     }
 
-
-
-private:
+//private:
     NodeList  nodes;
     PivotList pivots;
 };
@@ -270,8 +289,11 @@ protected:
 public:
     virtual void setFixation ( Fixation );
     virtual Fixation getFixation () const;
-
     virtual void loadState ( const Node& );
+    virtual void setX ( int newX );
+    virtual void setY ( int newY );
+    virtual int getX () const;
+    virtual int getY () const;
 
 private:
     int x, y;

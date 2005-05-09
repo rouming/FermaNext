@@ -225,10 +225,6 @@ InputName=TrussUnitDesignerWindow
 !ENDIF 
 
 # End Source File
-# Begin Source File
-
-SOURCE=.\TrussWindow.h
-# End Source File
 # End Group
 # Begin Group "Moc Files"
 

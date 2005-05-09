@@ -44,6 +44,26 @@ void Node::loadState ( const Node& n )
     emit afterStateLoaded();
 }
 
+void Node::setX (int newX )
+{
+    x = newX;
+}
+
+void Node::setY (int newY )
+{
+    y = newY;
+}
+
+int Node::getX () const
+{
+    return x;
+}
+
+int Node::getY () const
+{
+    return y;
+}
+
 /****************************************************************************/
 
 
