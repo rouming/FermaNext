@@ -135,6 +135,16 @@ agg::rendering_buffer& AggQWidget::getAggRenderingBuffer ()
     return aggBuffer;
 }
 
+agg::rasterizer_scanline_aa<>& AggQWidget::getAggRasterizerScanline ()
+{
+    return aggRas;
+}
+
+agg::scanline_p8& AggQWidget::getAggScanline ()
+{
+    return aggScanline;
+}
+
 agg::trans_affine AggQWidget::getAggResizeMatrix ()
 {
     return agg::trans_affine_scaling(

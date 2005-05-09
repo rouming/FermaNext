@@ -2,15 +2,17 @@
 #ifndef AGGQWIDGET_H
 #define AGGQWIDGET_H
 
+#include <vector>
 #include <qwidget.h>
 #include <qimage.h>
-
 #include <agg_basics.h>
 #include <agg_rendering_buffer.h>
+#include <agg_rasterizer_scanline_aa.h>
+#include <agg_scanline_p.h>
+#include <agg_renderer_scanline.h>
 #include <agg_trans_affine.h>
 #include <util/agg_color_conv_rgb8.h>
 #include <ctrl/agg_ctrl.h>
-#include <vector>
 
 class AggCtrlContainer
 {
@@ -39,23 +41,30 @@ public:
 
 class AggQWidget : public QWidget
 {
-private:    
-    agg::rendering_buffer aggBuffer;    // store the ptr to reattach to m_image on resize 
-    bool                  aggFlipY;     // flip the y axis?
-    agg::trans_affine     aggResizeMtx;   
+    typedef agg::rendering_buffer          rendering_buffer;
+    typedef agg::scanline_p8               scanline;
+    typedef agg::rasterizer_scanline_aa<>  scanline_rasterizer;
+    typedef agg::trans_affine              trans_affine;
+private:
+    rendering_buffer      aggBuffer;    // store the ptr to reattach to m_image on resize 
+    trans_affine          aggResizeMtx;   
     QImage*               mainQImage;   // this is attached to the main rendering buffer
+    scanline_rasterizer   aggRas;
+    scanline              aggScanline;
+    AggCtrlContainer      ctrlContainer;
+    bool                  aggFlipY;     // flip the y axis?
     int                   initialWidth;
     int                   initialHeight;
-
-    AggCtrlContainer      ctrlContainer;
 
 public:
     AggQWidget ( QWidget* parent = 0, bool flip_y = false );
     virtual ~AggQWidget ();
 
 protected:
-    virtual agg::rendering_buffer& getAggRenderingBuffer ();
-    virtual agg::trans_affine  getAggResizeMatrix ();
+    virtual rendering_buffer& getAggRenderingBuffer ();
+    virtual scanline_rasterizer& getAggRasterizerScanline ();
+    virtual scanline& getAggScanline ();
+    virtual trans_affine getAggResizeMatrix ();
     virtual QImage& getMainImage ();
 
     virtual bool flipY ();
