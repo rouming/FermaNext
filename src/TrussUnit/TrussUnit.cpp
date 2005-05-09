@@ -1,6 +1,7 @@
-
+#include <stdio.h>
 #include "TrussUnit.h"
 #include <algorithm>
+
 
 /*****************************************************************************
  * Paintable Truss Element
@@ -37,23 +38,61 @@ bool PaintableTrussElement::isEnabled () const
     return enabled;
 }
 
+/*****************************************************************************/
+struct line
+{
+    double x1, y1, x2, y2;
+    int f;
+
+    line(double x1_, double y1_, double x2_, double y2_) : 
+        x1(x1_), y1(y1_), x2(x2_), y2(y2_), f(0) {}
+
+    void rewind(unsigned) { f = 0; }
+    unsigned vertex(double* x, double* y)
+    {
+        if(f == 0) { ++f; *x = x1; *y = y1; return agg::path_cmd_move_to; }
+        if(f == 1) { ++f; *x = x2; *y = y2; return agg::path_cmd_line_to; }
+        return agg::path_cmd_stop;
+    }
+};
+
+/*****************************************************************************/
+struct arrow
+{
+    typedef agg::conv_stroke<line, agg::vcgen_markers_term>                     stroke_type;
+    typedef agg::conv_marker<stroke_type::marker_type, agg::arrowhead>          marker_type;
+    typedef agg::conv_concat<stroke_type, marker_type>                          concat_type;
+
+    stroke_type    s;
+    agg::arrowhead ah;
+    marker_type    m;
+    concat_type    c;
+
+    arrow(line& l, double w) : 
+        s(l),
+        ah(),
+        m(s.markers(), ah),
+        c(s, m)
+    {
+        s.width(w); 
+        ah.head(5, 5, 5, 5);
+        s.shorten(w * 2.0);
+    }
+
+    void rewind(unsigned id) { c.rewind(id); }
+    unsigned vertex(double* x, double* y) { return c.vertex(x, y); }
+};
+
+
 /*****************************************************************************
  * Truss Unit
  *****************************************************************************/
 
 TrussUnit::TrussUnit ()
-{
-//    resEllHighlight = false;
-}
+{}
 
 TrussUnit::~TrussUnit ()
 {}
-
-void TrussUnit::setPosition ( QPoint point1, QPoint point2 )
-{
-    _point1 = point1;
-    _point2 = point2;
-}
 
 QPoint TrussUnit::getPoint1 () const
 {
@@ -65,14 +104,50 @@ QPoint TrussUnit::getPoint2 () const
     return _point2;
 }
 
+QPoint TrussUnit::getTrussAreaPoint1 () const
+{
+    QPoint point;
+    point.setX ( _point1.x() + 14 * bordW );
+    point.setY ( _point1.y() + 2* bordW + 2 * headW );
+    return point;
+}
+
+QPoint TrussUnit::getTrussAreaPoint2 () const
+{
+    QPoint point;
+    point.setX ( _point2.x() - 10 * bordW );
+    point.setY ( _point2.y() - 10 * bordW - headW/2 );
+    return point;
+}
+
+QPoint TrussUnit::transCoord ( QPoint point, bool flipY )
+{
+    QPoint p1, p2;
+    p1 = getTrussAreaPoint1 ();
+    p2 = getTrussAreaPoint2 ();
+    double realAreaLen = abs ( p2.x() - p1.x() );
+    double realAreaWid = abs ( p2.y() - p1.y() );
+    double scaleFactorX = realAreaLen / trussAreaLength;
+    double scaleFactorY = realAreaWid / trussAreaWidth;
+    point.setX ( p1.x() + point.x() * scaleFactorX );
+    point.setY ( flipY ? p2.y() - point.y() * scaleFactorY : 
+                           p1.y() + point.y() * scaleFactorY );
+    return point;
+}
+
+std::string TrussUnit::getTrussName () const
+{
+    return trussName;
+}
+
 int TrussUnit::getHeadlineWidth () const
 {
-	return headWidth;
+	return headW;
 }
 
 int TrussUnit::getBorderWidth () const
 {
-	return borderWidth;
+	return bordW;
 }
 
 int TrussUnit::getMinResizeVal () const
@@ -91,8 +166,6 @@ bool TrussUnit::inWindowRect ( int x, int y )
 
 bool TrussUnit::inCanvasRect ( int x, int y )
 {
-	int bordW = getBorderWidth ();
-	int headW = getHeadlineWidth ();
     if ( x >= _point1.x() + bordW && x <= _point2.x() - bordW && 
         y >= _point1.y() + bordW + headW && y <= _point2.y() - bordW )
 	{
@@ -103,8 +176,6 @@ bool TrussUnit::inCanvasRect ( int x, int y )
 
 bool TrussUnit::inHeadlineRect ( int x, int y )
 {
-	int bordW = getBorderWidth ();
-	int headW = getHeadlineWidth ();
 	if ( x >= _point1.x() + bordW && x <= _point2.x() - bordW && y >= 
 		_point1.y() + bordW && y <= _point1.y() + bordW + headW)
 	{
@@ -115,7 +186,6 @@ bool TrussUnit::inHeadlineRect ( int x, int y )
 
 bool TrussUnit::inHorResizeRect ( int x, int y )
 {
-    int bordW = getBorderWidth ();
     if ( x >= _point1.x() && x <= _point1.x() + bordW && 
         y >= _point1.y() + winRoundRad && y <= _point2.y() - winRoundRad ||
         x >= _point2.x() - bordW && x <= _point2.x() && 
@@ -128,7 +198,6 @@ bool TrussUnit::inHorResizeRect ( int x, int y )
 
 bool TrussUnit::inVerResizeRect ( int x, int y )
 {
-    int bordW = getBorderWidth ();
     if ( x >= _point1.x() + winRoundRad && x <= _point2.x() - winRoundRad && 
         y >= _point1.y() && y <= _point1.y() + bordW ||
         x >= _point1.x() + winRoundRad && x <= _point2.x() - winRoundRad && 
@@ -141,7 +210,6 @@ bool TrussUnit::inVerResizeRect ( int x, int y )
 
 bool TrussUnit::inBDiagResizeRect ( int x, int y )
 {
-    int bordW = getBorderWidth ();
     if ( sqrt( (x - (_point2.x() - bordW)) * (x - (_point2.x() - bordW)) +
         (y - (_point1.y() + bordW)) * (y - (_point1.y() + bordW)) ) <= resEllRad + 2 ||
         sqrt( (x - (_point1.x() + bordW)) * (x - (_point1.x() + bordW)) +
@@ -154,7 +222,6 @@ bool TrussUnit::inBDiagResizeRect ( int x, int y )
 
 bool TrussUnit::inFDiagResizeRect ( int x, int y )
 {
-    int bordW = getBorderWidth ();
     if ( sqrt( (x - (_point1.x() + bordW)) * (x - (_point1.x() + bordW)) +
         (y - (_point1.y() + bordW)) * (y - (_point1.y() + bordW)) ) <= resEllRad + 2 ||
         sqrt( (x - (_point2.x() - bordW)) * (x - (_point2.x() - bordW)) +
@@ -180,14 +247,65 @@ color_type TrussUnit::getBorderColor () const
 	return borderColor;
 }
 
+void TrussUnit::setPosition ( QPoint point1, QPoint point2 )
+{
+    _point1 = point1;
+    _point2 = point2;
+}
+
+void TrussUnit::setTrussArea ( int length, int width )
+{
+    trussAreaLength = length;
+    trussAreaWidth = width;
+}
+
+void TrussUnit::setTrussNodesPosition ()
+{
+    QPoint point;
+    NodeList::iterator iter = nodes.begin();
+    for ( ; iter != nodes.end(); ++iter )
+	{
+        TrussNode* node = *iter;
+        point.setX ( node->getX () );
+        point.setY ( node->getY () );
+        point = transCoord ( point, true );
+        node->setXWidgetPosition ( point.x() );
+        node->setYWidgetPosition ( point.y() );
+    }
+}
+
+void TrussUnit::setLineWidth ( int width )
+{
+    lineWidth = width;
+}
+
+void TrussUnit::setNodesRadius ( int rad )
+{
+    NodeList::iterator iter = nodes.begin();
+    for ( ; iter != nodes.end(); ++iter )
+        (*iter)->setRadius ( rad );
+}
+
+void TrussUnit::setPivotsWidth ( int wid )
+{
+    PivotList::iterator iter = pivots.begin();
+    for ( ; iter != pivots.end(); ++iter )
+        (*iter)->setPivotWidth ( wid );
+}
+
+void TrussUnit::setTrussName ( string name )
+{
+    trussName = name;
+}
+
 void TrussUnit::setHeadlineWidth ( int width )
 {
-	headWidth = width;
+	headW = width;
 }
 
 void TrussUnit::setBorderWidth ( int width )
 {
-	borderWidth = width;
+	bordW = width;
 }
 
 void TrussUnit::setResEllRad ( int radius )
@@ -224,66 +342,184 @@ void TrussUnit::setResEllColor ( int r , int g, int b )
 {
     resEllColor = agg::rgba(r, g, b);
 }
-/*
-void TrussUnit::setResEllHighlight ( bool h )
+
+void TrussUnit::drawLine ( scanline_rasterizer& ras, solid_renderer& solidRend,
+                          agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const
 {
-    resEllHighlight = h;
+    line newLine ( point1.x(), point1.y(), point2.x(), point2.y() );
+    agg::conv_stroke<line> stroke ( newLine );
+    stroke.width ( lineWidth ); 
+    ras.add_path ( stroke );
+    solidRend.color ( agg::rgba(90, 90, 90) );
+    agg::render_scanlines ( ras, sl, solidRend );
 }
 
-void TrussUnit::setHighlightPos ( int x, int y )
+void TrussUnit::drawArrow ( scanline_rasterizer& ras, solid_renderer& solidRend,
+                          agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const
 {
-    highlightPoint.setX ( x );
-    highlightPoint.setY ( y );
+    line newLine ( point1.x(), point1.y(), point2.x(), point2.y() );
+    arrow newArrow ( newLine, lineWidth );
+    ras.add_path ( newArrow );
+    solidRend.color ( agg::rgba(90, 90, 90) );
+    agg::render_scanlines ( ras, sl, solidRend );
 }
-*/
-void TrussUnit::paint ( base_renderer& baseRend, solid_renderer& solidRen, 
-                 agg::rasterizer_scanline_aa<>& ras, agg::scanline_p8& sl, 
-                 agg::ellipse& ell ) const
-{
-	int bordW = getBorderWidth ();
-	int headW = getHeadlineWidth ();
 
-    solidRen.color ( resEllColor );
+void TrussUnit::drawText ( base_renderer& baseRend, text_renderer& textRend,
+                          std::string str, color_type col, QPoint point, 
+                          bool flipY ) const 
+{
+    textRend.color( col );
+    const char* buf = str.c_str();
+    textRend.render_text ( point.x(), point.y(), buf, flipY );
+}
+
+void TrussUnit::drawTrussArea ( base_renderer& baseRend, scanline_rasterizer& ras,
+                                text_renderer& textRend, solid_renderer& solidRend, 
+                                agg::scanline_p8& sl ) const
+{
+    QPoint p1, p2;
+    p2 = getTrussAreaPoint1 ();
+    p1 = getTrussAreaPoint2 ();
+    baseRend.copy_bar ( p2.x(), p2.y(), p1.x(), p1.y(), agg::rgba8(255,255,255) );
+    p2.setY ( p2.y() - 6 * bordW );
+    p1.setX ( p2.x() );
+    p1.setY ( p1.y() + 3 * bordW );
+    drawArrow ( ras, solidRend, sl, p1, p2 );
+    p1 = getTrussAreaPoint2 ();
+    p1.setX ( p2.x() - 3 * bordW );
+    p2 = getTrussAreaPoint2 ();
+    p2.setX (p2.x() + 6 * bordW );
+    drawArrow ( ras, solidRend, sl, p1, p2 );
+    p1 = getTrussAreaPoint1 ();
+    p2 = getTrussAreaPoint2 ();
+    p1.setX ( p1.x() - 3 * bordW );
+    p1.setY ( p1.y() );
+    p2.setY ( p1.y() );
+    drawLine ( ras, solidRend, sl, p1, p2 );
+    p1 = getTrussAreaPoint2 ();
+    p1.setY ( p1.y() + 3 * bordW );
+    drawLine ( ras, solidRend, sl, p1, p2 );
+
+    p1 = getTrussAreaPoint1 ();
+    p2 = getTrussAreaPoint2 ();
+    double realAreaLen = p2.x() - p1.x();
+    double realAreaWid = p2.y() - p1.y();
+    double scaleFactorX = realAreaLen / 5;
+    double scaleFactorY = realAreaWid / 5;
+    p2.setX ( p1.x() - 3 * bordW );
+    unsigned i;
+    for (i = 0; i < 4; i++ )
+    {
+        p1.setY ( p1.y() + scaleFactorY );
+        p2.setY ( p1.y() );
+        drawLine ( ras, solidRend, sl, p1, p2 );
+    }
+
+    p1 = getTrussAreaPoint2 ();
+    p2 = getTrussAreaPoint1 ();
+    p1.setX ( p2.x() );
+    p2.setY ( p1.y() + 3 * bordW );
+    for (i = 0; i < 4; i++ )
+    {
+        p1.setX ( p1.x() + scaleFactorX );
+        p2.setX ( p1.x() );
+        drawLine ( ras, solidRend, sl, p1, p2 );
+    }
+
+    p1 = getTrussAreaPoint1 ();
+    p2 = getTrussAreaPoint2 ();
+    p1.setX ( p1.x() - 5 * bordW );
+    p1.setY ( p2.y() + 5 * bordW );
+    drawText  ( baseRend, textRend, "0", agg::rgba(100, 100, 100), p1, true );
+}
+
+void TrussUnit::drawHeadline ( base_renderer& baseRend, scanline_rasterizer& ras,
+                               agg::scanline_p8& sl, gradient_span_alloc& gradSpan,
+                               linear_gradient& gradFunc, color_array_type& gradColors,
+                               agg::trans_affine& mtx ) const
+{
+    agg::rounded_rect headline ( _point1.x()  + 3 * bordW, _point1.y() + bordW, 
+        _point2.x() - 3 * bordW, _point1.y() + headW, winRoundRad/2 );
+    color_type begin ( 190, 180, 100 ); 
+    color_type middle ( 180, 170, 170 ); 
+    color_type end ( 160, 100, 100 );
+    unsigned i;
+    for(i = 0; i < 128; ++i)
+    {
+        gradColors[i] = begin.gradient ( middle, i / 128.0 );
+    }
+    for(; i < 256; ++i)
+    {
+        gradColors[i] = middle.gradient ( end, (i - 128) / 128.0 );
+    }
+    mtx *= agg::trans_affine_scaling ( 1 / 2.0 );
+    mtx *= agg::trans_affine_translation ( _point1.y() , _point2.y() );
+    mtx.invert ();
+    interpolator inter ( mtx );
+    linear_gradient_span_gen gradSpanGen ( gradSpan, inter, gradFunc, 
+                                    gradColors, 0.0, 10.0 );
+    linear_gradient_renderer gradRend ( baseRend, gradSpanGen );
+    ras.add_path ( headline );
+    agg::render_scanlines ( ras, sl, gradRend );
+}
+
+void TrussUnit::paint ( base_renderer& baseRend, solid_renderer& solidRend,
+                        text_renderer& textRend, scanline_rasterizer& ras, 
+                        agg::scanline_p8& sl, agg::ellipse& ell ) const
+{
+    solidRend.color ( resEllColor );
     ell.init ( _point1.x() + bordW, _point1.y() + bordW, resEllRad, resEllRad, 16 );
     ras.add_path ( ell );
     ell.init ( _point2.x() - bordW, _point1.y() + bordW, resEllRad, resEllRad, 16 );
     ras.add_path ( ell );
     ell.init ( _point1.x() + bordW, _point2.y() - bordW, resEllRad, resEllRad, 16 );
     ras.add_path ( ell );
-    agg::render_scanlines ( ras, sl, solidRen );
+    agg::render_scanlines ( ras, sl, solidRend );
     ell.init ( _point2.x() - bordW, _point2.y() - bordW, resEllRad, resEllRad, 16 );
     ras.add_path(ell);
-    agg::render_scanlines ( ras, sl, solidRen );
+    agg::render_scanlines ( ras, sl, solidRend );
     agg::rounded_rect border ( _point1.x(), _point1.y(), 
-                              _point2.x(), _point2.y(), winRoundRad );
+                               _point2.x(), _point2.y(), winRoundRad );
     border.normalize_radius();
-    solidRen.color ( agg::rgba8(255,255,255) );
+    solidRend.color ( agg::rgba8(255,255,255) );
     agg::conv_stroke<agg::rounded_rect> stroke(border);
-    stroke.width(1.0);
+    stroke.width ( 1.0 );
     ras.add_path ( stroke );
-    agg::render_scanlines(ras, sl, solidRen);
+    agg::render_scanlines(ras, sl, solidRend);
     ras.add_path ( border );
-    solidRen.color ( borderColor );
-    agg::render_scanlines(ras, sl, solidRen);
+    solidRend.color ( borderColor );
+    agg::render_scanlines(ras, sl, solidRend);
     agg::rounded_rect canvas ( _point1.x()  + bordW, _point1.y() + bordW + headW, 
         _point2.x() - bordW, _point2.y() - bordW - headW/2, winRoundRad/3 );
     ras.add_path ( canvas );
-    solidRen.color ( canvColor );
-    agg::render_scanlines(ras, sl, solidRen);
-    agg::rounded_rect headline ( _point1.x()  + 3*bordW, _point1.y() + bordW, 
-        _point2.x() - 3*bordW, _point1.y() + headW, winRoundRad/2 );
-    ras.add_path ( headline );
-    solidRen.color ( headColor );
-    agg::render_scanlines(ras, sl, solidRen);
-/*
-    if ( resEllHighlight )
-    {
-        ell.init ( highlightPoint.x(), highlightPoint.y(), resEllRad, resEllRad, 16 );
-        ras.add_path(ell);
-        solidRen.color ( agg::rgba8(155,255,155,80)  );
-        agg::render_scanlines ( ras, sl, solidRen );
-    }
+    solidRend.color ( canvColor );
+    agg::render_scanlines ( ras, sl, solidRend );
+
+
+/* TODO
+    gradient_span_alloc gradSpan;
+    linear_gradient gradFunc;
+    color_array_type gradColors;
+    agg::trans_affine mtx;
+    drawHeadline ( baseRend, ras, sl, gradSpan, gradFunc, gradColors, mtx );
 */
+    QPoint point;
+    agg::rounded_rect headline ( _point1.x()  + 3 * bordW, _point1.y() + bordW, 
+        _point2.x() - 3 * bordW, _point1.y() + headW, winRoundRad/2 );
+    ras.add_path ( headline );
+    solidRend.color ( headColor );
+    agg::render_scanlines(ras, sl, solidRend);
+    point.setX ( _point1.x() + ( _point2.x() - _point1.x() )/2 - 10 * bordW );
+    point.setY ( _point1.y() + 5 * bordW );
+    drawText ( baseRend, textRend, trussName, agg::rgba(10, 10, 10), point, true );
+    drawTrussArea ( baseRend, ras, textRend, solidRend, sl );
+
+    PivotList::const_iterator pivotsIter = pivots.begin();
+    for ( ; pivotsIter != pivots.end(); ++pivotsIter )
+        (*pivotsIter)->paint ( baseRend, solidRend, textRend, ras, sl, ell );
+    NodeList::const_iterator nodesIter = nodes.begin();
+    for ( ; nodesIter != nodes.end(); ++nodesIter )
+        (*nodesIter)->paint ( baseRend, solidRend, textRend, ras, sl, ell );
 }
 
 /****************************************************************************/
