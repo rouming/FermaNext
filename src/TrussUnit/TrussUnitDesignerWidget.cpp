@@ -20,19 +20,16 @@ TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
     AggQWidget(p)
 {}
 
-TrussUnit& TrussUnitDesignerWidget::createTrussUnit ()
-{
-    TrussUnit* truss = new TrussUnit;
-    trussUnits.push_back(truss);
-    return *truss;
+void TrussUnitDesignerWidget::addTrussUnit ( TrussUnit& truss )
+{    
+    trussUnits.push_back(&truss); 
 }
 
 bool TrussUnitDesignerWidget::removeTrussUnit ( const TrussUnit& truss )
 {
     TrussUnitList::iterator iter = trussUnits.begin();
     for ( ; iter != trussUnits.end(); ++iter )
-        if ( (*iter) == &truss ) {
-            delete *iter;
+        if ( (*iter) == &truss ) {            
             trussUnits.erase(iter);
             return true;
         }            
@@ -146,6 +143,7 @@ void TrussUnitDesignerWidget::onDraw ()
     trussUnit->setBorderColor ( 20,35,40 );
     trussUnit->setHeadlineColor ( 75, 105, 95 );
     trussUnit->setResEllColor ( 50, 50, 50 );
+   
 }
 
 void TrussUnitDesignerWidget::initTruss ()  //temp method. Later to remove.
@@ -153,12 +151,6 @@ void TrussUnitDesignerWidget::initTruss ()  //temp method. Later to remove.
 	QWidget::setMouseTracking(true);
     flipY( true );
     QPoint pos1, pos2, pivotPnt1, pivotPnt2;
-    std::string str ("Truss Unit"); 
-	uint i;
-	for(i = 0; i <3; i++)
-	{
-		createTrussUnit().setTrussName ( str );
-	}
 	TrussUnitList::iterator iter = trussUnits.begin();
 	for ( ; iter != trussUnits.end(); ++iter )
 	{

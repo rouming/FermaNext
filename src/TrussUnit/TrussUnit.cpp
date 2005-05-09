@@ -135,7 +135,7 @@ QPoint TrussUnit::transCoord ( QPoint point, bool flipY )
     return point;
 }
 
-std::string TrussUnit::getTrussName () const
+const QString& TrussUnit::getTrussName () const
 {
     return trussName;
 }
@@ -293,7 +293,7 @@ void TrussUnit::setPivotsWidth ( int wid )
         (*iter)->setPivotWidth ( wid );
 }
 
-void TrussUnit::setTrussName ( string name )
+void TrussUnit::setTrussName ( const QString& name )
 {
     trussName = name;
 }
@@ -365,12 +365,11 @@ void TrussUnit::drawArrow ( scanline_rasterizer& ras, solid_renderer& solidRend,
 }
 
 void TrussUnit::drawText ( base_renderer& baseRend, text_renderer& textRend,
-                          std::string str, color_type col, QPoint point, 
-                          bool flipY ) const 
+                           const QString& str, color_type col, QPoint point, 
+                           bool flipY ) const 
 {
-    textRend.color( col );
-    const char* buf = str.c_str();
-    textRend.render_text ( point.x(), point.y(), buf, flipY );
+    textRend.color( col );    
+    textRend.render_text ( point.x(), point.y(), str.ascii(), flipY );
 }
 
 void TrussUnit::drawTrussArea ( base_renderer& baseRend, scanline_rasterizer& ras,

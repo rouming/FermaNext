@@ -4,7 +4,7 @@
 
 #include "Truss.h"
 #include <vector>
-#include <string>
+#include <qstring.h>
 #include <qpoint.h> 
 
 #include "agg_basics.h"
@@ -79,17 +79,20 @@ private:
 class TrussUnit : public Truss<TrussNode, TrussPivot>, 
                   public PaintableTrussElement
 {
-public:
-    typedef std::string string;
-
+private:    
+    // constructor is closed. TrussUnitManager should manage trusses;
+    friend class TrussUnitManager;
     TrussUnit ();
+
+public:        
     virtual ~TrussUnit ();
+
     QPoint getPoint1 () const;
     QPoint getPoint2 () const;
     QPoint getTrussAreaPoint1 () const;
     QPoint getTrussAreaPoint2 () const;
     QPoint transCoord ( QPoint point, bool flipY );
-    string getTrussName () const;
+    const QString& getTrussName () const;
 	int getHeadlineWidth () const;
 	int getBorderWidth () const;
     int getMinResizeVal () const;
@@ -106,7 +109,7 @@ public:
     void setPosition ( QPoint point1, QPoint point2 );
     void setTrussArea ( int length, int width );
     void setTrussNodesPosition ();
-    void setTrussName ( string name );
+    void setTrussName ( const QString& name );
     void setLineWidth ( int width );
     void setNodesRadius ( int rad );
     void setPivotsWidth ( int wid );
@@ -120,7 +123,7 @@ public:
     void setWinRoundRad ( int radius );
     void setResEllColor ( int r, int g, int b );
     void drawText ( base_renderer& baseRend, text_renderer& textRend,
-                    string str, color_type c, QPoint point, bool flipY ) const;
+                    const QString& str, color_type c, QPoint point, bool flipY ) const;
     void drawLine ( scanline_rasterizer& ras, solid_renderer& solidRend,
                     agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const;
     void drawArrow ( scanline_rasterizer& ras, solid_renderer& solidRend,
@@ -140,7 +143,7 @@ private:
          lineWidth, trussAreaLength, trussAreaWidth;
     QPoint _point1, _point2;
 	color_type canvColor, headColor, borderColor, resEllColor;
-    string trussName;
+    QString trussName;
 };
 
 class TrussNode: public Node, public PaintableTrussElement

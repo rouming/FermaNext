@@ -24,4 +24,15 @@ TrussUnitDesignerWindow::TrussUnitDesignerWindow ( const QString& caption,
     setCaption( caption );
 }
 
+void TrussUnitDesignerWindow::addTrussUnit ( TrussUnit& truss )
+{    
+    designerWidget.addTrussUnit(truss); 
+}
+
+bool TrussUnitDesignerWindow::removeTrussUnit ( const TrussUnit& truss )
+{
+    return designerWidget.removeTrussUnit(truss);
+}
+
+
 /*****************************************************************************/
