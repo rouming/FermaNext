@@ -24,7 +24,7 @@ public:
     { return disabled; }
 public slots:
     void disable ()
-    { disabled = false; emit onDisable(this); }
+    { disabled = true; emit onDisable(this); }
 signals:
     void onDisable ( ObjectState* );
 private:
@@ -39,10 +39,10 @@ class ConcreteObjectState : virtual public ObjectState
 public:
     ConcreteObjectState ( Obj* obj_, Obj* state_ ) : 
         obj(obj_), state(state_)
-    { connect(obj, SIGNAL(onStateDestroy(StatefulObject*)), SLOT(disable())); }
+    { connect(obj, SIGNAL(onStatefulObjectDestroy(StatefulObject*)), SLOT(disable()));  }
        
     ~ConcreteObjectState ()
-    { delete state; }
+    { if ( !isDisabled() ) obj->removeObjectState(state);  }
 
     void submitState () const
     { if ( !isDisabled() ) obj->loadState(*state); }
@@ -51,27 +51,59 @@ public:
 class StatefulObject : public QObject 
 {
     Q_OBJECT
-public: 
+public:
     virtual ~StatefulObject () 
-    { emit onStateDestroy(this); } 
+    // Should notice everyone about forthcoming decease.
+    { emit onStatefulObjectDestroy(this); }
 signals:
-    void onStateDestroy ( StatefulObject* );
+    void onStatefulObjectDestroy ( StatefulObject* );
 };
 
 template <class Obj>
 class ConcreteStatefulObject : public StatefulObject
 {
 protected:
-    virtual Obj* self () = 0;
+    // Do not forget to clear states from the descendant 
+    // destructor, or memory leaks are awaited.
+    void clearStates () 
+    {
+        std::vector<Obj*>::iterator i = states.begin();
+        for ( ; i != states.end(); ++i )
+            removeState(*i);
+        states.clear();
+    }
 public:
-    virtual ~ConcreteStatefulObject () {}
-    virtual void loadState ( const Obj& node ) = 0;
+    Obj* takeObjectState ()
+    {
+        Obj* state = takeState();
+        states.push_back(state);
+        return state;
+    }
 
+    void removeObjectState ( Obj* state )
+    {
+        std::vector<Obj*>::iterator i = states.begin();
+        for ( ; i != states.end(); ++i )
+            if ( *i == state ) {
+                Obj* st = *i;
+                states.erase(i);
+                removeState(st);
+                return;
+            }
+    }
+protected:
+    virtual Obj* self () = 0;
+    virtual Obj* takeState () = 0;
+    virtual void removeState ( Obj* ) = 0;
+public:
     void saveState ( ObjectStateManager& sm )
     {        
-        sm.saveState( new ConcreteObjectState<Obj>(self(), new Obj(*self())) );
+        sm.saveState( new ConcreteObjectState<Obj>(self(), takeObjectState()) );
     }
-};
 
+    virtual void loadState ( const Obj& node ) = 0;  
+private:
+    std::vector<Obj*> states;
+};
 
 #endif //STATEFULOBJECT_H

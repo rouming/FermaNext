@@ -80,4 +80,9 @@ void ObjectStateManager::redo () throw (UnknownException, RedoException)
     currentState->submitState();
 }
 
+size_t ObjectStateManager::countStates ()
+{
+    return states.size();
+}
+
 /*****************************************************************************/

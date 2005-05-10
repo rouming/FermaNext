@@ -5,24 +5,33 @@
 #include <iostream>
 
 int objects = 0;
+int PASSED = 0, FAILED = 0;
 
 void my_assert( bool val, const std::string& str ) 
 {
+    if ( val ) ++PASSED;
+    else ++FAILED;
+    
     std::cout << str << ": " << (val ? "OK\n" : "NOT OK\n");
 }
 
 class SomeObject : public ConcreteStatefulObject<SomeObject>
 {
+    friend class SomeObjectManager;
 protected:
     SomeObject* self ()  { return this; }
 public:
     SomeObject (int val_): val(val_) { ++objects; }
-    ~SomeObject () { --objects; }
+    SomeObject* takeState (){ return new SomeObject(*self()); }
+    void removeState ( SomeObject* o ){ delete o; }
+
+    ~SomeObject () { --objects; clearStates(); }
     SomeObject ( const SomeObject& obj ) 
     { 
         ++objects;
         val = obj.val;
     } 
+public:
     void loadState ( const SomeObject& obj )
     {
         val = obj.val;
@@ -38,9 +47,9 @@ int main ()
     const int STACK_SIZE = 10;
     int i = 0;
 
+    ObjectStateManager m;
     
     {// Scope
-        ObjectStateManager m;
         
         SomeObject obj(666);
         obj.saveState(m);
@@ -126,12 +135,13 @@ int main ()
         anotherObj->saveState(m);
         anotherObj->saveState(m);
         delete anotherObj;
-        
 
-        
     }//Scope end
     my_assert( objects == 0, "All objects should be destroyed" );
+    my_assert( m.countStates() == 0, "State manager should be empty" );
 
+
+		std::cout << "\n" << "Passed: " << PASSED << "\nFailed: " << FAILED << "\n";
     return 0;    
 }
 
