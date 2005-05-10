@@ -27,6 +27,7 @@ public:
     virtual void saveState ( ObjectState* st ) throw (UnknownException);
     virtual void undo () throw (UnknownException, UndoException);
     virtual void redo () throw (UnknownException, RedoException);
+    size_t countStates ();
 
 protected slots:
     void removeState ( ObjectState* );
