@@ -87,62 +87,14 @@ private:
 public:        
     virtual ~TrussUnit ();
 
-    QPoint getPoint1 () const;
-    QPoint getPoint2 () const;
-    QPoint getTrussAreaPoint1 () const;
-    QPoint getTrussAreaPoint2 () const;
-    QPoint transCoord ( QPoint point, bool flipY );
     const QString& getTrussName () const;
-	int getHeadlineWidth () const;
-	int getBorderWidth () const;
-    int getMinResizeVal () const;
-    bool inWindowRect ( int x, int y );
-	bool inCanvasRect ( int  x, int  y );
-	bool inHeadlineRect ( int  x, int  y );
-    bool inHorResizeRect ( int x, int y );
-    bool inVerResizeRect ( int x, int y );
-    bool inBDiagResizeRect ( int x, int y );
-    bool inFDiagResizeRect ( int x, int y );
-	color_type getCanvasColor () const;
-	color_type getHeadlineColor () const;
-	color_type getBorderColor () const;
-    void setPosition ( QPoint point1, QPoint point2 );
-    void setTrussArea ( int length, int width );
-    void setTrussNodesPosition ();
     void setTrussName ( const QString& name );
-    void setLineWidth ( int width );
     void setNodesRadius ( int rad );
     void setPivotsWidth ( int wid );
-	void setHeadlineWidth ( int  width );
-	void setBorderWidth ( int  width );
-    void setMinResizeVal ( int value );
-	void setCanvasColor ( int r, int g, int b );
-	void setHeadlineColor ( int r, int g, int b );
-	void setBorderColor ( int r, int g, int b );
-    void setResEllRad ( int radius );
-    void setWinRoundRad ( int radius );
-    void setResEllColor ( int r, int g, int b );
-    void drawText ( base_renderer& baseRend, text_renderer& textRend,
-                    const QString& str, color_type c, QPoint point, bool flipY ) const;
-    void drawLine ( scanline_rasterizer& ras, solid_renderer& solidRend,
-                    agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const;
-    void drawArrow ( scanline_rasterizer& ras, solid_renderer& solidRend,
-                     agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const;
-    void drawTrussArea ( base_renderer& baseRend, scanline_rasterizer& ras,
-                         text_renderer& textRend, solid_renderer& solidRend, 
-                         agg::scanline_p8& sl ) const;
-    void drawHeadline ( base_renderer& baseRend, scanline_rasterizer& ras,
-                        agg::scanline_p8& sl, gradient_span_alloc& gradSpan,
-                        linear_gradient& gradFunc, color_array_type& gradColors,
-                        agg::trans_affine& mtx ) const;
     void paint ( base_renderer& baseRend, solid_renderer& solidRend,
                  text_renderer& textRend, agg::rasterizer_scanline_aa<>& ras, 
                  agg::scanline_p8& sl, agg::ellipse& ell ) const;
 private:
-	int  headW, bordW, resEllRad, winRoundRad, minResizeVal,
-         lineWidth, trussAreaLength, trussAreaWidth;
-    QPoint _point1, _point2;
-	color_type canvColor, headColor, borderColor, resEllColor;
     QString trussName;
 };
 

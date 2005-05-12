@@ -3,10 +3,10 @@
 #define TRUSSDESIGNERWIDGET_H
 
 #include "AggQWidget.h"
-#include "TrussUnit.h"
+#include "TrussUnitPseudoWindow.h"
 
-typedef std::vector<TrussUnit*>  TrussUnitList;
-typedef std::vector<TrussUnit*>::iterator  TrussUnitListIter;
+typedef std::vector<TrussUnitPseudoWindow*>  PseudoWindowList;
+typedef std::vector<TrussUnitPseudoWindow*>::iterator  PseudoWindowListIter;
 
 class TrussUnitDesignerWidget : public AggQWidget
 {
@@ -20,8 +20,8 @@ public:
     virtual bool isVerResize ( int x, int y );
     virtual bool isBDiagResize ( int x, int y );
     virtual bool isFDiagResize ( int x, int y );
-    virtual TrussUnit* whoIsInRect ( int x, int y );
-	virtual void initTruss(); //temp
+    virtual TrussUnitPseudoWindow* whoIsInRect ( int x, int y );
+	virtual void initPseudoWindow(); //temp
 	virtual void onDraw();
 
     // Handlers on events
@@ -35,11 +35,11 @@ public:
 
 public slots:
     virtual void addTrussUnit ( TrussUnit& );
-    virtual bool removeTrussUnit ( const TrussUnit& );
+    virtual bool removeTrussUnitPseudoWindow ( const TrussUnitPseudoWindow& );
 
 private:
-    TrussUnitList trussUnits;
-    TrussUnit* selectedTruss;
+    PseudoWindowList pseudoWindows;
+    TrussUnitPseudoWindow* selectedPseudoWindow;
     enum winBehaviours { nothing = 0, onDrag, onHorResize, onVerResize, 
         onBDiagResize, onFDiagResize };
     int behaviour;

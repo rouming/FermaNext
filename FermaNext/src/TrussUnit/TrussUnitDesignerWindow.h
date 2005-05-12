@@ -1,4 +1,4 @@
-
+ 
 #ifndef TRUSSUNITDESIGNERWINDOW_H
 #define TRUSSUNITDESIGNERWINDOW_H
 
@@ -17,7 +17,7 @@ public:
 public slots:
     // Delegate some slots of designerWidget
     virtual void addTrussUnit ( TrussUnit& );
-    virtual bool removeTrussUnit ( const TrussUnit& );
+    virtual bool removeTrussUnitPseudoWindow ( const TrussUnitPseudoWindow& );
 
 private:
     QVBoxLayout vbox;

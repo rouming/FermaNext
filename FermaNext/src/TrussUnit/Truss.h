@@ -185,6 +185,16 @@ public:
         emit afterStateLoaded();
     }
 
+    virtual const NodeList& getNodeList () const
+    {
+        return nodes;
+    }
+
+    virtual const PivotList& getPivotList () const
+    {
+        return pivots;
+    }
+
 protected:
     virtual void removeNode ( NodeListIter& iter )
     {
@@ -208,7 +218,7 @@ protected:
         emit afterPivotRemoval();
     }
 
-//private:
+private:
     NodeList  nodes;
     PivotList pivots;
 };
