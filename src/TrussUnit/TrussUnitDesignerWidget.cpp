@@ -22,33 +22,35 @@ TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
 
 void TrussUnitDesignerWidget::addTrussUnit ( TrussUnit& truss )
 {    
-    trussUnits.push_back(&truss); 
+    TrussUnitPseudoWindow* window = new TrussUnitPseudoWindow(truss);
+    pseudoWindows.push_back(window);
 }
 
-bool TrussUnitDesignerWidget::removeTrussUnit ( const TrussUnit& truss )
+bool TrussUnitDesignerWidget::removeTrussUnitPseudoWindow 
+                                    ( const TrussUnitPseudoWindow& window )
 {
-    TrussUnitList::iterator iter = trussUnits.begin();
-    for ( ; iter != trussUnits.end(); ++iter )
-        if ( (*iter) == &truss ) {            
-            trussUnits.erase(iter);
+    PseudoWindowList::iterator iter = pseudoWindows.begin();
+    for ( ; iter != pseudoWindows.end(); ++iter )
+        if ( (*iter) == &window ) {            
+            pseudoWindows.erase(iter);
             return true;
         }            
     return false; 
 }
 
-TrussUnit* TrussUnitDesignerWidget::whoIsInRect ( int x, int y )
+TrussUnitPseudoWindow* TrussUnitDesignerWidget::whoIsInRect ( int x, int y )
 {
-    TrussUnitList::reverse_iterator rev_iter = trussUnits.rbegin();
-    for ( ; rev_iter != trussUnits.rend(); ++rev_iter )
+    PseudoWindowList::reverse_iterator rev_iter = pseudoWindows.rbegin();
+    for ( ; rev_iter != pseudoWindows.rend(); ++rev_iter )
         if ( (*rev_iter)->inWindowRect(x, y) )
 		{
-            TrussUnit* tmpTruss = *rev_iter;
-            trussUnits.push_back(tmpTruss);
-            TrussUnitList::iterator iter = trussUnits.begin();
-            for ( ; iter != trussUnits.end(); ++iter )
+            TrussUnitPseudoWindow* tmpTruss = *rev_iter;
+            pseudoWindows.push_back(tmpTruss);
+            PseudoWindowList::iterator iter = pseudoWindows.begin();
+            for ( ; iter != pseudoWindows.end(); ++iter )
                 if ( (*iter)->inWindowRect(x, y) && *iter == tmpTruss )
                 {
-					trussUnits.erase(iter);
+					pseudoWindows.erase(iter);
                     if ( tmpTruss->inHeadlineRect(x, y) )
                        behaviour = onDrag; 
                     return tmpTruss;
@@ -59,8 +61,8 @@ TrussUnit* TrussUnitDesignerWidget::whoIsInRect ( int x, int y )
 
 bool TrussUnitDesignerWidget::isHorResize ( int x, int y )
 {
-    TrussUnitList::reverse_iterator rev_iter = trussUnits.rbegin();
-    for ( ; rev_iter != trussUnits.rend(); ++rev_iter )
+    PseudoWindowList::reverse_iterator rev_iter = pseudoWindows.rbegin();
+    for ( ; rev_iter != pseudoWindows.rend(); ++rev_iter )
     {
         if ( (*rev_iter)->inWindowRect(x, y) )
         {
@@ -74,8 +76,8 @@ bool TrussUnitDesignerWidget::isHorResize ( int x, int y )
 
 bool TrussUnitDesignerWidget::isVerResize ( int x, int y )
 {
-    TrussUnitList::reverse_iterator rev_iter = trussUnits.rbegin();
-    for ( ; rev_iter != trussUnits.rend(); ++rev_iter )
+    PseudoWindowList::reverse_iterator rev_iter = pseudoWindows.rbegin();
+    for ( ; rev_iter != pseudoWindows.rend(); ++rev_iter )
     {
         if ( (*rev_iter)->inWindowRect(x, y) )
         {
@@ -89,8 +91,8 @@ bool TrussUnitDesignerWidget::isVerResize ( int x, int y )
 
 bool TrussUnitDesignerWidget::isBDiagResize ( int x, int y )
 {
-    TrussUnitList::reverse_iterator rev_iter = trussUnits.rbegin();
-    for ( ; rev_iter != trussUnits.rend(); ++rev_iter )
+    PseudoWindowList::reverse_iterator rev_iter = pseudoWindows.rbegin();
+    for ( ; rev_iter != pseudoWindows.rend(); ++rev_iter )
     {
         if ( (*rev_iter)->inWindowRect(x, y) )
         {
@@ -104,8 +106,8 @@ bool TrussUnitDesignerWidget::isBDiagResize ( int x, int y )
 
 bool TrussUnitDesignerWidget::isFDiagResize ( int x, int y )
 {
-    TrussUnitList::reverse_iterator rev_iter = trussUnits.rbegin();
-    for ( ; rev_iter != trussUnits.rend(); ++rev_iter )
+    PseudoWindowList::reverse_iterator rev_iter = pseudoWindows.rbegin();
+    for ( ; rev_iter != pseudoWindows.rend(); ++rev_iter )
     {
         if ( (*rev_iter)->inWindowRect(x, y) )
         {
@@ -129,70 +131,70 @@ void TrussUnitDesignerWidget::onDraw ()
     glyph_gen glyph(0);
     text_renderer textRend ( baseRend, glyph );
     glyph.font ( agg::verdana18_bold );
-    TrussUnitList::iterator iter = trussUnits.begin();
-    for ( ; iter != trussUnits.end() - 1; ++iter )
+    PseudoWindowListIter iter = pseudoWindows.begin();
+    for ( ; iter != pseudoWindows.end() - 1; ++iter )
     {
-         TrussUnit* trussUnit = (*iter);
-         trussUnit->paint( baseRend, solidRend, textRend, ras, sl, ell );
+         TrussUnitPseudoWindow* pseudoWindow = (*iter);
+         pseudoWindow->paint( baseRend, solidRend, textRend, ras, sl, ell );
     }
-    TrussUnit* trussUnit = (*iter);
-    trussUnit->setBorderColor ( 25,55,65 );
-    trussUnit->setHeadlineColor ( 55, 155, 165 );
-    trussUnit->setResEllColor ( 120, 120, 120 );
-    trussUnits.back()->paint ( baseRend, solidRend, textRend, ras, sl, ell );
-    trussUnit->setBorderColor ( 20,35,40 );
-    trussUnit->setHeadlineColor ( 75, 105, 95 );
-    trussUnit->setResEllColor ( 50, 50, 50 );
+    TrussUnitPseudoWindow* pseudoWindow = (*iter);
+    pseudoWindow->setBorderColor ( 25,55,65 );
+    pseudoWindow->setHeadlineColor ( 55, 155, 165 );
+    pseudoWindow->setResEllColor ( 120, 120, 120 );
+    pseudoWindows.back()->paint ( baseRend, solidRend, textRend, ras, sl, ell );
+    pseudoWindow->setBorderColor ( 20,35,40 );
+    pseudoWindow->setHeadlineColor ( 75, 105, 95 );
+    pseudoWindow->setResEllColor ( 50, 50, 50 );
    
 }
 
-void TrussUnitDesignerWidget::initTruss ()  //temp method. Later to remove.
+void TrussUnitDesignerWidget::initPseudoWindow ()  //temp method. Later to remove.
 {
 	QWidget::setMouseTracking(true);
     flipY( true );
     QPoint pos1, pos2, pivotPnt1, pivotPnt2;
-	TrussUnitList::iterator iter = trussUnits.begin();
-	for ( ; iter != trussUnits.end(); ++iter )
+	PseudoWindowListIter iter = pseudoWindows.begin();
+	for ( ; iter != pseudoWindows.end(); ++iter )
 	{
-        TrussUnit* trussUnit = (*iter);
+        TrussUnitPseudoWindow* pseudoWindow = (*iter);
         pos1.setX ( X1 ); 
         pos1.setY ( Y1 ); 
         pos2.setX ( X2 );
         pos2.setY ( Y2 );
         behaviour = nothing;
-        trussUnit->setTrussArea ( 300, 300 );
-        trussUnit->createNode ( 280, 30 );
+        pseudoWindow->setTrussArea ( 300, 300 );
+        pseudoWindow->getTrussUnit().createNode ( 280, 30 );
         pivotPnt1.setX ( 0 );
         pivotPnt1.setY ( 0 );
         pivotPnt2.setX ( 130 );
         pivotPnt2.setY ( 130 );
-        trussUnit->createPivot ( pivotPnt1, pivotPnt2, 5 );
+        pseudoWindow->getTrussUnit().createPivot ( pivotPnt1, pivotPnt2, 5 );
         pivotPnt1.setX ( 252 );
         pivotPnt1.setY ( 300 );
-        trussUnit->createPivot ( pivotPnt1, pivotPnt2, 5 );
+        pseudoWindow->getTrussUnit().createPivot ( pivotPnt1, pivotPnt2, 5 );
         pivotPnt1.setX ( 0 );
         pivotPnt1.setY ( 300 );
-        trussUnit->createPivot ( pivotPnt1, pivotPnt2, 5 );
+        pseudoWindow->getTrussUnit().createPivot ( pivotPnt1, pivotPnt2, 5 );
         pivotPnt2.setX ( 250 );
         pivotPnt2.setY ( 300 );
-        trussUnit->createPivot ( pivotPnt1, pivotPnt2, 5 );
+        pseudoWindow->getTrussUnit().createPivot ( pivotPnt1, pivotPnt2, 5 );
         pivotPnt2.setX ( 0 );
         pivotPnt2.setY ( 0 );
-        trussUnit->createPivot ( pivotPnt1, pivotPnt2, 5 );
-        trussUnit->setLineWidth ( 1 );
-        trussUnit->setNodesRadius ( 5 );
-        trussUnit->setPivotsWidth ( 3 );
-        trussUnit->setResEllRad ( 3 );
-        trussUnit->setMinResizeVal ( 300 );
-        trussUnit->setWinRoundRad ( 25 );
-		trussUnit->setPosition ( pos1, pos2 );
-		trussUnit->setHeadlineWidth ( 30 );
-		trussUnit->setBorderWidth ( 4 );
-	    trussUnit->setBorderColor ( 20,35,40 );
-	    trussUnit->setCanvasColor ( 8, 10, 12 );
-        trussUnit->setHeadlineColor ( 75, 105, 95 );
-        trussUnit->setResEllColor ( 50, 50, 50 );
-        trussUnit->setTrussNodesPosition ();
+        pseudoWindow->getTrussUnit().createPivot ( pivotPnt1, pivotPnt2, 5 );
+        pseudoWindow->setCoordinateLineWidth ( 1 );
+        pseudoWindow->getTrussUnit().setNodesRadius ( 5 );
+        pseudoWindow->getTrussUnit().setPivotsWidth ( 3 );
+        pseudoWindow->setResEllRad ( 3 );
+        pseudoWindow->setMinResizeVal ( 300 );
+        pseudoWindow->setWinRoundRad ( 25 );
+		pseudoWindow->setPosition ( pos1, pos2 );
+		pseudoWindow->setHeadlineWidth ( 30 );
+		pseudoWindow->setBorderWidth ( 4 );
+	    pseudoWindow->setBorderColor ( 20,35,40 );
+	    pseudoWindow->setCanvasColor ( 8, 10, 12 );
+        pseudoWindow->setHeadlineColor ( 75, 105, 95 );
+        pseudoWindow->setResEllColor ( 50, 50, 50 );
+        pseudoWindow->setTrussNodesPosition ();
 		X1 = X1 + 180;
 		X2 = X2 + 180;
 	}
@@ -205,7 +207,7 @@ void TrussUnitDesignerWidget::initTruss ()  //temp method. Later to remove.
 void TrussUnitDesignerWidget::aggPaintEvent ( QPaintEvent* pe )
 {
 	if(init)
-		initTruss();
+		initPseudoWindow ();
 	onDraw();
 }
 
@@ -222,11 +224,11 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     if ( behaviour == onHorResize )
     {
         int dx;
-        int resizeLimit = selectedTruss->getMinResizeVal ();
+        int resizeLimit = selectedPseudoWindow->getMinResizeVal ();
 		dx = me->x() - clickX;
-        QPoint point1 = selectedTruss->getPoint1 ();
-        QPoint point2 = selectedTruss->getPoint2 ();
-        int bordW = selectedTruss->getBorderWidth ();
+        QPoint point1 = selectedPseudoWindow->getPoint1 ();
+        QPoint point2 = selectedPseudoWindow->getPoint2 ();
+        int bordW = selectedPseudoWindow->getBorderWidth ();
         if ( abs ( clickX - point1.x() ) <= bordW )
         {
             point1.setX ( point1.x() + dx );
@@ -239,8 +241,8 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
             if ( abs ( point2.x() - point1.x() ) < resizeLimit )
                point2.setX( point1.x() + resizeLimit );
         }
-        selectedTruss->setPosition ( point1, point2 );
-        selectedTruss->setTrussNodesPosition ();
+        selectedPseudoWindow->setPosition ( point1, point2 );
+        selectedPseudoWindow->setTrussNodesPosition ();
         update();
 		clickX += dx;
         return;
@@ -248,11 +250,11 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     if ( behaviour == onVerResize )
     {
         int dy;
-        int resizeLimit = selectedTruss->getMinResizeVal ();
+        int resizeLimit = selectedPseudoWindow->getMinResizeVal ();
 	    dy = flipY() ? height() - me->y() - clickY : me->y() - clickY;
-        QPoint point1 = selectedTruss->getPoint1 ();
-        QPoint point2 = selectedTruss->getPoint2 ();
-        int bordW = selectedTruss->getBorderWidth ();
+        QPoint point1 = selectedPseudoWindow->getPoint1 ();
+        QPoint point2 = selectedPseudoWindow->getPoint2 ();
+        int bordW = selectedPseudoWindow->getBorderWidth ();
         if ( abs ( clickY - point1.y() ) <= bordW )
         {
             point1.setY ( point1.y() + dy );
@@ -265,8 +267,8 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
             if ( abs ( point2.y() - point1.y() ) < resizeLimit )
                point2.setY( point1.y() + resizeLimit );
         }
-        selectedTruss->setPosition ( point1, point2 );
-        selectedTruss->setTrussNodesPosition ();
+        selectedPseudoWindow->setPosition ( point1, point2 );
+        selectedPseudoWindow->setTrussNodesPosition ();
         update();
 		clickY += dy;
         return;
@@ -275,12 +277,12 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     {
         int dx;
         int dy;
-        int resizeLimit = selectedTruss->getMinResizeVal ();
+        int resizeLimit = selectedPseudoWindow->getMinResizeVal ();
         dx = me->x() - clickX;
 	    dy = flipY() ? height() - me->y() - clickY : me->y() - clickY;
-        QPoint point1 = selectedTruss->getPoint1 ();
-        QPoint point2 = selectedTruss->getPoint2 ();
-        int bordW = selectedTruss->getBorderWidth ();
+        QPoint point1 = selectedPseudoWindow->getPoint1 ();
+        QPoint point2 = selectedPseudoWindow->getPoint2 ();
+        int bordW = selectedPseudoWindow->getBorderWidth ();
         if ( abs ( clickX - (point1.x() + bordW) ) <= bordW )
         {
             point1.setX ( point1.x() + dx );
@@ -305,8 +307,8 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
             if ( abs ( point2.y() - point1.y() ) < resizeLimit )
                point2.setY( point1.y() + resizeLimit );
         }
-        selectedTruss->setPosition ( point1, point2 );
-        selectedTruss->setTrussNodesPosition ();
+        selectedPseudoWindow->setPosition ( point1, point2 );
+        selectedPseudoWindow->setTrussNodesPosition ();
         update();
         clickX += dx;
 		clickY += dy;
@@ -316,12 +318,12 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     {
         int dx;
         int dy;
-        int resizeLimit = selectedTruss->getMinResizeVal ();
+        int resizeLimit = selectedPseudoWindow->getMinResizeVal ();
         dx = me->x() - clickX;
         dy = flipY() ? height() - me->y() - clickY : me->y() - clickY;
-        QPoint point1 = selectedTruss->getPoint1 ();
-        QPoint point2 = selectedTruss->getPoint2 ();
-        int bordW = selectedTruss->getBorderWidth ();
+        QPoint point1 = selectedPseudoWindow->getPoint1 ();
+        QPoint point2 = selectedPseudoWindow->getPoint2 ();
+        int bordW = selectedPseudoWindow->getBorderWidth ();
         if ( abs ( clickX - (point1.x() + bordW) ) <= bordW )
         {
             point1.setX ( point1.x() + dx );
@@ -343,11 +345,11 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         if ( abs ( clickY - (point2.y() - bordW) ) <= bordW )
         {
             point2.setY ( point2.y() + dy );
-            if ( abs ( point2.y() - point1.y() ) < selectedTruss->getMinResizeVal () )
-               point2.setY( point1.y() + selectedTruss->getMinResizeVal () );
+            if ( abs ( point2.y() - point1.y() ) < selectedPseudoWindow->getMinResizeVal () )
+               point2.setY( point1.y() + selectedPseudoWindow->getMinResizeVal () );
         }
-        selectedTruss->setPosition ( point1, point2 );
-        selectedTruss->setTrussNodesPosition ();
+        selectedPseudoWindow->setPosition ( point1, point2 );
+        selectedPseudoWindow->setTrussNodesPosition ();
         update();
         clickX += dx;
 		clickY += dy;
@@ -358,14 +360,14 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
 		int dx, dy;
 		dx = me->x() - clickX;
 		dy = flipY() ? height() - me->y() - clickY : me->y() - clickY;
-        QPoint point1 = selectedTruss->getPoint1 ();
-        QPoint point2 = selectedTruss->getPoint2 ();
+        QPoint point1 = selectedPseudoWindow->getPoint1 ();
+        QPoint point2 = selectedPseudoWindow->getPoint2 ();
         point1.setX ( point1.x() + dx ); 
         point1.setY ( point1.y() + dy );
         point2.setX ( point2.x() + dx );
         point2.setY ( point2.y() + dy );
-		selectedTruss->setPosition ( point1, point2 );
-        selectedTruss->setTrussNodesPosition ();
+		selectedPseudoWindow->setPosition ( point1, point2 );
+        selectedPseudoWindow->setTrussNodesPosition ();
 		update();
 		clickX += dx;
 		clickY += dy;
@@ -389,7 +391,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
 
 void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
 {
-	selectedTruss = NULL;
+	selectedPseudoWindow = NULL;
     behaviour = nothing;
 }
 
@@ -397,7 +399,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
 {
 	clickX = me->x();
 	clickY = flipY() ? height() - me->pos().y() : me->pos().y();
-    selectedTruss = whoIsInRect ( clickX, clickY );
+    selectedPseudoWindow = whoIsInRect ( clickX, clickY );
     if ( isHorResize ( me->x(), flipY() ? height() - me->y() : me->y() ) )
     {
         behaviour = onHorResize;

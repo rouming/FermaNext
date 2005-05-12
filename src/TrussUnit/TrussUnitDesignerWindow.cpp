@@ -26,12 +26,13 @@ TrussUnitDesignerWindow::TrussUnitDesignerWindow ( const QString& caption,
 
 void TrussUnitDesignerWindow::addTrussUnit ( TrussUnit& truss )
 {    
-    designerWidget.addTrussUnit(truss); 
+    designerWidget.addTrussUnit ( truss ); 
 }
 
-bool TrussUnitDesignerWindow::removeTrussUnit ( const TrussUnit& truss )
+bool TrussUnitDesignerWindow::removeTrussUnitPseudoWindow 
+                                ( const TrussUnitPseudoWindow& window )
 {
-    return designerWidget.removeTrussUnit(truss);
+    return designerWidget.removeTrussUnitPseudoWindow ( window );
 }
 
 
