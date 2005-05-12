@@ -161,8 +161,7 @@ void TrussUnitDesignerWidget::initPseudoWindow ()  //temp method. Later to remov
         pos1.setY ( Y1 ); 
         pos2.setX ( X2 );
         pos2.setY ( Y2 );
-        behaviour = nothing;
-        pseudoWindow->setTrussArea ( 300, 300 );
+        behaviour = nothing;        
         pseudoWindow->getTrussUnit().createNode ( 280, 30 );
         pivotPnt1.setX ( 0 );
         pivotPnt1.setY ( 0 );

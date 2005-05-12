@@ -81,8 +81,7 @@ public:
 	color_type getCanvasColor () const;
 	color_type getHeadlineColor () const;
 	color_type getBorderColor () const;
-    void setPosition ( QPoint point1, QPoint point2 );
-    void setTrussArea ( int length, int width );
+    void setPosition ( QPoint point1, QPoint point2 );    
     void setTrussAreaWindowIndent ( int indent );
     void setTrussNodesPosition ();
     void setCoordinateLineWidth ( int width );
@@ -113,8 +112,8 @@ public:
                  agg::scanline_p8& sl, agg::ellipse& ell ) const;
 private:
     TrussUnit& trussUnit;
-	int  headW, bordW, resEllRad, winRoundRad, minResizeVal,
-         lineWidth, trussAreaLength, trussAreaWidth, trussAreaIndent;
+	int  headW, bordW, resEllRad, winRoundRad, 
+          minResizeVal, lineWidth, trussAreaIndent;
     QPoint _point1, _point2;
 	color_type canvColor, headColor, borderColor, resEllColor;
 };

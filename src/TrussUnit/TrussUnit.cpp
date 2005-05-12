@@ -43,7 +43,8 @@ bool PaintableTrussElement::isEnabled () const
  * Truss Unit
  *****************************************************************************/
 
-TrussUnit::TrussUnit ()
+TrussUnit::TrussUnit () :
+    area( 300, 300 )
 {}
 
 TrussUnit::~TrussUnit ()
@@ -56,7 +57,9 @@ const QString& TrussUnit::getTrussName () const
 
 void TrussUnit::setTrussName ( const QString& name )
 {
+    QString old(trussName);
     trussName = name;
+    emit onTrussNameChange( old, trussName );
 }
 
 void TrussUnit::setNodesRadius ( int rad )
@@ -65,6 +68,7 @@ void TrussUnit::setNodesRadius ( int rad )
     NodeList::iterator iter = nodeList.begin();
     for ( ; iter != nodeList.end(); ++iter )
         (*iter)->setRadius ( rad );
+    emit onNodesRadiusChange( rad );
 }
 
 void TrussUnit::setPivotsWidth ( int wid )
@@ -73,6 +77,18 @@ void TrussUnit::setPivotsWidth ( int wid )
     PivotList::iterator iter = pivotList.begin();
     for ( ; iter != pivotList.end(); ++iter )
         (*iter)->setPivotWidth ( wid );
+    emit onPivotsWidthChange( wid );
+}
+
+void TrussUnit::setArea ( const QSize& a )
+{    
+    area = a;
+    emit onAreaChange( area );
+}
+
+const QSize& TrussUnit::getArea ()
+{
+    return area;
 }
 
 void TrussUnit::paint ( base_renderer& baseRend, solid_renderer& solidRend,

@@ -60,7 +60,7 @@ class TrussNode;
 class TrussPivot;
 
 class PaintableTrussElement 
-{
+{    
 public:
     PaintableTrussElement ();
     PaintableTrussElement ( bool e, bool v );
@@ -76,9 +76,10 @@ private:
     bool enabled; 
 };
 
-class TrussUnit : public Truss<TrussNode, TrussPivot>, 
+class TrussUnit : public Truss<TrussNode, TrussPivot>,                  
                   public PaintableTrussElement
 {
+    Q_OBJECT
 private:    
     // constructor is closed. TrussUnitManager should manage trusses;
     friend class TrussUnitManager;
@@ -88,14 +89,27 @@ public:
     virtual ~TrussUnit ();
 
     const QString& getTrussName () const;
-    void setTrussName ( const QString& name );
-    void setNodesRadius ( int rad );
-    void setPivotsWidth ( int wid );
+    const QSize& getArea ();
+  
     void paint ( base_renderer& baseRend, solid_renderer& solidRend,
                  text_renderer& textRend, agg::rasterizer_scanline_aa<>& ras, 
                  agg::scanline_p8& sl, agg::ellipse& ell ) const;
+
+public slots:
+    void setTrussName ( const QString& name );
+    void setNodesRadius ( int rad );
+    void setPivotsWidth ( int wid );
+    void setArea ( const QSize& );
+
+signals:
+    void onTrussNameChange ( const QString& old, const QString& n );
+    void onAreaChange ( const QSize& );
+    void onNodesRadiusChange ( int );
+    void onPivotsWidthChange ( int );
+
 private:
     QString trussName;
+    QSize area;
 };
 
 class TrussNode: public Node, public PaintableTrussElement
