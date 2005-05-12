@@ -93,13 +93,14 @@ QPoint TrussUnitPseudoWindow::getTrussAreaPoint2 () const
 
 QPoint TrussUnitPseudoWindow::transCoord ( QPoint point, bool flipY )
 {
+    const QSize area = trussUnit.getArea();
     QPoint p1, p2;
     p1 = getTrussAreaPoint1 ();
     p2 = getTrussAreaPoint2 ();
     double realAreaLen = abs ( p2.x() - p1.x() );
     double realAreaWid = abs ( p2.y() - p1.y() );
-    double scaleFactorX = realAreaLen / trussAreaLength;
-    double scaleFactorY = realAreaWid / trussAreaWidth;
+    double scaleFactorX = realAreaLen / area.height();
+    double scaleFactorY = realAreaWid / area.width();
     point.setX ( p1.x() + point.x() * scaleFactorX );
     point.setY ( flipY ? p2.y() - point.y() * scaleFactorY : 
                            p1.y() + point.y() * scaleFactorY );
@@ -217,12 +218,6 @@ void TrussUnitPseudoWindow::setPosition ( QPoint point1, QPoint point2 )
 {
     _point1 = point1;
     _point2 = point2;
-}
-
-void TrussUnitPseudoWindow::setTrussArea ( int length, int width )
-{
-    trussAreaLength = length;
-    trussAreaWidth = width;
 }
 
 void TrussUnitPseudoWindow::setTrussAreaWindowIndent ( int indent )
