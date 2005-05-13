@@ -11,11 +11,11 @@ TrussUnitDesignerWindow::TrussUnitDesignerWindow ( const QString& caption,
     QMainWindow(p, n, f),
     vbox(this),
     scroll(this),
-    designerWidget(this)
+    designerWidget(new TrussUnitDesignerWidget(this))
 {       
-    designerWidget.resize(900,800);
-    scroll.addChild(&designerWidget);
-    designerWidget.setAcceptDrops(TRUE);
+    designerWidget->resize(900,800);
+    scroll.addChild(designerWidget);
+    designerWidget->setAcceptDrops(TRUE);
 
     vbox.addWidget(&scroll);
     vbox.activate();
@@ -26,18 +26,18 @@ TrussUnitDesignerWindow::TrussUnitDesignerWindow ( const QString& caption,
 
 void TrussUnitDesignerWindow::addTrussUnit ( TrussUnit& truss )
 {    
-    designerWidget.addTrussUnit ( truss ); 
+    designerWidget->addTrussUnit ( truss ); 
 }
 
 bool TrussUnitDesignerWindow::removeTrussUnit ( const TrussUnit& truss )
 {
-    return designerWidget.removeTrussUnit( truss );
+    return designerWidget->removeTrussUnit( truss );
 }
 
 bool TrussUnitDesignerWindow::removeTrussUnitPseudoWindow 
                                 ( const TrussUnitPseudoWindow& window )
 {
-    return designerWidget.removeTrussUnitPseudoWindow ( window );
+    return designerWidget->removeTrussUnitPseudoWindow ( window );
 }
 
 
