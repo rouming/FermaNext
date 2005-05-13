@@ -87,6 +87,7 @@ public:
     void setTrussAreaWindowIndent ( int indent );
     void setTrussNodesPosition ();
     void setNodeHighlight ( int x, int y );
+    void removeNodeHighlight ();
     void setCoordinateLineWidth ( int width );
     void setHeadlineWidth ( int  width );
     void setBorderWidth ( int  width );

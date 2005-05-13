@@ -134,7 +134,6 @@ void TrussUnitDesignerWidget::initPseudoWindow ()  //temp method. Later to remov
         pos2.setX ( X2 );
         pos2.setY ( Y2 );
         winBehaviour = windowIdle;
-
         pseudoWindow->getTrussUnit().createNode ( 280, 30 );
         pivotPnt1.setX ( 0 );
         pivotPnt1.setY ( 0 );
@@ -358,15 +357,16 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
             QWidget::setCursor ( Qt::SizeBDiagCursor );
         else if ( pseudoWindow->inFDiagResizeRect ( x, y ) )
             QWidget::setCursor ( Qt::SizeFDiagCursor );
-/* TODO   
         else if ( pseudoWindow->inNodeRadius ( x, y ) )
         {
-            trussElemBehaviour = onNodeSelect;
+            QWidget::setMouseTracking(true);
             pseudoWindow->setNodeHighlight ( x, y );
+            trussElemBehaviour = onNodeSelect;
             QWidget::setCursor ( Qt::ArrowCursor );
         }
-*/ 
         else
+            pseudoWindow->removeNodeHighlight ();
+            trussElemBehaviour = trussElementIdle;
             QWidget::setCursor ( Qt::ArrowCursor );
     }
     else

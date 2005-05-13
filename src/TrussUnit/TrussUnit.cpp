@@ -69,6 +69,7 @@ void TrussUnit::setTrussName ( const QString& name )
 
 void TrussUnit::setNodesRadius ( int rad )
 {
+    nodesRadius = rad;
     NodeList nodeList = getNodeList ();
     NodeList::iterator iter = nodeList.begin();
     for ( ; iter != nodeList.end(); ++iter )
