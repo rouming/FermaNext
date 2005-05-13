@@ -5,24 +5,24 @@
 #include "AggQWidget.h"
 #include "TrussUnitPseudoWindow.h"
 
-typedef std::vector<TrussUnitPseudoWindow*>  PseudoWindowList;
-typedef std::vector<TrussUnitPseudoWindow*>::iterator  PseudoWindowListIter;
-
 class TrussUnitDesignerWidget : public AggQWidget
 {
     Q_OBJECT
 public:
     bool init; //temp    
+    int X1, Y1; //temp       
+    int X2, Y2; //temp        
 
     TrussUnitDesignerWidget ( QWidget* parent = 0 );
+    virtual ~TrussUnitDesignerWidget ();
     
     virtual bool isHorResize ( int x, int y );
     virtual bool isVerResize ( int x, int y );
     virtual bool isBDiagResize ( int x, int y );
     virtual bool isFDiagResize ( int x, int y );
     virtual TrussUnitPseudoWindow* whoIsInRect ( int x, int y );
-	virtual void initPseudoWindow(); //temp
-	virtual void onDraw();
+    virtual void initPseudoWindow(); //temp
+    virtual void onDraw();
 
     // Handlers on events
     void aggPaintEvent ( QPaintEvent* );
@@ -38,12 +38,19 @@ public slots:
     virtual bool removeTrussUnit ( const TrussUnit& );
     virtual bool removeTrussUnitPseudoWindow ( const TrussUnitPseudoWindow& );
 
+protected:
+    virtual void clearPseudoWindows ();
+
 private:
+    typedef std::vector<TrussUnitPseudoWindow*> PseudoWindowList;
+    typedef std::vector<TrussUnitPseudoWindow*>::iterator PseudoWindowListIter;
+
+    enum WindowBehaviour { nothing = 0, onDrag, onHorResize, onVerResize, 
+                           onBDiagResize, onFDiagResize };
+
     PseudoWindowList pseudoWindows;
     TrussUnitPseudoWindow* selectedPseudoWindow;
-    enum winBehaviours { nothing = 0, onDrag, onHorResize, onVerResize, 
-        onBDiagResize, onFDiagResize };
-    int behaviour;
+    WindowBehaviour behaviour;
     int clickX, clickY;
 };
 

@@ -9,16 +9,29 @@
 #include <qcursor.h>
 #include <qpoint.h>
 
-int X1 = 50, Y1 = 50;       //temp
-int X2 = 400, Y2 = 400;         
-
 /*****************************************************************************
  * Truss Designer Widget
  *****************************************************************************/
 
 TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
-    AggQWidget(p)
+    AggQWidget(p),
+    init(true),
+    X1(50), Y1(50),
+    X2(400), Y2(400)
 {}
+
+TrussUnitDesignerWidget::~TrussUnitDesignerWidget ()
+{
+    clearPseudoWindows();
+}
+
+void TrussUnitDesignerWidget::clearPseudoWindows ()
+{
+    PseudoWindowListIter iter = pseudoWindows.begin();
+    for ( ; iter != pseudoWindows.end(); ++iter )
+        delete *iter;
+    pseudoWindows.clear();    
+}
 
 void TrussUnitDesignerWidget::addTrussUnit ( TrussUnit& truss )
 {    
@@ -30,10 +43,12 @@ bool TrussUnitDesignerWidget::removeTrussUnit ( const TrussUnit& truss )
 {
     PseudoWindowList::iterator iter = pseudoWindows.begin();
     for ( ; iter != pseudoWindows.end(); ++iter )
-        if ( &((*iter)->getTrussUnit()) == &truss ) {            
+        if ( &((*iter)->getTrussUnit()) == &truss ) {
+            TrussUnitPseudoWindow* w = *iter;
             pseudoWindows.erase(iter);
+            delete w;
             return true;
-        }            
+        }
     return false;     
 }
 
@@ -42,10 +57,12 @@ bool TrussUnitDesignerWidget::removeTrussUnitPseudoWindow
 {
     PseudoWindowList::iterator iter = pseudoWindows.begin();
     for ( ; iter != pseudoWindows.end(); ++iter )
-        if ( (*iter) == &window ) {            
+        if ( (*iter) == &window ) {
+            TrussUnitPseudoWindow* w = *iter;
             pseudoWindows.erase(iter);
+            delete w;
             return true;
-        }            
+        }
     return false; 
 }
 
@@ -66,7 +83,7 @@ TrussUnitPseudoWindow* TrussUnitDesignerWidget::whoIsInRect ( int x, int y )
                        behaviour = onDrag; 
                     return tmpTruss;
 				}
-        }
+                }
     return 0;
 }
 
@@ -143,11 +160,13 @@ void TrussUnitDesignerWidget::onDraw ()
     text_renderer textRend ( baseRend, glyph );
     glyph.font ( agg::verdana18_bold );
     PseudoWindowListIter iter = pseudoWindows.begin();
-    for ( ; iter != pseudoWindows.end() - 1; ++iter )
-    {
-         TrussUnitPseudoWindow* pseudoWindow = (*iter);
-         pseudoWindow->paint( baseRend, solidRend, textRend, ras, sl, ell );
-    }
+    
+    for ( ; iter != pseudoWindows.end() - 1; ++iter ) {
+            TrussUnitPseudoWindow* pseudoWindow = (*iter);
+            pseudoWindow->paint( baseRend, solidRend, textRend, ras, sl, ell );
+
+    }  
+
     TrussUnitPseudoWindow* pseudoWindow = (*iter);
     pseudoWindow->setBorderColor ( 25,55,65 );
     pseudoWindow->setHeadlineColor ( 55, 155, 165 );
@@ -155,24 +174,24 @@ void TrussUnitDesignerWidget::onDraw ()
     pseudoWindows.back()->paint ( baseRend, solidRend, textRend, ras, sl, ell );
     pseudoWindow->setBorderColor ( 20,35,40 );
     pseudoWindow->setHeadlineColor ( 75, 105, 95 );
-    pseudoWindow->setResEllColor ( 50, 50, 50 );
-   
+    pseudoWindow->setResEllColor ( 50, 50, 50 );   
 }
 
 void TrussUnitDesignerWidget::initPseudoWindow ()  //temp method. Later to remove.
 {
-	QWidget::setMouseTracking(true);
+    QWidget::setMouseTracking(true);
     flipY( true );
     QPoint pos1, pos2, pivotPnt1, pivotPnt2;
-	PseudoWindowListIter iter = pseudoWindows.begin();
-	for ( ; iter != pseudoWindows.end(); ++iter )
-	{
-        TrussUnitPseudoWindow* pseudoWindow = (*iter);
+
+    PseudoWindowListIter iter = pseudoWindows.begin();
+    for ( ; iter != pseudoWindows.end(); ++iter ) { 
+        TrussUnitPseudoWindow* pseudoWindow = (*iter);        
         pos1.setX ( X1 ); 
         pos1.setY ( Y1 ); 
         pos2.setX ( X2 );
         pos2.setY ( Y2 );
-        behaviour = nothing;        
+        behaviour = nothing;
+
         pseudoWindow->getTrussUnit().createNode ( 280, 30 );
         pivotPnt1.setX ( 0 );
         pivotPnt1.setY ( 0 );
@@ -197,18 +216,18 @@ void TrussUnitDesignerWidget::initPseudoWindow ()  //temp method. Later to remov
         pseudoWindow->setResEllRad ( 3 );
         pseudoWindow->setMinResizeVal ( 300 );
         pseudoWindow->setWinRoundRad ( 25 );
-		pseudoWindow->setPosition ( pos1, pos2 );
-		pseudoWindow->setHeadlineWidth ( 30 );
-		pseudoWindow->setBorderWidth ( 4 );
-	    pseudoWindow->setBorderColor ( 20,35,40 );
-	    pseudoWindow->setCanvasColor ( 8, 10, 12 );
+        pseudoWindow->setPosition ( pos1, pos2 );
+        pseudoWindow->setHeadlineWidth ( 30 );
+        pseudoWindow->setBorderWidth ( 4 );
+        pseudoWindow->setBorderColor ( 20,35,40 );
+        pseudoWindow->setCanvasColor ( 8, 10, 12 );
         pseudoWindow->setHeadlineColor ( 75, 105, 95 );
         pseudoWindow->setResEllColor ( 50, 50, 50 );
         pseudoWindow->setTrussNodesPosition ();
-		X1 = X1 + 180;
-		X2 = X2 + 180;
-	}
-	init = false;
+        X1 = X1 + 180;
+        X2 = X2 + 180;
+    }
+    init = false;
 }
 
 /*****************************************************************************/
@@ -216,9 +235,9 @@ void TrussUnitDesignerWidget::initPseudoWindow ()  //temp method. Later to remov
 
 void TrussUnitDesignerWidget::aggPaintEvent ( QPaintEvent* pe )
 {
-	if(init)
-		initPseudoWindow ();
-	onDraw();
+   if ( init ) 
+       initPseudoWindow ();
+   onDraw();
 }
 
 void TrussUnitDesignerWidget::aggResizeEvent ( QResizeEvent* re )
@@ -396,12 +415,12 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         QWidget::setCursor ( Qt::SizeFDiagCursor );
     }
     else
-         QWidget::setCursor ( Qt::ArrowCursor );     
+    QWidget::setCursor ( Qt::ArrowCursor );
 }
 
 void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
 {
-	selectedPseudoWindow = NULL;
+    selectedPseudoWindow = NULL;
     behaviour = nothing;
 }
 
@@ -430,7 +449,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
         behaviour = onFDiagResize;
         QWidget::setCursor ( Qt::SizeFDiagCursor );
     }
-	update();
+    update();
 }
 
 void TrussUnitDesignerWidget::aggCtrlChangedEvent ( const agg::ctrl* ctrl )
