@@ -78,12 +78,15 @@ public:
     bool inVerResizeRect ( int x, int y );
     bool inBDiagResizeRect ( int x, int y );
     bool inFDiagResizeRect ( int x, int y );
-    color_type getCanvasColor () const;
-    color_type getHeadlineColor () const;
-    color_type getBorderColor () const;
+    TrussNode* findNodeByCoord ( int x, int y );
+    bool inNodeRadius ( int x, int y );
+	color_type getCanvasColor () const;
+	color_type getHeadlineColor () const;
+	color_type getBorderColor () const;
     void setPosition ( QPoint point1, QPoint point2 );    
     void setTrussAreaWindowIndent ( int indent );
     void setTrussNodesPosition ();
+    void setNodeHighlight ( int x, int y );
     void setCoordinateLineWidth ( int width );
     void setHeadlineWidth ( int  width );
     void setBorderWidth ( int  width );

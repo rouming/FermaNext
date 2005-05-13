@@ -16,13 +16,10 @@ public:
     TrussUnitDesignerWidget ( QWidget* parent = 0 );
     virtual ~TrussUnitDesignerWidget ();
     
-    virtual bool isHorResize ( int x, int y );
-    virtual bool isVerResize ( int x, int y );
-    virtual bool isBDiagResize ( int x, int y );
-    virtual bool isFDiagResize ( int x, int y );
-    virtual TrussUnitPseudoWindow* whoIsInRect ( int x, int y );
-    virtual void initPseudoWindow(); //temp
-    virtual void onDraw();
+    virtual TrussUnitPseudoWindow* findPseudoWindowByCoord ( int x, int y );
+    virtual void pseudoWindowToFront ( TrussUnitPseudoWindow* window );
+	virtual void onDraw();
+	virtual void initPseudoWindow(); //temp
 
     // Handlers on events
     void aggPaintEvent ( QPaintEvent* );
@@ -45,12 +42,14 @@ private:
     typedef std::vector<TrussUnitPseudoWindow*> PseudoWindowList;
     typedef std::vector<TrussUnitPseudoWindow*>::iterator PseudoWindowListIter;
 
-    enum WindowBehaviour { nothing = 0, onDrag, onHorResize, onVerResize, 
+    enum WindowBehaviour { windowIdle = 0, onDrag, onHorResize, onVerResize, 
                            onBDiagResize, onFDiagResize };
-
+    enum TrussElementBehaviour { trussElementIdle = 0, onNodeSelect, onNodeDrag,
+                                  onPivotSelect, onPivotDrag };
     PseudoWindowList pseudoWindows;
-    TrussUnitPseudoWindow* selectedPseudoWindow;
-    WindowBehaviour behaviour;
+    TrussUnitPseudoWindow* pseudoWindow;
+    WindowBehaviour winBehaviour;
+    TrussElementBehaviour trussElemBehaviour;
     int clickX, clickY;
 };
 
