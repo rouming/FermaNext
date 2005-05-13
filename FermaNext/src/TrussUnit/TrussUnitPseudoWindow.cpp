@@ -252,6 +252,18 @@ void TrussUnitPseudoWindow::setNodeHighlight ( int x, int y )
     node->setHighlighted ( true );
 }
 
+void TrussUnitPseudoWindow::removeNodeHighlight ()
+{
+    TrussUnit::NodeList nodeList = trussUnit.getNodeList ();
+    TrussUnit::NodeList:: iterator iter = nodeList.begin();
+    for ( ; iter != nodeList.end(); ++iter )
+	{
+        TrussNode* node = *iter;
+        if ( node->isHighlighted () )
+            node->setHighlighted ( false );
+    }
+}
+
 void TrussUnitPseudoWindow::setTrussAreaWindowIndent ( int indent )
 {
     trussAreaIndent = indent;

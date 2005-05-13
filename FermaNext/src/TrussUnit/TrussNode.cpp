@@ -47,11 +47,21 @@ void TrussNode::paint ( base_renderer& baseRend, solid_renderer& solidRend,
                         text_renderer&, scanline_rasterizer& ras, 
                         agg::scanline_p8& sl, agg::ellipse& ell ) const
 {
+    int k = 0;
+    if ( isHighlighted () )
+        k = 1;
     solidRend.color ( agg::rgba(10, 10, 10) );
-    ell.init ( xPos, yPos, radius + 1, radius + 1, 16 );
+    ell.init ( xPos, yPos, radius + k + 1, radius + k + 1, 16 );
     ras.add_path ( ell );
     agg::render_scanlines ( ras, sl, solidRend );
-    ell.init ( xPos, yPos, radius, radius, 16 );
+    if ( isHighlighted () )
+    {
+        solidRend.color ( agg::rgba(200, 35, 15, 0.5) );
+        ell.init ( xPos, yPos, radius + 5, radius + 5, 16 );
+        ras.add_path ( ell );
+        agg::render_scanlines ( ras, sl, solidRend );
+    }
+    ell.init ( xPos, yPos, radius + k, radius + k, 16 );
     gradient_span_alloc gradSpan;
     radial_gradient gradFunc;
     color_array_type gradColors;
