@@ -359,15 +359,16 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
             QWidget::setCursor ( Qt::SizeFDiagCursor );
         else if ( pseudoWindow->inNodeRadius ( x, y ) )
         {
-            QWidget::setMouseTracking(true);
             pseudoWindow->setNodeHighlight ( x, y );
             trussElemBehaviour = onNodeSelect;
             QWidget::setCursor ( Qt::ArrowCursor );
+            update();
         }
         else
             pseudoWindow->removeNodeHighlight ();
             trussElemBehaviour = trussElementIdle;
             QWidget::setCursor ( Qt::ArrowCursor );
+            update();
     }
     else
         QWidget::setCursor ( Qt::ArrowCursor );

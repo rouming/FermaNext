@@ -67,7 +67,7 @@ void TrussNode::paint ( base_renderer& baseRend, solid_renderer& solidRend,
     color_array_type gradColors;
     color_type begin ( 250, 250, 230 ); 
     color_type middle ( 220, 190, 180 ); 
-    color_type end ( 170, 120, 110 );
+    color_type end ( 170 - k * 100, 120 - k * 60, 110 - k * 50 );
     unsigned i;
     for(i = 0; i < 128; ++i)
     {
