@@ -24,8 +24,8 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWorkspace* qWsp ) :
     // Catch trusses creation or deletion.
     connect( &trussManager, SIGNAL(onTrussUnitCreate(TrussUnit&)), 
              designerWindow, SLOT(addTrussUnit(TrussUnit&)) );
-    connect( &trussManager, SIGNAL(onTrussUnitRemove(TrussUnit&)), 
-             designerWindow, SLOT(removeTrussUnit(TrussUnit&)) );    
+    connect( &trussManager, SIGNAL(onTrussUnitRemove(const TrussUnit&)), 
+             designerWindow, SLOT(removeTrussUnit(const TrussUnit&)) );
 
     //TODO: remove this block in future
 	for( uint i = 0; i <3; i++)
@@ -72,13 +72,15 @@ ObjectStateManager& FermaNextProject::getStateManager ()
     return stateManager;
 }
 
-bool FermaNextProject::eventFilter( QObject* o, QEvent* e )
+bool FermaNextProject::eventFilter( QObject*, QEvent* e )
 {
     switch ( e->type() )
     {    
     case QEvent::WindowStateChange:
         maximizedDesginerWindow = designerWindow->isMaximized();
-        break;    
+        break;
+    default:
+        break;
     }
     return false;
 }

@@ -68,29 +68,29 @@ public:
     QPoint getTrussAreaPoint1 () const;
     QPoint getTrussAreaPoint2 () const;
     QPoint transCoord ( QPoint point, bool flipY );
-	int getHeadlineWidth () const;
-	int getBorderWidth () const;
+    int getHeadlineWidth () const;
+    int getBorderWidth () const;
     int getMinResizeVal () const;
     bool inWindowRect ( int x, int y );
-	bool inCanvasRect ( int  x, int  y );
-	bool inHeadlineRect ( int  x, int  y );
+    bool inCanvasRect ( int  x, int  y );
+    bool inHeadlineRect ( int  x, int  y );
     bool inHorResizeRect ( int x, int y );
     bool inVerResizeRect ( int x, int y );
     bool inBDiagResizeRect ( int x, int y );
     bool inFDiagResizeRect ( int x, int y );
-	color_type getCanvasColor () const;
-	color_type getHeadlineColor () const;
-	color_type getBorderColor () const;
+    color_type getCanvasColor () const;
+    color_type getHeadlineColor () const;
+    color_type getBorderColor () const;
     void setPosition ( QPoint point1, QPoint point2 );    
     void setTrussAreaWindowIndent ( int indent );
     void setTrussNodesPosition ();
     void setCoordinateLineWidth ( int width );
-	void setHeadlineWidth ( int  width );
-	void setBorderWidth ( int  width );
+    void setHeadlineWidth ( int  width );
+    void setBorderWidth ( int  width );
     void setMinResizeVal ( int value );
-	void setCanvasColor ( int r, int g, int b );
-	void setHeadlineColor ( int r, int g, int b );
-	void setBorderColor ( int r, int g, int b );
+    void setCanvasColor ( int r, int g, int b );
+    void setHeadlineColor ( int r, int g, int b );
+    void setBorderColor ( int r, int g, int b );
     void setResEllRad ( int radius );
     void setWinRoundRad ( int radius );
     void setResEllColor ( int r, int g, int b );
@@ -112,10 +112,10 @@ public:
                  agg::scanline_p8& sl, agg::ellipse& ell ) const;
 private:
     TrussUnit& trussUnit;
-	int  headW, bordW, resEllRad, winRoundRad, 
-          minResizeVal, lineWidth, trussAreaIndent;
+    int  headW, bordW, resEllRad, winRoundRad, 
+         minResizeVal, lineWidth, trussAreaIndent;
     QPoint _point1, _point2;
-	color_type canvColor, headColor, borderColor, resEllColor;
+    color_type canvColor, headColor, borderColor, resEllColor;
 };
 
 #endif //TRUSSUNITPSEUDOWINDOW_H

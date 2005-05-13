@@ -132,14 +132,15 @@ public:
 
     virtual N& nodeComparison ( QPoint point, int nodeRadius )
     {
-        NodeList::iterator iter = nodes.begin();
+        NodeListIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
         {
             N* node = *iter;
             int x1 = node->getX ();
             int y1 = node->getY ();
             if ( ( (point.x() - x1) * (point.x() - x1) + 
-                   (point.y() - y1) * (point.y() - y1) ) <  4 * nodeRadius * nodeRadius )
+                   (point.y() - y1) * (point.y() - y1) ) <  
+                 4 * nodeRadius * nodeRadius )
                 return *node;
         }
         N& newNode = createNode ( point.x(), point.y() );
@@ -232,14 +233,15 @@ template <class N> class Pivot : public PivotEmitter
 protected:
     Pivot () : first(0), last(0) {}
     Pivot ( N& first_, N& last_ ) : 
-       nodesDelegated(true),
-       first(&first_),
-       last(&last_) 
+        nodesDelegated(true),
+        first(&first_),
+        last(&last_) 
     {}
     Pivot ( const Pivot& p ) :
-       nodesDelegated(false),
-       first(new N(*p.first)),
-       last(new N(*p.last))
+        PivotEmitter(),
+        nodesDelegated(false),
+        first(new N(*p.first)),
+        last(new N(*p.last))
     {}
     virtual ~Pivot ()
     {

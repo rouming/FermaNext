@@ -13,7 +13,8 @@ TrussPivot::TrussPivot ( TrussNode& first, TrussNode& last ) :
 {}
 
 TrussPivot::TrussPivot ( const TrussPivot& p ) :
-    Pivot<TrussNode>(p)
+    Pivot<TrussNode>(p),
+    PaintableTrussElement()
 {}
 
 struct line

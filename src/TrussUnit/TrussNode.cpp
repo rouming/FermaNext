@@ -9,7 +9,8 @@ TrussNode::TrussNode ()
 {}
 
 TrussNode::TrussNode ( const TrussNode& n ) :
-    Node(n)
+    Node(n),
+    PaintableTrussElement()
 {}
 
 int TrussNode::getRadius () const
@@ -43,7 +44,7 @@ void TrussNode::setRadius ( int rad )
 }
 
 void TrussNode::paint ( base_renderer& baseRend, solid_renderer& solidRend,
-                        text_renderer& textRend, scanline_rasterizer& ras, 
+                        text_renderer&, scanline_rasterizer& ras, 
                         agg::scanline_p8& sl, agg::ellipse& ell ) const
 {
     solidRend.color ( agg::rgba(10, 10, 10) );

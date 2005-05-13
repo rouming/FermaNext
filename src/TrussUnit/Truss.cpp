@@ -19,6 +19,7 @@ Node::Node ( int x_, int y_, Fixation fix_ ) :
 {}
 
 Node::Node ( const Node& n ) :
+    QObject(),
     x(n.x), y(n.y), fix(n.fix)
 {}
 

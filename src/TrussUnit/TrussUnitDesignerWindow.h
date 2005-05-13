@@ -17,6 +17,7 @@ public:
 public slots:
     // Delegate some slots of designerWidget
     virtual void addTrussUnit ( TrussUnit& );
+    virtual bool removeTrussUnit ( const TrussUnit& );
     virtual bool removeTrussUnitPseudoWindow ( const TrussUnitPseudoWindow& );
 
 private:

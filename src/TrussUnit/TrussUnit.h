@@ -59,7 +59,7 @@ typedef agg::renderer_raster_htext_solid<base_renderer,
 class TrussNode;
 class TrussPivot;
 
-class PaintableTrussElement 
+class PaintableTrussElement
 {    
 public:
     PaintableTrussElement ();
