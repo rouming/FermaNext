@@ -23,7 +23,7 @@ public slots:
 private:
     QVBoxLayout vbox;
     QScrollView scroll;
-    TrussUnitDesignerWidget designerWidget;
+    TrussUnitDesignerWidget* designerWidget;
 };
 
 #endif //TRUSSUNITDESIGNERWINDOW_H
