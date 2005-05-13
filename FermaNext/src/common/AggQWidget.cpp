@@ -114,9 +114,8 @@ const agg::ctrl* AggCtrlContainer::arrowKeysPressEvent ( bool left, bool right,
 AggQWidget::AggQWidget ( QWidget* parent,                         
                          bool flip_y ) :
     QWidget( parent ),
-    aggFlipY( flip_y ),
-    mainQImage( new QImage )
-    
+    mainQImage( new QImage ),
+    aggFlipY( flip_y )    
 {
     setBackgroundMode( QWidget::NoBackground );
     setMinimumSize( QSize(100, 100) );

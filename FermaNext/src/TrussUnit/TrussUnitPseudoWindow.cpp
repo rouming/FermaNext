@@ -101,9 +101,9 @@ QPoint TrussUnitPseudoWindow::transCoord ( QPoint point, bool flipY )
     double realAreaWid = abs ( p2.y() - p1.y() );
     double scaleFactorX = realAreaLen / area.height();
     double scaleFactorY = realAreaWid / area.width();
-    point.setX ( p1.x() + point.x() * scaleFactorX );
-    point.setY ( flipY ? p2.y() - point.y() * scaleFactorY : 
-                           p1.y() + point.y() * scaleFactorY );
+    point.setX ( int(p1.x() + point.x() * scaleFactorX) );
+    point.setY ( flipY ? int(p2.y() - point.y() * scaleFactorY) : 
+                         int(p1.y() + point.y() * scaleFactorY) );
     return point;
 }
 
@@ -357,7 +357,7 @@ void TrussUnitPseudoWindow::drawTrussArea ( base_renderer& baseRend, scanline_ra
     unsigned i;
     for (i = 0; i < 4; i++ )
     {
-        p1.setY ( p1.y() + scaleFactorY );
+        p1.setY ( int(p1.y() + scaleFactorY) );
         p2.setY ( p1.y() );
         drawLine ( ras, solidRend, sl, p1, p2 );
     }
@@ -368,7 +368,7 @@ void TrussUnitPseudoWindow::drawTrussArea ( base_renderer& baseRend, scanline_ra
     p2.setY ( p1.y() + 3 * bordW );
     for (i = 0; i < 4; i++ )
     {
-        p1.setX ( p1.x() + scaleFactorX );
+        p1.setX ( int(p1.x() + scaleFactorX) );
         p2.setX ( p1.x() );
         drawLine ( ras, solidRend, sl, p1, p2 );
     }

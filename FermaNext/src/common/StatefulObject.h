@@ -62,12 +62,14 @@ signals:
 template <class Obj>
 class ConcreteStatefulObject : public StatefulObject
 {
+    typedef std::vector<Obj*> StateList;
+    typedef typename std::vector<Obj*>::iterator StateListIter;
 protected:
     // Do not forget to clear states from the descendant 
     // destructor, or memory leaks are awaited.
     void clearStates () 
     {
-        std::vector<Obj*>::iterator i = states.begin();
+        StateListIter i = states.begin();
         for ( ; i != states.end(); ++i )
             removeState(*i);
         states.clear();
@@ -82,7 +84,7 @@ public:
 
     void removeObjectState ( Obj* state )
     {
-        std::vector<Obj*>::iterator i = states.begin();
+        StateListIter i = states.begin();
         for ( ; i != states.end(); ++i )
             if ( *i == state ) {
                 Obj* st = *i;
@@ -103,7 +105,7 @@ public:
 
     virtual void loadState ( const Obj& node ) = 0;  
 private:
-    std::vector<Obj*> states;
+    StateList states;
 };
 
 #endif //STATEFULOBJECT_H

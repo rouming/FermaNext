@@ -25,7 +25,7 @@ public slots:
 
 signals:
     void onTrussUnitCreate ( TrussUnit& );
-    void onTrussUnitRemove ( TrussUnit& );
+    void onTrussUnitRemove ( const TrussUnit& );
 
 private:
     TrussUnitList trussUnits;

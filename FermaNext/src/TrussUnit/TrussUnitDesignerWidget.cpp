@@ -26,6 +26,17 @@ void TrussUnitDesignerWidget::addTrussUnit ( TrussUnit& truss )
     pseudoWindows.push_back(window);
 }
 
+bool TrussUnitDesignerWidget::removeTrussUnit ( const TrussUnit& truss )
+{
+    PseudoWindowList::iterator iter = pseudoWindows.begin();
+    for ( ; iter != pseudoWindows.end(); ++iter )
+        if ( &((*iter)->getTrussUnit()) == &truss ) {            
+            pseudoWindows.erase(iter);
+            return true;
+        }            
+    return false;     
+}
+
 bool TrussUnitDesignerWidget::removeTrussUnitPseudoWindow 
                                     ( const TrussUnitPseudoWindow& window )
 {
