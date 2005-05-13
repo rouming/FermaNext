@@ -63,17 +63,17 @@ class PaintableTrussElement
 {    
 public:
     PaintableTrussElement ();
-    PaintableTrussElement ( bool e, bool v );
+    PaintableTrussElement ( bool h, bool v );
     virtual void setVisible ( bool );
-    virtual void setEnabled ( bool );
+    virtual void setHighlighted ( bool );
     virtual bool isVisible () const;
-    virtual bool isEnabled () const;
+    virtual bool isHighlighted () const;
     virtual void paint ( base_renderer& baseRend, solid_renderer& solidRend,
                         text_renderer& textRend, agg::rasterizer_scanline_aa<>& ras, 
                         agg::scanline_p8& sl, agg::ellipse& ell ) const = 0;
 private:
     bool visible;
-    bool enabled; 
+    bool highlighted; 
 };
 
 class TrussUnit : public Truss<TrussNode, TrussPivot>,                  
@@ -88,6 +88,7 @@ private:
 public:        
     virtual ~TrussUnit ();
 
+    int getNodesRadius () const;
     const QString& getTrussName () const;
     const QSize& getArea ();
   
@@ -108,6 +109,7 @@ signals:
     void onPivotsWidthChange ( int );
 
 private:
+    int nodesRadius;
     QString trussName;
     QSize area;
 };

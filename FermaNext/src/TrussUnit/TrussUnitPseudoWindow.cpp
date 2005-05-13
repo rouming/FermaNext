@@ -199,6 +199,32 @@ bool TrussUnitPseudoWindow::inFDiagResizeRect ( int x, int y )
     return false;
 }
 
+bool TrussUnitPseudoWindow::inNodeRadius ( int x, int y )
+{
+    TrussNode* node = findNodeByCoord ( x , y );
+    if ( node )
+        return true;
+    return false;
+}
+
+TrussNode* TrussUnitPseudoWindow::findNodeByCoord ( int x, int y )
+{
+    int radius = trussUnit.getNodesRadius ();
+    QPoint point;
+    TrussUnit::NodeList nodeList = trussUnit.getNodeList ();
+    TrussUnit::NodeList:: iterator iter = nodeList.begin();
+    for ( ; iter != nodeList.end(); ++iter )
+	{
+        TrussNode* node = *iter;
+        point.setX ( node->getXWidgetPosition () );
+        point.setY ( node->getYWidgetPosition () );
+        if ( ( (point.x() - x) * (point.x() - x) + 
+               (point.y() - y) * (point.y() - y) ) <  4 * radius * radius )
+            return node;
+    }
+    return 0;
+}
+
 color_type TrussUnitPseudoWindow::getCanvasColor () const
 {
 	return canvColor;
@@ -218,6 +244,12 @@ void TrussUnitPseudoWindow::setPosition ( QPoint point1, QPoint point2 )
 {
     _point1 = point1;
     _point2 = point2;
+}
+
+void TrussUnitPseudoWindow::setNodeHighlight ( int x, int y )
+{
+    TrussNode* node = findNodeByCoord ( x , y );
+    node->setHighlighted ( true );
 }
 
 void TrussUnitPseudoWindow::setTrussAreaWindowIndent ( int indent )

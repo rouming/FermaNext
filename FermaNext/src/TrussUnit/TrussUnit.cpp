@@ -9,12 +9,12 @@
 
 PaintableTrussElement::PaintableTrussElement () : 
     visible(false), 
-    enabled(false)
+    highlighted(false)
 {}
 
-PaintableTrussElement::PaintableTrussElement ( bool e_, bool v_ ) :
+PaintableTrussElement::PaintableTrussElement ( bool h_, bool v_ ) :
     visible(v_), 
-    enabled(e_)
+    highlighted(h_)
 {}
 
 void PaintableTrussElement::setVisible ( bool v_ )
@@ -22,10 +22,9 @@ void PaintableTrussElement::setVisible ( bool v_ )
     visible = v_;
 }
 
-void PaintableTrussElement::setEnabled ( bool e_ )
+void PaintableTrussElement::setHighlighted ( bool h_ )
 {
-    enabled = e_;
-    if ( !enabled ) visible = false;
+    highlighted = h_;
 }
 
 bool PaintableTrussElement::isVisible () const
@@ -33,9 +32,9 @@ bool PaintableTrussElement::isVisible () const
     return visible;
 }
 
-bool PaintableTrussElement::isEnabled () const
+bool PaintableTrussElement::isHighlighted () const
 {
-    return enabled;
+    return highlighted;
 }
 
 
@@ -50,9 +49,15 @@ TrussUnit::TrussUnit () :
 TrussUnit::~TrussUnit ()
 {}
 
+
 const QString& TrussUnit::getTrussName () const
 {
     return trussName;
+}
+
+int TrussUnit::getNodesRadius () const
+{
+    return nodesRadius;
 }
 
 void TrussUnit::setTrussName ( const QString& name )
