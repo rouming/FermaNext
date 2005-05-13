@@ -218,8 +218,9 @@ TrussNode* TrussUnitPseudoWindow::findNodeByCoord ( int x, int y )
         TrussNode* node = *iter;
         point.setX ( node->getXWidgetPosition () );
         point.setY ( node->getYWidgetPosition () );
-        if ( ( (point.x() - x) * (point.x() - x) + 
-               (point.y() - y) * (point.y() - y) ) <  4 * radius * radius )
+        if ( abs ( point.x() - x ) < radius && abs ( point.y() - y ) < radius )
+ //           ( (point.x() - x) * (point.x() - x) + 
+ //              (point.y() - y) * (point.y() - y) ) <  4 * radius * radius )
             return node;
     }
     return 0;
