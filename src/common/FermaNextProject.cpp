@@ -1,9 +1,8 @@
 
 #include "FermaNextProject.h"
+#include "SubsidiaryConstants.h"
 
 #include <qworkspace.h>
-
-const QString imagesPath( "images");
 
 /*****************************************************************************
  * FermaNext Project
