@@ -5,7 +5,8 @@
  * Truss Node
  *****************************************************************************/
 
-TrussNode::TrussNode ()
+TrussNode::TrussNode () :
+    radius(5)
 {}
 
 TrussNode::TrussNode ( const TrussNode& n ) :

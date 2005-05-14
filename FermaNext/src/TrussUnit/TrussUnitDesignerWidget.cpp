@@ -37,6 +37,28 @@ void TrussUnitDesignerWidget::addTrussUnit ( TrussUnit& truss )
 {    
     TrussUnitPseudoWindow* window = new TrussUnitPseudoWindow(truss);
     pseudoWindows.push_back(window);
+
+    QPoint pos1, pos2;
+        pos1.setX ( X1 ); 
+        pos1.setY ( Y1 ); 
+        pos2.setX ( X2 );
+        pos2.setY ( Y2 );
+
+        window->setCoordinateLineWidth ( 1 );
+        window->getTrussUnit().setNodesRadius ( 5 );
+        window->getTrussUnit().setPivotsWidth ( 3 );
+        window->setResEllRad ( 3 );
+        window->setMinResizeVal ( 300 );
+        window->setWinRoundRad ( 25 );
+        window->setPosition ( pos1, pos2 );
+        window->setHeadlineWidth ( 30 );
+        window->setBorderWidth ( 4 );
+        window->setBorderColor ( 20,35,40 );
+        window->setCanvasColor ( 8, 10, 12 );
+        window->setHeadlineColor ( 75, 105, 95 );
+        window->setResEllColor ( 50, 50, 50 );
+        window->setTrussNodesPosition ();
+
 }
 
 bool TrussUnitDesignerWidget::removeTrussUnit ( const TrussUnit& truss )
@@ -109,15 +131,25 @@ void TrussUnitDesignerWidget::onDraw ()
     {
         TrussUnitPseudoWindow* pseudoWindow = (*iter);
         pseudoWindow->paint( baseRend, solidRend, textRend, ras, sl, ell );
-    }  
+    }
+    
     TrussUnitPseudoWindow* pseudoWindow = (*iter);
+
+    pseudoWindow->setTrussNodesPosition ();
+    pseudoWindow->getTrussUnit().setNodesRadius ( 5 );
+    pseudoWindow->getTrussUnit().setPivotsWidth ( 3 );
+
+
     pseudoWindow->setBorderColor ( 25,55,65 );
     pseudoWindow->setHeadlineColor ( 55, 155, 165 );
     pseudoWindow->setResEllColor ( 120, 120, 120 );
     pseudoWindows.back()->paint ( baseRend, solidRend, textRend, ras, sl, ell );
     pseudoWindow->setBorderColor ( 20,35,40 );
     pseudoWindow->setHeadlineColor ( 75, 105, 95 );
-    pseudoWindow->setResEllColor ( 50, 50, 50 );   
+    pseudoWindow->setResEllColor ( 50, 50, 50 );
+
+
+
 }
 
 void TrussUnitDesignerWidget::initPseudoWindow ()  //temp method. Later to remove.

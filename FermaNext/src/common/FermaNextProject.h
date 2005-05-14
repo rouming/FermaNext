@@ -23,7 +23,8 @@ public:
     virtual void setName ( const QString& );
 
     virtual void activate ( bool );    
-    virtual ObjectStateManager& getStateManager ();    
+    virtual ObjectStateManager& getStateManager ();
+    virtual TrussUnitManager& getTrussUnitManager ();
 
 signals:
     void onNameChange ( const QString& );    

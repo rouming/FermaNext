@@ -42,8 +42,9 @@ bool PaintableTrussElement::isHighlighted () const
  * Truss Unit
  *****************************************************************************/
 
-TrussUnit::TrussUnit () :
-    area( 300, 300 )
+TrussUnit::TrussUnit ( const QString& name ) :
+    trussName(name),
+    area( 300, 300 )    
 {}
 
 TrussUnit::~TrussUnit ()

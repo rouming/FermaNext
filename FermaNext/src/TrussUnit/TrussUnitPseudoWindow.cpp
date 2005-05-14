@@ -506,7 +506,6 @@ void TrussUnitPseudoWindow::paint ( base_renderer& baseRend, solid_renderer& sol
     drawText ( baseRend, textRend, trussUnit.getTrussName (), 
                agg::rgba(10, 10, 10), point, true );
     drawTrussArea ( baseRend, ras, textRend, solidRend, sl );
-
     trussUnit.paint ( baseRend, solidRend, textRend, ras, sl, ell );
 }
 

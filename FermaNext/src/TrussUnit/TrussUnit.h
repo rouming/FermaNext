@@ -83,7 +83,7 @@ class TrussUnit : public Truss<TrussNode, TrussPivot>,
 private:    
     // constructor is closed. TrussUnitManager should manage trusses;
     friend class TrussUnitManager;
-    TrussUnit ();
+    TrussUnit ( const QString& name );
 
 public:        
     virtual ~TrussUnit ();
@@ -109,6 +109,8 @@ signals:
     void onPivotsWidthChange ( int );
 
 private:
+    static const QString UNNAMED;
+
     int nodesRadius;
     QString trussName;
     QSize area;
