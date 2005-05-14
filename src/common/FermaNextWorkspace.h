@@ -7,6 +7,7 @@
 #include <qstring.h>
 #include <qmutex.h> 
 #include "FermaNextProject.h"
+#include "FermaNextConfig.h"
 
 class QWorkspace;
 
@@ -32,6 +33,8 @@ public:
 
     virtual void setWorkspaceWidget ( QWorkspace& );
 
+    virtual FermaNextConfig& config ();
+
 private:
     FermaNextWorkspace ();
     FermaNextWorkspace ( const FermaNextWorkspace& );
@@ -52,7 +55,8 @@ private:
     static QMutex mutex;
     QString name;
     QWorkspace* qWsp;
-    ProjectList projects;    
+    ProjectList projects;
+    FermaNextConfig fermaConfig;
 };
 
 #endif //FERMANEXTWORKSPACE_H

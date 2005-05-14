@@ -111,4 +111,9 @@ void FermaNextWorkspace::setWorkspaceWidget ( QWorkspace& qWsp_ )
     qWsp = &qWsp_;    
 }
 
+FermaNextConfig& FermaNextWorkspace::config ()
+{
+    return fermaConfig;
+}
+
 /*****************************************************************************/
