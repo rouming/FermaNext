@@ -96,6 +96,10 @@ SOURCE=.\src\FermaNext.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\common\FermaNextConfig.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\gui\FermaNextMainFrame.cpp
 # End Source File
 # Begin Source File
@@ -110,10 +114,18 @@ SOURCE=.\src\common\FermaNextWorkspace.cpp
 
 SOURCE=.\src\gui\ProjectToolBox.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\src\common\SubsidiaryConstants.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
+# Begin Source File
+
+SOURCE=.\src\common\FermaNextConfig.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\src\gui\FermaNextMainFrame.h
@@ -201,6 +213,10 @@ InputName=ProjectToolBox
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\common\SubsidiaryConstants.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

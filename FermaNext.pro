@@ -1,6 +1,7 @@
 
 TARGET = FermaNext
 
+
 CONFIG += qt warn_on thread release
 
 MOC_DIR = mocs
@@ -20,7 +21,9 @@ SOURCES = src/FermaNext.cpp \
           src/common/AggQWidget.cpp \
           src/common/FermaNextWorkspace.cpp \
           src/common/FermaNextProject.cpp \
+          src/common/FermaNextConfig.cpp \
           src/common/ObjectStateManager.cpp \
+          src/common/SubsidiaryConstants.cpp \
           \
           src/gui/FermaNextMainFrame.cpp \
           src/gui/ProjectToolBox.cpp \
@@ -37,8 +40,10 @@ SOURCES = src/FermaNext.cpp \
 HEADERS = src/common/AggQWidget.h \
           src/common/FermaNextWorkspace.h \
           src/common/FermaNextProject.h \
+          src/common/FermaNextConfig.h \
           src/common/ObjectStateManager.h \
           src/common/StatefulObject.h \
+          src/common/SubsidiaryConstants.h \
           \
           src/gui/FermaNextMainFrame.h \
           src/gui/ProjectToolBox.h \
