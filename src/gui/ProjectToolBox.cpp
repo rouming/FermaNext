@@ -9,6 +9,7 @@
 #include <qheader.h>
 #include <qmessagebox.h>
 #include <qiconset.h>
+#include <qfiledialog.h>
 
 /*****************************************************************************
  * Project Remover
@@ -224,8 +225,18 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
 	buttonSave->setUsesTextLabel( TRUE );
     buttonSave->setFont( simpleFont );
 
+    QToolButton* buttonImport = new QToolButton(buttons);
+	buttonImport->setBackgroundMode(PaletteBase);
+	buttonImport->setTextLabel( "Import" );
+	buttonImport->setAutoRaise( TRUE );
+	buttonImport->setTextPosition( QToolButton::Right );
+	buttonImport->setUsesTextLabel( TRUE );
+    buttonImport->setFont( simpleFont );
+    connect( buttonImport, SIGNAL(clicked()), this, SLOT(importIsPressed()) ); 
+
 	buttons->insert( buttonRemove, 0 );
     buttons->insert( buttonSave, 0 );
+    buttons->insert( buttonImport, 0 );
 
     // Assembling
     pageLayout->addWidget( groupBox );
@@ -267,6 +278,31 @@ void ProjectToolBox::clear ()
     for ( int i=0; i < workspace.countProjects(); ++i )
         removeProject( workspace.getProject(i) );        
     currentPrj = 0;
+}
+
+void ProjectToolBox::importIsPressed ()
+{
+    FermaNextProject* currPrj = currentProject();
+    if ( currPrj == 0 )
+        return;
+
+    QString fileName = QFileDialog::getOpenFileName( QString::null,        
+                                                     "Ferma (*.fnx );;Ferma old (*.frm)",
+                                                     this );
+    if ( fileName.isEmpty() ) 
+        return;
+
+    try { 
+        currPrj->getTrussUnitManager().createTrussUnitFromFile(fileName);
+    } catch ( TrussUnitManager::ReadFileException& ) {
+        QMessageBox::critical( 0, "TrussUnitManager::ReadFileException",
+                               QString("TrussUnitManager::ReadFileException") );
+        return;
+
+    } catch ( TrussUnitManager::WrongFormatException& ) {
+        QMessageBox::critical( 0, "TrussUnitManager::WrongFormatException",
+                               QString("TrussUnitManager::WrongFormatException") );
+    }
 }
 
 /****************************************************************************/

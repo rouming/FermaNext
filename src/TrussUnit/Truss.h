@@ -51,7 +51,10 @@ signals:
 
 template <class N, class P> class Truss : public TrussEmitter
 {
-public:        
+public:   
+    // Truss exceptions
+    class NodeIndexOutOfBoundException {};
+
     typedef std::vector<N*>  NodeList;
     typedef std::vector<P*> PivotList;
     typedef typename NodeList::iterator NodeListIter;
@@ -107,6 +110,23 @@ public:
         clear();
     }
 
+    virtual N& nodeComparison ( QPoint point, int nodeRadius )
+    {
+        NodeListIter iter = nodes.begin();
+        for ( ; iter != nodes.end(); ++iter )
+        {
+            N* node = *iter;
+            int x1 = node->getX ();
+            int y1 = node->getY ();
+            if ( ( (point.x() - x1) * (point.x() - x1) + 
+                   (point.y() - y1) * (point.y() - y1) ) <  
+                 4 * nodeRadius * nodeRadius )
+                return *node;
+        }
+        N& newNode = createNode ( point.x(), point.y() );
+        return newNode;
+    }   
+
     virtual N& createNode ( int x, int y )
     {
         emit beforePivotCreation();
@@ -130,22 +150,23 @@ public:
         return *pivot;
     }
 
-    virtual N& nodeComparison ( QPoint point, int nodeRadius )
+    virtual P& createPivot ( uint firstNodeIndex, uint lastNodeIndex ) 
+                                                        throw (NodeIndexOutOfBoundException) 
     {
-        NodeListIter iter = nodes.begin();
-        for ( ; iter != nodes.end(); ++iter )
-        {
-            N* node = *iter;
-            int x1 = node->getX ();
-            int y1 = node->getY ();
-            if ( ( (point.x() - x1) * (point.x() - x1) + 
-                   (point.y() - y1) * (point.y() - y1) ) <  
-                 4 * nodeRadius * nodeRadius )
-                return *node;
-        }
-        N& newNode = createNode ( point.x(), point.y() );
-        return newNode;
-    }   
+        if ( lastNodeIndex >= nodes.size() || lastNodeIndex >= nodes.size() )
+            throw NodeIndexOutOfBoundException();
+
+        emit beforePivotCreation();
+        uint s = nodes.size();
+        N* n1 = nodes.at(firstNodeIndex);
+        N* n2 = nodes.at(lastNodeIndex);
+
+        P* pivot = new P( *nodes.at(firstNodeIndex), *nodes.at(lastNodeIndex) );
+        pivots.push_back(pivot);
+        emit afterPivotCreation(pivot->getFirstNode(), 
+                                pivot->getLastNode());
+        return *pivot;
+    }
 
     virtual P& createPivot ( N& first, N& last )
     {

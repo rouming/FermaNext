@@ -5,7 +5,8 @@
  * Truss Pivot
  *****************************************************************************/
 
-TrussPivot::TrussPivot ()
+TrussPivot::TrussPivot () :
+    width(4)
 {}
 
 TrussPivot::TrussPivot ( TrussNode& first, TrussNode& last ) :

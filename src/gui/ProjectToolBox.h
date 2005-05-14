@@ -63,6 +63,7 @@ protected slots:
 
 public slots:
     virtual void clear ();
+    virtual void importIsPressed ();
 
 private:
     typedef QMap<FermaNextProject*, QWidget*> ProjectMap;

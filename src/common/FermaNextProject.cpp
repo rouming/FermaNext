@@ -29,7 +29,7 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWorkspace* qWsp ) :
     //TODO: remove this block in future
 	for( uint i = 0; i <3; i++)
 	{
-        trussManager.createTrussUnit().setTrussName ( "Truss unit" );
+        trussManager.createTrussUnit("Truss unit");
 	}
 }
 
@@ -69,6 +69,11 @@ void FermaNextProject::setName ( const QString& name_ )
 ObjectStateManager& FermaNextProject::getStateManager ()
 {
     return stateManager;
+}
+
+TrussUnitManager& FermaNextProject::getTrussUnitManager ()
+{
+    return trussManager;
 }
 
 bool FermaNextProject::eventFilter( QObject*, QEvent* e )
