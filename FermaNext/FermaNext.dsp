@@ -116,6 +116,10 @@ SOURCE=.\src\gui\ProjectToolBox.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\gui\PseudoWindowListBox.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\common\SubsidiaryConstants.cpp
 # End Source File
 # End Group
@@ -216,6 +220,28 @@ InputName=ProjectToolBox
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\gui\PseudoWindowListBox.h
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.\src\gui
+InputPath=.\src\gui\PseudoWindowListBox.h
+InputName=PseudoWindowListBox
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\common\SubsidiaryConstants.h
 # End Source File
 # End Group
@@ -241,6 +267,10 @@ SOURCE=.\src\common\mocs\moc_FermaNextWorkspace.cpp
 # Begin Source File
 
 SOURCE=.\src\gui\mocs\moc_ProjectToolBox.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\gui\mocs\moc_PseudoWindowListBox.cpp
 # End Source File
 # End Group
 # End Target

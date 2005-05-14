@@ -1,5 +1,6 @@
 
 #include "ProjectToolBox.h"
+#include "PseudoWindowListBox.h"
 #include "SubsidiaryConstants.h"
 
 #include <qbuttongroup.h>
@@ -166,20 +167,11 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
     labelVisibleTrussesVal->setBackgroundMode(PaletteBase); 
     groupBoxInfoLayout->addWidget( labelVisibleTrussesVal, 2, 1 );
 
-    // Windows list view
-    QListView* listViewWindows = new QListView( groupBoxWindows, "listViewWindows" );
-    groupBoxWindowsLayout->addWidget( listViewWindows );
-    listViewWindows->header()->hide();
-    listViewWindows->setLineWidth( 0 );
-    listViewWindows->addColumn( tr( "Names" ) );    
-    listViewWindows->setRootIsDecorated( TRUE );
-
-    // Temp windows in list view
-    QListViewItem* headerItem = new QListViewItem( listViewWindows, 0 );
-    headerItem->setText(0,"Truss Unit Windows");
-    (void) new QCheckListItem( headerItem, 0, "my_first_truss", QCheckListItem::CheckBox );
-    (void) new QCheckListItem( headerItem, 0, "my_second_truss", QCheckListItem::CheckBox );
-    (void) new QCheckListItem( headerItem, 0, "my_third_truss", QCheckListItem::CheckBox );
+    PseudoWindowListBox * listBox = new PseudoWindowListBox ( groupBoxWindows, "listBox" );
+    groupBoxWindowsLayout->addWidget( listBox );
+    listBox->addItem ("my_first_truss");
+    listBox->addItem ("my_second_truss");
+    listBox->addItem ("my_third_truss");
     
     // Fonts
     QFont labelFont( "arial", 9  );
