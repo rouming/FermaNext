@@ -2,6 +2,7 @@
 #include "FermaNextMainFrame.h"
 #include "FermaNextWorkspace.h"
 #include "ProjectToolBox.h"
+#include "SubsidiaryConstants.h"
 
 #include <qpopupmenu.h>
 #include <qmenubar.h>
@@ -24,7 +25,6 @@
 #include <qworkspace.h>
 
 const QString mainFrameCaption( QObject::tr( "Educational CAD System 'Ferma'" ) );
-const QString imagesPath( "images");
 
 /*****************************************************************************
  * FermaNext Main Frame

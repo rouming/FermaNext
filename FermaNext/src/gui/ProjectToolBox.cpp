@@ -1,5 +1,6 @@
 
 #include "ProjectToolBox.h"
+#include "SubsidiaryConstants.h"
 
 #include <qbuttongroup.h>
 #include <qtoolbutton.h>
@@ -34,8 +35,6 @@ FermaNextProject& ProjectRemover::getProjectToRemove ()
 /*****************************************************************************
  * Project ToolBox
  *****************************************************************************/
-
-const QString imagesPath( "images");
 
 ProjectToolBox::ProjectToolBox ( FermaNextWorkspace& ws, QWidget* parent, 
                                  const char* name, WFlags f ) :
