@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<FermaNextConfig>
+   <TrussUnitPseudoWindow>
+       <BorderColor>#142328</BorderColor>
+       <CanvasColor>#080A0C</CanvasColor>
+       <HeadlineColor>#080A0C</HeadlineColor>
+       <Color>
+          <ArrowColor>#000000</ArrowColor>
+          <GridColor>#ffffff</GridColor>
+       </Color>
+      
+   </TrussUnitPseudoWindow>
+</FermaNextConfig>
