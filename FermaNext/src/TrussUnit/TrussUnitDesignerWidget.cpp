@@ -228,9 +228,8 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     int y = flipY() ? height() - me->y() : me->y();
     if ( winBehaviour == onHorResize )
     {
-        int dx;
         int resizeLimit = pseudoWindow->getMinResizeVal ();
-		dx = x - clickX;
+		int dx = x - clickX;
         QPoint point1 = pseudoWindow->getPoint1 ();
         QPoint point2 = pseudoWindow->getPoint2 ();
         int bordW = pseudoWindow->getBorderWidth ();
@@ -254,9 +253,8 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     }
     if ( winBehaviour == onVerResize )
     {
-        int dy;
         int resizeLimit = pseudoWindow->getMinResizeVal ();
-	    dy = y - clickY;
+	    int dy = y - clickY;
         QPoint point1 = pseudoWindow->getPoint1 ();
         QPoint point2 = pseudoWindow->getPoint2 ();
         int bordW = pseudoWindow->getBorderWidth ();
@@ -280,11 +278,9 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     }
     if ( winBehaviour == onBDiagResize )
     {
-        int dx;
-        int dy;
         int resizeLimit = pseudoWindow->getMinResizeVal ();
-        dx = x - clickX;
-	    dy = y - clickY;
+        int dx = x - clickX;
+	    int dy = y - clickY;
         QPoint point1 = pseudoWindow->getPoint1 ();
         QPoint point2 = pseudoWindow->getPoint2 ();
         int bordW = pseudoWindow->getBorderWidth ();
@@ -321,11 +317,9 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     }
     if ( winBehaviour == onFDiagResize )
     {
-        int dx;
-        int dy;
         int resizeLimit = pseudoWindow->getMinResizeVal ();
-        dx = x - clickX;
-        dy = y - clickY;
+        int dx = x - clickX;
+        int dy = y - clickY;
         QPoint point1 = pseudoWindow->getPoint1 ();
         QPoint point2 = pseudoWindow->getPoint2 ();
         int bordW = pseudoWindow->getBorderWidth ();
@@ -362,9 +356,8 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     }
 	if ( winBehaviour == onDrag )
 	{
-		int dx, dy;
-		dx = x - clickX;
-		dy = y - clickY;
+		int dx = x - clickX;
+		int dy = y - clickY;
         QPoint point1 = pseudoWindow->getPoint1 ();
         QPoint point2 = pseudoWindow->getPoint2 ();
         point1.setX ( point1.x() + dx ); 
@@ -378,6 +371,20 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
 		clickY += dy;
         return;
 	}
+	if ( trussElemBehaviour == onNodeDrag )
+	{
+ /*       QPoint point;
+	    int dx = x - clickX;
+	    int dy = y - clickY;
+        point = trussNode->getNodeWidgetPosition ();
+        point.setX ( point.x() + dx );
+        point.setY ( point.y() + dy );
+        trussNode->setNodeWidgetPosition ( point );
+        update();
+        clickX += dx;
+        clickY += dy;
+        return;
+*/	}
     pseudoWindow = findPseudoWindowByCoord ( x, y );
     if ( pseudoWindow )
     {
@@ -397,18 +404,36 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
             update();
         }
         else
-            pseudoWindow->removeNodeHighlight ();
-            trussElemBehaviour = trussElementIdle;
+        {
             QWidget::setCursor ( Qt::ArrowCursor );
-            update();
+            if ( trussElemBehaviour == onNodeSelect )
+            {
+                PseudoWindowListIter iter = pseudoWindows.begin();
+                for ( ; iter != pseudoWindows.end(); ++iter ) 
+                    (*iter)->removeNodeHighlight ();
+                trussElemBehaviour = trussElementIdle;
+                update();
+            }
+        }
     }
     else
+    {
         QWidget::setCursor ( Qt::ArrowCursor );
+        if ( trussElemBehaviour == onNodeSelect )
+        {
+            PseudoWindowListIter iter = pseudoWindows.begin();
+            for ( ; iter != pseudoWindows.end(); ++iter ) 
+                (*iter)->removeNodeHighlight ();
+            trussElemBehaviour = trussElementIdle;
+            update();
+        }
+    }
 }
 
 void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
 {
 	pseudoWindow = 0;
+    trussNode = 0;
     winBehaviour = windowIdle;
     trussElemBehaviour = trussElementIdle;
 }
@@ -444,6 +469,11 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
         {
             winBehaviour = onFDiagResize;
             QWidget::setCursor ( Qt::SizeFDiagCursor );
+        }
+        if ( pseudoWindow->inNodeRadius ( clickX, clickY ) )
+        {
+            trussNode = pseudoWindow->findNodeByCoord ( clickX, clickY );
+            trussElemBehaviour = onNodeDrag;
         }
         update();
     }

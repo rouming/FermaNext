@@ -121,17 +121,16 @@ class TrussNode: public Node, public PaintableTrussElement
 public:
     TrussNode ();
     TrussNode ( const TrussNode& );
-    int getXWidgetPosition () const;
-    int getYWidgetPosition () const;
-    void setXWidgetPosition ( int x );
-    void setYWidgetPosition ( int y );
+    QPoint getNodeWidgetPosition () const;
+    void setNodeWidgetPosition ( QPoint point );
     int getRadius () const;
     void setRadius ( int rad );
     void paint ( base_renderer& baseRend, solid_renderer& solidRend,
                  text_renderer& textRend, scanline_rasterizer& ras, 
                  agg::scanline_p8& sl, agg::ellipse& ell ) const;
 private:
-    int xPos, yPos, radius;
+    int radius;
+    QPoint widgetPosition;
 };
 
 class TrussPivot : public Pivot<TrussNode>, public PaintableTrussElement

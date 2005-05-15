@@ -61,10 +61,8 @@ void TrussPivot::paint ( base_renderer& baseRend, solid_renderer& solidRend,
                         agg::scanline_p8& sl, agg::ellipse& ell ) const
 {
     QPoint p1, p2;
-    p1.setX ( getFirstNode().getXWidgetPosition () );
-    p1.setY ( getFirstNode().getYWidgetPosition () );
-    p2.setX ( getLastNode().getXWidgetPosition () );
-    p2.setY ( getLastNode().getYWidgetPosition () );
+    p1 = getFirstNode().getNodeWidgetPosition ();
+    p2 = getLastNode().getNodeWidgetPosition ();
     drawLine ( ras, solidRend, sl, p1, p2 );   
 }
 

@@ -80,14 +80,16 @@ public:
     bool inFDiagResizeRect ( int x, int y );
     TrussNode* findNodeByCoord ( int x, int y );
     bool inNodeRadius ( int x, int y );
-	color_type getCanvasColor () const;
-	color_type getHeadlineColor () const;
-	color_type getBorderColor () const;
+
     void setPosition ( QPoint point1, QPoint point2 );    
     void setTrussAreaWindowIndent ( int indent );
     void setTrussNodesPosition ();
     void setNodeHighlight ( int x, int y );
     void removeNodeHighlight ();
+
+    color_type getCanvasColor () const;
+	color_type getHeadlineColor () const;
+	color_type getBorderColor () const;
     void setCoordinateLineWidth ( int width );
     void setHeadlineWidth ( int  width );
     void setBorderWidth ( int  width );
@@ -98,6 +100,7 @@ public:
     void setResEllRad ( int radius );
     void setWinRoundRad ( int radius );
     void setResEllColor ( int r, int g, int b );
+
     void drawText ( base_renderer& baseRend, text_renderer& textRend,
                     const QString& str, color_type c, QPoint point, bool flipY ) const;
     void drawLine ( scanline_rasterizer& ras, solid_renderer& solidRend,

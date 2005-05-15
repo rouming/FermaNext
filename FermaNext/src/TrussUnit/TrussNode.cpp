@@ -19,24 +19,14 @@ int TrussNode::getRadius () const
     return radius;
 }
 
-int TrussNode::getXWidgetPosition () const
+QPoint TrussNode::getNodeWidgetPosition () const
 {
-    return xPos;
+    return widgetPosition;
 }
 
-int TrussNode::getYWidgetPosition () const
+void TrussNode::setNodeWidgetPosition ( QPoint point )
 {
-    return yPos;
-}
-
-void TrussNode::setXWidgetPosition ( int x )
-{
-    xPos = x;
-}
-
-void TrussNode::setYWidgetPosition ( int y )
-{
-    yPos = y;
+    widgetPosition = point;
 }
 
 void TrussNode::setRadius ( int rad )
@@ -52,17 +42,18 @@ void TrussNode::paint ( base_renderer& baseRend, solid_renderer& solidRend,
     if ( isHighlighted () )
         k = 1;
     solidRend.color ( agg::rgba(10, 10, 10) );
-    ell.init ( xPos, yPos, radius + k + 1, radius + k + 1, 16 );
+    ell.init ( widgetPosition.x(), widgetPosition.y(), 
+        radius + k + 1, radius + k + 1, 16 );
     ras.add_path ( ell );
     agg::render_scanlines ( ras, sl, solidRend );
     if ( isHighlighted () )
     {
-        solidRend.color ( agg::rgba(200, 35, 15, 0.5) );
-        ell.init ( xPos, yPos, radius + 5, radius + 5, 16 );
+        solidRend.color ( agg::rgba(200, 135, 15, 0.5) );
+        ell.init ( widgetPosition.x(), widgetPosition.y(), radius + 5, radius + 5, 16 );
         ras.add_path ( ell );
         agg::render_scanlines ( ras, sl, solidRend );
     }
-    ell.init ( xPos, yPos, radius + k, radius + k, 16 );
+    ell.init ( widgetPosition.x(), widgetPosition.y(), radius + k, radius + k, 16 );
     gradient_span_alloc gradSpan;
     radial_gradient gradFunc;
     color_array_type gradColors;
@@ -80,7 +71,7 @@ void TrussNode::paint ( base_renderer& baseRend, solid_renderer& solidRend,
     }
     agg::trans_affine mtx;
     mtx *= agg::trans_affine_scaling ( 1 / 2.0 );
-    mtx *= agg::trans_affine_translation ( xPos, yPos );
+    mtx *= agg::trans_affine_translation ( widgetPosition.x(), widgetPosition.y() );
     mtx.invert ();
     interpolator inter(mtx);
     radial_gradient_span_gen gradSpanGen ( gradSpan, inter, gradFunc, 
