@@ -48,6 +48,7 @@ private:
                                   onPivotSelect, onPivotDrag };
     PseudoWindowList pseudoWindows;
     TrussUnitPseudoWindow* pseudoWindow;
+    TrussNode* trussNode;
     WindowBehaviour winBehaviour;
     TrussElementBehaviour trussElemBehaviour;
     int clickX, clickY;
