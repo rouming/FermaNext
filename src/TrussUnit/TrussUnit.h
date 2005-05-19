@@ -37,7 +37,7 @@ typedef pixfmt::color_type                                  color_type;
 typedef agg::renderer_base<pixfmt>                          base_renderer;
 typedef agg::renderer_scanline_aa_solid<base_renderer>      solid_renderer;
 typedef agg::gradient_circle                                radial_gradient;
-typedef agg::gradient_x                                     linear_gradient;
+typedef agg::gradient_y                                     linear_gradient;
 typedef agg::span_interpolator_linear<>                     interpolator;
 typedef agg::pod_auto_array<color_type, 256>                color_array_type;
 typedef agg::span_gradient<color_type, interpolator, 
@@ -89,6 +89,7 @@ public:
     virtual ~TrussUnit ();
 
     int getNodesRadius () const;
+    int getPivotsWidth () const;
     const QString& getTrussName () const;
     const QSize& getArea ();
   
@@ -111,7 +112,7 @@ signals:
 private:
     static const QString UNNAMED;
 
-    int nodesRadius;
+    int nodesRadius, pivotsWidth;
     QString trussName;
     QSize area;
 };
@@ -142,7 +143,8 @@ public:
     int getPivotWidth ();
     void setPivotWidth ( int w );
     void drawLine ( scanline_rasterizer& ras, solid_renderer& solidRend,
-                    agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const;
+                    agg::scanline_p8& sl, QPoint point1, QPoint point2,
+                    int width, color_type color ) const;
     void paint ( base_renderer& baseRend, solid_renderer& solidRend,
                  text_renderer& textRend, scanline_rasterizer& ras, 
                  agg::scanline_p8& sl, agg::ellipse& ell ) const;

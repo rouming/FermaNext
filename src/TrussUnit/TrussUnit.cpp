@@ -61,6 +61,11 @@ int TrussUnit::getNodesRadius () const
     return nodesRadius;
 }
 
+int TrussUnit::getPivotsWidth () const
+{
+    return pivotsWidth;
+}
+
 void TrussUnit::setTrussName ( const QString& name )
 {
     QString old(trussName);
@@ -80,6 +85,7 @@ void TrussUnit::setNodesRadius ( int rad )
 
 void TrussUnit::setPivotsWidth ( int wid )
 {
+    pivotsWidth = wid;
     PivotList pivotList = getPivotList ();
     PivotList::iterator iter = pivotList.begin();
     for ( ; iter != pivotList.end(); ++iter )

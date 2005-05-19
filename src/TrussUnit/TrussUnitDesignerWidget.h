@@ -18,6 +18,7 @@ public:
     
     virtual TrussUnitPseudoWindow* findPseudoWindowByCoord ( int x, int y );
     virtual void pseudoWindowToFront ( TrussUnitPseudoWindow* window );
+    virtual void removeAllHighlight ();
 	virtual void onDraw();
 	virtual void initPseudoWindow(); //temp
 

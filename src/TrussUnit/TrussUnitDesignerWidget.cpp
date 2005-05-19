@@ -17,7 +17,7 @@ TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
     AggQWidget(p),
     init(true),
     X1(50), Y1(50),
-    X2(400), Y2(400)
+    X2(330), Y2(330)
 {}
 
 TrussUnitDesignerWidget::~TrussUnitDesignerWidget ()
@@ -45,20 +45,19 @@ void TrussUnitDesignerWidget::addTrussUnit ( TrussUnit& truss )
         pos2.setY ( Y2 );
 
         window->setCoordinateLineWidth ( 1 );
-        window->getTrussUnit().setNodesRadius ( 5 );
-        window->getTrussUnit().setPivotsWidth ( 3 );
+        window->getTrussUnit().setNodesRadius ( 4 );
+        window->getTrussUnit().setPivotsWidth ( 2 );
         window->setResEllRad ( 3 );
-        window->setMinResizeVal ( 300 );
-        window->setWinRoundRad ( 25 );
+        window->setMinResizeVal ( 200 );
+        window->setWinCornerRadius ( 25 );
         window->setPosition ( pos1, pos2 );
-        window->setHeadlineWidth ( 30 );
+        window->setHeadlineWidth ( 26 );
         window->setBorderWidth ( 4 );
         window->setBorderColor ( 20,35,40 );
         window->setCanvasColor ( 8, 10, 12 );
         window->setHeadlineColor ( 75, 105, 95 );
         window->setResEllColor ( 50, 50, 50 );
         window->setTrussNodesPosition ();
-
 }
 
 bool TrussUnitDesignerWidget::removeTrussUnit ( const TrussUnit& truss )
@@ -114,6 +113,26 @@ void TrussUnitDesignerWidget::pseudoWindowToFront ( TrussUnitPseudoWindow* windo
     }
 }
 
+void TrussUnitDesignerWidget::removeAllHighlight ()
+{
+    if ( trussElemBehaviour == onNodeSelect )
+    {
+        PseudoWindowListIter iter = pseudoWindows.begin();
+        for ( ; iter != pseudoWindows.end(); ++iter ) 
+            (*iter)->removeNodeHighlight ();
+        trussElemBehaviour = trussElementIdle;
+        update();
+    }
+    if ( trussElemBehaviour == onPivotSelect )
+    {
+        PseudoWindowListIter iter = pseudoWindows.begin();
+        for ( ; iter != pseudoWindows.end(); ++iter ) 
+            (*iter)->removePivotHighlight ();
+        trussElemBehaviour = trussElementIdle;
+        update();
+    }
+}
+
 void TrussUnitDesignerWidget::onDraw ()
 {
     pixfmt pixf ( getAggRenderingBuffer() );
@@ -125,7 +144,7 @@ void TrussUnitDesignerWidget::onDraw ()
     agg::ellipse ell;
     glyph_gen glyph(0);
     text_renderer textRend ( baseRend, glyph );
-    glyph.font ( agg::verdana18_bold );
+    glyph.font ( agg::verdana17_bold );
     PseudoWindowListIter iter = pseudoWindows.begin();
     for ( ; iter != pseudoWindows.end() - 1; ++iter ) 
     {
@@ -136,9 +155,8 @@ void TrussUnitDesignerWidget::onDraw ()
     TrussUnitPseudoWindow* pseudoWindow = (*iter);
 
     pseudoWindow->setTrussNodesPosition ();
-    pseudoWindow->getTrussUnit().setNodesRadius ( 5 );
-    pseudoWindow->getTrussUnit().setPivotsWidth ( 3 );
-
+    pseudoWindow->getTrussUnit().setNodesRadius ( 4 );
+    pseudoWindow->getTrussUnit().setPivotsWidth ( 2 );
 
     pseudoWindow->setBorderColor ( 25,55,65 );
     pseudoWindow->setHeadlineColor ( 55, 155, 165 );
@@ -147,9 +165,6 @@ void TrussUnitDesignerWidget::onDraw ()
     pseudoWindow->setBorderColor ( 20,35,40 );
     pseudoWindow->setHeadlineColor ( 75, 105, 95 );
     pseudoWindow->setResEllColor ( 50, 50, 50 );
-
-
-
 }
 
 void TrussUnitDesignerWidget::initPseudoWindow ()  //temp method. Later to remove.
@@ -185,13 +200,13 @@ void TrussUnitDesignerWidget::initPseudoWindow ()  //temp method. Later to remov
         pivotPnt2.setY ( 0 );
         pseudoWindow->getTrussUnit().createPivot ( pivotPnt1, pivotPnt2, 5 );
         pseudoWindow->setCoordinateLineWidth ( 1 );
-        pseudoWindow->getTrussUnit().setNodesRadius ( 5 );
-        pseudoWindow->getTrussUnit().setPivotsWidth ( 3 );
+        pseudoWindow->getTrussUnit().setNodesRadius ( 4 );
+        pseudoWindow->getTrussUnit().setPivotsWidth ( 2 );
         pseudoWindow->setResEllRad ( 3 );
-        pseudoWindow->setMinResizeVal ( 300 );
-        pseudoWindow->setWinRoundRad ( 25 );
+        pseudoWindow->setMinResizeVal ( 200 );
+        pseudoWindow->setWinCornerRadius ( 25 );
         pseudoWindow->setPosition ( pos1, pos2 );
-        pseudoWindow->setHeadlineWidth ( 30 );
+        pseudoWindow->setHeadlineWidth ( 26 );
         pseudoWindow->setBorderWidth ( 4 );
         pseudoWindow->setBorderColor ( 20,35,40 );
         pseudoWindow->setCanvasColor ( 8, 10, 12 );
@@ -373,7 +388,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
 	}
 	if ( trussElemBehaviour == onNodeDrag )
 	{
- /*       QPoint point;
+/*        QPoint point;
 	    int dx = x - clickX;
 	    int dy = y - clickY;
         point = trussNode->getNodeWidgetPosition ();
@@ -398,35 +413,30 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
             QWidget::setCursor ( Qt::SizeFDiagCursor );
         else if ( pseudoWindow->inNodeRadius ( x, y ) )
         {
+            removeAllHighlight ();
             pseudoWindow->setNodeHighlight ( x, y );
             trussElemBehaviour = onNodeSelect;
+            QWidget::setCursor ( Qt::ArrowCursor );
+            update();
+        }
+        else if ( pseudoWindow->isPivotSelected ( x, y ) )
+        {
+            removeAllHighlight ();
+            pseudoWindow->setPivotHighlight ( x, y );
+            trussElemBehaviour = onPivotSelect;
             QWidget::setCursor ( Qt::ArrowCursor );
             update();
         }
         else
         {
             QWidget::setCursor ( Qt::ArrowCursor );
-            if ( trussElemBehaviour == onNodeSelect )
-            {
-                PseudoWindowListIter iter = pseudoWindows.begin();
-                for ( ; iter != pseudoWindows.end(); ++iter ) 
-                    (*iter)->removeNodeHighlight ();
-                trussElemBehaviour = trussElementIdle;
-                update();
-            }
+            removeAllHighlight ();
         }
     }
     else
     {
         QWidget::setCursor ( Qt::ArrowCursor );
-        if ( trussElemBehaviour == onNodeSelect )
-        {
-            PseudoWindowListIter iter = pseudoWindows.begin();
-            for ( ; iter != pseudoWindows.end(); ++iter ) 
-                (*iter)->removeNodeHighlight ();
-            trussElemBehaviour = trussElementIdle;
-            update();
-        }
+        removeAllHighlight ();
     }
 }
 

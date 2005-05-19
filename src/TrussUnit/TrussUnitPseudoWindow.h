@@ -3,7 +3,6 @@
 #define TRUSSUNITPSEUDOWINDOW_H
 
 #include "TrussUnit.h"
-//#include "TrussUnitConstants.h"
 #include <vector>
 #include <qstring.h>
 #include <qpoint.h> 
@@ -38,7 +37,7 @@ typedef pixfmt::color_type                                  color_type;
 typedef agg::renderer_base<pixfmt>                          base_renderer;
 typedef agg::renderer_scanline_aa_solid<base_renderer>      solid_renderer;
 typedef agg::gradient_circle                                radial_gradient;
-typedef agg::gradient_x                                     linear_gradient;
+typedef agg::gradient_y                                     linear_gradient;
 typedef agg::span_interpolator_linear<>                     interpolator;
 typedef agg::pod_auto_array<color_type, 256>                color_array_type;
 typedef agg::span_gradient<color_type, interpolator, 
@@ -78,14 +77,17 @@ public:
     bool inVerResizeRect ( int x, int y );
     bool inBDiagResizeRect ( int x, int y );
     bool inFDiagResizeRect ( int x, int y );
-    TrussNode* findNodeByCoord ( int x, int y );
     bool inNodeRadius ( int x, int y );
-
+    bool isPivotSelected ( int x, int y );
+    TrussNode* findNodeByCoord ( int x, int y );
+    TrussPivot* findPivotByCoord ( int x, int y );
     void setPosition ( QPoint point1, QPoint point2 );    
     void setTrussAreaWindowIndent ( int indent );
     void setTrussNodesPosition ();
     void setNodeHighlight ( int x, int y );
+    void setPivotHighlight ( int x, int y );
     void removeNodeHighlight ();
+    void removePivotHighlight ();
 
     color_type getCanvasColor () const;
 	color_type getHeadlineColor () const;
@@ -98,28 +100,35 @@ public:
     void setHeadlineColor ( int r, int g, int b );
     void setBorderColor ( int r, int g, int b );
     void setResEllRad ( int radius );
-    void setWinRoundRad ( int radius );
+    void setWinCornerRadius ( int radius );
     void setResEllColor ( int r, int g, int b );
 
     void drawText ( base_renderer& baseRend, text_renderer& textRend,
-                    const QString& str, color_type c, QPoint point, bool flipY ) const;
+                    const QString& str, color_type c, 
+                    QPoint point, bool flipY ) const;
     void drawLine ( scanline_rasterizer& ras, solid_renderer& solidRend,
                     agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const;
     void drawArrow ( scanline_rasterizer& ras, solid_renderer& solidRend,
                      agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const;
+    void drawOutlineRoundedRect ( solid_renderer& solidRend, 
+                                  scanline_rasterizer& ras,
+                                  agg::scanline_p8& sl, 
+                                  QPoint point1, QPoint point2, 
+                                  int cornerRadius,
+                                  color_type color) const;
     void drawTrussArea ( base_renderer& baseRend, scanline_rasterizer& ras,
                          text_renderer& textRend, solid_renderer& solidRend, 
                          agg::scanline_p8& sl ) const;
-    void drawHeadline ( base_renderer& baseRend, scanline_rasterizer& ras,
-                        agg::scanline_p8& sl, gradient_span_alloc& gradSpan,
-                        linear_gradient& gradFunc, color_array_type& gradColors,
-                        agg::trans_affine& mtx ) const;
+    void drawHeadline ( base_renderer& baseRend, solid_renderer& solidRend,
+                        scanline_rasterizer& ras, agg::scanline_p8& sl, 
+                        gradient_span_alloc& gradSpan, linear_gradient& gradFunc, 
+                        color_array_type& gradColors, agg::trans_affine& mtx ) const;
     void paint ( base_renderer& baseRend, solid_renderer& solidRend,
                  text_renderer& textRend, agg::rasterizer_scanline_aa<>& ras, 
                  agg::scanline_p8& sl, agg::ellipse& ell ) const;
 private:
     TrussUnit& trussUnit;
-    int  headW, bordW, resEllRad, winRoundRad, 
+    int  headW, bordW, resEllRad, winCornerRadius, 
          minResizeVal, lineWidth, trussAreaIndent;
     QPoint _point1, _point2;
     color_type canvColor, headColor, borderColor, resEllColor;

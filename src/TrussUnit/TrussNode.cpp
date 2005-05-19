@@ -38,28 +38,33 @@ void TrussNode::paint ( base_renderer& baseRend, solid_renderer& solidRend,
                         text_renderer&, scanline_rasterizer& ras, 
                         agg::scanline_p8& sl, agg::ellipse& ell ) const
 {
-    int k = 0;
+    int highlightKoeff = 0;
     if ( isHighlighted () )
-        k = 1;
+    {
+        highlightKoeff = 1;
+    }
     solidRend.color ( agg::rgba(10, 10, 10) );
     ell.init ( widgetPosition.x(), widgetPosition.y(), 
-        radius + k + 1, radius + k + 1, 16 );
+               radius + highlightKoeff + 1, radius + highlightKoeff + 1, 16 );
     ras.add_path ( ell );
     agg::render_scanlines ( ras, sl, solidRend );
     if ( isHighlighted () )
     {
-        solidRend.color ( agg::rgba(200, 135, 15, 0.5) );
+        solidRend.color ( agg::rgba(200, 135, 15, 0.45) );
         ell.init ( widgetPosition.x(), widgetPosition.y(), radius + 5, radius + 5, 16 );
         ras.add_path ( ell );
         agg::render_scanlines ( ras, sl, solidRend );
     }
-    ell.init ( widgetPosition.x(), widgetPosition.y(), radius + k, radius + k, 16 );
+    ell.init ( widgetPosition.x(), widgetPosition.y(), radius + highlightKoeff, 
+                                                       radius + highlightKoeff, 16 );
     gradient_span_alloc gradSpan;
     radial_gradient gradFunc;
     color_array_type gradColors;
-    color_type begin ( 250, 250, 230 ); 
-    color_type middle ( 220, 190, 180 ); 
-    color_type end ( 170 - k * 100, 120 - k * 60, 110 - k * 50 );
+    color_type begin ( 255, 255, 255 ); 
+    color_type middle ( 230, 200, 195 ); 
+    color_type end ( 130 - highlightKoeff * 100, 
+                     90 - highlightKoeff * 60, 
+                     70 - highlightKoeff * 50 );
     unsigned i;
     for(i = 0; i < 128; ++i)
     {
