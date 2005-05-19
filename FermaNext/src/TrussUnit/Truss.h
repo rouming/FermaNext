@@ -123,6 +123,7 @@ public:
                  4 * nodeRadius * nodeRadius )
                 return *node;
         }
+//        return 0;
         N& newNode = createNode ( point.x(), point.y() );
         return newNode;
     }   
@@ -141,7 +142,21 @@ public:
     virtual P& createPivot ( QPoint p1 , QPoint p2, int nodeRadius )
     {
         N& first = nodeComparison ( p1, nodeRadius );
-        N& last = nodeComparison ( p2, nodeRadius );
+        N& last = nodeComparison ( p2, nodeRadius );    
+/*  TODO
+        N* first = nodeComparison ( p1, nodeRadius );
+        N* last = nodeComparison ( p2, nodeRadius );
+        if ( first == 0 )
+        {
+            N& node1 = createNode ( p1.x(), p1.y() );
+            *first = node1;
+        }
+        if ( last == 0 )
+        {
+            N& node2 = createNode ( p2.x(), p2.y() );
+            *last = node2;
+        }
+*/
         emit beforePivotCreation();
         P* pivot = new P ( first, last );        
         pivots.push_back(pivot);

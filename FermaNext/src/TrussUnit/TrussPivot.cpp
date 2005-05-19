@@ -46,13 +46,14 @@ void TrussPivot::setPivotWidth ( int w )
 }
 
 void TrussPivot::drawLine ( scanline_rasterizer& ras, solid_renderer& solidRend,
-                          agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const
+                          agg::scanline_p8& sl, QPoint point1, QPoint point2,
+                          int width_, color_type color ) const
 {
     line newLine ( point1.x(), point1.y(), point2.x(), point2.y() );
     agg::conv_stroke<line> stroke ( newLine );
-    stroke.width ( width ); 
+    stroke.width ( width_ ); 
     ras.add_path ( stroke );
-    solidRend.color ( agg::rgba(0, 0, 0) );
+    solidRend.color ( color );
     agg::render_scanlines ( ras, sl, solidRend );
 }
 
@@ -63,7 +64,9 @@ void TrussPivot::paint ( base_renderer& baseRend, solid_renderer& solidRend,
     QPoint p1, p2;
     p1 = getFirstNode().getNodeWidgetPosition ();
     p2 = getLastNode().getNodeWidgetPosition ();
-    drawLine ( ras, solidRend, sl, p1, p2 );   
+    if ( isHighlighted () )
+        drawLine ( ras, solidRend, sl, p1, p2, width + 5, agg::rgba(200, 135, 15, 0.45) ); 
+    drawLine ( ras, solidRend, sl, p1, p2, width, agg::rgba(0, 0, 0) ); 
 }
 
 /****************************************************************************/
