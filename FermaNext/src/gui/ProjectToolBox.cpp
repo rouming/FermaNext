@@ -167,7 +167,7 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
     labelVisibleTrussesVal->setBackgroundMode(PaletteBase); 
     groupBoxInfoLayout->addWidget( labelVisibleTrussesVal, 2, 1 );
 
-    PseudoWindowListBox * listBox = new PseudoWindowListBox ( groupBoxWindows, "listBox" );
+    PseudoWindowListBox * listBox = new PseudoWindowListBox ( prj, groupBoxWindows, "listBox" );
     groupBoxWindowsLayout->addWidget( listBox );
     listBox->addItem ("my_first_truss");
     listBox->addItem ("my_second_truss");

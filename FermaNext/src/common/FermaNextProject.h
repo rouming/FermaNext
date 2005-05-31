@@ -45,9 +45,9 @@ private:
     ObjectStateManager stateManager;
     TrussUnitManager trussManager;
 
-    // We own this object by pointer, because it should be destroyed
-    // by Qt deletion mechanism when all the application closes.
-    // Nobody should call getWindow after deletion has happened.
+    // We own this object by pointer, because it can be destroyed
+    // by Qt deletion mechanism when the application closes.
+    // Nobody should own this member after deletion has happened.
     TrussUnitDesignerWindow* designerWindow;
 
     // If Qt has already destroyed designer window it should not be
