@@ -149,7 +149,7 @@ void TrussUnitDesignerWidget::onDraw ()
     for ( ; iter != pseudoWindows.end() - 1; ++iter ) 
     {
         TrussUnitPseudoWindow* pseudoWindow = (*iter);
-        pseudoWindow->paint( baseRend, solidRend, textRend, ras, sl, ell );
+        pseudoWindow->paint( baseRend );
     }
     
     TrussUnitPseudoWindow* pseudoWindow = (*iter);
@@ -161,7 +161,7 @@ void TrussUnitDesignerWidget::onDraw ()
     pseudoWindow->setBorderColor ( 25,55,65 );
     pseudoWindow->setHeadlineColor ( 55, 155, 165 );
     pseudoWindow->setResEllColor ( 120, 120, 120 );
-    pseudoWindows.back()->paint ( baseRend, solidRend, textRend, ras, sl, ell );
+    pseudoWindows.back()->paint ( baseRend  );
     pseudoWindow->setBorderColor ( 20,35,40 );
     pseudoWindow->setHeadlineColor ( 75, 105, 95 );
     pseudoWindow->setResEllColor ( 50, 50, 50 );

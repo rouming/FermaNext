@@ -34,10 +34,16 @@ void TrussNode::setRadius ( int rad )
     radius = rad;
 }
 
-void TrussNode::paint ( base_renderer& baseRend, solid_renderer& solidRend,
-                        text_renderer&, scanline_rasterizer& ras, 
-                        agg::scanline_p8& sl, agg::ellipse& ell ) const
+void TrussNode::paint ( base_renderer& baseRend ) const
 {
+    solid_renderer solidRend ( baseRend );
+    glyph_gen glyph(0);
+    text_renderer textRend ( baseRend, glyph );
+    scanline_rasterizer   ras;
+    agg::scanline_p8     sl;
+    agg::ellipse ell;
+    glyph.font ( agg::verdana17_bold );
+
     int highlightKoeff = 0;
     if ( isHighlighted () )
     {

@@ -68,9 +68,7 @@ public:
     virtual void setHighlighted ( bool );
     virtual bool isVisible () const;
     virtual bool isHighlighted () const;
-    virtual void paint ( base_renderer& baseRend, solid_renderer& solidRend,
-                        text_renderer& textRend, agg::rasterizer_scanline_aa<>& ras, 
-                        agg::scanline_p8& sl, agg::ellipse& ell ) const = 0;
+    virtual void paint ( base_renderer& baseRend ) const = 0;
 private:
     bool visible;
     bool highlighted; 
@@ -93,9 +91,7 @@ public:
     const QString& getTrussName () const;
     const QSize& getArea ();
   
-    void paint ( base_renderer& baseRend, solid_renderer& solidRend,
-                 text_renderer& textRend, agg::rasterizer_scanline_aa<>& ras, 
-                 agg::scanline_p8& sl, agg::ellipse& ell ) const;
+    void paint ( base_renderer& baseRend ) const;
 
 public slots:
     void setTrussName ( const QString& name );
@@ -126,9 +122,7 @@ public:
     void setNodeWidgetPosition ( QPoint point );
     int getRadius () const;
     void setRadius ( int rad );
-    void paint ( base_renderer& baseRend, solid_renderer& solidRend,
-                 text_renderer& textRend, scanline_rasterizer& ras, 
-                 agg::scanline_p8& sl, agg::ellipse& ell ) const;
+    void paint ( base_renderer& baseRend ) const;
 private:
     int radius;
     QPoint widgetPosition;
@@ -145,9 +139,7 @@ public:
     void drawLine ( scanline_rasterizer& ras, solid_renderer& solidRend,
                     agg::scanline_p8& sl, QPoint point1, QPoint point2,
                     int width, color_type color ) const;
-    void paint ( base_renderer& baseRend, solid_renderer& solidRend,
-                 text_renderer& textRend, scanline_rasterizer& ras, 
-                 agg::scanline_p8& sl, agg::ellipse& ell ) const;
+    void paint ( base_renderer& baseRend ) const;
 private:
     int width;
 };

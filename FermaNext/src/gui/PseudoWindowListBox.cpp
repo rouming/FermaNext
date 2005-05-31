@@ -9,14 +9,15 @@
  * Pseudo Windows List Box
  *****************************************************************************/
 
-PseudoWindowListBox::PseudoWindowListBox ( QWidget* parent, const char* name, 
-                                           WFlags fl ) : 
-    QListBox( parent, name, fl )
+PseudoWindowListBox::PseudoWindowListBox ( FermaNextProject& prj, QWidget* parent,
+                                           const char* name, WFlags fl ) : 
+    QListBox( parent, name, fl ),
+    project(prj)
 {
     activ.resize(0);
     shown.resize(0);
     connect( this, SIGNAL(selected(int)), SLOT(DoubleClick(int)) );
-    connect( this, SIGNAL(highlighted (int)), SLOT(_highl(int)) );
+    connect( this, SIGNAL(highlighted(int)), SLOT(_highl(int)) );
 }
 
 void PseudoWindowListBox::addItem( const QString & text )
@@ -34,6 +35,7 @@ void PseudoWindowListBox::addItem( const QString & text )
 
 void PseudoWindowListBox::DoubleClick(int index)
 {
+
 }
 
 int PseudoWindowListBox::_isSelected ( int index )
@@ -88,15 +90,15 @@ void PseudoWindowListBox::contextMenuEvent ( QContextMenuEvent* )
     if ( _isSelected(now_highl) ) {
         contextMenu->insertItem(
                       QPixmap::fromMimeSource(imagesPath + "/unselect.png"),
-                      "UnSelect", this, SLOT(_unsel()) );
+                      "Unselect", this, SLOT(_unsel()) );
     }
     contextMenu->insertSeparator();
     contextMenu->insertItem(
                       QPixmap::fromMimeSource(imagesPath + "/select.png"),
-                      "SelectAll", this, SLOT(_selall()) );
+                      "Select All", this, SLOT(_selall()) );
     contextMenu->insertItem(
                        QPixmap::fromMimeSource(imagesPath + "/unselect.png"),
-                       "UnselectAll", this, SLOT(_unselall()) );
+                       "Unselect All", this, SLOT(_unselall()) );
     contextMenu->insertSeparator();
     contextMenu->insertItem(
                        QPixmap::fromMimeSource(imagesPath + "/calculate.png"),
