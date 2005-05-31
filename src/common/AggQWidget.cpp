@@ -1,5 +1,6 @@
 
 #include "AggQWidget.h"
+#include "Benchmark.h"
 
 #include <qpainter.h>
 #include <qsize.h>
@@ -170,9 +171,9 @@ void AggQWidget::flipY ( bool flip )
 /*****************************************************************************
  * Private QT event handlers. Override AGG handlers instead.
  ****************************************************************************/
-
 void AggQWidget::paintEvent ( QPaintEvent* event )
 {
+    BEGIN_BENCHMARK("AggQWidget::paintEvent");
     // Notice other agg paintable elements 
     aggPaintEvent( event );
 
@@ -186,7 +187,8 @@ void AggQWidget::paintEvent ( QPaintEvent* event )
     
         
     agg::color_conv(&rbufTmp, &aggBuffer, agg::color_conv_rgb24_to_rgba32());
-    bitBlt( this, 0,0, &tmpImg );  
+    bitBlt( this, 0,0, &tmpImg );
+    CLOSE_BENCHMARK;
 }
 
 void AggQWidget::resizeEvent ( QResizeEvent* event )

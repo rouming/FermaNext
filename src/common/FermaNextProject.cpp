@@ -27,7 +27,7 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWorkspace* qWsp ) :
              designerWindow, SLOT(removeTrussUnit(const TrussUnit&)) );
 
     //TODO: remove this block in future
-	for( uint i = 0; i <3; i++)
+	for( uint i = 0; i <1; i++)
 	{
         trussManager.createTrussUnit("Truss unit");
 	}
