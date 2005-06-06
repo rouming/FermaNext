@@ -14,6 +14,8 @@ unix {
   LIBS = -lagg -L.
 }
 
+DEFINES += BENCHMARK_ON
+
 INCLUDEPATH = $$(AGGDIR)/include src src/common src/gui src/TrussUnit
 
 SOURCES = src/FermaNext.cpp \
@@ -24,6 +26,7 @@ SOURCES = src/FermaNext.cpp \
           src/common/FermaNextConfig.cpp \
           src/common/ObjectStateManager.cpp \
           src/common/SubsidiaryConstants.cpp \
+          src/common/Benchmark.cpp \
           \
           src/gui/FermaNextMainFrame.cpp \
           src/gui/ProjectToolBox.cpp \
@@ -45,6 +48,7 @@ HEADERS = src/common/AggQWidget.h \
           src/common/ObjectStateManager.h \
           src/common/StatefulObject.h \
           src/common/SubsidiaryConstants.h \
+          src/common/Benchmark.h \
           \
           src/gui/FermaNextMainFrame.h \
           src/gui/ProjectToolBox.h \

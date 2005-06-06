@@ -23,6 +23,9 @@ Benchmark::Benchmark () :
     markIsNode(false)
 {}
 
+Benchmark::~Benchmark ()
+{}
+
 Benchmark& Benchmark::benchmark ()
 {
     if ( instance == 0 ) {
