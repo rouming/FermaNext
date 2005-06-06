@@ -54,6 +54,9 @@ public:
     // Print last mark like a node in the marks tree.
     virtual void printLastMark () const;
 
+protected:
+    virtual ~Benchmark ();
+
 private:    
     Benchmark ();
 

@@ -97,8 +97,9 @@ void TrussUnitManager::loadOldVersion ( TrussUnit& truss, QFile& file )
     file.readLine( line, 256 );
     //int sd1  = strtod( line,  NULL );
 
+    int i;
 
-    for ( int i = 0; i < pivotsNum; ++i )
+    for ( i = 0; i < pivotsNum; ++i )
     {
         uint firstNodeInd, lastNodeInd;
         file.readLine( line, 256 );
@@ -114,10 +115,10 @@ void TrussUnitManager::loadOldVersion ( TrussUnit& truss, QFile& file )
     {
         int x, y;
         file.readLine( line, 256 );
-        x = strtod( line,  NULL );
+        x = (int)strtod( line,  NULL );
     
         file.readLine( line, 256 );
-        y = strtod( line,  NULL );
+        y = (int)strtod( line,  NULL );
 
         truss.createNode( x, y );
     }

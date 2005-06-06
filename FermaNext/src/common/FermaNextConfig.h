@@ -27,7 +27,7 @@ public:
     ConfigItems getConfigItems ( const QDomNode& node ) const;
 
 protected:
-    void parseConfig () throw (ConfigReadException, ConfigWriteException);
+    void parseConfig () throw (ConfigReadException, ConfigParseException);
 
 private:
     QString fileName;
