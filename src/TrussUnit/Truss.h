@@ -110,7 +110,7 @@ public:
         clear();
     }
 
-    virtual N& nodeComparison ( QPoint point, int nodeRadius )
+    virtual N* findNode ( QPoint point, int nodeRadius )
     {
         NodeListIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
@@ -121,16 +121,14 @@ public:
             if ( ( (point.x() - x1) * (point.x() - x1) + 
                    (point.y() - y1) * (point.y() - y1) ) <  
                  4 * nodeRadius * nodeRadius )
-                return *node;
+                return node;
         }
-//        return 0;
-        N& newNode = createNode ( point.x(), point.y() );
-        return newNode;
+        return 0;
     }   
 
     virtual N& createNode ( int x, int y )
     {
-        emit beforePivotCreation();
+        emit beforeNodeCreation();
         N* node = new N;
         node->setX ( x );
         node->setY ( y );
@@ -141,27 +139,19 @@ public:
 
     virtual P& createPivot ( QPoint p1 , QPoint p2, int nodeRadius )
     {
-        N& first = nodeComparison ( p1, nodeRadius );
-        N& last = nodeComparison ( p2, nodeRadius );    
-/*  TODO
-        N* first = nodeComparison ( p1, nodeRadius );
-        N* last = nodeComparison ( p2, nodeRadius );
-        if ( first == 0 )
-        {
-            N& node1 = createNode ( p1.x(), p1.y() );
-            *first = node1;
-        }
-        if ( last == 0 )
-        {
-            N& node2 = createNode ( p2.x(), p2.y() );
-            *last = node2;
-        }
-*/
+        N* first = findNode( p1, nodeRadius );
+        N* last = findNode( p2, nodeRadius );
+        if ( first == 0 )  
+            first = &createNode( p1.x(), p1.y() );            
+        
+        if ( last == 0 )        
+            last = &createNode( p2.x(), p2.y() );
+
         emit beforePivotCreation();
-        P* pivot = new P ( first, last );        
+        P* pivot = new P( *first, *last );        
         pivots.push_back(pivot);
         emit afterPivotCreation(pivot->getFirstNode(), 
-                                pivot->getLastNode());
+                                pivot->getLastNode());                               
         return *pivot;
     }
 
@@ -268,24 +258,17 @@ template <class N> class Pivot : public PivotEmitter
 
 protected:
     Pivot () : first(0), last(0) {}
-    Pivot ( N& first_, N& last_ ) : 
-        nodesDelegated(true),
+    Pivot ( N& first_, N& last_ ) :         
         first(&first_),
         last(&last_) 
     {}
     Pivot ( const Pivot& p ) :
-        PivotEmitter(),
-        nodesDelegated(false),
+        PivotEmitter(),        
         first(new N(*p.first)),
         last(new N(*p.last))
     {}
     virtual ~Pivot ()
-    {
-        if ( !nodesDelegated ) {
-            delete first;
-            delete last;
-        }
-    }
+    {}
 
 public:
     virtual const N& getFirstNode () const
@@ -303,8 +286,7 @@ public:
         emit afterStateLoaded();
     }
 
-private:
-    bool nodesDelegated;
+private:    
     N *first, *last;
 };
 
