@@ -80,12 +80,8 @@ class TrussUnit : public Truss<TrussNode, TrussPivot>,
                   public PaintableTrussElement
 {
     Q_OBJECT
-private:    
-    // constructor is closed. TrussUnitManager should manage trusses;
-    friend class TrussUnitManager;
-    TrussUnit ( const QString& name );
-
 public:        
+    TrussUnit ( const QString& name );
     virtual ~TrussUnit ();
 
     int getNodesRadius () const;

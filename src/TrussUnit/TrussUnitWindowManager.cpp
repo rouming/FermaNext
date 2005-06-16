@@ -1,39 +1,39 @@
 
-#include "TrussUnitManager.h"
+#include "TrussUnitWindowManager.h"
 #include <qregexp.h>
 
 /*****************************************************************************
- * Truss Unit Manager
+ * Truss Unit Window Manager
  *****************************************************************************/
 
-const QString TrussUnitManager::NEW_EXTENSION = ".fnx";
-const QString TrussUnitManager::OLD_EXTENSION = ".frm";
+const QString TrussUnitWindowManager::NEW_EXTENSION = ".fnx";
+const QString TrussUnitWindowManager::OLD_EXTENSION = ".frm";
 
 
-TrussUnitManager::~TrussUnitManager ()
+TrussUnitWindowManager::~TrussUnitWindowManager ()
 {
-    clearTrussUnits();
+    clearTrussUnitWindows();
 }
 
-void TrussUnitManager::clearTrussUnits ()
+void TrussUnitWindowManager::clearTrussUnitWindows ()
 {
-    TrussUnitListIter iter = trussUnits.begin();
-    for ( ; iter != trussUnits.end(); ++iter )       
+    WindowListIter iter = trussWindows.begin();
+    for ( ; iter != trussWindows.end(); ++iter )       
       delete *iter;    
-    trussUnits.clear();
+    trussWindows.clear();
 }
 
-TrussUnit& TrussUnitManager::createTrussUnit ( const QString& name )
+TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow ( const QString& name )
 {
-    TrussUnit* truss = new TrussUnit(name);
-    trussUnits.push_back(truss);
-    emit onTrussUnitCreate(*truss);
-    return *truss;
+    TrussUnitWindow* trussWindow = new TrussUnitWindow(name);
+    trussWindows.push_back(trussWindow);
+    emit onTrussUnitWindowCreate(*trussWindow);
+    return *trussWindow;
 }
 
-TrussUnit& TrussUnitManager::createTrussUnitFromFile ( const QString& fileName ) 
-                                                                throw (ReadFileException,
-                                                                       WrongFormatException)
+TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindowFromFile ( 
+    const QString& fileName ) throw (ReadFileException,
+                                     WrongFormatException)
 {
     QFile file( fileName );
     if ( !file.open( IO_ReadOnly ) )
@@ -45,38 +45,39 @@ TrussUnit& TrussUnitManager::createTrussUnitFromFile ( const QString& fileName )
     if ( trussName.isEmpty() )        
         throw ReadFileException();
 
-    TrussUnit& truss = createTrussUnit(trussName);
+    TrussUnitWindow& trussWindow = createTrussUnitWindow(trussName);
     try {
 
         if( fileName.contains(NEW_EXTENSION) ) 
-            load( truss, file );
+            load( trussWindow, file );
         else if ( fileName.contains(OLD_EXTENSION) ) 
-            loadOldVersion( truss, file );
+            loadOldVersion( trussWindow, file );
         else 
             throw WrongFormatException();
 
     } catch ( WrongFormatException& ) {
-        removeTrussUnit(truss);
+        removeTrussUnitWindow(trussWindow);
         throw;
     }
-    return truss;
+    return trussWindow;
 }
 
-bool TrussUnitManager::removeTrussUnit ( const TrussUnit& truss )
+bool TrussUnitWindowManager::removeTrussUnitWindow ( 
+    TrussUnitWindow& trussWindow )
 {
-    TrussUnitListIter iter = trussUnits.begin();
-    for ( ; iter != trussUnits.end(); ++iter )
-        if ( (*iter) == &truss ) {
-            TrussUnit* truss = *iter;
-            emit onTrussUnitRemove(*truss);
-            trussUnits.erase(iter);
-            delete truss;
+    WindowListIter iter = trussWindows.begin();
+    for ( ; iter != trussWindows.end(); ++iter )
+        if ( (*iter) == &trussWindow ) {
+            TrussUnitWindow* trussWindow = *iter;
+            emit onTrussUnitWindowRemove(*trussWindow);
+            trussWindows.erase(iter);
+            delete trussWindow;
             return true;
         }            
     return false; 
 }
 
-void TrussUnitManager::loadOldVersion ( TrussUnit& truss, QFile& file ) 
+void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file ) 
                                                             throw (WrongFormatException)
 {
     char line[256];
@@ -210,7 +211,7 @@ void TrussUnitManager::loadOldVersion ( TrussUnit& truss, QFile& file )
 */
 }
 
-void TrussUnitManager::load ( TrussUnit& truss, const QFile& )
+void TrussUnitWindowManager::load ( TrussUnit& truss, const QFile& )
                                                             throw (WrongFormatException)
 {
     // Implementation is looked forward

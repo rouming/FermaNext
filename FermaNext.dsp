@@ -122,11 +122,11 @@ SOURCE=.\src\gui\ProjectToolBox.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\gui\PseudoWindowListBox.cpp
+SOURCE=.\src\common\SubsidiaryConstants.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\common\SubsidiaryConstants.cpp
+SOURCE=.\src\gui\WindowListBox.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -230,7 +230,11 @@ InputName=ProjectToolBox
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\gui\PseudoWindowListBox.h
+SOURCE=.\src\common\SubsidiaryConstants.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\gui\WindowListBox.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
@@ -238,8 +242,8 @@ SOURCE=.\src\gui\PseudoWindowListBox.h
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
 InputDir=.\src\gui
-InputPath=.\src\gui\PseudoWindowListBox.h
-InputName=PseudoWindowListBox
+InputPath=.\src\gui\WindowListBox.h
+InputName=WindowListBox
 
 "$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
@@ -249,10 +253,6 @@ InputName=PseudoWindowListBox
 
 !ENDIF 
 
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\common\SubsidiaryConstants.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
@@ -280,7 +280,7 @@ SOURCE=.\src\gui\mocs\moc_ProjectToolBox.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\gui\mocs\moc_PseudoWindowListBox.cpp
+SOURCE=.\src\gui\mocs\moc_WindowListBox.cpp
 # End Source File
 # End Group
 # End Target

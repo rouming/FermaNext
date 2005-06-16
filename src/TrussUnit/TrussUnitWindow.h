@@ -1,6 +1,6 @@
 
-#ifndef TRUSSUNITPSEUDOWINDOW_H
-#define TRUSSUNITPSEUDOWINDOW_H
+#ifndef TRUSSUNITWINDOW_H
+#define TRUSSUNITWINDOW_H
 
 #include "TrussUnit.h"
 #include <vector>
@@ -56,12 +56,15 @@ typedef agg::renderer_raster_htext_solid<base_renderer,
                                          glyph_gen>         text_renderer;
 
 
-class TrussUnitPseudoWindow : public PaintableTrussElement
+//     // constructor is closed. TrussUnitWindowManager should manage trusses;
+//    friend class TrussUnitWindowManager;
+
+class TrussUnitWindow : public TrussUnit
 {
 public:     
-    TrussUnitPseudoWindow ( TrussUnit& truss );
-    virtual ~TrussUnitPseudoWindow ();
-    TrussUnit& getTrussUnit ();
+    TrussUnitWindow ( const QString& name );
+    virtual ~TrussUnitWindow ();    
+
     QPoint getPoint1 () const;
     QPoint getPoint2 () const;
     QPoint getTrussAreaPoint1 () const;
@@ -126,12 +129,11 @@ public:
     void paint ( base_renderer& baseRend, solid_renderer& solidRend,
                  text_renderer& textRend, agg::rasterizer_scanline_aa<>& ras, 
                  agg::scanline_p8& sl, agg::ellipse& ell ) const;
-private:
-    TrussUnit& trussUnit;
+private:    
     int  headW, bordW, resEllRad, winCornerRadius, 
          minResizeVal, lineWidth, trussAreaIndent;
     QPoint _point1, _point2;
     color_type canvColor, headColor, borderColor, resEllColor;
 };
 
-#endif //TRUSSUNITPSEUDOWINDOW_H
+#endif //TRUSSUNITWINDOW_H

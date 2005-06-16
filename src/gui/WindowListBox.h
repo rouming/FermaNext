@@ -1,16 +1,16 @@
 
-#ifndef PSEUDOWINDOWLISTBOX_H
-#define PSEUDOWINDOWLISTBOX_H
+#ifndef WINDOWLISTBOX_H
+#define WINDOWLISTBOX_H
 
 #include "FermaNextProject.h"
 #include <qlistbox.h>
 #include <qbitarray.h>
 
-class PseudoWindowListBox : public QListBox
+class WindowListBox : public QListBox
 {
     Q_OBJECT
 public:
-    PseudoWindowListBox( FermaNextProject&, QWidget* parent = 0, 
+    WindowListBox( FermaNextProject&, QWidget* parent = 0, 
                          const char* name = 0, WFlags fl = 0 );    
 
     void addItem( const QString & text );
@@ -48,4 +48,4 @@ private:
     int now_highl;
 };
 
-#endif // PSEUDOWINDOWLISTBOX_H
+#endif // WINDOWLISTBOX_H

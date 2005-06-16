@@ -3,7 +3,7 @@
 #define TRUSSDESIGNERWIDGET_H
 
 #include "AggQWidget.h"
-#include "TrussUnitPseudoWindow.h"
+#include "TrussUnitWindowManager.h"
 
 class TrussUnitDesignerWidget : public AggQWidget
 {
@@ -15,13 +15,15 @@ public:
 
     TrussUnitDesignerWidget ( QWidget* parent = 0 );
     virtual ~TrussUnitDesignerWidget ();
-    
-    virtual TrussUnitPseudoWindow* findPseudoWindowByCoord ( int x, int y );
-    virtual void pseudoWindowToFront ( TrussUnitPseudoWindow* window );
+
+protected:
+    virtual void trussWindowToFront ( TrussUnitWindow& );    
+    virtual TrussUnitWindow* findTrussUnitWindowByCoord ( int x, int y );    
     virtual void removeAllHighlight ();
 	virtual void onDraw();
-	virtual void initPseudoWindow(); //temp
+	virtual void initTrussUnitWindow(); //temp
 
+public:
     // Handlers on events
     void aggPaintEvent ( QPaintEvent* );
     void aggResizeEvent ( QResizeEvent* );
@@ -32,23 +34,19 @@ public:
     void aggCtrlChangedEvent ( const agg::ctrl* );
 
 public slots:
-    virtual void addTrussUnit ( TrussUnit& );
-    virtual bool removeTrussUnit ( const TrussUnit& );
-    virtual bool removeTrussUnitPseudoWindow ( const TrussUnitPseudoWindow& );
+    virtual void addTrussUnitWindow ( TrussUnitWindow& );    
+    virtual bool removeTrussUnitWindow ( const TrussUnitWindow& );
 
 protected:
-    virtual void clearPseudoWindows ();
+    virtual void clearTrussUnitWindows ();
 
 private:
-    typedef std::vector<TrussUnitPseudoWindow*> PseudoWindowList;
-    typedef std::vector<TrussUnitPseudoWindow*>::iterator PseudoWindowListIter;
-
     enum WindowBehaviour { windowIdle = 0, onDrag, onHorResize, onVerResize, 
                            onBDiagResize, onFDiagResize };
     enum TrussElementBehaviour { trussElementIdle = 0, onNodeSelect, onNodeDrag,
                                   onPivotSelect, onPivotDrag };
-    PseudoWindowList pseudoWindows;
-    TrussUnitPseudoWindow* pseudoWindow;
+    WindowList trussWindows;
+    TrussUnitWindow* trussWindow;
     TrussNode* trussNode;
     WindowBehaviour winBehaviour;
     TrussElementBehaviour trussElemBehaviour;

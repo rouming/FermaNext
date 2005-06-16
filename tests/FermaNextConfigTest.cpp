@@ -5,7 +5,7 @@
 int main ()
 {
     FermaNextConfig& conf = FermaNextWorkspace::workspace().config();
-    QDomNode n = conf.findConfigNode("TrussUnitPseudoWindow");
+    QDomNode n = conf.findConfigNode("TrussUnitWindow");
     if ( n.isNull() ) {
         std::cout << "can't find\n";
         return 1;
