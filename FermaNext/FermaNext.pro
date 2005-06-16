@@ -38,8 +38,8 @@ SOURCES = src/FermaNext.cpp \
           src/TrussUnit/TrussUnitDesignerWidget.cpp \
           src/TrussUnit/TrussPivot.cpp \
           src/TrussUnit/TrussUnitDesignerWindow.cpp \
-	  src/TrussUnit/TrussUnitPseudoWindow.cpp \
-          src/TrussUnit/TrussUnitManager.cpp
+          src/TrussUnit/TrussUnitWindow.cpp \
+          src/TrussUnit/TrussUnitWindowManager.cpp
 
 HEADERS = src/common/AggQWidget.h \
           src/common/FermaNextWorkspace.h \
@@ -58,7 +58,7 @@ HEADERS = src/common/AggQWidget.h \
           src/TrussUnit/TrussUnit.h \
           src/TrussUnit/TrussUnitDesignerWidget.h \
           src/TrussUnit/TrussUnitDesignerWindow.h \
-          src/TrussUnit/TrussUnitPseudoWindow.h \
-          src/TrussUnit/TrussUnitManager.h
+          src/TrussUnit/TrussUnitWindow.h \
+          src/TrussUnit/TrussUnitWindowManager.h
 
 

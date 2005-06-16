@@ -2,7 +2,7 @@
 #include "TrussUnitDesignerWindow.h"
 
 /*****************************************************************************
- * Designer Window
+ * Truss Unit Designer Window
  *****************************************************************************/
 
 TrussUnitDesignerWindow::TrussUnitDesignerWindow ( const QString& caption, 
@@ -24,21 +24,9 @@ TrussUnitDesignerWindow::TrussUnitDesignerWindow ( const QString& caption,
     setCaption( caption );
 }
 
-void TrussUnitDesignerWindow::addTrussUnit ( TrussUnit& truss )
-{    
-    designerWidget->addTrussUnit ( truss ); 
-}
-
-bool TrussUnitDesignerWindow::removeTrussUnit ( const TrussUnit& truss )
+TrussUnitDesignerWidget& TrussUnitDesignerWindow::getDesignerWidget ()
 {
-    return designerWidget->removeTrussUnit( truss );
+    return *designerWidget;
 }
-
-bool TrussUnitDesignerWindow::removeTrussUnitPseudoWindow 
-                                ( const TrussUnitPseudoWindow& window )
-{
-    return designerWidget->removeTrussUnitPseudoWindow ( window );
-}
-
 
 /*****************************************************************************/

@@ -1,15 +1,15 @@
 
-#include "PseudoWindowListBox.h"
+#include "WindowListBox.h"
 #include "SubsidiaryConstants.h"
 #include <qstring.h>
 #include <qcursor.h>
 #include <qpopupmenu.h>
 
 /*****************************************************************************
- * Pseudo Windows List Box
+ * Windows List Box
  *****************************************************************************/
 
-PseudoWindowListBox::PseudoWindowListBox ( FermaNextProject& prj, QWidget* parent,
+WindowListBox::WindowListBox ( FermaNextProject& prj, QWidget* parent,
                                            const char* name, WFlags fl ) : 
     QListBox( parent, name, fl ),
     project(prj)
@@ -20,7 +20,7 @@ PseudoWindowListBox::PseudoWindowListBox ( FermaNextProject& prj, QWidget* paren
     connect( this, SIGNAL(highlighted(int)), SLOT(_highl(int)) );
 }
 
-void PseudoWindowListBox::addItem( const QString & text )
+void WindowListBox::addItem( const QString & text )
 {
     int i;
     insertItem( QPixmap::fromMimeSource( imagesPath + "/unselect.png" ), 
@@ -33,12 +33,12 @@ void PseudoWindowListBox::addItem( const QString & text )
     shown[i-1]=1;
 }
 
-void PseudoWindowListBox::DoubleClick(int index)
+void WindowListBox::DoubleClick(int index)
 {
 
 }
 
-int PseudoWindowListBox::_isSelected ( int index )
+int WindowListBox::_isSelected ( int index )
 {
     if ( activ[index]==1 )
         return 1;    
@@ -46,7 +46,7 @@ int PseudoWindowListBox::_isSelected ( int index )
         return 0;
 }
 
-int PseudoWindowListBox::_isShown ( int index )
+int WindowListBox::_isShown ( int index )
 {
     if ( shown[index]==1 ) 
         return 1;
@@ -55,7 +55,7 @@ int PseudoWindowListBox::_isShown ( int index )
 }
 
 
-void PseudoWindowListBox::_setSelected ( int index )
+void WindowListBox::_setSelected ( int index )
 {
     if ( _isSelected(index)==0 ) {
         changeItem( QPixmap::fromMimeSource(imagesPath + "/select.png"),
@@ -64,7 +64,7 @@ void PseudoWindowListBox::_setSelected ( int index )
     }
 }
 
-void PseudoWindowListBox::_setUnSelected ( int index )
+void WindowListBox::_setUnSelected ( int index )
 {
     if ( _isSelected(index) ) {
         changeItem( QPixmap::fromMimeSource(imagesPath + "/unselect.png"),
@@ -73,12 +73,12 @@ void PseudoWindowListBox::_setUnSelected ( int index )
     }
 }
 
-void PseudoWindowListBox::_highl ( int index )
+void WindowListBox::_highl ( int index )
 {
     now_highl=index;
 }
 
-void PseudoWindowListBox::contextMenuEvent ( QContextMenuEvent* )
+void WindowListBox::contextMenuEvent ( QContextMenuEvent* )
 {
     QPopupMenu* contextMenu = new QPopupMenu( this );
     Q_CHECK_PTR( contextMenu );
@@ -123,33 +123,33 @@ void PseudoWindowListBox::contextMenuEvent ( QContextMenuEvent* )
     delete contextMenu;
 }
 
-void PseudoWindowListBox::_sel()
+void WindowListBox::_sel()
 {                    
     _setSelected(now_highl);
 }
 
-void PseudoWindowListBox::_unsel()
+void WindowListBox::_unsel()
 {
     _setUnSelected(now_highl);
 }
 
-void PseudoWindowListBox::_selall()
+void WindowListBox::_selall()
 {
     for ( uint i = 0; i < activ.size(); i++ )
         _setSelected(i);
 }
 
-void PseudoWindowListBox::_unselall()
+void WindowListBox::_unselall()
 {
     for ( uint i = 0; i < activ.size(); i++ )
         _setUnSelected(i);
 }
 
-void PseudoWindowListBox::_show()
+void WindowListBox::_show()
 {
 }
 
-void PseudoWindowListBox::_hide()
+void WindowListBox::_hide()
 {
 }
 

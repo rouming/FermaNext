@@ -1,6 +1,6 @@
 
 #include "ProjectToolBox.h"
-#include "PseudoWindowListBox.h"
+#include "WindowListBox.h"
 #include "SubsidiaryConstants.h"
 
 #include <qbuttongroup.h>
@@ -167,11 +167,11 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
     labelVisibleTrussesVal->setBackgroundMode(PaletteBase); 
     groupBoxInfoLayout->addWidget( labelVisibleTrussesVal, 2, 1 );
 
-    PseudoWindowListBox * listBox = new PseudoWindowListBox ( prj, groupBoxWindows, "listBox" );
+    WindowListBox * listBox = new WindowListBox ( prj, groupBoxWindows, "listBox" );
     groupBoxWindowsLayout->addWidget( listBox );
-    listBox->addItem ("my_first_truss");
-    listBox->addItem ("my_second_truss");
-    listBox->addItem ("my_third_truss");
+    listBox->addItem("my_first_truss");
+    listBox->addItem("my_second_truss");
+    listBox->addItem("my_third_truss");
     
     // Fonts
     QFont labelFont( "arial", 9  );
@@ -285,15 +285,15 @@ void ProjectToolBox::importIsPressed ()
         return;
 
     try { 
-        currPrj->getTrussUnitManager().createTrussUnitFromFile(fileName);
-    } catch ( TrussUnitManager::ReadFileException& ) {
-        QMessageBox::critical( 0, "TrussUnitManager::ReadFileException",
-                               QString("TrussUnitManager::ReadFileException") );
+        currPrj->getTrussUnitWindowManager().createTrussUnitWindowFromFile(fileName);
+    } catch ( TrussUnitWindowManager::ReadFileException& ) {
+        QMessageBox::critical( 0, "TrussUnitWindowManager::ReadFileException",
+                               QString("TrussUnitWindowManager::ReadFileException") );
         return;
 
-    } catch ( TrussUnitManager::WrongFormatException& ) {
-        QMessageBox::critical( 0, "TrussUnitManager::WrongFormatException",
-                               QString("TrussUnitManager::WrongFormatException") );
+    } catch ( TrussUnitWindowManager::WrongFormatException& ) {
+        QMessageBox::critical( 0, "TrussUnitWindowManager::WrongFormatException",
+                               QString("TrussUnitWindowManager::WrongFormatException") );
     }
 }
 

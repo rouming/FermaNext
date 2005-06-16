@@ -14,11 +14,7 @@ public:
     TrussUnitDesignerWindow ( const QString& caption, QWidget* p = 0, 
                               const char* n = 0, WFlags f =WType_TopLevel );
 
-public slots:
-    // Delegate some slots of designerWidget
-    virtual void addTrussUnit ( TrussUnit& );
-    virtual bool removeTrussUnit ( const TrussUnit& );
-    virtual bool removeTrussUnitPseudoWindow ( const TrussUnitPseudoWindow& );
+    virtual TrussUnitDesignerWidget& getDesignerWidget ();
 
 private:
     QVBoxLayout vbox;

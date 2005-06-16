@@ -16,20 +16,21 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWorkspace* qWsp ) :
 {
     designerWindow->setIcon( QPixmap::fromMimeSource( imagesPath + "/project.png" ) );
     designerWindow->installEventFilter(this);
+    TrussUnitDesignerWidget& designerWidget = designerWindow->getDesignerWidget();
 
     // Should be connected to avoid double deletion.
     connect( designerWindow, SIGNAL(destroyed()), SLOT(markWindowDestroyed()) );
 
     // Catch trusses creation or deletion.
-    connect( &trussManager, SIGNAL(onTrussUnitCreate(TrussUnit&)), 
-             designerWindow, SLOT(addTrussUnit(TrussUnit&)) );
-    connect( &trussManager, SIGNAL(onTrussUnitRemove(const TrussUnit&)), 
-             designerWindow, SLOT(removeTrussUnit(const TrussUnit&)) );
+    connect( &trussWindowManager, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
+             &designerWidget, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
+    connect( &trussWindowManager, SIGNAL(onTrussUnitWindowRemove(const TrussUnitWindow&)), 
+             &designerWidget, SLOT(removeTrussUnitWindow(const TrussUnitWindow&)) );
 
     //TODO: remove this block in future
 	for( uint i = 0; i <1; i++)
 	{
-        trussManager.createTrussUnit("Truss unit");
+        trussWindowManager.createTrussUnitWindow("Truss unit");
 	}
 }
 
@@ -71,9 +72,9 @@ ObjectStateManager& FermaNextProject::getStateManager ()
     return stateManager;
 }
 
-TrussUnitManager& FermaNextProject::getTrussUnitManager ()
+TrussUnitWindowManager& FermaNextProject::getTrussUnitWindowManager ()
 {
-    return trussManager;
+    return trussWindowManager;
 }
 
 bool FermaNextProject::eventFilter( QObject*, QEvent* e )

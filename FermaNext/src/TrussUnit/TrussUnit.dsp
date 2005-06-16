@@ -122,11 +122,11 @@ SOURCE=.\TrussUnitDesignerWindow.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\TrussUnitManager.cpp
+SOURCE=.\TrussUnitWindow.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\TrussUnitPseudoWindow.cpp
+SOURCE=.\TrussUnitWindowManager.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -270,7 +270,11 @@ InputName=TrussUnitDesignerWindow
 # End Source File
 # Begin Source File
 
-SOURCE=.\TrussUnitManager.h
+SOURCE=.\TrussUnitWindow.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\TrussUnitWindowManager.h
 
 !IF  "$(CFG)" == "TrussUnit - Win32 Release"
 
@@ -278,8 +282,8 @@ SOURCE=.\TrussUnitManager.h
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
 InputDir=.
-InputPath=.\TrussUnitManager.h
-InputName=TrussUnitManager
+InputPath=.\TrussUnitWindowManager.h
+InputName=TrussUnitWindowManager
 
 "$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
@@ -289,10 +293,6 @@ InputName=TrussUnitManager
 
 !ENDIF 
 
-# End Source File
-# Begin Source File
-
-SOURCE=.\TrussUnitPseudoWindow.h
 # End Source File
 # End Group
 # Begin Group "Moc Files"
@@ -324,7 +324,7 @@ SOURCE=.\mocs\moc_TrussUnitDesignerWindow.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\mocs\moc_TrussUnitManager.cpp
+SOURCE=.\mocs\moc_TrussUnitWindowManager.cpp
 # End Source File
 # End Group
 # End Target
