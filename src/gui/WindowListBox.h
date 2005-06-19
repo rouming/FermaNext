@@ -11,7 +11,7 @@ class WindowListBox : public QListBox
     Q_OBJECT
 public:
     WindowListBox( FermaNextProject&, QWidget* parent = 0, 
-                         const char* name = 0, WFlags fl = 0 );    
+                   const char* name = 0, WFlags fl = 0 );    
 
     void addItem( const QString & text );
     void _setSelected( int index );

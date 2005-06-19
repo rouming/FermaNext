@@ -130,11 +130,10 @@ void TrussUnitDesignerWidget::onDraw ()
     for ( ; iter != trussWindows.end() - 1; ++iter ) 
     {
         TrussUnitWindow* trussWindow = (*iter);
-        trussWindow->paint( baseRend, solidRend, textRend, ras, sl, ell );
+        trussWindow->paint( baseRend );
     }
     
-    TrussUnitWindow* trussWindow = (*iter);
-
+    TrussUnitWindow* trussWindow = (*iter); 
     trussWindow->setTrussNodesPosition ();
     trussWindow->setNodesRadius ( 4 );
     trussWindow->setPivotsWidth ( 2 );
@@ -142,7 +141,7 @@ void TrussUnitDesignerWidget::onDraw ()
     trussWindow->setBorderColor ( 25,55,65 );
     trussWindow->setHeadlineColor ( 55, 155, 165 );
     trussWindow->setResEllColor ( 120, 120, 120 );
-    trussWindows.back()->paint ( baseRend, solidRend, textRend, ras, sl, ell );
+    trussWindows.back()->paint ( baseRend  );
     trussWindow->setBorderColor ( 20,35,40 );
     trussWindow->setHeadlineColor ( 75, 105, 95 );
     trussWindow->setResEllColor ( 50, 50, 50 );

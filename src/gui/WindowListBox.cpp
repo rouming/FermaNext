@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 WindowListBox::WindowListBox ( FermaNextProject& prj, QWidget* parent,
-                                           const char* name, WFlags fl ) : 
+                               const char* name, WFlags fl ) : 
     QListBox( parent, name, fl ),
     project(prj)
 {
