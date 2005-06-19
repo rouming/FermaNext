@@ -104,18 +104,25 @@ const QSize& TrussUnit::getArea ()
     return area;
 }
 
-void TrussUnit::paint ( base_renderer& baseRend, solid_renderer& solidRend,
-                        text_renderer& textRend, scanline_rasterizer& ras, 
-                        agg::scanline_p8& sl, agg::ellipse& ell ) const
+void TrussUnit::paint ( base_renderer& baseRend ) const
 {
+    solid_renderer solidRend ( baseRend );
+    glyph_gen glyph(0);
+    text_renderer textRend ( baseRend, glyph );
+    scanline_rasterizer   ras;
+    agg::scanline_p8     sl;
+    agg::ellipse ell;
+    glyph.font ( agg::verdana17_bold );
+
+
     PivotList pivotList = getPivotList ();
     PivotList::const_iterator pivotsIter = pivotList.begin();
     for ( ; pivotsIter != pivotList.end(); ++pivotsIter )
-        (*pivotsIter)->paint ( baseRend, solidRend, textRend, ras, sl, ell );
+        (*pivotsIter)->paint ( baseRend );
     NodeList nodeList = getNodeList ();
     NodeList::const_iterator nodesIter = nodeList.begin();
     for ( ; nodesIter != nodeList.end(); ++nodesIter )
-        (*nodesIter)->paint ( baseRend, solidRend, textRend, ras, sl, ell );
+        (*nodesIter)->paint ( baseRend );
 }
 
 /****************************************************************************/

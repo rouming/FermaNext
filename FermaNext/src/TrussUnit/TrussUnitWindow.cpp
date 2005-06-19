@@ -54,20 +54,26 @@ struct arrow
  *****************************************************************************/
 
 TrussUnitWindow::TrussUnitWindow ( const QString& name ) :
-    TrussUnit(name)
+    TrussUnit(name),
+    rbuf( new rbuf_dynarow(300,300) ),
+    _point1(0,0), _point2(300,300)
 {}
 
 TrussUnitWindow::~TrussUnitWindow ()
-{}
+{
+    delete rbuf;
+}
 
 QPoint TrussUnitWindow::getPoint1 () const
 {
-    return _point1;
+    //return _point1;
+    return leftTopPos;
 }
 
 QPoint TrussUnitWindow::getPoint2 () const
 {
-    return _point2;
+    //return _point2;
+    return rightBottomPos;
 }
 
 QPoint TrussUnitWindow::getTrussAreaPoint1 () const
@@ -75,8 +81,8 @@ QPoint TrussUnitWindow::getTrussAreaPoint1 () const
     int leftAreaIndent = 40,
         upperAreaIndent = 55;
     QPoint point;
-    point.setX ( _point1.x() + leftAreaIndent );
-    point.setY ( _point1.y() + upperAreaIndent );
+    point.setX ( leftTopPos.x() + leftAreaIndent );
+    point.setY ( leftTopPos.y() + upperAreaIndent );
     return point;
 }
 
@@ -85,8 +91,8 @@ QPoint TrussUnitWindow::getTrussAreaPoint2 () const
     int rigthAreaIndent = 30,
         lowerAreaIndent = 40;
     QPoint point;
-    point.setX ( _point2.x() - rigthAreaIndent );
-    point.setY ( _point2.y() - lowerAreaIndent );
+    point.setX ( rightBottomPos.x() - rigthAreaIndent );
+    point.setY ( rightBottomPos.y() - lowerAreaIndent );
     return point;
 }
 
@@ -123,7 +129,7 @@ int TrussUnitWindow::getMinResizeVal () const
 
 bool TrussUnitWindow::inWindowRect ( int x, int y )
 {
-	if ( x >= _point1.x() && x <= _point2.x() && y >= _point1.y() && y <= _point2.y() )
+	if ( x >= leftTopPos.x() && x <= rightBottomPos.x() && y >= leftTopPos.y() && y <= rightBottomPos.y() )
 	{
 		return true;
 	}
@@ -132,8 +138,8 @@ bool TrussUnitWindow::inWindowRect ( int x, int y )
 
 bool TrussUnitWindow::inCanvasRect ( int x, int y )
 {
-    if ( x >= _point1.x() + bordW && x <= _point2.x() - bordW && 
-        y >= _point1.y() + bordW + headW && y <= _point2.y() - bordW )
+    if ( x >= leftTopPos.x() + bordW && x <= rightBottomPos.x() - bordW && 
+        y >= leftTopPos.y() + bordW + headW && y <= rightBottomPos.y() - bordW )
 	{
 		return true;
 	}
@@ -142,8 +148,8 @@ bool TrussUnitWindow::inCanvasRect ( int x, int y )
 
 bool TrussUnitWindow::inHeadlineRect ( int x, int y )
 {
-	if ( x >= _point1.x() + bordW && x <= _point2.x() - bordW && y >= 
-		_point1.y() + bordW && y <= _point1.y() + bordW + headW)
+	if ( x >= leftTopPos.x() + bordW && x <= rightBottomPos.x() - bordW && y >= 
+		leftTopPos.y() + bordW && y <= leftTopPos.y() + bordW + headW)
 	{
 		return true;
 	}
@@ -152,10 +158,10 @@ bool TrussUnitWindow::inHeadlineRect ( int x, int y )
 
 bool TrussUnitWindow::inHorResizeRect ( int x, int y )
 {
-    if ( x >= _point1.x() && x <= _point1.x() + bordW && 
-        y >= _point1.y() + winCornerRadius && y <= _point2.y() - winCornerRadius ||
-        x >= _point2.x() - bordW && x <= _point2.x() && 
-        y >= _point1.y() + winCornerRadius && y <= _point2.y() - winCornerRadius )
+    if ( x >= leftTopPos.x() && x <= leftTopPos.x() + bordW && 
+        y >= leftTopPos.y() + winCornerRadius && y <= rightBottomPos.y() - winCornerRadius ||
+        x >= rightBottomPos.x() - bordW && x <= rightBottomPos.x() && 
+        y >= leftTopPos.y() + winCornerRadius && y <= rightBottomPos.y() - winCornerRadius )
     {
         return true;
     }
@@ -164,10 +170,10 @@ bool TrussUnitWindow::inHorResizeRect ( int x, int y )
 
 bool TrussUnitWindow::inVerResizeRect ( int x, int y )
 {
-    if ( x >= _point1.x() + winCornerRadius && x <= _point2.x() - winCornerRadius && 
-        y >= _point1.y() && y <= _point1.y() + bordW ||
-        x >= _point1.x() + winCornerRadius && x <= _point2.x() - winCornerRadius && 
-        y >= _point2.y() - bordW && y <= _point2.y() )
+    if ( x >= leftTopPos.x() + winCornerRadius && x <= rightBottomPos.x() - winCornerRadius && 
+        y >= leftTopPos.y() && y <= leftTopPos.y() + bordW ||
+        x >= leftTopPos.x() + winCornerRadius && x <= rightBottomPos.x() - winCornerRadius && 
+        y >= rightBottomPos.y() - bordW && y <= rightBottomPos.y() )
     {
         return true;
     }
@@ -176,10 +182,10 @@ bool TrussUnitWindow::inVerResizeRect ( int x, int y )
 
 bool TrussUnitWindow::inBDiagResizeRect ( int x, int y )
 {
-    if ( sqrt( (x - (_point2.x() - bordW)) * (x - (_point2.x() - bordW)) +
-        (y - (_point1.y() + bordW)) * (y - (_point1.y() + bordW)) ) <= resEllRad + 2 ||
-        sqrt( (x - (_point1.x() + bordW)) * (x - (_point1.x() + bordW)) +
-        (y - (_point2.y() - bordW)) * (y - (_point2.y() - bordW)) ) <= resEllRad + 2 )
+    if ( sqrt( (x - (rightBottomPos.x() - bordW)) * (x - (rightBottomPos.x() - bordW)) +
+        (y - (leftTopPos.y() + bordW)) * (y - (leftTopPos.y() + bordW)) ) <= resEllRad + 2 ||
+        sqrt( (x - (leftTopPos.x() + bordW)) * (x - (leftTopPos.x() + bordW)) +
+        (y - (rightBottomPos.y() - bordW)) * (y - (rightBottomPos.y() - bordW)) ) <= resEllRad + 2 )
     {
         return true;
     }
@@ -188,10 +194,10 @@ bool TrussUnitWindow::inBDiagResizeRect ( int x, int y )
 
 bool TrussUnitWindow::inFDiagResizeRect ( int x, int y )
 {
-    if ( sqrt( (x - (_point1.x() + bordW)) * (x - (_point1.x() + bordW)) +
-        (y - (_point1.y() + bordW)) * (y - (_point1.y() + bordW)) ) <= resEllRad + 2 ||
-        sqrt( (x - (_point2.x() - bordW)) * (x - (_point2.x() - bordW)) +
-        (y - (_point2.y() - bordW)) * (y - (_point2.y() - bordW)) ) <= resEllRad + 2 )
+    if ( sqrt( (x - (leftTopPos.x() + bordW)) * (x - (leftTopPos.x() + bordW)) +
+        (y - (leftTopPos.y() + bordW)) * (y - (leftTopPos.y() + bordW)) ) <= resEllRad + 2 ||
+        sqrt( (x - (rightBottomPos.x() - bordW)) * (x - (rightBottomPos.x() - bordW)) +
+        (y - (rightBottomPos.y() - bordW)) * (y - (rightBottomPos.y() - bordW)) ) <= resEllRad + 2 )
     {
         return true;
     }
@@ -268,8 +274,10 @@ color_type TrussUnitWindow::getBorderColor () const
 
 void TrussUnitWindow::setPosition ( QPoint point1, QPoint point2 )
 {
-    _point1 = point1;
-    _point2 = point2;
+    //_point1 = point1;
+    //_point2 = point2;
+    leftTopPos = point1;
+    rightBottomPos = point2;
 }
 
 void TrussUnitWindow::setNodeHighlight ( int x, int y )
@@ -378,7 +386,7 @@ void TrussUnitWindow::setResEllColor ( int r , int g, int b )
     resEllColor = agg::rgba(r, g, b);
 }
 
-void TrussUnitWindow::drawText ( base_renderer& baseRend, text_renderer& textRend,
+void TrussUnitWindow::drawText ( ren_dynarow& baseRend, textRenderer& textRend,
                            const QString& str, color_type col, QPoint point, 
                            bool flipY ) const 
 {
@@ -386,7 +394,7 @@ void TrussUnitWindow::drawText ( base_renderer& baseRend, text_renderer& textRen
     textRend.render_text ( point.x(), point.y(), str.ascii(), flipY );
 }
 
-void TrussUnitWindow::drawLine ( scanline_rasterizer& ras, solid_renderer& solidRend,
+void TrussUnitWindow::drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
                           agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const
 {
     line newLine ( point1.x(), point1.y(), point2.x(), point2.y() );
@@ -397,7 +405,7 @@ void TrussUnitWindow::drawLine ( scanline_rasterizer& ras, solid_renderer& solid
     agg::render_scanlines ( ras, sl, solidRend );
 }
 
-void TrussUnitWindow::drawArrow ( scanline_rasterizer& ras, solid_renderer& solidRend,
+void TrussUnitWindow::drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
                           agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const
 {
     line newLine ( point1.x(), point1.y(), point2.x(), point2.y() );
@@ -407,7 +415,7 @@ void TrussUnitWindow::drawArrow ( scanline_rasterizer& ras, solid_renderer& soli
     agg::render_scanlines ( ras, sl, solidRend );
 }
 
-void TrussUnitWindow::drawOutlineRoundedRect ( solid_renderer& solidRend, 
+void TrussUnitWindow::drawOutlineRoundedRect ( solidRenderer& solidRend, 
                                                      scanline_rasterizer& ras,
                                                      agg::scanline_p8& sl, 
                                                      QPoint point1, QPoint point2, 
@@ -424,9 +432,9 @@ void TrussUnitWindow::drawOutlineRoundedRect ( solid_renderer& solidRend,
     agg::render_scanlines(ras, sl, solidRend);
 }
 
-void TrussUnitWindow::drawTrussArea ( base_renderer& baseRend, 
-                               scanline_rasterizer& ras, text_renderer& textRend, 
-                               solid_renderer& solidRend, agg::scanline_p8& sl ) const
+void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend, 
+                               scanline_rasterizer& ras, textRenderer& textRend, 
+                               solidRenderer& solidRend, agg::scanline_p8& sl ) const
 {
     int arrowTailIndent = 10,
         arrowHeadIndent = 16,
@@ -488,8 +496,8 @@ void TrussUnitWindow::drawTrussArea ( base_renderer& baseRend,
     drawText  ( baseRend, textRend, "0", agg::rgba(100, 100, 100), p1, true );
 }
 
-void TrussUnitWindow::drawHeadline ( base_renderer& baseRend, 
-                               solid_renderer& solidRend, scanline_rasterizer& ras,
+void TrussUnitWindow::drawHeadline ( ren_dynarow& baseRend, 
+                               solidRenderer& solidRend, scanline_rasterizer& ras,
                                agg::scanline_p8& sl, gradient_span_alloc& gradSpan,
                                linear_gradient& gradFunc, color_array_type& gradColors,
                                agg::trans_affine& mtx ) const
@@ -516,7 +524,7 @@ void TrussUnitWindow::drawHeadline ( base_renderer& baseRend,
     interpolator inter ( mtx );
     linear_gradient_span_gen gradSpanGen ( gradSpan, inter, gradFunc, gradColors, 
                                            _point1.y(), _point1.y() + headW );
-    linear_gradient_renderer gradRend ( baseRend, gradSpanGen );
+    linearGradientRenderer gradRend ( baseRend, gradSpanGen );
     ras.add_path ( headline );
     agg::render_scanlines ( ras, sl, gradRend );
 
@@ -524,12 +532,35 @@ void TrussUnitWindow::drawHeadline ( base_renderer& baseRend,
                              winCornerRadius/2, agg::rgba(30,20,10) ); 
 }
 
-void TrussUnitWindow::paint ( base_renderer& baseRend, solid_renderer& solidRend,
-                        text_renderer& textRend, scanline_rasterizer& ras, 
-                        agg::scanline_p8& sl, agg::ellipse& ell ) const
+void TrussUnitWindow::paint ( base_renderer& baseRend ) const
 {
+    glyph_gen glyph(0);
+    scanline_rasterizer   ras;    
+    agg::scanline_p8     sl;
+    agg::ellipse ell;
+    glyph.font ( agg::verdana17_bold );
+
+    static bool isRendered = false;
+   
+    //solid_renderer solidRend ( baseRend );    
+    //text_renderer textRend ( baseRend, glyph );
+
+
+    pixf_dynarow pixf(*rbuf);
+
+    if ( isRendered == false ) { 
+        
+        ren_dynarow baseRend(pixf);
+
+        solidRenderer solidRend ( baseRend );    
+        textRenderer textRend ( baseRend, glyph );
+
+
     //draw resize ellipses
     solidRend.color ( resEllColor );
+
+ 
+    
     ell.init ( _point1.x() + bordW, _point1.y() + bordW, resEllRad, resEllRad, 16 );
     ras.add_path ( ell );
     ell.init ( _point2.x() - bordW, _point1.y() + bordW, resEllRad, resEllRad, 16 );
@@ -539,11 +570,14 @@ void TrussUnitWindow::paint ( base_renderer& baseRend, solid_renderer& solidRend
     agg::render_scanlines ( ras, sl, solidRend );
     ell.init ( _point2.x() - bordW, _point2.y() - bordW, resEllRad, resEllRad, 16 );
     ras.add_path(ell);
+    
     agg::render_scanlines ( ras, sl, solidRend );
 
-    // draw -window canvas
+    // draw window canvas
     drawOutlineRoundedRect ( solidRend, ras, sl, _point1, _point2, 
                              winCornerRadius, agg::rgba(1,1,1) );
+                                             
+
     agg::rounded_rect border ( _point1.x(), _point1.y(), 
                                _point2.x(), _point2.y(), winCornerRadius );
     ras.add_path ( border );
@@ -555,25 +589,29 @@ void TrussUnitWindow::paint ( base_renderer& baseRend, solid_renderer& solidRend
     solidRend.color ( canvColor );
     agg::render_scanlines ( ras, sl, solidRend );
 
-    // draw -window headline
+    // draw window headline
     gradient_span_alloc gradSpan;
     linear_gradient gradFunc;
     color_array_type gradColors;
     agg::trans_affine mtx;
     drawHeadline ( baseRend, solidRend, ras, sl, gradSpan, gradFunc, gradColors, mtx );
 
-    // draw -window title text
+    // draw window title text
     QPoint point;
     point.setX ( _point1.x() + ( _point2.x() - _point1.x() )/2 - 10 * bordW );
     point.setY ( _point1.y() + 18 );
     drawText ( baseRend, textRend, getTrussName (), 
                agg::rgba(1, 1, 1), point, true );
 
-    // draw editable -window area in which canvas truss unit will be painted
-    drawTrussArea ( baseRend, ras, textRend, solidRend, sl );
+    // draw editable window area in which canvas truss unit will be painted
+    //drawTrussArea ( baseRend, ras, textRend, solidRend, sl );
 
     // draw trusses
-    TrussUnit::paint( baseRend, solidRend, textRend, ras, sl, ell );
+    //trussUnit.paint ( baseRend );    
+
+        isRendered = true;
+    }
+    baseRend.blend_from(pixf,  0, leftTopPos.x(), leftTopPos.y(), unsigned(1.0 * 255));
 }
 
 /****************************************************************************/

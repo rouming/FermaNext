@@ -57,10 +57,16 @@ void TrussPivot::drawLine ( scanline_rasterizer& ras, solid_renderer& solidRend,
     agg::render_scanlines ( ras, sl, solidRend );
 }
 
-void TrussPivot::paint ( base_renderer& baseRend, solid_renderer& solidRend,
-                        text_renderer& textRend, agg::rasterizer_scanline_aa<>& ras, 
-                        agg::scanline_p8& sl, agg::ellipse& ell ) const
+void TrussPivot::paint ( base_renderer& baseRend ) const
 {
+    solid_renderer solidRend ( baseRend );
+    glyph_gen glyph(0);
+    text_renderer textRend ( baseRend, glyph );
+    scanline_rasterizer   ras;
+    agg::scanline_p8     sl;
+    agg::ellipse ell;
+    glyph.font ( agg::verdana17_bold );
+
     QPoint p1, p2;
     p1 = getFirstNode().getNodeWidgetPosition ();
     p2 = getLastNode().getNodeWidgetPosition ();
