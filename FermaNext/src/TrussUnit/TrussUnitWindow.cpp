@@ -240,7 +240,6 @@ TrussPivot* TrussUnitWindow::findPivotByCoord ( int x, int y )
 {
     int eps = 100;
     QPoint p1, p2;
-    int width = getPivotsWidth ();
     PivotList pivotList = getPivotList ();
     PivotListIter iter = pivotList.begin();
     for ( ; iter != pivotList.end(); ++iter )
@@ -386,12 +385,12 @@ void TrussUnitWindow::setResEllColor ( int r , int g, int b )
     resEllColor = agg::rgba(r, g, b);
 }
 
-void TrussUnitWindow::drawText ( ren_dynarow& baseRend, textRenderer& textRend,
-                           const QString& str, color_type col, QPoint point, 
-                           bool flipY ) const 
+void TrussUnitWindow::drawText ( ren_dynarow&, textRenderer& textRend,
+                                 const QString& str, color_type col, 
+                                 QPoint point, bool flipY ) const 
 {
     textRend.color( col );    
-    textRend.render_text ( point.x(), point.y(), str.ascii(), flipY );
+    textRend.render_text( point.x(), point.y(), str.ascii(), flipY );
 }
 
 void TrussUnitWindow::drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,

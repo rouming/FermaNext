@@ -211,8 +211,8 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
 */
 }
 
-void TrussUnitWindowManager::load ( TrussUnit& truss, const QFile& )
-                                                            throw (WrongFormatException)
+void TrussUnitWindowManager::load ( TrussUnit&, const QFile& )
+                                                   throw (WrongFormatException)
 {
     // Implementation is looked forward
 }

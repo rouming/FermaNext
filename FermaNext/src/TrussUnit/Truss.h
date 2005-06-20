@@ -162,11 +162,10 @@ public:
             throw NodeIndexOutOfBoundException();
 
         emit beforePivotCreation();
-        uint s = nodes.size();
-        N* n1 = nodes.at(firstNodeIndex);
-        N* n2 = nodes.at(lastNodeIndex);
+        N* firstNode = nodes.at(firstNodeIndex);
+        N* lastNode = nodes.at(lastNodeIndex);
 
-        P* pivot = new P( *nodes.at(firstNodeIndex), *nodes.at(lastNodeIndex) );
+        P* pivot = new P( *firstNode, *lastNode );
         pivots.push_back(pivot);
         emit afterPivotCreation(pivot->getFirstNode(), 
                                 pivot->getLastNode());

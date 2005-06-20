@@ -61,7 +61,6 @@ bool TrussUnitDesignerWidget::removeTrussUnitWindow ( const TrussUnitWindow& win
     WindowList::iterator iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter )
         if ( (*iter) == &window ) {
-            TrussUnitWindow* w = *iter;
             trussWindows.erase(iter);            
             return true;
         }
@@ -79,7 +78,6 @@ TrussUnitWindow* TrussUnitDesignerWidget::findTrussUnitWindowByCoord ( int x, in
 
 void TrussUnitDesignerWidget::trussWindowToFront ( TrussUnitWindow& window )
 {
-    int s = trussWindows.size();
     if ( trussWindows.back() == &window )
         return;
     trussWindows.push_back(&window);
@@ -120,8 +118,6 @@ void TrussUnitDesignerWidget::onDraw ()
     base_renderer baseRend ( pixf );
     solid_renderer solidRend ( baseRend );
     baseRend.clear ( agg::rgba (10, 10, 10) );
-    agg::rasterizer_scanline_aa<>& ras = getAggRasterizerScanline ();
-    agg::scanline_p8& sl = getAggScanline ();
     agg::ellipse ell;
     glyph_gen glyph(0);
     text_renderer textRend ( baseRend, glyph );
@@ -202,18 +198,18 @@ void TrussUnitDesignerWidget::initTrussUnitWindow ()  //temp method. Later to re
 /*****************************************************************************/
 // Event handlers
 
-void TrussUnitDesignerWidget::aggPaintEvent ( QPaintEvent* pe )
+void TrussUnitDesignerWidget::aggPaintEvent ( QPaintEvent* )
 {
    if ( init ) 
        initTrussUnitWindow ();
    onDraw();
 }
 
-void TrussUnitDesignerWidget::aggResizeEvent ( QResizeEvent* re )
+void TrussUnitDesignerWidget::aggResizeEvent ( QResizeEvent* )
 {
 }
 
-void TrussUnitDesignerWidget::aggKeyPressEvent ( QKeyEvent* ke )
+void TrussUnitDesignerWidget::aggKeyPressEvent ( QKeyEvent* )
 {
 }
 
@@ -420,9 +416,9 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     }
 }
 
-void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
+void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* )
 {
-	trussWindow = 0;
+    trussWindow = 0;
     trussNode = 0;
     winBehaviour = windowIdle;
     trussElemBehaviour = trussElementIdle;
@@ -469,7 +465,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
     }
 }
 
-void TrussUnitDesignerWidget::aggCtrlChangedEvent ( const agg::ctrl* ctrl )
+void TrussUnitDesignerWidget::aggCtrlChangedEvent ( const agg::ctrl* )
 {
 }
 
