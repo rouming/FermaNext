@@ -33,7 +33,7 @@ void WindowListBox::addItem( const QString & text )
     shown[i-1]=1;
 }
 
-void WindowListBox::DoubleClick(int index)
+void WindowListBox::DoubleClick( int )
 {
 
 }
