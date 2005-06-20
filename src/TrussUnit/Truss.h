@@ -32,9 +32,6 @@ signals:
     void afterPivotCreation ( const Node&, const Node& );
     void beforePivotRemoval ( const Node&, const Node& );
     void afterPivotRemoval ();
-
-    void beforeStateLoaded ();
-    void afterStateLoaded ();
 };
 
 class PivotEmitter : public QObject
@@ -43,9 +40,6 @@ class PivotEmitter : public QObject
 signals: 
     void onFirstNodeChange ( const Node& );
     void onLastNodeChange ( const Node& );
-
-    void beforeStateLoaded ();
-    void afterStateLoaded ();
 };
 
 
@@ -63,31 +57,6 @@ public:
     typedef typename PivotList::const_iterator PivotListConstIter;
 
     Truss () {}
-
-    Truss ( const Truss& t ) 
-    {
-      copy(t);
-    }
-
-    virtual void copy ( const Truss& t )
-    {
-        clear();
-        NodeListConstIter itNodes;
-        PivotListConstIter itPivots;
-        for ( itNodes = t.nodes.begin(); 
-              itNodes != t.nodes.end();  
-              ++itNodes ) { 
-            const N* n = *itNodes;
-            nodes.push_back( new N(*n) );
-        }
-
-        for ( itPivots = t.pivots.begin(); 
-              itPivots != t.pivots.end();  
-              ++itPivots ) {
-            const P* p = *itPivots;
-            pivots.push_back( new P(*p) );
-        }
-    }
 
     virtual void clear () 
     {
@@ -110,12 +79,13 @@ public:
         clear();
     }
 
-    virtual N* findNode ( QPoint point, int nodeRadius )
-    {
+    virtual N* findNode ( QPoint point )
+    {        
         NodeListIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
         {
             N* node = *iter;
+            int nodeRadius = node->getRadius();
             int x1 = node->getX ();
             int y1 = node->getY ();
             if ( ( (point.x() - x1) * (point.x() - x1) + 
@@ -137,10 +107,10 @@ public:
         return *node;
     }
 
-    virtual P& createPivot ( QPoint p1 , QPoint p2, int nodeRadius )
+    virtual P& createPivot ( QPoint p1 , QPoint p2 )
     {
-        N* first = findNode( p1, nodeRadius );
-        N* last = findNode( p2, nodeRadius );
+        N* first = findNode( p1 );
+        N* last = findNode( p2 );
         if ( first == 0 )  
             first = &createNode( p1.x(), p1.y() );            
         
@@ -204,13 +174,6 @@ public:
         return false;    
     }
 
-    virtual void loadState ( const Truss& t )
-    {
-        emit beforeStateLoaded();
-        copy(t);
-        emit afterStateLoaded();
-    }
-
     virtual const NodeList& getNodeList () const
     {
         return nodes;
@@ -261,11 +224,6 @@ protected:
         first(&first_),
         last(&last_) 
     {}
-    Pivot ( const Pivot& p ) :
-        PivotEmitter(),        
-        first(new N(*p.first)),
-        last(new N(*p.last))
-    {}
     virtual ~Pivot ()
     {}
 
@@ -274,16 +232,6 @@ public:
     { return *first; }
     virtual const N& getLastNode () const
     { return *last; }
-
-    virtual void loadState ( const Pivot& p )
-    {    
-        emit beforeStateLoaded();        
-        first->loadState(*p.first);
-        emit onFirstNodeChange(*p.first);        
-        last->loadState(*p.last);
-        emit onLastNodeChange(*p.last);
-        emit afterStateLoaded();
-    }
 
 private:    
     N *first, *last;
@@ -306,9 +254,6 @@ signals:
     void onFixationChange ( Fixation );
     void onPositionChange ( int, int );
 
-    void beforeStateLoaded ();
-    void afterStateLoaded ();
-    
 protected:
     Node ();
     Node ( int x, int y );
@@ -318,9 +263,12 @@ protected:
 public:
     virtual void setFixation ( Fixation );
     virtual Fixation getFixation () const;
-    virtual void loadState ( const Node& );
+    
+    virtual void setPoint ( QPoint );
     virtual void setX ( int newX );
     virtual void setY ( int newY );
+
+    virtual QPoint getPoint () const;
     virtual int getX () const;
     virtual int getY () const;
 
