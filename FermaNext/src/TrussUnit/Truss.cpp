@@ -34,26 +34,30 @@ Node::Fixation Node::getFixation () const
     return fix;
 }
 
-void Node::loadState ( const Node& n ) 
+void Node::setPoint ( QPoint p )
 {
-    emit beforeStateLoaded();    
-    x = n.x;
-    y = n.y;    
+    x = p.x();
+    y = p.y();
     emit onPositionChange(x, y);
-    fix = n.fix;
-    emit onFixationChange(fix);
-    emit afterStateLoaded();
 }
 
 void Node::setX (int newX )
 {
     x = newX;
+    emit onPositionChange(x, y);
 }
 
 void Node::setY (int newY )
 {
     y = newY;
+    emit onPositionChange(x, y);
 }
+
+QPoint Node::getPoint () const
+{
+    return QPoint(x, y);
+}
+
 
 int Node::getX () const
 {
@@ -66,5 +70,3 @@ int Node::getY () const
 }
 
 /****************************************************************************/
-
-
