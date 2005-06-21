@@ -9,11 +9,6 @@ TrussNode::TrussNode () :
     radius(5)
 {}
 
-TrussNode::TrussNode ( const TrussNode& n ) :
-    Node(n),
-    PaintableTrussElement()
-{}
-
 int TrussNode::getRadius () const
 {
     return radius;

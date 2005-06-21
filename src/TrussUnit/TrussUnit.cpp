@@ -99,7 +99,7 @@ void TrussUnit::setArea ( const QSize& a )
     emit onAreaChange( area );
 }
 
-const QSize& TrussUnit::getArea ()
+const QSize& TrussUnit::getArea () const
 {
     return area;
 }

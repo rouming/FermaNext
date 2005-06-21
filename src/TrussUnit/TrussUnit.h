@@ -85,7 +85,7 @@ public:
     int getNodesRadius () const;
     int getPivotsWidth () const;
     const QString& getTrussName () const;
-    const QSize& getArea ();
+    const QSize& getArea () const;
   
     void paint ( base_renderer& baseRend ) const;
 
@@ -113,7 +113,7 @@ class TrussNode: public Node, public PaintableTrussElement
 {    
 public:
     TrussNode ();
-    TrussNode ( const TrussNode& );
+
     QPoint getNodeWidgetPosition () const;
     void setNodeWidgetPosition ( QPoint point );
     int getRadius () const;
@@ -129,8 +129,8 @@ class TrussPivot : public Pivot<TrussNode>, public PaintableTrussElement
 public:
     TrussPivot ();
     TrussPivot ( TrussNode&, TrussNode& );
-    TrussPivot ( const TrussPivot& );
-    int getPivotWidth ();
+
+    int getPivotWidth () const;
     void setPivotWidth ( int w );
     void drawLine ( scanline_rasterizer& ras, solid_renderer& solidRend,
                     agg::scanline_p8& sl, QPoint point1, QPoint point2,
