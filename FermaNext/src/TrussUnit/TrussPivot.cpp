@@ -13,11 +13,6 @@ TrussPivot::TrussPivot ( TrussNode& first, TrussNode& last ) :
     Pivot<TrussNode>(first, last)
 {}
 
-TrussPivot::TrussPivot ( const TrussPivot& p ) :
-    Pivot<TrussNode>(p),
-    PaintableTrussElement()
-{}
-
 struct line
 {
     double x1, y1, x2, y2;
@@ -35,7 +30,7 @@ struct line
     }
 };
 
-int TrussPivot::getPivotWidth ()
+int TrussPivot::getPivotWidth () const
 {
     return width;
 }

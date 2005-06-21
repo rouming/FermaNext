@@ -52,6 +52,7 @@ public:
     typedef std::vector<N*>  NodeList;
     typedef std::vector<P*> PivotList;
     typedef typename NodeList::iterator NodeListIter;
+    typedef typename NodeList::const_iterator NodeListConstIter;
     typedef typename PivotList::iterator PivotListIter;
     typedef typename NodeList::const_iterator NodeListConstIter;
     typedef typename PivotList::const_iterator PivotListConstIter;
@@ -79,9 +80,9 @@ public:
         clear();
     }
 
-    virtual N* findNode ( QPoint point )
+    virtual N* findNode ( QPoint point ) const
     {        
-        NodeListIter iter = nodes.begin();
+        NodeListConstIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
         {
             N* node = *iter;
