@@ -12,8 +12,7 @@ TrussUnitDesignerWindow::TrussUnitDesignerWindow ( const QString& caption,
     vbox(this),
     scroll(this),
     designerWidget(new TrussUnitDesignerWidget(this))
-{       
-    designerWidget->resize(900,800);
+{   
     scroll.addChild(designerWidget);
     designerWidget->setAcceptDrops(TRUE);
 
@@ -27,6 +26,11 @@ TrussUnitDesignerWindow::TrussUnitDesignerWindow ( const QString& caption,
 TrussUnitDesignerWidget& TrussUnitDesignerWindow::getDesignerWidget ()
 {
     return *designerWidget;
+}
+
+void TrussUnitDesignerWindow::resizeEvent ( QResizeEvent* event )
+{
+    designerWidget->resize(event->size());   
 }
 
 /*****************************************************************************/
