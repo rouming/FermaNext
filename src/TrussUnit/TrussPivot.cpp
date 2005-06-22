@@ -40,7 +40,7 @@ void TrussPivot::setPivotWidth ( int w )
     width = w;
 }
 
-void TrussPivot::drawLine ( scanline_rasterizer& ras, solid_renderer& solidRend,
+void TrussPivot::drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
                           agg::scanline_p8& sl, QPoint point1, QPoint point2,
                           int width_, color_type color ) const
 {
@@ -52,15 +52,12 @@ void TrussPivot::drawLine ( scanline_rasterizer& ras, solid_renderer& solidRend,
     agg::render_scanlines ( ras, sl, solidRend );
 }
 
-void TrussPivot::paint ( base_renderer& baseRend ) const
+void TrussPivot::paint ( ren_dynarow& baseRend ) const
 {
-    solid_renderer solidRend ( baseRend );
-    glyph_gen glyph(0);
-    text_renderer textRend ( baseRend, glyph );
+    solidRenderer solidRend ( baseRend );
     scanline_rasterizer   ras;
     agg::scanline_p8     sl;
     agg::ellipse ell;
-    glyph.font ( agg::verdana17_bold );
 
     QPoint p1, p2;
     p1 = getFirstNode().getNodeWidgetPosition ();

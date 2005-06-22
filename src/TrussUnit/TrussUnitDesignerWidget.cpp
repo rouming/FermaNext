@@ -44,7 +44,7 @@ void TrussUnitDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow 
     trussWindow.setNodesRadius ( 4 );
     trussWindow.setPivotsWidth ( 2 );
     trussWindow.setResEllRad ( 3 );
-    trussWindow.setMinResizeVal ( 200 );
+    trussWindow.setMinResizeValue ( 200 );
     trussWindow.setWinCornerRadius ( 25 );
     trussWindow.setPosition ( pos1, pos2 );
     trussWindow.setHeadlineWidth ( 26 );
@@ -118,10 +118,6 @@ void TrussUnitDesignerWidget::onDraw ()
     base_renderer baseRend ( pixf );
     solid_renderer solidRend ( baseRend );
     baseRend.clear ( agg::rgba (10, 10, 10) );
-    agg::ellipse ell;
-    glyph_gen glyph(0);
-    text_renderer textRend ( baseRend, glyph );
-    glyph.font ( agg::verdana17_bold );
     WindowListIter iter = trussWindows.begin();
     for ( ; iter != trussWindows.end() - 1; ++iter ) 
     {
@@ -179,7 +175,7 @@ void TrussUnitDesignerWidget::initTrussUnitWindow ()  //temp method. Later to re
         trussWindow->setNodesRadius ( 4 );
         trussWindow->setPivotsWidth ( 2 );
         trussWindow->setResEllRad ( 3 );
-        trussWindow->setMinResizeVal ( 200 );
+        trussWindow->setMinResizeValue ( 200 );
         trussWindow->setWinCornerRadius ( 25 );
         trussWindow->setPosition ( pos1, pos2 );
         trussWindow->setHeadlineWidth ( 26 );
@@ -219,10 +215,10 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     int y = flipY() ? height() - me->y() : me->y();
     if ( winBehaviour == onHorResize )
     {
-        int resizeLimit = trussWindow->getMinResizeVal ();
+        int resizeLimit = trussWindow->getMinResizeValue ();
 		int dx = x - clickX;
-        QPoint point1 = trussWindow->getPoint1 ();
-        QPoint point2 = trussWindow->getPoint2 ();
+        QPoint point1 = trussWindow->getWindowLeftTopPos ();
+        QPoint point2 = trussWindow->getWindowRightBottomPos ();
         int bordW = trussWindow->getBorderWidth ();
         if ( abs ( clickX - point1.x() ) <= bordW )
         {
@@ -244,10 +240,10 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     }
     if ( winBehaviour == onVerResize )
     {
-        int resizeLimit = trussWindow->getMinResizeVal ();
+        int resizeLimit = trussWindow->getMinResizeValue ();
 	    int dy = y - clickY;
-        QPoint point1 = trussWindow->getPoint1 ();
-        QPoint point2 = trussWindow->getPoint2 ();
+        QPoint point1 = trussWindow->getWindowLeftTopPos ();
+        QPoint point2 = trussWindow->getWindowRightBottomPos ();
         int bordW = trussWindow->getBorderWidth ();
         if ( abs ( clickY - point1.y() ) <= bordW )
         {
@@ -269,11 +265,11 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     }
     if ( winBehaviour == onBDiagResize )
     {
-        int resizeLimit = trussWindow->getMinResizeVal ();
+        int resizeLimit = trussWindow->getMinResizeValue ();
         int dx = x - clickX;
 	    int dy = y - clickY;
-        QPoint point1 = trussWindow->getPoint1 ();
-        QPoint point2 = trussWindow->getPoint2 ();
+        QPoint point1 = trussWindow->getWindowLeftTopPos ();
+        QPoint point2 = trussWindow->getWindowRightBottomPos ();
         int bordW = trussWindow->getBorderWidth ();
         if ( abs ( clickX - (point1.x() + bordW) ) <= bordW )
         {
@@ -308,11 +304,11 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     }
     if ( winBehaviour == onFDiagResize )
     {
-        int resizeLimit = trussWindow->getMinResizeVal ();
+        int resizeLimit = trussWindow->getMinResizeValue ();
         int dx = x - clickX;
         int dy = y - clickY;
-        QPoint point1 = trussWindow->getPoint1 ();
-        QPoint point2 = trussWindow->getPoint2 ();
+        QPoint point1 = trussWindow->getWindowLeftTopPos ();
+        QPoint point2 = trussWindow->getWindowRightBottomPos ();
         int bordW = trussWindow->getBorderWidth ();
         if ( abs ( clickX - (point1.x() + bordW) ) <= bordW )
         {
@@ -335,8 +331,8 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         if ( abs ( clickY - (point2.y() - bordW) ) <= bordW )
         {
             point2.setY ( point2.y() + dy );
-            if ( abs ( point2.y() - point1.y() ) < trussWindow->getMinResizeVal () )
-               point2.setY( point1.y() + trussWindow->getMinResizeVal () );
+            if ( abs ( point2.y() - point1.y() ) < trussWindow->getMinResizeValue () )
+               point2.setY( point1.y() + trussWindow->getMinResizeValue () );
         }
         trussWindow->setPosition ( point1, point2 );
         trussWindow->setTrussNodesPosition ();
@@ -349,8 +345,8 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
 	{
 		int dx = x - clickX;
 		int dy = y - clickY;
-        QPoint point1 = trussWindow->getPoint1 ();
-        QPoint point2 = trussWindow->getPoint2 ();
+        QPoint point1 = trussWindow->getWindowLeftTopPos ();
+        QPoint point2 = trussWindow->getWindowRightBottomPos ();
         point1.setX ( point1.x() + dx ); 
         point1.setY ( point1.y() + dy );
         point2.setX ( point2.x() + dx );
