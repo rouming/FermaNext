@@ -63,7 +63,7 @@ public:
     virtual void setHighlighted ( bool );
     virtual bool isVisible () const;
     virtual bool isHighlighted () const;
-//    virtual void paint ( base_renderer& baseRend ) const = 0;
+
 private:
     bool visible;
     bool highlighted; 
