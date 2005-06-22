@@ -44,12 +44,14 @@ bool PaintableTrussElement::isHighlighted () const
 
 TrussUnit::TrussUnit ( const QString& name ) :
     trussName(name),
+    rbuf( new rbuf_dynarow(300,300) ),
     area( 300, 300 )    
 {}
 
 TrussUnit::~TrussUnit ()
-{}
-
+{
+    delete rbuf;
+}
 
 const QString& TrussUnit::getTrussName () const
 {
@@ -104,25 +106,31 @@ const QSize& TrussUnit::getArea () const
     return area;
 }
 
-void TrussUnit::paint ( base_renderer& baseRend ) const
+void TrussUnit::paint ( ren_dynarow& baseRend, QPoint leftTopPos ) const
 {
-    solid_renderer solidRend ( baseRend );
-    glyph_gen glyph(0);
-    text_renderer textRend ( baseRend, glyph );
     scanline_rasterizer   ras;
     agg::scanline_p8     sl;
     agg::ellipse ell;
-    glyph.font ( agg::verdana17_bold );
 
+    static bool isRendered1 = false;
+   
+    pixf_dynarow pixf(*rbuf);
 
-    PivotList pivotList = getPivotList ();
-    PivotList::const_iterator pivotsIter = pivotList.begin();
-    for ( ; pivotsIter != pivotList.end(); ++pivotsIter )
-        (*pivotsIter)->paint ( baseRend );
-    NodeList nodeList = getNodeList ();
-    NodeList::const_iterator nodesIter = nodeList.begin();
-    for ( ; nodesIter != nodeList.end(); ++nodesIter )
-        (*nodesIter)->paint ( baseRend );
+    if ( isRendered1 == false ) 
+    { 
+        solidRenderer solidRend ( baseRend );    
+
+        PivotList pivotList = getPivotList ();
+        PivotList::const_iterator pivotsIter = pivotList.begin();
+        for ( ; pivotsIter != pivotList.end(); ++pivotsIter )
+            (*pivotsIter)->paint ( baseRend );
+        NodeList nodeList = getNodeList ();
+        NodeList::const_iterator nodesIter = nodeList.begin();
+        for ( ; nodesIter != nodeList.end(); ++nodesIter )
+            (*nodesIter)->paint ( baseRend );
+        isRendered1 = true;
+    }
+    baseRend.blend_from(pixf, 0, leftTopPos.x(), leftTopPos.y(), unsigned(1.0 * 255));
 }
 
 /****************************************************************************/
