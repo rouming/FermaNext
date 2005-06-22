@@ -14,6 +14,9 @@ TrussUnitDesignerWindow::TrussUnitDesignerWindow ( const QString& caption,
     designerWidget(new TrussUnitDesignerWidget(this))
 {   
     scroll.addChild(designerWidget);
+    scroll.setVScrollBarMode ( QScrollView::AlwaysOff );
+    scroll.setHScrollBarMode ( QScrollView::AlwaysOff );
+
     designerWidget->setAcceptDrops(TRUE);
 
     vbox.addWidget(&scroll);

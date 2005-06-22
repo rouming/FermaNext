@@ -105,6 +105,7 @@ private:
     int nodesRadius, pivotsWidth;
     QString trussName;
     QSize area;
+    mutable bool isRendered;
 };
 
 /*****************************************************************************/
