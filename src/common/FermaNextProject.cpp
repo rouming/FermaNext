@@ -2,18 +2,24 @@
 #include "FermaNextProject.h"
 #include "SubsidiaryConstants.h"
 
-#include <qworkspace.h>
+#include <qwidgetstack.h>
 
 /*****************************************************************************
  * FermaNext Project
  *****************************************************************************/
-
-FermaNextProject::FermaNextProject ( const QString& name_, QWorkspace* qWsp ) :
+//TODO:remove
+#include <qtabwidget.h>
+FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* parent ) :
     maximizedDesginerWindow(true),
     name(name_),
-    designerWindow( new TrussUnitDesignerWindow(name_, qWsp, name_, 0) ),
+    designerWindow( new TrussUnitDesignerWindow(name_, parent, name_, 0) ),
     windowIsAlreadyDestroyed(false)
 {
+    QTabWidget* tw = new QTabWidget(parent);
+    tw->setTabPosition(QTabWidget::Bottom);
+    tw->addTab(designerWindow, tr("Designer") );
+    tw->addTab(new QWidget(parent), tr("Strength Analysis") );
+    parent->addWidget( tw, 0 );
     designerWindow->setIcon( QPixmap::fromMimeSource( imagesPath + "/project.png" ) );
     designerWindow->installEventFilter(this);
     TrussUnitDesignerWidget& designerWidget = designerWindow->getDesignerWidget();
@@ -40,15 +46,20 @@ FermaNextProject::~FermaNextProject ()
     if ( !windowIsAlreadyDestroyed )
         delete designerWindow;
 }
-
+//TODO: remove
+#include "FermaNextWorkspace.h"
 void FermaNextProject::activate ( bool activate )
 {
+    //TODO: remove
+    FermaNextWorkspace::workspace().getWidgetStack().raiseWidget(0);
+    /*
     if ( activate && maximizedDesginerWindow ) 
         designerWindow->showMaximized();
     else if ( activate && !maximizedDesginerWindow ) 
         designerWindow->showNormal();
     else
         designerWindow->hide();
+        */
 }
 
 void FermaNextProject::markWindowDestroyed ()
@@ -66,12 +77,12 @@ void FermaNextProject::setName ( const QString& name_ )
     name = name_;
     emit onNameChange(name);
 }
-
+/* TODO
 ObjectStateManager& FermaNextProject::getStateManager ()
 {
     return stateManager;
 }
-
+*/
 TrussUnitWindowManager& FermaNextProject::getTrussUnitWindowManager ()
 {
     return trussWindowManager;

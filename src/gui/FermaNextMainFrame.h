@@ -3,7 +3,7 @@
 #define FERMANEXTFRAME_H
 
 #include <qmainwindow.h>
-#include <qworkspace.h>
+#include <qwidgetstack.h>
 #include <qvbox.h>
 
 #include "ProjectToolBox.h"
@@ -60,8 +60,8 @@ protected slots:
     void helpAbout ();
 
 private:    
-    QWorkspace* workspaceWidget;
-    QVBox* vbox;
+    QWidgetStack* widgetStack;
+    //QVBox* vbox;
     QDockWindow* dw;
     ProjectToolBox* projectToolBox;
     FermaNextWorkspace* wsp;

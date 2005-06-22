@@ -1,7 +1,7 @@
 
 #include "FermaNextWorkspace.h"
 
-#include <qworkspace.h>
+#include <qwidgetstack.h>
 
 const QString untitledName( QObject::tr("Unnamed workspace") );
 
@@ -14,7 +14,7 @@ QMutex FermaNextWorkspace::mutex;
 
 FermaNextWorkspace::FermaNextWorkspace () :
     name(untitledName),
-    qWsp(0)
+    widgetStack(0)
 {}
 
 FermaNextWorkspace::~FermaNextWorkspace ()
@@ -50,7 +50,7 @@ void FermaNextWorkspace::reset ()
 
 FermaNextProject& FermaNextWorkspace::createProject ( const QString& name )
 {
-    FermaNextProject* project = new FermaNextProject(name, qWsp);
+    FermaNextProject* project = new FermaNextProject(name, widgetStack);
     projects.push_back(project);
     emit onProjectCreate(*project);    
     return *project;
@@ -106,9 +106,14 @@ void FermaNextWorkspace::setName ( const QString& name_ )
     emit onNameChange(name);
 }
 
-void FermaNextWorkspace::setWorkspaceWidget ( QWorkspace& qWsp_ )
+void FermaNextWorkspace::setWidgetStack ( QWidgetStack& widgetStack_ )
 {
-    qWsp = &qWsp_;    
+    widgetStack = &widgetStack_;    
+}
+
+QWidgetStack& FermaNextWorkspace::getWidgetStack ()
+{
+    return *widgetStack;
 }
 
 FermaNextConfig& FermaNextWorkspace::config ()

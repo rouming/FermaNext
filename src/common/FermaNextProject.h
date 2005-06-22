@@ -11,7 +11,7 @@
 #include "ObjectStateManager.h"
 
 class FermaNextWorkspace;
-class QWorkspace;
+class QWidgetStack;
 
 class FermaNextProject : public QObject
 {
@@ -23,7 +23,7 @@ public:
     virtual void setName ( const QString& );
 
     virtual void activate ( bool );    
-    virtual ObjectStateManager& getStateManager ();
+    //TODO: virtual ObjectStateManager& getStateManager ();
     virtual TrussUnitWindowManager& getTrussUnitWindowManager ();
 
 signals:
@@ -36,13 +36,13 @@ private:
     friend class FermaNextWorkspace;
     
     bool eventFilter( QObject* o, QEvent* e );
-    FermaNextProject ( const QString& name, QWorkspace* qWsp = 0 );
+    FermaNextProject ( const QString& name, QWidgetStack* parent = 0 );
 
 
 private:
     bool maximizedDesginerWindow;
     QString name;
-    ObjectStateManager stateManager;
+    //TODO: ObjectStateManager stateManager;
     TrussUnitWindowManager trussWindowManager;
 
     // We own this object by pointer, because it can be destroyed

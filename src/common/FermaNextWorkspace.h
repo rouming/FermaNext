@@ -9,7 +9,7 @@
 #include "FermaNextProject.h"
 #include "FermaNextConfig.h"
 
-class QWorkspace;
+class QWidgetStack;
 
 class FermaNextWorkspace : public QObject
 {
@@ -31,7 +31,8 @@ public:
     virtual const QString& getName () const;
     virtual void setName ( const QString& );
 
-    virtual void setWorkspaceWidget ( QWorkspace& );
+    virtual void setWidgetStack ( QWidgetStack& );
+    virtual QWidgetStack& getWidgetStack ();
 
     virtual FermaNextConfig& config ();
 
@@ -54,7 +55,7 @@ private:
     static FermaNextWorkspace* instance;
     static QMutex mutex;
     QString name;
-    QWorkspace* qWsp;
+    QWidgetStack* widgetStack;
     ProjectList projects;
     FermaNextConfig fermaConfig;
 };
