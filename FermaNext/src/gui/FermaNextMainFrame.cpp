@@ -46,16 +46,11 @@ FermaNextMainFrame::FermaNextMainFrame ( QWidget* p, const char* n,
 
 void FermaNextMainFrame::init ()
 {
-    vbox = new QVBox(this); 
-    workspaceWidget = new QWorkspace(vbox);
+    widgetStack = new QWidgetStack(this);
+    setCentralWidget(widgetStack);
 
     // Do not move this line. FermaNextWorkspace should be initialized first.
-    FermaNextWorkspace::workspace().setWorkspaceWidget(*workspaceWidget);
-
-    vbox->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
-    vbox->setMargin( 0 );
-    vbox->setLineWidth( 0);
-    setCentralWidget(vbox);
+    FermaNextWorkspace::workspace().setWidgetStack(*widgetStack);
 
     setCaption(mainFrameCaption);
     setMinimumSize( 640, 480 );
@@ -64,6 +59,7 @@ void FermaNextMainFrame::init ()
     dw = new QDockWindow( QDockWindow::InDock, this );
     dw->setResizeEnabled( TRUE );
     dw->setVerticalStretchable( TRUE );
+    dw->setCaption( tr("Truss Unit Projects") );
     addDockWindow( dw, DockLeft );
     setDockEnabled( dw, DockTop, FALSE );
     setDockEnabled( dw, DockBottom, FALSE );
@@ -94,7 +90,8 @@ void FermaNextMainFrame::createProject ()
 {
     bool ok;
     QString text = QInputDialog::getText(
-            "Project creation", "Enter project name:", QLineEdit::Normal,
+            tr("Project creation"), 
+            tr("Enter project name:"), QLineEdit::Normal,
             QString::null, &ok, this );
     if ( ok && !text.isEmpty() ) {
         FermaNextWorkspace::workspace().createProject( text ).activate( true );
