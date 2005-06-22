@@ -2,9 +2,7 @@
 #ifndef FERMANEXTPROJECT_H
 #define FERMANEXTPROJECT_H
 
-#include <qobject.h>
 #include <qstring.h>
-#include <qmainwindow.h>
 
 #include "TrussUnitDesignerWindow.h"
 #include "TrussUnitWindowManager.h"
@@ -12,6 +10,7 @@
 
 class FermaNextWorkspace;
 class QWidgetStack;
+class QTabWidget;
 
 class FermaNextProject : public QObject
 {
@@ -22,9 +21,10 @@ public:
     virtual const QString& getName () const;
     virtual void setName ( const QString& );
 
-    virtual void activate ( bool );    
+    virtual void activate ();    
     //TODO: virtual ObjectStateManager& getStateManager ();
     virtual TrussUnitWindowManager& getTrussUnitWindowManager ();
+    virtual QTabWidget& getProjectTab ();
 
 signals:
     void onNameChange ( const QString& );    
@@ -35,15 +35,15 @@ private slots:
 private:
     friend class FermaNextWorkspace;
     
-    bool eventFilter( QObject* o, QEvent* e );
     FermaNextProject ( const QString& name, QWidgetStack* parent = 0 );
-
 
 private:
     bool maximizedDesginerWindow;
     QString name;
     //TODO: ObjectStateManager stateManager;
     TrussUnitWindowManager trussWindowManager;
+    QTabWidget* projectTab;
+    QWidget* justStrengthAnalisysWidget;
 
     // We own this object by pointer, because it can be destroyed
     // by Qt deletion mechanism when the application closes.
@@ -52,7 +52,7 @@ private:
 
     // If Qt has already destroyed designer window it should not be
     // destroyed twice.
-    bool windowIsAlreadyDestroyed;
+    bool windowIsAlreadyDestroyed;    
 };
 
 #endif //FERMANEXTPROJECT_H

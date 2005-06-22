@@ -72,7 +72,7 @@ private:
     ProjectMap projects;
     ProjectRemover* lastRemover;
     FermaNextProject* currentPrj;
-    FermaNextWorkspace& workspace;
+    FermaNextWorkspace& workspace;    
 };
 
 #endif //PROJECTTOOLBOX_H

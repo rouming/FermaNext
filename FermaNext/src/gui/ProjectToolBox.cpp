@@ -63,8 +63,6 @@ ProjectToolBox::ProjectToolBox ( FermaNextWorkspace& ws, QWidget* parent,
 
 int ProjectToolBox::addProject ( FermaNextProject& prj )
 {
-    if ( currentPrj != 0 )
-        currentPrj->activate(false);
     currentPrj = &prj;
     QWidget* page = createSubsidiaryWidget(prj);
     projects[&prj] = page;
@@ -72,7 +70,7 @@ int ProjectToolBox::addProject ( FermaNextProject& prj )
     QIconSet iconSet( QPixmap::fromMimeSource( imagesPath + "/project_toolbox.png" ) );
     int result = addItem( page, iconSet, prj.getName() );
     setCurrentItem(page);
-    prj.activate(true);
+    prj.activate();
     return result;
 }
 
@@ -251,12 +249,11 @@ void ProjectToolBox::activateSelected ( int index )
     QWidget* page = currentItem();
     QValueList<FermaNextProject*> keys = projects.keys();
     QValueList<FermaNextProject*>::iterator i = keys.begin();
-    for ( ; i != keys.end(); ++i ) {
-        if ( page == projects[*i] )             
-            (*i)->activate(true);        
-        else
-            (*i)->activate(false);
-    }
+    for ( ; i != keys.end(); ++i )
+        if ( page == projects[*i] ) {
+            (*i)->activate();
+            break;
+        }
 
     QIconSet activeIconSet( QPixmap::fromMimeSource( imagesPath + "/project_toolbox.png" ) );
     QIconSet disablesIconSet( QPixmap::fromMimeSource( imagesPath + "/project_d.png" ) );

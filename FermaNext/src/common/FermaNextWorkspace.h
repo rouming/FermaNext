@@ -10,6 +10,7 @@
 #include "FermaNextConfig.h"
 
 class QWidgetStack;
+class FermaNextMainFrame;
 
 class FermaNextWorkspace : public QObject
 {
@@ -24,6 +25,9 @@ public:
     virtual FermaNextProject& createProject ( const QString& name );
     virtual bool removeProject ( FermaNextProject& );
     virtual bool removeProject ( const QString& name );
+    virtual void activateProject ( FermaNextProject& );
+    virtual void activateProject ( const QString& prjName );
+    virtual FermaNextProject* findProjectByName ( const QString& name );
 
     virtual int countProjects () const;
     virtual FermaNextProject& getProject ( int index );
@@ -31,10 +35,9 @@ public:
     virtual const QString& getName () const;
     virtual void setName ( const QString& );
 
-    virtual void setWidgetStack ( QWidgetStack& );
-    virtual QWidgetStack& getWidgetStack ();
+    virtual QWidgetStack& getWidgetStack ();    
 
-    virtual FermaNextConfig& config ();
+    virtual FermaNextConfig& config ();    
 
 private:
     FermaNextWorkspace ();
@@ -55,9 +58,9 @@ private:
     static FermaNextWorkspace* instance;
     static QMutex mutex;
     QString name;
-    QWidgetStack* widgetStack;
+    QWidgetStack* widgetStack;    
     ProjectList projects;
-    FermaNextConfig fermaConfig;
+    FermaNextConfig fermaConfig;    
 };
 
 #endif //FERMANEXTWORKSPACE_H

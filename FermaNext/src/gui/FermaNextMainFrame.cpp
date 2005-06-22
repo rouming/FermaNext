@@ -46,11 +46,10 @@ FermaNextMainFrame::FermaNextMainFrame ( QWidget* p, const char* n,
 
 void FermaNextMainFrame::init ()
 {
-    widgetStack = new QWidgetStack(this);
-    setCentralWidget(widgetStack);
-
-    // Do not move this line. FermaNextWorkspace should be initialized first.
-    FermaNextWorkspace::workspace().setWidgetStack(*widgetStack);
+    // Do not move this lines. Should be the first for corrent init.
+    QWidgetStack& widgetStack = FermaNextWorkspace::workspace().getWidgetStack();
+    widgetStack.reparent(this, pos());
+    setCentralWidget(&widgetStack);
 
     setCaption(mainFrameCaption);
     setMinimumSize( 640, 480 );
@@ -94,7 +93,7 @@ void FermaNextMainFrame::createProject ()
             tr("Enter project name:"), QLineEdit::Normal,
             QString::null, &ok, this );
     if ( ok && !text.isEmpty() ) {
-        FermaNextWorkspace::workspace().createProject( text ).activate( true );
+        FermaNextWorkspace::workspace().createProject( text ).activate();
     } else {
         // user entered nothing or pressed Cancel
     }
@@ -433,8 +432,5 @@ void FermaNextMainFrame::helpAbout ()
 {
     qWarning("Not implmented yet!");
 }
-
-
-
 
 /*****************************************************************************/
