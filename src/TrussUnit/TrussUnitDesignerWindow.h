@@ -15,6 +15,8 @@ public:
                               const char* n = 0, WFlags f =WType_TopLevel );
 
     virtual TrussUnitDesignerWidget& getDesignerWidget ();
+    
+    void resizeEvent ( QResizeEvent* );
 
 private:
     QVBoxLayout vbox;
