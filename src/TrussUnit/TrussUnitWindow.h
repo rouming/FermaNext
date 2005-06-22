@@ -98,7 +98,8 @@ private:
          minResizeVal, lineWidth, trussAreaIndent;
     QPoint trussAreaLeftTopPos, trussAreaRightBottomPos;
     QPoint windowLeftTopPos, windowRightBottomPos;
-    color_type canvColor, headColor, borderColor, resEllColor;    
+    color_type canvColor, headColor, borderColor, resEllColor;
+    mutable bool isRendered;
 };
 
 #endif //TRUSSUNITWINDOW_H

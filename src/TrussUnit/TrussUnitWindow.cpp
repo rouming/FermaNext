@@ -56,7 +56,8 @@ struct arrow
 TrussUnitWindow::TrussUnitWindow ( const QString& name ) :
     TrussUnit(name),
     rbuf( new rbuf_dynarow(300,300) ),
-    trussAreaLeftTopPos(0,0), trussAreaRightBottomPos(300,300)
+    trussAreaLeftTopPos(0,0), trussAreaRightBottomPos(300,300),
+    isRendered(false)
 {}
 
 TrussUnitWindow::~TrussUnitWindow ()
@@ -553,11 +554,9 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
     agg::ellipse ell;
     glyph.font ( agg::verdana17_bold );
 
-    static bool isRendered = false;
-   
     pixf_dynarow pixf(*rbuf);
 
-    if ( isRendered == false ) 
+    if ( ! isRendered ) 
     { 
         ren_dynarow baseRend(pixf);
         solidRenderer solidRend ( baseRend );    

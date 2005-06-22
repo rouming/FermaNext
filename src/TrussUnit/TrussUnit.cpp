@@ -45,7 +45,8 @@ bool PaintableTrussElement::isHighlighted () const
 TrussUnit::TrussUnit ( const QString& name ) :
     trussName(name),
     rbuf( new rbuf_dynarow(300,300) ),
-    area( 300, 300 )    
+    area( 300, 300 ),
+    isRendered(false)
 {}
 
 TrussUnit::~TrussUnit ()
@@ -112,11 +113,9 @@ void TrussUnit::paint ( ren_dynarow& baseRend, QPoint leftTopPos ) const
     agg::scanline_p8     sl;
     agg::ellipse ell;
 
-    static bool isRendered1 = false;
-   
     pixf_dynarow pixf(*rbuf);
 
-    if ( isRendered1 == false ) 
+    if ( ! isRendered )
     { 
         solidRenderer solidRend ( baseRend );    
 
@@ -128,7 +127,7 @@ void TrussUnit::paint ( ren_dynarow& baseRend, QPoint leftTopPos ) const
         NodeList::const_iterator nodesIter = nodeList.begin();
         for ( ; nodesIter != nodeList.end(); ++nodesIter )
             (*nodesIter)->paint ( baseRend );
-        isRendered1 = true;
+        isRendered = true;
     }
     baseRend.blend_from(pixf, 0, leftTopPos.x(), leftTopPos.y(), unsigned(1.0 * 255));
 }
