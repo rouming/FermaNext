@@ -60,8 +60,6 @@ protected slots:
     void helpAbout ();
 
 private:    
-    QWidgetStack* widgetStack;
-    //QVBox* vbox;
     QDockWindow* dw;
     ProjectToolBox* projectToolBox;
     FermaNextWorkspace* wsp;

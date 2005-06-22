@@ -1,5 +1,6 @@
 
 #include "FermaNextWorkspace.h"
+#include "FermaNextMainFrame.h"
 
 #include <qwidgetstack.h>
 
@@ -14,7 +15,7 @@ QMutex FermaNextWorkspace::mutex;
 
 FermaNextWorkspace::FermaNextWorkspace () :
     name(untitledName),
-    widgetStack(0)
+    widgetStack( new QWidgetStack() )
 {}
 
 FermaNextWorkspace::~FermaNextWorkspace ()
@@ -84,6 +85,27 @@ bool FermaNextWorkspace::removeProject ( const QString& name )
     return false; 
 }
 
+void FermaNextWorkspace::activateProject ( FermaNextProject& prj )
+{
+    widgetStack->raiseWidget( (QWidget*)&prj.getProjectTab() );
+}
+
+void FermaNextWorkspace::activateProject ( const QString& prjName )
+{
+    FermaNextProject* prj = findProjectByName(prjName);
+    if ( prj )
+        widgetStack->raiseWidget( (QWidget*)&prj->getProjectTab() );
+}
+
+FermaNextProject* FermaNextWorkspace::findProjectByName ( const QString& name )
+{
+    ProjectListIter iter = projects.begin();
+    for ( ; iter != projects.end(); ++iter ) 
+        if ( (*iter)->getName() == name )
+            return *iter;    
+    return 0;
+}
+
 int FermaNextWorkspace::countProjects () const
 {
     return (int)projects.size();
@@ -104,11 +126,6 @@ void FermaNextWorkspace::setName ( const QString& name_ )
 {
     name = name_;
     emit onNameChange(name);
-}
-
-void FermaNextWorkspace::setWidgetStack ( QWidgetStack& widgetStack_ )
-{
-    widgetStack = &widgetStack_;    
 }
 
 QWidgetStack& FermaNextWorkspace::getWidgetStack ()

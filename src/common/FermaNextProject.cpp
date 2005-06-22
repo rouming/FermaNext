@@ -1,32 +1,36 @@
 
 #include "FermaNextProject.h"
+#include "FermaNextWorkspace.h"
 #include "SubsidiaryConstants.h"
 
+#include <qtabwidget.h>
 #include <qwidgetstack.h>
 
 /*****************************************************************************
  * FermaNext Project
  *****************************************************************************/
-//TODO:remove
-#include <qtabwidget.h>
-FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* parent ) :
+FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack ) :
     maximizedDesginerWindow(true),
     name(name_),
-    designerWindow( new TrussUnitDesignerWindow(name_, parent, name_, 0) ),
+    projectTab( new QTabWidget(stack) ),
     windowIsAlreadyDestroyed(false)
-{
-    QTabWidget* tw = new QTabWidget(parent);
-    tw->setTabPosition(QTabWidget::Bottom);
-    tw->addTab(designerWindow, tr("Designer") );
-    tw->addTab(new QWidget(parent), tr("Strength Analysis") );
-    parent->addWidget( tw, 0 );
+{    
+    justStrengthAnalisysWidget = new QWidget(stack);
+    designerWindow = new TrussUnitDesignerWindow(name_, stack);
+
+    projectTab->setTabPosition( QTabWidget::Bottom );
+    projectTab->addTab( designerWindow, tr("Designer") );
+    projectTab->addTab( justStrengthAnalisysWidget, tr("Strength Analysis") );
+    stack->addWidget(projectTab);
+
     designerWindow->setIcon( QPixmap::fromMimeSource( imagesPath + "/project.png" ) );
     designerWindow->installEventFilter(this);
+
     TrussUnitDesignerWidget& designerWidget = designerWindow->getDesignerWidget();
 
     // Should be connected to avoid double deletion.
     connect( designerWindow, SIGNAL(destroyed()), SLOT(markWindowDestroyed()) );
-
+    
     // Catch trusses creation or deletion.
     connect( &trussWindowManager, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
              &designerWidget, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
@@ -42,24 +46,18 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* parent 
 
 FermaNextProject::~FermaNextProject ()
 {
+    FermaNextWorkspace::workspace().getWidgetStack().removeWidget(projectTab);
     // Double deletion detected
-    if ( !windowIsAlreadyDestroyed )
+    if ( !windowIsAlreadyDestroyed ) {
         delete designerWindow;
+        delete projectTab;
+        //TODO: access violation delete justStrengthAnalisysWidget;
+    }
 }
-//TODO: remove
-#include "FermaNextWorkspace.h"
-void FermaNextProject::activate ( bool activate )
+
+void FermaNextProject::activate ()
 {
-    //TODO: remove
-    FermaNextWorkspace::workspace().getWidgetStack().raiseWidget(0);
-    /*
-    if ( activate && maximizedDesginerWindow ) 
-        designerWindow->showMaximized();
-    else if ( activate && !maximizedDesginerWindow ) 
-        designerWindow->showNormal();
-    else
-        designerWindow->hide();
-        */
+    FermaNextWorkspace::workspace().activateProject(*this);
 }
 
 void FermaNextProject::markWindowDestroyed ()
@@ -88,17 +86,9 @@ TrussUnitWindowManager& FermaNextProject::getTrussUnitWindowManager ()
     return trussWindowManager;
 }
 
-bool FermaNextProject::eventFilter( QObject*, QEvent* e )
+QTabWidget& FermaNextProject::getProjectTab ()
 {
-    switch ( e->type() )
-    {    
-    case QEvent::WindowStateChange:
-        maximizedDesginerWindow = designerWindow->isMaximized();
-        break;
-    default:
-        break;
-    }
-    return false;
+    return *projectTab;
 }
 
 /*****************************************************************************/
