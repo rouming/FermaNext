@@ -7,7 +7,7 @@
 #include <qscrollview.h>
 #include "TrussUnitDesignerWidget.h"
 
-class TrussUnitDesignerWindow : public QMainWindow
+class TrussUnitDesignerWindow : public QWidget
 {
     Q_OBJECT
 public:
@@ -19,8 +19,8 @@ public:
     void resizeEvent ( QResizeEvent* );
 
 private:
-    QVBoxLayout vbox;
-    QScrollView scroll;
+    QVBoxLayout* vbox;
+    QScrollView* scroll;
     TrussUnitDesignerWidget* designerWidget;
 };
 
