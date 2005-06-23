@@ -99,12 +99,12 @@ signals:
     void onPivotsWidthChange ( int );
 
 private:
-    rbuf_dynarow* rbuf;
     static const QString UNNAMED;
 
     int nodesRadius, pivotsWidth;
     QString trussName;
     QSize area;
+    rbuf_dynarow* rbuf;
     mutable bool isRendered;
 };
 

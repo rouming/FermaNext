@@ -58,7 +58,7 @@ ProjectToolBox::ProjectToolBox ( FermaNextWorkspace& ws, QWidget* parent,
     connect( &workspace, SIGNAL(onProjectRemove(FermaNextProject&)), 
                          SLOT(removeProject(FermaNextProject&)) );
     connect( this, SIGNAL(currentChanged(int)), 
-                         SLOT(activateSelected(int)) );
+                   SLOT(activateSelected(int)) );
 }
 
 int ProjectToolBox::addProject ( FermaNextProject& prj )
@@ -251,7 +251,8 @@ void ProjectToolBox::activateSelected ( int index )
     QValueList<FermaNextProject*>::iterator i = keys.begin();
     for ( ; i != keys.end(); ++i )
         if ( page == projects[*i] ) {
-            (*i)->activate();
+            currentPrj = *i; 
+            currentPrj->activate();
             break;
         }
 

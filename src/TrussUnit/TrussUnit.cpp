@@ -44,8 +44,8 @@ bool PaintableTrussElement::isHighlighted () const
 
 TrussUnit::TrussUnit ( const QString& name ) :
     trussName(name),
-    rbuf( new rbuf_dynarow(300,300) ),
     area( 300, 300 ),
+    rbuf( new rbuf_dynarow(300,300) ),
     isRendered(false)
 {}
 
