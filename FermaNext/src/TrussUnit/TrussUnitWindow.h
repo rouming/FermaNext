@@ -30,11 +30,10 @@ public:
 
     QPoint getWindowLeftTopPos () const;
     QPoint getWindowRightBottomPos () const;
-
     QPoint getTrussAreaLeftTopPos () const;
     QPoint getTrussAreaRightBottomPos () const;
     QPoint transCoord ( QPoint point, bool flipY );
-
+    rbuf_dynarow* getRBufDynarow ();
     int getHeadlineWidth () const;
     int getBorderWidth () const;
     int getMinResizeValue () const;
@@ -49,17 +48,17 @@ public:
     bool isPivotSelected ( int x, int y );
     TrussNode* findNodeByCoord ( int x, int y );
     TrussPivot* findPivotByCoord ( int x, int y );
-    void setPosition ( QPoint point1, QPoint point2 );    
+    color_type getCanvasColor () const;
+	color_type getHeadlineColor () const;
+	color_type getBorderColor () const;
+
+    void setWindowPosition ( QPoint pos );    
     void setTrussAreaWindowIndent ( int indent );
     void setTrussNodesPosition ();
     void setNodeHighlight ( int x, int y );
     void setPivotHighlight ( int x, int y );
     void removeNodeHighlight ();
     void removePivotHighlight ();
-
-    color_type getCanvasColor () const;
-	color_type getHeadlineColor () const;
-	color_type getBorderColor () const;
     void setCoordinateLineWidth ( int width );
     void setHeadlineWidth ( int  width );
     void setBorderWidth ( int  width );
@@ -96,8 +95,8 @@ private:
     rbuf_dynarow* rbuf;
     int  headWidth, bordWidth, resEllRad, winCornerRadius, 
          minResizeVal, lineWidth, trussAreaIndent;
-    QPoint trussAreaLeftTopPos, trussAreaRightBottomPos;
     QPoint windowLeftTopPos, windowRightBottomPos;
+    QSize windowSize;
     color_type canvColor, headColor, borderColor, resEllColor;
     mutable bool isRendered;
 };
