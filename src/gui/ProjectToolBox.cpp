@@ -85,6 +85,8 @@ int ProjectToolBox::removeProject ( FermaNextProject& prj )
     QWidget* page = iter.data();
     projects.erase(iter);
     int result = removeItem(page);
+    if ( result > 0 )
+        setCurrentIndex( result - 1 );        
     delete page;
     return result;
 }
