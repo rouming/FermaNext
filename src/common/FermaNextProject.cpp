@@ -12,11 +12,10 @@
 FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack ) :
     maximizedDesginerWindow(true),
     name(name_),
-    projectTab( new QTabWidget(stack) ),
-    windowIsAlreadyDestroyed(false)
+    projectTab( new QTabWidget(stack) )
 {    
-    justStrengthAnalisysWidget = new QWidget(stack);
-    designerWindow = new TrussUnitDesignerWindow(name_, stack);
+    justStrengthAnalisysWidget = new QWidget(projectTab);
+    designerWindow = new TrussUnitDesignerWindow(name_, projectTab);
 
     projectTab->setTabPosition( QTabWidget::Bottom );
     projectTab->addTab( designerWindow, tr("Designer") );
@@ -28,9 +27,6 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack )
 
     TrussUnitDesignerWidget& designerWidget = designerWindow->getDesignerWidget();
 
-    // Should be connected to avoid double deletion.
-    connect( designerWindow, SIGNAL(destroyed()), SLOT(markWindowDestroyed()) );
-    
     // Catch trusses creation or deletion.
     connect( &trussWindowManager, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
              &designerWidget, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
@@ -47,22 +43,12 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack )
 FermaNextProject::~FermaNextProject ()
 {
     FermaNextWorkspace::workspace().getWidgetStack().removeWidget(projectTab);
-    // Double deletion detected
-    if ( !windowIsAlreadyDestroyed ) {
-        delete designerWindow;
-        delete projectTab;
-        //TODO: access violation delete justStrengthAnalisysWidget;
-    }
+    delete projectTab;
 }
 
 void FermaNextProject::activate ()
 {
     FermaNextWorkspace::workspace().activateProject(*this);
-}
-
-void FermaNextProject::markWindowDestroyed ()
-{
-    windowIsAlreadyDestroyed = true;
 }
 
 const QString& FermaNextProject::getName () const
