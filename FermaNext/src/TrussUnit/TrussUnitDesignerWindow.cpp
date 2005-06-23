@@ -8,20 +8,18 @@
 TrussUnitDesignerWindow::TrussUnitDesignerWindow ( const QString& caption, 
                                                    QWidget* p, const char* n, 
                                                    WFlags f ) :
-    QMainWindow(p, n, f),
-    vbox(this),
-    scroll(this),
-    designerWidget(new TrussUnitDesignerWidget(this))
+    QWidget(p, n, f),
+    vbox( new QVBoxLayout(this) ),
+    scroll( new QScrollView(this) )    
 {   
-    scroll.addChild(designerWidget);
-    scroll.setVScrollBarMode ( QScrollView::AlwaysOff );
-    scroll.setHScrollBarMode ( QScrollView::AlwaysOff );
+    vbox->addWidget(scroll);    
+    scroll->setVScrollBarMode( QScrollView::AlwaysOff );
+    scroll->setHScrollBarMode( QScrollView::AlwaysOff );
 
-    designerWidget->setAcceptDrops(TRUE);
+    designerWidget = new TrussUnitDesignerWidget(scroll->viewport());
+    scroll->addChild(designerWidget);
+    designerWidget->setAcceptDrops(TRUE);    
 
-    vbox.addWidget(&scroll);
-    vbox.activate();
- 
     setMinimumSize( 640, 480 );
     setCaption( caption );
 }
