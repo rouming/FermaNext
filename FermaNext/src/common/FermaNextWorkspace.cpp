@@ -2,6 +2,7 @@
 #include "FermaNextWorkspace.h"
 #include "FermaNextMainFrame.h"
 
+#include <qapplication.h>
 #include <qwidgetstack.h>
 
 const QString untitledName( QObject::tr("Unnamed workspace") );
@@ -16,7 +17,10 @@ QMutex FermaNextWorkspace::mutex;
 FermaNextWorkspace::FermaNextWorkspace () :
     name(untitledName),
     widgetStack( new QWidgetStack() )
-{}
+{
+    // Singleton desist by Qt quit signal
+    connect( qApp, SIGNAL(lastWindowClosed()), SLOT(clear()) );
+}
 
 FermaNextWorkspace::~FermaNextWorkspace ()
 {

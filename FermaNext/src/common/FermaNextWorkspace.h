@@ -46,6 +46,8 @@ private:
 protected:
     FermaNextWorkspace& operator= ( const FermaNextWorkspace& );
     virtual ~FermaNextWorkspace ();
+
+protected slots:
     virtual void clear ();
 
 signals:

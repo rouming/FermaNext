@@ -28,10 +28,7 @@ public:
 
 signals:
     void onNameChange ( const QString& );    
-
-private slots:
-    void markWindowDestroyed ();
-    
+  
 private:
     friend class FermaNextWorkspace;
     
@@ -49,10 +46,6 @@ private:
     // by Qt deletion mechanism when the application closes.
     // Nobody should own this member after deletion has happened.
     TrussUnitDesignerWindow* designerWindow;
-
-    // If Qt has already destroyed designer window it should not be
-    // destroyed twice.
-    bool windowIsAlreadyDestroyed;    
 };
 
 #endif //FERMANEXTPROJECT_H
