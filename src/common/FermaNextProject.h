@@ -35,7 +35,6 @@ private:
     FermaNextProject ( const QString& name, QWidgetStack* parent = 0 );
 
 private:
-    bool maximizedDesginerWindow;
     QString name;
     //TODO: ObjectStateManager stateManager;
     TrussUnitWindowManager trussWindowManager;
