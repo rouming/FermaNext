@@ -1,6 +1,7 @@
 
 #include "AggQWidget.h"
 #include "Benchmark.h"
+#include "SubsidiaryConstants.h"
 
 #include <qpainter.h>
 #include <qsize.h>
@@ -112,11 +113,9 @@ const agg::ctrl* AggCtrlContainer::arrowKeysPressEvent ( bool left, bool right,
  * Agg QWidget
  *****************************************************************************/
 
-AggQWidget::AggQWidget ( QWidget* parent,                         
-                         bool flip_y ) :
+AggQWidget::AggQWidget ( QWidget* parent ) :
     QWidget( parent ),
-    mainQImage( new QImage ),
-    aggFlipY( flip_y )    
+    mainQImage( new QImage )
 {
     setBackgroundMode( QWidget::NoBackground );
     setMinimumSize( QSize(100, 100) );
@@ -156,17 +155,6 @@ QImage& AggQWidget::getMainImage ()
 {
     return *mainQImage;
 }
-
-bool AggQWidget::flipY ()
-{
-    return aggFlipY;
-}
-
-void AggQWidget::flipY ( bool flip )
-{
-    aggFlipY = flip;
-}
-
 
 /*****************************************************************************
  * Private QT event handlers. Override AGG handlers instead.
@@ -251,7 +239,7 @@ void AggQWidget::mouseMoveEvent ( QMouseEvent* me )
     if( !flags ) flags |= agg::mouse_left; 
 				
     int curX = me->pos().x();
-    int curY = flipY() ? height() - me->pos().y() : me->pos().y();
+    int curY = flipY ? height() - me->pos().y() : me->pos().y();
 		
 
     const agg::ctrl* ctrl = ctrlContainer.mouseMoveEvent( curX, curY,
@@ -284,7 +272,7 @@ void AggQWidget::mouseReleaseEvent ( QMouseEvent* me )
     if ( me->button() == Qt::RightButton)  flags |= agg::mouse_right;
 				
     int curX = me->pos().x();
-    int curY = flipY() ? height() - me->pos().y() : me->pos().y();
+    int curY = flipY ? height() - me->pos().y() : me->pos().y();
 
     if ( flags & agg::mouse_left )
     {
@@ -314,7 +302,7 @@ void AggQWidget::mousePressEvent ( QMouseEvent* me )
     if ( me->button() == Qt::RightButton)  flags |= agg::mouse_right;
 				
     int curX = me->pos().x();
-    int curY = flipY() ? height() - me->pos().y() : me->pos().y();
+    int curY = flipY ? height() - me->pos().y() : me->pos().y();
 
     if ( flags & agg::mouse_left )
     {
