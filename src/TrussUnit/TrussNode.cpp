@@ -5,32 +5,16 @@
  * Truss Node
  *****************************************************************************/
 
-TrussNode::TrussNode () :
-    radius(5)
+TrussNode::TrussNode ()
 {}
 
-int TrussNode::getRadius () const
+void TrussNode::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
+                       int trussAreaHeight ) const
 {
-    return radius;
-}
+    int x = getX() * scaleMultX + leftWindowIndent;
+    int y = flipY ? ( trussAreaHeight - getY() ) * scaleMultY + topWindowIndent :
+                    getY() * scaleMultY + topWindowIndent;
 
-QPoint TrussNode::getNodeWidgetPosition () const
-{
-    return widgetPosition;
-}
-
-void TrussNode::setNodeWidgetPosition ( QPoint point )
-{
-    widgetPosition = point;
-}
-
-void TrussNode::setRadius ( int rad )
-{
-    radius = rad;
-}
-
-void TrussNode::paint ( ren_dynarow& baseRend ) const
-{
     solidRenderer solidRend ( baseRend );
 
     scanline_rasterizer   ras;
@@ -43,19 +27,17 @@ void TrussNode::paint ( ren_dynarow& baseRend ) const
         highlightKoeff = 1;
     }
     solidRend.color ( agg::rgba(10, 10, 10) );
-    ell.init ( widgetPosition.x(), widgetPosition.y(), 
-               radius + highlightKoeff + 1, radius + highlightKoeff + 1, 16 );
+    ell.init ( x, y, nodesRadius + highlightKoeff + 1, nodesRadius + highlightKoeff + 1, 16 );
     ras.add_path ( ell );
     agg::render_scanlines ( ras, sl, solidRend );
     if ( isHighlighted () )
     {
         solidRend.color ( agg::rgba(200, 135, 15, 0.45) );
-        ell.init ( widgetPosition.x(), widgetPosition.y(), radius + 5, radius + 5, 16 );
+        ell.init ( x, y, nodesRadius + 5, nodesRadius + 5, 16 );
         ras.add_path ( ell );
         agg::render_scanlines ( ras, sl, solidRend );
     }
-    ell.init ( widgetPosition.x(), widgetPosition.y(), radius + highlightKoeff, 
-                                                       radius + highlightKoeff, 16 );
+    ell.init ( x, y, nodesRadius + highlightKoeff, nodesRadius + highlightKoeff, 16 );
     gradient_span_alloc gradSpan;
     radial_gradient gradFunc;
     color_array_type gradColors;
@@ -75,7 +57,7 @@ void TrussNode::paint ( ren_dynarow& baseRend ) const
     }
     agg::trans_affine mtx;
     mtx *= agg::trans_affine_scaling ( 1 / 2.0 );
-    mtx *= agg::trans_affine_translation ( widgetPosition.x(), widgetPosition.y() );
+    mtx *= agg::trans_affine_translation ( x, y );
     mtx.invert ();
     interpolator inter(mtx);
     radial_gradient_span_gen gradSpanGen ( gradSpan, inter, gradFunc, 

@@ -32,11 +32,10 @@ public:
     QPoint getWindowRightBottomPos () const;
     QPoint getTrussAreaLeftTopPos () const;
     QPoint getTrussAreaRightBottomPos () const;
-    QPoint transCoord ( QPoint point, bool flipY );
     rbuf_dynarow* getRBufDynarow ();
-    int getHeadlineWidth () const;
-    int getBorderWidth () const;
-    int getMinResizeValue () const;
+    double getScaleMultiplierX () const;
+    double getScaleMultiplierY () const;
+
     bool inWindowRect ( int x, int y );
     bool inCanvasRect ( int  x, int  y );
     bool inHeadlineRect ( int  x, int  y );
@@ -52,27 +51,22 @@ public:
 	color_type getHeadlineColor () const;
 	color_type getBorderColor () const;
 
+    void setWindowSize ( int w, int h );
     void setWindowPosition ( QPoint pos );    
-    void setTrussAreaWindowIndent ( int indent );
-    void setTrussNodesPosition ();
+    void setRenderingStatus ( bool status );
     void setNodeHighlight ( int x, int y );
     void setPivotHighlight ( int x, int y );
     void removeNodeHighlight ();
     void removePivotHighlight ();
-    void setCoordinateLineWidth ( int width );
-    void setHeadlineWidth ( int  width );
-    void setBorderWidth ( int  width );
-    void setMinResizeValue ( int value );
+
     void setCanvasColor ( int r, int g, int b );
     void setHeadlineColor ( int r, int g, int b );
     void setBorderColor ( int r, int g, int b );
-    void setResEllRad ( int radius );
-    void setWinCornerRadius ( int radius );
     void setResEllColor ( int r, int g, int b );
 
     void drawText ( ren_dynarow& baseRend, textRenderer& textRend,
                     const QString& str, color_type c, 
-                    QPoint point, bool flipY ) const;
+                    QPoint point ) const;
     void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
                     agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const;
     void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
@@ -93,8 +87,6 @@ public:
     void paint ( base_renderer& baseRend ) const;
 private:
     rbuf_dynarow* rbuf;
-    int  headWidth, bordWidth, resEllRad, winCornerRadius, 
-         minResizeVal, lineWidth, trussAreaIndent;
     QPoint windowLeftTopPos, windowRightBottomPos;
     QSize windowSize;
     color_type canvColor, headColor, borderColor, resEllColor;

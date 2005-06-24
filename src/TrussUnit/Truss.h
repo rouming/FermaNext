@@ -86,12 +86,11 @@ public:
         for ( ; iter != nodes.end(); ++iter )
         {
             N* node = *iter;
-            int nodeRadius = node->getRadius();
             int x1 = node->getX ();
             int y1 = node->getY ();
             if ( ( (point.x() - x1) * (point.x() - x1) + 
                    (point.y() - y1) * (point.y() - y1) ) <  
-                 4 * nodeRadius * nodeRadius )
+                 4 * nodesRadius * nodesRadius )
                 return node;
         }
         return 0;
