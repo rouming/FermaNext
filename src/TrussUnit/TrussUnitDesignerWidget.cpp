@@ -376,12 +376,14 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         {
             QWidget::setCursor ( Qt::ArrowCursor );
             removeAllHighlight ();
+            update();
         }
     }
     else
     {
         QWidget::setCursor ( Qt::ArrowCursor );
         removeAllHighlight ();
+        update();
     }
 }
 

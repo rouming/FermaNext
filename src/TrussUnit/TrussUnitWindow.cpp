@@ -230,29 +230,26 @@ bool TrussUnitWindow::isPivotSelected ( int x, int y )
 
 TrussNode* TrussUnitWindow::findNodeByCoord ( int x, int y )
 {
-/* TODO
-    bool flipY = true;
-    int radius = getNodesRadius ();
     QPoint point;
     TrussUnit::NodeList nodeList = getNodeList ();
     TrussUnit::NodeList:: iterator iter = nodeList.begin();
     for ( ; iter != nodeList.end(); ++iter )
 	{
         TrussNode* node = *iter;
-        point.setX ( node->getX () + leftWindowIndent );
-        point.setY ( flipY ? ( getTrussAreaSize().height() - point.y() ) * 
-                 getScaleMultiplierY() + topWindowIndent :
-                 point.y() * getScaleMultiplierY() + topWindowIndent );
-        if ( abs ( point.x() - x ) < radius && abs ( point.y() - y ) < radius )
+        point.setX ( node->getX () * getScaleMultiplierX () + leftWindowIndent + 
+                    windowLeftTopPos.x() );
+        point.setY ( flipY ? ( getTrussAreaSize().height() - node->getY () ) * 
+                    getScaleMultiplierY() + topWindowIndent + windowLeftTopPos.y() :
+                    node->getY () * getScaleMultiplierY() + topWindowIndent + 
+                    windowLeftTopPos.y() );
+        if ( abs ( point.x() - x ) < nodesRadius && abs ( point.y() - y ) < nodesRadius )
             return node;
-    }*/
+    }
     return 0;
 }
 
 TrussPivot* TrussUnitWindow::findPivotByCoord ( int x, int y )
 {
-/* TODO
-    bool flipY = true;
     QPoint p1, p2;
     PivotList pivotList = getPivotList ();
     PivotListIter iter = pivotList.begin();
@@ -261,20 +258,24 @@ TrussPivot* TrussUnitWindow::findPivotByCoord ( int x, int y )
         TrussPivot* pivot = *iter;
         p1 = pivot->getFirstNode ().getPoint ();
         p2 = pivot->getLastNode ().getPoint ();
-        p1.setX ( p1.x() * getScaleMultiplierX () + leftWindowIndent );
+        p1.setX ( p1.x() * getScaleMultiplierX () + leftWindowIndent + 
+                    windowLeftTopPos.x() );
         p1.setY ( flipY ? ( getTrussAreaSize().height() - p1.y() ) * 
-                 getScaleMultiplierY() + topWindowIndent :
-                 p1.y() * getScaleMultiplierY() + topWindowIndent );
-        p2.setX ( p2.x() * getScaleMultiplierX() + leftWindowIndent );
-        p1.setY ( flipY ? ( getTrussAreaSize().height() - p2.y() ) * 
-                 getScaleMultiplierY() + topWindowIndent :
-                 p2.y() * getScaleMultiplierY() + topWindowIndent );
+                    getScaleMultiplierY() + topWindowIndent + windowLeftTopPos.y() :
+                    p1.y () * getScaleMultiplierY() + topWindowIndent + 
+                    windowLeftTopPos.y() );
+        p2.setX ( p2.x() * getScaleMultiplierX () + leftWindowIndent + 
+                    windowLeftTopPos.x() );
+        p2.setY ( flipY ? ( getTrussAreaSize().height() - p2.y() ) * 
+                    getScaleMultiplierY() + topWindowIndent + windowLeftTopPos.y() :
+                    p2.y () * getScaleMultiplierY() + topWindowIndent + 
+                    windowLeftTopPos.y() );
         if ( ( abs ( ( x - p1.x() ) * ( p1.y() - p2.y() ) - 
                      ( y - p1.y() ) * ( p1.x() - p2.x() ) ) <= eps ) && 
              ( ( x >= p1.x() && x <= p2.x() || x >= p2.x() && x <= p1.x() ) && 
                ( y >= p1.y() && y <= p2.y() || y >= p2.y() && y <= p1.y() ) ) )
             return pivot;
-    }*/
+    }
     return 0;
 }
 
