@@ -10,7 +10,6 @@
  * FermaNext Project
  *****************************************************************************/
 FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack ) :
-    maximizedDesginerWindow(true),
     name(name_),
     projectTab( new QTabWidget(stack) )
 {    
@@ -21,9 +20,6 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack )
     projectTab->addTab( designerWindow, tr("Designer") );
     projectTab->addTab( justStrengthAnalisysWidget, tr("Strength Analysis") );
     stack->addWidget(projectTab);
-
-    designerWindow->setIcon( QPixmap::fromMimeSource( imagesPath + "/project.png" ) );
-    designerWindow->installEventFilter(this);
 
     TrussUnitDesignerWidget& designerWidget = designerWindow->getDesignerWidget();
 
