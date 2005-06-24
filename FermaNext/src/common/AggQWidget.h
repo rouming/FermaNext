@@ -57,7 +57,7 @@ private:
     int                   initialHeight;
 
 public:
-    AggQWidget ( QWidget* parent = 0, bool flip_y = false );
+    AggQWidget ( QWidget* parent = 0 );
     virtual ~AggQWidget ();
 
 protected:
@@ -66,9 +66,6 @@ protected:
     virtual scanline& getAggScanline ();
     virtual trans_affine getAggResizeMatrix ();
     virtual QImage& getMainImage ();
-
-    virtual bool flipY ();
-    virtual void flipY ( bool );
 
 // Hide QT events, override AGG events instead.
 private:

@@ -15,6 +15,25 @@ extern const QString imagesPath;
  * Truss Unit Consts
  ************************************/
 
+extern const int leftWindowIndent,
+                 rigthWindowIndent,
+                 topWindowIndent,
+                 bottomWindowIndent,
+                 scaleTextLeftBottomIndent,
+                 arrowTailIndent,
+                 arrowHeadIndent,
+                 scalePieceLength,
+                 bordWidth,
+                 headWidth,
+                 coordLineWidth,
+                 resizeLimit,
+                 winCornerRadius,
+                 resEllRad,
+                 nodesRadius,
+                 pivotsWidth,
+                 eps;
+
+extern const bool flipY;
 
 /************************************
  * Desginer Consts
