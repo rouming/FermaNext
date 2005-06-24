@@ -5,8 +5,7 @@
  * Truss Pivot
  *****************************************************************************/
 
-TrussPivot::TrussPivot () :
-    width(4)
+TrussPivot::TrussPivot () 
 {}
 
 TrussPivot::TrussPivot ( TrussNode& first, TrussNode& last ) :
@@ -30,41 +29,39 @@ struct line
     }
 };
 
-int TrussPivot::getPivotWidth () const
-{
-    return width;
-}
-
-void TrussPivot::setPivotWidth ( int w )
-{
-    width = w;
-}
-
 void TrussPivot::drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
                           agg::scanline_p8& sl, QPoint point1, QPoint point2,
-                          int width_, color_type color ) const
+                          int width, color_type color ) const
 {
     line newLine ( point1.x(), point1.y(), point2.x(), point2.y() );
     agg::conv_stroke<line> stroke ( newLine );
-    stroke.width ( width_ ); 
+    stroke.width ( width ); 
     ras.add_path ( stroke );
     solidRend.color ( color );
     agg::render_scanlines ( ras, sl, solidRend );
 }
 
-void TrussPivot::paint ( ren_dynarow& baseRend ) const
+void TrussPivot::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
+                        int trussAreaHeight) const
 {
+    bool flipY = true;
     solidRenderer solidRend ( baseRend );
     scanline_rasterizer   ras;
     agg::scanline_p8     sl;
     agg::ellipse ell;
 
     QPoint p1, p2;
-    p1 = getFirstNode().getNodeWidgetPosition ();
-    p2 = getLastNode().getNodeWidgetPosition ();
+    p1 = getFirstNode().getPoint ();
+    p2 = getLastNode().getPoint ();
+    p1.setX ( p1.x() * scaleMultX + leftWindowIndent );
+    p1.setY ( flipY ? ( trussAreaHeight - p1.y() ) * scaleMultY + topWindowIndent :
+             p1.y() * scaleMultY + topWindowIndent );
+    p2.setX ( p2.x() * scaleMultX + leftWindowIndent );
+    p2.setY ( flipY ? ( trussAreaHeight - p2.y() ) * scaleMultY + topWindowIndent :
+             p2.y() * scaleMultY + topWindowIndent );
     if ( isHighlighted () )
-        drawLine ( ras, solidRend, sl, p1, p2, width + 5, agg::rgba(200, 135, 15, 0.45) ); 
-    drawLine ( ras, solidRend, sl, p1, p2, width, agg::rgba(0, 0, 0) ); 
+        drawLine ( ras, solidRend, sl, p1, p2, pivotsWidth + 5, agg::rgba(200, 135, 15, 0.45) ); 
+    drawLine ( ras, solidRend, sl, p1, p2, pivotsWidth, agg::rgba(0, 0, 0) ); 
 }
 
 /****************************************************************************/

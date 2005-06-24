@@ -3,9 +3,11 @@
 #define TRUSSUNIT_H
 
 #include "Truss.h"
+#include "SubsidiaryConstants.h"
 #include <vector>
 #include <qstring.h>
 #include <qpoint.h> 
+
 
 #include "agg_rasterizer_scanline_aa.h"
 #include "agg_scanline_p.h"
@@ -79,33 +81,25 @@ public:
     TrussUnit ( const QString& name );
     virtual ~TrussUnit ();
 
-    int getNodesRadius () const;
-    int getPivotsWidth () const;
     const QString& getTrussName () const;
-    const QSize& getArea () const;
+    const QSize& getTrussAreaSize () const;
   
-    void paint ( ren_dynarow& baseRend, QPoint leftTopPos ) const;
+    void paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
+                int trussAreaHeight ) const;
 
 public slots:
     void setTrussName ( const QString& name );
-    void setNodesRadius ( int rad );
-    void setPivotsWidth ( int wid );
-    void setArea ( const QSize& );
+    void setTrussAreaSize ( const QSize& );
 
 signals:
     void onTrussNameChange ( const QString& old, const QString& n );
     void onAreaChange ( const QSize& );
-    void onNodesRadiusChange ( int );
-    void onPivotsWidthChange ( int );
 
 private:
     static const QString UNNAMED;
 
-    int nodesRadius, pivotsWidth;
     QString trussName;
-    QSize area;
-    rbuf_dynarow* rbuf;
-    mutable bool isRendered;
+    QSize trussAreaSize;
 };
 
 /*****************************************************************************/
@@ -115,14 +109,8 @@ class TrussNode: public Node, public PaintableTrussElement
 public:
     TrussNode ();
 
-    QPoint getNodeWidgetPosition () const;
-    void setNodeWidgetPosition ( QPoint point );
-    int getRadius () const;
-    void setRadius ( int rad );
-    void paint ( ren_dynarow& baseRend ) const;
-private:
-    int radius;
-    QPoint widgetPosition;
+    void paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
+                int trussAreaHeight ) const;
 };
 
 /*****************************************************************************/
@@ -133,14 +121,11 @@ public:
     TrussPivot ();
     TrussPivot ( TrussNode&, TrussNode& );
 
-    int getPivotWidth () const;
-    void setPivotWidth ( int w );
     void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
                     agg::scanline_p8& sl, QPoint point1, QPoint point2,
                     int width, color_type color ) const;
-    void paint ( ren_dynarow& baseRend ) const;
-private:
-    int width;
+    void paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
+                int trussAreaHeight) const;
 };
 
 #endif //TRUSSUNIT_H

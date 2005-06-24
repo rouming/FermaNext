@@ -34,33 +34,23 @@ void TrussUnitDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow 
 {    
     trussWindows.push_back(&trussWindow);
 
-    QPoint pos1, pos2;
+    QPoint pos1;
     pos1.setX ( X1 ); 
     pos1.setY ( Y1 ); 
-    pos2.setX ( X2 );
-    pos2.setY ( Y2 );
 
-    trussWindow.setCoordinateLineWidth ( 1 );
-    trussWindow.setNodesRadius ( 4 );
-    trussWindow.setPivotsWidth ( 2 );
-    trussWindow.setResEllRad ( 3 );
-    trussWindow.setMinResizeValue ( 200 );
-    trussWindow.setWinCornerRadius ( 25 );
     trussWindow.setWindowPosition ( pos1 );
-    trussWindow.setHeadlineWidth ( 26 );
-    trussWindow.setBorderWidth ( 4 );
     trussWindow.setBorderColor ( 20,35,40 );
     trussWindow.setCanvasColor ( 8, 10, 12 );
     trussWindow.setHeadlineColor ( 75, 105, 95 );
     trussWindow.setResEllColor ( 50, 50, 50 );
-    trussWindow.setTrussNodesPosition ();
 }
 
 bool TrussUnitDesignerWidget::removeTrussUnitWindow ( const TrussUnitWindow& window )
 {
     WindowList::iterator iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter )
-        if ( (*iter) == &window ) {
+        if ( (*iter) == &window ) 
+        {
             trussWindows.erase(iter);            
             return true;
         }
@@ -126,9 +116,6 @@ void TrussUnitDesignerWidget::onDraw ()
     }
     
     TrussUnitWindow* trussWindow = (*iter); 
-    trussWindow->setTrussNodesPosition ();
-    trussWindow->setNodesRadius ( 4 );
-    trussWindow->setPivotsWidth ( 2 );
 
     trussWindow->setBorderColor ( 25,55,65 );
     trussWindow->setHeadlineColor ( 55, 155, 165 );
@@ -142,16 +129,13 @@ void TrussUnitDesignerWidget::onDraw ()
 void TrussUnitDesignerWidget::initTrussUnitWindow ()  //temp method. Later to remove.
 {
     QWidget::setMouseTracking(true);
-    flipY( true );
-    QPoint pos1, pos2, pivotPnt1, pivotPnt2;
+    QPoint pos1, pivotPnt1, pivotPnt2;
 
     WindowListIter iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter ) { 
         TrussUnitWindow* trussWindow = (*iter);        
         pos1.setX ( X1 ); 
         pos1.setY ( Y1 ); 
-        pos2.setX ( X2 );
-        pos2.setY ( Y2 );
         winBehaviour = windowIdle;
         trussWindow->createNode ( 280, 30 );
         pivotPnt1.setX ( 0 );
@@ -171,22 +155,12 @@ void TrussUnitDesignerWidget::initTrussUnitWindow ()  //temp method. Later to re
         pivotPnt2.setX ( 0 );
         pivotPnt2.setY ( 0 );
         trussWindow->createPivot ( pivotPnt1, pivotPnt2 );
-        trussWindow->setCoordinateLineWidth ( 1 );
-        trussWindow->setNodesRadius ( 4 );
-        trussWindow->setPivotsWidth ( 2 );
-        trussWindow->setResEllRad ( 3 );
-        trussWindow->setMinResizeValue ( 200 );
-        trussWindow->setWinCornerRadius ( 25 );
+
         trussWindow->setWindowPosition ( pos1 );
-        trussWindow->setHeadlineWidth ( 26 );
-        trussWindow->setBorderWidth ( 4 );
         trussWindow->setBorderColor ( 20,35,40 );
         trussWindow->setCanvasColor ( 8, 10, 12 );
         trussWindow->setHeadlineColor ( 75, 105, 95 );
         trussWindow->setResEllColor ( 50, 50, 50 );
-        trussWindow->setTrussNodesPosition ();
-        X1 = X1 + 180;
-        X2 = X2 + 180;
     }
     init = false;
 }
@@ -212,93 +186,91 @@ void TrussUnitDesignerWidget::aggKeyPressEvent ( QKeyEvent* )
 void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
 {
     int x = me->x();
-    int y = flipY() ? height() - me->y() : me->y();
+    int y = flipY ? height() - me->y() : me->y();
     if ( winBehaviour == onHorResize )
     {
-        int resizeLimit = trussWindow->getMinResizeValue ();
 		int dx = x - clickX;
-//        rbuf_dynarow* rbuf = trussWindow->getRBufDynarow ();
         QPoint point1 = trussWindow->getWindowLeftTopPos ();
         QPoint point2 = trussWindow->getWindowRightBottomPos ();
-        int bordW = trussWindow->getBorderWidth ();
-        if ( abs ( clickX - point1.x() ) <= bordW )
+        if ( abs ( clickX - point1.x() ) <= bordWidth )
         {
             point1.setX ( point1.x() + dx );
             if ( abs ( point2.x() - point1.x() ) < resizeLimit )
                 point1.setX( point2.x() - resizeLimit );
         }
-        if ( abs ( clickX - point2.x() ) <= bordW )
+        if ( abs ( clickX - point2.x() ) <= bordWidth )
         {
             point2.setX ( point2.x() + dx );
             if ( abs ( point2.x() - point1.x() ) < resizeLimit )
                point2.setX( point1.x() + resizeLimit );
         }
-//        rbuf->init ( point2.x() - point1.x(), point2.y() - point1.y() );
+        rbuf_dynarow* rbuf = trussWindow->getRBufDynarow ();
+        rbuf->init ( point2.x() - point1.x(), point2.y() - point1.y() );
+        trussWindow->setWindowSize ( point2.x() - point1.x(), point2.y() - point1.y() );
         trussWindow->setWindowPosition ( point1 );
-        trussWindow->setTrussNodesPosition ();
         update();
 		clickX += dx;
         return;
     }
     if ( winBehaviour == onVerResize )
     {
-        int resizeLimit = trussWindow->getMinResizeValue ();
 	    int dy = y - clickY;
         QPoint point1 = trussWindow->getWindowLeftTopPos ();
         QPoint point2 = trussWindow->getWindowRightBottomPos ();
-        int bordW = trussWindow->getBorderWidth ();
-        if ( abs ( clickY - point1.y() ) <= bordW )
+        if ( abs ( clickY - point1.y() ) <= bordWidth )
         {
             point1.setY ( point1.y() + dy );
             if ( abs ( point2.y() - point1.y() ) < resizeLimit )
                 point1.setY( point2.y() - resizeLimit );
         }
-        if ( abs ( clickY - point2.y() ) <= bordW )
+        if ( abs ( clickY - point2.y() ) <= bordWidth )
         {
             point2.setY ( point2.y() + dy );
             if ( abs ( point2.y() - point1.y() ) < resizeLimit )
                point2.setY( point1.y() + resizeLimit );
         }
+        rbuf_dynarow* rbuf = trussWindow->getRBufDynarow ();
+        rbuf->init ( point2.x() - point1.x(), point2.y() - point1.y() );
+        trussWindow->setWindowSize ( point2.x() - point1.x(), point2.y() - point1.y() );
         trussWindow->setWindowPosition ( point1 );
-        trussWindow->setTrussNodesPosition ();
         update();
 		clickY += dy;
         return;
     }
     if ( winBehaviour == onBDiagResize )
     {
-        int resizeLimit = trussWindow->getMinResizeValue ();
         int dx = x - clickX;
 	    int dy = y - clickY;
         QPoint point1 = trussWindow->getWindowLeftTopPos ();
         QPoint point2 = trussWindow->getWindowRightBottomPos ();
-        int bordW = trussWindow->getBorderWidth ();
-        if ( abs ( clickX - (point1.x() + bordW) ) <= bordW )
+        if ( abs ( clickX - (point1.x() + bordWidth) ) <= bordWidth )
         {
             point1.setX ( point1.x() + dx );
             if ( abs ( point2.x() - point1.x() ) < resizeLimit )
                 point1.setX( point2.x() - resizeLimit );
         }
-        if ( abs ( clickX - (point2.x() - bordW) ) <= bordW )
+        if ( abs ( clickX - (point2.x() - bordWidth) ) <= bordWidth )
         {
             point2.setX ( point2.x() + dx );
             if ( abs ( point2.x() - point1.x() ) < resizeLimit )
                point2.setX( point1.x() + resizeLimit );
         }
-        if ( abs ( clickY - (point1.y() + bordW) ) <= bordW )
+        if ( abs ( clickY - (point1.y() + bordWidth) ) <= bordWidth )
         {
             point1.setY ( point1.y() + dy );
             if ( abs ( point2.y() - point1.y() ) < resizeLimit )
                 point1.setY( point2.y() - resizeLimit );
         }
-        if ( abs ( clickY - (point2.y() - bordW) ) <= bordW )
+        if ( abs ( clickY - (point2.y() - bordWidth) ) <= bordWidth )
         {
             point2.setY ( point2.y() + dy );
             if ( abs ( point2.y() - point1.y() ) < resizeLimit )
                point2.setY( point1.y() + resizeLimit );
         }
+        rbuf_dynarow* rbuf = trussWindow->getRBufDynarow ();
+        rbuf->init ( point2.x() - point1.x(), point2.y() - point1.y() );
+        trussWindow->setWindowSize ( point2.x() - point1.x(), point2.y() - point1.y() );
         trussWindow->setWindowPosition ( point1 );
-        trussWindow->setTrussNodesPosition ();
         update();
         clickX += dx;
 		clickY += dy;
@@ -306,38 +278,38 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     }
     if ( winBehaviour == onFDiagResize )
     {
-        int resizeLimit = trussWindow->getMinResizeValue ();
         int dx = x - clickX;
         int dy = y - clickY;
         QPoint point1 = trussWindow->getWindowLeftTopPos ();
         QPoint point2 = trussWindow->getWindowRightBottomPos ();
-        int bordW = trussWindow->getBorderWidth ();
-        if ( abs ( clickX - (point1.x() + bordW) ) <= bordW )
+        if ( abs ( clickX - (point1.x() + bordWidth) ) <= bordWidth )
         {
             point1.setX ( point1.x() + dx );
             if ( abs ( point2.x() - point1.x() ) < resizeLimit )
-                point1.setX( point2.x() - resizeLimit );
+                point1.setX ( point2.x() - resizeLimit );
         }
-        if ( abs ( clickX - (point2.x() - bordW) ) <= bordW )
+        if ( abs ( clickX - (point2.x() - bordWidth) ) <= bordWidth )
         {
             point2.setX ( point2.x() + dx );
             if ( abs ( point2.x() - point1.x() ) < resizeLimit )
-               point2.setX( point1.x() + resizeLimit );
+               point2.setX ( point1.x() + resizeLimit );
         }
-        if ( abs ( clickY - (point1.y() + bordW) ) <= bordW )
+        if ( abs ( clickY - (point1.y() + bordWidth) ) <= bordWidth )
         {
             point1.setY ( point1.y() + dy );
             if ( abs ( point2.y() - point1.y() ) < resizeLimit )
-                point1.setY( point2.y() - resizeLimit );
+                point1.setY ( point2.y() - resizeLimit );
         }
-        if ( abs ( clickY - (point2.y() - bordW) ) <= bordW )
+        if ( abs ( clickY - (point2.y() - bordWidth) ) <= bordWidth )
         {
             point2.setY ( point2.y() + dy );
-            if ( abs ( point2.y() - point1.y() ) < trussWindow->getMinResizeValue () )
-               point2.setY( point1.y() + trussWindow->getMinResizeValue () );
+            if ( abs ( point2.y() - point1.y() ) < resizeLimit )
+               point2.setY ( point1.y() + resizeLimit );
         }
+        rbuf_dynarow* rbuf = trussWindow->getRBufDynarow ();
+        rbuf->init ( point2.x() - point1.x(), point2.y() - point1.y() );
+        trussWindow->setWindowSize ( point2.x() - point1.x(), point2.y() - point1.y() );
         trussWindow->setWindowPosition ( point1 );
-        trussWindow->setTrussNodesPosition ();
         update();
         clickX += dx;
 		clickY += dy;
@@ -354,7 +326,6 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         point2.setX ( point2.x() + dx );
         point2.setY ( point2.y() + dy );
 		trussWindow->setWindowPosition ( point1 );
-        trussWindow->setTrussNodesPosition ();
 		update();
 		clickX += dx;
 		clickY += dy;
@@ -425,7 +396,7 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* )
 void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
 {
     clickX = me->x();
-    clickY = flipY() ? height() - me->pos().y() : me->pos().y();
+    clickY = flipY ? height() - me->pos().y() : me->pos().y();
     trussWindow = findTrussUnitWindowByCoord ( clickX, clickY );
     if ( trussWindow )
     {
