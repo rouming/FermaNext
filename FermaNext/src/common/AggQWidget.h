@@ -57,7 +57,7 @@ private:
     int                   initialHeight;
 
 public:
-    AggQWidget ( QWidget* parent = 0 );
+    AggQWidget ( QWidget* parent = 0, bool flip_y = false );
     virtual ~AggQWidget ();
 
 protected:

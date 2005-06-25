@@ -1,5 +1,6 @@
 
 #include "TrussUnitDesignerWidget.h"
+#include "SubsidiaryConstants.h"
 #include <algorithm>
 #include <vector>
 #include <string>
@@ -14,7 +15,7 @@
  *****************************************************************************/
 
 TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
-    AggQWidget(p),
+    AggQWidget(p, flipY),
     init(true),
     X1(50), Y1(50),
     X2(330), Y2(330)
