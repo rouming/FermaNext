@@ -2,110 +2,53 @@
 #ifndef STATEFULOBJECT_H
 #define STATEFULOBJECT_H
 
-#include <qobject.h>
+#include "ObjectState.h"
 #include "ObjectStateManager.h"
 
-// State of any object. 
-class ObjectState;
-template <class Obj> class ConcreteState;
+#include <qobject.h>
 
-// Object, that can be saved and loaded by state.
-class StatefulObject;
-template <class Obj> class ConcreteStatefulObject;
 
-class ObjectState : public QObject
-{
-    Q_OBJECT
-public:
-    ObjectState () : disabled(false) {}
-    virtual void submitState () const = 0;
-    virtual ~ObjectState () { };
-    bool isDisabled () const 
-    { return disabled; }
-public slots:
-    void disable ()
-    { disabled = true; emit onDisable(this); }
-signals:
-    void onDisable ( ObjectState* );
-private:
-    mutable bool disabled;
-};
-
-template <class Obj>
-class ConcreteObjectState : virtual public ObjectState
-{
-    Obj* obj;
-    Obj* state;    
-public:
-    ConcreteObjectState ( Obj* obj_, Obj* state_ ) : 
-        obj(obj_), state(state_)
-    { connect(obj, SIGNAL(onStatefulObjectDestroy(StatefulObject*)), SLOT(disable()));  }
-       
-    ~ConcreteObjectState ()
-    { if ( !isDisabled() ) obj->removeObjectState(state);  }
-
-    void submitState () const
-    { if ( !isDisabled() ) obj->loadState(*state); }
-};
-
+// Basic class in stateful hierarchy.
+// This class is used to provide Qt subsidiary signals. 
 class StatefulObject : public QObject 
 {
     Q_OBJECT
-public:
-    virtual ~StatefulObject () 
-    // Should notice everyone about forthcoming decease.
-    { emit onStatefulObjectDestroy(this); }
+public:        
+    StatefulObject ( ObjectStateManager* );
+    virtual ~StatefulObject ();
+
+    // Returns state manager of this stateful object.
+    // If manager died, returns 0.
+    virtual ObjectStateManager* getStateManager ();
+
+    // Methods managing the states.     
+    virtual ObjectState& createState ();
+    virtual bool removeState ( ObjectState& );
+
+    virtual size_t countStates ();
+
+    // Marks this stateful object as desisted
+    virtual void desist ();
+    // Revives this stateful object 
+    virtual void revive ();
+    // Checks if it is alive
+    virtual bool isAlive ();
+
+protected slots:
+    // Marks manager as destroyed
+    virtual void stateManagerDestroyed ();
+
 signals:
-    void onStatefulObjectDestroy ( StatefulObject* );
-};
+    void onDesist ( StatefulObject& );
+    void onRevive ( StatefulObject& );
 
-template <class Obj>
-class ConcreteStatefulObject : public StatefulObject
-{
-    typedef std::vector<Obj*> StateList;
-    typedef typename std::vector<Obj*>::iterator StateListIter;
-protected:
-    // Do not forget to clear states from the descendant 
-    // destructor, or memory leaks are awaited.
-    void clearStates () 
-    {
-        StateListIter i = states.begin();
-        for ( ; i != states.end(); ++i )
-            removeState(*i);
-        states.clear();
-    }
-public:
-    Obj* takeObjectState ()
-    {
-        Obj* state = takeState();
-        states.push_back(state);
-        return state;
-    }
-
-    void removeObjectState ( Obj* state )
-    {
-        StateListIter i = states.begin();
-        for ( ; i != states.end(); ++i )
-            if ( *i == state ) {
-                Obj* st = *i;
-                states.erase(i);
-                removeState(st);
-                return;
-            }
-    }
-protected:
-    virtual Obj* self () = 0;
-    virtual Obj* takeState () = 0;
-    virtual void removeState ( Obj* ) = 0;
-public:
-    void saveState ( ObjectStateManager& sm )
-    {        
-        sm.saveState( new ConcreteObjectState<Obj>(self(), takeObjectState()) );
-    }
-
-    virtual void loadState ( const Obj& node ) = 0;  
 private:
+    typedef std::vector<ObjectState*> StateList;
+    typedef std::vector<ObjectState*>::iterator StateListIter;
+
     StateList states;
+    ObjectStateManager* stateManager;
+    bool isDesisted;   
 };
 
 #endif //STATEFULOBJECT_H
