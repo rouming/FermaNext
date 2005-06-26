@@ -91,14 +91,6 @@ LIB32=link.exe -lib
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;f90;for;f;fpp"
 # Begin Source File
 
-SOURCE=..\common\AggQWidget.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\ObjectStateManager.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\Truss.cpp
 # End Source File
 # Begin Source File
@@ -133,54 +125,6 @@ SOURCE=.\TrussUnitWindowManager.cpp
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
-# Begin Source File
-
-SOURCE=..\common\AggQWidget.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\ObjectStateManager.h
-
-!IF  "$(CFG)" == "TrussUnit - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\common
-InputPath=..\common\ObjectStateManager.h
-InputName=ObjectStateManager
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\StatefulObject.h
-
-!IF  "$(CFG)" == "TrussUnit - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\common
-InputPath=..\common\StatefulObject.h
-InputName=StatefulObject
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
 # Begin Source File
 
 SOURCE=.\Truss.h
@@ -299,14 +243,6 @@ InputName=TrussUnitWindowManager
 # Begin Group "Moc Files"
 
 # PROP Default_Filter "cpp"
-# Begin Source File
-
-SOURCE=..\common\mocs\moc_ObjectStateManager.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\mocs\moc_StatefulObject.cpp
-# End Source File
 # Begin Source File
 
 SOURCE=.\mocs\moc_Truss.cpp

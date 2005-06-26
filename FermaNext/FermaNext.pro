@@ -25,6 +25,8 @@ SOURCES = src/FermaNext.cpp \
           src/common/FermaNextProject.cpp \
           src/common/FermaNextConfig.cpp \
           src/common/ObjectStateManager.cpp \
+          src/common/ObjectState.cpp \
+          src/common/StatefulObject.cpp \
           src/common/SubsidiaryConstants.cpp \
           src/common/Benchmark.cpp \
           \
@@ -45,7 +47,9 @@ HEADERS = src/common/AggQWidget.h \
           src/common/FermaNextWorkspace.h \
           src/common/FermaNextProject.h \
           src/common/FermaNextConfig.h \
+          src/common/AbstractObjectAction.h \
           src/common/ObjectStateManager.h \
+          src/common/ObjectState.h \
           src/common/StatefulObject.h \
           src/common/SubsidiaryConstants.h \
           src/common/Benchmark.h \
