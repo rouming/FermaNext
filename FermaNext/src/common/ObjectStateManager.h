@@ -85,9 +85,19 @@ public:
     // Returns number of blocks
     virtual size_t countBlocks ();
 
+    // When state of object changes in some method, object should
+    // create state to undo changes in future. When undo works, method
+    // can be called again to restore the state. So we can get into
+    // recursion. isStateCall returns true when the state restores
+    // itself from undo or redo call.
+    virtual bool isStateCall ();
+
 protected:
     // Simply frees all allocated memory
     void clear ();
+
+    // Sets state call flag
+    void stateCall ( bool );
 
 private:
     typedef std::vector<StateBlock*> BlockList;
@@ -97,6 +107,7 @@ private:
     StateBlock* currentBlock;
     size_t possibleStackSize;
     bool currentBlockIsEnded;
+    bool isStateCallFlag;
 };
 
 #endif //STATEMANAGER_H
