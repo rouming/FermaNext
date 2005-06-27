@@ -15,29 +15,33 @@ void my_assert( bool val, const std::string& str )
     std::cout << str << ": " << (val ? "OK\n" : "NOT OK\n");
 }
 
-class SomeObject : public ConcreteStatefulObject<SomeObject>
+class SomeObject : public StatefulObject
 {
-    friend class SomeObjectManager;
-protected:
-    SomeObject* self ()  { return this; }
 public:
-    SomeObject (int val_): val(val_) { ++objects; }
-    SomeObject* takeState (){ return new SomeObject(*self()); }
-    void removeState ( SomeObject* o ){ delete o; }
-
-    ~SomeObject () { --objects; clearStates(); }
-    SomeObject ( const SomeObject& obj ) 
-    { 
-        ++objects;
-        val = obj.val;
-    } 
+    SomeObject (int val_, ObjectStateManager& mng) :
+        StatefulObject(&mng),
+        val(val_)
+    { ++objects; }
+    ~SomeObject () { --objects;  }
 public:
-    void loadState ( const SomeObject& obj )
-    {
-        val = obj.val;
-    }
     int value () const { return val; }
-    void value ( int val_ ) { val = val_; }    
+    void value ( int val_ ) 
+    { 
+        if ( !getStateManager()->isStateCall() ) {       
+            ObjectState& state = createState(); 
+            
+            ConcreteObjectAction<SomeObject, int>* action = 
+                new ConcreteObjectAction<SomeObject, int>(*this, 
+                                                          &SomeObject::value,
+                                                          &SomeObject::value,
+                                                          val_,
+                                                          val);
+            state.addAction( action );
+            getStateManager()->saveState(&state);
+        }
+        
+        val = val_; 
+    }
 private:
     int val;
 };
@@ -48,16 +52,14 @@ int main ()
     int i = 0;
 
     ObjectStateManager m;
-    
+   
     {// Scope
         
-        SomeObject obj(666);
-        obj.saveState(m);
+        SomeObject obj(666, m);
 
         //Changes
         for ( i=0; i < STACK_SIZE; ++i ) {
             obj.value(i+1);
-            obj.saveState(m);
         }
         my_assert( obj.value() == STACK_SIZE, "Last change" );
 
@@ -70,7 +72,7 @@ int main ()
         //Rollback to initial
         m.undo();
         my_assert( obj.value() == 666, "Initial" );
-        
+
         //Check bounds
         bool excp = false;
         try { m.undo();  } 
@@ -88,13 +90,13 @@ int main ()
         try { m.redo();  } 
         catch ( ObjectStateManager::RedoException& ) { excp = true; }
         my_assert( excp, "RedoException catched" );
-        
+
         //Half Undo
         for (  i=STACK_SIZE-1; i >= STACK_SIZE/2; --i ) {
             m.undo();
             my_assert( obj.value() == i, "Half undo" );
         }    
-        
+
         //Half Redo
         for (  i=STACK_SIZE/2+1; i <= STACK_SIZE; ++i ) {
             m.redo();
@@ -110,10 +112,9 @@ int main ()
         //New Changes
         for (  i=STACK_SIZE/2; i <= STACK_SIZE; ++i ) {
             obj.value((i)*10);
-            obj.saveState(m);
         }
         my_assert( obj.value() == STACK_SIZE*10, "Last new change" );
-        
+
         //Full Undo
         int j =0;
         for ( i=STACK_SIZE; i > 0; --i ) {
@@ -124,21 +125,22 @@ int main ()
                 j = i;
             my_assert( obj.value() == j, "Undo3" );
         }
-        
+
         //Rollback to initial
         m.undo();
         my_assert( obj.value() == 666, "Initial" );
 
-        SomeObject* anotherObj = new SomeObject(101010);
-        anotherObj->saveState(m);
-        anotherObj->saveState(m);
-        anotherObj->saveState(m);
-        anotherObj->saveState(m);
+        SomeObject* anotherObj = new SomeObject(101010, m);
+        anotherObj->value(1);
+        anotherObj->value(2);
+        anotherObj->value(3);
+        anotherObj->value(4);        
         delete anotherObj;
 
-    }//Scope end
+    }//Scope ends
     my_assert( objects == 0, "All objects should be destroyed" );
-    my_assert( m.countStates() == 0, "State manager should be empty" );
+    my_assert( m.countStates() == 0, "State vector should be empty" );
+    my_assert( m.countBlocks() == 0, "Block vector should be empty" );
 
 
 		std::cout << "\n" << "Passed: " << PASSED << "\nFailed: " << FAILED << "\n";
