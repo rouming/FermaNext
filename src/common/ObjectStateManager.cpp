@@ -62,7 +62,8 @@ void ObjectStateManager::StateBlock::clear ()
 ObjectStateManager::ObjectStateManager () :
     currentBlock(0),    
     possibleStackSize(POSSIBLE_STACK_SIZE),
-    currentBlockIsEnded(false)
+    currentBlockIsEnded(false),
+    isStateCallFlag(false)
 {
     // Suppose there are 4 states in one block. 
     stateBlocks.reserve(possibleStackSize/4);
@@ -243,7 +244,10 @@ void ObjectStateManager::undo () throw (UnknownException, UndoException)
     if ( iter == stateBlocks.end() )                
         throw UnknownException();
 
+    // Safe undo
+    stateCall(true);
     currentBlock->undo();
+    stateCall(false);
     
     // Should zero current block if we undoed the first block
     if ( iter == stateBlocks.begin() )
@@ -279,7 +283,11 @@ void ObjectStateManager::redo () throw (UnknownException, RedoException)
 
     }
     currentBlock = *iter;
+
+    // Safe redo
+    stateCall(true);
     currentBlock->redo();
+    stateCall(false);
 }
 
 size_t ObjectStateManager::countStates ()
@@ -294,6 +302,16 @@ size_t ObjectStateManager::countStates ()
 size_t ObjectStateManager::countBlocks ()
 {
     return stateBlocks.size();
+}
+
+void ObjectStateManager::stateCall ( bool stateCall )
+{
+    isStateCallFlag = stateCall;
+}
+
+bool ObjectStateManager::isStateCall ()
+{
+    return isStateCallFlag;
 }
 
 /*****************************************************************************/
