@@ -62,7 +62,7 @@ void ObjectStateManager::StateBlock::clear ()
 ObjectStateManager::ObjectStateManager () :
     currentBlock(0),    
     possibleStackSize(POSSIBLE_STACK_SIZE),
-    currentBlockIsEnded(false),
+    currentBlockIsEnded(true),
     isStateCallFlag(false)
 {
     // Suppose there are 4 states in one block. 
@@ -88,11 +88,13 @@ void ObjectStateManager::startStateBlock ()
     if ( countBlocks() == 0 ) {
         currentBlock = new StateBlock();
         stateBlocks.push_back(currentBlock);
+        currentBlockIsEnded = false;
     }
     // Begins new block if previous block was filled and correctly ended
     else if ( currentBlockIsEnded ) {
         currentBlock = new StateBlock();
         stateBlocks.push_back(currentBlock);
+        currentBlockIsEnded = false;
     }
     // Does nothing if block was not ended or not started yet
 }
@@ -101,8 +103,9 @@ void ObjectStateManager::endStateBlock ()
 {
     // Finishes block if it is not empty
     if ( currentBlock != 0 &&
-         !currentBlock->isEmpty() && !currentBlockIsEnded )
+         !currentBlock->isEmpty() && !currentBlockIsEnded ) {
         currentBlockIsEnded = true;
+    }
     // Does nothing if block was already finished or not started
 }
 
