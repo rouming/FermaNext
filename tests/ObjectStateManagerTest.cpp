@@ -54,7 +54,7 @@ int main ()
     ObjectStateManager m;
    
     {// Scope
-        
+
         SomeObject obj(666, m);
 
         //Changes
@@ -131,10 +131,18 @@ int main ()
         my_assert( obj.value() == 666, "Initial" );
 
         SomeObject* anotherObj = new SomeObject(101010, m);
+        m.startStateBlock();
         anotherObj->value(1);
         anotherObj->value(2);
         anotherObj->value(3);
         anotherObj->value(4);        
+        m.endStateBlock();
+
+        m.undo();
+        my_assert( anotherObj->value() == 101010, "Undo state block" );
+        m.redo();
+        my_assert( anotherObj->value() == 4, "Redo state block" );
+
         delete anotherObj;
 
     }//Scope ends
