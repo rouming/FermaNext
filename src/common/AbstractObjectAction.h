@@ -17,9 +17,9 @@ public:
     virtual void execute () = 0;
     virtual void unexecute () = 0;
 
-public slots:
-    virtual void actionExecuted ( AbstractObjectAction& );
-    virtual void actionUnexecuted ( AbstractObjectAction& );
+signals:
+    void actionExecuted ( AbstractObjectAction& );
+    void actionUnexecuted ( AbstractObjectAction& );
 };
 
 
