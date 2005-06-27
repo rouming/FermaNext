@@ -45,7 +45,7 @@ bool StatefulObject::removeState ( ObjectState& state )
 {
     StateListIter iter = states.begin();
     for ( ; iter != states.end(); ++iter )
-        if ( *iter = &state ) {
+        if ( *iter == &state ) {
             delete *iter;
             states.erase(iter);
             return true;
