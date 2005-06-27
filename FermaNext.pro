@@ -2,7 +2,7 @@
 TARGET = FermaNext
 
 
-CONFIG += qt warn_on thread release
+CONFIG += qt warn_on thread debug
 
 MOC_DIR = mocs
 OBJECTS_DIR = obj
