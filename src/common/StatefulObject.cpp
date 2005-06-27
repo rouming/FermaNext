@@ -35,8 +35,6 @@ void StatefulObject::stateManagerDestroyed ()
 ObjectState& StatefulObject::createState ()
 {
     ObjectState* state = new ObjectState(this);
-    connect( state, SIGNAL(onStateDestroy(ObjectState&)),
-                    SLOT(removeState(ObjectState&)) );
     states.push_back(state);
     return *state;
 }
