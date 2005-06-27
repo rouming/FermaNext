@@ -236,12 +236,12 @@ TrussNode* TrussUnitWindow::findNodeByCoord ( int x, int y )
     for ( ; iter != nodeList.end(); ++iter )
 	{
         TrussNode* node = *iter;
-        point.setX ( node->getX () * getScaleMultiplierX () + leftWindowIndent + 
+        point.setX ( int(node->getX () * getScaleMultiplierX()) + leftWindowIndent + 
                     windowLeftTopPos.x() );
-        point.setY ( flipY ? ( getTrussAreaSize().height() - node->getY () ) * 
-                    getScaleMultiplierY() + topWindowIndent + windowLeftTopPos.y() :
-                    node->getY () * getScaleMultiplierY() + topWindowIndent + 
-                    windowLeftTopPos.y() );
+        point.setY ( flipY ? int(( getTrussAreaSize().height() - node->getY ()) * 
+                    getScaleMultiplierY()) + topWindowIndent + windowLeftTopPos.y() :
+                    int(node->getY () * getScaleMultiplierY()) + 
+                    topWindowIndent + windowLeftTopPos.y() );
         if ( abs ( point.x() - x ) < nodesRadius && abs ( point.y() - y ) < nodesRadius )
             return node;
     }
@@ -258,17 +258,17 @@ TrussPivot* TrussUnitWindow::findPivotByCoord ( int x, int y )
         TrussPivot* pivot = *iter;
         p1 = pivot->getFirstNode ().getPoint ();
         p2 = pivot->getLastNode ().getPoint ();
-        p1.setX ( p1.x() * getScaleMultiplierX () + leftWindowIndent + 
+        p1.setX ( int(p1.x() * getScaleMultiplierX ()) + leftWindowIndent + 
                     windowLeftTopPos.x() );
-        p1.setY ( flipY ? ( getTrussAreaSize().height() - p1.y() ) * 
-                    getScaleMultiplierY() + topWindowIndent + windowLeftTopPos.y() :
-                    p1.y () * getScaleMultiplierY() + topWindowIndent + 
+        p1.setY ( flipY ? int(( getTrussAreaSize().height() - p1.y() ) * 
+                    getScaleMultiplierY()) + topWindowIndent + windowLeftTopPos.y() :
+                    int(p1.y () * getScaleMultiplierY()) + topWindowIndent + 
                     windowLeftTopPos.y() );
-        p2.setX ( p2.x() * getScaleMultiplierX () + leftWindowIndent + 
+        p2.setX ( int(p2.x() * getScaleMultiplierX ()) + leftWindowIndent + 
                     windowLeftTopPos.x() );
-        p2.setY ( flipY ? ( getTrussAreaSize().height() - p2.y() ) * 
-                    getScaleMultiplierY() + topWindowIndent + windowLeftTopPos.y() :
-                    p2.y () * getScaleMultiplierY() + topWindowIndent + 
+        p2.setY ( flipY ? int(( getTrussAreaSize().height() - p2.y() ) * 
+                    getScaleMultiplierY()) + topWindowIndent + windowLeftTopPos.y() :
+                    int(p2.y () * getScaleMultiplierY()) + topWindowIndent + 
                     windowLeftTopPos.y() );
         if ( ( abs ( ( x - p1.x() ) * ( p1.y() - p2.y() ) - 
                      ( y - p1.y() ) * ( p1.x() - p2.x() ) ) <= eps ) && 

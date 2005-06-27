@@ -11,9 +11,9 @@ TrussNode::TrussNode ()
 void TrussNode::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
                        int trussAreaHeight ) const
 {
-    int x = getX() * scaleMultX + leftWindowIndent;
-    int y = flipY ? ( trussAreaHeight - getY() ) * scaleMultY + topWindowIndent :
-                    getY() * scaleMultY + topWindowIndent;
+    int x = int(getX() * scaleMultX) + leftWindowIndent;
+    int y = flipY ? int(( trussAreaHeight - getY() ) * scaleMultY) + topWindowIndent :
+                    int(getY() * scaleMultY) + topWindowIndent;
 
     solidRenderer solidRend ( baseRend );
 
