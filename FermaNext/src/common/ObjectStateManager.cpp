@@ -8,11 +8,52 @@
  * State Block
  *****************************************************************************/
 
-ObjectStateManager::StateBlock::StateBlock ( ObjectState* start_, 
-                                            ObjectState* end_ ) :
-    start(start_),
-    end(end_)
-{}
+ObjectStateManager::StateBlock::~StateBlock ()
+{
+    clear();
+}
+
+void ObjectStateManager::StateBlock::addState ( ObjectState& st )
+{
+    states.push_back(&st);
+}
+
+bool ObjectStateManager::StateBlock::contains ( ObjectState& st )
+{
+    StateListIter iter = std::find( states.begin(), states.end(), &st );
+    // Found nothing
+    if ( iter == states.end() )
+        return false;
+    return true;
+}
+bool ObjectStateManager::StateBlock::isEmpty ()
+{
+    return states.size() == 0;
+}
+
+size_t ObjectStateManager::StateBlock::countStates ()
+{
+    return states.size();
+}
+
+void ObjectStateManager::StateBlock::undo ()
+{
+    StateListRevIter iter = states.rbegin();
+    for ( ; iter != states.rend(); ++iter )
+        (*iter)->rollbackState();
+}
+
+void ObjectStateManager::StateBlock::redo ()
+{
+    StateListIter iter = states.begin();
+    for ( ; iter != states.end(); ++iter )
+        (*iter)->commitState();
+}
+
+void ObjectStateManager::StateBlock::clear ()
+{
+    states.clear();
+}
 
 /*****************************************************************************
  * Object State Manager
@@ -20,141 +61,60 @@ ObjectStateManager::StateBlock::StateBlock ( ObjectState* start_,
 
 ObjectStateManager::ObjectStateManager () :
     currentBlock(0),    
-    possibleStackSize(DEF_STACK_SIZE)    
+    possibleStackSize(POSSIBLE_STACK_SIZE),
+    currentBlockIsEnded(false)
 {
-    states.reserve(possibleStackSize);
+    // Suppose there are 4 states in one block. 
+    stateBlocks.reserve(possibleStackSize/4);
 }
 
 ObjectStateManager::~ObjectStateManager ()
-{}
-
-bool ObjectStateManager::isValid ( StateBlock& block )
-    throw (UnknownException)
 {
-    // Block is not started
-    if ( block.start == 0 )
-        return false;
+    clear();
+}
 
-    StateListIter startIter = std::find( states.begin(), states.end(), block.start );
-    // Never should happen
-    if ( startIter == states.end() )
-        throw UnknownException();
-
-    // Block is not finished. That's ok.
-    if ( block.end == 0 )
-        return true;
-
-    StateListIter endIter = std::find( states.begin(), states.end(), block.end );
-
-    // Never should happen
-    if ( endIter == states.end() )
-        throw UnknownException();
-    
-    return (startIter <= endIter);
+void ObjectStateManager::clear ()
+{
+    BlockListIter iter = stateBlocks.begin();
+    for ( ; iter != stateBlocks.end(); ++iter )
+        delete *iter;
+    stateBlocks.clear();
 }
 
 void ObjectStateManager::startStateBlock ()
 {
     // First start
-    if ( currentBlock == 0 ) {
+    if ( countBlocks() == 0 ) {
         currentBlock = new StateBlock();
         stateBlocks.push_back(currentBlock);
     }
-    // Begins new block if previous block was filled
-    else if ( stateBlockIsStarted() && stateBlockIsEnded() ) {
+    // Begins new block if previous block was filled and correctly ended
+    else if ( currentBlockIsEnded ) {
         currentBlock = new StateBlock();
         stateBlocks.push_back(currentBlock);
     }
-    // Does nothing if block was not ended or 
-    // not started yet
+    // Does nothing if block was not ended or not started yet
 }
 
 void ObjectStateManager::endStateBlock ()
 {
-    // Finishes block if it was already started 
-    // (so states vector is not empty)
-    if ( stateBlockIsStarted() && !stateBlockIsEnded() ) {
-        currentBlock->end = states.back();        
-    }
+    // Finishes block if it is not empty
+    if ( currentBlock != 0 &&
+         !currentBlock->isEmpty() && !currentBlockIsEnded )
+        currentBlockIsEnded = true;
     // Does nothing if block was already finished or not started
 }
 
-bool ObjectStateManager::stateBlockIsStarted ()
+ObjectStateManager::StateBlock* ObjectStateManager::findBlock ( 
+                                                          ObjectState& state )
 {
-    return (currentBlock != 0 && currentBlock->start != 0);
-}
-
-bool ObjectStateManager::stateBlockIsEnded ()
-{
-    return (currentBlock != 0 && currentBlock->end != 0);
-}
-
-ObjectStateManager::StateBlock* ObjectStateManager::findBlock ( ObjectState& state )
-    throw (BlockIsInvalid)
-{
-    
     BlockListIter iter = stateBlocks.begin();
     for ( ; iter != stateBlocks.end(); ++iter ) {
         StateBlock* block = *iter;
-        // Is not inited, strange but possible
-        if ( block->start == 0 )
-            continue;
-        if ( !isValid(*block) )
-            throw BlockIsInvalid();
-
-        StateListIter startIter = std::find( states.begin(), states.end(), 
-                                             block->start );
-        StateListIter endIter;
-
-        // Block is not finished. That's ok. Should be the last block
-        if ( block->end == 0 )
-            endIter = states.end();
-        else {
-            endIter = std::find( states.begin(), states.end(), block->end );
-            // Take following element
-            ++endIter;
-        }
-
-        for ( ; startIter != endIter; ++startIter )
-            if ( *startIter == &state )
-                return block;
+        if ( block->contains(state) )
+            return block;
     }
     return 0;
-}
-
-bool ObjectStateManager::removeStatesFromBlock ( StateBlock& block ) 
-    throw (UnknownException)
-{
-    // Nothing to remove if block was not inited
-    if ( block.start == 0 )
-        return false;
-
-    StateListIter startIter = std::find( states.begin(), 
-                                         states.end(), 
-                                         block.start );
-    // Never should happen
-    if ( startIter == states.end() )
-        throw UnknownException();
-
-    StateListIter endIter;
-
-    // We take the end of the stack if block is not finished
-    if ( block.end == 0 )
-        endIter = states.end();
-    else {
-        endIter = std::find( states.begin(), states.end(), block.end );
-        // Never should happen
-        if ( endIter == states.end() )
-            throw UnknownException();
-        // Take following element for correct erase
-        ++endIter;
-    }
-    // Strange if start > end. Never should happen
-    if ( startIter > endIter )
-        throw UnknownException();
-
-    states.erase( startIter, endIter );
-    return true;    
 }
 
 bool ObjectStateManager::removeBlockByState (  ObjectState& st )
@@ -171,8 +131,6 @@ bool ObjectStateManager::removeBlockByState (  ObjectState& st )
         //throw IsNotThreadSafe();
         return false;
 
-    // Remove all states from this block
-    removeStatesFromBlock(*block);
     // Remove block
     stateBlocks.erase(iter);
     delete block;
@@ -182,27 +140,39 @@ bool ObjectStateManager::removeBlockByState (  ObjectState& st )
 
 bool ObjectStateManager::tryToRemoveStackTop () throw (UnknownException)
 {
-    if ( currentBlock == 0 )
-        return false;
-    
-    StateListIter iter = std::find(states.begin(), states.end(), currentBlock->start);
-    // We should remove top of the stack if current state exists in vector
-    // and it is not the last element.
-    if ( iter == states.end() )
-        throw UnknownException();
-
-    // Nothing to do if current state is at the top of the stack
-    if ( ++iter != states.end() )
+    // Is empty
+    if ( countBlocks() == 0 )
         return false;
 
-    StateListIter eraseIter = iter;
-    for ( ; iter != states.end(); ++iter )
-        delete *iter;            
-    states.erase( eraseIter, states.end() );
+    BlockListIter iter;
+
+    // If current block is not empty remove all blocks 
+    // which are placed after it
+    if ( currentBlock != 0 ) {
+        iter = std::find(stateBlocks.begin(), stateBlocks.end(), currentBlock);
+ 
+       // Strange.
+        if ( iter == stateBlocks.end() )
+            throw UnknownException();
+
+        // Nothing to do if current block is at the top of the stack
+        if ( ++iter == stateBlocks.end() )
+            return false;
+    }
+    // Remove all stack
+    else 
+        iter = stateBlocks.begin();
+
+    // Remove useless blocks
+    BlockListIter eraseIter = iter;
+    for ( ; iter != stateBlocks.end(); ++iter )
+        delete *iter;
+    stateBlocks.erase( eraseIter, stateBlocks.end() );
+
     return true;
 }
 
-bool ObjectStateManager::tryToPushStack ()
+bool ObjectStateManager::tryToShiftStack ()
 {
     // At first we should remove top of the stack
     bool topIsRemoved = tryToRemoveStackTop();
@@ -210,103 +180,120 @@ bool ObjectStateManager::tryToPushStack ()
     if ( topIsRemoved )
         return true;
 
-    // Should we push?
-    if ( states.size() != possibleStackSize )
+    // Should we shift?
+    size_t statesNum = countStates();
+    if ( statesNum <= possibleStackSize )
         return false;
 
-    
+    // Remove first block
+    BlockListIter iterBegin = stateBlocks.begin();
+    delete *iterBegin;
+    stateBlocks.erase( iterBegin );
+
     return true;
 }
 
 void ObjectStateManager::saveState ( ObjectState* st ) throw (UnknownException)
 {
     if ( currentBlock != 0 ) {
-        bool noStartedBlock = stateBlockIsStarted() && stateBlockIsEnded();
+        bool noStartedBlock = !currentBlock->isEmpty() && currentBlockIsEnded;
 
-        // New block has not been started yet, so start it        
+        // Shift the stack if possible
+        tryToShiftStack();
+
+        // New block has not been started yet, so start it
         if ( noStartedBlock )
-            // Starts new state block
-            startStateBlock();
-
+            startStateBlock();        
         
-        tryToPushStack();
-        
-
+        // Save state
+        currentBlock->addState(*st);
 
         // End newly started block
         if ( noStartedBlock )
-            // Ends started block
-            endStateBlock();        
+            endStateBlock();
     }
-    // First call without started block
+    // First call or all blocks were undoed. Create single state block.
     else {
-        // Starts new state block
+        // Should shift at first
+        tryToShiftStack();
         startStateBlock();
-        currentBlock->start = st;        
-        states.push_back(st);
-        QObject::connect(st, SIGNAL(onStateDestroy(ObjectState&)), 
-                             SLOT(removeBlockByState(ObjectState&)));
-        // Ends started block
+        // Save state
+        currentBlock->addState(*st);
         endStateBlock();
     }
 
-
-
-/*
-    if ( currentState != 0 ) {
-        StatesIter iter = std::find(states.begin(), states.end(), currentState);
-        // We should remove top of the stack if current state exists in vector
-        // and it is not the last element.
-        if ( iter == states.end() )
-            throw UnknownException();
-        if ( iter != states.end() && ++iter != states.end() )
-        {
-            StatesIter eraseIter = iter;
-            for ( ; iter != states.end(); ++iter )
-                delete *iter;            
-            states.erase( eraseIter, states.end() );
-        }
-    }
-    QObject::connect(st, SIGNAL(onDisable(ObjectState*)), 
-                         SLOT(removeState(ObjectState*)));
-    states.push_back(st);
-    currentState = st;    
-    */
+    // Connect to know when state is ready to be destroyed
+    QObject::connect(st, SIGNAL(onStateDestroy(ObjectState&)), 
+                         SLOT(removeBlockByState(ObjectState&)));
 }
 
 void ObjectStateManager::undo () throw (UnknownException, UndoException) 
-{    /*
-    if ( currentState == 0 ) 
-        throw UnknownException();        
-    StatesIter iter = std::find( states.begin(), states.end(), currentState );
-    if ( iter == states.end() )                
-        throw UnknownException();
-    if ( iter == states.begin() )
+{    
+    // Nothing to undo
+    if ( countBlocks() == 0 ) 
         throw UndoException();
-    --iter;
-    currentState = *iter;
-    currentState->submitState();
-    */
+    // Nothing to undo
+    if ( currentBlock == 0 )
+        throw UndoException();
+
+    BlockListIter iter = std::find( stateBlocks.begin(), 
+                                    stateBlocks.end(), 
+                                    currentBlock);
+    // Hm. Strange.
+    if ( iter == stateBlocks.end() )                
+        throw UnknownException();
+
+    currentBlock->undo();
+    
+    // Should zero current block if we undoed the first block
+    if ( iter == stateBlocks.begin() )
+        currentBlock = 0;
+    else {
+        --iter;
+        currentBlock = *iter;
+    }        
 }
 
 void ObjectStateManager::redo () throw (UnknownException, RedoException)
-{    /*
-    if ( currentState == 0 )
-        throw UnknownException();
-    StatesIter iter = std::find( states.begin(), states.end(), currentState );
-    if ( iter == states.end() )
-        throw UnknownException();
-    ++iter;
-    if ( iter == states.end() )
-        throw RedoException();
-    currentState = *iter;
-    currentState->submitState();
-    */
+{
+    // Nothing to undo
+    if ( countBlocks() == 0 ) 
+        throw UndoException();
+
+    BlockListIter iter;
+
+    if ( currentBlock == 0 )
+        iter = stateBlocks.begin();
+    else {
+        iter = std::find(stateBlocks.begin(), stateBlocks.end(), currentBlock);
+
+        // Hm. Strange.
+        if ( iter == stateBlocks.end() )
+            throw UnknownException();
+
+        ++iter;
+
+        // Nothing to redo
+        if ( iter == stateBlocks.end() )
+            throw RedoException();
+
+    }
+    currentBlock = *iter;
+    currentBlock->redo();
 }
 
 size_t ObjectStateManager::countStates ()
 {
-    return states.size();
+    size_t statesNum = 0;
+    BlockListIter iter = stateBlocks.begin();
+    for ( ; iter != stateBlocks.end(); ++iter )
+        statesNum += (*iter)->countStates();
+    return statesNum;
+}
+
+size_t ObjectStateManager::countBlocks ()
+{
+    return stateBlocks.size();
 }
 
 /*****************************************************************************/

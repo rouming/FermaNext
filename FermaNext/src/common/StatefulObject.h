@@ -21,9 +21,8 @@ public:
     // If manager died, returns 0.
     virtual ObjectStateManager* getStateManager ();
 
-    // Methods managing the states.     
+    // Manages states.
     virtual ObjectState& createState ();
-    virtual bool removeState ( ObjectState& );
 
     virtual size_t countStates ();
 
@@ -33,6 +32,10 @@ public:
     virtual void revive ();
     // Checks if it is alive
     virtual bool isAlive ();
+
+public slots:
+    // Manages states.
+    virtual bool removeState ( ObjectState& );
 
 protected slots:
     // Marks manager as destroyed
