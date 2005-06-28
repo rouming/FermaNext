@@ -59,7 +59,7 @@ void ObjectState::save ()
     ObjectStateManager* mng = stObj->getStateManager();
     // If manager is alive try to save the state
     if ( mng )
-        mng->saveState(this);
+        mng->saveState(*this);
 }
 
 StatefulObject* ObjectState::getStatefulObject ()
