@@ -37,7 +37,7 @@ public:
                                                           val_,
                                                           val);
             state.addAction( action );
-            getStateManager()->saveState(&state);
+            getStateManager()->saveState(state);
         }
         
         val = val_; 
@@ -64,18 +64,18 @@ void start_end_state_block_test ()
     m.startStateBlock();
     my_assert(m.countBlocks() == 1, "m.startStateBlock(): should be 1 block");
 
-    m.saveState(&st);
+    m.saveState(st);
     my_assert(m.countStates() == 1, "m.countStates(): should be 1 state");
     m.endStateBlock();
 
     // New block
     m.startStateBlock();
     my_assert( m.countBlocks() == 2, "m.endStateBlock(): should be 2 block");
-    m.saveState(&st);
+    m.saveState(st);
     // Doesn't create new block because previous one is not closed
     m.startStateBlock();
     my_assert( m.countBlocks() == 2, "Should be 2 blocks" );
-    m.saveState(&st);
+    m.saveState(st);
     my_assert( m.countStates() == 3, "Should be 3 states" );
 
     // Close inner block.
@@ -84,7 +84,7 @@ void start_end_state_block_test ()
     // Checks that outer block is not closed
     m.startStateBlock();
     my_assert( m.countBlocks() == 2, "Should be 2 again blocks" );
-    m.saveState(&st);
+    m.saveState(st);
     my_assert( m.countStates() == 4, "Should be 4 states" );
     m.endStateBlock();
 
@@ -95,7 +95,7 @@ void start_end_state_block_test ()
     // New third block
     m.startStateBlock();
     my_assert( m.countBlocks() == 3, "Should be 3 blocks" );
-    m.saveState(&st);
+    m.saveState(st);
     my_assert( m.countStates() == 5, "Should be 5 states" );
     m.endStateBlock();    
 }

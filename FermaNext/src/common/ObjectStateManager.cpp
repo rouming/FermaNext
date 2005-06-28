@@ -207,7 +207,7 @@ bool ObjectStateManager::tryToShiftStack ()
     return true;
 }
 
-void ObjectStateManager::saveState ( ObjectState* st ) throw (UnknownException)
+void ObjectStateManager::saveState ( ObjectState& st ) throw (UnknownException)
 {
     if ( currentBlock != 0 ) {
         bool noStartedBlock = !currentBlock->isEmpty() && currentBlockIsEnded;
@@ -220,7 +220,7 @@ void ObjectStateManager::saveState ( ObjectState* st ) throw (UnknownException)
             startStateBlock();        
         
         // Save state
-        currentBlock->addState(*st);
+        currentBlock->addState(st);
 
         // End newly started block
         if ( noStartedBlock )
@@ -232,13 +232,13 @@ void ObjectStateManager::saveState ( ObjectState* st ) throw (UnknownException)
         tryToShiftStack();
         startStateBlock();
         // Save state
-        currentBlock->addState(*st);
+        currentBlock->addState(st);
         endStateBlock();
     }
 
     // Connect to know when state is ready to be destroyed
-    QObject::connect(st, SIGNAL(onStateDestroy(ObjectState&)), 
-                         SLOT(removeBlockByState(ObjectState&)));
+    QObject::connect(&st, SIGNAL(onStateDestroy(ObjectState&)), 
+                          SLOT(removeBlockByState(ObjectState&)));
 }
 
 void ObjectStateManager::undo () throw (UnknownException, UndoException, 

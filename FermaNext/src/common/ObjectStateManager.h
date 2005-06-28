@@ -75,7 +75,7 @@ public:
 
     // Saves object state. If startStateBlock was called first, state
     // saves in this block.
-    virtual void saveState ( ObjectState* ) throw (UnknownException);
+    virtual void saveState ( ObjectState& ) throw (UnknownException);
 
     // Manages the undo/redo cookery
     virtual void undo () throw (UnknownException, UndoException, 
