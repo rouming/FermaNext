@@ -47,8 +47,11 @@ public:
     bool isPivotSelected ( int x, int y );
     TrussNode* findNodeByCoord ( int x, int y );
     TrussPivot* findPivotByCoord ( int x, int y );
+
     color_type getCanvasColor () const;
-	color_type getHeadlineColor () const;
+	color_type getHeadlineFirstColor () const;
+    color_type getHeadlineMiddleColor () const;
+    color_type getHeadlineLastColor () const;
 	color_type getBorderColor () const;
 
     void setWindowSize ( int w, int h );
@@ -60,7 +63,9 @@ public:
     void removePivotHighlight ();
 
     void setCanvasColor ( int r, int g, int b );
-    void setHeadlineColor ( int r, int g, int b );
+    void setHeadlineFirstColor ( int r, int g, int b );
+    void setHeadlineMiddleColor ( int r, int g, int b );
+    void setHeadlineLastColor ( int r, int g, int b );
     void setBorderColor ( int r, int g, int b );
     void setResEllColor ( int r, int g, int b );
 
@@ -89,7 +94,8 @@ private:
     rbuf_dynarow* rbuf;
     QPoint windowLeftTopPos, windowRightBottomPos;
     QSize windowSize;
-    color_type canvColor, headColor, borderColor, resEllColor;
+    color_type canvColor, headFirstColor, headMiddleColor, headLastColor, 
+               borderColor, resEllColor;
     mutable bool isRendered;
 };
 

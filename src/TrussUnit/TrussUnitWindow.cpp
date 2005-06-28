@@ -284,9 +284,19 @@ color_type TrussUnitWindow::getCanvasColor () const
 	return canvColor;
 }
 
-color_type TrussUnitWindow::getHeadlineColor () const
+color_type TrussUnitWindow::getHeadlineFirstColor () const
 {
-	return headColor;
+	return headFirstColor;
+}
+
+color_type TrussUnitWindow::getHeadlineMiddleColor () const
+{
+	return headMiddleColor;
+}
+
+color_type TrussUnitWindow::getHeadlineLastColor () const
+{
+	return headLastColor;
 }
 
 color_type TrussUnitWindow::getBorderColor () const
@@ -362,9 +372,19 @@ void TrussUnitWindow::setCanvasColor ( int r, int g, int b )
 	canvColor = agg::rgba(r, g, b);
 }
 
-void TrussUnitWindow::setHeadlineColor ( int r, int g, int b )
+void TrussUnitWindow::setHeadlineFirstColor ( int r, int g, int b )
 {
-	headColor = agg::rgba(r, g, b);
+	headFirstColor = agg::rgba8(r, g, b);
+}
+
+void TrussUnitWindow::setHeadlineMiddleColor ( int r, int g, int b )
+{
+	headMiddleColor = agg::rgba8(r, g, b);
+}
+
+void TrussUnitWindow::setHeadlineLastColor ( int r, int g, int b )
+{
+	headLastColor = agg::rgba8(r, g, b);
 }
 
 void TrussUnitWindow::setBorderColor ( int r, int g, int b )
@@ -494,17 +514,14 @@ void TrussUnitWindow::drawHeadline ( ren_dynarow& baseRend,
     p2.setX ( windowSize.width() - 3 * bordWidth );
     p2.setY ( headWidth );
     agg::rounded_rect headline ( p1.x(), p1.y(), p2.x(), p2.y(), winCornerRadius/2 );
-    color_type begin ( 180, 130, 100 ); 
-    color_type middle ( 230, 190, 170 ); 
-    color_type end ( 150, 90, 80 );
     unsigned i;
     for(i = 0; i < 128; ++i)
     {
-        gradColors[i] = begin.gradient ( middle, i / 128.0 );
+        gradColors[i] = headFirstColor.gradient ( headMiddleColor, i / 128.0 );
     }
     for(; i < 256; ++i)
     {
-        gradColors[i] = middle.gradient ( end, (i - 128) / 128.0 );
+        gradColors[i] = headMiddleColor.gradient ( headLastColor, (i - 128) / 128.0 );
     }
 
     interpolator inter ( mtx );

@@ -21,7 +21,7 @@
 #include "agg_rendering_buffer_dynarow.h"
 
 typedef agg::rendering_buffer_dynarow<4>                                    rbuf_dynarow;
-typedef agg::pixfmt_custom_rbuf_rgba<agg::blender_bgra32, rbuf_dynarow>     pixf_dynarow;
+typedef agg::pixfmt_custom_rbuf_rgba<agg::blender_rgba32, rbuf_dynarow>     pixf_dynarow;
 typedef agg::renderer_base<pixf_dynarow>                                    ren_dynarow;
 
 typedef agg::renderer_scanline_aa_solid<ren_dynarow>        solidRenderer;
