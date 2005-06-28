@@ -17,7 +17,8 @@ public:
     virtual ~TrussUnitDesignerWidget ();
 
 protected:
-    virtual void trussWindowToFront ( TrussUnitWindow& );    
+    virtual void trussWindowToFront ( TrussUnitWindow& );
+    virtual void redrawTrussWindows ();
     virtual TrussUnitWindow* findTrussUnitWindowByCoord ( int x, int y );    
     virtual void removeAllHighlight ();
 	virtual void onDraw();
@@ -41,15 +42,16 @@ protected:
     virtual void clearTrussUnitWindows ();
 
 private:
-    enum WindowBehaviour { windowIdle = 0, onDrag, onHorResize, onVerResize, 
-                           onBDiagResize, onFDiagResize };
-    enum TrussElementBehaviour { trussElementIdle = 0, onNodeSelect, onNodeDrag,
-                                  onPivotSelect, onPivotDrag };
+    enum TrussWindowBehaviour { windowIdle = 0, onWindowDrag, onHorResize, onVerResize, 
+                                onBDiagResize, onFDiagResize };
+    enum TrussNodeBehaviour { nodeIdle = 0, onNodeSelect, onNodeDrag };
+    enum TrussPivotBehaviour { pivotIdle = 0, onPivotSelect, onPivotDrag };
     WindowList trussWindows;
     TrussUnitWindow* trussWindow;
     TrussNode* trussNode;
-    WindowBehaviour winBehaviour;
-    TrussElementBehaviour trussElemBehaviour;
+    TrussWindowBehaviour winBehaviour;
+    TrussNodeBehaviour nodeBehaviour;
+    TrussPivotBehaviour pivotBehaviour;
     int clickX, clickY;
 };
 
