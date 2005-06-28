@@ -12,7 +12,7 @@ void my_assert( bool val, const std::string& str )
     if ( val ) ++PASSED;
     else ++FAILED;
     
-    std::cout << str << ": " << (val ? "OK\n" : "NOT OK\n");
+    std::cout << (val ? "    OK: " : "NOT OK: ") << str << "\n";
 }
 
 class SomeObject : public StatefulObject
@@ -46,10 +46,68 @@ private:
     int val;
 };
 
+
+void start_end_state_block_test ()
+{
+    ObjectStateManager m;
+    StatefulObject o(&m);
+    ObjectState& st = o.createState();
+    
+    my_assert( m.countBlocks() == 0, "After init m.countBlocks() == 0" );
+
+    m.startStateBlock();
+    my_assert( m.countBlocks() == 1, "m.startStateBlock(): should be 1 block");
+    m.endStateBlock();
+    my_assert( m.countBlocks() == 1, "m.endStateBlock(): should be 1 block");
+
+    // Can't start new block because previous one is empty
+    m.startStateBlock();
+    my_assert(m.countBlocks() == 1, "m.startStateBlock(): should be 1 block");
+
+    m.saveState(&st);
+    my_assert(m.countStates() == 1, "m.countStates(): should be 1 state");
+    m.endStateBlock();
+
+    // New block
+    m.startStateBlock();
+    my_assert( m.countBlocks() == 2, "m.endStateBlock(): should be 2 block");
+    m.saveState(&st);
+    // Doesn't create new block because previous one is not closed
+    m.startStateBlock();
+    my_assert( m.countBlocks() == 2, "Should be 2 blocks" );
+    m.saveState(&st);
+    my_assert( m.countStates() == 3, "Should be 3 states" );
+
+    // Close inner block.
+    m.endStateBlock();
+    my_assert( m.countBlocks() == 2, "Should be 2 blocks" );
+    // Checks that outer block is not closed
+    m.startStateBlock();
+    my_assert( m.countBlocks() == 2, "Should be 2 again blocks" );
+    m.saveState(&st);
+    my_assert( m.countStates() == 4, "Should be 4 states" );
+    m.endStateBlock();
+
+    // Really close.
+    m.endStateBlock();
+    my_assert( m.countBlocks() == 2, "Should be 2 blocks" );
+
+    // New third block
+    m.startStateBlock();
+    my_assert( m.countBlocks() == 3, "Should be 3 blocks" );
+    m.saveState(&st);
+    my_assert( m.countStates() == 5, "Should be 5 states" );
+    m.endStateBlock();    
+}
+
+
+
 int main ()
 {
     const int STACK_SIZE = 10;
     int i = 0;
+
+    start_end_state_block_test();
 
     ObjectStateManager m;
    
@@ -135,7 +193,19 @@ int main ()
         anotherObj->value(1);
         anotherObj->value(2);
         anotherObj->value(3);
-        anotherObj->value(4);        
+        anotherObj->value(4);
+
+        //Check Undo/Redo incorrectness, because of unclosed block
+        excp = false;
+        try { m.undo();  } 
+        catch ( ObjectStateManager::StateBlockIsNotEnded& ) { excp = true; }
+        my_assert( excp, "BlockIsNotClosed should be catched" );
+
+        excp = false;
+        try { m.redo();  } 
+        catch ( ObjectStateManager::StateBlockIsNotEnded& ) { excp = true; }
+        my_assert( excp, "BlockIsNotClosed should be catched" );
+
         m.endStateBlock();
 
         m.undo();
