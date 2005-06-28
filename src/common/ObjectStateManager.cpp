@@ -62,6 +62,7 @@ void ObjectStateManager::StateBlock::clear ()
 ObjectStateManager::ObjectStateManager () :
     currentBlock(0),    
     possibleStackSize(POSSIBLE_STACK_SIZE),
+    startedBlocks(0),
     currentBlockIsEnded(true),
     isStateCallFlag(false)
 {
@@ -89,22 +90,31 @@ void ObjectStateManager::startStateBlock ()
         currentBlock = new StateBlock();
         stateBlocks.push_back(currentBlock);
         currentBlockIsEnded = false;
+        startedBlocks = 1;
     }
     // Begins new block if previous block was filled and correctly ended
     else if ( currentBlockIsEnded ) {
         currentBlock = new StateBlock();
         stateBlocks.push_back(currentBlock);
         currentBlockIsEnded = false;
+        startedBlocks = 1;
     }
+    // We should count inner blocks, but if they are not empty
+    else if ( !currentBlock->isEmpty() )
+        ++startedBlocks;
+
     // Does nothing if block was not ended or not started yet
 }
 
 void ObjectStateManager::endStateBlock ()
 {
-    // Finishes block if it is not empty
+    // Finishes block if it is not empty and all inner blocks are ended
     if ( currentBlock != 0 &&
          !currentBlock->isEmpty() && !currentBlockIsEnded ) {
-        currentBlockIsEnded = true;
+        // If only one block remains we should close it
+        if ( startedBlocks == 1 )
+            currentBlockIsEnded = true;
+        --startedBlocks;
     }
     // Does nothing if block was already finished or not started
 }
@@ -231,14 +241,20 @@ void ObjectStateManager::saveState ( ObjectState* st ) throw (UnknownException)
                          SLOT(removeBlockByState(ObjectState&)));
 }
 
-void ObjectStateManager::undo () throw (UnknownException, UndoException) 
+void ObjectStateManager::undo () throw (UnknownException, UndoException, 
+                                        StateBlockIsNotEnded) 
 {    
     // Nothing to undo
     if ( countBlocks() == 0 ) 
         throw UndoException();
+
     // Nothing to undo
     if ( currentBlock == 0 )
         throw UndoException();
+
+    // Can't undo if block is not ended
+    if ( !currentBlockIsEnded ) 
+        throw StateBlockIsNotEnded();
 
     BlockListIter iter = std::find( stateBlocks.begin(), 
                                     stateBlocks.end(), 
@@ -249,7 +265,9 @@ void ObjectStateManager::undo () throw (UnknownException, UndoException)
 
     // Safe undo
     stateCall(true);
+    emit beforeUndo(*this);
     currentBlock->undo();
+    emit afterUndo(*this);
     stateCall(false);
     
     // Should zero current block if we undoed the first block
@@ -261,11 +279,16 @@ void ObjectStateManager::undo () throw (UnknownException, UndoException)
     }        
 }
 
-void ObjectStateManager::redo () throw (UnknownException, RedoException)
+void ObjectStateManager::redo () throw (UnknownException, RedoException,
+                                        StateBlockIsNotEnded)
 {
     // Nothing to undo
     if ( countBlocks() == 0 ) 
         throw UndoException();
+
+    // Can't redo if block is not ended
+    if ( !currentBlockIsEnded ) 
+        throw StateBlockIsNotEnded();
 
     BlockListIter iter;
 
@@ -289,7 +312,9 @@ void ObjectStateManager::redo () throw (UnknownException, RedoException)
 
     // Safe redo
     stateCall(true);
+    emit beforeRedo(*this);
     currentBlock->redo();
+    emit afterRedo(*this);
     stateCall(false);
 }
 

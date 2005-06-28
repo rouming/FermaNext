@@ -16,6 +16,7 @@ public:
     // Some state manager exceptions
     class UndoException {};
     class RedoException {};
+    class StateBlockIsNotEnded {};
     class UnknownException {};
 
 protected:
@@ -77,8 +78,10 @@ public:
     virtual void saveState ( ObjectState* ) throw (UnknownException);
 
     // Manages the undo/redo cookery
-    virtual void undo () throw (UnknownException, UndoException);
-    virtual void redo () throw (UnknownException, RedoException);
+    virtual void undo () throw (UnknownException, UndoException, 
+                                StateBlockIsNotEnded);
+    virtual void redo () throw (UnknownException, RedoException,
+                                StateBlockIsNotEnded);
 
     // Returns number of states in all blocks
     virtual size_t countStates ();
@@ -99,6 +102,12 @@ protected:
     // Sets state call flag
     void stateCall ( bool );
 
+signals:
+    void beforeUndo ( ObjectStateManager& );
+    void afterUndo ( ObjectStateManager& );
+    void beforeRedo ( ObjectStateManager& );
+    void afterRedo ( ObjectStateManager& );    
+
 private:
     typedef std::vector<StateBlock*> BlockList;
     typedef BlockList::iterator BlockListIter;
@@ -106,6 +115,7 @@ private:
     BlockList stateBlocks;
     StateBlock* currentBlock;
     size_t possibleStackSize;
+    size_t startedBlocks;
     bool currentBlockIsEnded;
     bool isStateCallFlag;
 };
