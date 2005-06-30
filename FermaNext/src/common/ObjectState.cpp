@@ -7,7 +7,8 @@
  *****************************************************************************/
 
 ObjectState::ObjectState ( StatefulObject* stObj ) :
-    statefulObject(stObj)
+    statefulObject(stObj),
+    isDisabledFlag(false)
 {}
 
 ObjectState::~ObjectState ()
@@ -17,6 +18,16 @@ ObjectState::~ObjectState ()
     for ( ; iter != actions.end(); ++iter )
         delete *iter;    
     actions.clear();
+}
+
+bool ObjectState::isDisabled ()
+{
+    return isDisabledFlag;
+}
+
+void ObjectState::disable ()
+{
+    isDisabledFlag = true;
 }
 
 void ObjectState::addAction ( AbstractObjectAction* action )

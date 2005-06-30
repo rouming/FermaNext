@@ -13,9 +13,19 @@ ObjectStateManager::StateBlock::~StateBlock ()
     clear();
 }
 
-void ObjectStateManager::StateBlock::addState ( ObjectState& st )
+void ObjectStateManager::StateBlock::addState ( ObjectState& state )
 {
-    states.push_back(&st);
+    states.push_back(&state);
+}
+
+bool ObjectStateManager::StateBlock::removeState ( ObjectState& state )
+{
+    StateListIter iter = std::find( states.begin(), states.end(), &state );
+    if ( iter == states.end() )
+        return false;    
+    (*iter)->disable();
+    states.erase(iter);
+    return true;
 }
 
 bool ObjectStateManager::StateBlock::contains ( ObjectState& st )
@@ -52,6 +62,9 @@ void ObjectStateManager::StateBlock::redo ()
 
 void ObjectStateManager::StateBlock::clear ()
 {
+    StateListIter iter = states.begin();
+    for ( ; iter != states.end(); ++iter )
+        (*iter)->disable();
     states.clear();
 }
 
@@ -140,13 +153,16 @@ bool ObjectStateManager::removeBlockByState (  ObjectState& st )
     BlockListIter iter = std::find( stateBlocks.begin(), 
                                     stateBlocks.end(), 
                                     block );
-    if ( iter == stateBlocks.end() )
+    if ( iter == stateBlocks.end() ) {
         // Unreachable line, or is not thread-safe
         //throw IsNotThreadSafe();
         return false;
+    }
+
+    block->removeState(st);
 
     // Remove block
-    stateBlocks.erase(iter);
+    stateBlocks.erase(iter);    
     delete block;
 
     return true;
@@ -207,7 +223,7 @@ bool ObjectStateManager::tryToShiftStack ()
     return true;
 }
 
-void ObjectStateManager::saveState ( ObjectState& st ) throw (UnknownException)
+void ObjectStateManager::saveState ( ObjectState& st )
 {
     if ( currentBlock != 0 ) {
         bool noStartedBlock = !currentBlock->isEmpty() && currentBlockIsEnded;

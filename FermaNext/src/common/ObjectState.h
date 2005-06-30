@@ -35,6 +35,12 @@ public:
 
     // Returns the stateful object which manages this state
     virtual StatefulObject* getStatefulObject ();
+
+    // Disables the state for correct memory dealocation: 
+    // StatefulObject destroys all states which have been disabled.
+    virtual void disable ();
+    // Just returns true if the state is disabled or false -- otherwise
+    virtual bool isDisabled ();
     
 signals:
     void onStateDestroy ( ObjectState& );
@@ -50,6 +56,7 @@ private:
     
     ActionList actions;
     StatefulObject* statefulObject;
+    bool isDisabledFlag;
 };
 
 #endif //OBJECTSTATE_H

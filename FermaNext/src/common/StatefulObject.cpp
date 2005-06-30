@@ -16,10 +16,29 @@ StatefulObject::StatefulObject ( ObjectStateManager* mng ) :
 
 StatefulObject::~StatefulObject ()
 {
+    clear();  
+}
+
+void StatefulObject::removeDisabledStates ()
+{
     StateListIter iter = states.begin();
-    for ( ; iter != states.end(); ++iter )        
+    while ( iter != states.end() ) {
+        ObjectState* state = *iter;
+        if ( state->isDisabled() ) {
+            delete state;
+            states.erase(iter);
+        }
+        else 
+            ++iter;
+    }
+}
+
+void StatefulObject::clear ()
+{
+    StateListIter iter = states.begin();
+    for ( ; iter != states.end(); ++iter )
         delete *iter;
-    states.clear();        
+    states.clear();
 }
 
 ObjectStateManager* StatefulObject::getStateManager ()
@@ -30,10 +49,15 @@ ObjectStateManager* StatefulObject::getStateManager ()
 void StatefulObject::stateManagerDestroyed ()
 {
     stateManager = 0;
+    // Removes states
+    clear();
 }
 
 ObjectState& StatefulObject::createState ()
 {
+    // Remove already disabled states
+    removeDisabledStates();
+    // Create new one
     ObjectState* state = new ObjectState(this);
     states.push_back(state);
     return *state;
@@ -41,14 +65,12 @@ ObjectState& StatefulObject::createState ()
 
 bool StatefulObject::removeState ( ObjectState& state )
 {
-    StateListIter iter = states.begin();
-    for ( ; iter != states.end(); ++iter )
-        if ( *iter == &state ) {
-            delete *iter;
-            states.erase(iter);
-            return true;
-        }
-    return false;
+    StateListIter iter = std::find( states.begin(), states.end(), &state );
+    if ( iter == states.end() )
+        return false;    
+    delete *iter;
+    states.erase(iter);
+    return true;
 }
 
 size_t StatefulObject::countStates ()

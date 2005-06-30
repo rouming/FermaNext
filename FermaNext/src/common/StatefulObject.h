@@ -23,6 +23,7 @@ public:
 
     // Manages states.
     virtual ObjectState& createState ();
+    virtual bool removeState ( ObjectState& );
 
     virtual size_t countStates ();
 
@@ -33,9 +34,11 @@ public:
     // Checks if it is alive
     virtual bool isAlive ();
 
-public slots:
-    // Manages states.
-    virtual bool removeState ( ObjectState& );
+protected:
+    // Frees all allocated states
+    virtual void clear ();
+    // Frees only disabled states
+    virtual void removeDisabledStates ();
 
 protected slots:
     // Marks manager as destroyed

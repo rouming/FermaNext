@@ -25,8 +25,9 @@ protected:
     public:
         ~StateBlock ();
         
-        // Adds the state to vector
+        // Manage states
         void addState ( ObjectState& );
+        bool removeState ( ObjectState& );
         // Checks if vector contains state
         bool contains ( ObjectState& );
         bool isEmpty ();
@@ -75,7 +76,7 @@ public:
 
     // Saves object state. If startStateBlock was called first, state
     // saves in this block.
-    virtual void saveState ( ObjectState& ) throw (UnknownException);
+    virtual void saveState ( ObjectState& );
 
     // Manages the undo/redo cookery
     virtual void undo () throw (UnknownException, UndoException, 
