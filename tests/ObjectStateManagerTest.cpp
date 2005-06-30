@@ -48,8 +48,9 @@ private:
 
 
 void start_end_state_block_test ()
-{
-    ObjectStateManager m;
+{    
+    ObjectStateManager* mng = new ObjectStateManager;
+    ObjectStateManager& m = *mng;
     StatefulObject o(&m);
     ObjectState& st = o.createState();
     
@@ -98,6 +99,10 @@ void start_end_state_block_test ()
     m.saveState(st);
     my_assert( m.countStates() == 5, "Should be 5 states" );
     m.endStateBlock();    
+
+    delete mng;
+    
+    my_assert( o.getStateManager() == 0, "State manager should be NULL" );
 }
 
 
@@ -110,7 +115,7 @@ int main ()
     start_end_state_block_test();
 
     ObjectStateManager m;
-   
+
     {// Scope
 
         SomeObject obj(666, m);
@@ -221,7 +226,7 @@ int main ()
     my_assert( m.countBlocks() == 0, "Block vector should be empty" );
 
 
-		std::cout << "\n" << "Passed: " << PASSED << "\nFailed: " << FAILED << "\n";
+    std::cout << "\n" << "Passed: " << PASSED << "\nFailed: " << FAILED << "\n";
     return 0;    
 }
 
