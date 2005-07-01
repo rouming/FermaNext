@@ -130,9 +130,9 @@ void TrussUnitDesignerWidget::moveTrussNode ( int x, int y, TrussUnitWindow* win
     // TODO: flipY comparison
     double scaleMultX = window->getScaleMultiplierX ();
     double scaleMultY = window->getScaleMultiplierY ();
-    int newX = ( x - window->getWindowLeftTopPos ().x() - leftWindowIndent ) / scaleMultX;
-    int newY = ( window->getWindowSize().height() - y + 
-                window->getWindowLeftTopPos ().y() - bottomWindowIndent ) / scaleMultY;
+    int newX = int(( x - window->getWindowLeftTopPos ().x() - leftWindowIndent ) / scaleMultX);
+    int newY = int(( window->getWindowSize().height() - y + 
+                window->getWindowLeftTopPos ().y() - bottomWindowIndent ) / scaleMultY);
 
     int areaWidth = window->getTrussAreaSize().width();
     int areaHeight = window->getTrussAreaSize().height();
@@ -163,10 +163,10 @@ void TrussUnitDesignerWidget::moveTrussPivot ( int dx, int dy, TrussUnitWindow* 
     QPoint oldFirstCoord ( oldXFirst, oldYFirst );
     QPoint oldLastCoord ( oldXLast, oldYLast );
 
-    int newXFirst = ( oldXFirst + dx / scaleMultX );
-    int newYFirst = ( oldYFirst - dy / scaleMultY );
-    int newXLast = ( oldXLast + dx / scaleMultX );
-    int newYLast = ( oldYLast - dy / scaleMultY );
+    int newXFirst = int( oldXFirst + dx / scaleMultX );
+    int newYFirst = int( oldYFirst - dy / scaleMultY );
+    int newXLast = int( oldXLast + dx / scaleMultX );
+    int newYLast = int( oldYLast - dy / scaleMultY );
 
     int areaWidth = window->getTrussAreaSize().width();
     int areaHeight = window->getTrussAreaSize().height();
