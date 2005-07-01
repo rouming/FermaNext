@@ -80,7 +80,7 @@ public:
         clear();
     }
 
-    virtual N* findNode ( QPoint point ) const
+    virtual N* findNodeByCoord ( QPoint point )
     {        
         NodeListConstIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
@@ -109,8 +109,8 @@ public:
 
     virtual P& createPivot ( QPoint p1 , QPoint p2 )
     {
-        N* first = findNode( p1 );
-        N* last = findNode( p2 );
+        N* first = findNodeByCoord ( p1 );
+        N* last = findNodeByCoord ( p2 );
         if ( first == 0 )  
             first = &createNode( p1.x(), p1.y() );            
         

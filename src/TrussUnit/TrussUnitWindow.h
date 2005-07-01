@@ -32,6 +32,7 @@ public:
     QPoint getWindowRightBottomPos () const;
     QPoint getTrussAreaLeftTopPos () const;
     QPoint getTrussAreaRightBottomPos () const;
+    const QSize& getWindowSize () const;
     rbuf_dynarow* getRBufDynarow ();
     double getScaleMultiplierX () const;
     double getScaleMultiplierY () const;
@@ -45,8 +46,8 @@ public:
     bool inFDiagResizeRect ( int x, int y );
     bool inNodeRadius ( int x, int y );
     bool isPivotSelected ( int x, int y );
-    TrussNode* findNodeByCoord ( int x, int y );
-    TrussPivot* findPivotByCoord ( int x, int y );
+    TrussNode* findNodeByWidgetPos ( int x, int y );
+    TrussPivot* findPivotByWidgetPos ( int x, int y );
 
     color_type getCanvasColor () const;
 	color_type getHeadlineFirstColor () const;

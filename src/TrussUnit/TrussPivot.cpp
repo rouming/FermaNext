@@ -60,7 +60,8 @@ void TrussPivot::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleM
     p2.setY ( flipY ? int(( trussAreaHeight - p2.y() ) * scaleMultY) + topWindowIndent :
              int(p2.y() * scaleMultY) + topWindowIndent );
     if ( isHighlighted () )
-        drawLine ( ras, solidRend, sl, p1, p2, pivotsWidth + 5, agg::rgba(200, 135, 15, 0.45) ); 
+        drawLine ( ras, solidRend, sl, p1, p2, pivotsWidth + 5, 
+                  agg::rgba(200, 135, 15, 0.45) );
     drawLine ( ras, solidRend, sl, p1, p2, pivotsWidth, agg::rgba(0, 0, 0) ); 
 }
 
