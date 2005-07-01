@@ -91,6 +91,11 @@ QPoint TrussUnitWindow::getTrussAreaRightBottomPos () const
     return point;
 }
 
+const QSize& TrussUnitWindow::getWindowSize () const
+{
+    return windowSize;
+}
+
 rbuf_dynarow* TrussUnitWindow::getRBufDynarow ()
 {
     return rbuf;
@@ -214,7 +219,7 @@ bool TrussUnitWindow::inFDiagResizeRect ( int x, int y )
 
 bool TrussUnitWindow::inNodeRadius ( int x, int y )
 {
-    TrussNode* node = findNodeByCoord ( x , y );
+    TrussNode* node = findNodeByWidgetPos ( x , y );
     if ( node )
         return true;
     return false;
@@ -222,13 +227,13 @@ bool TrussUnitWindow::inNodeRadius ( int x, int y )
 
 bool TrussUnitWindow::isPivotSelected ( int x, int y )
 {
-    TrussPivot* pivot = findPivotByCoord ( x, y );
+    TrussPivot* pivot = findPivotByWidgetPos ( x, y );
     if ( pivot )
         return true;
     return false;
 }
 
-TrussNode* TrussUnitWindow::findNodeByCoord ( int x, int y )
+TrussNode* TrussUnitWindow::findNodeByWidgetPos ( int x, int y )
 {
     QPoint point;
     TrussUnit::NodeList nodeList = getNodeList ();
@@ -248,7 +253,7 @@ TrussNode* TrussUnitWindow::findNodeByCoord ( int x, int y )
     return 0;
 }
 
-TrussPivot* TrussUnitWindow::findPivotByCoord ( int x, int y )
+TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y )
 {
     QPoint p1, p2;
     PivotList pivotList = getPivotList ();
@@ -320,15 +325,23 @@ void TrussUnitWindow::setWindowPosition ( QPoint pos )
 
 void TrussUnitWindow::setNodeHighlight ( int x, int y )
 {
-    TrussNode* node = findNodeByCoord ( x , y );
+    TrussNode* node = findNodeByWidgetPos ( x , y );
     node->setHighlighted ( true );
     setRenderingStatus ( false );
 }
 
 void TrussUnitWindow::setPivotHighlight ( int x, int y )
 {
-    TrussPivot* pivot = findPivotByCoord ( x , y );
+    TrussPivot* pivot = findPivotByWidgetPos ( x , y );
     pivot->setHighlighted ( true );
+    QPoint firstCoord ( pivot->getFirstNode().getX(), 
+                   pivot->getFirstNode().getY() );
+    QPoint lastCoord ( pivot->getLastNode().getX(), 
+                   pivot->getLastNode().getY() );
+    TrussNode* firstNode = findNodeByCoord ( firstCoord );
+    TrussNode* lastNode = findNodeByCoord ( lastCoord );
+    firstNode->setHighlighted ( true );
+    lastNode->setHighlighted ( true );
     setRenderingStatus ( false );
 }
 
@@ -357,6 +370,14 @@ void TrussUnitWindow::removePivotHighlight ()
         if ( pivot->isHighlighted () )
         {
             pivot->setHighlighted ( false );
+            QPoint firstCoord ( pivot->getFirstNode().getX(), 
+                               pivot->getFirstNode().getY() );
+            QPoint lastCoord ( pivot->getLastNode().getX(), 
+                              pivot->getLastNode().getY() );
+            TrussNode* firstNode = findNodeByCoord ( firstCoord );
+            TrussNode* lastNode = findNodeByCoord ( lastCoord );
+            firstNode->setHighlighted ( false );
+            lastNode->setHighlighted ( false );
             setRenderingStatus ( false );
         }
     }
