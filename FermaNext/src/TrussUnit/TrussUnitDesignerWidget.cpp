@@ -149,12 +149,22 @@ void TrussUnitDesignerWidget::moveTrussNode ( int x, int y, TrussUnitWindow* win
     node->setY ( newY );
 }
 
-void TrussUnitDesignerWidget::moveTrussPivot ( int dx, int dy, TrussUnitWindow* window, 
+void TrussUnitDesignerWidget::moveTrussPivot ( int x, int y, TrussUnitWindow* window, 
                                         TrussPivot* pivot )
 {
     // TODO: flipY comparison
     double scaleMultX = window->getScaleMultiplierX ();
     double scaleMultY = window->getScaleMultiplierY ();
+    int newXFirst = int( ( x - window->getWindowLeftTopPos ().x() - 
+                         leftWindowIndent ) / scaleMultX )  + dxFirst;
+    int newXLast = int( ( x - window->getWindowLeftTopPos ().x() - 
+                         leftWindowIndent ) / scaleMultX ) + dxLast;
+    int newYFirst = int( ( window->getWindowSize().height() - y + 
+                          window->getWindowLeftTopPos ().y() - bottomWindowIndent ) / 
+                          scaleMultY ) + dyFirst;
+    int newYLast = int( ( window->getWindowSize().height() - y + 
+                         window->getWindowLeftTopPos ().y() - bottomWindowIndent ) / 
+                         scaleMultY ) + dyLast;
 
     int oldXFirst = pivot->getFirstNode().getX();
     int oldYFirst = pivot->getFirstNode().getY();
@@ -162,11 +172,6 @@ void TrussUnitDesignerWidget::moveTrussPivot ( int dx, int dy, TrussUnitWindow* 
     int oldYLast = pivot->getLastNode().getY();
     QPoint oldFirstCoord ( oldXFirst, oldYFirst );
     QPoint oldLastCoord ( oldXLast, oldYLast );
-
-    int newXFirst = int( oldXFirst + dx / scaleMultX );
-    int newYFirst = int( oldYFirst - dy / scaleMultY );
-    int newXLast = int( oldXLast + dx / scaleMultX );
-    int newYLast = int( oldYLast - dy / scaleMultY );
 
     int areaWidth = window->getTrussAreaSize().width();
     int areaHeight = window->getTrussAreaSize().height();
@@ -440,13 +445,13 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
 	}
 	if ( pivotBehaviour == onPivotDrag )
 	{
-	    int dx = x - clickX;
-	    int dy = y - clickY;
-        moveTrussPivot ( dx, dy , trussWindow, trussPivot );
+//	    int dx = x - clickX;
+//	    int dy = y - clickY;
+        moveTrussPivot ( x, y, trussWindow, trussPivot );
         trussWindow->setRenderingStatus ( false );
         update();
-        clickX += dx;
-        clickY += dy;
+//        clickX += dx;
+//        clickY += dy;
         return;
 	}
     trussWindow = findTrussUnitWindowByCoord ( x, y );
@@ -543,9 +548,23 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
             trussNode = trussWindow->findNodeByWidgetPos ( clickX, clickY );
             nodeBehaviour = onNodeDrag;
         }
+        // TODO: flipY comparison
         if ( trussWindow->isPivotSelected ( clickX, clickY ) )
         {
             trussPivot = trussWindow->findPivotByWidgetPos ( clickX, clickY );
+
+            double scaleMultX = trussWindow->getScaleMultiplierX ();
+            double scaleMultY = trussWindow->getScaleMultiplierY ();
+            int absX = int( ( clickX - trussWindow->getWindowLeftTopPos ().x() - 
+                             leftWindowIndent ) / scaleMultX );
+            int absY = int( ( trussWindow->getWindowSize().height() - clickY + 
+                             trussWindow->getWindowLeftTopPos ().y() - 
+                             bottomWindowIndent ) / scaleMultY );
+
+            dxFirst = trussPivot->getFirstNode().getX() - absX;
+            dxLast = trussPivot->getLastNode().getX() - absX;
+            dyFirst = trussPivot->getFirstNode().getY() - absY;
+            dyLast = trussPivot->getLastNode().getY() - absY;
             pivotBehaviour = onPivotDrag;
         }
         redrawTrussWindows ();

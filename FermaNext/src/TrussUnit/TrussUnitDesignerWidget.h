@@ -59,7 +59,7 @@ private:
     TrussWindowBehaviour winBehaviour;
     TrussNodeBehaviour nodeBehaviour;
     TrussPivotBehaviour pivotBehaviour;
-    int clickX, clickY;
+    int clickX, clickY, dxFirst, dxLast, dyFirst, dyLast;
 };
 
 #endif //TRUSSDESIGNERWIDGET_H
