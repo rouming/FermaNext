@@ -34,7 +34,7 @@ public:
     virtual void save ();
 
     // Returns the stateful object which manages this state
-    virtual StatefulObject* getStatefulObject ();
+    virtual StatefulObject* getStatefulObject () const;
 
     // Disables the state for correct memory dealocation: 
     // StatefulObject destroys all states which have been disabled.

@@ -300,7 +300,7 @@ void ObjectStateManager::redo () throw (UnknownException, RedoException,
 {
     // Nothing to undo
     if ( countBlocks() == 0 ) 
-        throw UndoException();
+        throw RedoException();
 
     // Can't redo if block is not ended
     if ( !currentBlockIsEnded ) 
