@@ -212,7 +212,7 @@ bool ObjectStateManager::tryToShiftStack ()
 
     // Should we shift?
     size_t statesNum = countStates();
-    if ( statesNum <= possibleStackSize )
+    if ( statesNum < possibleStackSize )
         return false;
 
     // Remove first block

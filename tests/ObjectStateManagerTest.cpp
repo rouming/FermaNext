@@ -49,11 +49,12 @@ private:
 
 void start_end_state_block_test ()
 {    
+    std::cout << std::endl << ">>>> start_end_state_block_test" << std::endl;
+
     ObjectStateManager* mng = new ObjectStateManager;
     ObjectStateManager& m = *mng;
     StatefulObject o(&m);
-    ObjectState& st = o.createState();
-    
+
     my_assert( m.countBlocks() == 0, "After init m.countBlocks() == 0" );
 
     m.startStateBlock();
@@ -65,6 +66,7 @@ void start_end_state_block_test ()
     m.startStateBlock();
     my_assert(m.countBlocks() == 1, "m.startStateBlock(): should be 1 block");
 
+    ObjectState& st = o.createState();
     m.saveState(st);
     my_assert(m.countStates() == 1, "m.countStates(): should be 1 state");
     m.endStateBlock();
@@ -72,10 +74,12 @@ void start_end_state_block_test ()
     // New block
     m.startStateBlock();
     my_assert( m.countBlocks() == 2, "m.endStateBlock(): should be 2 block");
+    st = o.createState();
     m.saveState(st);
     // Doesn't create new block because previous one is not closed
     m.startStateBlock();
     my_assert( m.countBlocks() == 2, "Should be 2 blocks" );
+    st = o.createState();
     m.saveState(st);
     my_assert( m.countStates() == 3, "Should be 3 states" );
 
@@ -85,6 +89,7 @@ void start_end_state_block_test ()
     // Checks that outer block is not closed
     m.startStateBlock();
     my_assert( m.countBlocks() == 2, "Should be 2 again blocks" );
+    st = o.createState();
     m.saveState(st);
     my_assert( m.countStates() == 4, "Should be 4 states" );
     m.endStateBlock();
@@ -96,6 +101,7 @@ void start_end_state_block_test ()
     // New third block
     m.startStateBlock();
     my_assert( m.countBlocks() == 3, "Should be 3 blocks" );
+    st = o.createState();
     m.saveState(st);
     my_assert( m.countStates() == 5, "Should be 5 states" );
     m.endStateBlock();    
@@ -103,6 +109,52 @@ void start_end_state_block_test ()
     delete mng;
     
     my_assert( o.getStateManager() == 0, "State manager should be NULL" );
+
+    std::cout << std::endl;
+}
+
+
+void stack_shifting_test ()
+{
+    std::cout << std::endl << ">>>> stack_shifting_test" << std::endl;
+
+    ObjectStateManager m;
+    SomeObject obj(666, m);
+
+    const size_t STACK_SIZE = 256;
+    size_t i = 0;
+
+    // Fill all stack by states 
+    for ( i = 1; i <= STACK_SIZE; ++i ) 
+        obj.value(i);
+
+    // Some more (+ quarter)
+    for ( i = 1; i <= STACK_SIZE/4; ++i ) 
+        obj.value(i);
+
+    // Full undo
+    for ( i = 1; i <= STACK_SIZE; ++i ) 
+        m.undo();
+
+    // Full redo and check
+    int ii = 0;
+    bool shifting_res = true;
+    for ( i = 0; i < STACK_SIZE; ++i ) {
+        int val = obj.value();
+        bool res;
+        if ( i <= STACK_SIZE/4 * 3 )
+            res = (val == STACK_SIZE/4 + i );
+        else 
+            res = (val == ++ii);
+        if ( !res ) {
+            my_assert( false, "Shifting" );
+            shifting_res = res;
+        }
+        m.redo();
+    }
+    my_assert( shifting_res, "All shifting" );
+
+    std::cout << std::endl;
 }
 
 
@@ -117,6 +169,7 @@ int main ()
     ObjectStateManager m;
 
     {// Scope
+        std::cout << ">>>> main undo/redo test" << std::endl;
 
         SomeObject obj(666, m);
 
@@ -225,6 +278,8 @@ int main ()
     my_assert( m.countStates() == 0, "State vector should be empty" );
     my_assert( m.countBlocks() == 0, "Block vector should be empty" );
 
+
+    stack_shifting_test();
 
     std::cout << "\n" << "Passed: " << PASSED << "\nFailed: " << FAILED << "\n";
     return 0;    
