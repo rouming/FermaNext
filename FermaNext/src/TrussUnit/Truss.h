@@ -148,7 +148,7 @@ public:
     virtual P& createPivot ( N& first, N& last )
     {
         emit beforePivotCreation();
-        P* pivot = new P( first, last );        
+        P* pivot = new P( first, last, getStateManager() );        
         pivots.push_back(pivot);
         emit afterPivotCreation(pivot->getFirstNode(), 
                                 pivot->getLastNode());
@@ -221,13 +221,17 @@ private:
 
 
 template <class N> 
-class Pivot
+class Pivot : public StatefulObject
 {
     friend class Truss<class N_, class P_>;
 
 protected:
-    Pivot () : first(0), last(0) {}
-    Pivot ( N& first_, N& last_ ) :         
+    Pivot ( ObjectStateManager* mng ) : 
+        StatefulObject(mng),
+        first(0), last(0) 
+    {}
+    Pivot ( N& first_, N& last_, ObjectStateManager* mng ) :
+        StatefulObject(mng),
         first(&first_),
         last(&last_) 
     {}
@@ -235,9 +239,9 @@ protected:
     {}
 
 public:
-    virtual const N& getFirstNode () const
+    virtual N& getFirstNode () const
     { return *first; }
-    virtual const N& getLastNode () const
+    virtual N& getLastNode () const
     { return *last; }
 
 private:    

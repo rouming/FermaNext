@@ -5,11 +5,13 @@
  * Truss Pivot
  *****************************************************************************/
 
-TrussPivot::TrussPivot () 
+TrussPivot::TrussPivot ( ObjectStateManager* mng ) :
+    Pivot<TrussNode>(mng)
 {}
 
-TrussPivot::TrussPivot ( TrussNode& first, TrussNode& last ) :
-    Pivot<TrussNode>(first, last)
+TrussPivot::TrussPivot ( TrussNode& first, TrussNode& last,
+                         ObjectStateManager* mng) :
+    Pivot<TrussNode>(first, last, mng)
 {}
 
 struct line
