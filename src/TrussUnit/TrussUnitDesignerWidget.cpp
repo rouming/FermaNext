@@ -290,6 +290,32 @@ void TrussUnitDesignerWidget::savePivotStateAfterDrag ( QPoint firstPos, QPoint 
     if ( selectedPivot == 0 )
         return;
 
+    TrussNode& firstNode = selectedPivot->getFirstNode();
+    TrussNode& lastNode  = selectedPivot->getLastNode();    
+    
+    // State to save
+    ObjectState& state = selectedPivot->createState();
+    // Action to save
+    ConcreteObjectAction<TrussNode, QPoint>* action = 0;    
+
+    // First pos    
+    action = new ConcreteObjectAction<TrussNode, QPoint>( firstNode, 
+                                                          &TrussNode::setPoint,
+                                                          &TrussNode::setPoint,
+                                                          firstPos,
+                                                          beforeDragFirstPos);
+    state.addAction( action );
+
+    // Last pos
+    ObjectState& state2 = lastNode.createState();
+    action = new ConcreteObjectAction<TrussNode, QPoint>( lastNode, 
+                                                          &TrussNode::setPoint,
+                                                          &TrussNode::setPoint,
+                                                          lastPos,
+                                                          beforeDragLastPos);
+    state.addAction( action );
+
+    state.save();
 }
 
 /*****************************************************************************/

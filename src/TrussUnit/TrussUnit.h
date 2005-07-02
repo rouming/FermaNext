@@ -131,8 +131,8 @@ public:
 class TrussPivot : public Pivot<TrussNode>, public PaintableTrussElement
 {
 public:
-    TrussPivot ();
-    TrussPivot ( TrussNode&, TrussNode& );
+    TrussPivot ( ObjectStateManager* );
+    TrussPivot ( TrussNode&, TrussNode&, ObjectStateManager* );
 
     void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
                     agg::scanline_p8& sl, QPoint point1, QPoint point2,
