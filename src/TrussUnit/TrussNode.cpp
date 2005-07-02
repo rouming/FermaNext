@@ -5,15 +5,25 @@
  * Truss Node
  *****************************************************************************/
 
-TrussNode::TrussNode ()
+TrussNode::TrussNode ( ObjectStateManager* mng ) :
+    Node(mng)
+{}
+
+TrussNode::TrussNode ( int x, int y, ObjectStateManager* mng ) :
+    Node(x, y, mng)
+{}
+
+TrussNode::TrussNode ( int x, int y, Fixation fix, ObjectStateManager* mng ) :
+    Node(x, y, fix, mng)
 {}
 
 void TrussNode::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
                        int trussAreaHeight ) const
 {
-    int x = int(getX() * scaleMultX) + leftWindowIndent;
-    int y = flipY ? int(( trussAreaHeight - getY() ) * scaleMultY) + topWindowIndent :
-                    int(getY() * scaleMultY) + topWindowIndent;
+    QPoint pos = getPoint();
+    int x = int(pos.x() * scaleMultX) + leftWindowIndent;
+    int y = flipY ? int(( trussAreaHeight - pos.y() ) * scaleMultY) + topWindowIndent :
+                    int(pos.y() * scaleMultY) + topWindowIndent;
 
     solidRenderer solidRend ( baseRend );
 

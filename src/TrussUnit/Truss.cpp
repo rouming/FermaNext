@@ -3,24 +3,48 @@
 #include <algorithm>
 
 /*****************************************************************************
+ * Truss Emitter
+ *****************************************************************************/
+
+TrussEmitter::TrussEmitter ( ObjectStateManager* mng ) :
+    StatefulObject(mng)
+{}
+
+void TrussEmitter::stateIsChanged ()
+{
+    emit onStateChange();
+}
+
+/*****************************************************************************
  * Node
  *****************************************************************************/
 
-Node::Node () : 
-    x(0), y(0), fix(Unfixed)
+Node::Node ( ObjectStateManager* mng ) : 
+    StatefulObject(mng),
+    x(0), y(0), 
+    fix(Unfixed),
+    number(0)
 {}
 
-Node::Node ( int x_, int y_ ) :
-    x(x_), y(y_), fix(Unfixed)
+Node::Node ( int x_, int y_, ObjectStateManager* mng ) :
+    StatefulObject(mng),
+    x(x_), y(y_), 
+    fix(Unfixed),
+    number(0)
 {}
 
-Node::Node ( int x_, int y_, Fixation fix_ ) :
-    x(x_), y(y_), fix(fix_)
+Node::Node ( int x_, int y_, Fixation fix_, ObjectStateManager* mng ) :
+    StatefulObject(mng),
+    x(x_), y(y_), 
+    fix(fix_),
+    number(0)
 {}
 
-Node::Node ( const Node& n ) :
-    QObject(),
-    x(n.x), y(n.y), fix(n.fix)
+Node::Node ( int x_, int y_, Fixation fix_, int num_, ObjectStateManager* mng ) :
+    StatefulObject(mng),
+    x(x_), y(y_), 
+    fix(fix_),
+    number(num_)
 {}
 
 void Node::setFixation ( Node::Fixation fix_ )
@@ -36,28 +60,20 @@ Node::Fixation Node::getFixation () const
 
 void Node::setPoint ( QPoint p )
 {
-    x = p.x();
-    y = p.y();
-    emit onPositionChange(x, y);
+    setPoint(p.x(), p.y());
 }
 
-void Node::setX (int newX )
+void Node::setPoint ( int x_, int y_ )
 {
-    x = newX;
-    emit onPositionChange(x, y);
-}
-
-void Node::setY (int newY )
-{
-    y = newY;
-    emit onPositionChange(x, y);
+    x = x_;
+    y = y_;
+    emit onPositionChange(x, y);    
 }
 
 QPoint Node::getPoint () const
 {
     return QPoint(x, y);
 }
-
 
 int Node::getX () const
 {
@@ -67,6 +83,17 @@ int Node::getX () const
 int Node::getY () const
 {
     return y;
+}
+
+void Node::setNumber ( int num_ )
+{
+    number = num_;
+    emit onNumberChange(number);
+}
+
+int Node::getNumber () const
+{
+    return number;
 }
 
 /****************************************************************************/

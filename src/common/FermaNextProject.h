@@ -22,9 +22,10 @@ public:
     virtual void setName ( const QString& );
 
     virtual void activate ();    
-    //TODO: virtual ObjectStateManager& getStateManager ();
+    virtual ObjectStateManager& getStateManager ();
     virtual TrussUnitWindowManager& getTrussUnitWindowManager ();
     virtual QTabWidget& getProjectTab ();
+    virtual TrussUnitDesignerWindow& getDesignerWindow ();
 
 signals:
     void onNameChange ( const QString& );    
@@ -36,7 +37,7 @@ private:
 
 private:
     QString name;
-    //TODO: ObjectStateManager stateManager;
+    ObjectStateManager stateManager;
     TrussUnitWindowManager trussWindowManager;
     QTabWidget* projectTab;
     QWidget* justStrengthAnalisysWidget;

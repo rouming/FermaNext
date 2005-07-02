@@ -24,80 +24,85 @@ typedef agg::renderer_raster_htext_solid<ren_dynarow, glyph_gen>    textRenderer
 
 class TrussUnitWindow : public TrussUnit
 {
+    Q_OBJECT
 public:     
-    TrussUnitWindow ( const QString& name );
+    TrussUnitWindow ( const QString& name, ObjectStateManager* );
     virtual ~TrussUnitWindow ();
 
-    QPoint getWindowLeftTopPos () const;
-    QPoint getWindowRightBottomPos () const;
-    QPoint getTrussAreaLeftTopPos () const;
-    QPoint getTrussAreaRightBottomPos () const;
-    const QSize& getWindowSize () const;
-    rbuf_dynarow* getRBufDynarow ();
-    double getScaleMultiplierX () const;
-    double getScaleMultiplierY () const;
+    virtual QPoint getWindowLeftTopPos () const;
+    virtual QPoint getWindowRightBottomPos () const;
+    virtual QPoint getTrussAreaLeftTopPos () const;
+    virtual QPoint getTrussAreaRightBottomPos () const;
+    virtual const QSize& getWindowSize () const;    
+    virtual double getScaleMultiplierX () const;
+    virtual double getScaleMultiplierY () const;
 
-    bool inWindowRect ( int x, int y );
-    bool inCanvasRect ( int  x, int  y );
-    bool inHeadlineRect ( int  x, int  y );
-    bool inHorResizeRect ( int x, int y );
-    bool inVerResizeRect ( int x, int y );
-    bool inBDiagResizeRect ( int x, int y );
-    bool inFDiagResizeRect ( int x, int y );
-    bool inNodeRadius ( int x, int y );
-    bool isPivotSelected ( int x, int y );
-    TrussNode* findNodeByWidgetPos ( int x, int y );
-    TrussPivot* findPivotByWidgetPos ( int x, int y );
+    virtual bool inWindowRect ( int x, int y ) const;
+    virtual bool inCanvasRect ( int  x, int  y ) const;
+    virtual bool inHeadlineRect ( int  x, int  y ) const;
+    virtual bool inHorResizeRect ( int x, int y ) const;
+    virtual bool inVerResizeRect ( int x, int y ) const;
+    virtual bool inBDiagResizeRect ( int x, int y ) const;
+    virtual bool inFDiagResizeRect ( int x, int y ) const;
+    virtual bool inNodeRadius ( int x, int y ) const;
+    virtual bool isPivotSelected ( int x, int y ) const;
 
-    color_type getCanvasColor () const;
-	color_type getHeadlineFirstColor () const;
-    color_type getHeadlineMiddleColor () const;
-    color_type getHeadlineLastColor () const;
-	color_type getBorderColor () const;
+    virtual TrussNode* findNodeByWidgetPos ( int x, int y ) const;
+    virtual TrussPivot* findPivotByWidgetPos ( int x, int y ) const;
 
-    void setWindowSize ( int w, int h );
-    void setWindowPosition ( QPoint pos );    
-    void setRenderingStatus ( bool status );
-    void setNodeHighlight ( int x, int y );
-    void setPivotHighlight ( int x, int y );
-    void removeNodeHighlight ();
-    void removePivotHighlight ();
+    virtual color_type getCanvasColor () const;
+	virtual color_type getHeadlineFirstColor () const;
+    virtual color_type getHeadlineMiddleColor () const;
+    virtual color_type getHeadlineLastColor () const;
+	virtual color_type getBorderColor () const;
 
-    void setCanvasColor ( int r, int g, int b );
-    void setHeadlineFirstColor ( int r, int g, int b );
-    void setHeadlineMiddleColor ( int r, int g, int b );
-    void setHeadlineLastColor ( int r, int g, int b );
-    void setBorderColor ( int r, int g, int b );
-    void setResEllColor ( int r, int g, int b );
+    virtual void setWindowSize ( int w, int h );
+    virtual void setWindowPosition ( QPoint pos );
+    virtual void setNodeHighlight ( int x, int y );
+    virtual void setPivotHighlight ( int x, int y );
+    virtual void removeNodeHighlight ();
+    virtual void removePivotHighlight ();
 
-    void drawText ( ren_dynarow& baseRend, textRenderer& textRend,
-                    const QString& str, color_type c, 
-                    QPoint point ) const;
-    void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                    agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const;
-    void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                     agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const;
-    void drawOutlineRoundedRect ( solidRenderer& solidRend, 
-                                  scanline_rasterizer& ras,
-                                  agg::scanline_p8& sl, 
-                                  QPoint point1, QPoint point2, 
-                                  int cornerRadius,
-                                  color_type color) const;
-    void drawTrussArea ( ren_dynarow& baseRend, scanline_rasterizer& ras,
-                         textRenderer& textRend, solidRenderer& solidRend, 
-                         agg::scanline_p8& sl ) const;
-    void drawHeadline ( ren_dynarow& baseRend, solidRenderer& solidRend,
-                        scanline_rasterizer& ras, agg::scanline_p8& sl, 
-                        gradient_span_alloc& gradSpan, linear_gradient& gradFunc, 
-                        color_array_type& gradColors, agg::trans_affine& mtx ) const;
-    void paint ( base_renderer& baseRend ) const;
+    virtual void setCanvasColor ( int r, int g, int b );
+    virtual void setHeadlineFirstColor ( int r, int g, int b );
+    virtual void setHeadlineMiddleColor ( int r, int g, int b );
+    virtual void setHeadlineLastColor ( int r, int g, int b );
+    virtual void setBorderColor ( int r, int g, int b );
+    virtual void setResEllColor ( int r, int g, int b );
+
+    virtual void resize ( QPoint leftTop, QPoint rightBottom );
+
+    virtual void drawText ( ren_dynarow& baseRend, textRenderer& textRend,
+                            const QString& str, color_type c, QPoint point ) const;
+    virtual void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
+                            agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const;
+    virtual void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
+                             agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const;
+    virtual void drawOutlineRoundedRect ( solidRenderer& solidRend, 
+                                         scanline_rasterizer& ras,
+                                         agg::scanline_p8& sl, 
+                                         QPoint point1, QPoint point2, 
+                                         int cornerRadius,
+                                         color_type color) const;
+    virtual void drawTrussArea ( ren_dynarow& baseRend, scanline_rasterizer& ras,
+                                 textRenderer& textRend, solidRenderer& solidRend, 
+                                 agg::scanline_p8& sl ) const;
+    virtual void drawHeadline ( ren_dynarow& baseRend, solidRenderer& solidRend,
+                                scanline_rasterizer& ras, agg::scanline_p8& sl, 
+                                gradient_span_alloc& gradSpan, linear_gradient& gradFunc, 
+                                color_array_type& gradColors, agg::trans_affine& mtx ) const;
+    virtual void paint ( base_renderer& baseRend ) const;
+
+signals:
+    void onResize ( QSize oldS, QSize newS );
+    void onMove ( QPoint oldP, QPoint newP );
+
 private:
     rbuf_dynarow* rbuf;
     QPoint windowLeftTopPos, windowRightBottomPos;
     QSize windowSize;
     color_type canvColor, headFirstColor, headMiddleColor, headLastColor, 
-               borderColor, resEllColor;
-    mutable bool isRendered;
+               borderColor, resEllColor;    
 };
 
 #endif //TRUSSUNITWINDOW_H

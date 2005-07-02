@@ -22,7 +22,7 @@
 #include <qlabel.h>
 #include <qpushbutton.h>
 #include <qinputdialog.h> 
-#include <qworkspace.h>
+#include <qmessagebox.h>
 
 const QString mainFrameCaption( QObject::tr( "Educational CAD System 'Ferma'" ) );
 
@@ -65,7 +65,7 @@ void FermaNextMainFrame::init ()
     dw->setCloseMode( QDockWindow::Always );
 
     FermaNextWorkspace& ws = FermaNextWorkspace::workspace();
-    QToolBox* projectToolBox = new ProjectToolBox( ws, dw );
+    projectToolBox = new ProjectToolBox( ws, dw );
     connect( &ws, SIGNAL(onProjectRemove(FermaNextProject&)), SLOT(someProjectRemoved()) );
     connect( &ws, SIGNAL(onProjectCreate(FermaNextProject&)), SLOT(someProjectCreated()) );
     dw->setWidget( projectToolBox );
@@ -389,12 +389,36 @@ void FermaNextMainFrame::fileExit ()
 
 void FermaNextMainFrame::editUndo ()
 {
-    qWarning("Not implmented yet!");
+    FermaNextProject* prj = projectToolBox->currentProject();
+    if ( prj == 0 )
+        return;
+    
+    try {
+        prj->getStateManager().undo();
+        prj->getDesignerWindow().getDesignerWidget().update();        
+    } 
+    catch ( ObjectStateManager::UndoException& )
+    {
+        QMessageBox::information( this, tr("Can't undo"),
+                                        tr("Nothing to undo") );
+    }
 }
 
 void FermaNextMainFrame::editRedo ()
 {
-    qWarning("Not implmented yet!");
+    FermaNextProject* prj = projectToolBox->currentProject();
+    if ( prj == 0 )
+        return;
+    
+    try {
+        prj->getStateManager().redo();
+        prj->getDesignerWindow().getDesignerWidget().update();
+    } 
+    catch ( ObjectStateManager::RedoException& )
+    {
+        QMessageBox::information( this, tr("Can't redo"), 
+                                        tr("Nothing to redo") );                                   
+    }
 }
 
 void FermaNextMainFrame::editCopy ()

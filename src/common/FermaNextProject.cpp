@@ -11,6 +11,8 @@
  *****************************************************************************/
 FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack ) :
     name(name_),
+    stateManager(),
+    trussWindowManager(&stateManager),
     projectTab( new QTabWidget(stack) )
 {    
     justStrengthAnalisysWidget = new QWidget(projectTab);
@@ -57,12 +59,12 @@ void FermaNextProject::setName ( const QString& name_ )
     name = name_;
     emit onNameChange(name);
 }
-/* TODO
+
 ObjectStateManager& FermaNextProject::getStateManager ()
 {
     return stateManager;
 }
-*/
+
 TrussUnitWindowManager& FermaNextProject::getTrussUnitWindowManager ()
 {
     return trussWindowManager;
@@ -71,6 +73,11 @@ TrussUnitWindowManager& FermaNextProject::getTrussUnitWindowManager ()
 QTabWidget& FermaNextProject::getProjectTab ()
 {
     return *projectTab;
+}
+
+TrussUnitDesignerWindow& FermaNextProject::getDesignerWindow ()
+{
+    return *designerWindow;
 }
 
 /*****************************************************************************/
