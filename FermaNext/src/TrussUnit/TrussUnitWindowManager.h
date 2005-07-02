@@ -7,12 +7,13 @@
 #include <qfile.h>
 #include <qstring.h>
 
+#include "StatefulObject.h"
 #include "TrussUnitWindow.h"
 
 typedef std::vector<TrussUnitWindow*>  WindowList;
 typedef std::vector<TrussUnitWindow*>::iterator  WindowListIter;
 
-class TrussUnitWindowManager : public QObject
+class TrussUnitWindowManager : public StatefulObject
 {
     Q_OBJECT
 public:
@@ -21,6 +22,7 @@ public:
     class WriteFileException {};
     class WrongFormatException {};
 
+    TrussUnitWindowManager ( ObjectStateManager* );
     virtual ~TrussUnitWindowManager ();
 
 protected:

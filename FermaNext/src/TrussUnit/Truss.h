@@ -7,6 +7,8 @@
 #include <qobject.h>
 #include <qpoint.h>
 
+#include "StatefulObject.h"
+
 // Basic classes for truss unit construction. 
 template <class N, class P> class Truss;
 template <class N> class Pivot;
@@ -17,10 +19,19 @@ class Node;
 // All signals logic was moved to this classes 
 // because of Qt rejection to moc templates.
 
-class TrussEmitter : public QObject
+class TrussEmitter : public StatefulObject
 {
     Q_OBJECT
-signals: 
+public:
+     TrussEmitter ( ObjectStateManager* mng );
+
+protected slots:
+    void stateIsChanged ();
+
+signals:
+    // Truss signals
+    void onStateChange ();
+
     // Nodes signals
     void beforeNodeCreation ();
     void afterNodeCreation ( const Node& );
@@ -34,16 +45,9 @@ signals:
     void afterPivotRemoval ();
 };
 
-class PivotEmitter : public QObject
-{
-    Q_OBJECT
-signals: 
-    void onFirstNodeChange ( const Node& );
-    void onLastNodeChange ( const Node& );
-};
 
-
-template <class N, class P> class Truss : public TrussEmitter
+template <class N, class P> 
+class Truss : public TrussEmitter                                    
 {
 public:   
     // Truss exceptions
@@ -57,7 +61,9 @@ public:
     typedef typename NodeList::const_iterator NodeListConstIter;
     typedef typename PivotList::const_iterator PivotListConstIter;
 
-    Truss () {}
+    Truss ( ObjectStateManager* mng ) :
+        TrussEmitter(mng)
+    {}
 
     virtual void clear () 
     {
@@ -80,16 +86,15 @@ public:
         clear();
     }
 
-    virtual N* findNodeByCoord ( QPoint point )
+    virtual N* findNodeByCoord ( QPoint point ) const
     {        
         NodeListConstIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
         {
             N* node = *iter;
-            int x1 = node->getX ();
-            int y1 = node->getY ();
-            if ( ( (point.x() - x1) * (point.x() - x1) + 
-                   (point.y() - y1) * (point.y() - y1) ) <  
+            QPoint pos = node->getPoint();
+            if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
+                   (point.y() - pos.y()) * (point.y() - pos.y()) ) <  
                  4 * nodesRadius * nodesRadius )
                 return node;
         }
@@ -99,11 +104,19 @@ public:
     virtual N& createNode ( int x, int y )
     {
         emit beforeNodeCreation();
-        N* node = new N;
-        node->setX ( x );
-        node->setY ( y );
+        N* node = new N(getStateManager());
+        node->setPoint( x, y );
         nodes.push_back(node);
+
+        QObject::connect( node, SIGNAL(onFixationChange ( Fixation )),
+                                SLOT(stateIsChanged()) );
+        QObject::connect( node, SIGNAL(onPositionChange ( int, int )),
+                                SLOT(stateIsChanged()) );
+        QObject::connect( node, SIGNAL(onNumberChange ( int )),
+                                SLOT(stateIsChanged()) );
+
         emit afterNodeCreation(*node);
+        emit onStateChange();
         return *node;
     }
 
@@ -117,12 +130,7 @@ public:
         if ( last == 0 )        
             last = &createNode( p2.x(), p2.y() );
 
-        emit beforePivotCreation();
-        P* pivot = new P( *first, *last );        
-        pivots.push_back(pivot);
-        emit afterPivotCreation(pivot->getFirstNode(), 
-                                pivot->getLastNode());                               
-        return *pivot;
+        return createPivot( *first, *last );
     }
 
     virtual P& createPivot ( uint firstNodeIndex, uint lastNodeIndex ) 
@@ -130,16 +138,11 @@ public:
     {
         if ( lastNodeIndex >= nodes.size() || lastNodeIndex >= nodes.size() )
             throw NodeIndexOutOfBoundException();
+        
+        N* first = nodes.at(firstNodeIndex);
+        N* last  = nodes.at(lastNodeIndex);
 
-        emit beforePivotCreation();
-        N* firstNode = nodes.at(firstNodeIndex);
-        N* lastNode = nodes.at(lastNodeIndex);
-
-        P* pivot = new P( *firstNode, *lastNode );
-        pivots.push_back(pivot);
-        emit afterPivotCreation(pivot->getFirstNode(), 
-                                pivot->getLastNode());
-        return *pivot;
+        return createPivot( *first, *last );
     }
 
     virtual P& createPivot ( N& first, N& last )
@@ -149,6 +152,7 @@ public:
         pivots.push_back(pivot);
         emit afterPivotCreation(pivot->getFirstNode(), 
                                 pivot->getLastNode());
+        emit onStateChange();
         return *pivot;    
     }
 
@@ -194,6 +198,7 @@ protected:
         delete n;
         nodes.erase(iter);
         emit afterNodeRemoval();
+        emit onStateChange();
     }
 
     virtual void removePivot ( PivotListIter& iter )
@@ -205,6 +210,7 @@ protected:
         delete p;
         pivots.erase(iter);
         emit afterPivotRemoval();
+        emit onStateChange();
     }
 
 private:
@@ -214,7 +220,8 @@ private:
 
 
 
-template <class N> class Pivot : public PivotEmitter
+template <class N> 
+class Pivot
 {
     friend class Truss<class N_, class P_>;
 
@@ -239,7 +246,7 @@ private:
 
 
 
-class Node : public QObject
+class Node : public StatefulObject
 {
     Q_OBJECT
     friend class Truss<class N, class P>;
@@ -253,27 +260,31 @@ public:
 signals:
     void onFixationChange ( Fixation );
     void onPositionChange ( int, int );
+    void onNumberChange ( int );
 
 protected:
-    Node ();
-    Node ( int x, int y );
-    Node ( int x, int y, Fixation );
-    Node ( const Node& );
+    Node ( ObjectStateManager* mng );
+    Node ( int x, int y, ObjectStateManager* mng );
+    Node ( int x, int y, Fixation, ObjectStateManager* mng );
+    Node ( int x, int y, Fixation, int, ObjectStateManager* mng );
 
 public:
     virtual void setFixation ( Fixation );
     virtual Fixation getFixation () const;
     
     virtual void setPoint ( QPoint );
-    virtual void setX ( int newX );
-    virtual void setY ( int newY );
-
+    virtual void setPoint ( int x, int y );
+        
     virtual QPoint getPoint () const;
     virtual int getX () const;
     virtual int getY () const;
 
+    virtual void setNumber ( int );
+    virtual int getNumber () const;
+
 private:
     int x, y;
+    int number;
     Fixation fix;
 };
 

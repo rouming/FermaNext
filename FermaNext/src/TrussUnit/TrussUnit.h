@@ -4,6 +4,7 @@
 
 #include "Truss.h"
 #include "SubsidiaryConstants.h"
+
 #include <vector>
 #include <qstring.h>
 #include <qpoint.h> 
@@ -60,15 +61,22 @@ class PaintableTrussElement
 {    
 public:
     PaintableTrussElement ();
-    PaintableTrussElement ( bool h, bool v );
-    virtual void setVisible ( bool );
-    virtual void setHighlighted ( bool );
+    PaintableTrussElement ( bool h, bool v, bool r );
+
     virtual bool isVisible () const;
     virtual bool isHighlighted () const;
+    virtual bool isRendered () const;
+
+    virtual void setVisible ( bool );
+    virtual void setHighlighted ( bool );
+
+protected:
+    virtual void rendered ( bool ) const;
 
 private:
     bool visible;
-    bool highlighted; 
+    bool highlighted;
+    mutable bool renderedFlag;
 };
 
 /*****************************************************************************/
@@ -78,18 +86,21 @@ class TrussUnit : public Truss<TrussNode, TrussPivot>,
 {
     Q_OBJECT
 public:        
-    TrussUnit ( const QString& name );
+    TrussUnit ( const QString& name, ObjectStateManager* mng );
     virtual ~TrussUnit ();
 
     const QString& getTrussName () const;
     const QSize& getTrussAreaSize () const;
-  
+
     void paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
                 int trussAreaHeight ) const;
 
 public slots:
     void setTrussName ( const QString& name );
     void setTrussAreaSize ( const QSize& );
+
+protected slots:
+    void trussUnitStateIsChanged ();
 
 signals:
     void onTrussNameChange ( const QString& old, const QString& n );
@@ -107,7 +118,9 @@ private:
 class TrussNode: public Node, public PaintableTrussElement
 {    
 public:
-    TrussNode ();
+    TrussNode ( ObjectStateManager* );
+    TrussNode ( int x, int y, ObjectStateManager* );
+    TrussNode ( int x, int y, Fixation, ObjectStateManager* );
 
     void paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
                 int trussAreaHeight ) const;

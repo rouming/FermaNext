@@ -9,18 +9,11 @@ class TrussUnitDesignerWidget : public AggQWidget
 {
     Q_OBJECT
 public:
-    bool init; //temp    
-    int X1, Y1; //temp       
-    int X2, Y2; //temp        
-
     TrussUnitDesignerWidget ( QWidget* parent = 0 );
     virtual ~TrussUnitDesignerWidget ();
 
 protected:
-    virtual void trussWindowToFront ( TrussUnitWindow& );
-    virtual void redrawTrussWindows ();
-    virtual void resizeTrussWindow ( TrussUnitWindow* window, QPoint newLeftTopPos, 
-                                    QPoint newRightBottomPos, rbuf_dynarow* rbuf );
+    virtual void trussWindowToFront ( TrussUnitWindow& );    
     virtual TrussUnitWindow* findTrussUnitWindowByCoord ( int x, int y );    
     virtual void removeAllHighlight ();
     virtual void moveTrussNode ( int x, int y, TrussUnitWindow* window, 
@@ -29,6 +22,10 @@ protected:
                                  TrussPivot* pivot );
 	virtual void onDraw();
 	virtual void initTrussUnitWindow(); //temp
+
+    // Save states to Undo/Redo stack after drag
+    virtual void saveNodeStateAfterDrag ( QPoint );
+    virtual void savePivotStateAfterDrag ( QPoint first, QPoint last );
 
 public:
     // Handlers on events
@@ -48,18 +45,32 @@ protected:
     virtual void clearTrussUnitWindows ();
 
 private:
-    enum TrussWindowBehaviour { windowIdle = 0, onWindowDrag, onHorResize, onVerResize, 
+    enum TrussWindowBehaviour { windowIdle = 0, onWindowDrag, 
+                                onHorResize, onVerResize, 
                                 onBDiagResize, onFDiagResize };
     enum TrussNodeBehaviour { nodeIdle = 0, onNodeSelect, onNodeDrag };
     enum TrussPivotBehaviour { pivotIdle = 0, onPivotSelect, onPivotDrag };
+
+    // Windows to show
     WindowList trussWindows;
-    TrussUnitWindow* trussWindow;
-    TrussNode* trussNode;
-    TrussPivot* trussPivot;
+    // Current selected truss elements
+    TrussUnitWindow* selectedWindow;
+    TrussNode* selectedNode;
+    TrussPivot* selectedPivot;
+    // Different behaviours
     TrussWindowBehaviour winBehaviour;
     TrussNodeBehaviour nodeBehaviour;
     TrussPivotBehaviour pivotBehaviour;
+    // Subsidiary vars
     int clickX, clickY, dxFirst, dxLast, dyFirst, dyLast;
+    // Undo/Redo
+    QPoint beforeDragNodePos;
+    QPoint beforeDragFirstPos, beforeDragLastPos;
+
+    // TODO: in future to remove
+    bool init; //temp    
+    int X1, Y1; //temp       
+    int X2, Y2; //temp    
 };
 
 #endif //TRUSSDESIGNERWIDGET_H

@@ -2,29 +2,39 @@
 #include "TrussUnit.h"
 #include <algorithm>
 
-
 /*****************************************************************************
  * Paintable Truss Element
  *****************************************************************************/
 
 PaintableTrussElement::PaintableTrussElement () : 
     visible(false), 
-    highlighted(false)
+    highlighted(false),
+    renderedFlag(false)
 {}
 
-PaintableTrussElement::PaintableTrussElement ( bool h_, bool v_ ) :
+PaintableTrussElement::PaintableTrussElement ( bool h_, bool v_, bool r_ ) :
     visible(v_), 
-    highlighted(h_)
+    highlighted(h_),
+    renderedFlag(r_)
 {}
 
 void PaintableTrussElement::setVisible ( bool v_ )
 {
-    visible = v_;
+    if ( visible != v_ )
+        rendered(false);
+    visible = v_;    
 }
 
 void PaintableTrussElement::setHighlighted ( bool h_ )
 {
-    highlighted = h_;
+    if ( highlighted != h_ )
+        rendered(false);
+    highlighted = h_;    
+}
+
+void PaintableTrussElement::rendered ( bool r_ ) const
+{
+    renderedFlag = r_;
 }
 
 bool PaintableTrussElement::isVisible () const
@@ -37,18 +47,31 @@ bool PaintableTrussElement::isHighlighted () const
     return highlighted;
 }
 
+bool PaintableTrussElement::isRendered () const
+{
+    return renderedFlag;
+}
 
 /*****************************************************************************
  * Truss Unit
  *****************************************************************************/
 
-TrussUnit::TrussUnit ( const QString& name ) :
+TrussUnit::TrussUnit ( const QString& name, ObjectStateManager* mng ) :
+    Truss<TrussNode, TrussPivot>(mng),
     trussName(name),
     trussAreaSize( 300, 300 )
-{}
+{
+    // We should render again when state has been changed
+    QObject::connect( this, SIGNAL(onStateChange()), SLOT(trussUnitStateIsChanged()) );
+}
 
 TrussUnit::~TrussUnit ()
 {}
+
+void TrussUnit::trussUnitStateIsChanged ()
+{
+    rendered(false);
+}
 
 const QString& TrussUnit::getTrussName () const
 {
@@ -58,14 +81,16 @@ const QString& TrussUnit::getTrussName () const
 void TrussUnit::setTrussName ( const QString& name )
 {
     QString old(trussName);
-    trussName = name;
+    trussName = name;    
     emit onTrussNameChange( old, trussName );
+    emit onStateChange();
 }
 
 void TrussUnit::setTrussAreaSize ( const QSize& area )
 {    
-    trussAreaSize = area;
+    trussAreaSize = area;    
     emit onAreaChange( trussAreaSize );
+    emit onStateChange();
 }
 
 const QSize& TrussUnit::getTrussAreaSize () const

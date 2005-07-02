@@ -9,6 +9,9 @@
 const QString TrussUnitWindowManager::NEW_EXTENSION = ".fnx";
 const QString TrussUnitWindowManager::OLD_EXTENSION = ".frm";
 
+TrussUnitWindowManager::TrussUnitWindowManager ( ObjectStateManager* mng ) :
+    StatefulObject(mng)
+{}
 
 TrussUnitWindowManager::~TrussUnitWindowManager ()
 {
@@ -25,7 +28,7 @@ void TrussUnitWindowManager::clearTrussUnitWindows ()
 
 TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow ( const QString& name )
 {
-    TrussUnitWindow* trussWindow = new TrussUnitWindow(name);
+    TrussUnitWindow* trussWindow = new TrussUnitWindow(name, getStateManager());
     trussWindows.push_back(trussWindow);
     emit onTrussUnitWindowCreate(*trussWindow);
     return *trussWindow;

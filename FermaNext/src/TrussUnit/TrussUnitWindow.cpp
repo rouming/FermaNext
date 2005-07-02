@@ -53,11 +53,10 @@ struct arrow
  * Truss Unit Window
  *****************************************************************************/
 
-TrussUnitWindow::TrussUnitWindow ( const QString& name ) :
-    TrussUnit(name),
+TrussUnitWindow::TrussUnitWindow ( const QString& name, ObjectStateManager* mng ) :
+    TrussUnit(name, mng),
     rbuf ( new rbuf_dynarow(250,250) ),
-    windowSize ( 250, 250),
-    isRendered(false)
+    windowSize ( 250, 250)    
 {}
 
 TrussUnitWindow::~TrussUnitWindow ()
@@ -96,11 +95,6 @@ const QSize& TrussUnitWindow::getWindowSize () const
     return windowSize;
 }
 
-rbuf_dynarow* TrussUnitWindow::getRBufDynarow ()
-{
-    return rbuf;
-}
-
 double TrussUnitWindow::getScaleMultiplierX () const
 {
     const QSize trussAreaSize = getTrussAreaSize();
@@ -123,7 +117,7 @@ double TrussUnitWindow::getScaleMultiplierY () const
     return scaleMultiplierY;
 }
 
-bool TrussUnitWindow::inWindowRect ( int x, int y )
+bool TrussUnitWindow::inWindowRect ( int x, int y ) const
 {
 	if ( x >= windowLeftTopPos.x() && x <= windowRightBottomPos.x() && 
         y >= windowLeftTopPos.y() && y <= windowRightBottomPos.y() )
@@ -133,7 +127,7 @@ bool TrussUnitWindow::inWindowRect ( int x, int y )
 	return false;
 }
 
-bool TrussUnitWindow::inCanvasRect ( int x, int y )
+bool TrussUnitWindow::inCanvasRect ( int x, int y ) const
 {
     if ( x >= windowLeftTopPos.x() + bordWidth && 
         x <= windowRightBottomPos.x() - bordWidth && 
@@ -145,7 +139,7 @@ bool TrussUnitWindow::inCanvasRect ( int x, int y )
 	return false;
 }
 
-bool TrussUnitWindow::inHeadlineRect ( int x, int y )
+bool TrussUnitWindow::inHeadlineRect ( int x, int y ) const
 {
 	if ( x >= windowLeftTopPos.x() + bordWidth && 
         x <= windowRightBottomPos.x() - bordWidth && y >= 
@@ -157,7 +151,7 @@ bool TrussUnitWindow::inHeadlineRect ( int x, int y )
 	return false;
 }
 
-bool TrussUnitWindow::inHorResizeRect ( int x, int y )
+bool TrussUnitWindow::inHorResizeRect ( int x, int y ) const
 {
     if ( x >= windowLeftTopPos.x() && x <= windowLeftTopPos.x() + bordWidth && 
         y >= windowLeftTopPos.y() + winCornerRadius && 
@@ -171,7 +165,7 @@ bool TrussUnitWindow::inHorResizeRect ( int x, int y )
     return false;
 }
 
-bool TrussUnitWindow::inVerResizeRect ( int x, int y )
+bool TrussUnitWindow::inVerResizeRect ( int x, int y ) const
 {
     if ( x >= windowLeftTopPos.x() + winCornerRadius && 
         x <= windowRightBottomPos.x() - winCornerRadius && 
@@ -185,7 +179,7 @@ bool TrussUnitWindow::inVerResizeRect ( int x, int y )
     return false;
 }
 
-bool TrussUnitWindow::inBDiagResizeRect ( int x, int y )
+bool TrussUnitWindow::inBDiagResizeRect ( int x, int y ) const
 {
     if ( sqrt( (x - (windowRightBottomPos.x() - bordWidth)) * 
         (x - (windowRightBottomPos.x() - bordWidth)) +
@@ -201,7 +195,7 @@ bool TrussUnitWindow::inBDiagResizeRect ( int x, int y )
     return false;
 }
 
-bool TrussUnitWindow::inFDiagResizeRect ( int x, int y )
+bool TrussUnitWindow::inFDiagResizeRect ( int x, int y ) const
 {
     if ( sqrt( (x - (windowLeftTopPos.x() + bordWidth)) * 
         (x - (windowLeftTopPos.x() + bordWidth)) +
@@ -217,7 +211,7 @@ bool TrussUnitWindow::inFDiagResizeRect ( int x, int y )
     return false;
 }
 
-bool TrussUnitWindow::inNodeRadius ( int x, int y )
+bool TrussUnitWindow::inNodeRadius ( int x, int y ) const
 {
     TrussNode* node = findNodeByWidgetPos ( x , y );
     if ( node )
@@ -225,7 +219,7 @@ bool TrussUnitWindow::inNodeRadius ( int x, int y )
     return false;
 }
 
-bool TrussUnitWindow::isPivotSelected ( int x, int y )
+bool TrussUnitWindow::isPivotSelected ( int x, int y ) const
 {
     TrussPivot* pivot = findPivotByWidgetPos ( x, y );
     if ( pivot )
@@ -233,7 +227,7 @@ bool TrussUnitWindow::isPivotSelected ( int x, int y )
     return false;
 }
 
-TrussNode* TrussUnitWindow::findNodeByWidgetPos ( int x, int y )
+TrussNode* TrussUnitWindow::findNodeByWidgetPos ( int x, int y ) const
 {
     QPoint point;
     TrussUnit::NodeList nodeList = getNodeList ();
@@ -253,7 +247,7 @@ TrussNode* TrussUnitWindow::findNodeByWidgetPos ( int x, int y )
     return 0;
 }
 
-TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y )
+TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y ) const
 {
     QPoint p1, p2;
     PivotList pivotList = getPivotList ();
@@ -311,23 +305,28 @@ color_type TrussUnitWindow::getBorderColor () const
 
 void TrussUnitWindow::setWindowSize ( int width, int height )
 {
+    QSize oldSize = windowSize;
     windowSize.setWidth ( width );
     windowSize.setHeight ( height );
-    setRenderingStatus ( false );
+    rendered(false);
+    emit onResize( oldSize, windowSize );
 }
 
 void TrussUnitWindow::setWindowPosition ( QPoint pos )
 {
+    QPoint oldPos = windowLeftTopPos;
     windowLeftTopPos = pos;
     windowRightBottomPos.setX ( windowLeftTopPos.x() + windowSize.width() );
     windowRightBottomPos.setY ( windowLeftTopPos.y() + windowSize.height() );
+    rendered(false);
+    emit onMove( oldPos, pos );
 }
 
 void TrussUnitWindow::setNodeHighlight ( int x, int y )
 {
     TrussNode* node = findNodeByWidgetPos ( x , y );
-    node->setHighlighted ( true );
-    setRenderingStatus ( false );
+    node->setHighlighted ( true ); 
+    rendered(false);
 }
 
 void TrussUnitWindow::setPivotHighlight ( int x, int y )
@@ -342,7 +341,7 @@ void TrussUnitWindow::setPivotHighlight ( int x, int y )
     TrussNode* lastNode = findNodeByCoord ( lastCoord );
     firstNode->setHighlighted ( true );
     lastNode->setHighlighted ( true );
-    setRenderingStatus ( false );
+    rendered(false);
 }
 
 void TrussUnitWindow::removeNodeHighlight ()
@@ -355,7 +354,7 @@ void TrussUnitWindow::removeNodeHighlight ()
         if ( node->isHighlighted () )
         {
             node->setHighlighted ( false );
-            setRenderingStatus ( false );
+            rendered(false);
         }
     }
 }
@@ -378,14 +377,9 @@ void TrussUnitWindow::removePivotHighlight ()
             TrussNode* lastNode = findNodeByCoord ( lastCoord );
             firstNode->setHighlighted ( false );
             lastNode->setHighlighted ( false );
-            setRenderingStatus ( false );
+            rendered(false);
         }
     }
-}
-
-void TrussUnitWindow::setRenderingStatus ( bool status )
-{
-    isRendered = status;
 }
 
 void TrussUnitWindow::setCanvasColor ( int r, int g, int b )
@@ -416,6 +410,15 @@ void TrussUnitWindow::setBorderColor ( int r, int g, int b )
 void TrussUnitWindow::setResEllColor ( int r , int g, int b )
 {
     resEllColor = agg::rgba(r, g, b);
+}
+
+void TrussUnitWindow::resize ( QPoint leftTop, QPoint rightBottom )
+{
+    int dx = rightBottom.x() - leftTop.x();
+    int dy = rightBottom.y() - leftTop.y();
+    rbuf->init( dx, dy );
+    setWindowSize( dx, dy );
+    setWindowPosition( leftTop );    
 }
 
 void TrussUnitWindow::drawText ( ren_dynarow&, textRenderer& textRend,
@@ -566,7 +569,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 
     pixf_dynarow pixf(*rbuf);
 
-    if ( ! isRendered ) 
+    if ( ! isRendered() ) 
     { 
         ren_dynarow baseRend(pixf);
         solidRenderer solidRend ( baseRend );    
@@ -631,7 +634,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         TrussUnit::paint ( baseRend, getScaleMultiplierX (), getScaleMultiplierY (),
                            getTrussAreaSize().height() );
 
-        isRendered = true;
+        rendered( true );
     }
     baseRenderer.blend_from ( pixf, 0, windowLeftTopPos.x(), windowLeftTopPos.y(), 
                              unsigned(1.0 * 255) );
