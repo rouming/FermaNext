@@ -73,7 +73,7 @@ void ObjectState::save ()
         mng->saveState(*this);
 }
 
-StatefulObject* ObjectState::getStatefulObject ()
+StatefulObject* ObjectState::getStatefulObject () const
 {
     return statefulObject;
 }
