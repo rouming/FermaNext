@@ -57,11 +57,31 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name, ObjectStateManager* mng 
     TrussUnit(name, mng),
     rbuf ( new rbuf_dynarow(250,250) ),
     windowSize ( 250, 250)    
-{}
+{
+    setCanvasColor ( 8, 10, 12 );
+    setHighlighted(false);    
+}
 
 TrussUnitWindow::~TrussUnitWindow ()
 {
     delete rbuf;
+}
+
+void TrussUnitWindow::setHighlighted ( bool h )
+{
+    if ( h ) {
+        setBorderColor( 25,55,65 );
+        setResEllColor( 50, 50, 50 );
+        setHeadlineFirstColor(180, 130, 100 );
+        setHeadlineMiddleColor( 230, 190, 170 );
+        setHeadlineLastColor( 150, 90, 80 );
+    } else {
+        setBorderColor( 40,65,60 );
+        setResEllColor( 120, 120, 120 );
+        setHeadlineFirstColor( 180, 130, 150 );
+        setHeadlineMiddleColor( 230, 210, 200 );
+        setHeadlineLastColor( 150, 90, 110 );        
+    }
 }
 
 QPoint TrussUnitWindow::getWindowLeftTopPos () const

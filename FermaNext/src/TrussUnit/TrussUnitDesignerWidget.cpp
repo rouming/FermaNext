@@ -44,16 +44,8 @@ void TrussUnitDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow 
 {    
     trussWindows.push_back(&trussWindow);
 
-    QPoint pos1;
-    pos1.setX ( X1 ); 
-    pos1.setY ( Y1 ); 
-    trussWindow.setWindowPosition ( pos1 );
-    trussWindow.setBorderColor ( 40,65,60 );
-    trussWindow.setCanvasColor ( 8, 10, 12 );
-    trussWindow.setResEllColor ( 50, 50, 50 );
-    trussWindow.setHeadlineFirstColor (180, 130, 100 );
-    trussWindow.setHeadlineMiddleColor ( 230, 210, 200 );
-    trussWindow.setHeadlineLastColor ( 150, 90, 110 );
+    trussWindow.setWindowPosition ( QPoint( X1, Y1 ) );
+    focusWindow(trussWindow);
 }
 
 bool TrussUnitDesignerWidget::removeTrussUnitWindow ( const TrussUnitWindow& window )
@@ -77,20 +69,23 @@ TrussUnitWindow* TrussUnitDesignerWidget::findTrussUnitWindowByCoord ( int x, in
     return 0;
 }
 
-void TrussUnitDesignerWidget::trussWindowToFront ( TrussUnitWindow& window )
+void TrussUnitDesignerWidget::focusWindow ( TrussUnitWindow& window )
 {
-    if ( trussWindows.back() == &window )
+    WindowListIter newSelectedIter = std::find( trussWindows.begin(),
+                                                trussWindows.end(), 
+                                                &window );
+    // Should be sure window is in vector
+    if ( newSelectedIter == trussWindows.end() )
         return;
-    trussWindows.push_back(&window);
-    WindowList::iterator iter = trussWindows.begin();
-    for ( ; iter != trussWindows.end(); ++iter )
-    {
-        if ( *iter == &window )
-        {
-    	    trussWindows.erase(iter);
-            return;
-        }
-    }
+    // Defocus previous selected window
+    if ( selectedWindow )
+        selectedWindow->setHighlighted(false);
+    // Focus on window
+    selectedWindow = &window;
+    selectedWindow->setHighlighted(true);
+    // Selected window to front
+    trussWindows.erase(newSelectedIter);
+    trussWindows.push_back(selectedWindow);
 }
 
 void TrussUnitDesignerWidget::removeAllHighlight ()
@@ -211,32 +206,6 @@ void TrussUnitDesignerWidget::moveTrussPivot ( int x, int y, TrussUnitWindow* wi
     lastNode->setPoint( newXLast, newYLast );    
 }
 
-void TrussUnitDesignerWidget::onDraw ()
-{
-    pixfmt pixf ( getAggRenderingBuffer() );
-    base_renderer baseRend ( pixf );
-    solid_renderer solidRend ( baseRend );
-    baseRend.clear ( agg::rgba (10, 10, 10) );
-    WindowListIter iter = trussWindows.begin();
-    for ( ; iter != trussWindows.end() - 1; ++iter ) 
-    {
-        TrussUnitWindow* trussWindow = (*iter);
-        trussWindow->paint( baseRend );
-    }
-    TrussUnitWindow* trussWindow = (*iter);
-    trussWindow->setBorderColor ( 25,55,65 );
-    trussWindow->setResEllColor ( 50, 50, 50 );
-    trussWindow->setHeadlineFirstColor (180, 130, 100 );
-    trussWindow->setHeadlineMiddleColor ( 230, 190, 170 );
-    trussWindow->setHeadlineLastColor ( 150, 90, 80 );
-    trussWindows.back()->paint ( baseRend  ); // draw front window
-    trussWindow->setBorderColor ( 40,65,60 );
-    trussWindow->setResEllColor ( 120, 120, 120 );
-    trussWindow->setHeadlineFirstColor (180, 130, 150 );
-    trussWindow->setHeadlineMiddleColor ( 230, 210, 200 );
-    trussWindow->setHeadlineLastColor ( 150, 90, 110 );
-}
-
 void TrussUnitDesignerWidget::initTrussUnitWindow ()  //temp method. Later to remove.
 {
     QWidget::setMouseTracking(true);
@@ -325,7 +294,14 @@ void TrussUnitDesignerWidget::aggPaintEvent ( QPaintEvent* )
 {
    if ( init ) 
        initTrussUnitWindow ();
-   onDraw();
+
+    pixfmt pixf ( getAggRenderingBuffer() );
+    base_renderer baseRend ( pixf );
+    solid_renderer solidRend ( baseRend );
+    baseRend.clear ( agg::rgba (10, 10, 10) );
+    WindowListIter iter = trussWindows.begin();
+    for ( ; iter != trussWindows.end(); ++iter )
+        (*iter)->paint( baseRend );
 }
 
 void TrussUnitDesignerWidget::aggResizeEvent ( QResizeEvent* )
@@ -562,7 +538,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
     selectedWindow = findTrussUnitWindowByCoord ( clickX, clickY );
     if ( selectedWindow )
     {
-        trussWindowToFront( *selectedWindow );
+        focusWindow( *selectedWindow );
         if ( selectedWindow->inHeadlineRect ( clickX, clickY ) )
         {
             winBehaviour = onWindowDrag;
