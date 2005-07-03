@@ -13,14 +13,14 @@ public:
     virtual ~TrussUnitDesignerWidget ();
 
 protected:
-    virtual void trussWindowToFront ( TrussUnitWindow& );    
+    virtual void focusWindow ( TrussUnitWindow& );    
     virtual TrussUnitWindow* findTrussUnitWindowByCoord ( int x, int y );    
     virtual void removeAllHighlight ();
     virtual void moveTrussNode ( int x, int y, TrussUnitWindow* window, 
                                 TrussNode* node );
     virtual void moveTrussPivot ( int dx, int dy, TrussUnitWindow* window, 
                                  TrussPivot* pivot );
-	virtual void onDraw();
+
 	virtual void initTrussUnitWindow(); //temp
 
     // Save states to Undo/Redo stack after drag

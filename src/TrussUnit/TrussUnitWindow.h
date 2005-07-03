@@ -29,6 +29,8 @@ public:
     TrussUnitWindow ( const QString& name, ObjectStateManager* );
     virtual ~TrussUnitWindow ();
 
+    virtual void setHighlighted ( bool );
+
     virtual QPoint getWindowLeftTopPos () const;
     virtual QPoint getWindowRightBottomPos () const;
     virtual QPoint getTrussAreaLeftTopPos () const;
