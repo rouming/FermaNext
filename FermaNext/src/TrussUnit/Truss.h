@@ -288,8 +288,8 @@ public:
 
 private:
     int x, y;
-    int number;
     Fixation fix;
+    int number;
 };
 
 #endif //TRUSS_H

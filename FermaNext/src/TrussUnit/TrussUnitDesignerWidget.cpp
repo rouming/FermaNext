@@ -276,7 +276,6 @@ void TrussUnitDesignerWidget::savePivotStateAfterDrag ( QPoint firstPos, QPoint 
     state.addAction( action );
 
     // Last pos
-    ObjectState& state2 = lastNode.createState();
     action = new ConcreteObjectAction<TrussNode, QPoint>( lastNode, 
                                                           &TrussNode::setPoint,
                                                           &TrussNode::setPoint,
