@@ -1,6 +1,7 @@
 
 #include "TrussUnitDesignerWidget.h"
 #include "SubsidiaryConstants.h"
+
 #include <algorithm>
 #include <vector>
 #include <string>
@@ -16,6 +17,7 @@
 
 TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
     AggQWidget(p, flipY),
+    focusedWindow(0),
     selectedWindow(0),
     selectedNode(0),
     selectedPivot(0),    
@@ -26,8 +28,7 @@ TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
     dxLast(0), dyFirst(0), dyLast(0),
     // Temp
     init(true),
-    X1(50), Y1(50),
-    X2(330), Y2(330)
+    X(50), Y(50)
 {}
 
 TrussUnitDesignerWidget::~TrussUnitDesignerWidget ()
@@ -42,10 +43,12 @@ void TrussUnitDesignerWidget::clearTrussUnitWindows ()
 
 void TrussUnitDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow )
 {    
-    trussWindows.push_back(&trussWindow);
+    X += 15; 
+    Y += 10;
 
-    trussWindow.setWindowPosition ( QPoint( X1, Y1 ) );
-    focusWindow(trussWindow);
+    trussWindows.push_back(&trussWindow);
+    trussWindow.setWindowPosition ( QPoint( X, Y ) );
+    focusOnWindow(trussWindow);    
 }
 
 bool TrussUnitDesignerWidget::removeTrussUnitWindow ( const TrussUnitWindow& window )
@@ -69,23 +72,38 @@ TrussUnitWindow* TrussUnitDesignerWidget::findTrussUnitWindowByCoord ( int x, in
     return 0;
 }
 
-void TrussUnitDesignerWidget::focusWindow ( TrussUnitWindow& window )
+void TrussUnitDesignerWidget::focusOnWindow ( TrussUnitWindow& window )
 {
+    // Nothing to focus
+    if ( focusedWindow == &window )
+        return;
+
     WindowListIter newSelectedIter = std::find( trussWindows.begin(),
                                                 trussWindows.end(), 
                                                 &window );
     // Should be sure window is in vector
     if ( newSelectedIter == trussWindows.end() )
         return;
-    // Defocus previous selected window
-    if ( selectedWindow )
-        selectedWindow->setHighlighted(false);
+    // Defocus previous focused window
+    if ( focusedWindow )
+        focusedWindow->setHighlighted(false);
     // Focus on window
-    selectedWindow = &window;
-    selectedWindow->setHighlighted(true);
-    // Selected window to front
+    focusedWindow = &window;
+    focusedWindow->setHighlighted(true);
+    // Focused window to front
     trussWindows.erase(newSelectedIter);
-    trussWindows.push_back(selectedWindow);
+    trussWindows.push_back(focusedWindow);
+
+    update();
+}
+
+void TrussUnitDesignerWidget::clearWindowFocus ()
+{
+    if ( focusedWindow ) {
+        focusedWindow->setHighlighted(false);
+        focusedWindow = 0;
+        update();
+    }
 }
 
 void TrussUnitDesignerWidget::removeAllHighlight ()
@@ -213,8 +231,8 @@ void TrussUnitDesignerWidget::initTrussUnitWindow ()  //temp method. Later to re
     WindowListIter iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter ) { 
         TrussUnitWindow* trussWindow = (*iter);        
-        pos1.setX ( X1 ); 
-        pos1.setY ( Y1 ); 
+        pos1.setX ( X ); 
+        pos1.setY ( Y ); 
         winBehaviour = windowIdle;
         trussWindow->createNode ( 280, 30 );
         pivotPnt1.setX ( 0 );
@@ -537,7 +555,6 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
     selectedWindow = findTrussUnitWindowByCoord ( clickX, clickY );
     if ( selectedWindow )
     {
-        focusWindow( *selectedWindow );
         if ( selectedWindow->inHeadlineRect ( clickX, clickY ) )
         {
             winBehaviour = onWindowDrag;
@@ -596,8 +613,10 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
 
             pivotBehaviour = onPivotDrag;
         }        
-        update();
+        focusOnWindow( *selectedWindow );
     }
+    else
+        clearWindowFocus();
 }
 
 void TrussUnitDesignerWidget::aggCtrlChangedEvent ( const agg::ctrl* )

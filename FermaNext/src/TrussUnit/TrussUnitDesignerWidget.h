@@ -13,7 +13,10 @@ public:
     virtual ~TrussUnitDesignerWidget ();
 
 protected:
-    virtual void focusWindow ( TrussUnitWindow& );    
+    // Manage window focus
+    virtual void focusOnWindow ( TrussUnitWindow& );
+    virtual void clearWindowFocus ();
+
     virtual TrussUnitWindow* findTrussUnitWindowByCoord ( int x, int y );    
     virtual void removeAllHighlight ();
     virtual void moveTrussNode ( int x, int y, TrussUnitWindow* window, 
@@ -53,6 +56,8 @@ private:
 
     // Windows to show
     WindowList trussWindows;
+    // Focused truss unit window
+    TrussUnitWindow* focusedWindow;
     // Current selected truss elements
     TrussUnitWindow* selectedWindow;
     TrussNode* selectedNode;
@@ -68,9 +73,8 @@ private:
     QPoint beforeDragFirstPos, beforeDragLastPos;
 
     // TODO: in future to remove
-    bool init; //temp    
-    int X1, Y1; //temp       
-    int X2, Y2; //temp    
+    bool init; //temp
+    int X, Y; //temp    
 };
 
 #endif //TRUSSDESIGNERWIDGET_H

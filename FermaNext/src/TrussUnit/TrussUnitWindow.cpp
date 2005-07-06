@@ -82,6 +82,7 @@ void TrussUnitWindow::setHighlighted ( bool h )
         setHeadlineMiddleColor( 230, 210, 200 );
         setHeadlineLastColor( 150, 90, 110 );        
     }
+    TrussUnit::setHighlighted(h);
 }
 
 QPoint TrussUnitWindow::getWindowLeftTopPos () const
