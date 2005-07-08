@@ -8,6 +8,8 @@
 
 #include "ProjectToolBox.h"
 
+class QAction;
+
 class FermaNextMainFrame : public QMainWindow
 {
     Q_OBJECT
@@ -17,8 +19,8 @@ public:
     
     
 public slots:
-    void someProjectRemoved ();
-    void someProjectCreated ();
+    void someProjectRemoved ( FermaNextProject& );
+    void someProjectCreated ( FermaNextProject& );
 
     void createProject ();
     
@@ -59,10 +61,16 @@ protected slots:
     void helpContents ();
     void helpAbout ();
 
+    // Set actions enabled/disabled
+    void refreshUndoRedoActions ();
+
 private:    
     QDockWindow* dw;
     ProjectToolBox* projectToolBox;
     FermaNextWorkspace* wsp;
+    // Some actions
+    QAction* undoAction;
+    QAction* redoAction;
 };
 
 #endif //FERMANEXTFRAME_H
