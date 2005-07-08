@@ -86,8 +86,18 @@ public:
 
     // Returns number of states in all blocks
     virtual size_t countStates ();
-    // Returns number of blocks
-    virtual size_t countBlocks ();
+    // Returns number of state blocks
+    virtual size_t countStateBlocks ();
+
+    // Returns number of states to redo
+    virtual size_t countStatesToRedo ();
+    // Returns number of state blocks to redo
+    virtual size_t countStateBlocksToRedo ();
+
+    // Returns number of states to undo
+    virtual size_t countStatesToUndo ();
+    // Returns number of state blocks to undo
+    virtual size_t countStateBlocksToUndo ();
 
     // When state of object changes in some method, object should
     // create state to undo changes in future. When undo works, method
@@ -107,7 +117,8 @@ signals:
     void beforeUndo ( ObjectStateManager& );
     void afterUndo ( ObjectStateManager& );
     void beforeRedo ( ObjectStateManager& );
-    void afterRedo ( ObjectStateManager& );    
+    void afterRedo ( ObjectStateManager& );
+    void onSaveState ( ObjectStateManager&, ObjectState& );
 
 private:
     typedef std::vector<StateBlock*> BlockList;

@@ -99,7 +99,7 @@ void ObjectStateManager::clear ()
 void ObjectStateManager::startStateBlock ()
 {
     // First start
-    if ( countBlocks() == 0 ) {
+    if ( countStateBlocks() == 0 ) {
         currentBlock = new StateBlock();
         stateBlocks.push_back(currentBlock);
         currentBlockIsEnded = false;
@@ -171,7 +171,7 @@ bool ObjectStateManager::removeBlockByState (  ObjectState& st )
 bool ObjectStateManager::tryToRemoveStackTop () throw (UnknownException)
 {
     // Is empty
-    if ( countBlocks() == 0 )
+    if ( countStateBlocks() == 0 )
         return false;
 
     BlockListIter iter;
@@ -255,13 +255,15 @@ void ObjectStateManager::saveState ( ObjectState& st )
     // Connect to know when state is ready to be destroyed
     QObject::connect(&st, SIGNAL(onStateDestroy(ObjectState&)), 
                           SLOT(removeBlockByState(ObjectState&)));
+    
+    emit onSaveState(*this, st);
 }
 
 void ObjectStateManager::undo () throw (UnknownException, UndoException, 
                                         StateBlockIsNotEnded) 
 {    
     // Nothing to undo
-    if ( countBlocks() == 0 ) 
+    if ( countStateBlocks() == 0 ) 
         throw UndoException();
 
     // Nothing to undo
@@ -299,7 +301,7 @@ void ObjectStateManager::redo () throw (UnknownException, RedoException,
                                         StateBlockIsNotEnded)
 {
     // Nothing to undo
-    if ( countBlocks() == 0 ) 
+    if ( countStateBlocks() == 0 ) 
         throw RedoException();
 
     // Can't redo if block is not ended
@@ -343,9 +345,85 @@ size_t ObjectStateManager::countStates ()
     return statesNum;
 }
 
-size_t ObjectStateManager::countBlocks ()
+size_t ObjectStateManager::countStateBlocks ()
 {
     return stateBlocks.size();
+}
+
+size_t ObjectStateManager::countStatesToRedo ()
+{
+    if ( currentBlock == 0 )
+        return countStates();
+    BlockListIter iter = std::find( stateBlocks.begin(),
+                                    stateBlocks.end(),
+                                    currentBlock );
+    // Hm. Strange.
+    if ( iter == stateBlocks.end() )
+        //throw UnknownException();
+        return 0;
+
+    size_t statesNum = 0;
+    while ( ++iter != stateBlocks.end() )
+        statesNum += (*iter)->countStates();
+    return statesNum;
+}
+
+size_t ObjectStateManager::countStateBlocksToRedo ()
+{
+    if ( currentBlock == 0 )
+        return countStateBlocks();
+    BlockListIter iter = std::find( stateBlocks.begin(),
+                                    stateBlocks.end(),
+                                    currentBlock );
+    // Hm. Strange.
+    if ( iter == stateBlocks.end() )
+        //throw UnknownException();
+        return 0;
+
+    size_t statesNum = 0;
+    while ( ++iter != stateBlocks.end() )
+        ++statesNum;
+    return statesNum;
+}
+
+size_t ObjectStateManager::countStatesToUndo ()
+{
+    if ( currentBlock == 0 )
+        return 0;
+    BlockListIter iter = std::find( stateBlocks.begin(),
+                                    stateBlocks.end(),
+                                    currentBlock );
+    // Hm. Strange.
+    if ( iter == stateBlocks.end() )
+        //throw UnknownException();
+        return 0;    
+
+    size_t statesNum = 0;
+    while ( iter-- != stateBlocks.begin() )
+        statesNum += (*iter)->countStates();
+    // We should count states of first state block
+    statesNum += stateBlocks.front()->countStates();
+    return statesNum;
+}
+
+size_t ObjectStateManager::countStateBlocksToUndo ()
+{
+    if ( currentBlock == 0 )
+        return 0;
+    BlockListIter iter = std::find( stateBlocks.begin(),
+                                    stateBlocks.end(),
+                                    currentBlock );
+    // Hm. Strange.
+    if ( iter == stateBlocks.end() )
+        //throw UnknownException();
+        return 0;    
+
+    size_t statesNum = 0;
+    while ( iter-- != stateBlocks.begin() )
+        ++statesNum;
+    // We should count first state block
+    ++statesNum;
+    return statesNum;
 }
 
 void ObjectStateManager::stateCall ( bool stateCall )

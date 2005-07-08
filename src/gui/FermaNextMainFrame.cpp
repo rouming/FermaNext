@@ -66,23 +66,29 @@ void FermaNextMainFrame::init ()
 
     FermaNextWorkspace& ws = FermaNextWorkspace::workspace();
     projectToolBox = new ProjectToolBox( ws, dw );
-    connect( &ws, SIGNAL(onProjectRemove(FermaNextProject&)), SLOT(someProjectRemoved()) );
-    connect( &ws, SIGNAL(onProjectCreate(FermaNextProject&)), SLOT(someProjectCreated()) );
+    connect( &ws, SIGNAL(onProjectRemove(FermaNextProject&)), SLOT(someProjectRemoved(FermaNextProject&)) );
+    connect( &ws, SIGNAL(onProjectCreate(FermaNextProject&)), SLOT(someProjectCreated(FermaNextProject&)) );
+    connect( projectToolBox, SIGNAL(currentChanged(int)), SLOT(refreshUndoRedoActions()) );
     dw->setWidget( projectToolBox );
     dw->hide();
 }
 
-void FermaNextMainFrame::someProjectRemoved ()
+void FermaNextMainFrame::someProjectRemoved ( FermaNextProject& prj )
 {
     if ( 1 == FermaNextWorkspace::workspace().countProjects() )
         dw->hide();
+    ObjectStateManager& mng = prj.getStateManager();
+    mng.disconnect( this );
 }
 
-void FermaNextMainFrame::someProjectCreated ()
+void FermaNextMainFrame::someProjectCreated ( FermaNextProject& prj )
 {
     if ( !dw->isVisible() && 
          0 < FermaNextWorkspace::workspace().countProjects() )
         dw->show();
+    ObjectStateManager& mng = prj.getStateManager();
+    connect( &mng, SIGNAL(onSaveState(ObjectStateManager&, ObjectState&)), 
+                   SLOT(refreshUndoRedoActions()) );
 }
 
 void FermaNextMainFrame::createProject ()
@@ -221,23 +227,27 @@ void FermaNextMainFrame::setupEditActions ()
     QPopupMenu *menu = new QPopupMenu( this );
     menuBar()->insertItem( tr( "&Edit" ), menu );
 
-    QAction *a;
     // Undo
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/editundo.xpm" ), 
-                     tr( "&Undo" ), CTRL + Key_Z, this, "editUndo" );
-    connect( a, SIGNAL( activated() ), this, SLOT( editUndo() ) );
-    a->addTo( tb );
-    a->addTo( menu );
+    undoAction = new QAction( 
+                      QPixmap::fromMimeSource( imagesPath + "/editundo.xpm" ), 
+                      tr( "&Undo" ), CTRL + Key_Z, this, "editUndo" );
+    connect( undoAction, SIGNAL( activated() ), this, SLOT( editUndo() ) );
+    undoAction->setDisabled(true);
+    undoAction->addTo( tb );
+    undoAction->addTo( menu );
 
     // Redo
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/editredo.xpm" ), 
-                     tr( "&Redo" ), CTRL + Key_Y, this, "editRedo" );
-    connect( a, SIGNAL( activated() ), this, SLOT( editRedo() ) );
-    a->addTo( tb );
-    a->addTo( menu );
+    redoAction = new QAction( 
+                      QPixmap::fromMimeSource( imagesPath + "/editredo.xpm" ), 
+                      tr( "&Redo" ), CTRL + Key_Y, this, "editRedo" );
+    connect( redoAction, SIGNAL( activated() ), this, SLOT( editRedo() ) );
+    redoAction->setDisabled(true);
+    redoAction->addTo( tb );
+    redoAction->addTo( menu );
     menu->insertSeparator();
     tb->addSeparator();
 
+    QAction *a;
     // Copy
     a = new QAction( QPixmap::fromMimeSource( imagesPath + "/editcopy.xpm" ), 
                      tr( "&Copy" ), CTRL + Key_C, this, "editCopy" );
@@ -300,6 +310,20 @@ void FermaNextMainFrame::setupHelpActions ()
                      tr( "About FermaNext" ), 0, this, "helpAbout" );
     connect( a, SIGNAL( activated() ), this, SLOT( helpAbout() ) );    
     a->addTo( menu );    
+}
+
+void FermaNextMainFrame::refreshUndoRedoActions ()
+{
+    bool enableUndo = false;
+    bool enableRedo = false;
+    FermaNextProject* prj = projectToolBox->currentProject();
+    if ( prj != 0 ) {
+        ObjectStateManager& mng = prj->getStateManager();
+        enableUndo = (mng.countStatesToUndo() > 0);
+        enableRedo = (mng.countStatesToRedo() > 0);
+    }
+    undoAction->setEnabled(enableUndo);
+    redoAction->setEnabled(enableRedo);
 }
 
 /*****************************************************************************
@@ -394,8 +418,10 @@ void FermaNextMainFrame::editUndo ()
         return;
     
     try {
-        prj->getStateManager().undo();
-        prj->getDesignerWindow().getDesignerWidget().update();        
+        ObjectStateManager& mng = prj->getStateManager();
+        mng.undo();
+        prj->getDesignerWindow().getDesignerWidget().update();
+        refreshUndoRedoActions();
     } 
     catch ( ObjectStateManager::UndoException& )
     {
@@ -411,8 +437,10 @@ void FermaNextMainFrame::editRedo ()
         return;
     
     try {
-        prj->getStateManager().redo();
+        ObjectStateManager& mng = prj->getStateManager();
+        mng.redo();
         prj->getDesignerWindow().getDesignerWidget().update();
+        refreshUndoRedoActions();
     } 
     catch ( ObjectStateManager::RedoException& )
     {
