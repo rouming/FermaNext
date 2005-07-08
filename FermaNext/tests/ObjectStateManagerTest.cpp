@@ -55,54 +55,54 @@ void start_end_state_block_test ()
     ObjectStateManager& m = *mng;
     StatefulObject o(&m);
 
-    my_assert( m.countBlocks() == 0, "After init m.countBlocks() == 0" );
+    my_assert( m.countStateBlocks() == 0, "After init m.countStateBlocks() == 0" );
 
     m.startStateBlock();
-    my_assert( m.countBlocks() == 1, "m.startStateBlock(): should be 1 block");
+    my_assert( m.countStateBlocks() == 1, "m.startStateBlock(): should be 1 block");
     m.endStateBlock();
-    my_assert( m.countBlocks() == 1, "m.endStateBlock(): should be 1 block");
+    my_assert( m.countStateBlocks() == 1, "m.endStateBlock(): should be 1 block");
 
     // Can't start new block because previous one is empty
     m.startStateBlock();
-    my_assert(m.countBlocks() == 1, "m.startStateBlock(): should be 1 block");
+    my_assert(m.countStateBlocks() == 1, "m.startStateBlock(): should be 1 block");
 
-    ObjectState& st = o.createState();
-    m.saveState(st);
+    ObjectState& st1 = o.createState();
+    m.saveState(st1);
     my_assert(m.countStates() == 1, "m.countStates(): should be 1 state");
     m.endStateBlock();
 
     // New block
     m.startStateBlock();
-    my_assert( m.countBlocks() == 2, "m.endStateBlock(): should be 2 block");
-    st = o.createState();
-    m.saveState(st);
+    my_assert( m.countStateBlocks() == 2, "m.endStateBlock(): should be 2 block");
+    ObjectState& st2 = o.createState();
+    m.saveState(st2);
     // Doesn't create new block because previous one is not closed
     m.startStateBlock();
-    my_assert( m.countBlocks() == 2, "Should be 2 blocks" );
-    st = o.createState();
-    m.saveState(st);
+    my_assert( m.countStateBlocks() == 2, "Should be 2 blocks" );
+    ObjectState& st3 = o.createState();
+    m.saveState(st3);
     my_assert( m.countStates() == 3, "Should be 3 states" );
 
     // Close inner block.
     m.endStateBlock();
-    my_assert( m.countBlocks() == 2, "Should be 2 blocks" );
+    my_assert( m.countStateBlocks() == 2, "Should be 2 blocks" );
     // Checks that outer block is not closed
     m.startStateBlock();
-    my_assert( m.countBlocks() == 2, "Should be 2 again blocks" );
-    st = o.createState();
-    m.saveState(st);
+    my_assert( m.countStateBlocks() == 2, "Should be 2 again blocks" );
+    ObjectState& st4 = o.createState();
+    m.saveState(st4);
     my_assert( m.countStates() == 4, "Should be 4 states" );
     m.endStateBlock();
 
     // Really close.
     m.endStateBlock();
-    my_assert( m.countBlocks() == 2, "Should be 2 blocks" );
+    my_assert( m.countStateBlocks() == 2, "Should be 2 blocks" );
 
     // New third block
     m.startStateBlock();
-    my_assert( m.countBlocks() == 3, "Should be 3 blocks" );
-    st = o.createState();
-    m.saveState(st);
+    my_assert( m.countStateBlocks() == 3, "Should be 3 blocks" );
+    ObjectState& st5 = o.createState();
+    m.saveState(st5);
     my_assert( m.countStates() == 5, "Should be 5 states" );
     m.endStateBlock();    
 
@@ -137,15 +137,15 @@ void stack_shifting_test ()
         m.undo();
 
     // Full redo and check
-    int ii = 0;
+    size_t ii = 0;
     bool shifting_res = true;
     for ( i = 0; i < STACK_SIZE; ++i ) {
         int val = obj.value();
         bool res;
         if ( i <= STACK_SIZE/4 * 3 )
-            res = (val == STACK_SIZE/4 + i );
+            res = ((size_t)val == STACK_SIZE/4 + i );
         else 
-            res = (val == ++ii);
+            res = ((size_t)val == ++ii);
         if ( !res ) {
             my_assert( false, "Shifting" );
             shifting_res = res;
@@ -276,7 +276,7 @@ int main ()
     }//Scope ends
     my_assert( objects == 0, "All objects should be destroyed" );
     my_assert( m.countStates() == 0, "State vector should be empty" );
-    my_assert( m.countBlocks() == 0, "Block vector should be empty" );
+    my_assert( m.countStateBlocks() == 0, "Block vector should be empty" );
 
 
     stack_shifting_test();
