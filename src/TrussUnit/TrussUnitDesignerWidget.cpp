@@ -352,12 +352,12 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         }
         selectedWindow->resize( point1, point2 );
         update();
-		clickX += dx;
+                clickX += dx;
         return;
     }
     if ( winBehaviour == onVerResize )
     {
-	    int dy = y - clickY;
+            int dy = y - clickY;
         QPoint point1 = selectedWindow->getWindowLeftTopPos ();
         QPoint point2 = selectedWindow->getWindowRightBottomPos ();
         if ( abs ( clickY - point1.y() ) <= bordWidth )
@@ -374,13 +374,13 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         }
         selectedWindow->resize( point1, point2 );
         update();
-		clickY += dy;
+                clickY += dy;
         return;
     }
     if ( winBehaviour == onBDiagResize )
     {
         int dx = x - clickX;
-	    int dy = y - clickY;
+            int dy = y - clickY;
         QPoint point1 = selectedWindow->getWindowLeftTopPos ();
         QPoint point2 = selectedWindow->getWindowRightBottomPos ();
         if ( abs ( clickX - (point1.x() + bordWidth) ) <= bordWidth )
@@ -410,7 +410,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         selectedWindow->resize( point1, point2 );
         update();
         clickX += dx;
-		clickY += dy;
+                clickY += dy;
         return;
     }
     if ( winBehaviour == onFDiagResize )
@@ -446,41 +446,41 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         selectedWindow->resize( point1, point2 );
         update();
         clickX += dx;
-		clickY += dy;
+        clickY += dy;
         return;
     }
-	if ( winBehaviour == onWindowDrag )
-	{
-		int dx = x - clickX;
-		int dy = y - clickY;
+    if ( winBehaviour == onWindowDrag )
+    {
+        int dx = x - clickX;
+        int dy = y - clickY;
         QPoint point1 = selectedWindow->getWindowLeftTopPos ();
         QPoint point2 = selectedWindow->getWindowRightBottomPos ();
         point1.setX ( point1.x() + dx ); 
         point1.setY ( point1.y() + dy );
         point2.setX ( point2.x() + dx );
         point2.setY ( point2.y() + dy );
-		selectedWindow->setWindowPosition ( point1 );
-		update();
-		clickX += dx;
-		clickY += dy;
+        selectedWindow->setWindowPosition ( point1 );
+        update();
+        clickX += dx;
+        clickY += dy;
         return;
-	}
-	if ( nodeBehaviour == onNodeDrag )
-	{
+    }
+    if ( nodeBehaviour == onNodeDrag )
+    {
         moveTrussNode( x, y, selectedWindow, selectedNode );        
         update();
         return;
-	}
-	if ( pivotBehaviour == onPivotDrag )
-	{
-//	    int dx = x - clickX;
-//	    int dy = y - clickY;
+    }
+    if ( pivotBehaviour == onPivotDrag )
+    {
+//        int dx = x - clickX;
+//        int dy = y - clickY;
         moveTrussPivot( x, y, selectedWindow, selectedPivot );        
         update();
 //        clickX += dx;
 //        clickY += dy;
         return;
-	}
+    }
     selectedWindow = findTrussUnitWindowByCoord ( x, y );
     if ( selectedWindow )
     {
