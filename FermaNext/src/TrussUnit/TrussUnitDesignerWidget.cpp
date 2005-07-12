@@ -258,7 +258,11 @@ void TrussUnitDesignerWidget::initTrussUnitWindow ()  //temp method. Later to re
 
 void TrussUnitDesignerWidget::saveNodeStateAfterDrag ( QPoint pos )
 {
+    // Actually nothing to save.
     if ( selectedNode == 0 )
+        return;
+    // Similar points. Nothing to save.
+    if ( pos == beforeDragNodePos )
         return;
 
     ObjectState& state = selectedNode->createState();
@@ -274,7 +278,12 @@ void TrussUnitDesignerWidget::saveNodeStateAfterDrag ( QPoint pos )
 
 void TrussUnitDesignerWidget::savePivotStateAfterDrag ( QPoint firstPos, QPoint lastPos )
 {
+    // Actually nothing to save.
     if ( selectedPivot == 0 )
+        return;
+    // Similar points. Nothing to save.
+    if ( firstPos == beforeDragFirstPos && 
+         lastPos == beforeDragLastPos )
         return;
 
     TrussNode& firstNode = selectedPivot->getFirstNode();
@@ -352,12 +361,12 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         }
         selectedWindow->resize( point1, point2 );
         update();
-                clickX += dx;
+        clickX += dx;
         return;
     }
     if ( winBehaviour == onVerResize )
     {
-            int dy = y - clickY;
+        int dy = y - clickY;
         QPoint point1 = selectedWindow->getWindowLeftTopPos ();
         QPoint point2 = selectedWindow->getWindowRightBottomPos ();
         if ( abs ( clickY - point1.y() ) <= bordWidth )
@@ -410,7 +419,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         selectedWindow->resize( point1, point2 );
         update();
         clickX += dx;
-                clickY += dy;
+        clickY += dy;
         return;
     }
     if ( winBehaviour == onFDiagResize )
