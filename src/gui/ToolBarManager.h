@@ -12,6 +12,16 @@ class QAction;
 class ToolBarManager : public QObject
 {
     Q_OBJECT
+ protected:
+    struct TabbedWidget
+    {
+        QAction* action;
+        QWidget* widget;
+        uint windowState;        
+        
+        TabbedWidget ( QWidget* w ) : widget(w) {}
+    };
+
  public:
     ToolBarManager ();
     ToolBarManager ( QToolBar* );
@@ -20,8 +30,9 @@ class ToolBarManager : public QObject
 
     virtual void setToolBar ( QToolBar* );
 
- private:
-    void clear ();
+ protected:
+    virtual void clear ();
+    virtual TabbedWidget* findByWidget ( QWidget* ) const;
 
  public slots:
     virtual void activateWidget ( QWidget*, bool activationFlag );
@@ -40,18 +51,9 @@ class ToolBarManager : public QObject
     void onRemove ( QWidget* );
 
  private:
-    struct TabbedWidget
-    {
-        QAction* action;
-        QWidget* widget;
-        uint windowState;        
-        
-        TabbedWidget ( QWidget* w ) : widget(w) {}
-        inline bool operator == ( const TabbedWidget* tw ) const
-        { return widget == tw->widget; }
-    };
     typedef std::vector<TabbedWidget*> TabbedWidgets;
     typedef TabbedWidgets::iterator TabbedWidgetsIter;
+    typedef TabbedWidgets::const_iterator TabbedWidgetsConstIter;
 
     TabbedWidgets widgets;
     QToolBar* toolBar;
