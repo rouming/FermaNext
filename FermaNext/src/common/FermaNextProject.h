@@ -7,6 +7,7 @@
 #include "TrussUnitDesignerWindow.h"
 #include "TrussUnitWindowManager.h"
 #include "ObjectStateManager.h"
+#include "CalcDataToolBar.h"
 
 class FermaNextWorkspace;
 class QWidgetStack;
@@ -23,8 +24,7 @@ public:
 
     virtual void activate ();    
     virtual ObjectStateManager& getStateManager ();
-    virtual TrussUnitWindowManager& getTrussUnitWindowManager ();
-    virtual QTabWidget& getProjectTab ();
+    virtual TrussUnitWindowManager& getTrussUnitWindowManager ();    
     virtual TrussUnitDesignerWindow& getDesignerWindow ();
 
 signals:
@@ -39,6 +39,9 @@ private:
     QString name;
     ObjectStateManager stateManager;
     TrussUnitWindowManager trussWindowManager;
+    QWidgetStack* widgetStack;
+    QMainWindow* projectMainWidget;
+    CalcDataToolBar* calcDataToolBar;
     QTabWidget* projectTab;
     QWidget* justStrengthAnalisysWidget;
 

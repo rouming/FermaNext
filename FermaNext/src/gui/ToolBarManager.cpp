@@ -9,13 +9,9 @@
  * Tool Bar Manager
  *****************************************************************************/
 
-ToolBarManager::ToolBarManager () :
+ToolBarManager::ToolBarManager ( QWidget* parent ) :
+    QObject(parent),
     toolBar(0),
-    currentActiveWidget(0)
-{}
-
-ToolBarManager::ToolBarManager ( QToolBar* tb ) :
-    toolBar(tb),
     currentActiveWidget(0)
 {}
 

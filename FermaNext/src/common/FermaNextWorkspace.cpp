@@ -16,7 +16,7 @@ QMutex FermaNextWorkspace::mutex;
 
 FermaNextWorkspace::FermaNextWorkspace () :
     name(untitledName),
-    widgetStack( new QWidgetStack() )
+    widgetStack(0)
 {
     // Singleton desist by Qt quit signal
     connect( qApp, SIGNAL(lastWindowClosed()), SLOT(clear()) );
@@ -53,8 +53,20 @@ void FermaNextWorkspace::reset ()
     clear();    
 }
 
-FermaNextProject& FermaNextWorkspace::createProject ( const QString& name )
+void FermaNextWorkspace::createWidgetStack ( QMainWindow& parent )
 {
+    if ( widgetStack )
+        return;
+    widgetStack = new QWidgetStack(&parent);
+    parent.setCentralWidget(widgetStack);
+}
+
+FermaNextProject& FermaNextWorkspace::createProject ( const QString& name )
+                                     throw (WorkspaceIsNotInitedCorrectly)
+{
+    // Assuming widget stack was created.
+    if ( widgetStack == 0 )
+        throw WorkspaceIsNotInitedCorrectly();
     FermaNextProject* project = new FermaNextProject(name, widgetStack);
     projects.push_back(project);
     emit onProjectCreate(*project);    
@@ -89,16 +101,11 @@ bool FermaNextWorkspace::removeProject ( const QString& name )
     return false; 
 }
 
-void FermaNextWorkspace::activateProject ( FermaNextProject& prj )
-{
-    widgetStack->raiseWidget( (QWidget*)&prj.getProjectTab() );
-}
-
 void FermaNextWorkspace::activateProject ( const QString& prjName )
 {
     FermaNextProject* prj = findProjectByName(prjName);
     if ( prj )
-        widgetStack->raiseWidget( (QWidget*)&prj->getProjectTab() );
+        prj->activate();
 }
 
 FermaNextProject* FermaNextWorkspace::findProjectByName ( const QString& name )
@@ -130,11 +137,6 @@ void FermaNextWorkspace::setName ( const QString& name_ )
 {
     name = name_;
     emit onNameChange(name);
-}
-
-QWidgetStack& FermaNextWorkspace::getWidgetStack ()
-{
-    return *widgetStack;
 }
 
 FermaNextConfig& FermaNextWorkspace::config ()

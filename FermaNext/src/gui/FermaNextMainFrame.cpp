@@ -41,15 +41,13 @@ FermaNextMainFrame::FermaNextMainFrame ( QWidget* p, const char* n,
     setupEditActions();
     setupProjectActions();
     setupWindowActions();
-    setupHelpActions();
+    setupHelpActions();    
 }
 
 void FermaNextMainFrame::init ()
 {
-    // Do not move this lines. Should be the first for corrent init.
-    QWidgetStack& widgetStack = FermaNextWorkspace::workspace().getWidgetStack();
-    widgetStack.reparent(this, pos());
-    setCentralWidget(&widgetStack);
+    // Do not move this line. Should be the first for correct inition.
+    FermaNextWorkspace::workspace().createWidgetStack( *this );
 
     setCaption(mainFrameCaption);
     setMinimumSize( 640, 480 );
@@ -71,6 +69,8 @@ void FermaNextMainFrame::init ()
     connect( projectToolBox, SIGNAL(currentChanged(int)), SLOT(refreshUndoRedoActions()) );
     dw->setWidget( projectToolBox );
     dw->hide();
+
+    setRightJustification( true );
 }
 
 void FermaNextMainFrame::someProjectRemoved ( FermaNextProject& prj )
