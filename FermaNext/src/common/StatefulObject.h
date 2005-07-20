@@ -25,14 +25,14 @@ public:
     virtual ObjectState& createState ();
     virtual bool removeState ( ObjectState& );
 
-    virtual size_t countStates ();
+    virtual size_t countStates () const;
 
     // Marks this stateful object as desisted
     virtual void desist ();
     // Revives this stateful object 
     virtual void revive ();
     // Checks if it is alive
-    virtual bool isAlive ();
+    virtual bool isAlive () const;
 
 protected:
     // Frees all allocated states

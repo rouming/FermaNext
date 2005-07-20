@@ -28,20 +28,20 @@ bool ObjectStateManager::StateBlock::removeState ( ObjectState& state )
     return true;
 }
 
-bool ObjectStateManager::StateBlock::contains ( ObjectState& st )
+bool ObjectStateManager::StateBlock::contains ( const ObjectState& st ) const
 {
-    StateListIter iter = std::find( states.begin(), states.end(), &st );
+    StateListConstIter iter = std::find( states.begin(), states.end(), &st );
     // Found nothing
     if ( iter == states.end() )
         return false;
     return true;
 }
-bool ObjectStateManager::StateBlock::isEmpty ()
+bool ObjectStateManager::StateBlock::isEmpty () const
 {
     return states.size() == 0;
 }
 
-size_t ObjectStateManager::StateBlock::countStates ()
+size_t ObjectStateManager::StateBlock::countStates () const
 {
     return states.size();
 }
@@ -336,27 +336,27 @@ void ObjectStateManager::redo () throw (UnknownException, RedoException,
     stateCall(false);
 }
 
-size_t ObjectStateManager::countStates ()
+size_t ObjectStateManager::countStates () const
 {
     size_t statesNum = 0;
-    BlockListIter iter = stateBlocks.begin();
+    BlockListConstIter iter = stateBlocks.begin();
     for ( ; iter != stateBlocks.end(); ++iter )
         statesNum += (*iter)->countStates();
     return statesNum;
 }
 
-size_t ObjectStateManager::countStateBlocks ()
+size_t ObjectStateManager::countStateBlocks () const
 {
     return stateBlocks.size();
 }
 
-size_t ObjectStateManager::countStatesToRedo ()
+size_t ObjectStateManager::countStatesToRedo () const
 {
     if ( currentBlock == 0 )
         return countStates();
-    BlockListIter iter = std::find( stateBlocks.begin(),
-                                    stateBlocks.end(),
-                                    currentBlock );
+    BlockListConstIter iter = std::find( stateBlocks.begin(),
+                                         stateBlocks.end(),
+                                         currentBlock );
     // Hm. Strange.
     if ( iter == stateBlocks.end() )
         //throw UnknownException();
@@ -368,13 +368,13 @@ size_t ObjectStateManager::countStatesToRedo ()
     return statesNum;
 }
 
-size_t ObjectStateManager::countStateBlocksToRedo ()
+size_t ObjectStateManager::countStateBlocksToRedo () const
 {
     if ( currentBlock == 0 )
         return countStateBlocks();
-    BlockListIter iter = std::find( stateBlocks.begin(),
-                                    stateBlocks.end(),
-                                    currentBlock );
+    BlockListConstIter iter = std::find( stateBlocks.begin(),
+                                         stateBlocks.end(),
+                                         currentBlock );
     // Hm. Strange.
     if ( iter == stateBlocks.end() )
         //throw UnknownException();
@@ -386,13 +386,13 @@ size_t ObjectStateManager::countStateBlocksToRedo ()
     return statesNum;
 }
 
-size_t ObjectStateManager::countStatesToUndo ()
+size_t ObjectStateManager::countStatesToUndo () const
 {
     if ( currentBlock == 0 )
         return 0;
-    BlockListIter iter = std::find( stateBlocks.begin(),
-                                    stateBlocks.end(),
-                                    currentBlock );
+    BlockListConstIter iter = std::find( stateBlocks.begin(),
+                                         stateBlocks.end(),
+                                         currentBlock );
     // Hm. Strange.
     if ( iter == stateBlocks.end() )
         //throw UnknownException();
@@ -406,13 +406,13 @@ size_t ObjectStateManager::countStatesToUndo ()
     return statesNum;
 }
 
-size_t ObjectStateManager::countStateBlocksToUndo ()
+size_t ObjectStateManager::countStateBlocksToUndo () const
 {
     if ( currentBlock == 0 )
         return 0;
-    BlockListIter iter = std::find( stateBlocks.begin(),
-                                    stateBlocks.end(),
-                                    currentBlock );
+    BlockListConstIter iter = std::find( stateBlocks.begin(),
+                                         stateBlocks.end(),
+                                         currentBlock );
     // Hm. Strange.
     if ( iter == stateBlocks.end() )
         //throw UnknownException();
@@ -431,7 +431,7 @@ void ObjectStateManager::stateCall ( bool stateCall )
     isStateCallFlag = stateCall;
 }
 
-bool ObjectStateManager::isStateCall ()
+bool ObjectStateManager::isStateCall () const
 {
     return isStateCallFlag;
 }
