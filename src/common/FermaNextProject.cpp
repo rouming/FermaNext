@@ -1,10 +1,11 @@
 
 #include "FermaNextProject.h"
-#include "FermaNextWorkspace.h"
 #include "SubsidiaryConstants.h"
 
 #include <qtabwidget.h>
 #include <qwidgetstack.h>
+/*TODO:remove*/#include <qpushbutton.h>
+/*TODO:remove*/#include <qlabel.h>
 
 /*****************************************************************************
  * FermaNext Project
@@ -13,15 +14,38 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack )
     name(name_),
     stateManager(),
     trussWindowManager(&stateManager),
-    projectTab( new QTabWidget(stack) )
-{    
+    widgetStack(stack),
+    projectMainWidget( new QMainWindow(widgetStack, 0, 0) ),
+    calcDataToolBar( new CalcDataToolBar ),
+    projectTab( new QTabWidget(projectMainWidget) )
+{
+    projectMainWidget->setRightJustification( true );
+    projectMainWidget->setDockEnabled( DockLeft, false );
+    projectMainWidget->setDockEnabled( DockRight, false );
+
+    widgetStack->addWidget(projectMainWidget);
+    projectMainWidget->setCentralWidget( projectTab );
+
+    QToolBar *tb = new QToolBar( projectMainWidget );
+    tb->setNewLine ( true );  
+
+    QIconSet iconEnabled ( QPixmap::fromMimeSource( "images/calcdata.png") );
+    //QIconSet iconDisabled ( QPixmap::fromMimeSource( "images/calcdata_d.png") );
+    QButton* button = new QPushButton( iconEnabled, tr("Truss unit 1"), tb );    
+    button = new QPushButton( iconEnabled, tr("Results are not valid"), tb );    
+    button->setEnabled(false);
+    button = new QPushButton( iconEnabled, tr("Next variant"), tb );    
+
+    // Blank widget
+    tb->setStretchableWidget( new QLabel(tb) );
+
     justStrengthAnalisysWidget = new QWidget(projectTab);
     designerWindow = new TrussUnitDesignerWindow(name_, projectTab);
 
     projectTab->setTabPosition( QTabWidget::Bottom );
     projectTab->addTab( designerWindow, tr("Designer") );
     projectTab->addTab( justStrengthAnalisysWidget, tr("Strength Analysis") );
-    stack->addWidget(projectTab);
+      
 
     TrussUnitDesignerWidget& designerWidget = designerWindow->getDesignerWidget();
 
@@ -40,13 +64,15 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack )
 
 FermaNextProject::~FermaNextProject ()
 {
-    FermaNextWorkspace::workspace().getWidgetStack().removeWidget(projectTab);
-    delete projectTab;
+    if ( widgetStack )
+        widgetStack->removeWidget( projectMainWidget );
+    delete projectMainWidget;
 }
 
 void FermaNextProject::activate ()
 {
-    FermaNextWorkspace::workspace().activateProject(*this);
+    if ( widgetStack && widgetStack->visibleWidget() != projectMainWidget )
+        widgetStack->raiseWidget( projectMainWidget );
 }
 
 const QString& FermaNextProject::getName () const
@@ -68,11 +94,6 @@ ObjectStateManager& FermaNextProject::getStateManager ()
 TrussUnitWindowManager& FermaNextProject::getTrussUnitWindowManager ()
 {
     return trussWindowManager;
-}
-
-QTabWidget& FermaNextProject::getProjectTab ()
-{
-    return *projectTab;
 }
 
 TrussUnitDesignerWindow& FermaNextProject::getDesignerWindow ()

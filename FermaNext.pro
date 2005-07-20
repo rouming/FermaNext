@@ -34,6 +34,7 @@ SOURCES = src/FermaNext.cpp \
           src/gui/ProjectToolBox.cpp \
           src/gui/WindowListBox.cpp \
           src/gui/ToolBarManager.cpp \
+          src/gui/CalcDataToolBar.cpp \
           \
           src/TrussUnit/Truss.cpp \
           src/TrussUnit/TrussUnit.cpp \
@@ -59,6 +60,7 @@ HEADERS = src/common/AggQWidget.h \
           src/gui/ProjectToolBox.h \
           src/gui/WindowListBox.h \
           src/gui/ToolBarManager.h \
+          src/gui/CalcDataToolBar.h \
           \
           src/TrussUnit/Truss.h \
           src/TrussUnit/TrussUnit.h \

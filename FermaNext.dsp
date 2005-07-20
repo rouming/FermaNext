@@ -102,6 +102,10 @@ SOURCE=.\src\common\Benchmark.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\gui\CalcDataToolBar.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\FermaNext.cpp
 # End Source File
 # Begin Source File
@@ -142,6 +146,10 @@ SOURCE=.\src\common\SubsidiaryConstants.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\gui\ToolBarManager.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\gui\WindowListBox.cpp
 # End Source File
 # End Group
@@ -177,6 +185,28 @@ SOURCE=.\src\common\AggQWidget.h
 # Begin Source File
 
 SOURCE=.\src\common\Benchmark.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\gui\CalcDataToolBar.h
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.\src\gui
+InputPath=.\src\gui\CalcDataToolBar.h
+InputName=CalcDataToolBar
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -342,6 +372,28 @@ SOURCE=.\src\common\SubsidiaryConstants.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\gui\ToolBarManager.h
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.\src\gui
+InputPath=.\src\gui\ToolBarManager.h
+InputName=ToolBarManager
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\gui\WindowListBox.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
@@ -376,6 +428,10 @@ SOURCE=.\src\common\mocs\moc_AbstractObjectAction.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\gui\mocs\moc_CalcDataToolBar.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\gui\mocs\moc_FermaNextMainFrame.cpp
 # End Source File
 # Begin Source File
@@ -401,6 +457,10 @@ SOURCE=.\src\gui\mocs\moc_ProjectToolBox.cpp
 # Begin Source File
 
 SOURCE=.\src\common\mocs\moc_StatefulObject.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\gui\mocs\moc_ToolBarManager.cpp
 # End Source File
 # Begin Source File
 

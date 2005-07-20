@@ -23,8 +23,7 @@ class ToolBarManager : public QObject
     };
 
  public:
-    ToolBarManager ();
-    ToolBarManager ( QToolBar* );
+    ToolBarManager ( QWidget* parent = 0 );    
 
     ~ToolBarManager ();
 

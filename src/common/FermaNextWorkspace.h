@@ -16,16 +16,20 @@ class FermaNextWorkspace : public QObject
 {
     Q_OBJECT
 public:
+    // Inner exceptions
+    class WorkspaceIsNotInitedCorrectly {};
+
     typedef std::vector<FermaNextProject*> ProjectList;
     typedef std::vector<FermaNextProject*>::iterator ProjectListIter;
 
     static FermaNextWorkspace& workspace ();
     virtual void reset ();
+    virtual void createWidgetStack ( QMainWindow& );
 
-    virtual FermaNextProject& createProject ( const QString& name );
+    virtual FermaNextProject& createProject ( const QString& name ) 
+                                    throw (WorkspaceIsNotInitedCorrectly);
     virtual bool removeProject ( FermaNextProject& );
     virtual bool removeProject ( const QString& name );
-    virtual void activateProject ( FermaNextProject& );
     virtual void activateProject ( const QString& prjName );
     virtual FermaNextProject* findProjectByName ( const QString& name );
 
@@ -34,8 +38,6 @@ public:
 
     virtual const QString& getName () const;
     virtual void setName ( const QString& );
-
-    virtual QWidgetStack& getWidgetStack ();    
 
     virtual FermaNextConfig& config ();    
 

@@ -27,10 +27,10 @@ public slots:
 protected:
     void init ();
     void setupFileActions ();
-    void setupEditActions();
-    void setupProjectActions();
-    void setupWindowActions();
-    void setupHelpActions();
+    void setupEditActions ();
+    void setupProjectActions ();
+    void setupWindowActions ();
+    void setupHelpActions ();
 
 protected slots:
     void fileNew ();
