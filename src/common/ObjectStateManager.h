@@ -29,9 +29,9 @@ protected:
         void addState ( ObjectState& );
         bool removeState ( ObjectState& );
         // Checks if vector contains state
-        bool contains ( ObjectState& );
-        bool isEmpty ();
-        size_t countStates ();
+        bool contains ( const ObjectState& ) const;
+        bool isEmpty () const;
+        size_t countStates () const;
 
         // Undoes/Redoes all states of block
         void undo ();
@@ -44,6 +44,7 @@ protected:
     private:
         typedef std::vector<ObjectState*> StateList;
         typedef StateList::iterator StateListIter;
+        typedef StateList::const_iterator StateListConstIter;
         typedef StateList::reverse_iterator StateListRevIter;
         
         StateList states;
@@ -55,11 +56,11 @@ protected:
 
     // Just removes first block if states number of all blocks
     // are > possible stack size
-    bool tryToShiftStack ();
+    virtual bool tryToShiftStack ();
 
     // Tries to remove top of the stack, if current block is pointing
     // not to the top
-    bool tryToRemoveStackTop () throw (UnknownException);
+    virtual bool tryToRemoveStackTop () throw (UnknownException);
 
 protected slots:
     // Removes all block and its states. Finds block by the state.
@@ -85,33 +86,33 @@ public:
                                 StateBlockIsNotEnded);
 
     // Returns number of states in all blocks
-    virtual size_t countStates ();
+    virtual size_t countStates () const;
     // Returns number of state blocks
-    virtual size_t countStateBlocks ();
+    virtual size_t countStateBlocks () const;
 
     // Returns number of states to redo
-    virtual size_t countStatesToRedo ();
+    virtual size_t countStatesToRedo () const;
     // Returns number of state blocks to redo
-    virtual size_t countStateBlocksToRedo ();
+    virtual size_t countStateBlocksToRedo () const;
 
     // Returns number of states to undo
-    virtual size_t countStatesToUndo ();
+    virtual size_t countStatesToUndo () const;
     // Returns number of state blocks to undo
-    virtual size_t countStateBlocksToUndo ();
+    virtual size_t countStateBlocksToUndo () const;
 
     // When state of object changes in some method, object should
     // create state to undo changes in future. When undo works, method
     // can be called again to restore the state. So we can get into
     // recursion. isStateCall returns true when the state restores
     // itself from undo or redo call.
-    virtual bool isStateCall ();
+    virtual bool isStateCall () const;
 
 protected:
     // Simply frees all allocated memory
-    void clear ();
+    virtual void clear ();
 
     // Sets state call flag
-    void stateCall ( bool );
+    virtual void stateCall ( bool );
 
 signals:
     void beforeUndo ( ObjectStateManager& );
@@ -123,6 +124,7 @@ signals:
 private:
     typedef std::vector<StateBlock*> BlockList;
     typedef BlockList::iterator BlockListIter;
+    typedef BlockList::const_iterator BlockListConstIter;
 
     BlockList stateBlocks;
     StateBlock* currentBlock;

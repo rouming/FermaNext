@@ -75,7 +75,7 @@ bool StatefulObject::removeState ( ObjectState& state )
     return true;
 }
 
-size_t StatefulObject::countStates ()
+size_t StatefulObject::countStates () const
 {
     return states.size();
 }
@@ -92,7 +92,7 @@ void StatefulObject::revive ()
     isDesisted = false;    
 }
 
-bool StatefulObject::isAlive ()
+bool StatefulObject::isAlive () const
 {
     return !isDesisted;
 }
