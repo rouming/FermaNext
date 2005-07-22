@@ -7,6 +7,7 @@
 #include <qstring.h>
 #include <qpoint.h> 
 
+#include "agg_basics.h"
 #include "agg_glyph_raster_bin.h"
 #include "agg_renderer_raster_text.h"
 #include "agg_embedded_raster_fonts.h"
@@ -20,6 +21,7 @@
 
 typedef agg::glyph_raster_bin<agg::rgba8>                           glyph_gen;
 typedef agg::renderer_raster_htext_solid<ren_dynarow, glyph_gen>    textRenderer;
+typedef const agg::int8u*                                                 textFont;
 
 
 class TrussUnitWindow : public TrussUnit
@@ -35,13 +37,14 @@ public:
     virtual QPoint getWindowRightBottomPos () const;
     virtual QPoint getTrussAreaLeftTopPos () const;
     virtual QPoint getTrussAreaRightBottomPos () const;
+    virtual QPoint getTrussCoordFromWidgetCoord ( int x, int y ) const;
+    virtual QPoint getWidgetCoordFromTrussCoord ( int x, int y ) const;
     virtual const QSize& getWindowSize () const;    
-    virtual double getScaleMultiplierX () const;
-    virtual double getScaleMultiplierY () const;
 
     virtual bool inWindowRect ( int x, int y ) const;
     virtual bool inCanvasRect ( int  x, int  y ) const;
     virtual bool inHeadlineRect ( int  x, int  y ) const;
+    virtual bool inTrussAreaRect ( int x, int y ) const;
     virtual bool inHorResizeRect ( int x, int y ) const;
     virtual bool inVerResizeRect ( int x, int y ) const;
     virtual bool inBDiagResizeRect ( int x, int y ) const;
@@ -62,8 +65,14 @@ public:
     virtual void setWindowPosition ( QPoint pos );
     virtual void setNodeHighlight ( int x, int y );
     virtual void setPivotHighlight ( int x, int y );
-    virtual void removeNodeHighlight ();
-    virtual void removePivotHighlight ();
+    virtual void removeNodesHighlight ();
+    virtual void removePivotsHighlight ();
+    virtual void moveTrussNode ( int x, int y, TrussNode* node );
+    virtual void moveTrussPivot ( int x, int y, TrussPivot* pivot, 
+                                  QPoint firstNodeClickDist, QPoint lastNodeClickDist );
+    virtual TrussNode* nodesMergingComparison ( TrussNode* comparableNode, int precision,
+                                                bool fixationCheck );
+    virtual void mergeNodes ( TrussNode* node, TrussNode* mergingNode );
 
     virtual void setCanvasColor ( int r, int g, int b );
     virtual void setHeadlineFirstColor ( int r, int g, int b );
@@ -99,7 +108,12 @@ signals:
     void onResize ( QSize oldS, QSize newS );
     void onMove ( QPoint oldP, QPoint newP );
 
+protected:
+    virtual double getScaleMultiplierX () const;
+    virtual double getScaleMultiplierY () const;
+
 private:
+    textFont headFont, numbersFont;
     rbuf_dynarow* rbuf;
     QPoint windowLeftTopPos, windowRightBottomPos;
     QSize windowSize;

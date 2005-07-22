@@ -46,6 +46,9 @@ void TrussPivot::drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
 void TrussPivot::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
                         int trussAreaHeight) const
 {
+    if ( !isVisible() )
+        return;
+
     bool flipY = true;
     solidRenderer solidRend ( baseRend );
     scanline_rasterizer   ras;
@@ -64,7 +67,10 @@ void TrussPivot::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleM
     if ( isHighlighted () )
         drawLine ( ras, solidRend, sl, p1, p2, pivotsWidth + 5, 
                   agg::rgba(200, 135, 15, 0.45) );
-    drawLine ( ras, solidRend, sl, p1, p2, pivotsWidth, agg::rgba(0, 0, 0) ); 
+    if ( isEnabled () )
+        drawLine ( ras, solidRend, sl, p1, p2, pivotsWidth, agg::rgba(0, 0, 0) );
+    else 
+        drawLine ( ras, solidRend, sl, p1, p2, pivotsWidth - 1, agg::rgba(0, 0, 0) );
 }
 
 /****************************************************************************/

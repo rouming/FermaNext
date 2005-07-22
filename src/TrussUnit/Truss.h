@@ -14,6 +14,9 @@ template <class N, class P> class Truss;
 template <class N> class Pivot;
 class Node;
 
+/*****************************************************************************
+ * Truss Emitter
+ *****************************************************************************/
 
 // Emitters for truss unit basic classes. 
 // All signals logic was moved to this classes 
@@ -45,6 +48,9 @@ signals:
     void afterPivotRemoval ();
 };
 
+/*****************************************************************************
+ * Truss 
+ *****************************************************************************/
 
 template <class N, class P> 
 class Truss : public TrussEmitter                                    
@@ -94,30 +100,67 @@ public:
             N* node = *iter;
             QPoint pos = node->getPoint();
             if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
-                   (point.y() - pos.y()) * (point.y() - pos.y()) ) <  
-                 4 * nodesRadius * nodesRadius )
+                   (point.y() - pos.y()) * (point.y() - pos.y()) ) < 
+                   4 * nodesRadius * nodesRadius )
+                return node;
+        }
+        return 0;
+    } 
+    
+    virtual N* findNodeByCoord ( QPoint point, int precision ) const
+    {        
+        NodeListConstIter iter = nodes.begin();
+        for ( ; iter != nodes.end(); ++iter )
+        {
+            N* node = *iter;
+            QPoint pos = node->getPoint();
+            if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
+                   (point.y() - pos.y()) * (point.y() - pos.y()) ) < precision )
                 return node;
         }
         return 0;
     }   
 
+    virtual N* findNodeByNumber ( int num )
+    {
+        NodeListConstIter iter = nodes.begin();
+        for ( ; iter != nodes.end(); ++iter )
+        {
+            N* node = *iter;
+            if ( node->getNumber () == num )
+                return node;
+        }
+        return 0;
+    }  
+
     virtual N& createNode ( int x, int y )
     {
         emit beforeNodeCreation();
-        N* node = new N(getStateManager());
-        node->setPoint( x, y );
-        nodes.push_back(node);
+        QPoint coord (x, y);
+        N* oldNode = findNodeByCoord ( coord );
+        if ( oldNode == 0 || !(oldNode->isEnabled()) )
+        {
+            N* node = new N(getStateManager());
+            node->setPoint( x, y );
+            if ( ! nodes.empty() )
+            {
+                int num = nodes.back()->getNumber();
+                node->setNumber( num + 1 );
+            }
+            nodes.push_back(node);
 
-        QObject::connect( node, SIGNAL(onFixationChange ( Fixation )),
-                                SLOT(stateIsChanged()) );
-        QObject::connect( node, SIGNAL(onPositionChange ( int, int )),
-                                SLOT(stateIsChanged()) );
-        QObject::connect( node, SIGNAL(onNumberChange ( int )),
-                                SLOT(stateIsChanged()) );
+            QObject::connect( node, SIGNAL(onFixationChange ( Fixation )),
+                                    SLOT(stateIsChanged()) );
+            QObject::connect( node, SIGNAL(onPositionChange ( int, int )),
+                                    SLOT(stateIsChanged()) );
+            QObject::connect( node, SIGNAL(onNumberChange ( int )),
+                                    SLOT(stateIsChanged()) );
 
-        emit afterNodeCreation(*node);
-        emit onStateChange();
-        return *node;
+            emit afterNodeCreation(*node);
+            emit onStateChange();
+            return *node;
+        }
+        return *oldNode;
     }
 
     virtual P& createPivot ( QPoint p1 , QPoint p2 )
@@ -194,11 +237,29 @@ protected:
         if ( iter == nodes.end() )
             return;
         Node* n = *iter;
+        int num = n->getNumber ();
         emit beforeNodeRemoval(*n);
         delete n;
         nodes.erase(iter);
+        decreaseNodesNumbers ( num );
         emit afterNodeRemoval();
         emit onStateChange();
+    }
+
+    virtual void decreaseNodesNumbers ( int fromNumb )
+    {
+        if ( nodes.empty () )
+            return;
+        NodeListConstIter iter = nodes.begin();
+        for ( ; iter != nodes.end(); ++iter )
+        {
+            N* node = *iter;
+            if ( node->getNumber () > fromNumb )
+            {
+                int newNumber = node->getNumber () - 1;
+                node->setNumber ( newNumber );
+            }
+        }
     }
 
     virtual void removePivot ( PivotListIter& iter )
@@ -218,7 +279,9 @@ private:
     PivotList pivots;
 };
 
-
+/*****************************************************************************
+ * Pivot
+ *****************************************************************************/
 
 template <class N> 
 class Pivot : public StatefulObject
@@ -243,12 +306,18 @@ public:
     { return *first; }
     virtual N& getLastNode () const
     { return *last; }
+    virtual void setFirstNode ( N* first_ )
+    { first = first_; }
+    virtual void setLastNode ( N* last_ )
+    { last = last_; }
 
 private:    
     N *first, *last;
 };
 
-
+/*****************************************************************************
+ * Node
+ *****************************************************************************/
 
 class Node : public StatefulObject
 {

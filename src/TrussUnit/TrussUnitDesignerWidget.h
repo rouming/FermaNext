@@ -4,6 +4,7 @@
 
 #include "AggQWidget.h"
 #include "TrussUnitWindowManager.h"
+#include "agg_svg_parser.h"
 
 class TrussUnitDesignerWidget : public AggQWidget
 {
@@ -16,14 +17,9 @@ protected:
     // Manage window focus
     virtual void focusOnWindow ( TrussUnitWindow& );
     virtual void clearWindowFocus ();
-
-    virtual TrussUnitWindow* findTrussUnitWindowByCoord ( int x, int y );    
+    virtual TrussUnitWindow* findWindowByWidgetPos ( int x, int y );    
     virtual void removeAllHighlight ();
-    virtual void moveTrussNode ( int x, int y, TrussUnitWindow* window, 
-                                TrussNode* node );
-    virtual void moveTrussPivot ( int dx, int dy, TrussUnitWindow* window, 
-                                 TrussPivot* pivot );
-
+    virtual bool nodeCanBeDrawn ( int x, int y );
 	virtual void initTrussUnitWindow(); //temp
 
     // Save states to Undo/Redo stack after drag
@@ -53,6 +49,8 @@ private:
                                 onBDiagResize, onFDiagResize };
     enum TrussNodeBehaviour { nodeIdle = 0, onNodeSelect, onNodeDrag };
     enum TrussPivotBehaviour { pivotIdle = 0, onPivotSelect, onPivotDrag };
+    enum DesignerBehaviour { onSelect = 0, onNodeDraw, onPivotFirstNodeDraw, 
+                            onPivotLastNodeDraw, onErase, onFixSet };
 
     // Windows to show
     WindowList trussWindows;
@@ -66,11 +64,17 @@ private:
     TrussWindowBehaviour winBehaviour;
     TrussNodeBehaviour nodeBehaviour;
     TrussPivotBehaviour pivotBehaviour;
+    DesignerBehaviour designerBehaviour;
     // Subsidiary vars
-    int clickX, clickY, dxFirst, dxLast, dyFirst, dyLast;
+    int clickX, clickY;
+    QPoint firstNodeClickDist, lastNodeClickDist;
+    agg::svg::path_renderer pathRend;
     // Undo/Redo
     QPoint beforeDragNodePos;
     QPoint beforeDragFirstPos, beforeDragLastPos;
+    // SVG viewer methods
+    void parseSvg ( const char* fname );
+    void drawSvg ( base_renderer& baseRend, solid_renderer& solidRend, int x, int y );
 
     // TODO: in future to remove
     bool init; //temp

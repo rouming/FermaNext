@@ -56,7 +56,9 @@ struct arrow
 TrussUnitWindow::TrussUnitWindow ( const QString& name, ObjectStateManager* mng ) :
     TrussUnit(name, mng),
     rbuf ( new rbuf_dynarow(250,250) ),
-    windowSize ( 250, 250)    
+    windowSize ( 250, 250),
+    headFont (agg::verdana16_bold),
+    numbersFont (agg::verdana13)
 {
     setCanvasColor ( 8, 10, 12 );
     setHighlighted(false);    
@@ -98,22 +100,47 @@ QPoint TrussUnitWindow::getWindowRightBottomPos () const
 QPoint TrussUnitWindow::getTrussAreaLeftTopPos () const
 {
     QPoint point;
-    point.setX ( leftWindowIndent );
-    point.setY ( topWindowIndent );
+    point.setX ( windowLeftTopPos.x() + leftWindowIndent );
+    point.setY ( windowLeftTopPos.y() + topWindowIndent );
     return point;
 }
 
 QPoint TrussUnitWindow::getTrussAreaRightBottomPos () const
 {
     QPoint point;
-    point.setX ( windowSize.width() - leftWindowIndent );
-    point.setY ( windowSize.height() - bottomWindowIndent );
+    point.setX ( windowLeftTopPos.x() + windowSize.width() - rigthWindowIndent );
+    point.setY ( windowLeftTopPos.y() + windowSize.height() - bottomWindowIndent );
     return point;
 }
 
 const QSize& TrussUnitWindow::getWindowSize () const
 {
     return windowSize;
+}
+
+
+QPoint TrussUnitWindow::getTrussCoordFromWidgetCoord ( int x, int y ) const
+{
+    // TODO: flipY comparison
+    double scaleMultX = getScaleMultiplierX ();
+    double scaleMultY = getScaleMultiplierY ();
+    int absX = int( ( x - windowLeftTopPos.x() - leftWindowIndent ) / scaleMultX );
+    int absY = int( ( windowSize.height() - y + windowLeftTopPos.y() - bottomWindowIndent )
+                   / scaleMultY );
+    QPoint trussCoord ( absX, absY );
+    return trussCoord;
+}
+
+QPoint TrussUnitWindow::getWidgetCoordFromTrussCoord ( int x, int y ) const
+{
+    double scaleMultX = getScaleMultiplierX ();
+    double scaleMultY = getScaleMultiplierY ();
+    int widgetX = int ( x * scaleMultX ) + leftWindowIndent + windowLeftTopPos.x();
+    int widgetY = ( flipY ? int( ( getTrussAreaSize().height() - y ) * 
+                   scaleMultY ) + topWindowIndent + windowLeftTopPos.y() : 
+                   int(y * scaleMultY) + topWindowIndent + windowLeftTopPos.y() );
+    QPoint widgetCoord ( widgetX, widgetY );
+    return widgetCoord;
 }
 
 double TrussUnitWindow::getScaleMultiplierX () const
@@ -166,6 +193,18 @@ bool TrussUnitWindow::inHeadlineRect ( int x, int y ) const
         x <= windowRightBottomPos.x() - bordWidth && y >= 
 		windowLeftTopPos.y() + bordWidth && 
         y <= windowLeftTopPos.y() + bordWidth + headWidth)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool TrussUnitWindow::inTrussAreaRect ( int x, int y ) const
+{
+	if ( x >= getTrussAreaLeftTopPos().x() && 
+        x <= getTrussAreaRightBottomPos().x() &&
+        y >= getTrussAreaLeftTopPos().y() &&
+        y <= getTrussAreaRightBottomPos().y() )
 	{
 		return true;
 	}
@@ -250,50 +289,40 @@ bool TrussUnitWindow::isPivotSelected ( int x, int y ) const
 
 TrussNode* TrussUnitWindow::findNodeByWidgetPos ( int x, int y ) const
 {
-    QPoint point;
-    TrussUnit::NodeList nodeList = getNodeList ();
-    TrussUnit::NodeList:: iterator iter = nodeList.begin();
+    QPoint widgetCoord;
+    NodeList nodeList = getNodeList ();
+    NodeListIter iter = nodeList.begin();
     for ( ; iter != nodeList.end(); ++iter )
 	{
         TrussNode* node = *iter;
-        point.setX ( int(node->getX () * getScaleMultiplierX()) + leftWindowIndent + 
-                    windowLeftTopPos.x() );
-        point.setY ( flipY ? int(( getTrussAreaSize().height() - node->getY ()) * 
-                    getScaleMultiplierY()) + topWindowIndent + windowLeftTopPos.y() :
-                    int(node->getY () * getScaleMultiplierY()) + 
-                    topWindowIndent + windowLeftTopPos.y() );
-        if ( abs ( point.x() - x ) < nodesRadius && abs ( point.y() - y ) < nodesRadius )
+        // get node widget coords (in pixels) from its truss (absolute) coords
+        widgetCoord = getWidgetCoordFromTrussCoord ( node->getX(), node->getY() );
+        if ( abs ( widgetCoord.x() - x ) < nodesRadius && 
+             abs ( widgetCoord.y() - y ) < nodesRadius )
+        {
             return node;
+        }
     }
     return 0;
 }
 
 TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y ) const
 {
-    QPoint p1, p2;
+    QPoint trussCoord1, trussCoord2, widgetCoord1, widgetCoord2;
     PivotList pivotList = getPivotList ();
     PivotListIter iter = pivotList.begin();
     for ( ; iter != pivotList.end(); ++iter )
 	{
         TrussPivot* pivot = *iter;
-        p1 = pivot->getFirstNode ().getPoint ();
-        p2 = pivot->getLastNode ().getPoint ();
-        p1.setX ( int(p1.x() * getScaleMultiplierX ()) + leftWindowIndent + 
-                    windowLeftTopPos.x() );
-        p1.setY ( flipY ? int(( getTrussAreaSize().height() - p1.y() ) * 
-                    getScaleMultiplierY()) + topWindowIndent + windowLeftTopPos.y() :
-                    int(p1.y () * getScaleMultiplierY()) + topWindowIndent + 
-                    windowLeftTopPos.y() );
-        p2.setX ( int(p2.x() * getScaleMultiplierX ()) + leftWindowIndent + 
-                    windowLeftTopPos.x() );
-        p2.setY ( flipY ? int(( getTrussAreaSize().height() - p2.y() ) * 
-                    getScaleMultiplierY()) + topWindowIndent + windowLeftTopPos.y() :
-                    int(p2.y () * getScaleMultiplierY()) + topWindowIndent + 
-                    windowLeftTopPos.y() );
-        if ( ( abs ( ( x - p1.x() ) * ( p1.y() - p2.y() ) - 
-                     ( y - p1.y() ) * ( p1.x() - p2.x() ) ) <= eps ) && 
-             ( ( x >= p1.x() && x <= p2.x() || x >= p2.x() && x <= p1.x() ) && 
-               ( y >= p1.y() && y <= p2.y() || y >= p2.y() && y <= p1.y() ) ) )
+        trussCoord1 = pivot->getFirstNode ().getPoint ();
+        trussCoord2 = pivot->getLastNode ().getPoint ();
+        widgetCoord1 = getWidgetCoordFromTrussCoord ( trussCoord1.x(), trussCoord1.y() );
+        widgetCoord2 = getWidgetCoordFromTrussCoord ( trussCoord2.x(), trussCoord2.y() );
+        if ( ( abs(( x - widgetCoord1.x() ) * ( widgetCoord1.y() - widgetCoord2.y() ) - 
+                     ( y - widgetCoord1.y() ) * ( widgetCoord1.x() - widgetCoord2.x() )) <= eps ) && 
+              ( ( x >= widgetCoord1.x() && x <= widgetCoord2.x() || x >= widgetCoord2.x() && 
+              x <= widgetCoord1.x() ) && ( y >= widgetCoord1.y() && y <= widgetCoord2.y() || 
+              y >= widgetCoord2.y() && y <= widgetCoord1.y() ) ) )
             return pivot;
     }
     return 0;
@@ -354,18 +383,16 @@ void TrussUnitWindow::setPivotHighlight ( int x, int y )
 {
     TrussPivot* pivot = findPivotByWidgetPos ( x , y );
     pivot->setHighlighted ( true );
-    QPoint firstCoord ( pivot->getFirstNode().getX(), 
-                   pivot->getFirstNode().getY() );
-    QPoint lastCoord ( pivot->getLastNode().getX(), 
-                   pivot->getLastNode().getY() );
-    TrussNode* firstNode = findNodeByCoord ( firstCoord );
-    TrussNode* lastNode = findNodeByCoord ( lastCoord );
+    int numbFirst = pivot->getFirstNode().getNumber(); 
+    int numbLast = pivot->getLastNode().getNumber();
+    TrussNode* firstNode = findNodeByNumber ( numbFirst );
+    TrussNode* lastNode = findNodeByNumber ( numbLast );
     firstNode->setHighlighted ( true );
     lastNode->setHighlighted ( true );
     rendered(false);
 }
 
-void TrussUnitWindow::removeNodeHighlight ()
+void TrussUnitWindow::removeNodesHighlight ()
 {
     NodeList nodeList = getNodeList ();
     NodeListIter iter = nodeList.begin();
@@ -380,7 +407,7 @@ void TrussUnitWindow::removeNodeHighlight ()
     }
 }
 
-void TrussUnitWindow::removePivotHighlight ()
+void TrussUnitWindow::removePivotsHighlight ()
 {
     PivotList pivotList = getPivotList ();
     PivotListIter iter = pivotList.begin();
@@ -401,6 +428,132 @@ void TrussUnitWindow::removePivotHighlight ()
             rendered(false);
         }
     }
+}
+
+void TrussUnitWindow::moveTrussNode ( int x, int y, TrussNode* node )
+{
+    QPoint newCoord = getTrussCoordFromWidgetCoord ( x, y );
+
+    int areaWidth = getTrussAreaSize().width();
+    int areaHeight = getTrussAreaSize().height();
+    if ( newCoord.x() < 0 )
+        newCoord.setX( 0 );
+    if ( newCoord.x() > areaWidth )
+        newCoord.setX( areaWidth );
+    if ( newCoord.y() < 0 )
+        newCoord.setY( 0 );
+    if ( newCoord.y() > areaHeight )
+        newCoord.setY( areaHeight );
+
+    node->setPoint( newCoord.x(), newCoord.y() );
+    rendered(false);
+}
+
+void TrussUnitWindow::moveTrussPivot ( int x, int y, TrussPivot* pivot, 
+                                      QPoint firstNodeClickDist, QPoint lastNodeClickDist )
+{
+    QPoint newCoord = getTrussCoordFromWidgetCoord ( x, y );
+    int newXFirst = newCoord.x()  + firstNodeClickDist.x();
+    int newYFirst = newCoord.y() + firstNodeClickDist.y();
+    int newXLast = newCoord.x() + lastNodeClickDist.x();
+    int newYLast = newCoord.y() + lastNodeClickDist.y();
+    
+    QPoint oldFirstCoord = pivot->getFirstNode().getPoint();
+    QPoint oldLastCoord  = pivot->getLastNode().getPoint();
+
+    int oldXFirst = pivot->getFirstNode().getPoint().x();
+    int oldYFirst = pivot->getFirstNode().getPoint().y();
+    int oldXLast  = pivot->getLastNode().getPoint().x();
+    int oldYLast  = pivot->getLastNode().getPoint().y();
+    int areaWidth = getTrussAreaSize().width();
+    int areaHeight = getTrussAreaSize().height();
+
+    if ( newXFirst < 0 )
+    {
+        newXFirst = 0;
+        newXLast = oldXLast - oldXFirst;
+    }
+    if ( newXLast < 0 )
+    {
+        newXLast = 0;
+        newXFirst = oldXFirst - oldXLast;
+    }
+    if ( newYFirst < 0 )
+    {
+        newYFirst = 0;
+        newYLast = oldYLast - oldYFirst;
+    }
+    if ( newYLast < 0 )
+    {
+        newYLast = 0;
+        newYFirst = oldYFirst - oldYLast;
+    }
+    if ( newXFirst > areaWidth )
+    {
+        newXFirst = areaWidth;
+        newXLast = oldXLast + ( areaWidth - oldXFirst );
+    }
+    if ( newXLast > areaWidth )
+    {
+        newXLast = areaWidth;
+        newXFirst = oldXFirst + ( areaWidth - oldXLast );
+    }
+    if ( newYFirst > areaHeight )
+    {
+        newYFirst = areaHeight;
+        newYLast = oldYLast + ( areaHeight - oldYFirst);
+    }
+    if ( newYLast > areaHeight )
+    {
+        newYLast = areaHeight;
+        newYFirst = oldYFirst + ( areaHeight - oldYLast);
+    }
+
+    int firstNumb = pivot->getFirstNode().getNumber();
+    int lastNumb = pivot->getLastNode().getNumber();
+    TrussNode* firstNode = findNodeByNumber ( firstNumb );
+    TrussNode* lastNode = findNodeByNumber ( lastNumb );
+    firstNode->setPoint( newXFirst, newYFirst );
+    lastNode->setPoint( newXLast, newYLast );
+    rendered(false);
+}
+
+TrussNode* TrussUnitWindow::nodesMergingComparison ( TrussNode* comparableNode, 
+                                                     int precision, bool fixationCheck )
+{
+    TrussNode* node = findNodeByCoord ( comparableNode->getPoint(), precision );
+    if ( node != 0 && node != comparableNode )
+    {
+        if ( fixationCheck )
+        {
+            if ( node->getFixation() == comparableNode->getFixation() )
+            {
+                return node;
+            }
+        }
+        else
+            return node;
+    }
+    rendered(false);
+    return 0;
+}
+
+void TrussUnitWindow::mergeNodes ( TrussNode* node, TrussNode* mergingNode )
+{
+    PivotList pivotList = getPivotList ();
+    PivotListIter iter = pivotList.begin();
+    for ( ; iter != pivotList.end(); ++iter )
+	{
+        TrussPivot* pivot = *iter;
+        TrussNode* firstNode = &(pivot->getFirstNode());
+        if ( firstNode == mergingNode )
+            pivot->setFirstNode ( node );
+        TrussNode* lastNode = &(pivot->getLastNode());
+        if ( lastNode == mergingNode )
+            pivot->setLastNode ( node );
+    }
+    removeNode ( *mergingNode );
+    rendered(false);
 }
 
 void TrussUnitWindow::setCanvasColor ( int r, int g, int b )
@@ -491,60 +644,89 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
                                scanline_rasterizer& ras, textRenderer& textRend, 
                                solidRenderer& solidRend, agg::scanline_p8& sl ) const
 {
+//  draw coordinate lines with arrow heads
+    QPoint leftTopAreaPos ( leftWindowIndent, topWindowIndent ),
+           rightBottomAreaPos ( windowSize.width() - rigthWindowIndent, 
+                                windowSize.height() - bottomWindowIndent );
     QPoint p1, p2;
-    p2 = getTrussAreaLeftTopPos ();
-    p1 = getTrussAreaRightBottomPos ();
+    p2 = leftTopAreaPos;
+    p1 = rightBottomAreaPos;
     baseRend.copy_bar ( p2.x(), p2.y(), p1.x(), p1.y(), agg::rgba8(255,255,255) );
     p2.setY ( p2.y() - arrowHeadIndent );
     p1.setX ( p2.x() );
     p1.setY ( p1.y() + arrowTailIndent );
     drawArrow ( ras, solidRend, sl, p1, p2 );
-    p1 = getTrussAreaRightBottomPos ();
+    p1 = rightBottomAreaPos;
     p1.setX ( p2.x() - arrowTailIndent );
-    p2 = getTrussAreaRightBottomPos ();
+    p2 = rightBottomAreaPos;
     p2.setX (p2.x() + arrowHeadIndent );
     drawArrow ( ras, solidRend, sl, p1, p2 );
 
-    p1 = getTrussAreaLeftTopPos ();
-    p2 = getTrussAreaRightBottomPos ();
+    p1 = leftTopAreaPos;
+    p2 = rightBottomAreaPos;
     p1.setX ( p1.x() - scalePieceLength );
     p1.setY ( p1.y() );
     p2.setY ( p1.y() );
     drawLine ( ras, solidRend, sl, p1, p2 );
-    p1 = getTrussAreaRightBottomPos ();
+
+    p1 = rightBottomAreaPos;
     p1.setY ( p1.y() + scalePieceLength );
     drawLine ( ras, solidRend, sl, p1, p2 );
 
-    p1 = getTrussAreaLeftTopPos ();
-    p2 = getTrussAreaRightBottomPos ();
-    double realAreaLen = p2.x() - p1.x();
-    double realAreaWid = p2.y() - p1.y();
-    double scaleFactorX = realAreaLen / 5;
-    double scaleFactorY = realAreaWid / 5;
+//  draw scale strokes and numbers
+    p1 = leftTopAreaPos;
+    p2 = rightBottomAreaPos;
+    double areaLenInPix = p2.x() - p1.x();
+    double areaWidInPix = p2.y() - p1.y();
+    double scaleFactorXInPix = areaLenInPix / 5;
+    double scaleFactorYInPix = areaWidInPix / 5;
+    int scaleFactorXInAbs = getTrussAreaSize().height() / 5;
+    int scaleFactorYInAbs = getTrussAreaSize().width() / 5;
+
     p2.setX ( p1.x() - scalePieceLength );
+    QString str;
     unsigned i;
-    for (i = 0; i < 4; i++ )
+    for (i = 4; i > 0; i-- )
     {
-        p1.setY ( int(p1.y() + scaleFactorY) );
+        p1.setY ( int(p1.y() + scaleFactorYInPix) );
         p2.setY ( p1.y() );
         drawLine ( ras, solidRend, sl, p1, p2 );
+        QPoint textPos ( p2.x() - 23, p2.y() + 3 );
+        str = QString("%1").arg( i * scaleFactorYInAbs );   
+        drawText ( baseRend, textRend, str, agg::rgba(100, 100, 100), textPos );
     }
-    p1 = getTrussAreaRightBottomPos ();
-    p2 = getTrussAreaLeftTopPos ();
+
+    p1 = rightBottomAreaPos;
+    p2 = leftTopAreaPos;
     p1.setX ( p2.x() );
     p2.setY ( p1.y() + scalePieceLength );
     for (i = 0; i < 4; i++ )
     {
-        p1.setX ( int(p1.x() + scaleFactorX) );
+        p1.setX ( int(p1.x() + scaleFactorXInPix) );
         p2.setX ( p1.x() );
         drawLine ( ras, solidRend, sl, p1, p2 );
+        QPoint textPos ( p2.x() - 10, p2.y() + 10 );
+        str = QString("%1").arg( (i + 1) * scaleFactorXInAbs );   
+        drawText ( baseRend, textRend, str, agg::rgba(100, 100, 100), textPos );
     }
 
-    p1 = getTrussAreaLeftTopPos ();
-    p2 = getTrussAreaRightBottomPos ();
+    p1 = leftTopAreaPos;
+    p2 = rightBottomAreaPos;
+    p1.setX (p1.x() - 23 - scalePieceLength );
+    p1.setY (p1.y() + 3 );
+    str = QString("%1").arg( getTrussAreaSize().height() );
+    drawText  ( baseRend, textRend, str, agg::rgba(100, 100, 100), p1 );
+    p2.setX (p2.x() - 10 );
+    p2.setY (p2.y() + 10 + scalePieceLength );
+    str = QString("%1").arg( getTrussAreaSize().width() );
+    drawText  ( baseRend, textRend, str, agg::rgba(100, 100, 100), p2 );
+
+    p1 = leftTopAreaPos;
+    p2 = rightBottomAreaPos;
     p1.setX ( p1.x() - scaleTextLeftBottomIndent );
     p1.setY ( p2.y() + scaleTextLeftBottomIndent );
     drawText  ( baseRend, textRend, "0", agg::rgba(100, 100, 100), p1 );
+    
 }
 
 void TrussUnitWindow::drawHeadline ( ren_dynarow& baseRend, 
@@ -582,11 +764,13 @@ void TrussUnitWindow::drawHeadline ( ren_dynarow& baseRend,
 
 void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 {
+    if ( !isVisible() )
+        return;
+
     glyph_gen glyph(0);
     scanline_rasterizer   ras;    
     agg::scanline_p8     sl;
     agg::ellipse ell;
-    glyph.font ( agg::verdana17_bold );
 
     pixf_dynarow pixf(*rbuf);
 
@@ -636,18 +820,20 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         linear_gradient gradFunc;
         color_array_type gradColors;
         agg::trans_affine mtx;
+        glyph.font ( headFont );
         drawHeadline ( baseRend, solidRend, ras, sl, gradSpan, gradFunc, gradColors, mtx );
 
 
         /*------draw window title text------*/
         QPoint point;
         point.setX ( windowSize.width()/2 - 10 * bordWidth );
-        point.setY ( 18 );
+        point.setY ( 17 );
         drawText ( baseRend, textRend, getTrussName (), 
                agg::rgba(1, 1, 1), point );
 
 
         /*------draw editable area in which canvas truss unit can be painted------*/
+        glyph.font ( numbersFont );
         drawTrussArea ( baseRend, ras, textRend, solidRend, sl );
 
 
