@@ -3,21 +3,58 @@
 
 #include <algorithm>
 #include <qtoolbar.h>
-#include <qaction.h>
+#include <qtoolbutton.h>
+
+/*****************************************************************************
+ * Tabbed Widget
+ *****************************************************************************/
+
+TabbedWidget::TabbedWidget ( ToolBarManager& tb,
+                                             QWidget& w, 
+                                             const QString& n,
+                                             const QIconSet & i ) : 
+    name(n), widget(w),
+    button( new QToolButton(i, n, n, this, SLOT(focus()),  &tb) ), 
+    windowState(0)
+{}
+
+void TabbedWidget::activate ()
+{
+}
+
+void TabbedWidget::disactivate ()
+{
+}
+
+void TabbedWidget::focus ()
+{
+}
+
+void TabbedWidget::defocus ()
+{
+}
+
+bool TabbedWidget::isActive () const
+{
+    return true;
+}
+
+bool TabbedWidget::isFocused () const
+{
+    return true;
+}
 
 /*****************************************************************************
  * Tool Bar Manager
  *****************************************************************************/
 
-ToolBarManager::ToolBarManager ( QWidget* parent ) :
-    QObject(parent),
-    toolBar(0),
+ToolBarManager::ToolBarManager ( QMainWindow* parent, const char* name ) :
+    QToolBar(parent, name),
     currentActiveWidget(0)
 {}
 
 ToolBarManager::~ToolBarManager ()
 {
-    setToolBar(0);
     clear();
 }
 
@@ -31,31 +68,18 @@ void ToolBarManager::clear ()
     widgets.clear();
 }
 
-ToolBarManager::TabbedWidget* ToolBarManager::findByWidget ( QWidget* w ) const
-{
+TabbedWidget* ToolBarManager::findByWidget ( QWidget* w ) const
+{/*
     TabbedWidgetsConstIter iter = widgets.begin();
     for ( ; iter != widgets.end(); ++iter )
         if ( (*iter)->widget == w )
             return *iter;
+ */
     return 0;
 }
 
-void ToolBarManager::setToolBar ( QToolBar* tb )
-{
-    TabbedWidgetsIter iter = widgets.begin();
-    for ( ; iter != widgets.end(); ++iter ) {
-        TabbedWidget* tw = *iter;
-        if ( toolBar )
-            tw->action->removeFrom( toolBar );
-        if ( tb )
-            tw->action->addTo( toolBar );
-    }    
-    toolBar = tb;
-    emit onToolBarChange(toolBar);
-}
-
 void ToolBarManager::activateWidget ( QWidget* w, bool activationFlag )
-{
+{/*
     uint activate = activationFlag ? WindowActive : ~WindowActive;
     TabbedWidget* tw = findByWidget(w);
     if ( tw ) {
@@ -65,7 +89,7 @@ void ToolBarManager::activateWidget ( QWidget* w, bool activationFlag )
         }        
         tw->widget->setWindowState( tw->windowState & activate );
         currentActiveWidget = tw;
-    }
+        }*/
 }
 
 void ToolBarManager::activateWidget ( QWidget* w )
@@ -79,13 +103,13 @@ void ToolBarManager::disactivateWidget ( QWidget* w )
 }
 
 void ToolBarManager::addWidget ( QWidget* w )
-{
+{/*
     TabbedWidget* tw = new TabbedWidget(w);
-    widgets.push_back(tw);    
+    widgets.push_back(tw);    */
 }
 
 void ToolBarManager::removeWidget ( QWidget* w )
-{
+{/*
     TabbedWidget* tw = findByWidget(w);
     if ( tw == 0 )
         return;
@@ -94,7 +118,7 @@ void ToolBarManager::removeWidget ( QWidget* w )
 
     TabbedWidgetsIter iter = std::find( widgets.begin(), widgets.end(), tw );
     delete *iter;
-    widgets.erase(iter);
+    widgets.erase(iter);*/
 }
 
 /****************************************************************************/
