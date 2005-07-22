@@ -83,6 +83,8 @@ bool TrussUnitWindowManager::removeTrussUnitWindow (
 void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file ) 
                                                             throw (WrongFormatException)
 {
+    //TODO: convert to some pretty struct all this stuff
+
     char line[256];
     std::vector<QPoint> pivots;
 
@@ -138,30 +140,41 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
         }
     }
 
-/*
-    //TODO: convert to some pretty struct
-
-    for ( i = 0; i < frm.nst1; ++i )
+    for ( i = 0; i < pivotsNum; ++i )
     {
         file.readLine( line, 256 );
-        frm.Fn[i] = strtod( line,  NULL );
+        //frm.Fn[i] = strtod( line,  NULL );
     }
     
-    for ( i = 0; i < 9; ++i )
-    {
-        frm.msn[i][0] = 0;
-        frm.msn[i][1] = 0;
-    }
-
-    for ( i = 0; i < frm.nyz1; ++i )
+    for ( i = 0; i < nodesNum; ++i )
     {
         file.readLine( line, 256 );
-        frm.msn[i][0] = strtol( line,  NULL, 10 );
+        int xFixation = strtol( line,  NULL, 10 );
+        //frm.msn[i][0] = strtol( line,  NULL, 10 );
+        file.readLine( line, 256 );
+        //frm.msn[i][1] = strtol( line,  NULL, 10 );
+        int yFixation = strtol( line,  NULL, 10 );
+
+        TrussNode* node = truss.findNodeByNumber( i );
+        if ( node == 0 )
+            throw WrongFormatException();
+
+        Node::Fixation fix = Node::Unfixed;
+        // All fixations of the old format are unusual swapped!
+        // So should be inverted!
+        if ( !xFixation && !yFixation )
+            fix = Node::FixationByXY;
+        else if ( !xFixation )
+            fix = Node::FixationByX;
+        else if ( !yFixation )
+            fix = Node::FixationByY;
+
+        node->setFixation( fix );
+    }
+
     
-        file.readLine( line, 256 );
-        frm.msn[i][1] = strtol( line,  NULL, 10 );
-    }
-
+    /*
+    // Fixation swapping
     for ( i = 0; i < frm.nyz1; ++i )
     {
         if ( frm.msn[i][0] == 0 )
