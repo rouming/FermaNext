@@ -619,7 +619,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
             beforeDragNodePos = selectedNode->getPoint();
             nodeBehaviour = onNodeDrag;
         }
-        if ( selectedWindow->isPivotSelected ( clickX, clickY ) )
+        else if ( selectedWindow->isPivotSelected ( clickX, clickY ) )
         {
             selectedPivot = selectedWindow->findPivotByWidgetPos ( clickX, clickY );
 
