@@ -2,32 +2,52 @@
 #ifndef TOOLBARMANAGER_H
 #define TOOLBARMANAGER_H
 
-#include <qobject.h>
+#include <qtoolbar.h>
+#include <qiconset.h>
 #include <vector>
 
-class QToolBar;
 class QWidget;
-class QAction;
+class QToolButton;
+class ToolBarManager;
 
-class ToolBarManager : public QObject
+class TabbedWidget : public QObject
+{
+    Q_OBJECT
+ public:
+    TabbedWidget ( ToolBarManager&,  QWidget&, 
+                   const QString& name, const QIconSet& iconSet );
+
+ public slots:
+    void activate ();
+    void disactivate ();
+    void focus ();
+    void defocus ();
+
+    bool isActive () const;
+    bool isFocused () const;
+
+ signals:
+    void onActivate ( TabbedWidget& );
+    void onDisactivate ( TabbedWidget& );
+    void onFocus ( TabbedWidget& );
+    void onDefocus ( TabbedWidget& );
+
+ private:
+    QString name;
+    QWidget& widget;
+    QToolButton* button;
+    uint windowState;
+};
+
+class ToolBarManager : public QToolBar
 {
     Q_OBJECT
  protected:
-    struct TabbedWidget
-    {
-        QAction* action;
-        QWidget* widget;
-        uint windowState;        
-        
-        TabbedWidget ( QWidget* w ) : widget(w) {}
-    };
 
  public:
-    ToolBarManager ( QWidget* parent = 0 );    
+    ToolBarManager ( QMainWindow* parent = 0, const char* name = 0 );
 
     ~ToolBarManager ();
-
-    virtual void setToolBar ( QToolBar* );
 
  protected:
     virtual void clear ();
@@ -55,7 +75,6 @@ class ToolBarManager : public QObject
     typedef TabbedWidgets::const_iterator TabbedWidgetsConstIter;
 
     TabbedWidgets widgets;
-    QToolBar* toolBar;
     TabbedWidget* currentActiveWidget;
 };
 

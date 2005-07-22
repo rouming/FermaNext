@@ -16,7 +16,7 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack )
     trussWindowManager(&stateManager),
     widgetStack(stack),
     projectMainWidget( new QMainWindow(widgetStack, 0, 0) ),
-    calcDataToolBar( new CalcDataToolBar ),
+    calcDataToolBar( new CalcDataToolBar(projectMainWidget) ),
     projectTab( new QTabWidget(projectMainWidget) )
 {
     projectMainWidget->setRightJustification( true );
@@ -26,18 +26,7 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack )
     widgetStack->addWidget(projectMainWidget);
     projectMainWidget->setCentralWidget( projectTab );
 
-    QToolBar *tb = new QToolBar( projectMainWidget );
-    tb->setNewLine ( true );  
-
-    QIconSet iconEnabled ( QPixmap::fromMimeSource( "images/calcdata.png") );
-    //QIconSet iconDisabled ( QPixmap::fromMimeSource( "images/calcdata_d.png") );
-    QButton* button = new QPushButton( iconEnabled, tr("Truss unit 1"), tb );    
-    button = new QPushButton( iconEnabled, tr("Results are not valid"), tb );    
-    button->setEnabled(false);
-    button = new QPushButton( iconEnabled, tr("Next variant"), tb );    
-
-    // Blank widget
-    tb->setStretchableWidget( new QLabel(tb) );
+    calcDataToolBar->setLabel( tr("Calculation data") );
 
     justStrengthAnalisysWidget = new QWidget(projectTab);
     designerWindow = new TrussUnitDesignerWindow(name_, projectTab);

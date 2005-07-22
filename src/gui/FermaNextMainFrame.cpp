@@ -51,7 +51,7 @@ void FermaNextMainFrame::init ()
 
     setCaption(mainFrameCaption);
     setMinimumSize( 640, 480 );
-    statusBar()->addWidget(new QLabel( "Ready", statusBar() ));
+    statusBar()->addWidget(new QLabel( tr("Ready"), statusBar() ));
 
     dw = new QDockWindow( QDockWindow::InDock, this );
     dw->setResizeEnabled( TRUE );
@@ -112,7 +112,7 @@ void FermaNextMainFrame::createProject ()
 void FermaNextMainFrame::setupFileActions ()
 {
     QToolBar *tb = new QToolBar( this );
-    tb->setLabel( "File Actions" );
+    tb->setLabel( tr("File Actions") );
     QPopupMenu *menu = new QPopupMenu( this );
     menuBar()->insertItem( tr( "&File" ), menu );
 
@@ -223,7 +223,7 @@ void FermaNextMainFrame::setupFileActions ()
 void FermaNextMainFrame::setupEditActions ()
 {
     QToolBar *tb = new QToolBar( this );
-    tb->setLabel( "Edit Actions" );
+    tb->setLabel( tr("Edit Actions") );
     QPopupMenu *menu = new QPopupMenu( this );
     menuBar()->insertItem( tr( "&Edit" ), menu );
 
