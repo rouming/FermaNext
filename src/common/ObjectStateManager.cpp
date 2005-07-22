@@ -161,8 +161,11 @@ bool ObjectStateManager::removeBlockByState (  ObjectState& st )
 
     block->removeState(st);
 
+    // Set current block to zero if we delete it
+    if ( currentBlock == block )
+        currentBlock = 0;
     // Remove block
-    stateBlocks.erase(iter);    
+    stateBlocks.erase(iter);
     delete block;
 
     return true;
@@ -242,7 +245,8 @@ void ObjectStateManager::saveState ( ObjectState& st )
         if ( noStartedBlock )
             endStateBlock();
     }
-    // First call or all blocks were undoed. Create single state block.
+    // First call, all blocks were undoed or current block was removed
+    // by dying state. So create single state block.
     else {
         // Should shift at first
         tryToShiftStack();
