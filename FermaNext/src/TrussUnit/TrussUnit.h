@@ -57,18 +57,22 @@ typedef agg::renderer_scanline_aa<ren_dynarow,
 class TrussNode;
 class TrussPivot;
 
+/*****************************************************************************/
+
 class PaintableTrussElement
 {    
 public:
     PaintableTrussElement ();
-    PaintableTrussElement ( bool h, bool v, bool r );
+    PaintableTrussElement ( bool h, bool v, bool e, bool r );
 
     virtual bool isVisible () const;
     virtual bool isHighlighted () const;
+    virtual bool isEnabled () const;
     virtual bool isRendered () const;
 
     virtual void setVisible ( bool );
     virtual void setHighlighted ( bool );
+    virtual void setEnabled ( bool );
 
 protected:
     virtual void rendered ( bool ) const;
@@ -76,6 +80,7 @@ protected:
 private:
     bool visible;
     bool highlighted;
+    bool enabled;
     mutable bool renderedFlag;
 };
 
@@ -122,6 +127,18 @@ public:
     TrussNode ( int x, int y, ObjectStateManager* );
     TrussNode ( int x, int y, Fixation, ObjectStateManager* );
 
+    void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
+                    agg::scanline_p8& sl, QPoint point1, QPoint point2,
+                    int width, color_type color ) const;
+    void drawFixation ( scanline_rasterizer& ras, solidRenderer& solidRend, 
+                        agg::scanline_p8& sl, int trussAreaHeight,
+                        double scaleMultX, double scaleMultY,
+                        int lineWidth, color_type color ) const;
+
+    void drawGradientEllipse ( scanline_rasterizer& ras, ren_dynarow& baseRend, 
+                               agg::scanline_p8& sl, int x, int y, int radius, 
+                               color_type begin, color_type middle, color_type end ) const;
+
     void paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
                 int trussAreaHeight ) const;
 };
@@ -137,6 +154,7 @@ public:
     void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
                     agg::scanline_p8& sl, QPoint point1, QPoint point2,
                     int width, color_type color ) const;
+
     void paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
                 int trussAreaHeight) const;
 };

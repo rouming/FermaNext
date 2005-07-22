@@ -7,14 +7,16 @@
  *****************************************************************************/
 
 PaintableTrussElement::PaintableTrussElement () : 
-    visible(false), 
+    visible(true), 
     highlighted(false),
+    enabled(true),
     renderedFlag(false)
 {}
 
-PaintableTrussElement::PaintableTrussElement ( bool h_, bool v_, bool r_ ) :
+PaintableTrussElement::PaintableTrussElement ( bool h_, bool v_, bool e_, bool r_ ) :
     visible(v_), 
     highlighted(h_),
+    enabled(e_),
     renderedFlag(r_)
 {}
 
@@ -32,6 +34,13 @@ void PaintableTrussElement::setHighlighted ( bool h_ )
     highlighted = h_;    
 }
 
+void PaintableTrussElement::setEnabled ( bool e_ )
+{
+    if ( enabled != e_ )
+        rendered(false);
+    enabled = e_;    
+}
+
 void PaintableTrussElement::rendered ( bool r_ ) const
 {
     renderedFlag = r_;
@@ -45,6 +54,11 @@ bool PaintableTrussElement::isVisible () const
 bool PaintableTrussElement::isHighlighted () const
 {
     return highlighted;
+}
+
+bool PaintableTrussElement::isEnabled () const
+{
+    return enabled;
 }
 
 bool PaintableTrussElement::isRendered () const
