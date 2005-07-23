@@ -120,6 +120,7 @@ signals:
     void beforeRedo ( ObjectStateManager& );
     void afterRedo ( ObjectStateManager& );
     void onSaveState ( ObjectStateManager&, ObjectState& );
+    void onRemoveState ( ObjectStateManager&, ObjectState& );
 
 private:
     typedef std::vector<StateBlock*> BlockList;
