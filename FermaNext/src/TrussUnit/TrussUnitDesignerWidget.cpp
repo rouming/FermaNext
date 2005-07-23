@@ -517,7 +517,7 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         selectedPivot->getLastNode().setVisible ( true );
         selectedPivot->setEnabled ( true );
         designerBehaviour = onPivotFirstNodeDraw;
-        TrussNode* node = selectedWindow->nodesMergingComparison( selectedNode, 200, false );
+        TrussNode* node = selectedWindow->nodesMergingComparison( selectedNode, 150, false );
         if ( node )
             selectedWindow->mergeNodes ( node, selectedNode );
         update();
@@ -538,6 +538,13 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
                 removeAllHighlight ();
                 nodeBehaviour = nodeIdle;
             }
+        TrussNode* node = selectedWindow->nodesMergingComparison( selectedNode, 150, true );
+        if ( node )
+        {
+            selectedWindow->mergeNodes ( node, selectedNode );
+            selectedNode = node;
+        }
+        update();
         }
         else
         {

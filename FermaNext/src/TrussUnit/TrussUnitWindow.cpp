@@ -521,7 +521,7 @@ void TrussUnitWindow::moveTrussPivot ( int x, int y, TrussPivot* pivot,
 TrussNode* TrussUnitWindow::nodesMergingComparison ( TrussNode* comparableNode, 
                                                      int precision, bool fixationCheck )
 {
-    TrussNode* node = findNodeByCoord ( comparableNode->getPoint(), precision );
+    TrussNode* node = findNodeWithSameCoord ( comparableNode, precision );
     if ( node != 0 && node != comparableNode )
     {
         if ( fixationCheck )
