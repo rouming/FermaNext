@@ -121,6 +121,22 @@ public:
         return 0;
     }   
 
+    virtual N* findNodeWithSameCoord ( N* comparableNode, int precision ) const
+    {
+        QPoint point = comparableNode->getPoint ();
+        NodeListConstIter iter = nodes.begin();
+        for ( ; iter != nodes.end(); ++iter )
+        {
+            N* node = *iter;
+            QPoint pos = node->getPoint();
+            if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
+                   (point.y() - pos.y()) * (point.y() - pos.y()) ) < precision &&
+                    node != comparableNode )
+                return node;
+        }
+        return 0;
+    }  
+
     virtual N* findNodeByNumber ( int num )
     {
         NodeListConstIter iter = nodes.begin();
