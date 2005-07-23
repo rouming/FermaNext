@@ -89,6 +89,8 @@ void FermaNextMainFrame::someProjectCreated ( FermaNextProject& prj )
     ObjectStateManager& mng = prj.getStateManager();
     connect( &mng, SIGNAL(onSaveState(ObjectStateManager&, ObjectState&)), 
                    SLOT(refreshUndoRedoActions()) );
+    connect( &mng, SIGNAL(onRemoveState(ObjectStateManager&, ObjectState&)), 
+                   SLOT(refreshUndoRedoActions()) );
 }
 
 void FermaNextMainFrame::createProject ()

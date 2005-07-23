@@ -189,6 +189,8 @@ bool ObjectStateManager::removeBlockByState (  ObjectState& st )
         delete *iter;
     stateBlocks.erase( eraseIter, stateBlocks.end() );
 
+    emit onRemoveState( *this, st );
+
     return true;
 }
 
