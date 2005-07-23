@@ -253,6 +253,20 @@ void block_removing_test ()
     delete obj2;
     my_assert( obj1->value() == obj1_value, "3. obj1 value has not been changed" );    
 
+    delete obj1;
+    my_assert( m.countStateBlocks() == 0, "3. Obj1 removed: none state blocks" );
+    my_assert( m.countStates() == 0, "3. Obj1 removed: none states" );    
+
+    bool excp = false;
+    try { m.undo(); }
+    catch (...) { excp = true; }
+    my_assert( excp, "3. Nothing to undo" );    
+
+    excp = false;
+    try { m.redo(); }
+    catch (...) { excp = true; }
+    my_assert( excp, "3. Nothing to redo" );
+
     std::cout << std::endl;
 }
 
