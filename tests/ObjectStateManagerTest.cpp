@@ -37,7 +37,7 @@ public:
                                                           val_,
                                                           val);
             state.addAction( action );
-            getStateManager()->saveState(state);
+            state.save();
         }
         
         val = val_; 
@@ -153,6 +153,105 @@ void stack_shifting_test ()
         m.redo();
     }
     my_assert( shifting_res, "All shifting" );
+
+    std::cout << std::endl;
+}
+
+void block_removing_test ()
+{
+    std::cout << std::endl << ">>>> stack_shifting_test" << std::endl;
+
+    ObjectStateManager m;
+
+    SomeObject* obj1 = new SomeObject(0, m);
+    SomeObject* obj2 = new SomeObject(10, m);
+    SomeObject* obj3 = new SomeObject(100, m);
+
+    int i =0;
+
+    // Next nearest test
+    for ( i = 1; i <= 10; ++i ) {
+        obj1->value( i );
+        obj2->value( 10 + i );
+        obj3->value( 100 + i );
+    }
+    my_assert( m.countStateBlocks() == 10 * 3, "1. Init count state blocks" );
+    my_assert( m.countStates() == 10 * 3, "1. Init count states" );
+    delete obj3;
+    my_assert( m.countStateBlocks() == 2, "1. Obj3 removed: state blocks" );
+    my_assert( m.countStates() == 2, "1. Obj3 removed: states" );
+    delete obj2;
+    my_assert( m.countStateBlocks() == 1, "1. Obj2 removed: state blocks" );
+    my_assert( m.countStates() == 1, "1. Obj2 removed: states" );
+    delete obj1;
+    my_assert( m.countStateBlocks() == 0, "1. Obj1 removed: none state blocks" );
+    my_assert( m.countStates() == 0, "1. Obj1 removed: none states" );
+
+
+    // Group test
+    obj1 = new SomeObject(0, m);
+    obj2 = new SomeObject(10, m);
+    obj3 = new SomeObject(100, m);
+    for ( i = 1; i <= 10; ++i ) {
+        obj1->value( i );
+    }
+    for ( i = 1; i <= 10; ++i ) {
+        obj2->value( 10 + i );
+    }
+    for ( i = 1; i <= 10; ++i ) {
+        obj3->value( 100 + i );
+    }
+    my_assert( m.countStateBlocks() == 10 * 3, "2. Init count state blocks" );
+    my_assert( m.countStates() == 10 * 3, "2. Init count states" );
+    delete obj2;
+    my_assert( m.countStateBlocks() == 10, "2. Obj2 removed: state blocks" );
+    my_assert( m.countStates() == 10, "2. Obj2 removed: states" );
+    delete obj3;
+    my_assert( m.countStateBlocks() == 10, "2. Obj3 removed: state blocks" );
+    my_assert( m.countStates() == 10, "2. Obj3 removed: states" );
+    delete obj1;
+    my_assert( m.countStateBlocks() == 0, "2. Obj1 removed: none state blocks" );
+    my_assert( m.countStates() == 0, "2. Obj1 removed: none states" );
+
+    
+    // Undo/Redo after block removing test
+    obj1 = new SomeObject(0, m);
+    obj2 = new SomeObject(666, m);
+    obj3 = new SomeObject(100, m);
+    for ( i = 1; i <= 10; ++i ) {
+        obj1->value( i );
+    }
+
+    obj2->value( 1 );
+
+    for ( i = 1; i <= 10; ++i ) {
+        obj3->value( 100 + i );
+    }
+
+    for ( i = 1; i <= 10; ++i ) {
+        m.undo();
+    }
+    // Undo obj2
+    m.undo();
+    my_assert( obj2->value() == 666, "3. Undo to obj2 init value" );
+
+    // Half redo. Nevermind what is the number.
+    for ( i = 1; i <= 10/2; ++i ) {
+        m.redo();
+    }
+    my_assert( obj2->value() != 666, "3. Redo" );
+
+    delete obj3;
+    m.undo();
+    my_assert( obj2->value() == 666, "3. Undoed current block to obj2 init value" );
+
+    // Half undo. Nevermind what is the number.
+    for ( i = 1; i <= 10/2; ++i ) {
+        m.undo();
+    }
+    int obj1_value = obj1->value();
+    delete obj2;
+    my_assert( obj1->value() == obj1_value, "3. obj1 value has not been changed" );    
 
     std::cout << std::endl;
 }
@@ -280,6 +379,7 @@ int main ()
 
 
     stack_shifting_test();
+    block_removing_test();
 
     std::cout << "\n" << "Passed: " << PASSED << "\nFailed: " << FAILED << "\n";
     return 0;    
