@@ -159,14 +159,35 @@ bool ObjectStateManager::removeBlockByState (  ObjectState& st )
         return false;
     }
 
-    block->removeState(st);
+    // If current block exists we should be sure it is located
+    // below the block is going to be removed.
+    if ( currentBlock != 0 ) {
+        BlockListIter currIter = std::find( stateBlocks.begin(), 
+                                            stateBlocks.end(), 
+                                            currentBlock );
+        // Strange. Should never reach this line. 
+        if ( currIter == stateBlocks.end() ) {
+            return false;
+        }
+        // Current block must be located below the block
+        // which is going to be removed.
+        if ( currIter >= iter )
+            currentBlock = ( iter != stateBlocks.begin() ? *(iter - 1) : 0 );
+    }
 
-    // Set current block to zero if we delete it
-    if ( currentBlock == block )
-        currentBlock = 0;
-    // Remove block
-    stateBlocks.erase(iter);
-    delete block;
+    // Remove all blocks wich are located above the block
+    // which is going to be removed.
+    // =============================
+    // Remember: We can't just remove block by dying state. 
+    //           Actually it is not save. Some states, which 
+    //           were saved after dying state, can depend on 
+    //           it. So all states located after dying state 
+    //           should be removed.
+    // =============================
+    BlockListIter eraseIter = iter;
+    for ( ; iter != stateBlocks.end(); ++iter )
+        delete *iter;
+    stateBlocks.erase( eraseIter, stateBlocks.end() );
 
     return true;
 }
@@ -245,8 +266,7 @@ void ObjectStateManager::saveState ( ObjectState& st )
         if ( noStartedBlock )
             endStateBlock();
     }
-    // First call, all blocks were undoed or current block was removed
-    // by dying state. So create single state block.
+    // First call or all blocks were undoed. Create single state block.
     else {
         // Should shift at first
         tryToShiftStack();
