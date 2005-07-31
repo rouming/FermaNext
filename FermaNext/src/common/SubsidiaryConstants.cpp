@@ -28,7 +28,7 @@ const int leftWindowIndent = 38,
           resEllRad = 3,
           nodesRadius = 4,
           pivotsWidth = 2,
-          eps = 100;
+          pivotFindingPrecision = 100;
 
 const bool flipY = true;
 

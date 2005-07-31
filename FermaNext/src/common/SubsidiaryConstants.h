@@ -31,7 +31,7 @@ extern const int leftWindowIndent,
                  resEllRad,
                  nodesRadius,
                  pivotsWidth,
-                 eps;
+                 pivotFindingPrecision;
 
 extern const bool flipY;
 
