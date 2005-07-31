@@ -40,13 +40,6 @@ Node::Node ( int x_, int y_, Fixation fix_, ObjectStateManager* mng ) :
     number(0)
 {}
 
-Node::Node ( int x_, int y_, Fixation fix_, int num_, ObjectStateManager* mng ) :
-    StatefulObject(mng),
-    x(x_), y(y_), 
-    fix(fix_),
-    number(num_)
-{}
-
 void Node::setFixation ( Node::Fixation fix_ )
 {
     fix = fix_;
@@ -88,7 +81,6 @@ int Node::getY () const
 void Node::setNumber ( int num_ )
 {
     number = num_;
-    emit onNumberChange(number);
 }
 
 int Node::getNumber () const

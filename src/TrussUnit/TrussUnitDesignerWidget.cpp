@@ -173,9 +173,9 @@ void TrussUnitDesignerWidget::initTrussUnitWindow ()  //temp method. Later to re
         pivotPnt2.setY ( 0 );
         trussWindow->createPivot ( pivotPnt1, pivotPnt2 );
 
-        trussWindow->findNodeByNumber( 0 )->setFixation( Node::FixationByX );
-        trussWindow->findNodeByNumber( 1 )->setFixation( Node::FixationByY );
-        trussWindow->findNodeByNumber( 2 )->setFixation( Node::FixationByXY );
+        trussWindow->findNodeByNumber( 1 )->setFixation( Node::FixationByX );
+        trussWindow->findNodeByNumber( 2 )->setFixation( Node::FixationByY );
+        trussWindow->findNodeByNumber( 3 )->setFixation( Node::FixationByXY );
     }
 //    parseSvg ( "tiger.svg" );
     init = false;

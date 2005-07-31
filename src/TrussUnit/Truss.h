@@ -93,11 +93,13 @@ public:
     }
 
     virtual N* findNodeByCoord ( QPoint point ) const
-    {        
+    {   
         NodeListConstIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
         {
             N* node = *iter;
+            if ( !node->isAlive() )
+                continue;
             QPoint pos = node->getPoint();
             if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
                    (point.y() - pos.y()) * (point.y() - pos.y()) ) < 
@@ -113,6 +115,8 @@ public:
         for ( ; iter != nodes.end(); ++iter )
         {
             N* node = *iter;
+            if ( !node->isAlive() )
+                continue;
             QPoint pos = node->getPoint();
             if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
                    (point.y() - pos.y()) * (point.y() - pos.y()) ) < precision )
@@ -128,6 +132,8 @@ public:
         for ( ; iter != nodes.end(); ++iter )
         {
             N* node = *iter;
+            if ( !node->isAlive() )
+                continue;
             QPoint pos = node->getPoint();
             if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
                    (point.y() - pos.y()) * (point.y() - pos.y()) ) < precision &&
@@ -137,26 +143,26 @@ public:
         return 0;
     }  
 
-    virtual N* findNodeByNumber ( int num )
+    virtual N* findNodeByNumber ( int num ) const
     {
         NodeListConstIter iter = nodes.begin();
-        for ( ; iter != nodes.end(); ++iter )
-        {
-            N* node = *iter;
-            if ( node->getNumber () == num )
-                return node;
+        for ( int i = 1; iter != nodes.end(); ++iter ) {
+            if ( (*iter)->isAlive() && i++ == num )
+                return *iter;
         }
         return 0;
-    }  
+    }
 
-    virtual P* findPivotByNodes ( N* node1, N* node2 )
+    virtual P* findPivotByNodes ( const N& node1, const N& node2 ) const
     {
-        PivotListIter iter = pivots.begin();
+        PivotListConstIter iter = pivots.begin();
         for ( ; iter != pivots.end(); ++iter )
         {
             P* pivot = (*iter);
-            if ( &(pivot->getFirstNode()) == node1 && &(pivot->getLastNode()) == node2 ||
-                 &(pivot->getFirstNode()) == node2 && &(pivot->getLastNode()) == node1 )
+            if ( &(pivot->getFirstNode()) == &node1 && 
+                 &(pivot->getLastNode()) == &node2 ||
+                 &(pivot->getFirstNode()) == &node2 && 
+                 &(pivot->getLastNode()) == &node1 )
                 {
                     return pivot;
                 }
@@ -164,34 +170,54 @@ public:
         return 0;
     }
 
+    virtual bool reviveNode ( N& node ) 
+    {
+        NodeListIter iter = std::find( nodes.begin(), nodes.end(), &node );
+        if ( iter == nodes.end() )
+            return false;
+        if ( node.isAlive() )
+            return false;
+
+        emit beforeNodeCreation();
+        node.revive();
+        emit afterNodeCreation(node);
+        emit onStateChange();
+        return true;
+    }
+
+    virtual bool revivePivot ( P& pivot )
+    {
+        PivotListIter iter = std::find( pivots.begin(), pivots.end(), &pivot );
+        if ( iter == pivots.end() )
+            return false;
+        if ( pivot.isAlive() )
+            return false;
+
+        emit beforePivotCreation();
+        pivot.revive();
+        emit afterPivotCreation( pivot.getFirstNode(), pivot.getLastNode() );
+        emit onStateChange();
+        return true;
+    }
+
     virtual N& createNode ( int x, int y )
     {
+        // Clean earlier desisted nodes/pivots
+        suspendedClean();
+
         emit beforeNodeCreation();
-        QPoint coord (x, y);
-        N* oldNode = findNodeByCoord ( coord );
-        if ( oldNode == 0 || !(oldNode->isEnabled()) )
-        {
-            N* node = new N(getStateManager());
-            node->setPoint( x, y );
-            if ( ! nodes.empty() )
-            {
-                int num = nodes.back()->getNumber();
-                node->setNumber( num + 1 );
-            }
-            nodes.push_back(node);
+        N* node = new N(getStateManager());
+        node->setPoint( x, y );
+        nodes.push_back(node);
 
-            QObject::connect( node, SIGNAL(onFixationChange ( Fixation )),
-                                    SLOT(stateIsChanged()) );
-            QObject::connect( node, SIGNAL(onPositionChange ( int, int )),
-                                    SLOT(stateIsChanged()) );
-            QObject::connect( node, SIGNAL(onNumberChange ( int )),
-                                    SLOT(stateIsChanged()) );
+        QObject::connect( node, SIGNAL(onFixationChange ( Fixation )),
+                                SLOT(stateIsChanged()) );
+        QObject::connect( node, SIGNAL(onPositionChange ( int, int )),
+                                SLOT(stateIsChanged()) );
 
-            emit afterNodeCreation(*node);
-            emit onStateChange();
-            return *node;
-        }
-        return *oldNode;
+        emit afterNodeCreation(*node);
+        emit onStateChange();
+        return *node;
     }
 
     virtual P& createPivot ( QPoint p1 , QPoint p2 )
@@ -221,6 +247,9 @@ public:
 
     virtual P& createPivot ( N& first, N& last )
     {
+        // Clean earlier desisted nodes/pivots
+        suspendedClean();
+
         emit beforePivotCreation();
         P* pivot = new P( first, last, getStateManager() );        
         pivots.push_back(pivot);
@@ -252,14 +281,34 @@ public:
         return false;    
     }
 
-    virtual const NodeList& getNodeList () const
+    // Returns alive nodes
+    virtual NodeList getNodeList () const
     {
-        return nodes;
+        NodeList aliveNodes;
+        NodeListConstIter iter = nodes.begin();
+        for ( int i = 1; iter != nodes.end(); ++iter ) {
+            N* node = *iter;
+            if ( node->isAlive() ) {
+                node->setNumber( i++ );
+                aliveNodes.push_back( node );
+            }
+        }
+        return aliveNodes;
     }
 
-    virtual const PivotList& getPivotList () const
+    // Returns alive nodes
+    virtual PivotList getPivotList () const
     {
-        return pivots;
+        PivotList alivePivots;
+        PivotListConstIter iter = pivots.begin();
+        for ( int i = 1; iter != pivots.end(); ++iter ) {
+            P* pivot = *iter;
+            if ( pivot->isAlive() ) {
+                pivot->setNumber( i++ );
+                alivePivots.push_back( pivot );
+            }
+        }
+        return alivePivots;
     }
 
     virtual void nodeToFront ( N& selectedNode )
@@ -279,44 +328,57 @@ public:
     }
 
 protected:
+    // Physically removes nodes and pivots
+    virtual void suspendedClean () 
+    {
+        // Clean desisted nodes without states
+        NodeListIter nIter = nodes.begin();
+        for ( ; nIter != nodes.end(); ) {
+            N* node = *nIter;
+            if ( !node->isAlive() && node->countStates() == 0 ) {
+                nodes.erase(nIter);
+                delete node;
+            }
+            else
+                ++nIter;
+        }
+
+        // Clean desisted pivots without states
+        PivotListIter pIter = pivots.begin();
+        for ( ; pIter != pivots.end(); ) {
+            P* pivot = *pIter;
+            if ( !pivot->isAlive() && pivot->countStates() == 0 ) {
+                pivots.erase(pIter);
+                delete pivot;
+            }
+            else
+                ++pIter;
+        }
+    }
+
+    // Doesn't physically remove node
     virtual void removeNode ( NodeListIter& iter )
     {
         if ( iter == nodes.end() )
             return;
+        // Clean earlier desisted nodes/pivots
+        suspendedClean();
         Node* n = *iter;
-        int num = n->getNumber ();
         emit beforeNodeRemoval(*n);
-        delete n;
-        nodes.erase(iter);
-        decreaseNodesNumbers ( num );
+        n->desist();
         emit afterNodeRemoval();
         emit onStateChange();
     }
-
-    virtual void decreaseNodesNumbers ( int fromNumb )
-    {
-        if ( nodes.empty () )
-            return;
-        NodeListConstIter iter = nodes.begin();
-        for ( ; iter != nodes.end(); ++iter )
-        {
-            N* node = *iter;
-            if ( node->getNumber () > fromNumb )
-            {
-                int newNumber = node->getNumber () - 1;
-                node->setNumber ( newNumber );
-            }
-        }
-    }
-
+    // Doesn't physically remove pivot
     virtual void removePivot ( PivotListIter& iter )
     {
         if ( iter == pivots.end() )
             return;
+        // Clean earlier desisted nodes/pivots
+        suspendedClean();
         P* p = *iter;
         emit beforePivotRemoval(p->getFirstNode(), p->getLastNode());
-        delete p;
-        pivots.erase(iter);
+        p->desist();
         emit afterPivotRemoval();
         emit onStateChange();
     }
@@ -358,12 +420,14 @@ class Pivot : public StatefulObject
 protected:
     Pivot ( ObjectStateManager* mng ) : 
         StatefulObject(mng),
-        first(0), last(0) 
+        first(0), last(0),
+        number(0)
     {}
     Pivot ( N& first_, N& last_, ObjectStateManager* mng ) :
         StatefulObject(mng),
         first(&first_),
-        last(&last_) 
+        last(&last_),
+        number(0)
     {}
     virtual ~Pivot ()
     {}
@@ -377,9 +441,14 @@ public:
     { first = first_; }
     virtual void setLastNode ( N* last_ )
     { last = last_; }
+    virtual int getNumber () const
+    { return number; }
+    virtual void setNumber ( int num )
+    { number = num; }
 
 private:    
     N *first, *last;
+    int number;
 };
 
 /*****************************************************************************
@@ -389,7 +458,7 @@ private:
 class Node : public StatefulObject
 {
     Q_OBJECT
-    friend class Truss<class N, class P>;
+    friend class Truss<Node, class P>;
 
 public:
     typedef enum { Unfixed = 0,
@@ -400,13 +469,11 @@ public:
 signals:
     void onFixationChange ( Fixation );
     void onPositionChange ( int, int );
-    void onNumberChange ( int );
 
 protected:
     Node ( ObjectStateManager* mng );
     Node ( int x, int y, ObjectStateManager* mng );
     Node ( int x, int y, Fixation, ObjectStateManager* mng );
-    Node ( int x, int y, Fixation, int, ObjectStateManager* mng );
 
 public:
     virtual void setFixation ( Fixation );
@@ -419,8 +486,8 @@ public:
     virtual int getX () const;
     virtual int getY () const;
 
-    virtual void setNumber ( int );
     virtual int getNumber () const;
+    virtual void setNumber ( int );
 
 private:
     int x, y;
