@@ -507,8 +507,8 @@ void TrussUnitWindow::moveTrussPivot ( int x, int y, TrussPivot* pivot,
         newYFirst = oldYFirst + ( areaHeight - oldYLast);
     }
 
-    pivot->getFirstNode().setPoint ( newXFirst, newYFirst );
-    pivot->getLastNode().setPoint ( newXLast, newYLast );
+    pivot->getFirstNode().setPoint( newXFirst, newYFirst );
+    pivot->getLastNode().setPoint( newXLast, newYLast );
     rendered(false);
 }
 
@@ -561,8 +561,8 @@ void TrussUnitWindow::dividePivot ( TrussPivot& dividualPivot, TrussNode& dividi
     TrussNode& first = dividualPivot.getFirstNode();
     TrussNode& last = dividualPivot.getLastNode();
     removePivot ( dividualPivot );
-    TrussPivot* pivot1 = findPivotByNodes ( &first, &dividingNode );
-    TrussPivot* pivot2 = findPivotByNodes ( &last, &dividingNode );
+    TrussPivot* pivot1 = findPivotByNodes ( first, dividingNode );
+    TrussPivot* pivot2 = findPivotByNodes ( last, dividingNode );
     // Check if there is another pivot with the same coords. 
     // If it so, we should create only one pivot instead of removed (divided) pivot.
     if ( pivot1 )
