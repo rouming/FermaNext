@@ -53,7 +53,7 @@ public:
     virtual bool isPivotSelected ( int x, int y ) const;
 
     virtual TrussNode* findNodeByWidgetPos ( int x, int y ) const;
-    virtual TrussPivot* findPivotByWidgetPos ( int x, int y ) const;
+    virtual TrussPivot* findPivotByWidgetPos ( int x, int y, int presicion ) const;
 
     virtual color_type getCanvasColor () const;
 	virtual color_type getHeadlineFirstColor () const;
@@ -61,18 +61,22 @@ public:
     virtual color_type getHeadlineLastColor () const;
 	virtual color_type getBorderColor () const;
 
-    virtual void setWindowSize ( int w, int h );
+    virtual void resize ( QPoint leftTop, QPoint rightBottom );
     virtual void setWindowPosition ( QPoint pos );
     virtual void setNodeHighlight ( int x, int y );
     virtual void setPivotHighlight ( int x, int y );
     virtual void removeNodesHighlight ();
     virtual void removePivotsHighlight ();
+
+    // TODO: carry to TrussUnit class
     virtual void moveTrussNode ( int x, int y, TrussNode* node );
     virtual void moveTrussPivot ( int x, int y, TrussPivot* pivot, 
                                   QPoint firstNodeClickDist, QPoint lastNodeClickDist );
     virtual TrussNode* nodesMergingComparison ( TrussNode* comparableNode, int precision,
                                                 bool fixationCheck );
     virtual void mergeNodes ( TrussNode* node, TrussNode* mergingNode );
+    virtual void dividePivot ( TrussPivot& dividualPivot, TrussNode& dividingNode );
+    virtual void checkAfterNodeManipulation ( TrussNode* selectedNode );
 
     virtual void setCanvasColor ( int r, int g, int b );
     virtual void setHeadlineFirstColor ( int r, int g, int b );
@@ -80,8 +84,6 @@ public:
     virtual void setHeadlineLastColor ( int r, int g, int b );
     virtual void setBorderColor ( int r, int g, int b );
     virtual void setResEllColor ( int r, int g, int b );
-
-    virtual void resize ( QPoint leftTop, QPoint rightBottom );
 
     virtual void drawText ( ren_dynarow& baseRend, textRenderer& textRend,
                             const QString& str, color_type c, QPoint point ) const;
@@ -111,6 +113,7 @@ signals:
 protected:
     virtual double getScaleMultiplierX () const;
     virtual double getScaleMultiplierY () const;
+    virtual void setWindowSize ( int w, int h );
 
 private:
     textFont headFont, numbersFont;

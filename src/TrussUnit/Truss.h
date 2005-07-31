@@ -149,6 +149,21 @@ public:
         return 0;
     }  
 
+    virtual P* findPivotByNodes ( N* node1, N* node2 )
+    {
+        PivotListIter iter = pivots.begin();
+        for ( ; iter != pivots.end(); ++iter )
+        {
+            P* pivot = (*iter);
+            if ( &(pivot->getFirstNode()) == node1 && &(pivot->getLastNode()) == node2 ||
+                 &(pivot->getFirstNode()) == node2 && &(pivot->getLastNode()) == node1 )
+                {
+                    return pivot;
+                }
+        }
+        return 0;
+    }
+
     virtual N& createNode ( int x, int y )
     {
         emit beforeNodeCreation();
@@ -247,6 +262,22 @@ public:
         return pivots;
     }
 
+    virtual void nodeToFront ( N& selectedNode )
+    {    
+        if ( nodes.back() == &selectedNode )
+            return;
+        NodeListIter newSelectedIter = std::find ( nodes.begin(), nodes.end(), 
+                                                  &selectedNode );
+        if ( !newSelectedIter )
+            return;
+
+        if ( *newSelectedIter != &selectedNode )
+            return;
+        // push selected node to front
+        nodes.erase ( newSelectedIter );
+        nodes.push_back ( &selectedNode );
+    }
+
 protected:
     virtual void removeNode ( NodeListIter& iter )
     {
@@ -288,6 +319,26 @@ protected:
         pivots.erase(iter);
         emit afterPivotRemoval();
         emit onStateChange();
+    }
+
+    virtual P* findPivotCopy ( P* comparablePivot )
+    {
+        PivotListIter iter = pivots.begin();
+        for ( ; iter != pivots.end(); ++iter )
+        {
+            P* pivot = (*iter);
+            if ( pivot != comparablePivot )
+            {
+                if ( &pivot->getFirstNode() == &comparablePivot->getFirstNode() && 
+                    &pivot->getLastNode() == &comparablePivot->getLastNode() ||
+                     &pivot->getFirstNode() == &comparablePivot->getLastNode() && 
+                    &pivot->getLastNode() == &comparablePivot->getFirstNode() )
+                {
+                    return pivot;
+                }
+            }
+        }
+        return 0;
     }
 
 private:
