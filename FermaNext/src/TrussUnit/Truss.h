@@ -159,13 +159,14 @@ public:
         for ( ; iter != pivots.end(); ++iter )
         {
             P* pivot = (*iter);
+			if ( ! pivot->isAlive() )
+				continue;
             if ( &(pivot->getFirstNode()) == &node1 && 
                  &(pivot->getLastNode()) == &node2 ||
                  &(pivot->getFirstNode()) == &node2 && 
-                 &(pivot->getLastNode()) == &node1 )
-                {
-                    return pivot;
-                }
+                 &(pivot->getLastNode()) == &node1 ) {
+				return pivot;
+			}
         }
         return 0;
     }
