@@ -118,7 +118,7 @@ const QSize& TrussUnitWindow::getWindowSize () const
     return windowSize;
 }
 
-QPoint TrussUnitWindow::getTrussCoordFromWidgetCoord ( int x, int y ) const
+QPoint TrussUnitWindow::getTrussCoordFromWidgetPos ( int x, int y ) const
 {
     // TODO: flipY comparison
     double scaleMultX = getScaleMultiplierX ();
@@ -130,7 +130,7 @@ QPoint TrussUnitWindow::getTrussCoordFromWidgetCoord ( int x, int y ) const
     return trussCoord;
 }
 
-QPoint TrussUnitWindow::getWidgetCoordFromTrussCoord ( int x, int y ) const
+QPoint TrussUnitWindow::getWidgetPosFromTrussCoord ( int x, int y ) const
 {
     double scaleMultX = getScaleMultiplierX ();
     double scaleMultY = getScaleMultiplierY ();
@@ -295,7 +295,7 @@ TrussNode* TrussUnitWindow::findNodeByWidgetPos ( int x, int y ) const
 	{
         TrussNode* node = *iter;
         // get node widget coords (in pixels) from its truss (absolute) coords
-        widgetCoord = getWidgetCoordFromTrussCoord ( node->getX(), node->getY() );
+        widgetCoord = getWidgetPosFromTrussCoord ( node->getX(), node->getY() );
         if ( abs ( widgetCoord.x() - x ) < nodesRadius && 
              abs ( widgetCoord.y() - y ) < nodesRadius )
         {
@@ -307,7 +307,8 @@ TrussNode* TrussUnitWindow::findNodeByWidgetPos ( int x, int y ) const
 
 TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y, int precision ) const
 {
-    QPoint trussCoord1, trussCoord2, widgetCoord1, widgetCoord2;
+    QPoint trussCoord1, trussCoord2, widgetPos1, widgetPos2, firstNodePos, lastNodePos;
+    int Y;
     PivotList pivotList = getPivotList ();
     PivotListIter iter = pivotList.begin();
     for ( ; iter != pivotList.end(); ++iter )
@@ -315,14 +316,31 @@ TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y, int precision 
         TrussPivot* pivot = *iter;
         trussCoord1 = pivot->getFirstNode ().getPoint ();
         trussCoord2 = pivot->getLastNode ().getPoint ();
-        widgetCoord1 = getWidgetCoordFromTrussCoord ( trussCoord1.x(), trussCoord1.y() );
-        widgetCoord2 = getWidgetCoordFromTrussCoord ( trussCoord2.x(), trussCoord2.y() );
-        if ( ( abs(( x - widgetCoord1.x() ) * ( widgetCoord1.y() - widgetCoord2.y() ) - 
-                   ( y - widgetCoord1.y() ) * ( widgetCoord1.x() - widgetCoord2.x() )) <= 
-              precision ) && ( ( x >= widgetCoord1.x() && x <= widgetCoord2.x() || 
-              x >= widgetCoord2.x() && x <= widgetCoord1.x() ) && ( y >= widgetCoord1.y() && 
-              y <= widgetCoord2.y() || y >= widgetCoord2.y() && y <= widgetCoord1.y() ) ) )
-            return pivot;
+        widgetPos1 = getWidgetPosFromTrussCoord ( trussCoord1.x(), trussCoord1.y() );
+        widgetPos2 = getWidgetPosFromTrussCoord ( trussCoord2.x(), trussCoord2.y() );
+
+        firstNodePos = getWidgetPosFromTrussCoord ( pivot->getFirstNode().getX(),
+                                                    pivot->getFirstNode().getY() );
+        lastNodePos = getWidgetPosFromTrussCoord ( pivot->getLastNode().getX(),
+                                                   pivot->getLastNode().getY() );
+
+        if ( ( x - firstNodePos.x() ) * ( x - firstNodePos.x() ) + 
+             ( y - firstNodePos.y() ) * ( y - firstNodePos.y() ) > 
+               nodesRadius * nodesRadius && 
+             ( x - lastNodePos.x() ) * ( x - lastNodePos.x() ) + 
+             ( y - lastNodePos.y() ) * ( y - lastNodePos.y() ) > 
+               nodesRadius * nodesRadius )
+        {               
+            // equation of line
+            Y = abs( ( x - widgetPos1.x() ) * ( widgetPos1.y() - widgetPos2.y() ) - 
+                     ( y - widgetPos1.y() ) * ( widgetPos1.x() - widgetPos2.x() ) );
+
+            if ( ( x >= widgetPos1.x() && x <= widgetPos2.x() || 
+                   x >= widgetPos2.x() && x <= widgetPos1.x() ) && 
+                 ( y >= widgetPos1.y() && y <= widgetPos2.y() || 
+                   y >= widgetPos2.y() && y <= widgetPos1.y() ) && Y <= precision )
+                return pivot;
+        }
     }
     return 0;
 }
@@ -430,7 +448,7 @@ void TrussUnitWindow::removePivotsHighlight ()
 
 void TrussUnitWindow::moveTrussNode ( int x, int y, TrussNode* node )
 {
-    QPoint newCoord = getTrussCoordFromWidgetCoord ( x, y );
+    QPoint newCoord = getTrussCoordFromWidgetPos ( x, y );
 
     int areaWidth = getTrussAreaSize().width();
     int areaHeight = getTrussAreaSize().height();
@@ -450,7 +468,7 @@ void TrussUnitWindow::moveTrussNode ( int x, int y, TrussNode* node )
 void TrussUnitWindow::moveTrussPivot ( int x, int y, TrussPivot* pivot, 
                                       QPoint firstNodeClickDist, QPoint lastNodeClickDist )
 {
-    QPoint newCoord = getTrussCoordFromWidgetCoord ( x, y );
+    QPoint newCoord = getTrussCoordFromWidgetPos ( x, y );
     int newXFirst = newCoord.x()  + firstNodeClickDist.x();
     int newYFirst = newCoord.y() + firstNodeClickDist.y();
     int newXLast = newCoord.x() + lastNodeClickDist.x();
@@ -597,7 +615,7 @@ void TrussUnitWindow::dividePivot ( TrussPivot& dividualPivot, TrussNode& dividi
 
 void TrussUnitWindow::checkAfterNodeManipulation ( TrussNode* selectedNode )
 {
-    QPoint nodePos = getWidgetCoordFromTrussCoord ( selectedNode->getX(), 
+    QPoint nodePos = getWidgetPosFromTrussCoord ( selectedNode->getX(), 
                                                     selectedNode->getY() );
     TrussNode* node = nodesMergingComparison( selectedNode, 150, true );
     TrussPivot* pivot = findPivotByWidgetPos ( nodePos.x(), nodePos.y(), 250 );

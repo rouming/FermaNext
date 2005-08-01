@@ -639,7 +639,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                                                                     pivotFindingPrecision );
 
             // Convert widget coordinates into truss (absolute) coordinates
-            QPoint trussCoord = selectedWindow->getTrussCoordFromWidgetCoord(clickX, clickY);
+            QPoint trussCoord = selectedWindow->getTrussCoordFromWidgetPos(clickX, clickY);
 
             QPoint firstPos = selectedPivot->getFirstNode().getPoint();
             QPoint lastPos  = selectedPivot->getLastNode().getPoint();
@@ -663,7 +663,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
         if ( nodeCanBeDrawn ( clickX, clickY ) )
         {
             QPoint nodeCoord = selectedWindow->
-                                        getTrussCoordFromWidgetCoord ( clickX, clickY );
+                                        getTrussCoordFromWidgetPos ( clickX, clickY );
             TrussNode* node = &selectedWindow->createNode ( nodeCoord.x(), nodeCoord.y() );
             selectedWindow->checkAfterNodeManipulation ( node );
             update();
@@ -674,8 +674,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
     {
         if ( nodeCanBeDrawn ( clickX, clickY ) )
         {
-            QPoint nodeCoord = selectedWindow->
-                                        getTrussCoordFromWidgetCoord ( clickX, clickY );
+            QPoint nodeCoord = selectedWindow->getTrussCoordFromWidgetPos( clickX, clickY );
             TrussNode& firstNode = selectedWindow->createNode( nodeCoord.x(), nodeCoord.y() );
             firstNode.setEnabled ( false );
             TrussNode& lastNode = selectedWindow->createNode( nodeCoord.x(), nodeCoord.y() );
