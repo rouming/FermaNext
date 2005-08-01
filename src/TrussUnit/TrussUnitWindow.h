@@ -37,8 +37,8 @@ public:
     virtual QPoint getWindowRightBottomPos () const;
     virtual QPoint getTrussAreaLeftTopPos () const;
     virtual QPoint getTrussAreaRightBottomPos () const;
-    virtual QPoint getTrussCoordFromWidgetCoord ( int x, int y ) const;
-    virtual QPoint getWidgetCoordFromTrussCoord ( int x, int y ) const;
+    virtual QPoint getTrussCoordFromWidgetPos ( int x, int y ) const;
+    virtual QPoint getWidgetPosFromTrussCoord ( int x, int y ) const;
     virtual const QSize& getWindowSize () const;    
 
     virtual bool inWindowRect ( int x, int y ) const;
