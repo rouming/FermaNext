@@ -159,14 +159,14 @@ public:
         for ( ; iter != pivots.end(); ++iter )
         {
             P* pivot = (*iter);
-			if ( ! pivot->isAlive() )
-				continue;
+            if ( ! pivot->isAlive() )
+                continue;
             if ( &(pivot->getFirstNode()) == &node1 && 
                  &(pivot->getLastNode()) == &node2 ||
                  &(pivot->getFirstNode()) == &node2 && 
                  &(pivot->getLastNode()) == &node1 ) {
-				return pivot;
-			}
+                return pivot;
+            }
         }
         return 0;
     }
@@ -318,7 +318,7 @@ public:
             return;
         NodeListIter newSelectedIter = std::find ( nodes.begin(), nodes.end(), 
                                                   &selectedNode );
-        if ( !newSelectedIter )
+        if ( newSelectedIter == nodes.end() )
             return;
 
         if ( *newSelectedIter != &selectedNode )
