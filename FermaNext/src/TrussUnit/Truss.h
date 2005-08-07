@@ -336,7 +336,7 @@ protected:
         NodeListIter nIter = nodes.begin();
         for ( ; nIter != nodes.end(); ) {
             N* node = *nIter;
-            if ( !node->isAlive() && node->countStates() == 0 ) {
+            if ( !node->isAlive() && node->countEnabledStates() == 0 ) {
                 nodes.erase(nIter);
                 delete node;
             }
@@ -348,7 +348,7 @@ protected:
         PivotListIter pIter = pivots.begin();
         for ( ; pIter != pivots.end(); ) {
             P* pivot = *pIter;
-            if ( !pivot->isAlive() && pivot->countStates() == 0 ) {
+            if ( !pivot->isAlive() && pivot->countEnabledStates() == 0 ) {
                 pivots.erase(pIter);
                 delete pivot;
             }
@@ -384,9 +384,9 @@ protected:
         emit onStateChange();
     }
 
-    virtual P* findPivotCopy ( P* comparablePivot )
+    virtual P* findPivotCopy ( const P* comparablePivot ) const
     {
-        PivotListIter iter = pivots.begin();
+        PivotListConstIter iter = pivots.begin();
         for ( ; iter != pivots.end(); ++iter )
         {
             P* pivot = (*iter);

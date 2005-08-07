@@ -27,12 +27,14 @@ public:
 
 protected:
     virtual void clearTrussUnitWindows ();
+    virtual void suspendedClean ();
 
     virtual void loadOldVersion ( TrussUnit&, QFile& ) throw (WrongFormatException);
     virtual void load ( TrussUnit&, const QFile& ) throw (WrongFormatException);
 
 public slots:
     virtual TrussUnitWindow& createTrussUnitWindow ( const QString& name );
+    virtual bool reviveTrussUnitWindow ( TrussUnitWindow& );
     virtual bool removeTrussUnitWindow ( TrussUnitWindow& );
 
 public:

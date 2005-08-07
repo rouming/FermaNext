@@ -26,8 +26,26 @@ void TrussUnitWindowManager::clearTrussUnitWindows ()
     trussWindows.clear();
 }
 
+void TrussUnitWindowManager::suspendedClean () 
+{
+    // Clean desisted truss windows without states
+    WindowListIter iter = trussWindows.begin();
+    for ( ; iter != trussWindows.end(); ) {
+        TrussUnitWindow* truss = *iter;
+        if ( !truss->isAlive() && truss->countEnabledStates() == 0 ) {
+            trussWindows.erase(iter);
+            delete truss;
+        }
+        else
+            ++iter;
+    }
+}
+
 TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow ( const QString& name )
 {
+    // Clean earlier desisted truss windows
+    suspendedClean();
+
     TrussUnitWindow* trussWindow = new TrussUnitWindow(name, getStateManager());
     trussWindows.push_back(trussWindow);
     emit onTrussUnitWindowCreate(*trussWindow);
@@ -48,9 +66,11 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindowFromFile (
     if ( trussName.isEmpty() )        
         throw ReadFileException();
 
+    // Clean earlier desisted truss windows
+    suspendedClean();
+
     TrussUnitWindow& trussWindow = createTrussUnitWindow(trussName);
     try {
-
         if( fileName.contains(NEW_EXTENSION) ) 
             load( trussWindow, file );
         else if ( fileName.contains(OLD_EXTENSION) ) 
@@ -65,19 +85,37 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindowFromFile (
     return trussWindow;
 }
 
+bool TrussUnitWindowManager::reviveTrussUnitWindow (
+    TrussUnitWindow& trussWindow )
+{
+    WindowListIter iter = std::find( trussWindows.begin(), 
+                                     trussWindows.end(), 
+                                     &trussWindow );
+    if ( iter == trussWindows.end() )
+        return false;
+    if ( trussWindow.isAlive() )
+        return false;
+
+    trussWindow.revive();
+    emit onTrussUnitWindowCreate( trussWindow );
+    return true;
+}
+
 bool TrussUnitWindowManager::removeTrussUnitWindow ( 
     TrussUnitWindow& trussWindow )
 {
-    WindowListIter iter = trussWindows.begin();
-    for ( ; iter != trussWindows.end(); ++iter )
-        if ( (*iter) == &trussWindow ) {
-            TrussUnitWindow* trussWindow = *iter;
-            emit onTrussUnitWindowRemove(*trussWindow);
-            trussWindows.erase(iter);
-            delete trussWindow;
-            return true;
-        }            
-    return false; 
+    // Clean earlier desisted truss windows
+    suspendedClean();
+
+    WindowListIter iter = std::find( trussWindows.begin(), 
+                                     trussWindows.end(), 
+                                     &trussWindow );
+    if ( iter == trussWindows.end() )
+        return false;
+
+    emit onTrussUnitWindowRemove( trussWindow );
+    trussWindow.desist();
+    return true;
 }
 
 void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file ) 
@@ -146,7 +184,7 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
         //frm.Fn[i] = strtod( line,  NULL );
     }
     
-    for ( i = 0; i < nodesNum; ++i )
+    for ( i = 1; i <= nodesNum; ++i )
     {
         file.readLine( line, 256 );
         int xFixation = strtol( line,  NULL, 10 );

@@ -25,7 +25,10 @@ public:
     virtual ObjectState& createState ();
     virtual bool removeState ( ObjectState& );
 
+    // Count all states
     virtual size_t countStates () const;
+    // Count only enabled states
+    virtual size_t countEnabledStates () const;
 
     // Marks this stateful object as desisted
     virtual void desist ();
@@ -51,6 +54,7 @@ signals:
 private:
     typedef std::vector<ObjectState*> StateList;
     typedef std::vector<ObjectState*>::iterator StateListIter;
+    typedef std::vector<ObjectState*>::const_iterator StateListConstIter;
 
     StateList states;
     ObjectStateManager* stateManager;

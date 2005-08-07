@@ -106,6 +106,10 @@ SOURCE=.\TrussUnit.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\TrussUnitActions.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\TrussUnitDesignerWidget.cpp
 # End Source File
 # Begin Source File
@@ -167,6 +171,10 @@ InputName=TrussUnit
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=.\TrussUnitActions.h
 # End Source File
 # Begin Source File
 

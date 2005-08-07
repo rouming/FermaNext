@@ -1,6 +1,7 @@
 
 #include "TrussUnitDesignerWidget.h"
 #include "SubsidiaryConstants.h"
+#include "TrussUnitActions.h"
 
 #include <algorithm>
 #include <vector>
@@ -201,6 +202,22 @@ void TrussUnitDesignerWidget::saveNodeStateAfterDrag ( QPoint pos )
     state.save();    
 }
 
+void TrussUnitDesignerWidget::saveNodeStateAfterCreate ( TrussUnit& truss, TrussNode& node )
+{    
+    ObjectState& state = node.createState();
+    TrussNodeCreateAction* action = new TrussNodeCreateAction( truss, node );
+    state.addAction( action );
+    state.save();
+}
+
+void TrussUnitDesignerWidget::saveNodeStateAfterRemove ( TrussUnit& truss, TrussNode& node )
+{
+    ObjectState& state = node.createState();
+    TrussNodeRemoveAction* action = new TrussNodeRemoveAction( truss, node );
+    state.addAction( action );
+    state.save();
+}
+
 void TrussUnitDesignerWidget::savePivotStateAfterDrag ( QPoint firstPos, QPoint lastPos )
 {
     // Actually nothing to save.
@@ -236,6 +253,25 @@ void TrussUnitDesignerWidget::savePivotStateAfterDrag ( QPoint firstPos, QPoint 
     state.addAction( action );
 
     state.save();
+}
+
+void TrussUnitDesignerWidget::savePivotStateAfterCreate ( TrussUnit& truss, 
+                                                          TrussNode& firstNode,
+                                                          TrussNode& lastNode, 
+                                                          TrussPivot& pivot )
+{    
+    ObjectStateManager* mng = pivot.getStateManager();
+    mng->startStateBlock();
+    // Save created nodes
+    saveNodeStateAfterCreate( truss, firstNode );
+    saveNodeStateAfterCreate( truss, lastNode );
+    // Save created pivot
+    ObjectState& state = pivot.createState();
+    TrussPivotCreateAction* action = new TrussPivotCreateAction( truss, pivot );
+    state.addAction( action );
+    state.save();
+    
+    mng->endStateBlock();
 }
 
 void TrussUnitDesignerWidget::parseSvg ( const char* fname )
@@ -665,7 +701,14 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
             QPoint nodeCoord = selectedWindow->
                                         getTrussCoordFromWidgetPos ( clickX, clickY );
             TrussNode* node = &selectedWindow->createNode ( nodeCoord.x(), nodeCoord.y() );
+
+            ObjectStateManager* mng = selectedWindow->getStateManager();
+            mng->startStateBlock();
+
+            saveNodeStateAfterCreate( *selectedWindow, *node );
             selectedWindow->checkAfterNodeManipulation ( node );
+
+            mng->endStateBlock();
             update();
         }
         focusOnWindow( *selectedWindow );
@@ -683,6 +726,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
             selectedPivot->setEnabled ( false );
             selectedNode = &lastNode;
             designerBehaviour = onPivotLastNodeDraw;
+            savePivotStateAfterCreate( *selectedWindow, firstNode, lastNode, *selectedPivot );
             update();
         }
         focusOnWindow( *selectedWindow );

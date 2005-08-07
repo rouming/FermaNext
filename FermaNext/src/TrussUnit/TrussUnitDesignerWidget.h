@@ -22,9 +22,13 @@ protected:
     virtual bool nodeCanBeDrawn ( int x, int y );
 	virtual void initTrussUnitWindow(); //temp
 
-    // Save states to Undo/Redo stack after drag
+    // Save states to Undo/Redo stack
     virtual void saveNodeStateAfterDrag ( QPoint );
-    virtual void savePivotStateAfterDrag ( QPoint first, QPoint last );
+    virtual void saveNodeStateAfterCreate ( TrussUnit&, TrussNode& );
+    virtual void saveNodeStateAfterRemove ( TrussUnit&, TrussNode& );
+    virtual void savePivotStateAfterDrag ( QPoint first, QPoint last );    
+    virtual void savePivotStateAfterCreate ( TrussUnit&, TrussNode& firstNode,
+                                             TrussNode& lastNode, TrussPivot& );
 
 public:
     // Handlers on events

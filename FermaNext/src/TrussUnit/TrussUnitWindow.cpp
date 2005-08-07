@@ -1,5 +1,6 @@
 
 #include "TrussUnitWindow.h"
+#include "TrussUnitActions.h"
 #include <algorithm>
 
 
@@ -554,6 +555,9 @@ void TrussUnitWindow::mergeNodes ( TrussNode* node, TrussNode* mergingNode )
 {
     PivotList pivotList = getPivotList ();
     PivotListIter iter = pivotList.begin();
+
+    ObjectState& state = mergingNode->createState();
+
     for ( ; iter != pivotList.end(); ++iter )
 	{
         TrussPivot* pivot = *iter;
@@ -565,12 +569,18 @@ void TrussUnitWindow::mergeNodes ( TrussNode* node, TrussNode* mergingNode )
             pivot->setLastNode ( node );
 
         // remove fake pivots
-        if ( &pivot->getFirstNode() == &pivot->getLastNode() )
-            removePivot ( *pivot );
-        else if ( findPivotCopy( pivot ) )
-            removePivot ( *pivot );
+        if ( &pivot->getFirstNode() == &pivot->getLastNode() ||
+             findPivotCopy( pivot ) ) {
+            removePivot( *pivot );
+            // Save remove pivot action
+            state.addAction( new TrussPivotRemoveAction( *this, *pivot ) );
+        }
     }
     removeNode ( *mergingNode );
+    // Save remove node action
+    state.addAction( new TrussNodeRemoveAction( *this, *mergingNode ) );
+    state.save();
+
     rendered(false);
 }
 
@@ -578,38 +588,73 @@ void TrussUnitWindow::dividePivot ( TrussPivot& dividualPivot, TrussNode& dividi
 {
     TrussNode& first = dividualPivot.getFirstNode();
     TrussNode& last = dividualPivot.getLastNode();
+
+    ObjectStateManager* mng = dividualPivot.getStateManager();
+    mng->startStateBlock();
+
     removePivot ( dividualPivot );
+    // Save remove pivot action
+    ObjectState& state = dividualPivot.createState();
+    state.addAction( new TrussPivotRemoveAction( *this, dividualPivot ) );
+    state.save();
+
     TrussPivot* pivot1 = findPivotByNodes ( first, dividingNode );
     TrussPivot* pivot2 = findPivotByNodes ( last, dividingNode );
     // Check if there is another pivot with the same coords. 
     // If it so, we should create only one pivot instead of removed (divided) pivot.
     if ( pivot1 )
     {
+        TrussPivot* newlyCreated = 0;
         if ( last.getNumber() < dividingNode.getNumber() )
-            createPivot ( last, dividingNode );
+            newlyCreated = &createPivot( last, dividingNode );
         else
-            createPivot ( dividingNode, last );
+            newlyCreated = &createPivot( dividingNode, last );
+
+        // Save create pivot action
+        ObjectState& state = newlyCreated->createState();
+        state.addAction( new TrussPivotCreateAction( *this, *newlyCreated ) );
+        state.save();
     }
     else if ( pivot2 )
     {
+        TrussPivot* newlyCreated = 0;
         if ( first.getNumber() < dividingNode.getNumber() )
-            createPivot ( first, dividingNode );
+            newlyCreated = &createPivot( first, dividingNode );
         else
-            createPivot ( dividingNode, first );
+            newlyCreated = &createPivot( dividingNode, first );
+
+        // Save create pivot action
+        ObjectState& state = newlyCreated->createState();
+        state.addAction( new TrussPivotCreateAction( *this, *newlyCreated ) );
+        state.save();
     }
     // Create two pivots instead of removed one.
     else
     {
+        TrussPivot* newlyCreated = 0;
+
         if ( first.getNumber() < dividingNode.getNumber() )
-            createPivot ( first, dividingNode );
+            newlyCreated = &createPivot( first, dividingNode );
         else
-            createPivot ( dividingNode, first );
+            newlyCreated = &createPivot( dividingNode, first );
+
+        // Save create pivot action
+        ObjectState& stateFirst = newlyCreated->createState();
+        stateFirst.addAction( new TrussPivotCreateAction( *this, *newlyCreated ) );
+        stateFirst.save();
 
         if ( last.getNumber() < dividingNode.getNumber() )
-            createPivot ( last, dividingNode );
+            newlyCreated = &createPivot( last, dividingNode );
         else
-            createPivot ( dividingNode, last );
+            newlyCreated = &createPivot( dividingNode, last );
+
+        // Save create pivot action
+        ObjectState& stateSecond = newlyCreated->createState();
+        stateSecond.addAction( new TrussPivotCreateAction( *this, *newlyCreated ) );
+        stateSecond.save();
     }
+    mng->endStateBlock();
+
     rendered(false);
 }
 

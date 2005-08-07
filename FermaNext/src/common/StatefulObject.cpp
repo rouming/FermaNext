@@ -80,6 +80,16 @@ size_t StatefulObject::countStates () const
     return states.size();
 }
 
+size_t StatefulObject::countEnabledStates () const
+{
+    size_t statesNum = 0;
+    StateListConstIter iter = states.begin();
+    for ( ; iter != states.end(); ++iter )
+        if ( ! (*iter)->isDisabled() )
+            ++statesNum;
+    return statesNum;
+}
+
 void StatefulObject::desist ()
 {
     emit onDesist(*this);

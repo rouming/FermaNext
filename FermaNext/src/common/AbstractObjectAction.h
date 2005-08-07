@@ -71,6 +71,4 @@ private:
     UnexecuteParams unexecuteParams;
 };
 
-
-
 #endif //ABSTRACTOBJECTACTION_H

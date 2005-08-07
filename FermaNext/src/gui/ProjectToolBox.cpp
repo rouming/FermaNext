@@ -2,6 +2,7 @@
 #include "ProjectToolBox.h"
 #include "WindowListBox.h"
 #include "SubsidiaryConstants.h"
+#include "TrussUnitActions.h"
 
 #include <qbuttongroup.h>
 #include <qtoolbutton.h>
@@ -285,7 +286,15 @@ void ProjectToolBox::importIsPressed ()
         return;
 
     try { 
-        currPrj->getTrussUnitWindowManager().createTrussUnitWindowFromFile(fileName);
+        TrussUnitWindowManager& trussMng = currPrj->getTrussUnitWindowManager();
+        TrussUnitWindow& truss = trussMng.createTrussUnitWindowFromFile(fileName);
+        // Save truss window create state
+        ObjectState& state = truss.createState();
+        TrussUnitWindowCreateAction* action = 
+                            new TrussUnitWindowCreateAction( trussMng, truss );
+        state.addAction( action );
+        state.save();        
+
     } catch ( TrussUnitWindowManager::ReadFileException& ) {
         QMessageBox::critical( 0, "TrussUnitWindowManager::ReadFileException",
                                QString("TrussUnitWindowManager::ReadFileException") );
