@@ -20,7 +20,7 @@ protected:
     virtual TrussUnitWindow* findWindowByWidgetPos ( int x, int y );    
     virtual void removeAllHighlight ();
     virtual bool nodeCanBeDrawn ( int x, int y );
-	virtual void initTrussUnitWindow(); //temp
+    virtual void initTrussUnitWindow(); //temp
 
     // Save states to Undo/Redo stack
     virtual void saveNodeStateAfterDrag ( QPoint );
@@ -29,6 +29,10 @@ protected:
     virtual void savePivotStateAfterDrag ( QPoint first, QPoint last );    
     virtual void savePivotStateAfterCreate ( TrussUnit&, TrussNode& firstNode,
                                              TrussNode& lastNode, TrussPivot& );
+
+    // SVG viewer methods
+    virtual void parseSvg ( const char* fname );
+    virtual void drawSvg ( base_renderer&, solid_renderer&, int x, int y );
 
 public:
     // Handlers on events
@@ -72,13 +76,12 @@ private:
     // Subsidiary vars
     int clickX, clickY;
     QPoint firstNodeClickDist, lastNodeClickDist;
-    agg::svg::path_renderer pathRend;
     // Undo/Redo
     QPoint beforeDragNodePos;
     QPoint beforeDragFirstPos, beforeDragLastPos;
-    // SVG viewer methods
-    void parseSvg ( const char* fname );
-    void drawSvg ( base_renderer& baseRend, solid_renderer& solidRend, int x, int y );
+
+    // Segmentation fault in destructor of this object!
+    // agg::svg::path_renderer pathRend;
 
     // TODO: in future to remove
     bool init; //temp
