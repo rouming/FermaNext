@@ -133,7 +133,6 @@ void TrussUnitDesignerWidget::removeAllHighlight ()
 
 bool TrussUnitDesignerWidget::nodeCanBeDrawn ( int x, int y )
 {
-    int precision = 100;
     WindowListIter iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter )
     {
