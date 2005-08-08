@@ -56,10 +56,10 @@ struct arrow
 
 TrussUnitWindow::TrussUnitWindow ( const QString& name, ObjectStateManager* mng ) :
     TrussUnit(name, mng),
-    rbuf ( new rbuf_dynarow(250,250) ),
-    windowSize ( 250, 250),
     headFont (agg::verdana16_bold),
-    numbersFont (agg::verdana13)
+    numbersFont (agg::verdana13),
+    rbuf ( new rbuf_dynarow(250,250) ),
+    windowSize ( 250, 250)
 {
     setCanvasColor ( 8, 10, 12 );
     setHighlighted(false);    
