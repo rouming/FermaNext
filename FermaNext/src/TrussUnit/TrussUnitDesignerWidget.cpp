@@ -287,7 +287,7 @@ void TrussUnitDesignerWidget::drawSvg ( base_renderer& baseRend,
 {
     scanline_rasterizer& ras = getAggRasterizerScanline ();    
     agg::scanline_p8& sl = getAggScanline ();
-    agg::trans_affine& mtx = getAggResizeMatrix ();
+    agg::trans_affine mtx = getAggResizeMatrix ();
     mtx *= agg::trans_affine_scaling(0.1);
     mtx *= agg::trans_affine_translation( x, y );
     pathRend.render ( ras, sl, solidRend, mtx, baseRend.clip_box(), 1.0 );

@@ -8,15 +8,20 @@ MOC_DIR = mocs
 OBJECTS_DIR = obj
 
 win32 {
-  LIBS = LibAgg.lib
+  LIBS = LibAgg.lib LibSVG.lib
 }
 unix {
-  LIBS = -lagg -L.
+  LIBS = -lagg -lsvg -L.
 }
 
 DEFINES += BENCHMARK_ON
 
-INCLUDEPATH = $$(AGGDIR)/include src src/common src/gui src/TrussUnit
+INCLUDEPATH = $$(AGGDIR)/include \
+              $$(AGGDIR)/svg \
+              src \
+              src/common \
+              src/gui \
+              src/TrussUnit
 
 SOURCES = src/FermaNext.cpp \
           \
@@ -38,6 +43,7 @@ SOURCES = src/FermaNext.cpp \
           \
           src/TrussUnit/Truss.cpp \
           src/TrussUnit/TrussUnit.cpp \
+          src/TrussUnit/TrussUnitActions.cpp \
           src/TrussUnit/TrussNode.cpp \
           src/TrussUnit/TrussUnitDesignerWidget.cpp \
           src/TrussUnit/TrussPivot.cpp \
@@ -64,6 +70,7 @@ HEADERS = src/common/AggQWidget.h \
           \
           src/TrussUnit/Truss.h \
           src/TrussUnit/TrussUnit.h \
+          src/TrussUnit/TrussUnitActions.h \
           src/TrussUnit/TrussUnitDesignerWidget.h \
           src/TrussUnit/TrussUnitDesignerWindow.h \
           src/TrussUnit/TrussUnitWindow.h \

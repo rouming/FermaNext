@@ -68,7 +68,7 @@ void ToolBarManager::clear ()
     widgets.clear();
 }
 
-TabbedWidget* ToolBarManager::findByWidget ( QWidget* w ) const
+TabbedWidget* ToolBarManager::findByWidget ( QWidget* ) const
 {/*
     TabbedWidgetsConstIter iter = widgets.begin();
     for ( ; iter != widgets.end(); ++iter )
@@ -78,7 +78,7 @@ TabbedWidget* ToolBarManager::findByWidget ( QWidget* w ) const
     return 0;
 }
 
-void ToolBarManager::activateWidget ( QWidget* w, bool activationFlag )
+void ToolBarManager::activateWidget ( QWidget*, bool )
 {/*
     uint activate = activationFlag ? WindowActive : ~WindowActive;
     TabbedWidget* tw = findByWidget(w);
@@ -102,13 +102,13 @@ void ToolBarManager::disactivateWidget ( QWidget* w )
     activateWidget( w, false );
 }
 
-void ToolBarManager::addWidget ( QWidget* w )
+void ToolBarManager::addWidget ( QWidget*  )
 {/*
     TabbedWidget* tw = new TabbedWidget(w);
     widgets.push_back(tw);    */
 }
 
-void ToolBarManager::removeWidget ( QWidget* w )
+void ToolBarManager::removeWidget ( QWidget* )
 {/*
     TabbedWidget* tw = findByWidget(w);
     if ( tw == 0 )

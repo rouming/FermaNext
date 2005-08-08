@@ -41,10 +41,12 @@ public:
 
 class AggQWidget : public QWidget
 {
+protected:
     typedef agg::rendering_buffer          rendering_buffer;
     typedef agg::scanline_p8               scanline;
     typedef agg::rasterizer_scanline_aa<>  scanline_rasterizer;
     typedef agg::trans_affine              trans_affine;
+
 private:
     rendering_buffer      aggBuffer;    // store the ptr to reattach to m_image on resize 
     trans_affine          aggResizeMtx;   
