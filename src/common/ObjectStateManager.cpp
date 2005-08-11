@@ -107,6 +107,8 @@ void ObjectStateManager::startStateBlock ()
     }
     // Begins new block if previous block was filled and correctly ended
     else if ( currentBlockIsEnded ) {
+        // Shift the stack if possible
+        tryToShiftStack();
         currentBlock = new StateBlock();
         stateBlocks.push_back(currentBlock);
         currentBlockIsEnded = false;
@@ -254,12 +256,9 @@ void ObjectStateManager::saveState ( ObjectState& st )
     if ( currentBlock != 0 ) {
         bool noStartedBlock = !currentBlock->isEmpty() && currentBlockIsEnded;
 
-        // Shift the stack if possible
-        tryToShiftStack();
-
         // New block has not been started yet, so start it
         if ( noStartedBlock )
-            startStateBlock();        
+            startStateBlock();
         
         // Save state
         currentBlock->addState(st);
@@ -270,8 +269,6 @@ void ObjectStateManager::saveState ( ObjectState& st )
     }
     // First call or all blocks were undoed. Create single state block.
     else {
-        // Should shift at first
-        tryToShiftStack();
         startStateBlock();
         // Save state
         currentBlock->addState(st);
