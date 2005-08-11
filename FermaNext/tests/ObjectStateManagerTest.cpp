@@ -104,7 +104,16 @@ void start_end_state_block_test ()
     ObjectState& st5 = o.createState();
     m.saveState(st5);
     my_assert( m.countStates() == 5, "Should be 5 states" );
-    m.endStateBlock();    
+    m.endStateBlock();
+
+    // Undo one last state block
+    m.undo();
+    m.startStateBlock();
+    // Check that top of the stack was removed
+    my_assert( m.countStateBlocks() == 3, "Should be again 3 blocks" );
+    ObjectState& st6 = o.createState();
+    m.saveState(st6);
+    m.endStateBlock();
 
     delete mng;
     
@@ -157,9 +166,45 @@ void stack_shifting_test ()
     std::cout << std::endl;
 }
 
+void stack_top_removing_test ()
+{
+    std::cout << std::endl << ">>>> stack_top_removing_test" << std::endl;
+
+    ObjectStateManager m;
+    size_t i = 0;
+
+    SomeObject* obj = new SomeObject(666, m);
+
+    my_assert( m.countStates() == 0, "1. Init count states = 0" );
+
+    for ( i = 0 ; i < 10; ++i )
+        obj->value(i);
+    my_assert( m.countStates() == 10, "2. Count states = 10" );
+
+    // Half undo
+    for ( i = 0 ; i < 5; ++i )
+        m.undo();
+
+    my_assert( m.countStates() == 10, "3. Count states = 10" );
+    obj->value(6);
+    my_assert( m.countStates() == 6, "4. Count states after half undo = 6" );
+
+    delete obj;
+    obj = new SomeObject(666, m);
+
+    obj->value(0);
+    my_assert( m.countStates() == 1, "5. Count states = 1" );
+    m.undo();
+    obj->value(0);
+    my_assert( m.countStates() == 1, "6. Count states after save = 1" );
+    delete obj;
+
+    std::cout << std::endl;
+}
+
 void block_removing_test ()
 {
-    std::cout << std::endl << ">>>> stack_shifting_test" << std::endl;
+    std::cout << std::endl << ">>>> block_removing_test" << std::endl;
 
     ObjectStateManager m;
 
@@ -394,6 +439,7 @@ int main ()
 
     stack_shifting_test();
     block_removing_test();
+    stack_top_removing_test();
 
     std::cout << "\n" << "Passed: " << PASSED << "\nFailed: " << FAILED << "\n";
     return 0;    
