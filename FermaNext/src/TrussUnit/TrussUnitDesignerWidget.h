@@ -80,8 +80,7 @@ private:
     QPoint beforeDragNodePos;
     QPoint beforeDragFirstPos, beforeDragLastPos;
 
-    // Segmentation fault in destructor of this object!
-    // agg::svg::path_renderer pathRend;
+    agg::svg::path_renderer pathRend;
 
     // TODO: in future to remove
     bool init; //temp

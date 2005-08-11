@@ -273,11 +273,6 @@ void TrussUnitDesignerWidget::savePivotStateAfterCreate ( TrussUnit& truss,
     mng->endStateBlock();
 }
 
-// TODO: kill this empty methods
-void TrussUnitDesignerWidget::parseSvg ( const char* ) {}
-void TrussUnitDesignerWidget::drawSvg ( base_renderer&, solid_renderer&,
-                                        int, int ) {}
-/*
 void TrussUnitDesignerWidget::parseSvg ( const char* fname )
 {
     agg::svg::parser svgParcer ( pathRend );
@@ -296,7 +291,7 @@ void TrussUnitDesignerWidget::drawSvg ( base_renderer& baseRend,
     mtx *= agg::trans_affine_translation( x, y );
     pathRend.render ( ras, sl, solidRend, mtx, baseRend.clip_box(), 1.0 );
 }
-*/
+
 /*****************************************************************************/
 // Event handlers
 
