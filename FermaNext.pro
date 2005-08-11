@@ -11,7 +11,7 @@ win32 {
   LIBS = LibAgg.lib LibSVG.lib
 }
 unix {
-  LIBS = -lagg -lsvg -L.
+  LIBS = -lsvg -lagg -L.
 }
 
 DEFINES += BENCHMARK_ON
