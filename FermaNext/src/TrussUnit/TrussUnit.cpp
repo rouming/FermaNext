@@ -24,14 +24,16 @@ void PaintableTrussElement::setVisible ( bool v_ )
 {
     if ( visible != v_ )
         rendered(false);
-    visible = v_;    
+    visible = v_;
+    emit onVisibleChange( visible );
 }
 
 void PaintableTrussElement::setHighlighted ( bool h_ )
 {
     if ( highlighted != h_ )
         rendered(false);
-    highlighted = h_;    
+    highlighted = h_;
+    emit onHighlightChange( highlighted );
 }
 
 void PaintableTrussElement::setEnabled ( bool e_ )
