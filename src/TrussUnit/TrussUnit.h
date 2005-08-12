@@ -60,7 +60,7 @@ class TrussPivot;
 /*****************************************************************************/
 
 class PaintableTrussElement
-{    
+{
 public:
     PaintableTrussElement ();
     PaintableTrussElement ( bool h, bool v, bool e, bool r );
@@ -70,12 +70,23 @@ public:
     virtual bool isEnabled () const;
     virtual bool isRendered () const;
 
+public:
     virtual void setVisible ( bool );
     virtual void setHighlighted ( bool );
     virtual void setEnabled ( bool );
 
 protected:
     virtual void rendered ( bool ) const;
+
+
+// We should use this pretty hack to workaround Qt prohibition
+// of using multiple inheritance. So we just declare methods as 
+// pure virtual and emit them in the body of the this class.
+// We get cheap possibility to have signals and multiple inheritance
+// at the same time.
+protected:
+    virtual void onVisibleChange ( bool ) = 0;
+    virtual void onHighlightChange ( bool ) = 0;
 
 private:
     bool visible;
@@ -110,6 +121,9 @@ protected slots:
 signals:
     void onTrussNameChange ( const QString& old, const QString& n );
     void onAreaChange ( const QSize& );
+// Paintable signals
+    void onVisibleChange ( bool );
+    void onHighlightChange ( bool );
 
 private:
     static const QString UNNAMED;
@@ -122,6 +136,7 @@ private:
 
 class TrussNode: public Node, public PaintableTrussElement
 {    
+    Q_OBJECT
 public:
     TrussNode ( ObjectStateManager* );
     TrussNode ( int x, int y, ObjectStateManager* );
@@ -141,12 +156,18 @@ public:
 
     void paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
                 int trussAreaHeight ) const;
+
+signals:
+// Paintable signals
+    void onVisibleChange ( bool );
+    void onHighlightChange ( bool );
 };
 
 /*****************************************************************************/
 
 class TrussPivot : public Pivot<TrussNode>, public PaintableTrussElement
 {
+    Q_OBJECT
 public:
     TrussPivot ( ObjectStateManager* );
     TrussPivot ( TrussNode&, TrussNode&, ObjectStateManager* );
@@ -157,6 +178,11 @@ public:
 
     void paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
                 int trussAreaHeight) const;
+
+signals:
+// Paintable signals
+    void onVisibleChange ( bool );
+    void onHighlightChange ( bool );
 };
 
 #endif //TRUSSUNIT_H
