@@ -81,10 +81,12 @@ TabbedWidget::TabbedWidget ( ToolBarManager* tb,
                              const QIconSet& i ) : 
     toolBar(tb),
     name(n), widget(w),
-    button( new TextToolButton(i, n, n, this, SLOT(showOrHide()), tb) ),
+    button( new TextToolButton(i, n, n, 0, 0, tb) ),
     windowState(0),
     toolBarIsDestroyed(false)
 {
+    // Direct connect
+    QObject::connect( button, SIGNAL(clicked()), SLOT(showOrHide()) );
     // Catch tool bar decease
     QObject::connect( tb, SIGNAL(destroyed()), SLOT(toolBarDestroyed()) );
     // Small font

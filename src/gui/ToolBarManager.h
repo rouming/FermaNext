@@ -38,6 +38,11 @@ public:
 
     ~TabbedWidget ();
 
+    bool isActive () const;
+    bool isShown () const;
+
+    QWidget& getWidget ();
+
 protected:
     void saveWidgetState ();
     void loadWidgetState ();
@@ -48,11 +53,6 @@ public slots:
     void disactivate ();
     void show ();
     void hide ();
-
-    bool isActive () const;
-    bool isShown () const;
-
-    QWidget& getWidget ();
 
 protected slots:
     void toolBarDestroyed ();
