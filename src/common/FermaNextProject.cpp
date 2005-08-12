@@ -43,6 +43,10 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack )
              &designerWidget, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
     connect( &trussWindowManager, SIGNAL(onTrussUnitWindowRemove(const TrussUnitWindow&)), 
              &designerWidget, SLOT(removeTrussUnitWindow(const TrussUnitWindow&)) );
+    connect( &trussWindowManager, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)),     
+             calcDataToolBar, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
+    connect( &trussWindowManager, SIGNAL(onTrussUnitWindowRemove(const TrussUnitWindow&)), 
+             calcDataToolBar, SLOT(removeTrussUnitWindow(const TrussUnitWindow&)) );
 
     //TODO: remove this block in future
 	for( uint i = 0; i <1; i++)
