@@ -1,26 +1,60 @@
 
 #include "CalcDataToolBar.h"
 
+#include <qlabel.h>
+#include <qiconset.h>
+
 /*****************************************************************************
  * Calculation Data Tool Bar
  *****************************************************************************/
 
-#include <qpushbutton.h>
-#include <qlabel.h>
 CalcDataToolBar::CalcDataToolBar ( QMainWindow* parent, const char* name ) :
     ToolBarManager(parent, name)
 {
-    setNewLine ( true );  
+    initCalcDataIcons();
+}
 
-    QIconSet iconEnabled ( QPixmap::fromMimeSource( "images/calcdata.png") );
-    //QIconSet iconDisabled ( QPixmap::fromMimeSource( "images/calcdata_d.png") );
-    QButton* button = new QPushButton( iconEnabled, tr("Truss unit 1"), this );    
-    button = new QPushButton( iconEnabled, tr("Results are not valid"), this );    
-    button->setEnabled(false);
-    button = new QPushButton( iconEnabled, tr("Next variant"), this );    
+CalcDataToolBar::~CalcDataToolBar ()
+{
+    clear();
+}
 
-    // Blank widget
-    setStretchableWidget( new QLabel(this) );
+void CalcDataToolBar::clear ()
+{
+    CalcDataMapIter iter = calcDataWidgets.begin();
+    for ( ; iter != calcDataWidgets.end(); ++iter )
+        delete iter.data();
+    calcDataWidgets.clear();
+}
+
+void CalcDataToolBar::initCalcDataIcons ()
+{
+    // Active icons
+    calcDataIcons.setPixmap( QPixmap::fromMimeSource( "images/calcdata.png"),
+                             QIconSet::Automatic, QIconSet::Active );
+}
+
+void CalcDataToolBar::addWidget ( QWidget& w )
+{
+    createTabbedWidget( w, w.caption(), calcDataIcons );    
+}
+
+void CalcDataToolBar::addTrussUnitWindow ( TrussUnitWindow& truss )
+{
+    QWidget* w = new QWidget();
+    w->setCaption( truss.getTrussName() );
+    calcDataWidgets[&truss] = w;
+    addWidget( *w );
+}
+
+void CalcDataToolBar::removeTrussUnitWindow ( const TrussUnitWindow& truss )
+{
+    if ( ! calcDataWidgets.contains( &truss ) )
+        return;
+    QWidget* w = calcDataWidgets[&truss];
+    removeWidget( *w );
+    calcDataWidgets.remove( &truss );
+    delete w;
 }
 
 /*****************************************************************************/

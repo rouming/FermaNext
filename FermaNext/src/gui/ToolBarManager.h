@@ -3,79 +3,111 @@
 #define TOOLBARMANAGER_H
 
 #include <qtoolbar.h>
+#include <qtoolbutton.h>
 #include <qiconset.h>
 #include <vector>
 
-class QWidget;
-class QToolButton;
 class ToolBarManager;
+class QLabel;
+
+/*****************************************************************************
+ * Text Tool Button
+ *****************************************************************************/
+
+/* Just another tool button with text label alongside pixmap */
+class TextToolButton : public  QToolButton
+{
+public:
+    TextToolButton ( const QIconSet&, const QString&, const QString&, QObject*,
+                     const char*, QToolBar*, const char* name = 0 );
+    QSize sizeHint() const;
+protected:
+    void drawButtonLabel( QPainter *p );
+};
+
+/*****************************************************************************
+ * Tabbed Widget
+ *****************************************************************************/
 
 class TabbedWidget : public QObject
 {
     Q_OBJECT
- public:
-    TabbedWidget ( ToolBarManager&,  QWidget&, 
+public:
+    TabbedWidget ( ToolBarManager* parent,  QWidget&, 
                    const QString& name, const QIconSet& iconSet );
 
- public slots:
+    ~TabbedWidget ();
+
+protected:
+    void saveWidgetState ();
+    void loadWidgetState ();
+
+public slots:
     void activate ();
+    void activate ( bool );
     void disactivate ();
-    void focus ();
-    void defocus ();
+    void show ();
+    void hide ();
 
     bool isActive () const;
-    bool isFocused () const;
+    bool isShown () const;
 
- signals:
+    QWidget& getWidget ();
+
+protected slots:
+    void toolBarDestroyed ();
+    void showOrHide ();
+
+signals:
     void onActivate ( TabbedWidget& );
     void onDisactivate ( TabbedWidget& );
-    void onFocus ( TabbedWidget& );
-    void onDefocus ( TabbedWidget& );
+    void onShow ( TabbedWidget& );
+    void onHide ( TabbedWidget& );
 
- private:
+private:
+    ToolBarManager* toolBar;
     QString name;
     QWidget& widget;
-    QToolButton* button;
+    TextToolButton* button;
     uint windowState;
+    bool toolBarIsDestroyed;
 };
+
+/*****************************************************************************
+ * Tool Bar Manager
+ *****************************************************************************/
 
 class ToolBarManager : public QToolBar
 {
     Q_OBJECT
- protected:
-
- public:
+public:
     ToolBarManager ( QMainWindow* parent = 0, const char* name = 0 );
+    virtual ~ToolBarManager ();
 
-    ~ToolBarManager ();
+protected:
+    void clear ();
+    virtual TabbedWidget* findByWidget ( QWidget& ) const;
 
- protected:
-    virtual void clear ();
-    virtual TabbedWidget* findByWidget ( QWidget* ) const;
+public slots:
+    virtual void activateWidget ( QWidget&, bool activationFlag );
+    virtual void activateWidget ( QWidget& );
+    virtual void disactivateWidget ( QWidget& );
 
- public slots:
-    virtual void activateWidget ( QWidget*, bool activationFlag );
-    virtual void activateWidget ( QWidget* );
-    virtual void disactivateWidget ( QWidget* );
+protected slots:
+    virtual TabbedWidget& createTabbedWidget ( QWidget&, 
+                                               const QString& name, 
+                                               const QIconSet& iconSet );
 
- protected slots:
-    virtual void addWidget ( QWidget* );
-    virtual void removeWidget ( QWidget* );
+    virtual void addWidget ( QWidget& ) = 0;
+    virtual void removeWidget ( QWidget& );
 
- signals: 
-    void onToolBarChange ( QToolBar* );
-    void onActivate ( QWidget* );
-    void onDisactivate ( QWidget* );
-    void onAdd ( QWidget* );
-    void onRemove ( QWidget* );
+private:
+    typedef std::vector<TabbedWidget*> TabbedWidgetList;
+    typedef TabbedWidgetList::iterator TabbedWidgetListIter;
+    typedef TabbedWidgetList::const_iterator TabbedWidgetListConstIter;
 
- private:
-    typedef std::vector<TabbedWidget*> TabbedWidgets;
-    typedef TabbedWidgets::iterator TabbedWidgetsIter;
-    typedef TabbedWidgets::const_iterator TabbedWidgetsConstIter;
-
-    TabbedWidgets widgets;
-    TabbedWidget* currentActiveWidget;
+    TabbedWidgetList widgets;
+    QLabel* blankLabel;
 };
 
 #endif //TOOLBARMANAGER_H
