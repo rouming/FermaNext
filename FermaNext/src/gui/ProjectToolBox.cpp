@@ -185,7 +185,7 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
     groupBoxWindows->setTitle( tr( "Trusses " ) );
     groupBoxWindows->setFont(simpleFont);
     labelTrussNumberVal->setText( tr( "6" ) );
-    labelTOKVal->setText( tr( "1,2339682" ) );     
+    labelTOKVal->setText( tr( "1,23" ) );     
     labelTOK->setText( tr( "TOK" ) );     
     labelTOK->setFont(labelFont);     
     labelVisibleTrusses->setText( tr( "Visible trusses" ) );
@@ -202,7 +202,7 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
 	
     QToolButton* buttonRemove = new QToolButton(buttons);
 	buttonRemove->setBackgroundMode(PaletteBase);
-	buttonRemove->setTextLabel( "Remove" );
+	buttonRemove->setTextLabel( tr("R") );
 	buttonRemove->setAutoRaise( TRUE );
 	buttonRemove->setTextPosition( QToolButton::Right );
 	buttonRemove->setUsesTextLabel( TRUE );
@@ -212,7 +212,7 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
 
     QToolButton* buttonSave = new QToolButton(buttons);
 	buttonSave->setBackgroundMode(PaletteBase);
-	buttonSave->setTextLabel( "Save" );
+	buttonSave->setTextLabel( tr("S") );
 	buttonSave->setAutoRaise( TRUE );
 	buttonSave->setTextPosition( QToolButton::Right );
 	buttonSave->setUsesTextLabel( TRUE );
@@ -220,7 +220,7 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
 
     QToolButton* buttonImport = new QToolButton(buttons);
 	buttonImport->setBackgroundMode(PaletteBase);
-	buttonImport->setTextLabel( "Import" );
+	buttonImport->setTextLabel( tr("I") );
 	buttonImport->setAutoRaise( TRUE );
 	buttonImport->setTextPosition( QToolButton::Right );
 	buttonImport->setUsesTextLabel( TRUE );
