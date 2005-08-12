@@ -68,6 +68,7 @@ void FermaNextMainFrame::init ()
     connect( &ws, SIGNAL(onProjectCreate(FermaNextProject&)), SLOT(someProjectCreated(FermaNextProject&)) );
     connect( projectToolBox, SIGNAL(currentChanged(int)), SLOT(refreshUndoRedoActions()) );
     dw->setWidget( projectToolBox );
+    dw->setFixedExtentWidth( 160 );
     dw->hide();
 
     setRightJustification( true );
