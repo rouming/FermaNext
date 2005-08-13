@@ -61,14 +61,14 @@ void TrussUnitDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow 
 
 bool TrussUnitDesignerWidget::removeTrussUnitWindow ( TrussUnitWindow& window )
 {
-    // Do disconnection
-    window.disconnect( this );
-
     WindowList::iterator iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter )
-        if ( (*iter) == &window ) 
-        {
-            trussWindows.erase(iter);            
+        if ( (*iter) == &window ) {
+            TrussUnitWindow* trussWindow = *iter;
+            // Do disconnection of all signals
+            trussWindow->disconnect( this );
+            trussWindows.erase(iter);
+            repaint();
             return true;
         }
     return false; 
