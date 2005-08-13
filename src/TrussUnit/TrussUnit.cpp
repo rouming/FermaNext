@@ -41,6 +41,7 @@ void PaintableTrussElement::setEnabled ( bool e_ )
     if ( enabled != e_ )
         rendered(false);
     enabled = e_;    
+    emit onEnableChange( enabled );
 }
 
 void PaintableTrussElement::rendered ( bool r_ ) const
@@ -96,9 +97,8 @@ const QString& TrussUnit::getTrussName () const
 
 void TrussUnit::setTrussName ( const QString& name )
 {
-    QString old(trussName);
     trussName = name;    
-    emit onTrussNameChange( old, trussName );
+    emit onTrussNameChange( trussName );
     emit onStateChange();
 }
 

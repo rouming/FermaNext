@@ -13,14 +13,14 @@ public:
     TrussUnitDesignerWidget ( QWidget* parent = 0 );
     virtual ~TrussUnitDesignerWidget ();
 
-protected:
     // Manage window focus
     virtual void focusOnWindow ( TrussUnitWindow& );
+
+protected:
     virtual void clearWindowFocus ();
     virtual TrussUnitWindow* findWindowByWidgetPos ( int x, int y );    
     virtual void removeAllHighlight ();
     virtual bool nodeCanBeDrawn ( int x, int y );
-    virtual void initTrussUnitWindow(); //temp
 
     // Save states to Undo/Redo stack
     virtual void saveNodeStateAfterDrag ( QPoint );
@@ -46,7 +46,7 @@ public:
 
 public slots:
     virtual void addTrussUnitWindow ( TrussUnitWindow& );    
-    virtual bool removeTrussUnitWindow ( const TrussUnitWindow& );
+    virtual bool removeTrussUnitWindow ( TrussUnitWindow& );
 
 protected:
     virtual void clearTrussUnitWindows ();
@@ -83,7 +83,6 @@ private:
     agg::svg::path_renderer pathRend;
 
     // TODO: in future to remove
-    bool init; //temp
     int X, Y; //temp    
 };
 
