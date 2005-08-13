@@ -170,9 +170,6 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
 
     WindowListBox * listBox = new WindowListBox ( prj, groupBoxWindows, "listBox" );
     groupBoxWindowsLayout->addWidget( listBox );
-    listBox->addItem("my_first_truss");
-    listBox->addItem("my_second_truss");
-    listBox->addItem("my_third_truss");
     
     // Fonts
     QFont labelFont( "arial", 9  );
@@ -289,7 +286,7 @@ void ProjectToolBox::importIsPressed ()
         TrussUnitWindowManager& trussMng = currPrj->getTrussUnitWindowManager();
         TrussUnitWindow& truss = trussMng.createTrussUnitWindowFromFile(fileName);
         // Save truss window create state
-        ObjectState& state = truss.createState();
+        ObjectState& state = trussMng.createState();
         TrussUnitWindowCreateAction* action = 
                             new TrussUnitWindowCreateAction( trussMng, truss );
         state.addAction( action );

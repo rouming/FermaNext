@@ -47,7 +47,7 @@ void CalcDataToolBar::addTrussUnitWindow ( TrussUnitWindow& truss )
     addWidget( *w );
 }
 
-void CalcDataToolBar::removeTrussUnitWindow ( const TrussUnitWindow& truss )
+void CalcDataToolBar::removeTrussUnitWindow ( TrussUnitWindow& truss )
 {
     if ( ! calcDataWidgets.contains( &truss ) )
         return;

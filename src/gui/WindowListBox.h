@@ -6,46 +6,68 @@
 #include <qlistbox.h>
 #include <qbitarray.h>
 
+class WindowListBox;
+
+class TrussUnitWindowItem : public QObject, public QListBoxPixmap
+{
+    Q_OBJECT
+public:
+    TrussUnitWindowItem ( FermaNextProject&, TrussUnitWindow&, 
+                          WindowListBox*, const QPixmap& );
+
+    virtual void fillPopup ( QPopupMenu* ) const;
+
+    virtual bool isSelectedInGroup () const;
+
+public slots:
+    virtual void setText ( const QString& );
+
+    virtual void raise ();
+    virtual void show ();
+    virtual void hide ();
+    virtual void selectInGroup ();
+    virtual void unselectFromGroup ();
+    virtual void selectAllInGroup ();
+    virtual void unselectAllFromGroup ();
+    virtual void calculate ();
+    virtual void remove ();
+
+private:
+    WindowListBox* listBox;
+    FermaNextProject& project;
+    TrussUnitWindow& trussWindow;
+    bool selected;
+};
+
+
 class WindowListBox : public QListBox
 {
     Q_OBJECT
 public:
     WindowListBox( FermaNextProject&, QWidget* parent = 0, 
-                   const char* name = 0, WFlags fl = 0 );    
+                   const char* name = 0, WFlags fl = 0 );
 
-    void addItem( const QString & text );
-    void _setSelected( int index );
-    void _setUnSelected ( int index );
-    int _isSelected ( int index );
-    int _isShown ( int index );
+    void contextMenuEvent ( QContextMenuEvent* );
 
-    void contextMenuEvent ( QContextMenuEvent * );
+protected:
+    TrussUnitWindowItem* findByTrussUnitWindow ( const TrussUnitWindow& ) const;
 
-protected slots:/*
-    virtual void highlight ( int );
-    virtual void windowToFront ( int );
-    virtual void _sel ();
-    virtual void _unsel ();
-    virtual void _selall ();
-    virtual void _unselall ();
-    virtual void _show ();
-    virtual void _hide ();
-*/
+public slots:
+    virtual void addTrussUnitWindow ( TrussUnitWindow& );
+    virtual void removeTrussUnitWindow ( TrussUnitWindow& );
+    
+    virtual void selectAllInGroup ();
+    virtual void unselectAllFromGroup ();
 
-    virtual void _highl ( int );
-    virtual void DoubleClick ( int );
-    virtual void _sel ();
-    virtual void _unsel ();
-    virtual void _selall ();
-    virtual void _unselall ();
-    virtual void _show ();
-    virtual void _hide ();
+protected slots:
+    virtual void raiseTrussUnitWindowItem ( QListBoxItem* );
 
 private:
+    typedef QMap< const TrussUnitWindow*, TrussUnitWindowItem* > WindowMap;
+    typedef WindowMap::iterator WindowMapIter;
+
     FermaNextProject& project;
-    QBitArray activ;
-    QBitArray shown;
-    int now_highl;
+    WindowMap windowItems;
 };
 
 #endif // WINDOWLISTBOX_H

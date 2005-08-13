@@ -102,7 +102,43 @@ void FermaNextMainFrame::createProject ()
             tr("Enter project name:"), QLineEdit::Normal,
             QString::null, &ok, this );
     if ( ok && !text.isEmpty() ) {
-        FermaNextWorkspace::workspace().createProject( text ).activate();
+        FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
+        FermaNextProject& prj = wsp.createProject( text );
+        TrussUnitWindowManager& mng = prj.getTrussUnitWindowManager();
+
+//TODO: remove this in future
+/*********** TEMP TRUSS UNIT **************************/        
+        QPoint pos1, pivotPnt1, pivotPnt2;
+        int X(50), Y(50);
+        TrussUnitWindow& trussWindow = mng.createTrussUnitWindow( "Truss unit" );
+        pos1.setX ( X ); 
+        pos1.setY ( Y );         
+        trussWindow.createNode ( 280, 30 );
+        pivotPnt1.setX ( 0 );
+        pivotPnt1.setY ( 0 );
+        pivotPnt2.setX ( 130 );
+        pivotPnt2.setY ( 130 );
+        trussWindow.createPivot ( pivotPnt1, pivotPnt2 );
+        pivotPnt1.setX ( 252 );
+        pivotPnt1.setY ( 300 );
+        trussWindow.createPivot ( pivotPnt1, pivotPnt2 );
+        pivotPnt1.setX ( 0 );
+        pivotPnt1.setY ( 300 );
+        trussWindow.createPivot ( pivotPnt1, pivotPnt2 );
+        pivotPnt2.setX ( 250 );
+        pivotPnt2.setY ( 300 );
+        trussWindow.createPivot ( pivotPnt1, pivotPnt2 );
+        pivotPnt2.setX ( 0 );
+        pivotPnt2.setY ( 0 );
+        trussWindow.createPivot ( pivotPnt1, pivotPnt2 );
+
+        trussWindow.findNodeByNumber( 1 )->setFixation( Node::FixationByX );
+        trussWindow.findNodeByNumber( 2 )->setFixation( Node::FixationByY );
+        trussWindow.findNodeByNumber( 3 )->setFixation( Node::FixationByXY );
+/*********** TEMP TRUSS UNIT **************************/
+
+        prj.activate();
+
     } else {
         // user entered nothing or pressed Cancel
     }
