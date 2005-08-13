@@ -1,9 +1,146 @@
 
 #include "WindowListBox.h"
 #include "SubsidiaryConstants.h"
+#include "TrussUnitActions.h"
+
 #include <qstring.h>
 #include <qcursor.h>
 #include <qpopupmenu.h>
+
+/*****************************************************************************
+ * Truss Unit Window Item
+ *****************************************************************************/
+
+TrussUnitWindowItem::TrussUnitWindowItem ( FermaNextProject& prj,
+                                           TrussUnitWindow& truss,
+                                           WindowListBox* lb,
+                                           const QPixmap& pixmap ) :
+    QListBoxPixmap( lb, pixmap, truss.getTrussName() ),
+    listBox(lb),
+    project(prj), 
+    trussWindow(truss),
+    selected(false)
+{
+    // Catch renaming
+    QObject::connect( &truss, SIGNAL(onTrussNameChange(const QString&)),
+                      SLOT(setText(const QString&)) );
+}
+
+void TrussUnitWindowItem::fillPopup ( QPopupMenu* popup ) const
+{
+    if ( isSelectedInGroup() ) {
+        popup->insertItem(
+                  QPixmap::fromMimeSource(imagesPath + "/unselect.png"),
+                  "Unselect", this, SLOT(unselectFromGroup()) );
+    } else {
+        popup->insertItem( 
+                  QPixmap::fromMimeSource(imagesPath + "/select.png"),
+                  "Select", this, SLOT(selectInGroup()) );
+    }
+    popup->insertSeparator();
+    popup->insertItem(
+                      QPixmap::fromMimeSource(imagesPath + "/select.png"),
+                      "Select All", this, SLOT(selectAllInGroup()) );
+    popup->insertItem(
+                      QPixmap::fromMimeSource(imagesPath + "/unselect.png"),
+                      "Unselect All", this, SLOT(unselectAllFromGroup()) );
+    popup->insertSeparator();
+    popup->insertItem(
+                      QPixmap::fromMimeSource(imagesPath + "/calculate.png"),
+                      "Calculate", this, SLOT(calculate()) );
+    popup->insertSeparator();
+    popup->insertItem(
+                      QPixmap::fromMimeSource(imagesPath + "/delete.png"),
+                      "Remove", this, SLOT(remove()) );
+    popup->insertSeparator();
+
+    if ( trussWindow.isVisible() ) {
+        popup->insertItem( 
+                      QPixmap::fromMimeSource( imagesPath + "/hide.png"),
+                      "Hide", this, SLOT(hide()) );
+    } else {
+        popup->insertItem(
+                      QPixmap::fromMimeSource(imagesPath + "/show.png"),
+                      "Show", this, SLOT(show()) );
+    }
+    popup->exec( QCursor::pos() );
+}
+
+bool TrussUnitWindowItem::isSelectedInGroup () const
+{
+    return selected;
+}
+
+void TrussUnitWindowItem::setText ( const QString& text )
+{
+    QListBoxPixmap::setText( text );
+}
+
+void TrussUnitWindowItem::raise ()
+{
+    if ( ! trussWindow.isVisible() )
+        return;
+    TrussUnitDesignerWidget& widget = project.getDesignerWindow().
+        getDesignerWidget();
+    widget.focusOnWindow( trussWindow );
+}
+
+void TrussUnitWindowItem::show ()
+{
+    if ( trussWindow.isVisible() )
+        return;
+    trussWindow.setVisible( true );
+    raise();
+}
+
+void TrussUnitWindowItem::hide ()
+{
+    if ( ! trussWindow.isVisible() )
+        return;
+    trussWindow.setVisible( false );
+}
+
+void TrussUnitWindowItem::selectInGroup ()
+{
+    selected = true;
+}
+
+void TrussUnitWindowItem::unselectFromGroup ()
+{
+    selected = false;
+}
+
+void TrussUnitWindowItem::selectAllInGroup ()
+{
+    if ( listBox == 0 )
+        return;
+    listBox->selectAllInGroup();
+}
+
+void TrussUnitWindowItem::unselectAllFromGroup ()
+{
+    if ( listBox == 0 )
+        return;
+    listBox->unselectAllFromGroup();
+}
+
+void TrussUnitWindowItem::calculate ()
+{
+    //TODO: add calculation call here!
+}
+
+void TrussUnitWindowItem::remove ()
+{
+    // Save truss window remove state
+    TrussUnitWindowManager& trussMng = project.getTrussUnitWindowManager();
+    ObjectState& state = trussMng.createState();
+    TrussUnitWindowRemoveAction* action = 
+                      new TrussUnitWindowRemoveAction( trussMng, trussWindow );
+    state.addAction( action );
+    state.save();
+    // Remove truss window
+    project.getTrussUnitWindowManager().removeTrussUnitWindow( trussWindow );
+}
 
 /*****************************************************************************
  * Windows List Box
@@ -14,143 +151,78 @@ WindowListBox::WindowListBox ( FermaNextProject& prj, QWidget* parent,
     QListBox( parent, name, fl ),
     project(prj)
 {
-    activ.resize(0);
-    shown.resize(0);
-    connect( this, SIGNAL(selected(int)), SLOT(DoubleClick(int)) );
-    connect( this, SIGNAL(highlighted(int)), SLOT(_highl(int)) );
+    // Catch double click on item
+    QObject::connect( this, SIGNAL(doubleClicked(QListBoxItem*)),
+                      SLOT(raiseTrussUnitWindowItem(QListBoxItem*)) );
+    // Catch truss creation/removing
+    TrussUnitWindowManager& trussMng = project.getTrussUnitWindowManager();
+    QObject::connect( &trussMng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
+                      SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
+    QObject::connect( &trussMng, SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
+                      SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
 }
 
-void WindowListBox::addItem( const QString & text )
+void WindowListBox::contextMenuEvent ( QContextMenuEvent* event )
 {
-    int i;
-    insertItem( QPixmap::fromMimeSource( imagesPath + "/unselect.png" ), 
-                tr( text ) );
-    i =activ.size();
-    i++;
-    activ.resize(i);
-    activ[i-1]=0;
-    shown.resize(i);
-    shown[i-1]=1;
+    QListBoxItem* selected = selectedItem();
+    if ( selected == 0 )
+        return;
+    TrussUnitWindowItem* item = 0;
+    try { item = dynamic_cast<TrussUnitWindowItem*>(selected); }
+    catch ( ... ) { return; }
+
+    QPopupMenu* popup = new QPopupMenu( this );
+    Q_CHECK_PTR( popup );
+    item->fillPopup( popup );
+    delete popup;
 }
 
-void WindowListBox::DoubleClick( int )
+TrussUnitWindowItem* WindowListBox::findByTrussUnitWindow ( 
+    const TrussUnitWindow& truss ) const
 {
-
-}
-
-int WindowListBox::_isSelected ( int index )
-{
-    if ( activ[index]==1 )
-        return 1;    
-    else        
+    if ( ! windowItems.contains( &truss ) )
         return 0;
+    return windowItems[&truss];
 }
 
-int WindowListBox::_isShown ( int index )
+void WindowListBox::addTrussUnitWindow ( TrussUnitWindow& truss )
 {
-    if ( shown[index]==1 ) 
-        return 1;
-    else
-        return 0;
+    TrussUnitWindowItem* item = new TrussUnitWindowItem( 
+                  project, truss, this, 
+                  QPixmap::fromMimeSource(imagesPath + "/project.png") );
+    windowItems[&truss] = item;
 }
 
-
-void WindowListBox::_setSelected ( int index )
+void WindowListBox::removeTrussUnitWindow ( TrussUnitWindow& truss )
 {
-    if ( _isSelected(index)==0 ) {
-        changeItem( QPixmap::fromMimeSource(imagesPath + "/select.png"),
-                    text(index), index );
-        activ[index] = 1;
-    }
+    if ( ! windowItems.contains( &truss ) )
+        return;
+    const TrussUnitWindowItem* item = windowItems[&truss];
+    windowItems.remove(&truss);
+    delete item;
 }
 
-void WindowListBox::_setUnSelected ( int index )
+void WindowListBox::selectAllInGroup ()
 {
-    if ( _isSelected(index) ) {
-        changeItem( QPixmap::fromMimeSource(imagesPath + "/unselect.png"),
-                    text(index),index);
-        activ[index] = 0;
-    }
+    WindowMapIter iter = windowItems.begin();
+    for ( ; iter != windowItems.end(); ++iter )
+        iter.data()->selectInGroup();
 }
 
-void WindowListBox::_highl ( int index )
+void WindowListBox::unselectAllFromGroup ()
 {
-    now_highl=index;
+    WindowMapIter iter = windowItems.begin();
+    for ( ; iter != windowItems.end(); ++iter )
+        iter.data()->unselectFromGroup();
 }
 
-void WindowListBox::contextMenuEvent ( QContextMenuEvent* )
+void WindowListBox::raiseTrussUnitWindowItem ( QListBoxItem* it )
 {
-    QPopupMenu* contextMenu = new QPopupMenu( this );
-    Q_CHECK_PTR( contextMenu );
-    if ( _isSelected(now_highl)==0 ) {
-        contextMenu->insertItem( 
-                  QPixmap::fromMimeSource(imagesPath + "/select.png"),
-                  "Select", this, SLOT(_sel()) );
-    }
-    if ( _isSelected(now_highl) ) {
-        contextMenu->insertItem(
-                      QPixmap::fromMimeSource(imagesPath + "/unselect.png"),
-                      "Unselect", this, SLOT(_unsel()) );
-    }
-    contextMenu->insertSeparator();
-    contextMenu->insertItem(
-                      QPixmap::fromMimeSource(imagesPath + "/select.png"),
-                      "Select All", this, SLOT(_selall()) );
-    contextMenu->insertItem(
-                       QPixmap::fromMimeSource(imagesPath + "/unselect.png"),
-                       "Unselect All", this, SLOT(_unselall()) );
-    contextMenu->insertSeparator();
-    contextMenu->insertItem(
-                       QPixmap::fromMimeSource(imagesPath + "/calculate.png"),
-                       "Calculate", this, SLOT(_none()) );
-    contextMenu->insertSeparator();
-    contextMenu->insertItem(
-                        QPixmap::fromMimeSource(imagesPath + "/delete.png"),
-                        "Remove", this, SLOT(_none()) );
-    contextMenu->insertSeparator();
+    TrussUnitWindowItem* item = 0;
+    try { item = dynamic_cast<TrussUnitWindowItem*>(it); }
+    catch ( ... ) { return; }
 
-    if ( _isShown(now_highl)==0 ) {
-        contextMenu->insertItem( 
-                        QPixmap::fromMimeSource( imagesPath + "/show.png"),
-                        "Show",this,SLOT(_show()) );
-    }
-    if ( _isShown(now_highl) )  {
-        contextMenu->insertItem(
-                        QPixmap::fromMimeSource(imagesPath + "/hide.png"),
-                        "Hide", this, SLOT(_hide()) );
-    }
-    contextMenu->exec( QCursor::pos() );
-    delete contextMenu;
-}
-
-void WindowListBox::_sel()
-{                    
-    _setSelected(now_highl);
-}
-
-void WindowListBox::_unsel()
-{
-    _setUnSelected(now_highl);
-}
-
-void WindowListBox::_selall()
-{
-    for ( uint i = 0; i < activ.size(); i++ )
-        _setSelected(i);
-}
-
-void WindowListBox::_unselall()
-{
-    for ( uint i = 0; i < activ.size(); i++ )
-        _setUnSelected(i);
-}
-
-void WindowListBox::_show()
-{
-}
-
-void WindowListBox::_hide()
-{
+    item->raise();
 }
 
 /*****************************************************************************/

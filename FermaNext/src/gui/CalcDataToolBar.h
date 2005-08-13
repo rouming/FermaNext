@@ -20,7 +20,7 @@ protected:
 
 public slots:
     virtual void addTrussUnitWindow ( TrussUnitWindow& );
-    virtual void removeTrussUnitWindow ( const TrussUnitWindow& );
+    virtual void removeTrussUnitWindow ( TrussUnitWindow& );
 
 protected slots:
     virtual void addWidget ( QWidget& );
