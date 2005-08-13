@@ -45,7 +45,7 @@ public:
 
 signals:
     void onTrussUnitWindowCreate ( TrussUnitWindow& );
-    void onTrussUnitWindowRemove ( const TrussUnitWindow& );
+    void onTrussUnitWindowRemove ( TrussUnitWindow& );
 
 private:
     static const QString NEW_EXTENSION;

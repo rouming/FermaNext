@@ -30,10 +30,10 @@ TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
     firstNodeClickDist(0,0), 
     lastNodeClickDist(0,0),
     // Temp
-    init(true),
     X(50), Y(50)
 {
-     QWidget::setFocus ();
+    QWidget::setFocus();
+    QWidget::setMouseTracking( true );
 }
 
 TrussUnitDesignerWidget::~TrussUnitDesignerWidget ()
@@ -51,13 +51,19 @@ void TrussUnitDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow 
     X += 15; 
     Y += 10;
 
+    // We should repaint all area after truss changes its visibility
+    QObject::connect( &trussWindow, SIGNAL(onVisibleChange(bool)), SLOT(repaint()) );
+
     trussWindows.push_back(&trussWindow);
     trussWindow.setWindowPosition ( QPoint( X, Y ) );
-    focusOnWindow(trussWindow);    
+    focusOnWindow(trussWindow);
 }
 
-bool TrussUnitDesignerWidget::removeTrussUnitWindow ( const TrussUnitWindow& window )
+bool TrussUnitDesignerWidget::removeTrussUnitWindow ( TrussUnitWindow& window )
 {
+    // Do disconnection
+    window.disconnect( this );
+
     WindowList::iterator iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter )
         if ( (*iter) == &window ) 
@@ -141,44 +147,6 @@ bool TrussUnitDesignerWidget::nodeCanBeDrawn ( int x, int y )
             return true;
     }
     return false;
-}
-
-void TrussUnitDesignerWidget::initTrussUnitWindow ()  //temp method. Later to remove.
-{
-    QWidget::setMouseTracking(true);
-   
-    QPoint pos1, pivotPnt1, pivotPnt2;
-    WindowListIter iter = trussWindows.begin();
-    for ( ; iter != trussWindows.end(); ++iter ) { 
-        TrussUnitWindow* trussWindow = (*iter);        
-        pos1.setX ( X ); 
-        pos1.setY ( Y ); 
-        winBehaviour = windowIdle;
-        trussWindow->createNode ( 280, 30 );
-        pivotPnt1.setX ( 0 );
-        pivotPnt1.setY ( 0 );
-        pivotPnt2.setX ( 130 );
-        pivotPnt2.setY ( 130 );
-        trussWindow->createPivot ( pivotPnt1, pivotPnt2 );
-        pivotPnt1.setX ( 252 );
-        pivotPnt1.setY ( 300 );
-        trussWindow->createPivot ( pivotPnt1, pivotPnt2 );
-        pivotPnt1.setX ( 0 );
-        pivotPnt1.setY ( 300 );
-        trussWindow->createPivot ( pivotPnt1, pivotPnt2 );
-        pivotPnt2.setX ( 250 );
-        pivotPnt2.setY ( 300 );
-        trussWindow->createPivot ( pivotPnt1, pivotPnt2 );
-        pivotPnt2.setX ( 0 );
-        pivotPnt2.setY ( 0 );
-        trussWindow->createPivot ( pivotPnt1, pivotPnt2 );
-
-        trussWindow->findNodeByNumber( 1 )->setFixation( Node::FixationByX );
-        trussWindow->findNodeByNumber( 2 )->setFixation( Node::FixationByY );
-        trussWindow->findNodeByNumber( 3 )->setFixation( Node::FixationByXY );
-    }
-//    parseSvg ( "tiger.svg" );
-    init = false;
 }
 
 void TrussUnitDesignerWidget::saveNodeStateAfterDrag ( QPoint pos )
@@ -297,9 +265,6 @@ void TrussUnitDesignerWidget::drawSvg ( base_renderer& baseRend,
 
 void TrussUnitDesignerWidget::aggPaintEvent ( QPaintEvent* )
 {
-   if ( init ) 
-       initTrussUnitWindow ();
-
     pixfmt pixf ( getAggRenderingBuffer() );
     base_renderer baseRend ( pixf );
     solid_renderer solidRend ( baseRend );

@@ -87,6 +87,7 @@ protected:
 protected:
     virtual void onVisibleChange ( bool ) = 0;
     virtual void onHighlightChange ( bool ) = 0;
+    virtual void onEnableChange ( bool ) = 0;
 
 private:
     bool visible;
@@ -119,11 +120,12 @@ protected slots:
     void trussUnitStateIsChanged ();
 
 signals:
-    void onTrussNameChange ( const QString& old, const QString& n );
+    void onTrussNameChange ( const QString& );
     void onAreaChange ( const QSize& );
 // Paintable signals
     void onVisibleChange ( bool );
     void onHighlightChange ( bool );
+    void onEnableChange ( bool );
 
 private:
     static const QString UNNAMED;
@@ -161,6 +163,7 @@ signals:
 // Paintable signals
     void onVisibleChange ( bool );
     void onHighlightChange ( bool );
+    void onEnableChange ( bool );
 };
 
 /*****************************************************************************/
@@ -183,6 +186,7 @@ signals:
 // Paintable signals
     void onVisibleChange ( bool );
     void onHighlightChange ( bool );
+    void onEnableChange ( bool );
 };
 
 #endif //TRUSSUNIT_H
