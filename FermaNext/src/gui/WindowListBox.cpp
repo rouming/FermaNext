@@ -150,7 +150,7 @@ void TrussUnitWindowItem::remove ()
 {
     // Save truss window remove state
     TrussUnitWindowManager& trussMng = project.getTrussUnitWindowManager();
-    ObjectState& state = trussMng.createState();
+    ObjectState& state = trussWindow.createState();
     TrussUnitWindowRemoveAction* action = 
                       new TrussUnitWindowRemoveAction( trussMng, trussWindow );
     state.addAction( action );
