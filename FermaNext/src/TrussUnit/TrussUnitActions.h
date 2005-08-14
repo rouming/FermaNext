@@ -76,6 +76,21 @@ public:
     void unexecute ();
 };
 
+class TrussPivotChangeNodeAction : public AbstractObjectAction
+{
+public:
+    TrussPivotChangeNodeAction ( TrussPivot&, TrussNode& oldNode, 
+                                 TrussNode& newNode, bool changeMode = true );
+
+    void execute ();
+    void unexecute ();
+private:
+    TrussPivot& pivot;
+    TrussNode& oldNode;
+    TrussNode& newNode;
+    bool firstNodeChange;
+};
+
 /*****************************************************************************
  * Truss Unit Window Actions
  *****************************************************************************/

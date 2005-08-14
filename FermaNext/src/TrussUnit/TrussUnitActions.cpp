@@ -37,7 +37,7 @@ void TrussNodeCreateAction::unexecute ()
     emit actionUnexecuted(*this);
 }
 
-/**** Truss Node Create Action ***/
+/**** Truss Node Remove Action ***/
 
 TrussNodeRemoveAction::TrussNodeRemoveAction ( TrussUnit& t_, TrussNode& n_ ) :
     TrussNodeAction( t_, n_ )
@@ -92,7 +92,7 @@ void TrussPivotCreateAction::unexecute ()
     emit actionUnexecuted(*this);
 }
 
-/**** Truss Pivot Create Action ***/
+/**** Truss Pivot Remove Action ***/
 
 TrussPivotRemoveAction::TrussPivotRemoveAction ( TrussUnit& t_, 
                                                  TrussPivot& p_ ) :
@@ -108,6 +108,36 @@ void TrussPivotRemoveAction::execute ()
 void TrussPivotRemoveAction::unexecute ()
 {
     getTruss().revivePivot( getPivot() );
+    emit actionUnexecuted(*this);
+}
+
+/**** Truss Pivot Change Node Action ***/
+
+TrussPivotChangeNodeAction::TrussPivotChangeNodeAction ( TrussPivot& p_,
+                                                         TrussNode& o_,
+                                                         TrussNode& n_,
+                                                         bool changeMode ) :
+    pivot(p_), 
+    oldNode(o_), 
+    newNode(n_),
+    firstNodeChange(changeMode)
+{}
+
+void TrussPivotChangeNodeAction::execute ()
+{
+    if ( firstNodeChange )
+        pivot.setFirstNode( &newNode );
+    else 
+        pivot.setLastNode( &newNode );
+    emit actionExecuted(*this);
+}
+
+void TrussPivotChangeNodeAction::unexecute ()
+{
+    if ( firstNodeChange )
+        pivot.setFirstNode( &oldNode );
+    else 
+        pivot.setLastNode( &oldNode );
     emit actionUnexecuted(*this);
 }
 
@@ -150,7 +180,7 @@ void TrussUnitWindowCreateAction::unexecute ()
     emit actionUnexecuted(*this);
 }
 
-/**** Truss Unit Create Action ***/
+/**** Truss Unit Remove Action ***/
 
 TrussUnitWindowRemoveAction::TrussUnitWindowRemoveAction ( 
                                              TrussUnitWindowManager& mng_,
