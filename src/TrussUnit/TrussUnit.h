@@ -175,6 +175,10 @@ public:
     TrussPivot ( ObjectStateManager* );
     TrussPivot ( TrussNode&, TrussNode&, ObjectStateManager* );
 
+    bool getDrawingStatus () const;
+    void setDrawingStatus ( bool status );
+
+
     void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
                     agg::scanline_p8& sl, QPoint point1, QPoint point2,
                     int width, color_type color ) const;
@@ -187,6 +191,9 @@ signals:
     void onVisibleChange ( bool );
     void onHighlightChange ( bool );
     void onEnableChange ( bool );
+
+private:
+    bool drawingStatus;
 };
 
 #endif //TRUSSUNIT_H

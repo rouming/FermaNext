@@ -271,34 +271,17 @@ bool TrussUnitWindow::inFDiagResizeRect ( int x, int y ) const
     return false;
 }
 
-bool TrussUnitWindow::inNodeRadius ( int x, int y ) const
-{
-    TrussNode* node = findNodeByWidgetPos ( x , y );
-    if ( node )
-        return true;
-    return false;
-}
-
-bool TrussUnitWindow::isPivotSelected ( int x, int y ) const
-{
-    TrussPivot* pivot = findPivotByWidgetPos ( x, y, pivotFindingPrecision );
-    if ( pivot )
-        return true;
-    return false;
-}
-
 TrussNode* TrussUnitWindow::findNodeByWidgetPos ( int x, int y ) const
 {
-    QPoint widgetCoord;
+    QPoint nodePos;
     NodeList nodeList = getNodeList ();
     NodeListIter iter = nodeList.begin();
     for ( ; iter != nodeList.end(); ++iter )
 	{
         TrussNode* node = *iter;
-        // get node widget coords (in pixels) from its truss (absolute) coords
-        widgetCoord = getWidgetPosFromTrussCoord ( node->getX(), node->getY() );
-        if ( abs ( widgetCoord.x() - x ) < nodesRadius && 
-             abs ( widgetCoord.y() - y ) < nodesRadius )
+        nodePos = getWidgetPosFromTrussCoord ( node->getX(), node->getY() );
+        if ( abs ( nodePos.x() - x ) < nodesRadius && 
+             abs ( nodePos.y() - y ) < nodesRadius )
         {
             return node;
         }
@@ -320,16 +303,11 @@ TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y, int precision 
         widgetPos1 = getWidgetPosFromTrussCoord ( trussCoord1.x(), trussCoord1.y() );
         widgetPos2 = getWidgetPosFromTrussCoord ( trussCoord2.x(), trussCoord2.y() );
 
-        firstNodePos = getWidgetPosFromTrussCoord ( pivot->getFirstNode().getX(),
-                                                    pivot->getFirstNode().getY() );
-        lastNodePos = getWidgetPosFromTrussCoord ( pivot->getLastNode().getX(),
-                                                   pivot->getLastNode().getY() );
-
-        if ( ( x - firstNodePos.x() ) * ( x - firstNodePos.x() ) + 
-             ( y - firstNodePos.y() ) * ( y - firstNodePos.y() ) > 
+        if ( ( x - widgetPos1.x() ) * ( x - widgetPos1.x() ) + 
+             ( y - widgetPos1.y() ) * ( y - widgetPos1.y() ) > 
                nodesRadius * nodesRadius && 
-             ( x - lastNodePos.x() ) * ( x - lastNodePos.x() ) + 
-             ( y - lastNodePos.y() ) * ( y - lastNodePos.y() ) > 
+             ( x - widgetPos2.x() ) * ( x - widgetPos2.x() ) + 
+             ( y - widgetPos2.y() ) * ( y - widgetPos2.y() ) > 
                nodesRadius * nodesRadius )
         {               
             // equation of line
@@ -344,31 +322,6 @@ TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y, int precision 
         }
     }
     return 0;
-}
-
-color_type TrussUnitWindow::getCanvasColor () const
-{
-	return canvColor;
-}
-
-color_type TrussUnitWindow::getHeadlineFirstColor () const
-{
-	return headFirstColor;
-}
-
-color_type TrussUnitWindow::getHeadlineMiddleColor () const
-{
-	return headMiddleColor;
-}
-
-color_type TrussUnitWindow::getHeadlineLastColor () const
-{
-	return headLastColor;
-}
-
-color_type TrussUnitWindow::getBorderColor () const
-{
-	return borderColor;
 }
 
 void TrussUnitWindow::setWindowSize ( int width, int height )
@@ -399,19 +352,22 @@ void TrussUnitWindow::setWindowPosition ( QPoint pos )
     emit onMove( oldPos, pos );
 }
 
-void TrussUnitWindow::setNodeHighlight ( int x, int y )
+void TrussUnitWindow::setNodeHighlight ( TrussNode* selectedNode )
 {
-    TrussNode* node = findNodeByWidgetPos ( x , y );
-    node->setHighlighted ( true ); 
+    selectedNode->setHighlighted ( true );
+    nodeToFront ( *selectedNode );
     rendered(false);
 }
 
-void TrussUnitWindow::setPivotHighlight ( int x, int y )
+void TrussUnitWindow::setPivotHighlight ( TrussPivot* selectedPivot )
 {
-    TrussPivot* pivot = findPivotByWidgetPos ( x , y, pivotFindingPrecision );
-    pivot->setHighlighted ( true );
-    pivot->getFirstNode().setHighlighted ( true );
-    pivot->getLastNode().setHighlighted ( true );
+    TrussNode& first = selectedPivot->getFirstNode();
+    TrussNode& last = selectedPivot->getLastNode();
+    selectedPivot->setHighlighted ( true );
+    first.setHighlighted ( true );
+    last.setHighlighted ( true );
+    nodeToFront ( first );
+    nodeToFront ( last );
     rendered(false);
 }
 
@@ -531,15 +487,15 @@ void TrussUnitWindow::moveTrussPivot ( int x, int y, TrussPivot* pivot,
     rendered(false);
 }
 
-TrussNode* TrussUnitWindow::nodesMergingComparison ( TrussNode* comparableNode, 
+TrussNode* TrussUnitWindow::nodesMergingComparison ( TrussNode& comparableNode, 
                                                      int precision, bool fixationCheck )
 {
     TrussNode* node = findNodeWithSameCoord ( comparableNode, precision );
-    if ( node != 0 && node != comparableNode )
+    if ( node != 0 && node != &comparableNode )
     {
         if ( fixationCheck )
         {
-            if ( node->getFixation() == comparableNode->getFixation() )
+            if ( node->getFixation() == comparableNode.getFixation() )
             {
                 return node;
             }
@@ -551,7 +507,7 @@ TrussNode* TrussUnitWindow::nodesMergingComparison ( TrussNode* comparableNode,
     return 0;
 }
 
-void TrussUnitWindow::mergeNodes ( TrussNode* node, TrussNode* mergingNode )
+void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
 {
     PivotList pivotList = getPivotList ();
     PivotListIter iter = pivotList.begin();
@@ -562,20 +518,34 @@ void TrussUnitWindow::mergeNodes ( TrussNode* node, TrussNode* mergingNode )
 	{
         TrussPivot* pivot = *iter;
         TrussNode* firstNode = &pivot->getFirstNode();
-        if ( firstNode == mergingNode )
-            pivot->setFirstNode ( node );
         TrussNode* lastNode = &pivot->getLastNode();
-        if ( lastNode == mergingNode )
-            pivot->setLastNode ( node );
+        if ( firstNode == mergingNode )
+        {
+            TrussPivot* samePivot = findPivotByNodes ( *node, *lastNode );
+            if ( samePivot )
+                removePivot ( *pivot );
+            else
+                pivot->setFirstNode ( node );
+        }
+        else if ( lastNode == mergingNode )
+        {
+            TrussPivot* samePivot = findPivotByNodes ( *node, *firstNode );
+            if ( samePivot )
+                removePivot ( *pivot );
+            else 
+                pivot->setLastNode ( node );
+        }
 
         // remove fake pivots
-        if ( &pivot->getFirstNode() == &pivot->getLastNode() ||
-             findPivotCopy( pivot ) ) {
+        if ( &pivot->getFirstNode() == &pivot->getLastNode() ) 
+        {
             removePivot( *pivot );
             // Save remove pivot action
             state.addAction( new TrussPivotRemoveAction( *this, *pivot ) );
         }
     }
+    if ( mergingNode->isHighlighted() )
+        node->setHighlighted ( true );
     removeNode ( *mergingNode );
     // Save remove node action
     state.addAction( new TrussNodeRemoveAction( *this, *mergingNode ) );
@@ -600,74 +570,192 @@ void TrussUnitWindow::dividePivot ( TrussPivot& dividualPivot, TrussNode& dividi
 
     TrussPivot* pivot1 = findPivotByNodes ( first, dividingNode );
     TrussPivot* pivot2 = findPivotByNodes ( last, dividingNode );
-    // Check if there is another pivot with the same coords. 
-    // If it so, we should create only one pivot instead of removed (divided) pivot.
     if ( pivot1 )
     {
-        TrussPivot* newlyCreated = 0;
-        if ( last.getNumber() < dividingNode.getNumber() )
-            newlyCreated = &createPivot( last, dividingNode );
-        else
-            newlyCreated = &createPivot( dividingNode, last );
-
-        // Save create pivot action
-        ObjectState& state = newlyCreated->createState();
-        state.addAction( new TrussPivotCreateAction( *this, *newlyCreated ) );
-        state.save();
+        removePivot ( *pivot1 );
     }
-    else if ( pivot2 )
+    if ( pivot2 )
     {
-        TrussPivot* newlyCreated = 0;
-        if ( first.getNumber() < dividingNode.getNumber() )
-            newlyCreated = &createPivot( first, dividingNode );
-        else
-            newlyCreated = &createPivot( dividingNode, first );
-
-        // Save create pivot action
-        ObjectState& state = newlyCreated->createState();
-        state.addAction( new TrussPivotCreateAction( *this, *newlyCreated ) );
-        state.save();
+        removePivot ( *pivot2 );
     }
-    // Create two pivots instead of removed one.
+    TrussPivot* newlyCreated = 0;
+
+    if ( first.getNumber() < dividingNode.getNumber() )
+        newlyCreated = &createPivot( first, dividingNode );
     else
-    {
-        TrussPivot* newlyCreated = 0;
+        newlyCreated = &createPivot( dividingNode, first );
 
-        if ( first.getNumber() < dividingNode.getNumber() )
-            newlyCreated = &createPivot( first, dividingNode );
-        else
-            newlyCreated = &createPivot( dividingNode, first );
+    // Save create pivot action
+    ObjectState& stateFirst = newlyCreated->createState();
+    stateFirst.addAction( new TrussPivotCreateAction( *this, *newlyCreated ) );
+    stateFirst.save();
 
-        // Save create pivot action
-        ObjectState& stateFirst = newlyCreated->createState();
-        stateFirst.addAction( new TrussPivotCreateAction( *this, *newlyCreated ) );
-        stateFirst.save();
+    if ( last.getNumber() < dividingNode.getNumber() )
+        newlyCreated = &createPivot( last, dividingNode );
+    else
+        newlyCreated = &createPivot( dividingNode, last );
 
-        if ( last.getNumber() < dividingNode.getNumber() )
-            newlyCreated = &createPivot( last, dividingNode );
-        else
-            newlyCreated = &createPivot( dividingNode, last );
-
-        // Save create pivot action
-        ObjectState& stateSecond = newlyCreated->createState();
-        stateSecond.addAction( new TrussPivotCreateAction( *this, *newlyCreated ) );
-        stateSecond.save();
-    }
+    // Save create pivot action
+    ObjectState& stateSecond = newlyCreated->createState();
+    stateSecond.addAction( new TrussPivotCreateAction( *this, *newlyCreated ) );
+    stateSecond.save();
     mng->endStateBlock();
 
     rendered(false);
 }
 
-void TrussUnitWindow::checkAfterNodeManipulation ( TrussNode* selectedNode )
+bool TrussUnitWindow::checkSegmentsCrossing ( QPoint p11, QPoint p12, 
+                                              QPoint p21, QPoint p22 ) const
+{
+    if ( p11 == p21 && p12 == p22 )
+        return false;
+
+    double denominator  = ( p12.y() - p11.y() ) * ( p21.x() - p22.x() ) - 
+                          ( p21.y() - p22.y() ) * ( p12.x() - p11.x() );
+    
+    double numerator1 = ( p12.y() - p11.y() ) * ( p21.x() - p11.x() ) - 
+                        ( p21.y() - p11.y() ) * ( p12.x() - p11.x() );
+    
+    double numerator2 = ( p21.y() - p11.y() ) * ( p21.x() - p22.x() ) - 
+                        ( p21.y() - p22.y() ) * ( p21.x() - p11.x() );
+
+    double crossIndicator1 = numerator1 / denominator;
+    double crossIndicator2 = numerator2 / denominator;
+
+    if( ( 0 < crossIndicator1 ) && ( crossIndicator1 < 1 ) && 
+        ( 0 < crossIndicator2 ) && ( crossIndicator2 < 1 ) )
+    {
+        return true;
+    }
+    return false;
+}
+
+void TrussUnitWindow::createPivotCrossPoints ( TrussPivot* selectedPivot, 
+                                               bool fixationCheck )
+{
+    removePivotsHighlight ();
+    TrussNode& first = selectedPivot->getFirstNode();
+    TrussNode& last = selectedPivot->getLastNode();
+    QPoint p11 = first.getPoint ();
+    QPoint p12 = last.getPoint ();
+
+    PivotList pivotList = getPivotList ();
+    PivotList::reverse_iterator rev_iter = pivotList.rbegin();
+    for ( ; rev_iter != pivotList.rend(); ++rev_iter )
+	{
+        TrussPivot* pivot = *rev_iter;
+        QPoint p21 = pivot->getFirstNode ().getPoint ();
+        QPoint p22 = pivot->getLastNode ().getPoint ();
+        if ( checkSegmentsCrossing( p11, p12, p21, p22 ) )
+        {
+            QPoint begin, end;
+            if ( p11.x() > p12.x() )
+            {
+                begin = p12;
+                end = p11;
+            }
+            else
+            {
+                begin = p11;
+                end = p12;
+            }
+            int x;
+            for ( x = begin.x(); x < end.x(); x++ )
+            {
+                double y1 = double( x - begin.x() ) / double( begin.x() - end.x() ) * 
+                            double( begin.y() - end.y() ) + begin.y();
+                double y2 = double( x - p21.x() ) / double( p21.x() - p22.x() ) * 
+                            double( p21.y() - p22.y() ) + p21.y();
+
+                QPoint crossPoint ( x, y1 );
+                TrussNode* crossNode = findNodeByCoord ( crossPoint, 200 );
+                if ( crossNode && crossNode != &first && crossNode != &last )
+                {
+                    checkAfterNodeManipulation ( crossNode, fixationCheck );
+                }
+                else if ( abs( y1 - y2 ) < 0.5 )
+                {
+                    crossNode = &createNode ( x, y1 );
+                    checkAfterNodeManipulation ( crossNode, fixationCheck );
+                    break;
+                }
+            }  
+        }
+    }
+}
+
+void TrussUnitWindow::checkAfterNodeManipulation ( TrussNode* selectedNode, 
+                                                   bool fixationCheck )
 {
     QPoint nodePos = getWidgetPosFromTrussCoord ( selectedNode->getX(), 
-                                                    selectedNode->getY() );
-    TrussNode* node = nodesMergingComparison( selectedNode, 150, true );
-    TrussPivot* pivot = findPivotByWidgetPos ( nodePos.x(), nodePos.y(), 250 );
+                                                  selectedNode->getY() );
+    TrussNode* node = nodesMergingComparison( *selectedNode, 100, fixationCheck );
+    TrussPivot* pivot = 0;
+
     if ( node )
-        mergeNodes ( node, selectedNode );
-    else if ( pivot )
-        dividePivot ( *pivot, *selectedNode );
+    {
+        mergeNodes ( selectedNode, node );
+    }
+    else
+    {
+        PivotList pivotList = getPivotList ();
+        uint i;
+        for ( i = 0; i < pivotList.size(); i++ )
+        {
+            pivot = findPivotByWidgetPos ( nodePos.x(), nodePos.y(), 250 );
+            if ( pivot )
+                dividePivot ( *pivot, *selectedNode );
+        }
+    }
+
+/*  TODO: find out what's the problem with pivots crossing
+
+    PivotList changedPivotList = getPivotList ();
+    PivotListIter iter = changedPivotList.begin();
+    for ( ; iter != changedPivotList.end(); ++iter )
+	{
+        TrussPivot* pivot = *iter;
+        if ( &pivot->getFirstNode() == selectedNode || 
+             &pivot->getLastNode() == selectedNode )
+        {
+            createPivotCrossPoints ( pivot, fixationCheck );
+        }
+    }
+*/
+}
+
+void TrussUnitWindow::checkAfterPivotManipulation ( TrussPivot* selectedPivot, 
+                                                   bool fixationCheck )
+{
+    TrussNode* firstNode = &selectedPivot->getFirstNode();
+    TrussNode* lastNode = &selectedPivot->getLastNode();
+    checkAfterNodeManipulation ( firstNode, fixationCheck );
+    checkAfterNodeManipulation ( lastNode, fixationCheck );
+}
+
+color_type TrussUnitWindow::getCanvasColor () const
+{
+	return canvColor;
+}
+
+color_type TrussUnitWindow::getHeadlineFirstColor () const
+{
+	return headFirstColor;
+}
+
+color_type TrussUnitWindow::getHeadlineMiddleColor () const
+{
+	return headMiddleColor;
+}
+
+color_type TrussUnitWindow::getHeadlineLastColor () const
+{
+	return headLastColor;
+}
+
+color_type TrussUnitWindow::getBorderColor () const
+{
+	return borderColor;
 }
 
 void TrussUnitWindow::setCanvasColor ( int r, int g, int b )
