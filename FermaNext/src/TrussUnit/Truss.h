@@ -125,9 +125,9 @@ public:
         return 0;
     }   
 
-    virtual N* findNodeWithSameCoord ( N* comparableNode, int precision ) const
+    virtual N* findNodeWithSameCoord ( N& comparableNode, int precision ) const
     {
-        QPoint point = comparableNode->getPoint ();
+        QPoint point = comparableNode.getPoint ();
         NodeListConstIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
         {
@@ -137,7 +137,7 @@ public:
             QPoint pos = node->getPoint();
             if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
                    (point.y() - pos.y()) * (point.y() - pos.y()) ) < precision &&
-                    node != comparableNode )
+                    node != &comparableNode )
                 return node;
         }
         return 0;
@@ -167,6 +167,18 @@ public:
                  &(pivot->getLastNode()) == &node1 ) {
                 return pivot;
             }
+        }
+        return 0;
+    }
+
+    virtual P* findPivotWithSameCoord ( const P& comparablePivot, int precision ) const
+    {
+        N* node1 = findNodeWithSameCoord ( comparablePivot.getFirstNode(), precision );
+        N* node2 = findNodeWithSameCoord ( comparablePivot.getLastNode(), precision );
+        if ( node1 && node2 )
+        {
+            P* pivot = findPivotByNodes ( *node1, *node2 );
+            return pivot;
         }
         return 0;
     }
@@ -382,26 +394,6 @@ protected:
         p->desist();
         emit afterPivotRemoval();
         emit onStateChange();
-    }
-
-    virtual P* findPivotCopy ( const P* comparablePivot ) const
-    {
-        PivotListConstIter iter = pivots.begin();
-        for ( ; iter != pivots.end(); ++iter )
-        {
-            P* pivot = (*iter);
-            if ( pivot != comparablePivot )
-            {
-                if ( &pivot->getFirstNode() == &comparablePivot->getFirstNode() && 
-                    &pivot->getLastNode() == &comparablePivot->getLastNode() ||
-                     &pivot->getFirstNode() == &comparablePivot->getLastNode() && 
-                    &pivot->getLastNode() == &comparablePivot->getFirstNode() )
-                {
-                    return pivot;
-                }
-            }
-        }
-        return 0;
     }
 
 private:

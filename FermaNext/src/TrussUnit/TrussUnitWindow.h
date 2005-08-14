@@ -21,7 +21,7 @@
 
 typedef agg::glyph_raster_bin<agg::rgba8>                           glyph_gen;
 typedef agg::renderer_raster_htext_solid<ren_dynarow, glyph_gen>    textRenderer;
-typedef const agg::int8u*                                                 textFont;
+typedef const agg::int8u*                                           textFont;
 
 
 class TrussUnitWindow : public TrussUnit
@@ -49,34 +49,42 @@ public:
     virtual bool inVerResizeRect ( int x, int y ) const;
     virtual bool inBDiagResizeRect ( int x, int y ) const;
     virtual bool inFDiagResizeRect ( int x, int y ) const;
-    virtual bool inNodeRadius ( int x, int y ) const;
-    virtual bool isPivotSelected ( int x, int y ) const;
 
     virtual TrussNode* findNodeByWidgetPos ( int x, int y ) const;
     virtual TrussPivot* findPivotByWidgetPos ( int x, int y, int presicion ) const;
+
+    virtual void resize ( QPoint leftTop, QPoint rightBottom );
+    virtual void setWindowPosition ( QPoint pos );
+
+    virtual void setNodeHighlight ( TrussNode* selectedNode );
+    virtual void setPivotHighlight ( TrussPivot* selectedPivot );
+    virtual void removeNodesHighlight ();
+    virtual void removePivotsHighlight ();
+
+    virtual void moveTrussNode ( int x, int y, TrussNode* node );
+    virtual void moveTrussPivot ( int x, int y, TrussPivot* pivot, 
+                                  QPoint firstNodeClickDist, QPoint lastNodeClickDist );
+
+    virtual TrussNode* nodesMergingComparison ( TrussNode& comparableNode, int precision,
+                                                bool fixationCheck );
+    virtual void mergeNodes ( TrussNode* mergingNode, TrussNode* node );
+
+    virtual void dividePivot ( TrussPivot& dividualPivot, TrussNode& dividingNode );
+
+    virtual bool checkSegmentsCrossing ( QPoint p11, QPoint p12, 
+                                         QPoint p21, QPoint p22 ) const;
+    virtual void createPivotCrossPoints ( TrussPivot* selectedPivot, bool fixationCheck );
+
+    virtual void checkAfterNodeManipulation ( TrussNode* selectedNode, 
+                                              bool fixationCheck );
+    virtual void checkAfterPivotManipulation ( TrussPivot* selectedPivot, 
+                                               bool fixationCheck );
 
     virtual color_type getCanvasColor () const;
 	virtual color_type getHeadlineFirstColor () const;
     virtual color_type getHeadlineMiddleColor () const;
     virtual color_type getHeadlineLastColor () const;
 	virtual color_type getBorderColor () const;
-
-    virtual void resize ( QPoint leftTop, QPoint rightBottom );
-    virtual void setWindowPosition ( QPoint pos );
-    virtual void setNodeHighlight ( int x, int y );
-    virtual void setPivotHighlight ( int x, int y );
-    virtual void removeNodesHighlight ();
-    virtual void removePivotsHighlight ();
-
-    // TODO: carry to TrussUnit class
-    virtual void moveTrussNode ( int x, int y, TrussNode* node );
-    virtual void moveTrussPivot ( int x, int y, TrussPivot* pivot, 
-                                  QPoint firstNodeClickDist, QPoint lastNodeClickDist );
-    virtual TrussNode* nodesMergingComparison ( TrussNode* comparableNode, int precision,
-                                                bool fixationCheck );
-    virtual void mergeNodes ( TrussNode* node, TrussNode* mergingNode );
-    virtual void dividePivot ( TrussPivot& dividualPivot, TrussNode& dividingNode );
-    virtual void checkAfterNodeManipulation ( TrussNode* selectedNode );
 
     virtual void setCanvasColor ( int r, int g, int b );
     virtual void setHeadlineFirstColor ( int r, int g, int b );

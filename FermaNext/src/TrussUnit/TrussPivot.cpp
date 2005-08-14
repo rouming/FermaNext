@@ -6,13 +6,23 @@
  *****************************************************************************/
 
 TrussPivot::TrussPivot ( ObjectStateManager* mng ) :
-    Pivot<TrussNode>(mng)
+    Pivot<TrussNode>(mng), drawingStatus(true)
 {}
 
 TrussPivot::TrussPivot ( TrussNode& first, TrussNode& last,
                          ObjectStateManager* mng) :
-    Pivot<TrussNode>(first, last, mng)
+    Pivot<TrussNode>(first, last, mng), drawingStatus(true)
 {}
+
+bool TrussPivot::getDrawingStatus () const
+{
+    return drawingStatus;
+}
+
+void TrussPivot::setDrawingStatus ( bool status )
+{
+    drawingStatus = status;
+}
 
 struct line
 {
@@ -67,7 +77,7 @@ void TrussPivot::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleM
     if ( isHighlighted () )
         drawLine ( ras, solidRend, sl, p1, p2, pivotsWidth + 5, 
                   agg::rgba(200, 135, 15, 0.45) );
-    if ( isEnabled () )
+    if ( drawingStatus )
         drawLine ( ras, solidRend, sl, p1, p2, pivotsWidth, agg::rgba(0, 0, 0) );
     else 
         drawLine ( ras, solidRend, sl, p1, p2, pivotsWidth - 1, agg::rgba(0, 0, 0) );
