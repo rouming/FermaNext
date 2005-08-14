@@ -286,7 +286,7 @@ void ProjectToolBox::importIsPressed ()
         TrussUnitWindowManager& trussMng = currPrj->getTrussUnitWindowManager();
         TrussUnitWindow& truss = trussMng.createTrussUnitWindowFromFile(fileName);
         // Save truss window create state
-        ObjectState& state = trussMng.createState();
+        ObjectState& state = truss.createState();
         TrussUnitWindowCreateAction* action = 
                             new TrussUnitWindowCreateAction( trussMng, truss );
         state.addAction( action );
