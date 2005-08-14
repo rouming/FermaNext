@@ -13,11 +13,15 @@ class TrussUnitWindowItem : public QObject, public QListBoxPixmap
     Q_OBJECT
 public:
     TrussUnitWindowItem ( FermaNextProject&, TrussUnitWindow&, 
-                          WindowListBox*, const QPixmap& );
+                          WindowListBox*, const QPixmap&,
+                          const QPixmap& disPix );
+
+    virtual const QPixmap* pixmap () const;
 
     virtual void fillPopup ( QPopupMenu* ) const;
 
     virtual bool isSelectedInGroup () const;
+    virtual bool isShown () const;
 
 public slots:
     virtual void setText ( const QString& );
@@ -36,7 +40,8 @@ private:
     WindowListBox* listBox;
     FermaNextProject& project;
     TrussUnitWindow& trussWindow;
-    bool selected;
+    QPixmap disabledPix;
+    bool selected;    
 };
 
 
