@@ -13,7 +13,7 @@
 FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack ) :
     name(name_),
     stateManager(),
-    trussWindowManager(&stateManager),
+    trussWindowManager(stateManager),
     widgetStack(stack),
     projectMainWidget( new QMainWindow(widgetStack, 0, 0) ),
     calcDataToolBar( new CalcDataToolBar(projectMainWidget) ),

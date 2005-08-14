@@ -13,7 +13,7 @@
 typedef std::vector<TrussUnitWindow*>  WindowList;
 typedef std::vector<TrussUnitWindow*>::iterator  WindowListIter;
 
-class TrussUnitWindowManager : public StatefulObject
+class TrussUnitWindowManager : public QObject
 {
     Q_OBJECT
 public:
@@ -22,7 +22,7 @@ public:
     class WriteFileException {};
     class WrongFormatException {};
 
-    TrussUnitWindowManager ( ObjectStateManager* );
+    TrussUnitWindowManager ( ObjectStateManager& );
     virtual ~TrussUnitWindowManager ();
 
 protected:
@@ -52,6 +52,7 @@ private:
     static const QString OLD_EXTENSION;
 
     WindowList trussWindows;
+    ObjectStateManager& stateManager;
 };
 
 #endif //TRUSSUNITWINDOWMANAGER_H
