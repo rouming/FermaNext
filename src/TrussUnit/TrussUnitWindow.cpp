@@ -74,13 +74,13 @@ void TrussUnitWindow::setHighlighted ( bool h )
 {
     if ( h ) {
         setBorderColor( 25,55,65 );
-        setResEllColor( 50, 50, 50 );
+        setResEllColor( 120, 120, 120 );
         setHeadlineFirstColor(180, 130, 100 );
         setHeadlineMiddleColor( 230, 190, 170 );
         setHeadlineLastColor( 150, 90, 80 );
     } else {
         setBorderColor( 40,65,60 );
-        setResEllColor( 120, 120, 120 );
+        setResEllColor( 50, 50, 50 );
         setHeadlineFirstColor( 180, 130, 150 );
         setHeadlineMiddleColor( 230, 210, 200 );
         setHeadlineLastColor( 150, 90, 110 );        
@@ -703,6 +703,7 @@ void TrussUnitWindow::createPivotCrossPoints ( TrussPivot* selectedPivot,
                 TrussNode* crossNode = findNodeByCoord ( crossPoint, 200 );
                 if ( crossNode && crossNode != &first && crossNode != &last )
                 {
+                    
                     checkAfterNodeManipulation ( crossNode, fixationCheck );
                 }
                 else if ( fabs( y1 - y2 ) < 0.5 )
@@ -1010,7 +1011,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
     if ( ! isRendered() ) 
     { 
         ren_dynarow baseRend(pixf);
-        baseRend.clear ( agg::rgba (10, 10, 10) );
+        baseRend.clear ( agg::rgba (10, 10, 10, 0) );
         solidRenderer solidRend ( baseRend );    
         textRenderer textRend ( baseRend, glyph );
 
