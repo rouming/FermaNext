@@ -748,6 +748,7 @@ void TrussUnitWindow::checkAfterNodeManipulation ( TrussNode* selectedNode,
     }
 
 /*  TODO: find out what's the problem with pivots crossing
+    2URA: good luck, my friend! :)
 
     PivotList changedPivotList = getPivotList ();
     PivotListIter iter = changedPivotList.begin();

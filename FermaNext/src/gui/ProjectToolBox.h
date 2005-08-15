@@ -15,29 +15,6 @@
 // QMap is used instead of std::map for avoiding this undisabling warning
 #include <qmap.h>
 
-class ProjectToolBox;
-
-// This class is for internal use only. 
-// Object of this class is created for emitting 
-// a signal to remove a project which it owns.
-// Generally ProjectToolBox eats this signal and removes
-// project manually. Of course, ProjectToolBox should
-// delete this remover too to avoid memory leaks.
-class ProjectRemover : public QObject
-{     
-    Q_OBJECT
-public:
-    ProjectRemover ( ProjectToolBox&, FermaNextProject& );
-    FermaNextProject& getProjectToRemove ();
-public slots:
-    void removeProject ();
-signals:
-    void onProjectRemove ( ProjectRemover& );
-private:
-    FermaNextProject& projectToRemove;    
-};
-
-
 // Container for smart FermaNext projects navigation
 class ProjectToolBox : public QToolBox
 {
@@ -56,21 +33,19 @@ public:
 protected slots:
     virtual int addProject ( FermaNextProject& );
     virtual int removeProject ( FermaNextProject& );
-    virtual void removeProjectFromWorkspace ( ProjectRemover& );
-    
+ 
     void activateSelected ( int index );
-
 
 public slots:
     virtual void clear ();
     virtual void importIsPressed ();
+    virtual void newTrussIsPressed ();
 
 private:
     typedef QMap<FermaNextProject*, QWidget*> ProjectMap;
     typedef QMap<FermaNextProject*, QWidget*>::iterator ProjectMapIter;
 
     ProjectMap projects;
-    ProjectRemover* lastRemover;
     FermaNextProject* currentPrj;
     FermaNextWorkspace& workspace;    
 };
