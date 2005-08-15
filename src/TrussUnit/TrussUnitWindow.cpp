@@ -699,15 +699,15 @@ void TrussUnitWindow::createPivotCrossPoints ( TrussPivot* selectedPivot,
                 double y2 = double( x - p21.x() ) / double( p21.x() - p22.x() ) * 
                             double( p21.y() - p22.y() ) + p21.y();
 
-                QPoint crossPoint ( x, y1 );
+                QPoint crossPoint ( x, (int)y1 );
                 TrussNode* crossNode = findNodeByCoord ( crossPoint, 200 );
                 if ( crossNode && crossNode != &first && crossNode != &last )
                 {
                     checkAfterNodeManipulation ( crossNode, fixationCheck );
                 }
-                else if ( abs( y1 - y2 ) < 0.5 )
+                else if ( fabs( y1 - y2 ) < 0.5 )
                 {
-                    crossNode = &createNode ( x, y1 );
+                    crossNode = &createNode ( x, (int)y1 );
                     // Save create node action
                     ObjectState& state = crossNode->createState();
                     TrussNodeCreateAction* action = 
