@@ -179,7 +179,7 @@ WindowListBox::WindowListBox ( FermaNextProject& prj, QWidget* parent,
                       SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
 }
 
-void WindowListBox::contextMenuEvent ( QContextMenuEvent* event )
+void WindowListBox::contextMenuEvent ( QContextMenuEvent* )
 {
     QListBoxItem* selected = selectedItem();
     if ( selected == 0 )

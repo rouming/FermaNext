@@ -14,7 +14,6 @@ unix {
   LIBS = -lsvg -lagg -L.
 }
 
-DEFINES += BENCHMARK_ON
 
 INCLUDEPATH = $$(AGGDIR)/include \
               $$(AGGDIR)/svg \

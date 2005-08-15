@@ -1,6 +1,6 @@
 
-#ifndef TRUSSDESIGNERWIDGET_H
-#define TRUSSDESIGNERWIDGET_H
+#ifndef TRUSSUNITDESIGNERWIDGET_H
+#define TRUSSUNITDESIGNERWIDGET_H
 
 #include "AggQWidget.h"
 #include "TrussUnitWindowManager.h"
@@ -86,4 +86,4 @@ private:
     int X, Y; //temp    
 };
 
-#endif //TRUSSDESIGNERWIDGET_H
+#endif //TRUSSUNITDESIGNERWIDGET_H
