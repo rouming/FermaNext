@@ -177,6 +177,14 @@ void FermaNextMainFrame::setupFileActions ()
     a->addTo( tb );
     a->addTo( menu );    
 
+    // Delete
+    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/editdelete.png" ), 
+                     tr( "&Delete" ), Key_Delete, this, "editDelete" );
+    connect( a, SIGNAL( activated() ), this, SLOT( editDelete() ) );    
+    a->addTo( menu );
+    a->addTo( tb );
+    menu->insertSeparator();
+
     // Save As
     a = new QAction( tr( "Save &As..." ), 0, this, "fileSaveAs" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileSaveAs() ) );
@@ -307,14 +315,6 @@ void FermaNextMainFrame::setupEditActions ()
     connect( a, SIGNAL( activated() ), this, SLOT( editCut() ) );
     a->addTo( tb );
     a->addTo( menu );
-
-    // Delete
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/editdelete.png" ), 
-                     tr( "&Delete" ), Key_Delete, this, "editDelete" );
-    connect( a, SIGNAL( activated() ), this, SLOT( editDelete() ) );    
-    a->addTo( menu );
-    a->addTo( tb );
-    menu->insertSeparator();
 
     // Select All
     a = new QAction( QPixmap::fromMimeSource( imagesPath + "/editselectall.xpm" ), 
@@ -505,7 +505,18 @@ void FermaNextMainFrame::editCut ()
 
 void FermaNextMainFrame::editDelete ()
 {
-    qWarning("Not implmented yet!");
+    FermaNextProject* currentPrj = projectToolBox->currentProject();
+    if ( currentPrj == 0 )
+        return;
+    if ( QMessageBox::question( this,
+                                tr("Project deleting - \"%1\"").
+                                  arg(currentPrj->getName()),
+                                tr("Delete current project?"),
+                                tr("&Yes"), tr("&No"),
+                                QString::null, 0, 1 ) )
+        return;
+    
+    FermaNextWorkspace::workspace().removeProject( *currentPrj );
 }
 
 void FermaNextMainFrame::editSelectAll ()

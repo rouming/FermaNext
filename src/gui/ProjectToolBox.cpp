@@ -12,28 +12,7 @@
 #include <qmessagebox.h>
 #include <qiconset.h>
 #include <qfiledialog.h>
-
-/*****************************************************************************
- * Project Remover
- *****************************************************************************/
-
-ProjectRemover::ProjectRemover ( ProjectToolBox& tb, FermaNextProject& prj ) :
-    QObject(&tb),
-    projectToRemove(prj)    
-{
-    connect( this, SIGNAL(onProjectRemove(ProjectRemover&)),
-             &tb, SLOT(removeProjectFromWorkspace(ProjectRemover&)) );
-}
-
-void ProjectRemover::removeProject () 
-{
-    emit onProjectRemove(*this);
-}
-
-FermaNextProject& ProjectRemover::getProjectToRemove ()
-{
-    return projectToRemove;
-}
+#include <qinputdialog.h> 
 
 /*****************************************************************************
  * Project ToolBox
@@ -42,7 +21,6 @@ FermaNextProject& ProjectRemover::getProjectToRemove ()
 ProjectToolBox::ProjectToolBox ( FermaNextWorkspace& ws, QWidget* parent, 
                                  const char* name, WFlags f ) :
     QToolBox(parent, name, f),
-    lastRemover(0),
     currentPrj(0),
     workspace(ws)
 {    
@@ -90,22 +68,6 @@ int ProjectToolBox::removeProject ( FermaNextProject& prj )
         setCurrentIndex( result - 1 );        
     delete page;
     return result;
-}
-
-void ProjectToolBox::removeProjectFromWorkspace ( ProjectRemover& remover )
-{
-    if ( QMessageBox::question( this,
-                                tr("Project removing - \"%1\"").
-                                  arg(remover.getProjectToRemove().getName()),
-                                tr("Are you sure?"),
-                                tr("&Yes"), tr("&No"),
-                                QString::null, 0, 1 ) ) 
-        return;
-
-    if ( lastRemover != 0 ) 
-        delete lastRemover;
-    lastRemover = &remover;
-    workspace.removeProject( remover.getProjectToRemove() );
 }
 
 QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
@@ -197,36 +159,26 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
     buttons->setEraseColor(green);
     buttons->setBackgroundMode(PaletteBase);
 	
-    QToolButton* buttonRemove = new QToolButton(buttons);
-	buttonRemove->setBackgroundMode(PaletteBase);
-	buttonRemove->setTextLabel( tr("R") );
-	buttonRemove->setAutoRaise( TRUE );
-	buttonRemove->setTextPosition( QToolButton::Right );
-	buttonRemove->setUsesTextLabel( TRUE );
-    buttonRemove->setFont( simpleFont );
-    ProjectRemover* remover = new ProjectRemover( *this, prj );
-    connect( buttonRemove, SIGNAL(clicked()), remover, SLOT(removeProject()) );    
-
-    QToolButton* buttonSave = new QToolButton(buttons);
-	buttonSave->setBackgroundMode(PaletteBase);
-	buttonSave->setTextLabel( tr("S") );
-	buttonSave->setAutoRaise( TRUE );
-	buttonSave->setTextPosition( QToolButton::Right );
-	buttonSave->setUsesTextLabel( TRUE );
-    buttonSave->setFont( simpleFont );
-
     QToolButton* buttonImport = new QToolButton(buttons);
 	buttonImport->setBackgroundMode(PaletteBase);
-	buttonImport->setTextLabel( tr("I") );
+	buttonImport->setTextLabel( tr("Import") );
 	buttonImport->setAutoRaise( TRUE );
 	buttonImport->setTextPosition( QToolButton::Right );
 	buttonImport->setUsesTextLabel( TRUE );
     buttonImport->setFont( simpleFont );
     connect( buttonImport, SIGNAL(clicked()), this, SLOT(importIsPressed()) ); 
 
-	buttons->insert( buttonRemove, 0 );
-    buttons->insert( buttonSave, 0 );
+    QToolButton* buttonNewTruss = new QToolButton(buttons);
+	buttonNewTruss->setBackgroundMode(PaletteBase);
+	buttonNewTruss->setTextLabel( tr("New") );
+	buttonNewTruss->setAutoRaise( TRUE );
+	buttonNewTruss->setTextPosition( QToolButton::Right );
+	buttonNewTruss->setUsesTextLabel( TRUE );
+    buttonNewTruss->setFont( simpleFont );
+    connect( buttonNewTruss, SIGNAL(clicked()), this, SLOT(newTrussIsPressed()) ); 
+
     buttons->insert( buttonImport, 0 );
+    buttons->insert( buttonNewTruss, 0 );
 
     // Assembling
     pageLayout->addWidget( groupBox );
@@ -300,6 +252,31 @@ void ProjectToolBox::importIsPressed ()
     } catch ( TrussUnitWindowManager::WrongFormatException& ) {
         QMessageBox::critical( 0, "TrussUnitWindowManager::WrongFormatException",
                                QString("TrussUnitWindowManager::WrongFormatException") );
+    }
+}
+
+void ProjectToolBox::newTrussIsPressed ()
+{
+    FermaNextProject* currPrj = currentProject();
+    if ( currPrj == 0 )
+        return;
+
+    bool ok;
+    QString trussName = QInputDialog::getText(
+            tr("Truss unit creation"), 
+            tr("Enter truss unit name:"), QLineEdit::Normal,
+            QString::null, &ok, this );
+    if ( ok && !trussName.isEmpty() ) {
+        TrussUnitWindowManager& trussMng = currPrj->getTrussUnitWindowManager();
+        TrussUnitWindow& truss = trussMng.createTrussUnitWindow(trussName);
+        // Save truss window create state
+        ObjectState& state = truss.createState();
+        TrussUnitWindowCreateAction* action = 
+                            new TrussUnitWindowCreateAction( trussMng, truss );
+        state.addAction( action );
+        state.save();
+    } else {
+        // user entered nothing or pressed Cancel
     }
 }
 
