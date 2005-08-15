@@ -1010,6 +1010,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
     if ( ! isRendered() ) 
     { 
         ren_dynarow baseRend(pixf);
+        baseRend.clear ( agg::rgba (10, 10, 10) );
         solidRenderer solidRend ( baseRend );    
         textRenderer textRend ( baseRend, glyph );
 
