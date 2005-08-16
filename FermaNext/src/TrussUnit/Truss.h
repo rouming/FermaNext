@@ -98,7 +98,7 @@ public:
         for ( ; iter != nodes.end(); ++iter )
         {
             N* node = *iter;
-            if ( !node->isAlive() )
+            if ( !node->isAlive() || !node->isEnabled() )
                 continue;
             QPoint pos = node->getPoint();
             if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
@@ -115,7 +115,7 @@ public:
         for ( ; iter != nodes.end(); ++iter )
         {
             N* node = *iter;
-            if ( !node->isAlive() )
+            if ( !node->isAlive() || !node->isEnabled() )
                 continue;
             QPoint pos = node->getPoint();
             if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
@@ -146,8 +146,9 @@ public:
     virtual N* findNodeByNumber ( int num ) const
     {
         NodeListConstIter iter = nodes.begin();
-        for ( int i = 1; iter != nodes.end(); ++iter ) {
-            if ( (*iter)->isAlive() && i++ == num )
+        for ( int i = 1; iter != nodes.end(); ++iter ) 
+        {
+            if ( (*iter)->isAlive() && (*iter)->isEnabled() && i++ == num )
                 return *iter;
         }
         return 0;
@@ -159,7 +160,7 @@ public:
         for ( ; iter != pivots.end(); ++iter )
         {
             P* pivot = (*iter);
-            if ( ! pivot->isAlive() )
+            if ( ! pivot->isAlive() && !pivot->isEnabled() )
                 continue;
             if ( &(pivot->getFirstNode()) == &node1 && 
                  &(pivot->getLastNode()) == &node2 ||

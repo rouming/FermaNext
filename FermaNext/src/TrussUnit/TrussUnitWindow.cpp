@@ -279,6 +279,8 @@ TrussNode* TrussUnitWindow::findNodeByWidgetPos ( int x, int y ) const
     for ( ; iter != nodeList.end(); ++iter )
 	{
         TrussNode* node = *iter;
+        if ( !node->isEnabled() )
+            continue;
         nodePos = getWidgetPosFromTrussCoord ( node->getX(), node->getY() );
         if ( abs ( nodePos.x() - x ) < nodesRadius && 
              abs ( nodePos.y() - y ) < nodesRadius )
@@ -298,6 +300,8 @@ TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y, int precision 
     for ( ; iter != pivotList.end(); ++iter )
 	{
         TrussPivot* pivot = *iter;
+        if ( !pivot->isEnabled() )
+            continue;
         trussCoord1 = pivot->getFirstNode ().getPoint ();
         trussCoord2 = pivot->getLastNode ().getPoint ();
         widgetPos1 = getWidgetPosFromTrussCoord ( trussCoord1.x(), trussCoord1.y() );
@@ -542,12 +546,15 @@ void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
         else if ( lastNode == mergingNode )
         {
             TrussPivot* samePivot = findPivotByNodes ( *node, *firstNode );
-            if ( samePivot ) {
+            if ( samePivot ) 
+            {
                 // Save remove pivot action
                 state.addAction( new TrussPivotRemoveAction( *this, *pivot ) );
                 removePivot( *pivot );
+                pivot = 0;
             }
-            else {
+            else 
+            {
                 pivot->setLastNode ( node );
                 // Save action of node changing
                 state.addAction( 
@@ -557,13 +564,15 @@ void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
                                                         &TrussPivot::setLastNode,
                                                         node,
                                                         firstNode ) );
+                pivot = 0;
             }
         }
-        else if ( firstNode == lastNode ) 
+        if ( firstNode == lastNode && pivot ) 
         {
             // Save remove pivot action
             state.addAction( new TrussPivotRemoveAction( *this, *pivot ) );
             removePivot( *pivot );
+            pivot = 0;
         }
     }
     if ( mergingNode->isHighlighted() )
@@ -665,12 +674,35 @@ bool TrussUnitWindow::checkSegmentsCrossing ( QPoint p11, QPoint p12,
 void TrussUnitWindow::createPivotCrossPoints ( TrussPivot* selectedPivot, 
                                                bool fixationCheck )
 {
+/*
     removePivotsHighlight ();
+    selectedPivot->setEnabled ( false );
     TrussNode& first = selectedPivot->getFirstNode();
     TrussNode& last = selectedPivot->getLastNode();
     QPoint p11 = first.getPoint ();
     QPoint p12 = last.getPoint ();
 
+   QPoint begin, end;
+    if ( p11.x() > p12.x() )
+    {
+        begin = p12;
+        end = p11;
+    }
+    else
+    {
+        begin = p11;
+        end = p12;
+    }
+    int x;
+    for ( x = begin.x(); x < end.x(); x++ )
+    {
+        double y = double( x - begin.x() ) / double( begin.x() - end.x() ) * 
+                   double( begin.y() - end.y() ) + begin.y();
+        if ( findPivotByCoord
+
+
+
+/*
     PivotList pivotList = getPivotList ();
     PivotList::reverse_iterator rev_iter = pivotList.rbegin();
     for ( ; rev_iter != pivotList.rend(); ++rev_iter )
@@ -722,6 +754,7 @@ void TrussUnitWindow::createPivotCrossPoints ( TrussPivot* selectedPivot,
             }  
         }
     }
+*/
 }
 
 void TrussUnitWindow::checkAfterNodeManipulation ( TrussNode* selectedNode, 
