@@ -139,12 +139,27 @@ void TrussUnitDesignerWidget::removeAllHighlight ()
 
 bool TrussUnitDesignerWidget::nodeCanBeDrawn ( int x, int y )
 {
-    WindowListIter iter = trussWindows.begin();
-    for ( ; iter != trussWindows.end(); ++iter )
+    bool wrongArea = false;
+    uint i = trussWindows.size();
+    WindowList::reverse_iterator rev_iter = trussWindows.rbegin();
+    for ( ; rev_iter != trussWindows.rend(); ++rev_iter )
     {
-        TrussUnitWindow* window = *iter;
+        i--;
+        TrussUnitWindow* window = *rev_iter;
         if ( window->inTrussAreaRect ( x, y ) )
-            return true;
+        {
+            WindowListIter iter = trussWindows.begin() + i;
+            for ( ; iter != trussWindows.end(); ++iter ) 
+            {
+                if ( (*iter)->inWindowRect ( x, y ) && (*iter) != window )
+                {
+                    wrongArea = true;
+                    break;
+                }
+            }
+            if ( !wrongArea )
+                return true;
+        }
     }
     return false;
 }
