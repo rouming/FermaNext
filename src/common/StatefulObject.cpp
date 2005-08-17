@@ -92,12 +92,16 @@ size_t StatefulObject::countEnabledStates () const
 
 void StatefulObject::desist ()
 {
+    if ( ! isAlive() )
+        return;
     emit onDesist(*this);
     isDesisted = true;
 }
 
 void StatefulObject::revive ()
 {
+    if ( isAlive() )
+        return;
     emit onRevive(*this);
     isDesisted = false;    
 }
