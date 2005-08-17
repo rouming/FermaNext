@@ -94,16 +94,18 @@ void StatefulObject::desist ()
 {
     if ( ! isAlive() )
         return;
-    emit onDesist(*this);
+    emit onBeforeDesist(*this);
     isDesisted = true;
+    emit onAfterDesist(*this);
 }
 
 void StatefulObject::revive ()
 {
     if ( isAlive() )
         return;
-    emit onRevive(*this);
-    isDesisted = false;    
+    emit onBeforeRevive(*this);
+    isDesisted = false;
+    emit onAfterRevive(*this);
 }
 
 bool StatefulObject::isAlive () const

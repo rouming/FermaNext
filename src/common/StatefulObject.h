@@ -48,8 +48,10 @@ protected slots:
     virtual void stateManagerDestroyed ();
 
 signals:
-    void onDesist ( StatefulObject& );
-    void onRevive ( StatefulObject& );
+    void onBeforeDesist ( StatefulObject& );
+    void onBeforeRevive ( StatefulObject& );
+    void onAfterDesist ( StatefulObject& );
+    void onAfterRevive ( StatefulObject& );
 
 private:
     typedef std::vector<ObjectState*> StateList;
