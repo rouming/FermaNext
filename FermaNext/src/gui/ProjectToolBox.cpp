@@ -240,7 +240,7 @@ void ProjectToolBox::importIsPressed ()
         // Save truss window create state
         ObjectState& state = truss.createState();
         TrussUnitWindowCreateAction* action = 
-                            new TrussUnitWindowCreateAction( trussMng, truss );
+                            new TrussUnitWindowCreateAction( truss );
         state.addAction( action );
         state.save();        
 
@@ -272,7 +272,7 @@ void ProjectToolBox::newTrussIsPressed ()
         // Save truss window create state
         ObjectState& state = truss.createState();
         TrussUnitWindowCreateAction* action = 
-                            new TrussUnitWindowCreateAction( trussMng, truss );
+                            new TrussUnitWindowCreateAction( truss );
         state.addAction( action );
         state.save();
     } else {

@@ -25,7 +25,12 @@ TrussUnitWindowItem::TrussUnitWindowItem ( FermaNextProject& prj,
 {
     // Catch renaming
     QObject::connect( &truss, SIGNAL(onTrussNameChange(const QString&)),
-                      SLOT(setText(const QString&)) );
+                              SLOT(setText(const QString&)) );
+    // Catch desisting/reviving
+    //QObject::connect( &truss, SIGNAL(onAfterDesist(StatefulObject&)), 
+                              //SLOT(repaint()) );
+    //QObject::connect( &truss, SIGNAL(onAfterRevive(StatefulObject&)), 
+                              //SLOT(repaint()) );
 }
 
 const QPixmap* TrussUnitWindowItem::pixmap () const
@@ -149,14 +154,13 @@ void TrussUnitWindowItem::calculate ()
 void TrussUnitWindowItem::remove ()
 {
     // Save truss window remove state
-    TrussUnitWindowManager& trussMng = project.getTrussUnitWindowManager();
     ObjectState& state = trussWindow.createState();
     TrussUnitWindowRemoveAction* action = 
-                      new TrussUnitWindowRemoveAction( trussMng, trussWindow );
+                      new TrussUnitWindowRemoveAction( trussWindow );
     state.addAction( action );
     state.save();
     // Remove truss window
-    project.getTrussUnitWindowManager().removeTrussUnitWindow( trussWindow );
+    trussWindow.desist();
 }
 
 /*****************************************************************************
