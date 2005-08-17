@@ -25,27 +25,33 @@ public:
     TrussUnitWindowManager ( ObjectStateManager& );
     virtual ~TrussUnitWindowManager ();
 
+    virtual TrussUnitWindow& createTrussUnitWindowFromFile ( 
+         const QString& fileName ) throw (ReadFileException,
+                                          WrongFormatException);
+
 protected:
     virtual void clearTrussUnitWindows ();
     virtual void suspendedClean ();
+    virtual bool removeTrussUnitWindow ( WindowListIter& );
 
     virtual void loadOldVersion ( TrussUnit&, QFile& ) throw (WrongFormatException);
     virtual void load ( TrussUnit&, const QFile& ) throw (WrongFormatException);
 
 public slots:
-    virtual TrussUnitWindow& createTrussUnitWindow ( const QString& name );
-    virtual bool reviveTrussUnitWindow ( TrussUnitWindow& );
+    virtual TrussUnitWindow& createTrussUnitWindow ( const QString& name );    
     virtual bool removeTrussUnitWindow ( TrussUnitWindow& );
 
-public:
-    virtual TrussUnitWindow& createTrussUnitWindowFromFile ( const QString& fileName ) 
-                                                      throw (ReadFileException,
-                                                             WrongFormatException);
-
+protected slots:
+    // Just wrappers to cast stateful object to truss window
+    // and to emit the signal further
+    virtual void trussWindowAfterRevive ( StatefulObject& );
+    virtual void trussWindowAfterDesist ( StatefulObject& );
 
 signals:
     void onTrussUnitWindowCreate ( TrussUnitWindow& );
     void onTrussUnitWindowRemove ( TrussUnitWindow& );
+    void onTrussUnitWindowRevive ( TrussUnitWindow& );
+    void onTrussUnitWindowDesist ( TrussUnitWindow& );
 
 private:
     static const QString NEW_EXTENSION;

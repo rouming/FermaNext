@@ -518,7 +518,7 @@ void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
 
     TrussPivot* fakePivot = findPivotByNodes ( *mergingNode, *node );
     if ( fakePivot )
-        removePivot ( *fakePivot );
+        fakePivot->desist();
     for ( ; iter != pivotList.end(); ++iter )
     {
         TrussPivot* pivot = *iter;
@@ -530,8 +530,8 @@ void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
             if ( fakePivot ) 
             {
                 // Save remove pivot action
-                state.addAction( new TrussPivotRemoveAction( *this, *fakePivot ) );
-                removePivot( *fakePivot );
+                state.addAction( new TrussPivotRemoveAction( *fakePivot ) );
+                fakePivot->desist();
             }
             pivot->setFirstNode( node );
             // Save action of node changing
@@ -549,8 +549,8 @@ void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
             if ( fakePivot ) 
             {
                 // Save remove pivot action
-                state.addAction( new TrussPivotRemoveAction( *this, *fakePivot ) );
-                removePivot( *fakePivot );
+                state.addAction( new TrussPivotRemoveAction( *fakePivot ) );
+                fakePivot->desist();
             }
             pivot->setLastNode ( node );
             // Save action of node changing
@@ -568,8 +568,8 @@ void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
         node->setHighlighted ( true );
 
     // Save remove node action
-    state.addAction( new TrussNodeRemoveAction( *this, *mergingNode ) );
-    removeNode ( *mergingNode );
+    state.addAction( new TrussNodeRemoveAction( *mergingNode ) );
+    mergingNode->desist();
 
     state.save();    
 
@@ -586,9 +586,9 @@ void TrussUnitWindow::dividePivot ( TrussPivot& dividualPivot, TrussNode& dividi
 
     // Save remove pivot action
     ObjectState& state = dividualPivot.createState();
-    state.addAction( new TrussPivotRemoveAction( *this, dividualPivot ) );
+    state.addAction( new TrussPivotRemoveAction( dividualPivot ) );
     state.save();
-    removePivot( dividualPivot );
+    dividualPivot.desist();
 
     TrussPivot* pivot1 = findPivotByNodes ( first, dividingNode );
     TrussPivot* pivot2 = findPivotByNodes ( last, dividingNode );
@@ -596,17 +596,17 @@ void TrussUnitWindow::dividePivot ( TrussPivot& dividualPivot, TrussNode& dividi
     {
         // Save remove pivot action
         ObjectState& state = pivot1->createState();
-        state.addAction( new TrussPivotRemoveAction( *this, *pivot1 ) );
+        state.addAction( new TrussPivotRemoveAction( *pivot1 ) );
         state.save();
-        removePivot( *pivot1 );
+        pivot1->desist();
     }
     if ( pivot2 )
     {
         // Save remove pivot action
         ObjectState& state = pivot2->createState();
-        state.addAction( new TrussPivotRemoveAction( *this, *pivot2 ) );
+        state.addAction( new TrussPivotRemoveAction( *pivot2 ) );
         state.save();
-        removePivot( *pivot2 );
+        pivot2->desist();
     }
     TrussPivot* newlyCreated = 0;
 
@@ -617,7 +617,7 @@ void TrussUnitWindow::dividePivot ( TrussPivot& dividualPivot, TrussNode& dividi
 
     // Save create pivot action
     ObjectState& stateFirst = newlyCreated->createState();
-    stateFirst.addAction( new TrussPivotCreateAction( *this, *newlyCreated ) );
+    stateFirst.addAction( new TrussPivotCreateAction( *newlyCreated ) );
     stateFirst.save();
 
     if ( last.getNumber() < dividingNode.getNumber() )
@@ -627,7 +627,7 @@ void TrussUnitWindow::dividePivot ( TrussPivot& dividualPivot, TrussNode& dividi
 
     // Save create pivot action
     ObjectState& stateSecond = newlyCreated->createState();
-    stateSecond.addAction( new TrussPivotCreateAction( *this, *newlyCreated ) );
+    stateSecond.addAction( new TrussPivotCreateAction( *newlyCreated ) );
     stateSecond.save();
     mng->endStateBlock();
 
@@ -703,7 +703,7 @@ void TrussUnitWindow::createPivotCrossPoints ( TrussPivot* selectedPivot,
         // Save create node action
         ObjectState& state = crossNode->createState();
         TrussNodeCreateAction* action = 
-            new TrussNodeCreateAction( *this, *crossNode );
+            new TrussNodeCreateAction( *crossNode );
         state.addAction( action );
         state.save();
         checkNodePosition ( crossNode, fixationCheck );
