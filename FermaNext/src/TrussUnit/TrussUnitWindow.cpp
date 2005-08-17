@@ -737,9 +737,13 @@ void TrussUnitWindow::checkNodePosition ( TrussNode* selectedNode, bool fixation
 void TrussUnitWindow::checkAfterNodeManipulation ( TrussNode* selectedNode, 
                                                    bool fixationCheck )
 {
+    QPoint nodeCoord = selectedNode->getPoint();
+
     // Check new position of selected node: merge with other node and(or) 
     // divide pivot if necessary.
     checkNodePosition ( selectedNode, fixationCheck );
+
+    selectedNode = findNodeByCoord ( nodeCoord );
 
     // Check pivots coordinates to find their intersections.
     PivotList pivotList = getPivotList ();
