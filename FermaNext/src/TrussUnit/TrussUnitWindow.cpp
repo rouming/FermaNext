@@ -352,7 +352,6 @@ void TrussUnitWindow::setWindowPosition ( QPoint pos )
     windowLeftTopPos = pos;
     windowRightBottomPos.setX ( windowLeftTopPos.x() + windowSize.width() );
     windowRightBottomPos.setY ( windowLeftTopPos.y() + windowSize.height() );
-    rendered(false);
     emit onMove( oldPos, pos );
 }
 
