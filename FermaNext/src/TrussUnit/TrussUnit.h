@@ -177,7 +177,8 @@ public:
 
     bool getDrawingStatus () const;
     void setDrawingStatus ( bool status );
-
+    
+    void setHighlighted ( bool h );
 
     void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
                     agg::scanline_p8& sl, QPoint point1, QPoint point2,

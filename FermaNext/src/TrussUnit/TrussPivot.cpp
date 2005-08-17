@@ -24,6 +24,13 @@ void TrussPivot::setDrawingStatus ( bool status )
     drawingStatus = status;
 }
 
+void TrussPivot::setHighlighted ( bool h )
+{
+    getFirstNode().setHighlighted ( h );
+    getLastNode().setHighlighted ( h );
+    PaintableTrussElement::setHighlighted ( h );
+}
+
 struct line
 {
     double x1, y1, x2, y2;
