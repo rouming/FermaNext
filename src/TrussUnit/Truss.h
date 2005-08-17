@@ -125,24 +125,6 @@ public:
         return 0;
     }   
 
-    virtual N* findNodeWithSameCoord ( N& comparableNode, int precision ) const
-    {
-        QPoint point = comparableNode.getPoint ();
-        NodeListConstIter iter = nodes.begin();
-        for ( ; iter != nodes.end(); ++iter )
-        {
-            N* node = *iter;
-            if ( !node->isAlive() )
-                continue;
-            QPoint pos = node->getPoint();
-            if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
-                   (point.y() - pos.y()) * (point.y() - pos.y()) ) < precision &&
-                    node != &comparableNode )
-                return node;
-        }
-        return 0;
-    }  
-
     virtual N* findNodeByNumber ( int num ) const
     {
         NodeListConstIter iter = nodes.begin();
@@ -154,13 +136,48 @@ public:
         return 0;
     }
 
+    virtual P* findPivotByCoord ( double x, double y, double precision ) const
+    {
+        QPoint firstCoord, lastCoord, coord( (int)x, (int)y );
+        double Y;
+        PivotListConstIter iter = pivots.begin();
+        for ( ; iter != pivots.end(); ++iter )
+        {
+            P* pivot = *iter;
+            if ( !pivot->isEnabled() )
+                continue;
+
+            N& firstNode = pivot->getFirstNode ();
+            N& lastNode = pivot->getLastNode ();
+            firstCoord = firstNode.getPoint ();
+            lastCoord = lastNode.getPoint ();
+
+            if ( findNodeByCoord( coord ) != &firstNode && 
+                 findNodeByCoord( coord ) != &lastNode )
+            {               
+                // equation of line
+                Y = fabs( ( x - double( firstCoord.x() ) ) * 
+                          double( firstCoord.y() - lastCoord.y() ) - 
+                          ( y - double( firstCoord.y() ) ) * 
+                          double( firstCoord.x() - lastCoord.x() ) );
+
+                if ( ( x >= firstCoord.x() && x <= lastCoord.x() || 
+                       x >= lastCoord.x() && x <= firstCoord.x() ) && 
+                     ( y >= firstCoord.y() && y <= lastCoord.y() || 
+                       y >= lastCoord.y() && y <= firstCoord.y() ) && Y <= precision )
+                    return pivot;
+            }
+        }
+        return 0;
+    }
+
     virtual P* findPivotByNodes ( const N& node1, const N& node2 ) const
     {
         PivotListConstIter iter = pivots.begin();
         for ( ; iter != pivots.end(); ++iter )
         {
             P* pivot = (*iter);
-            if ( ! pivot->isAlive() && !pivot->isEnabled() )
+            if ( ! pivot->isAlive() || !pivot->isEnabled() )
                 continue;
             if ( &(pivot->getFirstNode()) == &node1 && 
                  &(pivot->getLastNode()) == &node2 ||
@@ -168,18 +185,6 @@ public:
                  &(pivot->getLastNode()) == &node1 ) {
                 return pivot;
             }
-        }
-        return 0;
-    }
-
-    virtual P* findPivotWithSameCoord ( const P& comparablePivot, int precision ) const
-    {
-        N* node1 = findNodeWithSameCoord ( comparablePivot.getFirstNode(), precision );
-        N* node2 = findNodeWithSameCoord ( comparablePivot.getLastNode(), precision );
-        if ( node1 && node2 )
-        {
-            P* pivot = findPivotByNodes ( *node1, *node2 );
-            return pivot;
         }
         return 0;
     }
