@@ -278,24 +278,32 @@ public:
         return *pivot;    
     }
 
+    // Momentary removing of an object. Nothing can revive it.
     virtual bool removePivot ( const P& pivot )
     {
+        // Clean earlier desisted nodes/pivots
+        suspendedClean();
         PivotListIter iter = pivots.begin();
         for ( ; iter != pivots.end(); ++iter ) 
-            if ( (*iter) == &pivot ) {  
-                removePivot(iter);
-                return true;
+            if ( (*iter) == &pivot ) {
+                // Desist first
+                (*iter)->desist();
+                return removePivot(iter);
             }
         return false;    
     }
 
+    // Momentary removing of an object. Nothing can revive it.
     virtual bool removeNode ( const N& node )
     {
+        // Clean earlier desisted nodes/pivots
+        suspendedClean();
         NodeListIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
             if ( (*iter) == &node ) {
-                removeNode(iter);
-                return true;
+                // Desist first
+                (*iter)->desist();
+                return removeNode(iter);
             }            
         return false;    
     }
@@ -355,8 +363,7 @@ protected:
         for ( ; nIter != nodes.end(); ) {
             N* node = *nIter;
             if ( !node->isAlive() && node->countEnabledStates() == 0 ) {
-                nodes.erase(nIter);
-                delete node;
+                removeNode(nIter);
             }
             else
                 ++nIter;
@@ -367,39 +374,43 @@ protected:
         for ( ; pIter != pivots.end(); ) {
             P* pivot = *pIter;
             if ( !pivot->isAlive() && pivot->countEnabledStates() == 0 ) {
-                pivots.erase(pIter);
-                delete pivot;
+                removePivot(pIter);
             }
             else
                 ++pIter;
         }
     }
 
-    // Doesn't physically remove node
-    virtual void removeNode ( NodeListIter& iter )
+    // Momentary removing of desisted object. Nothing can revive it.
+    virtual bool removeNode ( NodeListIter& iter )
     {
         if ( iter == nodes.end() )
-            return;
-        // Clean earlier desisted nodes/pivots
-        suspendedClean();
+            return false;
         Node* n = *iter;
+        if ( n->isAlive() )
+            return false;
         emit beforeNodeRemoval(*n);
-        n->desist();
+        nodes.erase(iter);
+        delete n;
         emit afterNodeRemoval();
         emit onStateChange();
+        return true;
     }
-    // Doesn't physically remove pivot
-    virtual void removePivot ( PivotListIter& iter )
+
+    // Momentary removing of desisted object. Nothing can revive it.
+    virtual bool removePivot ( PivotListIter& iter )
     {
         if ( iter == pivots.end() )
-            return;
-        // Clean earlier desisted nodes/pivots
-        suspendedClean();
+            return false;
         P* p = *iter;
+        if ( p->isAlive() )
+            return false;
         emit beforePivotRemoval(p->getFirstNode(), p->getLastNode());
-        p->desist();
+        pivots.erase(iter);
+        delete p;
         emit afterPivotRemoval();
         emit onStateChange();
+        return true;
     }
 
 private:
