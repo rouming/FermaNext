@@ -71,8 +71,9 @@ public:
 
     virtual void dividePivot ( TrussPivot& dividualPivot, TrussNode& dividingNode );
 
-    virtual bool checkSegmentsCrossing ( QPoint p11, QPoint p12, 
-                                         QPoint p21, QPoint p22 ) const;
+    virtual QPoint getLineSegmentsIntersectionPoint ( QPoint p11, QPoint p12, 
+                                                      QPoint p21, QPoint p22 ) const;
+
     virtual void createPivotCrossPoints ( TrussPivot* selectedPivot, bool fixationCheck );
 
     virtual void checkAfterNodeManipulation ( TrussNode* selectedNode, 

@@ -534,8 +534,6 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         selectedPivot->getLastNode().setVisible ( true );
         selectedPivot->setDrawingStatus ( true );
         selectedWindow->checkAfterNodeManipulation ( selectedNode, false );
-        selectedPivot = selectedWindow->findPivotByWidgetPos( x, y,
-                                                      pivotFindingPrecision);
         update();
         designerBehaviour = onPivotFirstNodeDraw;
         selectedNode = 0;
