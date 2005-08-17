@@ -30,6 +30,7 @@ public:
 
 protected slots:
     void stateIsChanged ();
+    virtual void nodeBeforeDesist ( StatefulObject& ) = 0;
 
 signals:
     // Truss signals
@@ -59,7 +60,7 @@ public:
     // Truss exceptions
     class NodeIndexOutOfBoundException {};
 
-    typedef std::vector<N*>  NodeList;
+    typedef std::vector<N*> NodeList;
     typedef std::vector<P*> PivotList;
     typedef typename NodeList::iterator NodeListIter;
     typedef typename NodeList::const_iterator NodeListConstIter;
@@ -94,19 +95,7 @@ public:
 
     virtual N* findNodeByCoord ( QPoint point ) const
     {   
-        NodeListConstIter iter = nodes.begin();
-        for ( ; iter != nodes.end(); ++iter )
-        {
-            N* node = *iter;
-            if ( !node->isAlive() || !node->isEnabled() )
-                continue;
-            QPoint pos = node->getPoint();
-            if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
-                   (point.y() - pos.y()) * (point.y() - pos.y()) ) < 
-                   4 * nodesRadius * nodesRadius )
-                return node;
-        }
-        return 0;
+        return findNodeByCoord( point, (4 * nodesRadius * nodesRadius) );
     } 
     
     virtual N* findNodeByCoord ( QPoint point, int precision ) const
@@ -189,34 +178,19 @@ public:
         return 0;
     }
 
-    virtual bool reviveNode ( N& node ) 
+    virtual PivotList findAdjoiningPivots ( const N& node ) const
     {
-        NodeListIter iter = std::find( nodes.begin(), nodes.end(), &node );
-        if ( iter == nodes.end() )
-            return false;
-        if ( node.isAlive() )
-            return false;
-
-        emit beforeNodeCreation();
-        node.revive();
-        emit afterNodeCreation(node);
-        emit onStateChange();
-        return true;
-    }
-
-    virtual bool revivePivot ( P& pivot )
-    {
-        PivotListIter iter = std::find( pivots.begin(), pivots.end(), &pivot );
-        if ( iter == pivots.end() )
-            return false;
-        if ( pivot.isAlive() )
-            return false;
-
-        emit beforePivotCreation();
-        pivot.revive();
-        emit afterPivotCreation( pivot.getFirstNode(), pivot.getLastNode() );
-        emit onStateChange();
-        return true;
+        PivotList resPivots;
+        PivotListConstIter iter = pivots.begin();
+        for ( ; iter != pivots.end(); ++iter ) {
+            P* pivot = (*iter);
+            if ( ! pivot->isAlive() || !pivot->isEnabled() )
+                continue;
+            if ( &(pivot->getFirstNode()) == &node ||
+                 &(pivot->getLastNode()) == &node )
+                 resPivots.push_back( pivot );
+        }
+        return resPivots;
     }
 
     virtual N& createNode ( int x, int y )
@@ -229,6 +203,12 @@ public:
         node->setPoint( x, y );
         nodes.push_back(node);
 
+        // Signal connects to catch life time changing
+        QObject::connect( node, SIGNAL(onAfterRevive(StatefulObject&)),
+                                SLOT(stateIsChanged()) );
+        QObject::connect( node, SIGNAL(onBeforeDesist(StatefulObject&)),
+                                SLOT(nodeBeforeDesist(StatefulObject&)) );
+        // Just subsidiary catches
         QObject::connect( node, SIGNAL(onFixationChange ( Fixation )),
                                 SLOT(stateIsChanged()) );
         QObject::connect( node, SIGNAL(onPositionChange ( int, int )),
@@ -270,7 +250,12 @@ public:
         suspendedClean();
 
         emit beforePivotCreation();
-        P* pivot = new P( first, last, getStateManager() );        
+        P* pivot = new P( first, last, getStateManager() );
+        // Signal connects to catch life time changing
+        QObject::connect( pivot, SIGNAL(onAfterRevive(StatefulObject&)),
+                                 SLOT(stateIsChanged()) );
+        QObject::connect( pivot, SIGNAL(onAfterDesist(StatefulObject&)),
+                                 SLOT(stateIsChanged()) );
         pivots.push_back(pivot);
         emit afterPivotCreation(pivot->getFirstNode(), 
                                 pivot->getLastNode());
@@ -355,6 +340,22 @@ public:
     }
 
 protected:
+    // Desist all adjoining pivots
+    virtual void nodeBeforeDesist ( StatefulObject& st )
+    {
+        // Safe conversion
+        N* node = 0;
+        try { node = dynamic_cast<N*>(&st); }
+        catch ( ... ) { return; }
+
+        PivotList pivotsToDesist = findAdjoiningPivots(*node);
+        PivotListIter iter = pivotsToDesist.begin();
+        for ( ; iter != pivotsToDesist.end(); ++iter ) {
+            (*iter)->desist();
+        }
+        emit onStateChange();
+    }
+
     // Physically removes nodes and pivots
     virtual void suspendedClean () 
     {
@@ -386,15 +387,28 @@ protected:
     {
         if ( iter == nodes.end() )
             return false;
-        Node* n = *iter;
+        N* n = *iter;
         if ( n->isAlive() )
             return false;
         emit beforeNodeRemoval(*n);
+        // We should remove adjoining pivots first
+        removeAdjoiningPivots(*n);
         nodes.erase(iter);
         delete n;
         emit afterNodeRemoval();
         emit onStateChange();
         return true;
+    }
+
+    // Physically remove all adjoining pivots
+    virtual void removeAdjoiningPivots ( N& node )
+    {
+        PivotList pivotsToRemove = findAdjoiningPivots(node);
+        PivotListIter iter = pivotsToRemove.begin();
+        for ( ; iter != pivotsToRemove.end(); ++iter ) {
+            P* p = *iter;
+            removePivot(*p);
+        }
     }
 
     // Momentary removing of desisted object. Nothing can revive it.

@@ -13,20 +13,18 @@
 class TrussNodeAction : public AbstractObjectAction
 {
 public:
-    TrussNodeAction ( TrussUnit&, TrussNode& );
+    TrussNodeAction ( TrussNode& );
 
-    TrussUnit& getTruss ();
     TrussNode& getNode ();
 
 private:
-    TrussUnit& truss;
     TrussNode& node;
 };
 
 class TrussNodeCreateAction : public TrussNodeAction
 {
 public:
-    TrussNodeCreateAction ( TrussUnit&, TrussNode& );
+    TrussNodeCreateAction ( TrussNode& );
 
     void execute ();
     void unexecute ();
@@ -35,7 +33,7 @@ public:
 class TrussNodeRemoveAction : public TrussNodeAction
 {
 public:
-    TrussNodeRemoveAction ( TrussUnit&, TrussNode& );
+    TrussNodeRemoveAction ( TrussNode& );
 
     void execute ();
     void unexecute ();
@@ -48,20 +46,18 @@ public:
 class TrussPivotAction : public AbstractObjectAction
 {
 public:
-    TrussPivotAction ( TrussUnit&, TrussPivot& );
+    TrussPivotAction ( TrussPivot& );
 
-    TrussUnit& getTruss ();
     TrussPivot& getPivot ();
 
 private:
-    TrussUnit& truss;
     TrussPivot& pivot;
 };
 
 class TrussPivotCreateAction : public TrussPivotAction
 {
 public:
-    TrussPivotCreateAction ( TrussUnit&, TrussPivot& );
+    TrussPivotCreateAction ( TrussPivot& );
 
     void execute ();
     void unexecute ();
@@ -70,7 +66,7 @@ public:
 class TrussPivotRemoveAction : public TrussPivotAction
 {
 public:
-    TrussPivotRemoveAction ( TrussUnit&, TrussPivot& );
+    TrussPivotRemoveAction ( TrussPivot& );
 
     void execute ();
     void unexecute ();
@@ -98,20 +94,18 @@ private:
 class TrussUnitWindowAction : public AbstractObjectAction
 {
 public:
-    TrussUnitWindowAction ( TrussUnitWindowManager&, TrussUnitWindow& );
+    TrussUnitWindowAction ( TrussUnitWindow& );
 
     TrussUnitWindow& getTruss ();
-    TrussUnitWindowManager& getTrussManager ();
 
 private:
-    TrussUnitWindowManager& mng;
     TrussUnitWindow& truss;
 };
 
 class TrussUnitWindowCreateAction : public TrussUnitWindowAction
 {
 public:
-    TrussUnitWindowCreateAction ( TrussUnitWindowManager&, TrussUnitWindow& );
+    TrussUnitWindowCreateAction ( TrussUnitWindow& );
 
     void execute ();
     void unexecute ();
@@ -120,7 +114,7 @@ public:
 class TrussUnitWindowRemoveAction : public TrussUnitWindowAction
 {
 public:
-    TrussUnitWindowRemoveAction ( TrussUnitWindowManager&, TrussUnitWindow& );
+    TrussUnitWindowRemoveAction ( TrussUnitWindow& );
 
     void execute ();
     void unexecute ();

@@ -52,7 +52,13 @@ void TrussUnitDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow 
     Y += 10;
 
     // We should repaint all area after truss changes its visibility
-    QObject::connect( &trussWindow, SIGNAL(onVisibleChange(bool)), SLOT(repaint()) );
+    // or becomes desisted/revived
+    QObject::connect( &trussWindow, SIGNAL(onVisibleChange(bool)), 
+                                    SLOT(repaint()) );
+    QObject::connect( &trussWindow, SIGNAL(onAfterDesist(StatefulObject&)), 
+                                    SLOT(repaint()) );
+    QObject::connect( &trussWindow, SIGNAL(onAfterRevive(StatefulObject&)), 
+                                    SLOT(repaint()) );
 
     trussWindows.push_back(&trussWindow);
     trussWindow.setWindowPosition ( QPoint( X, Y ) );
@@ -77,9 +83,11 @@ bool TrussUnitDesignerWidget::removeTrussUnitWindow ( TrussUnitWindow& window )
 TrussUnitWindow* TrussUnitDesignerWidget::findWindowByWidgetPos ( int x, int y )
 {
     WindowList::reverse_iterator rev_iter = trussWindows.rbegin();
-    for ( ; rev_iter != trussWindows.rend(); ++rev_iter )
-        if ( (*rev_iter)->inWindowRect(x, y) )
+    for ( ; rev_iter != trussWindows.rend(); ++rev_iter ) {
+        TrussUnitWindow* w = *rev_iter;
+        if ( w->isAlive() && w->isEnabled() && w->inWindowRect(x, y) )
             return *rev_iter;
+    }
     return 0;
 }
 
@@ -94,6 +102,8 @@ void TrussUnitDesignerWidget::focusOnWindow ( TrussUnitWindow& window )
                                                 &window );
     // Should be sure window is in vector
     if ( newSelectedIter == trussWindows.end() )
+        return;
+    if ( ! (*newSelectedIter)->isAlive() || !(*newSelectedIter)->isEnabled() )
         return;
     // Defocus previous focused window
     if ( focusedWindow )
@@ -146,7 +156,7 @@ bool TrussUnitDesignerWidget::nodeCanBeDrawn ( int x, int y )
     {
         i--;
         TrussUnitWindow* window = *rev_iter;
-        if ( window->inTrussAreaRect ( x, y ) )
+        if ( window->isAlive() && window->inTrussAreaRect ( x, y ) )
         {
             WindowListIter iter = trussWindows.begin() + i;
             for ( ; iter != trussWindows.end(); ++iter ) 
@@ -184,18 +194,18 @@ void TrussUnitDesignerWidget::saveNodeStateAfterDrag ( QPoint pos )
     state.save();    
 }
 
-void TrussUnitDesignerWidget::saveNodeStateAfterCreate ( TrussUnit& truss, TrussNode& node )
+void TrussUnitDesignerWidget::saveNodeStateAfterCreate ( TrussNode& node )
 {    
     ObjectState& state = node.createState();
-    TrussNodeCreateAction* action = new TrussNodeCreateAction( truss, node );
+    TrussNodeCreateAction* action = new TrussNodeCreateAction( node );
     state.addAction( action );
     state.save();
 }
 
-void TrussUnitDesignerWidget::saveNodeStateAfterRemove ( TrussUnit& truss, TrussNode& node )
+void TrussUnitDesignerWidget::saveNodeStateAfterRemove ( TrussNode& node )
 {
     ObjectState& state = node.createState();
-    TrussNodeRemoveAction* action = new TrussNodeRemoveAction( truss, node );
+    TrussNodeRemoveAction* action = new TrussNodeRemoveAction( node );
     state.addAction( action );
     state.save();
 }
@@ -237,19 +247,18 @@ void TrussUnitDesignerWidget::savePivotStateAfterDrag ( QPoint firstPos, QPoint 
     state.save();
 }
 
-void TrussUnitDesignerWidget::savePivotStateAfterCreate ( TrussUnit& truss, 
-                                                          TrussNode& firstNode,
+void TrussUnitDesignerWidget::savePivotStateAfterCreate ( TrussNode& firstNode,
                                                           TrussNode& lastNode, 
                                                           TrussPivot& pivot )
 {    
     ObjectStateManager* mng = pivot.getStateManager();
     mng->startStateBlock();
     // Save created nodes
-    saveNodeStateAfterCreate( truss, firstNode );
-    saveNodeStateAfterCreate( truss, lastNode );
+    saveNodeStateAfterCreate( firstNode );
+    saveNodeStateAfterCreate( lastNode );
     // Save created pivot
     ObjectState& state = pivot.createState();
-    TrussPivotCreateAction* action = new TrussPivotCreateAction( truss, pivot );
+    TrussPivotCreateAction* action = new TrussPivotCreateAction( pivot );
     state.addAction( action );
     state.save();
     
@@ -285,8 +294,11 @@ void TrussUnitDesignerWidget::aggPaintEvent ( QPaintEvent* )
     solid_renderer solidRend ( baseRend );
     baseRend.clear ( agg::rgba (10, 10, 10) );
     WindowListIter iter = trussWindows.begin();
-    for ( ; iter != trussWindows.end(); ++iter )
-        (*iter)->paint( baseRend );
+    for ( ; iter != trussWindows.end(); ++iter ) {
+        TrussUnitWindow* w = *iter;
+        if ( w->isAlive() )
+            w->paint( baseRend );
+    }
 //    drawSvg ( baseRend, solidRend, 10, 500 );
 }
 
@@ -686,7 +698,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                 ObjectStateManager* mng = selectedWindow->getStateManager();
                 mng->startStateBlock();
 
-                saveNodeStateAfterCreate( *selectedWindow, newNode );
+                saveNodeStateAfterCreate( newNode );
                 selectedWindow->checkAfterNodeManipulation ( &newNode, true );
 
                 mng->endStateBlock();
@@ -709,7 +721,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                 selectedPivot->setDrawingStatus ( false );
                 selectedNode = &lastNode;
                 designerBehaviour = onPivotLastNodeDraw;
-                savePivotStateAfterCreate( *selectedWindow, *firstNode, lastNode, 
+                savePivotStateAfterCreate( *firstNode, lastNode, 
                                            *selectedPivot );
                 update();
             }

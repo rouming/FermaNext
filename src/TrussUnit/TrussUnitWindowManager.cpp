@@ -41,12 +41,30 @@ void TrussUnitWindowManager::suspendedClean ()
     }
 }
 
+void TrussUnitWindowManager::trussWindowAfterRevive ( StatefulObject& st )
+{
+    try {
+        onTrussUnitWindowRevive( dynamic_cast<TrussUnitWindow&>(st) );
+    } catch ( ... ) {}
+}
+
+void TrussUnitWindowManager::trussWindowAfterDesist ( StatefulObject& st )
+{
+    try {
+        onTrussUnitWindowDesist( dynamic_cast<TrussUnitWindow&>(st) );
+    } catch ( ... ) {}
+}
+
 TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow ( const QString& name )
 {
     // Clean earlier desisted truss windows
     suspendedClean();
 
     TrussUnitWindow* trussWindow = new TrussUnitWindow(name, &stateManager);
+    QObject::connect( trussWindow, SIGNAL(onAfterRevive(StatefulObject&)), 
+                                   SLOT(trussWindowAfterRevive(StatefulObject&)) );
+    QObject::connect( trussWindow, SIGNAL(onAfterDesist(StatefulObject&)), 
+                                   SLOT(trussWindowAfterDesist(StatefulObject&)) );
     trussWindows.push_back(trussWindow);
     emit onTrussUnitWindowCreate(*trussWindow);
     return *trussWindow;
@@ -66,9 +84,6 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindowFromFile (
     if ( trussName.isEmpty() )        
         throw ReadFileException();
 
-    // Clean earlier desisted truss windows
-    suspendedClean();
-
     TrussUnitWindow& trussWindow = createTrussUnitWindow(trussName);
     try {
         if( fileName.contains(NEW_EXTENSION) ) 
@@ -85,22 +100,6 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindowFromFile (
     return trussWindow;
 }
 
-bool TrussUnitWindowManager::reviveTrussUnitWindow (
-    TrussUnitWindow& trussWindow )
-{
-    WindowListIter iter = std::find( trussWindows.begin(), 
-                                     trussWindows.end(), 
-                                     &trussWindow );
-    if ( iter == trussWindows.end() )
-        return false;
-    if ( trussWindow.isAlive() )
-        return false;
-
-    trussWindow.revive();
-    emit onTrussUnitWindowCreate( trussWindow );
-    return true;
-}
-
 bool TrussUnitWindowManager::removeTrussUnitWindow ( 
     TrussUnitWindow& trussWindow )
 {
@@ -113,8 +112,21 @@ bool TrussUnitWindowManager::removeTrussUnitWindow (
     if ( iter == trussWindows.end() )
         return false;
 
-    emit onTrussUnitWindowRemove( trussWindow );
-    trussWindow.desist();
+    // Desist first
+    (*iter)->desist();
+    return removeTrussUnitWindow( iter );
+}
+
+bool TrussUnitWindowManager::removeTrussUnitWindow ( WindowListIter& iter )
+{
+    if ( iter == trussWindows.end() )
+        return false;
+    TrussUnitWindow* w = *iter;
+    if ( w->isAlive() )
+        return false;
+    emit onTrussUnitWindowRemove( *w );
+    trussWindows.erase(iter);
+    delete w;
     return true;
 }
 

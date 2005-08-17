@@ -24,10 +24,10 @@ protected:
 
     // Save states to Undo/Redo stack
     virtual void saveNodeStateAfterDrag ( QPoint );
-    virtual void saveNodeStateAfterCreate ( TrussUnit&, TrussNode& );
-    virtual void saveNodeStateAfterRemove ( TrussUnit&, TrussNode& );
+    virtual void saveNodeStateAfterCreate ( TrussNode& );
+    virtual void saveNodeStateAfterRemove ( TrussNode& );
     virtual void savePivotStateAfterDrag ( QPoint first, QPoint last );    
-    virtual void savePivotStateAfterCreate ( TrussUnit&, TrussNode& firstNode,
+    virtual void savePivotStateAfterCreate ( TrussNode& firstNode,
                                              TrussNode& lastNode, TrussPivot& );
 
     // SVG viewer methods

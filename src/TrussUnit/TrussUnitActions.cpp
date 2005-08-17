@@ -5,14 +5,9 @@
  * Truss Node Actions
  *****************************************************************************/
 
-TrussNodeAction::TrussNodeAction ( TrussUnit& t_, TrussNode& n_ ) :
-    truss(t_), node(n_)
+TrussNodeAction::TrussNodeAction ( TrussNode& n_ ) :
+    node(n_)
 {}
-
-TrussUnit& TrussNodeAction::getTruss ()
-{ 
-    return truss; 
-}
 
 TrussNode& TrussNodeAction::getNode ()
 { 
@@ -21,37 +16,37 @@ TrussNode& TrussNodeAction::getNode ()
 
 /**** Truss Node Create Action ***/
 
-TrussNodeCreateAction::TrussNodeCreateAction ( TrussUnit& t_, TrussNode& n_ ) :
-    TrussNodeAction( t_, n_ )
+TrussNodeCreateAction::TrussNodeCreateAction ( TrussNode& n_ ) :
+    TrussNodeAction( n_ )
 {}
 
 void TrussNodeCreateAction::execute ()
 {        
-    getTruss().reviveNode( getNode() );
+    getNode().revive();
     emit actionExecuted(*this);
 }
 
 void TrussNodeCreateAction::unexecute ()
 {
-    getTruss().removeNode( getNode() );
+    getNode().desist();
     emit actionUnexecuted(*this);
 }
 
 /**** Truss Node Remove Action ***/
 
-TrussNodeRemoveAction::TrussNodeRemoveAction ( TrussUnit& t_, TrussNode& n_ ) :
-    TrussNodeAction( t_, n_ )
+TrussNodeRemoveAction::TrussNodeRemoveAction ( TrussNode& n_ ) :
+    TrussNodeAction( n_ )
 {}
 
 void TrussNodeRemoveAction::execute ()
 {        
-    getTruss().removeNode( getNode() );
+    getNode().desist();
     emit actionExecuted(*this);
 }
 
 void TrussNodeRemoveAction::unexecute ()
 {
-    getTruss().reviveNode( getNode() );
+    getNode().revive();
     emit actionUnexecuted(*this);
 }
 
@@ -59,14 +54,9 @@ void TrussNodeRemoveAction::unexecute ()
  * Truss Pivot Actions
  *****************************************************************************/
 
-TrussPivotAction::TrussPivotAction ( TrussUnit& t_, TrussPivot& p_ ) :
-    truss(t_), pivot(p_)
+TrussPivotAction::TrussPivotAction ( TrussPivot& p_ ) :
+    pivot(p_)
 {}
-
-TrussUnit& TrussPivotAction::getTruss ()
-{ 
-    return truss; 
-}
 
 TrussPivot& TrussPivotAction::getPivot ()
 { 
@@ -75,39 +65,37 @@ TrussPivot& TrussPivotAction::getPivot ()
 
 /**** Truss Pivot Create Action ***/
 
-TrussPivotCreateAction::TrussPivotCreateAction ( TrussUnit& t_, 
-                                                 TrussPivot& p_ ) :
-    TrussPivotAction( t_, p_ )
+TrussPivotCreateAction::TrussPivotCreateAction ( TrussPivot& p_ ) :
+    TrussPivotAction( p_ )
 {}
 
 void TrussPivotCreateAction::execute ()
 {        
-    getTruss().revivePivot( getPivot() );
+    getPivot().revive();
     emit actionExecuted(*this);
 }
 
 void TrussPivotCreateAction::unexecute ()
 {
-    getTruss().removePivot( getPivot() );
+    getPivot().desist();
     emit actionUnexecuted(*this);
 }
 
 /**** Truss Pivot Remove Action ***/
 
-TrussPivotRemoveAction::TrussPivotRemoveAction ( TrussUnit& t_, 
-                                                 TrussPivot& p_ ) :
-    TrussPivotAction( t_, p_ )
+TrussPivotRemoveAction::TrussPivotRemoveAction ( TrussPivot& p_ ) :
+    TrussPivotAction( p_ )
 {}
 
 void TrussPivotRemoveAction::execute ()
 {        
-    getTruss().removePivot( getPivot() );
+    getPivot().desist();
     emit actionExecuted(*this);
 }
 
 void TrussPivotRemoveAction::unexecute ()
 {
-    getTruss().revivePivot( getPivot() );
+    getPivot().revive();
     emit actionUnexecuted(*this);
 }
 
@@ -145,9 +133,8 @@ void TrussPivotChangeNodeAction::unexecute ()
  * Truss Unit Actions
  *****************************************************************************/
 
-TrussUnitWindowAction::TrussUnitWindowAction ( TrussUnitWindowManager& mng_, 
-                                               TrussUnitWindow& t_ ) :
-    mng(mng_), truss(t_)
+TrussUnitWindowAction::TrussUnitWindowAction ( TrussUnitWindow& t_ ) :
+    truss(t_)
 {}
 
 TrussUnitWindow& TrussUnitWindowAction::getTruss ()
@@ -155,48 +142,41 @@ TrussUnitWindow& TrussUnitWindowAction::getTruss ()
     return truss; 
 }
 
-TrussUnitWindowManager& TrussUnitWindowAction::getTrussManager ()
-{ 
-    return mng;
-}
-
 /**** Truss Unit Create Action ***/
 
-TrussUnitWindowCreateAction::TrussUnitWindowCreateAction ( 
-                                               TrussUnitWindowManager& mng_, 
+TrussUnitWindowCreateAction::TrussUnitWindowCreateAction (
                                                TrussUnitWindow& t_ ) :
-    TrussUnitWindowAction( mng_, t_ )
+    TrussUnitWindowAction( t_ )
 {}
 
 void TrussUnitWindowCreateAction::execute ()
 {        
-    getTrussManager().reviveTrussUnitWindow( getTruss() );
+    getTruss().revive();
     emit actionExecuted(*this);
 }
 
 void TrussUnitWindowCreateAction::unexecute ()
 {
-    getTrussManager().removeTrussUnitWindow( getTruss() );
+    getTruss().desist();
     emit actionUnexecuted(*this);
 }
 
 /**** Truss Unit Remove Action ***/
 
-TrussUnitWindowRemoveAction::TrussUnitWindowRemoveAction ( 
-                                             TrussUnitWindowManager& mng_,
+TrussUnitWindowRemoveAction::TrussUnitWindowRemoveAction (
                                              TrussUnitWindow& t_ ) :
-    TrussUnitWindowAction( mng_, t_ )
+    TrussUnitWindowAction( t_ )
 {}
 
 void TrussUnitWindowRemoveAction::execute ()
 {        
-    getTrussManager().removeTrussUnitWindow( getTruss() );
+    getTruss().desist();
     emit actionExecuted(*this);
 }
 
 void TrussUnitWindowRemoveAction::unexecute ()
 {
-    getTrussManager().reviveTrussUnitWindow( getTruss() );
+    getTruss().revive();
     emit actionUnexecuted(*this);
 }
 
