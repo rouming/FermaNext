@@ -56,8 +56,8 @@ public:
     virtual void resize ( QPoint leftTop, QPoint rightBottom );
     virtual void setWindowPosition ( QPoint pos );
 
-    virtual void setNodeHighlight ( TrussNode* selectedNode );
-    virtual void setPivotHighlight ( TrussPivot* selectedPivot );
+    virtual void setFocusOnNode ( TrussNode* selectedNode );
+    virtual void setFocusOnPivot ( TrussPivot* selectedPivot );
     virtual void removeNodesHighlight ();
     virtual void removePivotsHighlight ();
 
@@ -73,7 +73,7 @@ public:
 
     virtual QPoint getLineSegmentsIntersectionPoint ( QPoint p11, QPoint p12, 
                                                       QPoint p21, QPoint p22 ) const;
-
+    virtual void checkNodePosition ( TrussNode* selectedNode, bool fixationCheck );
     virtual void createPivotCrossPoints ( TrussPivot* selectedPivot, bool fixationCheck );
 
     virtual void checkAfterNodeManipulation ( TrussNode* selectedNode, 

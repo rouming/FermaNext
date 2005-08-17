@@ -356,22 +356,18 @@ void TrussUnitWindow::setWindowPosition ( QPoint pos )
     emit onMove( oldPos, pos );
 }
 
-void TrussUnitWindow::setNodeHighlight ( TrussNode* selectedNode )
+void TrussUnitWindow::setFocusOnNode ( TrussNode* selectedNode )
 {
     selectedNode->setHighlighted ( true );
     nodeToFront ( *selectedNode );
     rendered(false);
 }
 
-void TrussUnitWindow::setPivotHighlight ( TrussPivot* selectedPivot )
+void TrussUnitWindow::setFocusOnPivot ( TrussPivot* selectedPivot )
 {
-    TrussNode& first = selectedPivot->getFirstNode();
-    TrussNode& last = selectedPivot->getLastNode();
     selectedPivot->setHighlighted ( true );
-    first.setHighlighted ( true );
-    last.setHighlighted ( true );
-    nodeToFront ( first );
-    nodeToFront ( last );
+    nodeToFront ( selectedPivot->getFirstNode() );
+    nodeToFront ( selectedPivot->getLastNode() );
     rendered(false);
 }
 
@@ -647,16 +643,16 @@ QPoint TrussUnitWindow::getLineSegmentsIntersectionPoint ( QPoint p11, QPoint p1
         return crossPoint;
 
     // denominator
-    double div  = ( p22.y() - p21.y() ) * ( p12.x() - p11.x() ) - 
-                  ( p12.y() - p11.y() ) * ( p22.x() - p21.x() );
+    double div  = ( p12.y() - p11.y() ) * ( p21.x() - p22.x() ) - 
+                  ( p21.y() - p22.y() ) * ( p12.x() - p11.x() );
     
     // numerator1
-    double mul1 = ( p11.y() - p21.y() ) * ( p22.x() - p21.x() ) - 
-                  ( p22.y() - p21.y() ) * ( p11.x() - p21.x() );
+    double mul1 = ( p12.y() - p11.y() ) * ( p21.x() - p11.x() ) - 
+                  ( p21.y() - p11.y() ) * ( p12.x() - p11.x() );
     
     // numerator2
-    double mul2 = ( p11.y() - p21.y() ) * ( p12.x() - p11.x() ) - 
-                  ( p12.y() - p11.y() ) * ( p11.x() - p21.x() ); 
+    double mul2 = ( p21.y() - p11.y() ) * ( p21.x() - p22.x() ) - 
+                  ( p21.y() - p22.y() ) * ( p21.x() - p11.x() ); 
 
     if ( div == 0 && mul1 == 0 && mul2 == 0 )
         // line sgments are the same or they are parallel
@@ -670,7 +666,7 @@ QPoint TrussUnitWindow::getLineSegmentsIntersectionPoint ( QPoint p11, QPoint p1
         ( 0 < Ua2 ) && ( Ua2 < 1 ) )
     {
         // intersection point is within both line segments
-        double x = p11.x() + ( p12.x() - p11.x() ) * Ua1;
+        double x = p11.x() + ( p12.x() - p11.x() ) * Ua2;
         double y = p11.y() + ( p12.y() - p11.y() ) * Ua2;
         crossPoint.setX ( x );
         crossPoint.setY ( y );
@@ -686,45 +682,10 @@ void TrussUnitWindow::createPivotCrossPoints ( TrussPivot* selectedPivot,
 {
     removePivotsHighlight ();
 
-/*
-    selectedPivot->setEnabled ( false );
     TrussNode& firstNode = selectedPivot->getFirstNode();
     TrussNode& lastNode = selectedPivot->getLastNode();
-    QPoint firstCoord = firstNode.getPoint ();
-    QPoint lastCoord = lastNode.getPoint ();
-
-    QPoint begin, end;
-    if ( firstCoord.x() > lastCoord.x() )
-    {
-        begin = lastCoord;
-        end = firstCoord;
-    }
-    else
-    {
-        begin = firstCoord;
-        end = lastCoord;
-    }
-
-    int x;
-    for ( x = begin.x(); x < end.x(); x++ )
-    {
-        double y = double( x - begin.x() ) / double( begin.x() - end.x() ) * 
-                   double( begin.y() - end.y() ) + begin.y();
-
-        TrussPivot* crossPivot = findPivotByCoord ( (double)x, y, 10.0 );
-
-        if ( crossPivot )
-        {
-            TrussNode& crossNode = createNode ( x, (int)y );
-            //dividePivot ( *selectedPivot, crossNode );
-            //dividePivot ( *crossPivot, crossNode );
-        }
-    }
-    selectedPivot->setEnabled ( true );
-*/
-
-    QPoint p11 = selectedPivot->getFirstNode().getPoint();
-    QPoint p12 = selectedPivot->getLastNode().getPoint();
+    QPoint p11 = firstNode.getPoint();
+    QPoint p12 = lastNode.getPoint();
 
     PivotList pivotList = getPivotList ();
     PivotList::reverse_iterator rev_iter = pivotList.rbegin();
@@ -745,14 +706,11 @@ void TrussUnitWindow::createPivotCrossPoints ( TrussPivot* selectedPivot,
             new TrussNodeCreateAction( *this, *crossNode );
         state.addAction( action );
         state.save();
-
-        //dividePivot ( *selectedPivot, crossNode );
-        //dividePivot ( *pivot, crossNode );
+        checkNodePosition ( crossNode, fixationCheck );
     }
 }
 
-void TrussUnitWindow::checkAfterNodeManipulation ( TrussNode* selectedNode, 
-                                                   bool fixationCheck )
+void TrussUnitWindow::checkNodePosition ( TrussNode* selectedNode, bool fixationCheck )
 {
     QPoint nodePos = getWidgetPosFromTrussCoord ( selectedNode->getX(), 
                                                   selectedNode->getY() );
@@ -774,10 +732,19 @@ void TrussUnitWindow::checkAfterNodeManipulation ( TrussNode* selectedNode,
                 dividePivot ( *pivot, *selectedNode );
         }
     }
+}
 
-    PivotList changedPivotList = getPivotList ();
-    PivotListIter iter = changedPivotList.begin();
-    for ( ; iter != changedPivotList.end(); ++iter )
+void TrussUnitWindow::checkAfterNodeManipulation ( TrussNode* selectedNode, 
+                                                   bool fixationCheck )
+{
+    // Check new position of selected node: merge with other node and(or) 
+    // divide pivot if necessary.
+    checkNodePosition ( selectedNode, fixationCheck );
+
+    // Check pivots coordinates to find their intersections.
+    PivotList pivotList = getPivotList ();
+    PivotListIter iter = pivotList.begin();
+    for ( ; iter != pivotList.end(); ++iter )
 	{
         TrussPivot* pivot = *iter;
         if ( &pivot->getFirstNode() == selectedNode || 

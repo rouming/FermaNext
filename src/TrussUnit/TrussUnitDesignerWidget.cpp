@@ -491,7 +491,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                     if ( selectedNode )
                     {
                         removeAllHighlight ();
-                        selectedWindow->setNodeHighlight ( selectedNode );
+                        selectedWindow->setFocusOnNode ( selectedNode );
                         nodeBehaviour = onNodeSelect;
                         QWidget::setCursor ( Qt::ArrowCursor );
                         update();
@@ -499,7 +499,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                     else if ( selectedPivot )
                     {
                         removeAllHighlight ();
-                        selectedWindow->setPivotHighlight ( selectedPivot );
+                        selectedWindow->setFocusOnPivot ( selectedPivot );
                         pivotBehaviour = onPivotSelect;
                         QWidget::setCursor ( Qt::ArrowCursor );
                         update();
@@ -588,7 +588,7 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
                 pivotBehaviour = pivotIdle;
             }
             else
-                selectedWindow->setPivotHighlight ( selectedPivot );
+                selectedWindow->setFocusOnPivot ( selectedPivot );
         }
         else
         {
