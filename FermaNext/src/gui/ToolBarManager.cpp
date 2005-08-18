@@ -75,20 +75,20 @@ void TextToolButton::drawButtonLabel( QPainter *p )
  * Tabbed Widget
  *****************************************************************************/
 
-TabbedWidget::TabbedWidget ( ToolBarManager* tb,
+TabbedWidget::TabbedWidget ( ToolBarManager& tb,
                              QWidget& w,
                              const QString& n,
                              const QIconSet& i ) : 
     toolBar(tb),
     name(n), widget(w),
-    button( new TextToolButton(i, n, n, 0, 0, tb) ),
+    button( new TextToolButton(i, n, n, 0, 0, &tb) ),
     windowState(0),
     toolBarIsDestroyed(false)
 {
     // Direct connect
     QObject::connect( button, SIGNAL(clicked()), SLOT(showOrHide()) );
     // Catch tool bar decease
-    QObject::connect( tb, SIGNAL(destroyed()), SLOT(toolBarDestroyed()) );
+    QObject::connect( &tb, SIGNAL(destroyed()), SLOT(toolBarDestroyed()) );
     // Small font
     QFont f = button->font();
     f.setPointSize( 10 );
@@ -151,6 +151,15 @@ void TabbedWidget::hide ()
         return;
     widget.hide();
     emit onHide( *this );
+}
+
+void TabbedWidget::setVisible ( bool visible )
+{
+    if ( visible ) 
+        show();
+    else 
+        hide();
+    button->setShown(visible);
 }
 
 void TabbedWidget::saveWidgetState ()
@@ -231,7 +240,7 @@ TabbedWidget& ToolBarManager::createTabbedWidget ( QWidget& w,
                                                    const QString& name, 
                                                    const QIconSet& iconSet )
 {    
-    TabbedWidget* tb = new TabbedWidget( this, w, name, iconSet );    
+    TabbedWidget* tb = new TabbedWidget( *this, w, name, iconSet );    
     if ( blankLabel )
         delete blankLabel;
     blankLabel = new QLabel(this);
