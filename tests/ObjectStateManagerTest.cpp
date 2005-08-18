@@ -60,7 +60,7 @@ void start_end_state_block_test ()
     m.startStateBlock();
     my_assert( m.countStateBlocks() == 1, "m.startStateBlock(): should be 1 block");
     m.endStateBlock();
-    my_assert( m.countStateBlocks() == 1, "m.endStateBlock(): should be 1 block");
+    my_assert( m.countStateBlocks() == 0, "m.endStateBlock(): 0 blocks; it should be removed");
 
     // Can't start new block because previous one is empty
     m.startStateBlock();
