@@ -33,8 +33,7 @@ void TrussUnitWindowManager::suspendedClean ()
     for ( ; iter != trussWindows.end(); ) {
         TrussUnitWindow* truss = *iter;
         if ( !truss->isAlive() && truss->countEnabledStates() == 0 ) {
-            trussWindows.erase(iter);
-            delete truss;
+            removeTrussUnitWindow(iter);
         }
         else
             ++iter;
