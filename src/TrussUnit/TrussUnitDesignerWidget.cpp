@@ -535,7 +535,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         }
     }
 }
-
+#include <iostream>
 void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
 {
     int x = me->x();
@@ -545,7 +545,14 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
     {
         selectedPivot->getLastNode().setVisible ( true );
         selectedPivot->setDrawingStatus ( true );
+
+        ObjectStateManager* mng = selectedWindow->getStateManager();
+        mng->startStateBlock();
+
         selectedWindow->checkAfterNodeManipulation ( selectedNode, false );
+
+        mng->endStateBlock();
+
         update();
         designerBehaviour = onPivotFirstNodeDraw;
         selectedNode = 0;
@@ -554,10 +561,16 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
     else if ( nodeBehaviour == onNodeDrag ) 
     {
         nodeBehaviour = onNodeSelect;
+
+        ObjectStateManager* mng = selectedWindow->getStateManager();
+        mng->startStateBlock();
+
         // Save state in Undo/Redo stack
         saveNodeStateAfterDrag( selectedNode->getPoint() );
-
         selectedWindow->checkAfterNodeManipulation ( selectedNode, true );
+
+        mng->endStateBlock();
+
         update();
 
         selectedWindow = findWindowByWidgetPos ( x, y );
@@ -583,10 +596,15 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         QPoint firstPos = selectedPivot->getFirstNode().getPoint();
         QPoint lastPos  = selectedPivot->getLastNode().getPoint();
 
+        ObjectStateManager* mng = selectedWindow->getStateManager();
+        mng->startStateBlock();
+
         // Save state in Undo/Redo stack
         savePivotStateAfterDrag( firstPos, lastPos );
-
         selectedWindow->checkAfterPivotManipulation ( selectedPivot, true );
+
+        mng->endStateBlock();
+
         update();
 
         selectedWindow = findWindowByWidgetPos ( x, y );
@@ -616,17 +634,25 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         selectedWindow = 0;
         winBehaviour = windowIdle;
     }
+
+    if ( focusedWindow ) {
+        ObjectStateManager* mng = focusedWindow->getStateManager();
+        mng->endStateBlock();
+    }
 }
 
 void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
 {
-    QWidget::setFocus ();
+    QWidget::setFocus();
     clickX = me->x();
     clickY = flipY ? height() - me->pos().y() : me->pos().y();
     selectedWindow = findWindowByWidgetPos ( clickX, clickY );
     if ( selectedWindow )
     {
         focusOnWindow( *selectedWindow );
+
+        ObjectStateManager* mng = focusedWindow->getStateManager();
+        mng->startStateBlock();
 
         if ( selectedWindow->inHeadlineRect ( clickX, clickY ) )
         {
