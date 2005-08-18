@@ -248,13 +248,15 @@ void TrussUnitDesignerWidget::savePivotStateAfterDrag ( QPoint firstPos, QPoint 
 }
 
 void TrussUnitDesignerWidget::savePivotStateAfterCreate ( TrussNode& firstNode,
+                                                          bool firstWasCreated,
                                                           TrussNode& lastNode, 
                                                           TrussPivot& pivot )
 {    
     ObjectStateManager* mng = pivot.getStateManager();
     mng->startStateBlock();
     // Save created nodes
-    saveNodeStateAfterCreate( firstNode );
+    if ( firstWasCreated )
+        saveNodeStateAfterCreate( firstNode );
     saveNodeStateAfterCreate( lastNode );
     // Save created pivot
     ObjectState& state = pivot.createState();
@@ -535,7 +537,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         }
     }
 }
-#include <iostream>
+
 void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
 {
     int x = me->x();
@@ -738,8 +740,11 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                 QPoint nodeCoord = selectedWindow->getTrussCoordFromWidgetPos( clickX, 
                                                                                clickY );
                 TrussNode* firstNode = selectedWindow->findNodeByWidgetPos( clickX, clickY );
-                if ( firstNode == 0 )
+                bool wasCreated = false;
+                if ( firstNode == 0 ) {
                     firstNode = &selectedWindow->createNode( nodeCoord.x(), nodeCoord.y() );
+                    wasCreated = true;
+                }
                 TrussNode& lastNode = selectedWindow->createNode( nodeCoord.x(), 
                                                                   nodeCoord.y() );
                 lastNode.setVisible ( false );
@@ -747,7 +752,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                 selectedPivot->setDrawingStatus ( false );
                 selectedNode = &lastNode;
                 designerBehaviour = onPivotLastNodeDraw;
-                savePivotStateAfterCreate( *firstNode, lastNode, 
+                savePivotStateAfterCreate( *firstNode, wasCreated, lastNode, 
                                            *selectedPivot );
                 update();
             }
