@@ -25,6 +25,11 @@ public slots:
 protected slots:
     virtual void addWidget ( QWidget& );
 
+    // Actions on some life time signals
+    virtual void trussUnitWindowDesist ( StatefulObject& );
+    virtual void trussUnitWindowRevive ( StatefulObject& );
+    virtual void trussUnitWindowReviveDesist ( StatefulObject&, bool );
+
 private:
     typedef QMap<const TrussUnitWindow*, QWidget*> CalcDataMap;
     typedef CalcDataMap::iterator CalcDataMapIter;

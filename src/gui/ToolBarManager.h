@@ -33,7 +33,7 @@ class TabbedWidget : public QObject
 {
     Q_OBJECT
 public:
-    TabbedWidget ( ToolBarManager* parent,  QWidget&, 
+    TabbedWidget ( ToolBarManager& parent,  QWidget&, 
                    const QString& name, const QIconSet& iconSet );
 
     ~TabbedWidget ();
@@ -53,6 +53,7 @@ public slots:
     void disactivate ();
     void show ();
     void hide ();
+    void setVisible ( bool );
 
 protected slots:
     void toolBarDestroyed ();
@@ -65,7 +66,7 @@ signals:
     void onHide ( TabbedWidget& );
 
 private:
-    ToolBarManager* toolBar;
+    ToolBarManager& toolBar;
     QString name;
     QWidget& widget;
     TextToolButton* button;
