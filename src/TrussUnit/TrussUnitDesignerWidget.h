@@ -27,8 +27,10 @@ protected:
     virtual void saveNodeStateAfterCreate ( TrussNode& );
     virtual void saveNodeStateAfterRemove ( TrussNode& );
     virtual void savePivotStateAfterDrag ( QPoint first, QPoint last );    
-    virtual void savePivotStateAfterCreate ( TrussNode& firstNode,
-                                             TrussNode& lastNode, TrussPivot& );
+    virtual void savePivotStateAfterCreate ( TrussNode& firstNode, 
+                                             bool firstPivotWasCreated,
+                                             TrussNode& lastNode, 
+                                             TrussPivot& );
 
     // SVG viewer methods
     virtual void parseSvg ( const char* fname );
