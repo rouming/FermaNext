@@ -667,8 +667,8 @@ QPoint TrussUnitWindow::getLineSegmentsIntersectionPoint ( QPoint p11, QPoint p1
         // intersection point is within both line segments
         double x = p11.x() + ( p12.x() - p11.x() ) * Ua2;
         double y = p11.y() + ( p12.y() - p11.y() ) * Ua2;
-        crossPoint.setX ( x );
-        crossPoint.setY ( y );
+        crossPoint.setX ( (int)x );
+        crossPoint.setY ( (int)y );
         return crossPoint;
     }
     else
