@@ -114,8 +114,8 @@ void ObjectStateManager::startStateBlock ()
         currentBlockIsEnded = false;
         startedBlocks = 1;
     }
-    // We should count inner blocks, but if they are not empty
-    else if ( !currentBlock->isEmpty() )
+    // We should count inner blocks
+    else 
         ++startedBlocks;
 
     // Does nothing if block was not ended or not started yet
@@ -123,14 +123,27 @@ void ObjectStateManager::startStateBlock ()
 
 void ObjectStateManager::endStateBlock ()
 {
-    // Finishes block if it is not empty and all inner blocks are ended
-    if ( currentBlock != 0 &&
-         !currentBlock->isEmpty() && !currentBlockIsEnded ) {
-        // If only one block remains we should close it
-        if ( startedBlocks == 1 )
-            currentBlockIsEnded = true;
-        --startedBlocks;
+    // Finishes block if it was created and all inner blocks are ended
+    if ( currentBlock != 0 && startedBlocks == 1 ) {
+        currentBlockIsEnded = true;
+        // We should remove current block if it is empty
+        if ( currentBlock->isEmpty() ) {
+            BlockListIter iter = std::find( stateBlocks.begin(), 
+                                            stateBlocks.end(), 
+                                            currentBlock );
+            stateBlocks.erase(iter);
+            delete currentBlock;
+            // Correct setting of current pointer
+            if ( stateBlocks.size() == 0 || iter == stateBlocks.begin() )
+                currentBlock = 0;
+            else 
+                currentBlock = *(--iter);
+        }
     }
+    // We should decrement inner blocks
+    if ( startedBlocks > 0 )
+       --startedBlocks;
+
     // Does nothing if block was already finished or not started
 }
 
