@@ -21,6 +21,7 @@ protected:
     virtual TrussUnitWindow* findWindowByWidgetPos ( int x, int y );    
     virtual void removeAllHighlight ();
     virtual bool nodeCanBeDrawn ( int x, int y );
+    virtual void clearAllCursorCoordFields ();
 
     // Save states to Undo/Redo stack
     virtual void saveNodeStateAfterDrag ( QPoint );
