@@ -178,19 +178,10 @@ public:
         return 0;
     }
 
+    // Returns only alive pivots
     virtual PivotList findAdjoiningPivots ( const N& node ) const
     {
-        PivotList resPivots;
-        PivotListConstIter iter = pivots.begin();
-        for ( ; iter != pivots.end(); ++iter ) {
-            P* pivot = (*iter);
-            if ( ! pivot->isAlive() || !pivot->isEnabled() )
-                continue;
-            if ( &(pivot->getFirstNode()) == &node ||
-                 &(pivot->getLastNode()) == &node )
-                 resPivots.push_back( pivot );
-        }
-        return resPivots;
+        return findAdjoiningPivots( node, true );
     }
 
     virtual N& createNode ( int x, int y )
@@ -285,7 +276,7 @@ public:
         suspendedClean();
         NodeListIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
-            if ( (*iter) == &node ) {
+            if ( (*iter) == &node ) {                
                 // Desist first
                 (*iter)->desist();
                 return removeNode(iter);
@@ -359,17 +350,6 @@ protected:
     // Physically removes nodes and pivots
     virtual void suspendedClean () 
     {
-        // Clean desisted nodes without states
-        NodeListIter nIter = nodes.begin();
-        for ( ; nIter != nodes.end(); ) {
-            N* node = *nIter;
-            if ( !node->isAlive() && node->countEnabledStates() == 0 ) {
-                removeNode(nIter);
-            }
-            else
-                ++nIter;
-        }
-
         // Clean desisted pivots without states
         PivotListIter pIter = pivots.begin();
         for ( ; pIter != pivots.end(); ) {
@@ -380,9 +360,21 @@ protected:
             else
                 ++pIter;
         }
+
+        // Clean desisted nodes without states
+        NodeListIter nIter = nodes.begin();
+        for ( ; nIter != nodes.end(); ) {
+            N* node = *nIter;
+            if ( !node->isAlive() && node->countEnabledStates() == 0 ) {
+                removeNode(nIter);
+            }
+            else
+                ++nIter;
+        }
     }
 
     // Momentary removing of desisted object. Nothing can revive it.
+    // Of course, adjoining pivots should be removed too.
     virtual bool removeNode ( NodeListIter& iter )
     {
         if ( iter == nodes.end() )
@@ -390,9 +382,9 @@ protected:
         N* n = *iter;
         if ( n->isAlive() )
             return false;
-        emit beforeNodeRemoval(*n);
         // We should remove adjoining pivots first
         removeAdjoiningPivots(*n);
+        emit beforeNodeRemoval(*n);
         nodes.erase(iter);
         delete n;
         emit afterNodeRemoval();
@@ -400,14 +392,34 @@ protected:
         return true;
     }
 
+    // If flag is true returns only alive pivots
+    virtual PivotList findAdjoiningPivots ( const N& node,
+                                            bool selectAlive ) const
+    {
+        PivotList resPivots;
+        if ( selectAlive && ! node.isAlive() )
+            return resPivots;
+        PivotListConstIter iter = pivots.begin();
+        for ( ; iter != pivots.end(); ++iter ) {
+            P* pivot = (*iter);
+            if ( selectAlive && ! pivot->isAlive() )
+                continue;
+            if ( &(pivot->getFirstNode()) == &node ||
+                 &(pivot->getLastNode()) == &node )
+                 resPivots.push_back( pivot );
+        }
+        return resPivots;
+    }
+
     // Physically remove all adjoining pivots
     virtual void removeAdjoiningPivots ( N& node )
     {
-        PivotList pivotsToRemove = findAdjoiningPivots(node);
+        PivotList pivotsToRemove = findAdjoiningPivots( node, false );
         PivotListIter iter = pivotsToRemove.begin();
         for ( ; iter != pivotsToRemove.end(); ++iter ) {
-            P* p = *iter;
-            removePivot(*p);
+            // Desist first
+            (*iter)->desist();            
+            removePivot(iter);
         }
     }
 
