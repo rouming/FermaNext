@@ -58,8 +58,11 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name, ObjectStateManager* mng 
     TrussUnit(name, mng),
     headFont (agg::verdana16_bold),
     numbersFont (agg::verdana13),
-    rbuf ( new rbuf_dynarow(250,250) ),
-    windowSize ( 250, 250)
+    windowBuf ( new rbuf_dynarow( 250, 250 ) ),
+    coordBuf ( new rbuf_dynarow( 49, 12 ) ),
+    cursorCoord ( -1, -1 ),
+    windowSize ( 250, 250),
+    coordFieldSize ( 49, 12 )
 {
     setCanvasColor ( 8, 10, 12 );
     setHighlighted(false);    
@@ -67,7 +70,8 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name, ObjectStateManager* mng 
 
 TrussUnitWindow::~TrussUnitWindow ()
 {
-    delete rbuf;
+    delete windowBuf;
+    delete coordBuf;
 }
 
 void TrussUnitWindow::setHighlighted ( bool h )
@@ -341,7 +345,7 @@ void TrussUnitWindow::resize ( QPoint leftTop, QPoint rightBottom )
 {
     int dx = rightBottom.x() - leftTop.x();
     int dy = rightBottom.y() - leftTop.y();
-    rbuf->init( dx, dy );
+    windowBuf->init( dx, dy );
     setWindowSize( dx, dy );
     setWindowPosition( leftTop );    
 }
@@ -353,6 +357,11 @@ void TrussUnitWindow::setWindowPosition ( QPoint pos )
     windowRightBottomPos.setX ( windowLeftTopPos.x() + windowSize.width() );
     windowRightBottomPos.setY ( windowLeftTopPos.y() + windowSize.height() );
     emit onMove( oldPos, pos );
+}
+
+void TrussUnitWindow::setCursorCoord ( QPoint coord )
+{
+    cursorCoord = coord;
 }
 
 void TrussUnitWindow::setFocusOnNode ( TrussNode* selectedNode )
@@ -583,6 +592,8 @@ void TrussUnitWindow::dividePivot ( TrussPivot& dividualPivot, TrussNode& dividi
     ObjectStateManager* mng = dividualPivot.getStateManager();
     mng->startStateBlock();
 
+    dividualPivot.setHighlighted ( false );
+
     // Save remove pivot action
     ObjectState& state = dividualPivot.createState();
     state.addAction( new TrussPivotRemoveAction( dividualPivot ) );
@@ -713,23 +724,24 @@ void TrussUnitWindow::checkNodePosition ( TrussNode* selectedNode, bool fixation
 {
     QPoint nodePos = getWidgetPosFromTrussCoord ( selectedNode->getX(), 
                                                   selectedNode->getY() );
-    TrussNode* node = nodesMergingComparison( *selectedNode, 100, fixationCheck );
     TrussPivot* pivot = 0;
 
+// TODO: Find out what's the reason of the exception, 
+//       caused by rearrangement of methods below.
+
+    PivotList pivotList = getPivotList ();
+    uint i;
+    for ( i = 0; i < pivotList.size(); i++ )
+    {
+        pivot = findPivotByWidgetPos ( nodePos.x(), nodePos.y(), 250 );
+        if ( pivot )
+            dividePivot ( *pivot, *selectedNode );
+    }
+
+    TrussNode* node = nodesMergingComparison( *selectedNode, 100, fixationCheck );
     if ( node )
     {
         mergeNodes ( selectedNode, node );
-    }
-    else
-    {
-        PivotList pivotList = getPivotList ();
-        uint i;
-        for ( i = 0; i < pivotList.size(); i++ )
-        {
-            pivot = findPivotByWidgetPos ( nodePos.x(), nodePos.y(), 250 );
-            if ( pivot )
-                dividePivot ( *pivot, *selectedNode );
-        }
     }
 }
 
@@ -761,10 +773,21 @@ void TrussUnitWindow::checkAfterNodeManipulation ( TrussNode* selectedNode,
 void TrussUnitWindow::checkAfterPivotManipulation ( TrussPivot* selectedPivot, 
                                                    bool fixationCheck )
 {
-    TrussNode* firstNode = &selectedPivot->getFirstNode();
-    TrussNode* lastNode = &selectedPivot->getLastNode();
-    checkAfterNodeManipulation ( firstNode, fixationCheck );
-    checkAfterNodeManipulation ( lastNode, fixationCheck );
+    QPoint firstCoord = selectedPivot->getFirstNode().getPoint();
+    QPoint lastCoord = selectedPivot->getLastNode().getPoint();
+
+    NodeList nodeList = getNodeList ();
+    NodeListIter iter = nodeList.begin();
+    for ( ; iter != nodeList.end(); ++iter )
+	{
+        TrussNode* node = *iter;
+        if ( ( node->getX() <= firstCoord.x() && node->getX() >= lastCoord.x() ||
+               node->getX() <= lastCoord.x() && node->getX() >= firstCoord.x() ) &&
+             ( node->getY() <= firstCoord.y() && node->getY() >= lastCoord.y() ||
+               node->getY() <= lastCoord.y() && node->getY() >= firstCoord.y() ) )
+            checkAfterNodeManipulation ( node, fixationCheck );
+
+    }
 }
 
 color_type TrussUnitWindow::getCanvasColor () const
@@ -822,6 +845,25 @@ void TrussUnitWindow::setResEllColor ( int r , int g, int b )
     resEllColor = agg::rgba(r, g, b);
 }
 
+QString TrussUnitWindow::fitTextToWindowSize ( QString str, int lengthLimit, 
+                                               glyph_gen& glyph ) const
+{
+    int textLength; // text length in pixels
+    uint i, totalChar = str.length();
+    for ( i = 0; i < totalChar; i++ )
+    {
+        textLength = glyph.width ( str.ascii() ); 
+        if ( textLength <= lengthLimit )
+            break;
+        else
+        {
+            str.replace (  str.length() - 3, 3, "..." );
+            str.remove ( str.length() - 4, 1 );
+        }
+    }
+    return str;
+}
+
 void TrussUnitWindow::drawText ( ren_dynarow&, textRenderer& textRend,
                                  const QString& str, color_type col, 
                                  QPoint point ) const 
@@ -852,11 +894,11 @@ void TrussUnitWindow::drawArrow ( scanline_rasterizer& ras, solidRenderer& solid
 }
 
 void TrussUnitWindow::drawOutlineRoundedRect ( solidRenderer& solidRend, 
-                                                     scanline_rasterizer& ras,
-                                                     agg::scanline_p8& sl, 
-                                                     QPoint point1, QPoint point2, 
-                                                     int cornerRadius,
-                                                     color_type color) const
+                                               scanline_rasterizer& ras,
+                                               agg::scanline_p8& sl, 
+                                               QPoint point1, QPoint point2, 
+                                               int cornerRadius,
+                                               color_type color) const
 {
     agg::rounded_rect rectangle ( point1.x(), point1.y(), 
                                   point2.x(), point2.y(), cornerRadius );
@@ -989,6 +1031,47 @@ void TrussUnitWindow::drawHeadline ( ren_dynarow& baseRend,
                              winCornerRadius/2, agg::rgba(30,20,10) ); 
 }
 
+void TrussUnitWindow::drawCursorCoordinatesField ( ren_dynarow& baseRend,
+                                                   textRenderer& textRend ) const
+                                             
+{
+    if ( isHighlighted() )
+        baseRend.clear ( agg::rgba( 25,55,65 ) );
+    else
+        baseRend.clear ( agg::rgba( 40,65,60 ) );
+    
+    QPoint textPos ( 0, 9 );
+    color_type textColor = agg::rgba(0, 0, 0);
+    if ( cursorCoord.x() == -1 )
+    {
+        textPos.setX ( 4 );
+        drawText ( baseRend, textRend, "---", textColor, textPos );
+        textPos.setX ( 22 );
+        drawText ( baseRend, textRend, ":", textColor, textPos );
+        textPos.setX ( 31 );
+        drawText ( baseRend, textRend, "---", textColor, textPos );
+    }
+    else
+    {
+        QString str;
+        str = QString("%1").arg( cursorCoord.x() );
+        if ( cursorCoord.x() < 10 )
+            textPos.setX ( 14 );
+        else if ( cursorCoord.x() < 100 )
+            textPos.setX ( 7 );
+        else
+            textPos.setX ( 0 );
+        drawText ( baseRend, textRend, str, textColor, textPos );
+
+        textPos.setX ( 22 );
+        drawText ( baseRend, textRend, ":", textColor, textPos );
+
+        str = QString("%1").arg( cursorCoord.y() );  
+        textPos.setX ( 28 );
+        drawText ( baseRend, textRend, str, textColor, textPos );
+    }
+}
+
 void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 {
     if ( !isVisible() )
@@ -999,11 +1082,12 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
     agg::scanline_p8     sl;
     agg::ellipse ell;
 
-    pixf_dynarow pixf(*rbuf);
+    pixf_dynarow windowPixf( *windowBuf );
+    pixf_dynarow coordPixf( *coordBuf );
 
     if ( ! isRendered() ) 
     { 
-        ren_dynarow baseRend(pixf);
+        ren_dynarow baseRend( windowPixf );
         baseRend.clear ( agg::rgba (10, 10, 10, 0) );
         solidRenderer solidRend ( baseRend );    
         textRenderer textRend ( baseRend, glyph );
@@ -1053,11 +1137,12 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 
 
         /*------draw window title text------*/
-        QPoint point;
-        point.setX ( windowSize.width()/2 - 10 * bordWidth );
-        point.setY ( 17 );
-        drawText ( baseRend, textRend, getTrussName (), 
-               agg::rgba(1, 1, 1), point );
+        int lengthLimit = windowSize.width() - 10 * bordWidth;
+        QString title = fitTextToWindowSize ( getTrussName (), lengthLimit, glyph );
+        int titleLength = glyph.width ( title.ascii() );
+        QPoint titlePos( ( lengthLimit - titleLength ) / 2 + 20, 17 );
+        color_type titleColor = agg::rgba(1, 1, 1);
+        drawText ( baseRend, textRend, title, titleColor, titlePos );
 
 
         /*------draw editable area in which canvas truss unit can be painted------*/
@@ -1071,9 +1156,20 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 
         rendered( true );
     }
-    baseRenderer.blend_from ( pixf, 0, windowLeftTopPos.x(), windowLeftTopPos.y(), 
+
+    /*------draw coordinates field------*/
+    ren_dynarow baseRend ( coordPixf );
+    textRenderer textRend ( baseRend, glyph );
+    glyph.font ( numbersFont );
+    drawCursorCoordinatesField ( baseRend, textRend );
+
+    /*------blend buffers------*/
+    baseRenderer.blend_from ( windowPixf, 0, windowLeftTopPos.x(), windowLeftTopPos.y(), 
                              unsigned(1.0 * 255) );
+    baseRenderer.blend_from ( coordPixf, 0, windowLeftTopPos.x() + 30, 
+                                        windowRightBottomPos.y() - 14, 
+                                        unsigned(1.0 * 255) );
+
 }
 
 /****************************************************************************/
-

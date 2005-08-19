@@ -55,6 +55,7 @@ public:
 
     virtual void resize ( QPoint leftTop, QPoint rightBottom );
     virtual void setWindowPosition ( QPoint pos );
+    virtual void setCursorCoord ( QPoint coord );
 
     virtual void setFocusOnNode ( TrussNode* selectedNode );
     virtual void setFocusOnPivot ( TrussPivot* selectedPivot );
@@ -94,6 +95,9 @@ public:
     virtual void setBorderColor ( int r, int g, int b );
     virtual void setResEllColor ( int r, int g, int b );
 
+    virtual QString fitTextToWindowSize ( QString str, int lengthLimit, 
+                                          glyph_gen& glyph ) const;
+
     virtual void drawText ( ren_dynarow& baseRend, textRenderer& textRend,
                             const QString& str, color_type c, QPoint point ) const;
     virtual void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
@@ -113,6 +117,8 @@ public:
                                 scanline_rasterizer& ras, agg::scanline_p8& sl, 
                                 gradient_span_alloc& gradSpan, linear_gradient& gradFunc, 
                                 color_array_type& gradColors, agg::trans_affine& mtx ) const;
+    virtual void drawCursorCoordinatesField ( ren_dynarow& baseRend,
+                                              textRenderer& textRend ) const;
     virtual void paint ( base_renderer& baseRend ) const;
 
 signals:
@@ -126,9 +132,10 @@ protected:
 
 private:
     textFont headFont, numbersFont;
-    rbuf_dynarow* rbuf;
-    QPoint windowLeftTopPos, windowRightBottomPos;
-    QSize windowSize;
+    rbuf_dynarow* windowBuf;
+    rbuf_dynarow* coordBuf;
+    QPoint windowLeftTopPos, windowRightBottomPos, cursorCoord;
+    QSize windowSize, coordFieldSize;
     color_type canvColor, headFirstColor, headMiddleColor, headLastColor, 
                borderColor, resEllColor;    
 };
