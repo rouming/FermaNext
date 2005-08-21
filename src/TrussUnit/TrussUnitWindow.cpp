@@ -572,7 +572,7 @@ void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
                                                     &TrussPivot::setLastNode,
                                                     &TrussPivot::setLastNode,
                                                     node,
-                                                    firstNode ) );
+                                                    lastNode ) );
   
         }
     }
