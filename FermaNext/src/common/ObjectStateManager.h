@@ -7,8 +7,6 @@
 
 class ObjectState;
 
-const size_t POSSIBLE_STACK_SIZE = 256;
-
 class ObjectStateManager : public QObject
 {
     Q_OBJECT
@@ -68,7 +66,7 @@ protected slots:
     virtual bool removeBlockByState (  ObjectState& );
 
 public:
-    ObjectStateManager ();
+    ObjectStateManager ( size_t stackSize = 256 );
     virtual ~ObjectStateManager ();
 
     //Manages state blocks
