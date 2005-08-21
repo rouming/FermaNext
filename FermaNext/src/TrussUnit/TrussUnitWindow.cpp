@@ -519,14 +519,18 @@ TrussNode* TrussUnitWindow::nodesMergingComparison ( TrussNode& comparableNode,
 
 void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
 {
-    PivotList pivotList = getPivotList ();
-    PivotListIter iter = pivotList.begin();
-
     ObjectState& state = mergingNode->createState();
 
     TrussPivot* fakePivot = findPivotByNodes ( *mergingNode, *node );
-    if ( fakePivot )
+    if ( fakePivot ) {
+        // Save remove pivot action
+        state.addAction( new TrussPivotRemoveAction( *fakePivot ) );        
         fakePivot->desist();
+    }
+
+    // Reduce search area: find only adjoining pivots
+    PivotList pivotList = findAdjoiningPivots( *mergingNode );
+    PivotListIter iter = pivotList.begin();
     for ( ; iter != pivotList.end(); ++iter )
     {
         TrussPivot* pivot = *iter;
