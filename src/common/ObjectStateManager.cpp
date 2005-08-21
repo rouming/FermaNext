@@ -72,15 +72,15 @@ void ObjectStateManager::StateBlock::clear ()
  * Object State Manager
  *****************************************************************************/
 
-ObjectStateManager::ObjectStateManager () :
+ObjectStateManager::ObjectStateManager ( size_t stackSize ) :
     currentBlock(0),    
-    possibleStackSize(POSSIBLE_STACK_SIZE),
+    //possibleStackSize(stackSize),
+    possibleStackSize(1),
     startedBlocks(0),
     currentBlockIsEnded(true),
     isStateCallFlag(false)
 {
-    // Suppose there are 4 states in one block. 
-    stateBlocks.reserve(possibleStackSize/4);
+    stateBlocks.reserve(possibleStackSize);
 }
 
 ObjectStateManager::~ObjectStateManager ()
@@ -252,8 +252,8 @@ bool ObjectStateManager::tryToShiftStack ()
         return true;
 
     // Should we shift?
-    size_t statesNum = countStates();
-    if ( statesNum < possibleStackSize )
+    size_t stateBlockNum = countStateBlocks();
+    if ( stateBlockNum < possibleStackSize )
         return false;
 
     // Remove first block
