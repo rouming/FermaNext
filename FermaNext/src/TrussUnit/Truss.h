@@ -339,10 +339,12 @@ protected:
         try { node = dynamic_cast<N*>(&st); }
         catch ( ... ) { return; }
 
-        PivotList pivotsToDesist = findAdjoiningPivots(*node);
+        PivotList pivotsToDesist = findAdjoiningPivots( *node, false );
         PivotListIter iter = pivotsToDesist.begin();
         for ( ; iter != pivotsToDesist.end(); ++iter ) {
-            (*iter)->desist();
+            P* pivot = *iter;
+            if ( pivot->isAlive() )
+                (*iter)->desist();
         }
         emit onStateChange();
     }
@@ -402,7 +404,8 @@ protected:
         PivotListConstIter iter = pivots.begin();
         for ( ; iter != pivots.end(); ++iter ) {
             P* pivot = (*iter);
-            if ( selectAlive && ! pivot->isAlive() )
+            if ( selectAlive && ! pivot->isAlive() && 
+                 ! pivot->isEnabled() )
                 continue;
             if ( &(pivot->getFirstNode()) == &node ||
                  &(pivot->getLastNode()) == &node )
