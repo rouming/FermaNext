@@ -404,8 +404,8 @@ protected:
         PivotListConstIter iter = pivots.begin();
         for ( ; iter != pivots.end(); ++iter ) {
             P* pivot = (*iter);
-            if ( selectAlive && ! pivot->isAlive() && 
-                 ! pivot->isEnabled() )
+            if ( selectAlive && 
+                 ( !pivot->isAlive() || !pivot->isEnabled() ) )
                 continue;
             if ( &(pivot->getFirstNode()) == &node ||
                  &(pivot->getLastNode()) == &node )
