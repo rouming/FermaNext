@@ -117,6 +117,7 @@ const QSize& TrussUnit::getTrussAreaSize () const
 void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
                        int trussAreaHeight ) const
 {
+    //((TrussUnit*)this)->suspendedClean(0);
     scanline_rasterizer   ras;
     agg::scanline_p8     sl;
     agg::ellipse ell;

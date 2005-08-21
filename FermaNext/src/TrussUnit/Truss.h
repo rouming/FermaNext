@@ -53,6 +53,20 @@ signals:
  * Truss 
  *****************************************************************************/
 
+template <class Cl>
+class Destr : public std::vector<Cl>
+{
+public:
+    Destr () : std::vector<Cl>(), n(0) {}
+    Destr ( Destr& d ) : std::vector<Cl>(d), n(d.n) { d.zero(); }
+    virtual void zero () { n = 0; }
+    virtual void setNumber ( uint& number ) const
+    { n = (uint*)&number; }
+    virtual ~Destr () { if ( n ) --(*n); }
+
+    mutable uint* n;
+};
+
 template <class N, class P> 
 class Truss : public TrussEmitter                                    
 {
@@ -60,17 +74,23 @@ public:
     // Truss exceptions
     class NodeIndexOutOfBoundException {};
 
-    typedef std::vector<N*> NodeList;
-    typedef std::vector<P*> PivotList;
+    typedef Destr<N*> NodeList;
+    typedef Destr<P*> PivotList;
     typedef typename NodeList::iterator NodeListIter;
     typedef typename NodeList::const_iterator NodeListConstIter;
     typedef typename PivotList::iterator PivotListIter;
     typedef typename NodeList::const_iterator NodeListConstIter;
     typedef typename PivotList::const_iterator PivotListConstIter;
 
+mutable uint nodesCall;
+mutable uint pivotsCall;
+
     Truss ( ObjectStateManager* mng ) :
         TrussEmitter(mng)
-    {}
+    {
+nodesCall =0;
+pivotsCall = 0;
+    }
 
     virtual void clear () 
     {
@@ -287,7 +307,10 @@ public:
     // Returns alive nodes
     virtual NodeList getNodeList () const
     {
+        // Clean earlier desisted nodes/pivots
+        ((Truss<N,P>*)this)->suspendedClean();
         NodeList aliveNodes;
+        aliveNodes.setNumber(++nodesCall);
         NodeListConstIter iter = nodes.begin();
         for ( int i = 1; iter != nodes.end(); ++iter ) {
             N* node = *iter;
@@ -302,7 +325,10 @@ public:
     // Returns alive nodes
     virtual PivotList getPivotList () const
     {
+        // Clean earlier desisted nodes/pivots
+       ((Truss<N,P>*)this)-> suspendedClean();
         PivotList alivePivots;
+        alivePivots.setNumber(++pivotsCall);
         PivotListConstIter iter = pivots.begin();
         for ( int i = 1; iter != pivots.end(); ++iter ) {
             P* pivot = *iter;
@@ -330,6 +356,8 @@ public:
         nodes.push_back ( &selectedNode );
     }
 
+    void suspendedClean (int) { suspendedClean(); }
+
 protected:
     // Desist all adjoining pivots
     virtual void nodeBeforeDesist ( StatefulObject& st )
@@ -352,26 +380,34 @@ protected:
     // Physically removes nodes and pivots
     virtual void suspendedClean () 
     {
+        if ( pivotsCall == 0 ) {
         // Clean desisted pivots without states
         PivotListIter pIter = pivots.begin();
         for ( ; pIter != pivots.end(); ) {
             P* pivot = *pIter;
             if ( !pivot->isAlive() && pivot->countEnabledStates() == 0 ) {
-                removePivot(pIter);
+                bool removed = removePivot(pIter);
+                if ( !removed )
+                    ++pIter;
             }
             else
                 ++pIter;
         }
+        }
 
+        if ( nodesCall == 0 ) {
         // Clean desisted nodes without states
         NodeListIter nIter = nodes.begin();
         for ( ; nIter != nodes.end(); ) {
             N* node = *nIter;
-            if ( !node->isAlive() && node->countEnabledStates() == 0 ) {
-                removeNode(nIter);
+            if ( !node->isAlive() && node->countEnabledStates() == 0  ) {
+                bool removed = removeNode(nIter);
+                if ( !removed )
+                    ++nIter;
             }
             else
                 ++nIter;
+        }
         }
     }
 
@@ -421,8 +457,12 @@ protected:
         PivotListIter iter = pivotsToRemove.begin();
         for ( ; iter != pivotsToRemove.end(); ++iter ) {
             // Desist first
-            (*iter)->desist();            
-            removePivot(iter);
+            (*iter)->desist();
+            // We should remove by pivot iter, not by temp iter.
+            PivotListIter iterToRemove = std::find( pivots.begin(),
+                                                    pivots.end(),
+                                                    *iter );
+            removePivot( iterToRemove );
         }
     }
 
