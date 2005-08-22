@@ -58,8 +58,8 @@ class Destr : public std::vector<Cl>
 {
 public:
     Destr () : std::vector<Cl>(), n(0) {}
-    Destr ( Destr& d ) : std::vector<Cl>(d), n(d.n) { d.zero(); }
-    virtual void zero () { n = 0; }
+    Destr ( const Destr<Cl>& d ) : std::vector<Cl>(d), n(d.n) { d.zero(); }
+    virtual void zero () const { n = 0; }
     virtual void setNumber ( uint& number ) const
     { n = (uint*)&number; }
     virtual ~Destr () { if ( n ) --(*n); }
