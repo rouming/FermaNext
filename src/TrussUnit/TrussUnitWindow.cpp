@@ -856,7 +856,7 @@ QString TrussUnitWindow::fitTextToWindowSize ( QString str, int lengthLimit,
     uint i, totalChar = str.length();
     for ( i = 0; i < totalChar; i++ )
     {
-        textLength = glyph.width ( str.ascii() ); 
+        textLength = (int)glyph.width( str.ascii() ); 
         if ( textLength <= lengthLimit )
             break;
         else
@@ -1143,7 +1143,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         /*------draw window title text------*/
         int lengthLimit = windowSize.width() - 10 * bordWidth;
         QString title = fitTextToWindowSize ( getTrussName (), lengthLimit, glyph );
-        int titleLength = glyph.width ( title.ascii() );
+        int titleLength = (int)glyph.width( title.ascii() );
         QPoint titlePos( ( lengthLimit - titleLength ) / 2 + 20, 17 );
         color_type titleColor = agg::rgba(1, 1, 1);
         drawText ( baseRend, textRend, title, titleColor, titlePos );
