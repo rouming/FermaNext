@@ -519,12 +519,15 @@ TrussNode* TrussUnitWindow::nodesMergingComparison ( TrussNode& comparableNode,
 
 void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
 {
-    ObjectState& state = mergingNode->createState();
+    ObjectStateManager* mng = mergingNode->getStateManager();
+    mng->startStateBlock();
 
     TrussPivot* fakePivot = findPivotByNodes ( *mergingNode, *node );
     if ( fakePivot ) {
         // Save remove pivot action
-        state.addAction( new TrussPivotRemoveAction( *fakePivot ) );        
+        ObjectState& state = fakePivot->createState();
+        state.addAction( new TrussPivotRemoveAction( *fakePivot ) );
+        state.save();
         fakePivot->desist();
     }
 
@@ -542,11 +545,13 @@ void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
             if ( fakePivot ) 
             {
                 // Save remove pivot action
+                ObjectState& state = fakePivot->createState();
                 state.addAction( new TrussPivotRemoveAction( *fakePivot ) );
+                state.save();
                 fakePivot->desist();
             }
-            pivot->setFirstNode( node );
             // Save action of node changing
+            ObjectState& state = pivot->createState();
             state.addAction( 
                 new ConcreteObjectAction<TrussPivot, TrussNode*>(
                                                     *pivot,
@@ -554,6 +559,8 @@ void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
                                                     &TrussPivot::setFirstNode,
                                                     node,
                                                     firstNode ) );
+            state.save();
+            pivot->setFirstNode( node );
         }
         else if ( lastNode == mergingNode )
         {
@@ -561,11 +568,13 @@ void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
             if ( fakePivot ) 
             {
                 // Save remove pivot action
+                ObjectState& state = fakePivot->createState();
                 state.addAction( new TrussPivotRemoveAction( *fakePivot ) );
+                state.save();
                 fakePivot->desist();
             }
-            pivot->setLastNode ( node );
             // Save action of node changing
+            ObjectState& state = pivot->createState();
             state.addAction( 
                 new ConcreteObjectAction<TrussPivot, TrussNode*>(
                                                     *pivot,
@@ -573,17 +582,20 @@ void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
                                                     &TrussPivot::setLastNode,
                                                     node,
                                                     lastNode ) );
-  
+            state.save();
+            pivot->setLastNode ( node );  
         }
     }
     if ( mergingNode->isHighlighted() )
         node->setHighlighted ( true );
 
     // Save remove node action
+    ObjectState& state = mergingNode->createState();
     state.addAction( new TrussNodeRemoveAction( *mergingNode ) );
+    state.save();
     mergingNode->desist();
 
-    state.save();    
+    mng->endStateBlock();
 
     rendered(false);
 }
