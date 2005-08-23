@@ -653,9 +653,9 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         update();
 
         selectedWindow = findWindowByWidgetPos ( x, y );
-        selectedWindow->removePivotsHighlight ();
         if ( selectedWindow )
         {
+            selectedWindow->removePivotsHighlight();
             selectedPivot = selectedWindow->findPivotByWidgetPos( x, y,
                                                           pivotFindingPrecision);
             if ( !selectedPivot )
