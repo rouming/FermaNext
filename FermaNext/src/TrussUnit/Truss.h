@@ -207,7 +207,7 @@ pivotsCall = 0;
     virtual N& createNode ( int x, int y )
     {
         // Clean earlier desisted nodes/pivots
-        suspendedClean();
+        //        suspendedClean();
 
         emit beforeNodeCreation();
         N* node = new N(getStateManager());
@@ -258,7 +258,7 @@ pivotsCall = 0;
     virtual P& createPivot ( N& first, N& last )
     {
         // Clean earlier desisted nodes/pivots
-        suspendedClean();
+        //        suspendedClean();
 
         emit beforePivotCreation();
         P* pivot = new P( first, last, getStateManager() );
@@ -278,7 +278,7 @@ pivotsCall = 0;
     virtual bool removePivot ( const P& pivot )
     {
         // Clean earlier desisted nodes/pivots
-        suspendedClean();
+        //        suspendedClean();
         PivotListIter iter = pivots.begin();
         for ( ; iter != pivots.end(); ++iter ) 
             if ( (*iter) == &pivot ) {
@@ -293,7 +293,7 @@ pivotsCall = 0;
     virtual bool removeNode ( const N& node )
     {
         // Clean earlier desisted nodes/pivots
-        suspendedClean();
+        //        suspendedClean();
         NodeListIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
             if ( (*iter) == &node ) {                
@@ -307,8 +307,6 @@ pivotsCall = 0;
     // Returns alive nodes
     virtual NodeList getNodeList () const
     {
-        // Clean earlier desisted nodes/pivots
-        ((Truss<N,P>*)this)->suspendedClean();
         NodeList aliveNodes;
         aliveNodes.setNumber(++nodesCall);
         NodeListConstIter iter = nodes.begin();
@@ -325,8 +323,6 @@ pivotsCall = 0;
     // Returns alive nodes
     virtual PivotList getPivotList () const
     {
-        // Clean earlier desisted nodes/pivots
-       ((Truss<N,P>*)this)-> suspendedClean();
         PivotList alivePivots;
         alivePivots.setNumber(++pivotsCall);
         PivotListConstIter iter = pivots.begin();
@@ -380,7 +376,7 @@ protected:
     // Physically removes nodes and pivots
     virtual void suspendedClean () 
     {
-        if ( pivotsCall == 0 ) {
+        if ( 1 || pivotsCall == 0 ) {
         // Clean desisted pivots without states
         PivotListIter pIter = pivots.begin();
         for ( ; pIter != pivots.end(); ) {
@@ -395,7 +391,7 @@ protected:
         }
         }
 
-        if ( nodesCall == 0 ) {
+        if ( 1 || nodesCall == 0 ) {
         // Clean desisted nodes without states
         NodeListIter nIter = nodes.begin();
         for ( ; nIter != nodes.end(); ) {

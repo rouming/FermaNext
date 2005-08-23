@@ -74,8 +74,7 @@ void ObjectStateManager::StateBlock::clear ()
 
 ObjectStateManager::ObjectStateManager ( size_t stackSize ) :
     currentBlock(0),    
-    //possibleStackSize(stackSize),
-    possibleStackSize(1),
+    possibleStackSize(stackSize),
     startedBlocks(0),
     currentBlockIsEnded(true),
     isStateCallFlag(false)
