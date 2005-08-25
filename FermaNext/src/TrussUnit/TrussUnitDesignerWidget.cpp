@@ -336,7 +336,7 @@ void TrussUnitDesignerWidget::aggKeyPressEvent ( QKeyEvent* ke )
         designerBehaviour = onPivotFirstNodeDraw;
         removeAllHighlight ();
     }
-        if ( ke->key() == Qt::Key_R && designerBehaviour != onPivotFirstNodeDraw )
+    if ( ke->key() == Qt::Key_R && designerBehaviour != onErase )
     {
         designerBehaviour = onErase;
         removeAllHighlight ();
