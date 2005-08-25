@@ -1,4 +1,3 @@
-
 #ifndef TRUSSUNIT_H
 #define TRUSSUNIT_H
 
@@ -108,6 +107,8 @@ public:
 
     const QString& getTrussName () const;
     const QSize& getTrussAreaSize () const;
+    void nodeToFront ( TrussNode& node );
+    void desistAdjoingPivots ( TrussNode& node );
 
     void paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
                 int trussAreaHeight ) const;
@@ -118,6 +119,7 @@ public slots:
 
 protected slots:
     void trussUnitStateIsChanged ();
+    void clearFrontNodePointer ( Node& node );
 
 signals:
     void onTrussNameChange ( const QString& );
@@ -129,7 +131,7 @@ signals:
 
 private:
     static const QString UNNAMED;
-
+    TrussNode* frontNode;
     QString trussName;
     QSize trussAreaSize;
 };
@@ -164,6 +166,9 @@ signals:
     void onVisibleChange ( bool );
     void onHighlightChange ( bool );
     void onEnableChange ( bool );
+
+public slots:
+    void removeNodeHighlight ();
 };
 
 /*****************************************************************************/
@@ -192,6 +197,9 @@ signals:
     void onVisibleChange ( bool );
     void onHighlightChange ( bool );
     void onEnableChange ( bool );
+
+public slots:
+    void removePivotHighlight ();
 
 private:
     bool drawingStatus;

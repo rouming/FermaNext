@@ -344,22 +344,6 @@ public:
         return alivePivots;
     }
 
-    virtual void nodeToFront ( N& selectedNode )
-    {    
-        if ( nodes.back() == &selectedNode )
-            return;
-        NodeListIter newSelectedIter = std::find ( nodes.begin(), nodes.end(), 
-                                                  &selectedNode );
-        if ( newSelectedIter == nodes.end() )
-            return;
-
-        if ( *newSelectedIter != &selectedNode )
-            return;
-        // push selected node to front
-        nodes.erase ( newSelectedIter );
-        nodes.push_back ( &selectedNode );
-    }
-
 protected:
     virtual void nodeBeforeRevive ( StatefulObject& st )
     {

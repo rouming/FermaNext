@@ -7,12 +7,18 @@
 
 TrussPivot::TrussPivot ( ObjectStateManager* mng ) :
     Pivot<TrussNode>(mng), drawingStatus(true)
-{}
+{
+    QObject::connect( this, SIGNAL(onAfterDesist( StatefulObject& )),
+                            SLOT(removePivotHighlight()) );   
+}
 
 TrussPivot::TrussPivot ( TrussNode& first, TrussNode& last,
                          ObjectStateManager* mng) :
     Pivot<TrussNode>(first, last, mng), drawingStatus(true)
-{}
+{
+    QObject::connect( this, SIGNAL(onAfterDesist( StatefulObject& )),
+                            SLOT(removePivotHighlight()) );   
+}
 
 bool TrussPivot::getDrawingStatus () const
 {
@@ -29,6 +35,11 @@ void TrussPivot::setHighlighted ( bool h )
     getFirstNode().setHighlighted ( h );
     getLastNode().setHighlighted ( h );
     PaintableTrussElement::setHighlighted ( h );
+}
+
+void TrussPivot::removePivotHighlight ()
+{
+    setHighlighted ( false );
 }
 
 struct line
