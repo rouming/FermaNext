@@ -13,7 +13,7 @@
   #include <dlfcn.h>
   typedef void* LibraryHandle;
   typedef void* ProcessAddress;
-  #define dl_open(filename) dlopen(filename, 0)
+  #define dl_open(filename) dlopen(filename, RTLD_LAZY)
   #define dl_sym(handler, funcname) dlsym(handler, funcname)
   #define dl_close(handler) dlclose(handler)
 #endif
@@ -32,12 +32,12 @@ public:
     DynaLoader ( const QString& fileName ) throw (LibraryLoadException);
     ~DynaLoader ();
 
-    void loadLibrary ( const QString& fileName ) throw (LibraryLoadException);
+    bool loadLibrary ( const QString& fileName );
 
     template <class AddressPointer>
     AddressPointer getAddress ( const QString& funcName ) 
                                                       throw (AddressException)
-    { return reinterpret_cast<AddressPointer>( getAddressHandler(funcName) ); }
+    { return (AddressPointer)getAddressHandler(funcName); }
 
     bool freeLibrary ();
 
