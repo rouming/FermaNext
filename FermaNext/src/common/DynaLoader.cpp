@@ -21,6 +21,7 @@ DynaLoader::DynaLoader ( const QString& fileName )
 
 DynaLoader::~DynaLoader ()
 {
+    freeLibrary();
 }
 
 bool DynaLoader::loadLibrary ( const QString& fileName )
