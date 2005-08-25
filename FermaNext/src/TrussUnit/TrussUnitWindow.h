@@ -1,4 +1,3 @@
-
 #ifndef TRUSSUNITWINDOW_H
 #define TRUSSUNITWINDOW_H
 
@@ -31,15 +30,16 @@ public:
     TrussUnitWindow ( const QString& name, ObjectStateManager* );
     virtual ~TrussUnitWindow ();
 
-    virtual void setHighlighted ( bool );
-
     virtual QPoint getWindowLeftTopPos () const;
     virtual QPoint getWindowRightBottomPos () const;
     virtual QPoint getTrussAreaLeftTopPos () const;
     virtual QPoint getTrussAreaRightBottomPos () const;
     virtual QPoint getTrussCoordFromWidgetPos ( int x, int y ) const;
     virtual QPoint getWidgetPosFromTrussCoord ( int x, int y ) const;
-    virtual const QSize& getWindowSize () const;    
+    virtual void setWindowPosition ( QPoint pos );
+    virtual void resize ( QPoint leftTop, QPoint rightBottom );
+    virtual void setCursorCoord ( QPoint coord );
+    virtual const QSize& getWindowSize () const;
 
     virtual bool inWindowRect ( int x, int y ) const;
     virtual bool inCanvasRect ( int  x, int  y ) const;
@@ -50,18 +50,14 @@ public:
     virtual bool inBDiagResizeRect ( int x, int y ) const;
     virtual bool inFDiagResizeRect ( int x, int y ) const;
 
-    virtual TrussNode* findNodeByWidgetPos ( int x, int y ) const;
-    virtual TrussPivot* findPivotByWidgetPos ( int x, int y, int presicion ) const;
-
-    virtual void resize ( QPoint leftTop, QPoint rightBottom );
-    virtual void setWindowPosition ( QPoint pos );
-    virtual void setCursorCoord ( QPoint coord );
-
+    virtual void setHighlighted ( bool );
     virtual void setFocusOnNode ( TrussNode* selectedNode );
     virtual void setFocusOnPivot ( TrussPivot* selectedPivot );
     virtual void removeNodesHighlight ();
     virtual void removePivotsHighlight ();
 
+    virtual TrussNode* findNodeByWidgetPos ( int x, int y ) const;
+    virtual TrussPivot* findPivotByWidgetPos ( int x, int y, int presicion ) const;
     virtual void moveTrussNode ( int x, int y, TrussNode* node );
     virtual void moveTrussPivot ( int x, int y, TrussPivot* pivot, 
                                   QPoint firstNodeClickDist, QPoint lastNodeClickDist );
@@ -83,10 +79,10 @@ public:
                                                bool fixationCheck );
 
     virtual color_type getCanvasColor () const;
-	virtual color_type getHeadlineFirstColor () const;
+    virtual color_type getHeadlineFirstColor () const;
     virtual color_type getHeadlineMiddleColor () const;
     virtual color_type getHeadlineLastColor () const;
-	virtual color_type getBorderColor () const;
+    virtual color_type getBorderColor () const;
 
     virtual void setCanvasColor ( int r, int g, int b );
     virtual void setHeadlineFirstColor ( int r, int g, int b );
@@ -119,6 +115,7 @@ public:
                                 color_array_type& gradColors, agg::trans_affine& mtx ) const;
     virtual void drawCursorCoordinatesField ( ren_dynarow& baseRend,
                                               textRenderer& textRend ) const;
+    virtual void drawNumbersField ( ren_dynarow& baseRend, textRenderer& textRend ) const;
     virtual void paint ( base_renderer& baseRend ) const;
 
 signals:
@@ -132,8 +129,7 @@ protected:
 
 private:
     textFont headFont, numbersFont;
-    rbuf_dynarow* windowBuf;
-    rbuf_dynarow* coordBuf;
+    rbuf_dynarow *windowBuf, *coordBuf, *numbersBuf;
     QPoint windowLeftTopPos, windowRightBottomPos, cursorCoord;
     QSize windowSize, coordFieldSize;
     color_type canvColor, headFirstColor, headMiddleColor, headLastColor, 

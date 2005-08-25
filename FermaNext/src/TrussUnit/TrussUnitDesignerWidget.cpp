@@ -336,6 +336,11 @@ void TrussUnitDesignerWidget::aggKeyPressEvent ( QKeyEvent* ke )
         designerBehaviour = onPivotFirstNodeDraw;
         removeAllHighlight ();
     }
+        if ( ke->key() == Qt::Key_R && designerBehaviour != onPivotFirstNodeDraw )
+    {
+        designerBehaviour = onErase;
+        removeAllHighlight ();
+    }
     if ( ke->key() == Qt::Key_Escape  && designerBehaviour != onSelect )
     {
         designerBehaviour = onSelect;
@@ -476,8 +481,9 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     }
     else
     {
-        if ( designerBehaviour  == onNodeDraw || 
-             designerBehaviour  == onPivotFirstNodeDraw )
+        if ( designerBehaviour == onNodeDraw || 
+             designerBehaviour == onPivotFirstNodeDraw ||
+             designerBehaviour == onErase )
         {
             if ( nodeCanBeDrawn ( x, y ) )
                 QWidget::setCursor ( Qt::CrossCursor );
@@ -539,7 +545,8 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                     QWidget::setCursor ( Qt::SizeBDiagCursor );
                 else if ( selectedWindow->inFDiagResizeRect ( x, y ) )
                     QWidget::setCursor ( Qt::SizeFDiagCursor );
-                else if ( designerBehaviour == onSelect )
+                else if ( designerBehaviour == onSelect || 
+                          designerBehaviour == onErase )
                 {
                     selectedNode = selectedWindow->findNodeByWidgetPos( x, y );
                     selectedPivot = selectedWindow->findPivotByWidgetPos( x, y,
@@ -551,7 +558,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                         selectedWindow->setFocusOnNode ( selectedNode );
                         selectedWindow->setCursorCoord ( selectedNode->getPoint() );
                         nodeBehaviour = onNodeSelect;
-                        QWidget::setCursor ( Qt::ArrowCursor );
+                        //QWidget::setCursor ( Qt::ArrowCursor );
                         update();
                     }
                     else if ( selectedPivot )
@@ -563,12 +570,16 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                             selectedWindow->getTrussCoordFromWidgetPos( x, y );
                         selectedWindow->setCursorCoord ( cursorCoord );
                         pivotBehaviour = onPivotSelect;
-                        QWidget::setCursor ( Qt::ArrowCursor );
+                        //QWidget::setCursor ( Qt::ArrowCursor );
                         update();
                     }
                     else
                     {
-                        QWidget::setCursor ( Qt::ArrowCursor );
+                        if ( designerBehaviour == onErase && 
+                             selectedWindow->inTrussAreaRect( x, y ) )
+                            QWidget::setCursor ( Qt::CrossCursor );
+                        else
+                            QWidget::setCursor ( Qt::ArrowCursor );
                         removeAllHighlight ();
                         selectedNode = 0;
                         selectedPivot = 0;
@@ -730,31 +741,60 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
 
         if ( nodeBehaviour == onNodeSelect )
         {
-            selectedWindow->nodeToFront ( *selectedNode );
-            update();
-            // Save pos for Undo/Redo
-            beforeDragNodePos = selectedNode->getPoint();
-            nodeBehaviour = onNodeDrag;
+            if ( designerBehaviour == onErase )
+            {
+                // Save remove node action
+                ObjectStateManager* mng = selectedNode->getStateManager();
+                mng->startStateBlock();
+                selectedWindow->desistAdjoingPivots ( *selectedNode );
+                ObjectState& state = selectedNode->createState();
+                state.addAction( new TrussNodeRemoveAction( *selectedNode ) );
+                state.save();
+                selectedNode->desist();
+                mng->endStateBlock();
+    
+                update();
+            }
+            else
+            {
+                selectedWindow->nodeToFront ( *selectedNode );
+                update();
+                // Save pos for Undo/Redo
+                beforeDragNodePos = selectedNode->getPoint();
+                nodeBehaviour = onNodeDrag;
+            }
         }
         else if ( pivotBehaviour == onPivotSelect )
         {
-            // Convert widget coordinates into truss (absolute) coordinates
-            QPoint trussCoord = selectedWindow->getTrussCoordFromWidgetPos(clickX, clickY);
+            if ( designerBehaviour == onErase )
+            {
+                // Save remove pivot action
+                ObjectState& state = selectedPivot->createState();
+                state.addAction( new TrussPivotRemoveAction( *selectedPivot ) );
+                state.save();
+                selectedPivot->desist();
+                update();
+            }
+            else
+            {
+                // Convert widget coordinates into truss (absolute) coordinates
+                QPoint trussCoord = selectedWindow->getTrussCoordFromWidgetPos(clickX, 
+                                                                               clickY);
+                QPoint firstPos = selectedPivot->getFirstNode().getPoint();
+                QPoint lastPos  = selectedPivot->getLastNode().getPoint();
 
-            QPoint firstPos = selectedPivot->getFirstNode().getPoint();
-            QPoint lastPos  = selectedPivot->getLastNode().getPoint();
+                // Get first and last nodes displacements about a clicked point 
+                firstNodeClickDist.setX ( firstPos.x() - trussCoord.x() );
+                firstNodeClickDist.setY ( firstPos.y() - trussCoord.y() );
+                lastNodeClickDist.setX (  lastPos.x()  - trussCoord.x() );
+                lastNodeClickDist.setY ( lastPos.y()  - trussCoord.y() );
 
-            // Get first and last nodes displacements about a clicked point 
-            firstNodeClickDist.setX ( firstPos.x() - trussCoord.x() );
-            firstNodeClickDist.setY ( firstPos.y() - trussCoord.y() );
-            lastNodeClickDist.setX (  lastPos.x()  - trussCoord.x() );
-            lastNodeClickDist.setY ( lastPos.y()  - trussCoord.y() );
+                // Save pos for Undo/Redo
+                beforeDragFirstPos = firstPos;
+                beforeDragLastPos  = lastPos;
 
-            // Save pos for Undo/Redo
-            beforeDragFirstPos = firstPos;
-            beforeDragLastPos  = lastPos;
-
-            pivotBehaviour = onPivotDrag;
+                pivotBehaviour = onPivotDrag;
+            }
         }    
         else if ( designerBehaviour == onNodeDraw )
         {

@@ -1,4 +1,3 @@
-
 #include "TrussUnitWindow.h"
 #include "TrussUnitActions.h"
 #include <algorithm>
@@ -59,6 +58,7 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name, ObjectStateManager* mng 
     headFont (agg::verdana16_bold),
     numbersFont (agg::verdana13),
     windowBuf ( new rbuf_dynarow( 250, 250 ) ),
+    numbersBuf ( new rbuf_dynarow( 60, 12 ) ),
     coordBuf ( new rbuf_dynarow( 49, 12 ) ),
     cursorCoord ( -1, -1 ),
     windowSize ( 250, 250),
@@ -72,24 +72,6 @@ TrussUnitWindow::~TrussUnitWindow ()
 {
     delete windowBuf;
     delete coordBuf;
-}
-
-void TrussUnitWindow::setHighlighted ( bool h )
-{
-    if ( h ) {
-        setBorderColor( 25,55,65 );
-        setResEllColor( 120, 120, 120 );
-        setHeadlineFirstColor(180, 130, 100 );
-        setHeadlineMiddleColor( 230, 190, 170 );
-        setHeadlineLastColor( 150, 90, 80 );
-    } else {
-        setBorderColor( 40,65,60 );
-        setResEllColor( 50, 50, 50 );
-        setHeadlineFirstColor( 180, 130, 150 );
-        setHeadlineMiddleColor( 230, 210, 200 );
-        setHeadlineLastColor( 150, 90, 110 );        
-    }
-    TrussUnit::setHighlighted(h);
 }
 
 QPoint TrussUnitWindow::getWindowLeftTopPos () const
@@ -116,11 +98,6 @@ QPoint TrussUnitWindow::getTrussAreaRightBottomPos () const
     point.setX ( windowLeftTopPos.x() + windowSize.width() - rigthWindowIndent );
     point.setY ( windowLeftTopPos.y() + windowSize.height() - bottomWindowIndent );
     return point;
-}
-
-const QSize& TrussUnitWindow::getWindowSize () const
-{
-    return windowSize;
 }
 
 QPoint TrussUnitWindow::getTrussCoordFromWidgetPos ( int x, int y ) const
@@ -169,14 +146,51 @@ double TrussUnitWindow::getScaleMultiplierY () const
     return scaleMultiplierY;
 }
 
+void TrussUnitWindow::setWindowPosition ( QPoint pos )
+{
+    QPoint oldPos = windowLeftTopPos;
+    windowLeftTopPos = pos;
+    windowRightBottomPos.setX ( windowLeftTopPos.x() + windowSize.width() );
+    windowRightBottomPos.setY ( windowLeftTopPos.y() + windowSize.height() );
+    emit onMove( oldPos, pos );
+}
+
+void TrussUnitWindow::resize ( QPoint leftTop, QPoint rightBottom )
+{
+    int dx = rightBottom.x() - leftTop.x();
+    int dy = rightBottom.y() - leftTop.y();
+    windowBuf->init( dx, dy );
+    setWindowSize( dx, dy );
+    setWindowPosition( leftTop );    
+}
+
+const QSize& TrussUnitWindow::getWindowSize () const
+{
+    return windowSize;
+}
+
+void TrussUnitWindow::setWindowSize ( int width, int height )
+{
+    QSize oldSize = windowSize;
+    windowSize.setWidth ( width );
+    windowSize.setHeight ( height );
+    rendered(false);
+    emit onResize( oldSize, windowSize );
+}
+
+void TrussUnitWindow::setCursorCoord ( QPoint coord )
+{
+    cursorCoord = coord;
+}
+
 bool TrussUnitWindow::inWindowRect ( int x, int y ) const
 {
-	if ( x >= windowLeftTopPos.x() && x <= windowRightBottomPos.x() && 
-        y >= windowLeftTopPos.y() && y <= windowRightBottomPos.y() )
-	{
-		return true;
-	}
-	return false;
+    if ( x >= windowLeftTopPos.x() && x <= windowRightBottomPos.x() && 
+         y >= windowLeftTopPos.y() && y <= windowRightBottomPos.y() )
+    {
+        return true;
+    }
+    return false;
 }
 
 bool TrussUnitWindow::inCanvasRect ( int x, int y ) const
@@ -185,34 +199,34 @@ bool TrussUnitWindow::inCanvasRect ( int x, int y ) const
         x <= windowRightBottomPos.x() - bordWidth && 
         y >= windowLeftTopPos.y() + bordWidth + headWidth && 
         y <= windowRightBottomPos.y() - bordWidth )
-	{
-		return true;
-	}
-	return false;
+    {
+        return true;
+    }
+    return false;
 }
 
 bool TrussUnitWindow::inHeadlineRect ( int x, int y ) const
 {
-	if ( x >= windowLeftTopPos.x() + bordWidth && 
-        x <= windowRightBottomPos.x() - bordWidth && y >= 
-		windowLeftTopPos.y() + bordWidth && 
-        y <= windowLeftTopPos.y() + bordWidth + headWidth)
-	{
-		return true;
-	}
-	return false;
+    if ( x >= windowLeftTopPos.x() + bordWidth && 
+         x <= windowRightBottomPos.x() - bordWidth && y >= 
+         windowLeftTopPos.y() + bordWidth && 
+         y <= windowLeftTopPos.y() + bordWidth + headWidth)
+    {
+        return true;
+    }
+    return false;
 }
 
 bool TrussUnitWindow::inTrussAreaRect ( int x, int y ) const
 {
-	if ( x >= getTrussAreaLeftTopPos().x() && 
+if ( x >= getTrussAreaLeftTopPos().x() && 
         x <= getTrussAreaRightBottomPos().x() &&
         y >= getTrussAreaLeftTopPos().y() &&
         y <= getTrussAreaRightBottomPos().y() )
-	{
-		return true;
-	}
-	return false;
+    {
+        return true;
+    }
+    return false;
 }
 
 bool TrussUnitWindow::inHorResizeRect ( int x, int y ) const
@@ -275,13 +289,78 @@ bool TrussUnitWindow::inFDiagResizeRect ( int x, int y ) const
     return false;
 }
 
+void TrussUnitWindow::setHighlighted ( bool h )
+{
+    if ( h ) {
+        setBorderColor( 25,55,65 );
+        setResEllColor( 120, 120, 120 );
+        setHeadlineFirstColor(180, 130, 100 );
+        setHeadlineMiddleColor( 230, 190, 170 );
+        setHeadlineLastColor( 150, 90, 80 );
+    } else {
+        setBorderColor( 40,65,60 );
+        setResEllColor( 50, 50, 50 );
+        setHeadlineFirstColor( 180, 130, 150 );
+        setHeadlineMiddleColor( 230, 210, 200 );
+        setHeadlineLastColor( 150, 90, 110 );        
+    }
+    TrussUnit::setHighlighted(h);
+}
+
+void TrussUnitWindow::setFocusOnNode ( TrussNode* selectedNode )
+{
+    selectedNode->setHighlighted ( true );
+    nodeToFront ( *selectedNode );
+    rendered(false);
+}
+
+void TrussUnitWindow::setFocusOnPivot ( TrussPivot* selectedPivot )
+{
+    selectedPivot->setHighlighted ( true );
+    nodeToFront ( selectedPivot->getFirstNode() );
+    nodeToFront ( selectedPivot->getLastNode() );
+    rendered(false);
+}
+
+void TrussUnitWindow::removeNodesHighlight ()
+{
+    NodeList nodeList = getNodeList ();
+    NodeListIter iter = nodeList.begin();
+    for ( ; iter != nodeList.end(); ++iter )
+    {
+        TrussNode* node = *iter;
+        if ( node->isHighlighted () )
+        {
+            node->setHighlighted ( false );
+            rendered(false);
+        }
+    }
+}
+
+void TrussUnitWindow::removePivotsHighlight ()
+{
+    PivotList pivotList = getPivotList ();
+    PivotListIter iter = pivotList.begin();
+    for ( ; iter != pivotList.end(); ++iter )
+    {
+        TrussPivot* pivot = *iter;
+        if ( pivot->isHighlighted () )
+        {
+            pivot->setHighlighted ( false );
+            pivot->getFirstNode().setHighlighted ( false );
+            pivot->getLastNode().setHighlighted ( false );
+            rendered(false);
+        }
+    }
+}
+
 TrussNode* TrussUnitWindow::findNodeByWidgetPos ( int x, int y ) const
 {
     QPoint nodePos;
     NodeList nodeList = getNodeList ();
     NodeListIter iter = nodeList.begin();
     for ( ; iter != nodeList.end(); ++iter )
-	{
+    {   
         TrussNode* node = *iter;
         if ( !node->isEnabled() )
             continue;
@@ -302,7 +381,7 @@ TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y, int precision 
     PivotList pivotList = getPivotList ();
     PivotListIter iter = pivotList.begin();
     for ( ; iter != pivotList.end(); ++iter )
-	{
+    {
         TrussPivot* pivot = *iter;
         if ( !pivot->isEnabled() )
             continue;
@@ -330,85 +409,6 @@ TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y, int precision 
         }
     }
     return 0;
-}
-
-void TrussUnitWindow::setWindowSize ( int width, int height )
-{
-    QSize oldSize = windowSize;
-    windowSize.setWidth ( width );
-    windowSize.setHeight ( height );
-    rendered(false);
-    emit onResize( oldSize, windowSize );
-}
-
-void TrussUnitWindow::resize ( QPoint leftTop, QPoint rightBottom )
-{
-    int dx = rightBottom.x() - leftTop.x();
-    int dy = rightBottom.y() - leftTop.y();
-    windowBuf->init( dx, dy );
-    setWindowSize( dx, dy );
-    setWindowPosition( leftTop );    
-}
-
-void TrussUnitWindow::setWindowPosition ( QPoint pos )
-{
-    QPoint oldPos = windowLeftTopPos;
-    windowLeftTopPos = pos;
-    windowRightBottomPos.setX ( windowLeftTopPos.x() + windowSize.width() );
-    windowRightBottomPos.setY ( windowLeftTopPos.y() + windowSize.height() );
-    emit onMove( oldPos, pos );
-}
-
-void TrussUnitWindow::setCursorCoord ( QPoint coord )
-{
-    cursorCoord = coord;
-}
-
-void TrussUnitWindow::setFocusOnNode ( TrussNode* selectedNode )
-{
-    selectedNode->setHighlighted ( true );
-    nodeToFront ( *selectedNode );
-    rendered(false);
-}
-
-void TrussUnitWindow::setFocusOnPivot ( TrussPivot* selectedPivot )
-{
-    selectedPivot->setHighlighted ( true );
-    nodeToFront ( selectedPivot->getFirstNode() );
-    nodeToFront ( selectedPivot->getLastNode() );
-    rendered(false);
-}
-
-void TrussUnitWindow::removeNodesHighlight ()
-{
-    NodeList nodeList = getNodeList ();
-    NodeListIter iter = nodeList.begin();
-    for ( ; iter != nodeList.end(); ++iter )
-	{
-        TrussNode* node = *iter;
-        if ( node->isHighlighted () )
-        {
-            node->setHighlighted ( false );
-            rendered(false);
-        }
-    }
-}
-
-void TrussUnitWindow::removePivotsHighlight ()
-{
-    PivotList pivotList = getPivotList ();
-    PivotListIter iter = pivotList.begin();
-    for ( ; iter != pivotList.end(); ++iter )
-	{
-        TrussPivot* pivot = *iter;
-        if ( pivot->isHighlighted () )
-        {
-            pivot->setHighlighted ( false );
-            pivot->getFirstNode().setHighlighted ( false );
-            pivot->getLastNode().setHighlighted ( false );
-            rendered(false);
-        }
-    }
 }
 
 void TrussUnitWindow::moveTrussNode ( int x, int y, TrussNode* node )
@@ -741,10 +741,6 @@ void TrussUnitWindow::checkNodePosition ( TrussNode* selectedNode, bool fixation
     QPoint nodePos = getWidgetPosFromTrussCoord ( selectedNode->getX(), 
                                                   selectedNode->getY() );
     TrussPivot* pivot = 0;
-
-// TODO: Find out what's the reason of the exception, 
-//       caused by rearrangement of methods below.
-
     PivotList pivotList = getPivotList ();
     uint i;
     for ( i = 0; i < pivotList.size(); i++ )
@@ -776,7 +772,7 @@ void TrussUnitWindow::checkAfterNodeManipulation ( TrussNode* selectedNode,
     PivotList pivotList = getPivotList ();
     PivotListIter iter = pivotList.begin();
     for ( ; iter != pivotList.end(); ++iter )
-	{
+    {   
         TrussPivot* pivot = *iter;
         if ( &pivot->getFirstNode() == selectedNode || 
              &pivot->getLastNode() == selectedNode )
@@ -795,7 +791,7 @@ void TrussUnitWindow::checkAfterPivotManipulation ( TrussPivot* selectedPivot,
     NodeList nodeList = getNodeList ();
     NodeListIter iter = nodeList.begin();
     for ( ; iter != nodeList.end(); ++iter )
-	{
+    {
         TrussNode* node = *iter;
         if ( ( node->getX() <= firstCoord.x() && node->getX() >= lastCoord.x() ||
                node->getX() <= lastCoord.x() && node->getX() >= firstCoord.x() ) &&
@@ -808,52 +804,52 @@ void TrussUnitWindow::checkAfterPivotManipulation ( TrussPivot* selectedPivot,
 
 color_type TrussUnitWindow::getCanvasColor () const
 {
-	return canvColor;
+    return canvColor;
 }
 
 color_type TrussUnitWindow::getHeadlineFirstColor () const
 {
-	return headFirstColor;
+    return headFirstColor;
 }
 
 color_type TrussUnitWindow::getHeadlineMiddleColor () const
 {
-	return headMiddleColor;
+    return headMiddleColor;
 }
 
 color_type TrussUnitWindow::getHeadlineLastColor () const
 {
-	return headLastColor;
+    return headLastColor;
 }
 
 color_type TrussUnitWindow::getBorderColor () const
 {
-	return borderColor;
+    return borderColor;
 }
 
 void TrussUnitWindow::setCanvasColor ( int r, int g, int b )
 {
-	canvColor = agg::rgba(r, g, b);
+    canvColor = agg::rgba(r, g, b);
 }
 
 void TrussUnitWindow::setHeadlineFirstColor ( int r, int g, int b )
 {
-	headFirstColor = agg::rgba8(r, g, b);
+    headFirstColor = agg::rgba8(r, g, b);
 }
 
 void TrussUnitWindow::setHeadlineMiddleColor ( int r, int g, int b )
 {
-	headMiddleColor = agg::rgba8(r, g, b);
+    headMiddleColor = agg::rgba8(r, g, b);
 }
 
 void TrussUnitWindow::setHeadlineLastColor ( int r, int g, int b )
 {
-	headLastColor = agg::rgba8(r, g, b);
+    headLastColor = agg::rgba8(r, g, b);
 }
 
 void TrussUnitWindow::setBorderColor ( int r, int g, int b )
 {
-	borderColor = agg::rgba(r, g, b);
+    borderColor = agg::rgba(r, g, b);
 }
 
 void TrussUnitWindow::setResEllColor ( int r , int g, int b )
@@ -958,7 +954,7 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
     p1.setY ( p1.y() + scalePieceLength );
     drawLine ( ras, solidRend, sl, p1, p2 );
 
-//  draw scale strokes and numbers
+//  draw scale strokes and figure it
     p1 = leftTopAreaPos;
     p2 = rightBottomAreaPos;
     double areaLenInPix = p2.x() - p1.x();
@@ -1088,6 +1084,67 @@ void TrussUnitWindow::drawCursorCoordinatesField ( ren_dynarow& baseRend,
     }
 }
 
+void TrussUnitWindow::drawNumbersField ( ren_dynarow& baseRend,
+                                         textRenderer& textRend ) const
+                                             
+{
+    if ( isHighlighted() )
+        baseRend.clear ( agg::rgba( 25,55,65 ) );
+    else
+        baseRend.clear ( agg::rgba( 40,65,60 ) );
+    
+    int nodeNumb = 0, pivotNumb = 0;
+    PivotList pivotList = getPivotList();
+    PivotListIter iter = pivotList.begin();
+    for ( ; iter != pivotList.end(); ++iter )
+    {
+        TrussPivot* pivot = *iter;
+        if ( pivot->isHighlighted() )
+        {
+            pivotNumb = pivot->getNumber();
+            break;
+        }
+    }
+    if ( ! pivotNumb )
+    {
+        NodeList nodeList = getNodeList();
+        NodeListIter iter = nodeList.begin();
+        for ( ; iter != nodeList.end(); ++iter )
+        {
+            TrussNode* node = *iter;
+            if ( node->isHighlighted() )
+            {
+                nodeNumb = node->getNumber();
+                break;
+            }
+        }
+    }
+    if ( ! nodeNumb && ! pivotNumb )
+        return;
+
+    QPoint textPos ( 0, 9 );
+    color_type textColor = agg::rgba(0, 0, 0);
+
+    if ( pivotNumb )
+    {
+        drawText ( baseRend, textRend, "Pivot #", textColor, textPos );
+
+        QString str;
+        str = QString("%1").arg( pivotNumb );
+        textPos.setX ( 41 );
+        drawText ( baseRend, textRend, str, textColor, textPos );
+    }
+    else if ( nodeNumb )
+    {
+        drawText ( baseRend, textRend, "Node #", textColor, textPos );
+
+        QString str;
+        str = QString("%1").arg( nodeNumb );
+        textPos.setX ( 41 );
+        drawText ( baseRend, textRend, str, textColor, textPos );
+    }    
+}
+
 void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 {
     if ( !isVisible() )
@@ -1098,8 +1155,10 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
     agg::scanline_p8     sl;
     agg::ellipse ell;
 
-    pixf_dynarow windowPixf( *windowBuf );
-    pixf_dynarow coordPixf( *coordBuf );
+    pixf_dynarow windowPixf( *windowBuf ),
+                 numbersPixf( *numbersBuf ),
+                 coordPixf( *coordBuf ); 
+                 
 
     if ( ! isRendered() ) 
     { 
@@ -1179,12 +1238,18 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
     glyph.font ( numbersFont );
     drawCursorCoordinatesField ( baseRend, textRend );
 
+    /*------draw truss elements numbers field------*/
+    baseRend = numbersPixf;
+    drawNumbersField ( baseRend, textRend );
+
     /*------blend buffers------*/
     baseRenderer.blend_from ( windowPixf, 0, windowLeftTopPos.x(), windowLeftTopPos.y(), 
                              unsigned(1.0 * 255) );
     baseRenderer.blend_from ( coordPixf, 0, windowLeftTopPos.x() + 30, 
                                         windowRightBottomPos.y() - 14, 
                                         unsigned(1.0 * 255) );
+    baseRenderer.blend_from ( numbersPixf, 0, windowRightBottomPos.x() - 80, 
+                              windowRightBottomPos.y() - 14, unsigned(1.0 * 255) );
 
 }
 

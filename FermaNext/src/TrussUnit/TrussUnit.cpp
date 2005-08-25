@@ -1,5 +1,5 @@
-
 #include "TrussUnit.h"
+#include "TrussUnitActions.h"
 #include <algorithm>
 
 /*****************************************************************************
@@ -83,6 +83,10 @@ TrussUnit::TrussUnit ( const QString& name, ObjectStateManager* mng ) :
 {
     // We should render again when state has been changed
     QObject::connect( this, SIGNAL(onStateChange()), SLOT(trussUnitStateIsChanged()) );
+
+    QObject::connect( this, SIGNAL(afterNodeDesist( Node& )),
+                            SLOT(clearFrontNodePointer( Node& )) );
+    frontNode = 0;
 }
 
 TrussUnit::~TrussUnit ()
@@ -117,6 +121,32 @@ const QSize& TrussUnit::getTrussAreaSize () const
     return trussAreaSize;
 }
 
+void TrussUnit::nodeToFront ( TrussNode& node )
+{
+    frontNode = &node;
+}
+
+void TrussUnit::clearFrontNodePointer ( Node& node )
+{
+    if ( &node == frontNode )
+        frontNode = 0;
+}
+
+void TrussUnit::desistAdjoingPivots ( TrussNode &node )
+{
+    PivotList pivotList = findAdjoiningPivots ( node );
+    PivotListIter iter = pivotList.begin();
+    for ( ; iter != pivotList.end(); ++iter )
+    {
+        TrussPivot* pivot = *iter;
+        // Save remove pivot action
+        ObjectState& state = pivot->createState();
+        state.addAction( new TrussPivotRemoveAction( *pivot ) );
+        state.save();
+        pivot->desist();
+    }
+}
+
 void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
                        int trussAreaHeight ) const
 {
@@ -130,9 +160,10 @@ void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMu
     NodeList nodeList = getNodeList ();
     NodeList::const_iterator nodesIter = nodeList.begin();
     for ( ; nodesIter != nodeList.end(); ++nodesIter )
-        (*nodesIter)->paint ( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
+        if ( *nodesIter != frontNode )
+            (*nodesIter)->paint ( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
+    if ( frontNode )
+        frontNode->paint ( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
 }
 
 /****************************************************************************/
-
-

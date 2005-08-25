@@ -7,15 +7,29 @@
 
 TrussNode::TrussNode ( ObjectStateManager* mng ) :
     Node(mng)
-{}
+{
+    QObject::connect( this, SIGNAL(onAfterDesist( StatefulObject& )),
+                            SLOT(removeNodeHighlight()) );   
+}
 
 TrussNode::TrussNode ( int x, int y, ObjectStateManager* mng ) :
     Node(x, y, mng)
-{}
+{
+    QObject::connect( this, SIGNAL(onAfterDesist( StatefulObject& )),
+                            SLOT(removeNodeHighlight()) );   
+}
 
 TrussNode::TrussNode ( int x, int y, Fixation fix, ObjectStateManager* mng ) :
     Node(x, y, fix, mng)
-{}
+{
+    QObject::connect( this, SIGNAL(onAfterDesist( StatefulObject& )),
+                            SLOT(removeNodeHighlight()) );   
+}
+
+void TrussNode::removeNodeHighlight ()
+{
+    setHighlighted ( false );
+}
 
 struct line
 {
