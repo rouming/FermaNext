@@ -558,7 +558,10 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                         selectedWindow->setFocusOnNode ( selectedNode );
                         selectedWindow->setCursorCoord ( selectedNode->getPoint() );
                         nodeBehaviour = onNodeSelect;
-                        //QWidget::setCursor ( Qt::ArrowCursor );
+                        if ( designerBehaviour == onErase )
+                            QWidget::setCursor ( Qt::CrossCursor );
+                        else
+                            QWidget::setCursor ( Qt::ArrowCursor );
                         update();
                     }
                     else if ( selectedPivot )
@@ -570,7 +573,10 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                             selectedWindow->getTrussCoordFromWidgetPos( x, y );
                         selectedWindow->setCursorCoord ( cursorCoord );
                         pivotBehaviour = onPivotSelect;
-                        //QWidget::setCursor ( Qt::ArrowCursor );
+                        if ( designerBehaviour == onErase )
+                            QWidget::setCursor ( Qt::CrossCursor );
+                        else
+                            QWidget::setCursor ( Qt::ArrowCursor );
                         update();
                     }
                     else

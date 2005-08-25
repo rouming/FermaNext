@@ -71,7 +71,7 @@ public:
     virtual QPoint getLineSegmentsIntersectionPoint ( QPoint p11, QPoint p12, 
                                                       QPoint p21, QPoint p22 ) const;
     virtual void checkNodePosition ( TrussNode* selectedNode, bool fixationCheck );
-    virtual void createPivotCrossPoints ( TrussPivot* selectedPivot, bool fixationCheck );
+    virtual void createPivotCrossPoints ( TrussPivot* selectedPivot );
 
     virtual void checkAfterNodeManipulation ( TrussNode* selectedNode, 
                                               bool fixationCheck );
