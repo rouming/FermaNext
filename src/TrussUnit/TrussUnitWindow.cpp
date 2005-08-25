@@ -782,11 +782,13 @@ void TrussUnitWindow::checkAfterNodeManipulation ( TrussNode* selectedNode,
     }
 }
 
-void TrussUnitWindow::checkAfterPivotManipulation ( TrussPivot* selectedPivot, 
-                                                   bool fixationCheck )
+void TrussUnitWindow::checkAfterPivotManipulation ( TrussPivot* selectedPivot,
+                                                    bool fixationCheck )
 {
-    QPoint firstCoord = selectedPivot->getFirstNode().getPoint();
-    QPoint lastCoord = selectedPivot->getLastNode().getPoint();
+    TrussNode& first = selectedPivot->getFirstNode();
+    TrussNode& last = selectedPivot->getLastNode();
+    QPoint firstCoord = first.getPoint();
+    QPoint lastCoord = last.getPoint();
 
     NodeList nodeList = getNodeList ();
     NodeListIter iter = nodeList.begin();
@@ -797,7 +799,12 @@ void TrussUnitWindow::checkAfterPivotManipulation ( TrussPivot* selectedPivot,
                node->getX() <= lastCoord.x() && node->getX() >= firstCoord.x() ) &&
              ( node->getY() <= firstCoord.y() && node->getY() >= lastCoord.y() ||
                node->getY() <= lastCoord.y() && node->getY() >= firstCoord.y() ) )
-            checkAfterNodeManipulation ( node, fixationCheck );
+        {
+            if ( node == &first || node == &last )
+                checkAfterNodeManipulation ( node, fixationCheck );
+            else
+                checkAfterNodeManipulation ( node, true );
+        }
 
     }
 }
