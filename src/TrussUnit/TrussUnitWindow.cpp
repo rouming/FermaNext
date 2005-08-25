@@ -703,8 +703,7 @@ QPoint TrussUnitWindow::getLineSegmentsIntersectionPoint ( QPoint p11, QPoint p1
         return crossPoint;
 }
 
-void TrussUnitWindow::createPivotCrossPoints ( TrussPivot* selectedPivot, 
-                                               bool fixationCheck )
+void TrussUnitWindow::createPivotCrossPoints ( TrussPivot* selectedPivot )
 {
     removePivotsHighlight ();
 
@@ -732,7 +731,7 @@ void TrussUnitWindow::createPivotCrossPoints ( TrussPivot* selectedPivot,
             new TrussNodeCreateAction( *crossNode );
         state.addAction( action );
         state.save();
-        checkNodePosition ( crossNode, fixationCheck );
+        checkNodePosition ( crossNode, false );
     }
 }
 
@@ -777,7 +776,7 @@ void TrussUnitWindow::checkAfterNodeManipulation ( TrussNode* selectedNode,
         if ( &pivot->getFirstNode() == selectedNode || 
              &pivot->getLastNode() == selectedNode )
         {
-            createPivotCrossPoints ( pivot, fixationCheck );
+            createPivotCrossPoints ( pivot );
         }
     }
 }
