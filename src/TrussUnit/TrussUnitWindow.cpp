@@ -58,8 +58,8 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name, ObjectStateManager* mng 
     headFont (agg::verdana16_bold),
     numbersFont (agg::verdana13),
     windowBuf ( new rbuf_dynarow( 250, 250 ) ),
-    numbersBuf ( new rbuf_dynarow( 60, 12 ) ),
     coordBuf ( new rbuf_dynarow( 49, 12 ) ),
+    numbersBuf ( new rbuf_dynarow( 60, 12 ) ),
     cursorCoord ( -1, -1 ),
     windowSize ( 250, 250),
     coordFieldSize ( 49, 12 )
