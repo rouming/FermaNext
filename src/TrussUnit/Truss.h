@@ -26,27 +26,48 @@ class TrussEmitter : public StatefulObject
 {
     Q_OBJECT
 public:
-     TrussEmitter ( ObjectStateManager* mng );
+    TrussEmitter ( ObjectStateManager* mng );
 
 protected slots:
     void stateIsChanged ();
+
+    virtual void nodeBeforeRevive ( StatefulObject& ) = 0;
+    virtual void nodeAfterRevive ( StatefulObject& ) = 0;
     virtual void nodeBeforeDesist ( StatefulObject& ) = 0;
+    virtual void nodeAfterDesist ( StatefulObject& ) = 0;
+
+    virtual void pivotBeforeRevive ( StatefulObject& ) = 0;
+    virtual void pivotAfterRevive ( StatefulObject& ) = 0;
+    virtual void pivotBeforeDesist ( StatefulObject& ) = 0;
+    virtual void pivotAfterDesist ( StatefulObject& ) = 0;
 
 signals:
     // Truss signals
     void onStateChange ();
 
-    // Nodes signals
+    // Nodes create/remove signals
     void beforeNodeCreation ();
     void afterNodeCreation ( const Node& );
     void beforeNodeRemoval ( const Node& );
     void afterNodeRemoval ();
 
-    // Pivots signals
+    // Nodes revive/desist signals
+    void beforeNodeRevive ( Node& );
+    void afterNodeRevive ( Node& );
+    void beforeNodeDesist ( Node& );
+    void afterNodeDesist ( Node& );
+
+    // Pivots create/remove signals
     void beforePivotCreation ();
     void afterPivotCreation ( const Node&, const Node& );
     void beforePivotRemoval ( const Node&, const Node& );
     void afterPivotRemoval ();
+
+    // Pivots revive/desist signals
+    void beforePivotRevive ( Node&, Node& );
+    void afterPivotRevive ( Node&, Node& );
+    void beforePivotDesist ( Node&, Node& );
+    void afterPivotDesist ( Node&, Node& );
 };
 
 /*****************************************************************************
@@ -195,10 +216,15 @@ public:
         nodes.push_back(node);
 
         // Signal connects to catch life time changing
+        QObject::connect( node, SIGNAL(onBeforeRevive(StatefulObject&)),
+                                 SLOT(nodeBeforeRevive(StatefulObject&)) );
         QObject::connect( node, SIGNAL(onAfterRevive(StatefulObject&)),
-                                SLOT(stateIsChanged()) );
+                                 SLOT(nodeAfterRevive(StatefulObject&)) );
         QObject::connect( node, SIGNAL(onBeforeDesist(StatefulObject&)),
-                                SLOT(nodeBeforeDesist(StatefulObject&)) );
+                                 SLOT(nodeBeforeDesist(StatefulObject&)) );
+        QObject::connect( node, SIGNAL(onAfterDesist(StatefulObject&)),
+                                 SLOT(nodeAfterDesist(StatefulObject&)) );
+
         // Just subsidiary catches
         QObject::connect( node, SIGNAL(onFixationChange ( Fixation )),
                                 SLOT(stateIsChanged()) );
@@ -243,10 +269,14 @@ public:
         emit beforePivotCreation();
         P* pivot = new P( first, last, getStateManager() );
         // Signal connects to catch life time changing
+        QObject::connect( pivot, SIGNAL(onBeforeRevive(StatefulObject&)),
+                                 SLOT(pivotBeforeRevive(StatefulObject&)) );
         QObject::connect( pivot, SIGNAL(onAfterRevive(StatefulObject&)),
-                                 SLOT(stateIsChanged()) );
+                                 SLOT(pivotAfterRevive(StatefulObject&)) );
+        QObject::connect( pivot, SIGNAL(onBeforeDesist(StatefulObject&)),
+                                 SLOT(pivotBeforeDesist(StatefulObject&)) );
         QObject::connect( pivot, SIGNAL(onAfterDesist(StatefulObject&)),
-                                 SLOT(stateIsChanged()) );
+                                 SLOT(pivotAfterDesist(StatefulObject&)) );
         pivots.push_back(pivot);
         emit afterPivotCreation(pivot->getFirstNode(), 
                                 pivot->getLastNode());
@@ -331,6 +361,27 @@ public:
     }
 
 protected:
+    virtual void nodeBeforeRevive ( StatefulObject& st )
+    {
+        // Safe conversion
+        try { 
+            N& node = dynamic_cast<N&>(st);
+            emit beforeNodeRevive(node);
+        }
+        catch ( ... ) { return; }
+    }
+
+    virtual void nodeAfterRevive ( StatefulObject& st )
+    {
+        // Safe conversion
+        try { 
+            N& node = dynamic_cast<N&>(st);
+            emit afterNodeRevive(node);
+            emit onStateChange();
+        }
+        catch ( ... ) { return; }
+    }
+
     // Desist all adjoining pivots
     virtual void nodeBeforeDesist ( StatefulObject& st )
     {
@@ -346,7 +397,60 @@ protected:
             if ( pivot->isAlive() )
                 (*iter)->desist();
         }
-        emit onStateChange();
+        emit beforeNodeDesist(*node);
+    }
+
+    virtual void nodeAfterDesist ( StatefulObject& st )
+    {
+        // Safe conversion
+        try { 
+            N& node = dynamic_cast<N&>(st);
+            emit afterNodeDesist(node);
+            emit onStateChange();
+        }
+        catch ( ... ) { return; }        
+    }
+
+    virtual void pivotBeforeRevive ( StatefulObject& st )
+    {
+        // Safe conversion
+        try { 
+            P& pivot = dynamic_cast<P&>(st);
+            emit beforePivotRevive( pivot.getFirstNode(), pivot.getLastNode());
+        }
+        catch ( ... ) { return; }
+    }
+
+    virtual void pivotAfterRevive ( StatefulObject& st )
+    {
+        // Safe conversion
+        try { 
+            P& pivot = dynamic_cast<P&>(st);
+            emit afterPivotRevive( pivot.getFirstNode(), pivot.getLastNode());
+            emit onStateChange();
+        }
+        catch ( ... ) { return; }
+    }
+
+    virtual void pivotBeforeDesist ( StatefulObject& st )
+    {
+        // Safe conversion
+        try { 
+            P& pivot = dynamic_cast<P&>(st);
+            emit beforePivotDesist( pivot.getFirstNode(), pivot.getLastNode());
+        }
+        catch ( ... ) { return; }
+    }
+
+    virtual void pivotAfterDesist ( StatefulObject& st )
+    {
+        // Safe conversion
+        try { 
+            P& pivot = dynamic_cast<P&>(st);
+            emit afterPivotDesist( pivot.getFirstNode(), pivot.getLastNode() );
+            emit onStateChange();
+        }
+        catch ( ... ) { return; }
     }
 
     // Physically removes nodes and pivots
