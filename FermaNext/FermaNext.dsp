@@ -72,7 +72,7 @@ LINK32=link.exe
 # ADD BASE F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /Od /I "src" /I "src\common" /I "src\TrussUnit" /I "src\gui" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "BENCHMARK_ON" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /GZ -Zm200 /c
+# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /Od /I "src" /I "src\common" /I "src\TrussUnit" /I "src\gui" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /GZ -Zm200 /c
 # ADD BASE RSC /l 0x419 /d "_DEBUG"
 # ADD RSC /l 0x419 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -103,6 +103,10 @@ SOURCE=.\src\common\Benchmark.cpp
 # Begin Source File
 
 SOURCE=.\src\gui\CalcDataToolBar.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\common\DynaLoader.cpp
 # End Source File
 # Begin Source File
 
@@ -207,6 +211,10 @@ InputName=CalcDataToolBar
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\common\DynaLoader.h
 # End Source File
 # Begin Source File
 
