@@ -13,7 +13,7 @@ class TrussUnitWindowItem : public QObject, public QListBoxPixmap
     Q_OBJECT
 public:
     TrussUnitWindowItem ( FermaNextProject&, TrussUnitWindow&, 
-                          WindowListBox*, const QPixmap&,
+                          WindowListBox&, const QPixmap&,
                           const QPixmap& disPix );
 
     virtual const QPixmap* pixmap () const;
@@ -22,6 +22,7 @@ public:
 
     virtual bool isSelectedInGroup () const;
     virtual bool isShown () const;
+    virtual bool isAlive () const;
 
 public slots:
     virtual void setText ( const QString& );
@@ -36,8 +37,12 @@ public slots:
     virtual void calculate ();
     virtual void remove ();
 
+protected slots:
+    virtual void trussWindowDesisted ();
+    virtual void trussWindowRevived ();
+
 private:
-    WindowListBox* listBox;
+    WindowListBox& listBox;
     FermaNextProject& project;
     TrussUnitWindow& trussWindow;
     QPixmap disabledPix;
@@ -64,11 +69,20 @@ public slots:
     virtual void selectAllInGroup ();
     virtual void unselectAllFromGroup ();
 
+    virtual void trussWindowDesisted ( const TrussUnitWindow& );
+    virtual void trussWindowRevived ( const TrussUnitWindow& );
+
 protected slots:
     virtual void raiseTrussUnitWindowItem ( QListBoxItem* );
 
 private:
-    typedef QMap< const TrussUnitWindow*, TrussUnitWindowItem* > WindowMap;
+    struct IndexedItem 
+    {
+        TrussUnitWindowItem* item;
+        int index;
+    };
+
+    typedef QMap< const TrussUnitWindow*, IndexedItem > WindowMap;
     typedef WindowMap::iterator WindowMapIter;
 
     FermaNextProject& project;

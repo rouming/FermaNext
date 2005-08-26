@@ -13,10 +13,10 @@
 
 TrussUnitWindowItem::TrussUnitWindowItem ( FermaNextProject& prj,
                                            TrussUnitWindow& truss,
-                                           WindowListBox* lb,
+                                           WindowListBox& lb,
                                            const QPixmap& pix,
                                            const QPixmap& disPix ) :
-    QListBoxPixmap( lb, pix, truss.getTrussName() ),
+    QListBoxPixmap( &lb, pix, truss.getTrussName() ),
     listBox(lb),
     project(prj), 
     trussWindow(truss),
@@ -26,11 +26,21 @@ TrussUnitWindowItem::TrussUnitWindowItem ( FermaNextProject& prj,
     // Catch renaming
     QObject::connect( &truss, SIGNAL(onTrussNameChange(const QString&)),
                               SLOT(setText(const QString&)) );
-    // Catch desisting/reviving
-    //QObject::connect( &truss, SIGNAL(onAfterDesist(StatefulObject&)), 
-                              //SLOT(repaint()) );
-    //QObject::connect( &truss, SIGNAL(onAfterRevive(StatefulObject&)), 
-                              //SLOT(repaint()) );
+    // Catch life time changing
+    QObject::connect( &truss, SIGNAL(onAfterDesist(StatefulObject&)), 
+                              SLOT(trussWindowDesisted()) );
+    QObject::connect( &truss, SIGNAL(onAfterRevive(StatefulObject&)), 
+                              SLOT(trussWindowRevived()) );
+}
+
+void TrussUnitWindowItem::trussWindowDesisted ()
+{
+    listBox.trussWindowDesisted( trussWindow );
+}
+
+void TrussUnitWindowItem::trussWindowRevived ()
+{
+    listBox.trussWindowRevived( trussWindow );
 }
 
 const QPixmap* TrussUnitWindowItem::pixmap () const
@@ -92,6 +102,11 @@ bool TrussUnitWindowItem::isShown () const
     return trussWindow.isVisible();
 }
 
+bool TrussUnitWindowItem::isAlive () const
+{
+    return trussWindow.isAlive();
+}
+
 void TrussUnitWindowItem::setText ( const QString& text )
 {
     QListBoxPixmap::setText( text );
@@ -134,16 +149,12 @@ void TrussUnitWindowItem::unselectFromGroup ()
 
 void TrussUnitWindowItem::selectAllInGroup ()
 {
-    if ( listBox == 0 )
-        return;
-    listBox->selectAllInGroup();
+    listBox.selectAllInGroup();
 }
 
 void TrussUnitWindowItem::unselectAllFromGroup ()
 {
-    if ( listBox == 0 )
-        return;
-    listBox->unselectAllFromGroup();
+    listBox.unselectAllFromGroup();
 }
 
 void TrussUnitWindowItem::calculate ()
@@ -203,39 +214,40 @@ TrussUnitWindowItem* WindowListBox::findByTrussUnitWindow (
 {
     if ( ! windowItems.contains( &truss ) )
         return 0;
-    return windowItems[&truss];
+    return windowItems[&truss].item;
 }
 
 void WindowListBox::addTrussUnitWindow ( TrussUnitWindow& truss )
 {
     TrussUnitWindowItem* item = new TrussUnitWindowItem( 
-                  project, truss, this, 
+                  project, truss, *this, 
                   QPixmap::fromMimeSource(imagesPath + "/project.png"),
                   QPixmap::fromMimeSource(imagesPath + "/project_d.png"));
-    windowItems[&truss] = item;
+    IndexedItem iitem = { item, index(item) };
+    windowItems[&truss] = iitem;
 }
 
 void WindowListBox::removeTrussUnitWindow ( TrussUnitWindow& truss )
 {
-    if ( ! windowItems.contains( &truss ) )
-        return;
-    const TrussUnitWindowItem* item = windowItems[&truss];
-    windowItems.remove(&truss);
-    delete item;
+    const TrussUnitWindowItem* item = findByTrussUnitWindow( truss );
+    if ( item ) {
+        windowItems.remove(&truss);
+        delete item;
+    }
 }
 
 void WindowListBox::selectAllInGroup ()
 {
     WindowMapIter iter = windowItems.begin();
     for ( ; iter != windowItems.end(); ++iter )
-        iter.data()->selectInGroup();
+        iter.data().item->selectInGroup();
 }
 
 void WindowListBox::unselectAllFromGroup ()
 {
     WindowMapIter iter = windowItems.begin();
     for ( ; iter != windowItems.end(); ++iter )
-        iter.data()->unselectFromGroup();
+        iter.data().item->unselectFromGroup();
 }
 
 void WindowListBox::raiseTrussUnitWindowItem ( QListBoxItem* it )
@@ -245,6 +257,22 @@ void WindowListBox::raiseTrussUnitWindowItem ( QListBoxItem* it )
     catch ( ... ) { return; }
 
     item->raise();
+}
+
+void WindowListBox::trussWindowDesisted ( const TrussUnitWindow& truss )
+{
+    TrussUnitWindowItem* item = findByTrussUnitWindow( truss );
+    if ( item && index( item ) != -1 )
+        takeItem( item );
+}
+
+void WindowListBox::trussWindowRevived ( const TrussUnitWindow& truss )
+{
+    TrussUnitWindowItem* item = findByTrussUnitWindow( truss );
+    if ( item && index( item ) == -1 ) {
+        insertItem( item, windowItems[&truss].index );
+        setCurrentItem( item );
+    }
 }
 
 /*****************************************************************************/
