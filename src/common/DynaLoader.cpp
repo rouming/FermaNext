@@ -27,7 +27,7 @@ DynaLoader::~DynaLoader ()
 bool DynaLoader::loadLibrary ( const QString& fileName )
 {
     freeLibrary();
-#if defined WINDOWS || defined WIN32  
+#if defined UNICODE && (defined WINDOWS || defined WIN32)
     handle = dl_open(fileName.ucs2());
 #else
     handle = dl_open(QFile::encodeName(fileName));
@@ -48,11 +48,7 @@ bool DynaLoader::freeLibrary ()
 ProcessAddress DynaLoader::getAddressHandler ( const QString& funcName )
     throw (AddressException)
 {
-#if defined WINDOWS || defined WIN32  
-    ProcessAddress address = dl_sym(handle, funcName.ucs2());
-#else
-    ProcessAddress address = dl_sym(handle, QFile::encodeName(funcName));
-#endif
+    ProcessAddress address = dl_sym(handle, funcName.ascii());
     if ( address == 0 )
         throw AddressException();
     return address;
