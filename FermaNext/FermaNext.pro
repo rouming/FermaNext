@@ -8,7 +8,8 @@ MOC_DIR = mocs
 OBJECTS_DIR = obj
 
 win32 {
-  LIBS = LibAgg.lib LibSVG.lib
+  LIBS = LibAgg.lib LibSVG.lib libexpat.lib -L$$(EXPATDIR)/Libs 
+  DEFINES += WIN32
 }
 unix {
   LIBS = -lsvg -lagg -L.
