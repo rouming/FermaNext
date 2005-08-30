@@ -58,62 +58,75 @@ void start_end_state_block_test ()
     my_assert( m.countStateBlocks() == 0, "After init m.countStateBlocks() == 0" );
 
     m.startStateBlock();
-    my_assert( m.countStateBlocks() == 1, "m.startStateBlock(): should be 1 block");
+    my_assert( m.countStateBlocks() == 0, "m.startStateBlock(): 0 blocks as before");
     m.endStateBlock();
-    my_assert( m.countStateBlocks() == 0, "m.endStateBlock(): 0 blocks; it should be removed");
+    my_assert( m.countStateBlocks() == 0, "m.endStateBlock(): 0 blocks again");
 
-    // Can't start new block because previous one is empty
+    // Again start and then save
     m.startStateBlock();
-    my_assert(m.countStateBlocks() == 1, "m.startStateBlock(): should be 1 block");
+    my_assert(m.countStateBlocks() == 0, "m.startStateBlock(): no blocks before block is ended");
 
     ObjectState& st1 = o.createState();
     m.saveState(st1);
-    my_assert(m.countStates() == 1, "m.countStates(): should be 1 state");
+    my_assert(m.countStateBlocks() == 0, "m.startStateBlock(): no blocks before block is ended");
+    my_assert(m.countStates() == 0, "m.countStates(): while block is open we can't count just saved states");
     m.endStateBlock();
+
+    my_assert(m.countStateBlocks() == 1, "m.startStateBlock(): 1 state block: block is correctly ended");
+    my_assert(m.countStates() == 1, "m.countStates(): 1 state: block is correctly ended");
 
     // New block
     m.startStateBlock();
-    my_assert( m.countStateBlocks() == 2, "m.endStateBlock(): should be 2 block");
+    my_assert( m.countStateBlocks() == 1, "m.endStateBlock(): should be 1 block as before");
     ObjectState& st2 = o.createState();
     m.saveState(st2);
     // Doesn't create new block because previous one is not closed
     m.startStateBlock();
-    my_assert( m.countStateBlocks() == 2, "Should be 2 blocks" );
+    my_assert( m.countStateBlocks() == 1, "Should be 1 block" );
     ObjectState& st3 = o.createState();
     m.saveState(st3);
-    my_assert( m.countStates() == 3, "Should be 3 states" );
+    my_assert( m.countStates() == 1, "Should be 1 state: block is not ended" );
 
     // Close inner block.
     m.endStateBlock();
-    my_assert( m.countStateBlocks() == 2, "Should be 2 blocks" );
+    my_assert( m.countStateBlocks() == 1, "Should be 1 block: outer block is not ended" );
     // Checks that outer block is not closed
     m.startStateBlock();
-    my_assert( m.countStateBlocks() == 2, "Should be 2 again blocks" );
+    my_assert( m.countStateBlocks() == 1, "Should be 1 block as before" );
     ObjectState& st4 = o.createState();
     m.saveState(st4);
-    my_assert( m.countStates() == 4, "Should be 4 states" );
+    my_assert( m.countStates() == 1, "Should be 1 state as before" );
     m.endStateBlock();
 
-    // Really close.
+    // Really close outer block.
     m.endStateBlock();
-    my_assert( m.countStateBlocks() == 2, "Should be 2 blocks" );
+    my_assert(m.countStateBlocks() == 2, "m.startStateBlock(): 2 state blocks: block is correctly ended");
+    my_assert(m.countStates() == 4, "m.countStates(): 4 states: block is correctly ended");
 
-    // New third block
+    // New third block. Simple check
     m.startStateBlock();
-    my_assert( m.countStateBlocks() == 3, "Should be 3 blocks" );
+    my_assert( m.countStateBlocks() == 2, "Should be 2 blocks as before" );
     ObjectState& st5 = o.createState();
     m.saveState(st5);
-    my_assert( m.countStates() == 5, "Should be 5 states" );
+    my_assert( m.countStates() == 4, "Should be 4 states" );
     m.endStateBlock();
+    my_assert(m.countStateBlocks() == 3, "m.startStateBlock(): 3 state blocks: block is correctly ended");
+    my_assert(m.countStates() == 5, "m.countStates(): 5 states: block is correctly ended");
+
 
     // Undo one last state block
     m.undo();
     m.startStateBlock();
-    // Check that top of the stack was removed
+    // Nothing should be removed from the top of the stack
     my_assert( m.countStateBlocks() == 3, "Should be again 3 blocks" );
     ObjectState& st6 = o.createState();
     m.saveState(st6);
+    // Check that top of the stack was not removed, this should be
+    // done only after block is being ended
+    my_assert( m.countStateBlocks() == 3, "Should be again 3 blocks: top was not removed, only after end" );
     m.endStateBlock();
+    // Block is ended, so stack top is removed
+    my_assert( m.countStateBlocks() == 3, "Should be again 3 blocks, top of the stack is removed" );
 
     delete mng;
     
@@ -405,6 +418,7 @@ int main ()
         my_assert( obj.value() == 666, "Initial" );
 
         SomeObject* anotherObj = new SomeObject(101010, m);
+        anotherObj->value(666);
         m.startStateBlock();
         anotherObj->value(1);
         anotherObj->value(2);
@@ -425,7 +439,7 @@ int main ()
         m.endStateBlock();
 
         m.undo();
-        my_assert( anotherObj->value() == 101010, "Undo state block" );
+        my_assert( anotherObj->value() == 666, "Undo state block" );
         m.redo();
         my_assert( anotherObj->value() == 4, "Redo state block" );
 
