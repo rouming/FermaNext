@@ -94,6 +94,10 @@ SOURCE=.\Truss.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\TrussLoad.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\TrussNode.cpp
 # End Source File
 # Begin Source File
@@ -140,6 +144,28 @@ SOURCE=.\Truss.h
 InputDir=.
 InputPath=.\Truss.h
 InputName=Truss
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\TrussLoad.h
+
+!IF  "$(CFG)" == "TrussUnit - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\TrussLoad.h
+InputName=TrussLoad
 
 "$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
@@ -271,6 +297,10 @@ InputName=TrussUnitWindowManager
 # Begin Source File
 
 SOURCE=.\mocs\moc_Truss.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mocs\moc_TrussLoad.cpp
 # End Source File
 # Begin Source File
 
