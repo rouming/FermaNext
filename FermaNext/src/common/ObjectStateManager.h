@@ -60,6 +60,10 @@ protected:
     // not to the top
     virtual bool tryToRemoveStackTop () throw (UnknownException);
 
+    // Tries to create new block if it was not created,
+    // otherwise returns old block
+    virtual StateBlock& tryToCreateStateBlock ();
+
 protected slots:
     // Removes all block and its states. Finds block by the state.
     // Returns true if succeed
@@ -127,9 +131,9 @@ private:
 
     BlockList stateBlocks;
     StateBlock* currentBlock;
+    StateBlock* newlyCreatedBlock;
     size_t possibleStackSize;
     size_t startedBlocks;
-    bool currentBlockIsEnded;
     bool isStateCallFlag;
 };
 

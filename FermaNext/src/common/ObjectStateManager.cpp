@@ -73,10 +73,10 @@ void ObjectStateManager::StateBlock::clear ()
  *****************************************************************************/
 
 ObjectStateManager::ObjectStateManager ( size_t stackSize ) :
-    currentBlock(0),    
+    currentBlock(0),
+    newlyCreatedBlock(0),
     possibleStackSize(stackSize),
     startedBlocks(0),
-    currentBlockIsEnded(true),
     isStateCallFlag(false)
 {
     stateBlocks.reserve(possibleStackSize);
@@ -97,53 +97,25 @@ void ObjectStateManager::clear ()
 
 void ObjectStateManager::startStateBlock ()
 {
-    // First start
-    if ( countStateBlocks() == 0 ) {
-        currentBlock = new StateBlock();
-        stateBlocks.push_back(currentBlock);
-        currentBlockIsEnded = false;
-        startedBlocks = 1;
-    }
-    // Begins new block if previous block was filled and correctly ended
-    else if ( currentBlockIsEnded ) {
-        // Shift the stack if possible
-        tryToShiftStack();
-        currentBlock = new StateBlock();
-        stateBlocks.push_back(currentBlock);
-        currentBlockIsEnded = false;
-        startedBlocks = 1;
-    }
-    // We should count inner blocks
-    else 
-        ++startedBlocks;
-
-    // Does nothing if block was not ended or not started yet
+    // We should increment inner blocks
+    ++startedBlocks;
 }
 
 void ObjectStateManager::endStateBlock ()
 {
-    // Finishes block if it was created and all inner blocks are ended
-    if ( currentBlock != 0 && startedBlocks == 1 ) {
-        currentBlockIsEnded = true;
-        // We should remove current block if it is empty
-        if ( currentBlock->isEmpty() ) {
-            BlockListIter iter = std::find( stateBlocks.begin(), 
-                                            stateBlocks.end(), 
-                                            currentBlock );
-            stateBlocks.erase(iter);
-            delete currentBlock;
-            // Correct setting of current pointer
-            if ( stateBlocks.size() == 0 || iter == stateBlocks.begin() )
-                currentBlock = 0;
-            else 
-                currentBlock = *(--iter);
-        }
-    }
-    // We should decrement inner blocks
-    if ( startedBlocks > 0 )
-       --startedBlocks;
+    if ( startedBlocks == 0 )
+        return;
 
-    // Does nothing if block was already finished or not started
+    // We should decrement inner blocks
+    --startedBlocks;
+
+    // Outer last block is ended and something was saved in it
+    if ( startedBlocks == 0 && newlyCreatedBlock ) {
+        tryToShiftStack();
+        currentBlock = newlyCreatedBlock;
+        stateBlocks.push_back(currentBlock);
+        newlyCreatedBlock = 0;
+    }
 }
 
 ObjectStateManager::StateBlock* ObjectStateManager::findBlock ( 
@@ -263,29 +235,20 @@ bool ObjectStateManager::tryToShiftStack ()
     return true;
 }
 
+ObjectStateManager::StateBlock& ObjectStateManager::tryToCreateStateBlock ()
+{
+    if ( newlyCreatedBlock == 0 ) {
+        newlyCreatedBlock = new StateBlock();
+    }   
+    return *newlyCreatedBlock;
+}
+
 void ObjectStateManager::saveState ( ObjectState& st )
 {
-    if ( currentBlock != 0 ) {
-        bool noStartedBlock = !currentBlock->isEmpty() && currentBlockIsEnded;
-
-        // New block has not been started yet, so start it
-        if ( noStartedBlock )
-            startStateBlock();
-        
-        // Save state
-        currentBlock->addState(st);
-
-        // End newly started block
-        if ( noStartedBlock )
-            endStateBlock();
-    }
-    // First call or all blocks were undoed. Create single state block.
-    else {
-        startStateBlock();
-        // Save state
-        currentBlock->addState(st);
-        endStateBlock();
-    }
+    startStateBlock();
+    // Save state
+    tryToCreateStateBlock().addState(st);    
+    endStateBlock();
 
     // Connect to know when state is ready to be destroyed
     QObject::connect(&st, SIGNAL(onStateDestroy(ObjectState&)), 
@@ -306,7 +269,7 @@ void ObjectStateManager::undo () throw (UnknownException, UndoException,
         throw UndoException();
 
     // Can't undo if block is not ended
-    if ( !currentBlockIsEnded ) 
+    if ( startedBlocks )
         throw StateBlockIsNotEnded();
 
     BlockListIter iter = std::find( stateBlocks.begin(), 
@@ -340,7 +303,7 @@ void ObjectStateManager::redo () throw (UnknownException, RedoException,
         throw RedoException();
 
     // Can't redo if block is not ended
-    if ( !currentBlockIsEnded ) 
+    if ( startedBlocks )
         throw StateBlockIsNotEnded();
 
     BlockListIter iter;
