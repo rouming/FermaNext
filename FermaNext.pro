@@ -43,6 +43,7 @@ SOURCES = src/FermaNext.cpp \
           src/gui/CalcDataToolBar.cpp \
           \
           src/TrussUnit/Truss.cpp \
+          src/TrussUnit/TrussLoad.cpp \
           src/TrussUnit/TrussUnit.cpp \
           src/TrussUnit/TrussUnitActions.cpp \
           src/TrussUnit/TrussNode.cpp \
@@ -71,6 +72,7 @@ HEADERS = src/common/AggQWidget.h \
           src/gui/CalcDataToolBar.h \
           \
           src/TrussUnit/Truss.h \
+          src/TrussUnit/TrussLoad.h \
           src/TrussUnit/TrussUnit.h \
           src/TrussUnit/TrussUnitActions.h \
           src/TrussUnit/TrussUnitDesignerWidget.h \

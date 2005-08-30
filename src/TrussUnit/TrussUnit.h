@@ -52,9 +52,15 @@ typedef agg::renderer_scanline_aa<ren_dynarow,
 typedef agg::renderer_scanline_aa<ren_dynarow, 
                                   linear_gradient_span_gen> linear_gradient_renderer;
 
+/*****************************************************************************/
 
 class TrussNode;
 class TrussPivot;
+
+/*****************************************************************************/
+
+typedef TrussLoadCaseArray<TrussNode> TrussUnitLoadCases;
+typedef TrussLoadCase<TrussNode> TrussUnitLoadCase;
 
 /*****************************************************************************/
 
@@ -108,7 +114,8 @@ public:
     const QString& getTrussName () const;
     const QSize& getTrussAreaSize () const;
     void nodeToFront ( TrussNode& node );
-    void desistAdjoingPivots ( TrussNode& node );
+    // Manually call. We should save states before pivot desist.
+    void desistAdjoiningPivots ( const TrussNode& node );
 
     void paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
                 int trussAreaHeight ) const;
