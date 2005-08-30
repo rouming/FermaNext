@@ -167,7 +167,7 @@ void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMu
     for ( ; nodesIter != nodeList.end(); ++nodesIter )
         if ( *nodesIter != frontNode ) {
             TrussNode* node = *nodesIter;
-            node->paint ( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
+            node->paint( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
             if ( loadCase ) {
                 // TODO: write TrussUnit method to paint truss load
                 //TrussLoad* load = loadCase->findLoad( *node );
@@ -175,7 +175,7 @@ void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMu
             }
         }
     if ( frontNode ) {
-        frontNode->paint ( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
+        frontNode->paint( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
         if ( loadCase ) {
             // TODO: write TrussUnit method to paint truss load
             //TrussLoad* load = loadCase->findLoad( *frontNode );

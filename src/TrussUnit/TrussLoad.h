@@ -179,7 +179,7 @@ public:
         return true;
     }
 
-    virtual TrussLoadCase<N>* getCurrentLoadCase ()
+    virtual TrussLoadCase<N>* getCurrentLoadCase () const
     {
         return currentLoadCase;
     }
