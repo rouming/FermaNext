@@ -91,7 +91,8 @@ public:
     typedef typename PivotList::const_iterator PivotListConstIter;
 
     Truss ( ObjectStateManager* mng ) :
-        TrussEmitter(mng)
+        TrussEmitter(mng),
+        loadCases( new TrussLoadCaseArray<N> )
     {}
 
     virtual void clear () 
@@ -112,6 +113,7 @@ public:
 
     virtual ~Truss ()
     {
+        delete loadCases;
         clear();
     }
 
@@ -345,9 +347,9 @@ public:
         return alivePivots;
     }
 
-    virtual TrussLoadCaseArray<N>& getLoadCases ()
+    virtual TrussLoadCaseArray<N>& getLoadCases () const
     {
-        return loadCases;
+        return *loadCases;
     }
 
 protected:
@@ -539,7 +541,7 @@ protected:
 private:
     NodeList  nodes;
     PivotList pivots;
-    TrussLoadCaseArray<N> loadCases;
+    TrussLoadCaseArray<N>* loadCases;
 };
 
 /*****************************************************************************
