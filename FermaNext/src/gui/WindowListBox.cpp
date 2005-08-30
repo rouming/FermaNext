@@ -199,14 +199,15 @@ void WindowListBox::contextMenuEvent ( QContextMenuEvent* )
     QListBoxItem* selected = selectedItem();
     if ( selected == 0 )
         return;
-    TrussUnitWindowItem* item = 0;
-    try { item = dynamic_cast<TrussUnitWindowItem*>(selected); }
+    try { 
+        TrussUnitWindowItem& item = 
+            dynamic_cast<TrussUnitWindowItem&>( *selected ); 
+        QPopupMenu* popup = new QPopupMenu( this );
+        Q_CHECK_PTR( popup );
+        item.fillPopup( popup );
+        delete popup;
+    }
     catch ( ... ) { return; }
-
-    QPopupMenu* popup = new QPopupMenu( this );
-    Q_CHECK_PTR( popup );
-    item->fillPopup( popup );
-    delete popup;
 }
 
 TrussUnitWindowItem* WindowListBox::findByTrussUnitWindow ( 
@@ -251,12 +252,14 @@ void WindowListBox::unselectAllFromGroup ()
 }
 
 void WindowListBox::raiseTrussUnitWindowItem ( QListBoxItem* it )
-{
-    TrussUnitWindowItem* item = 0;
-    try { item = dynamic_cast<TrussUnitWindowItem*>(it); }
+{    
+    if ( it == 0 )
+        return;
+    try { 
+        TrussUnitWindowItem& item = dynamic_cast<TrussUnitWindowItem&>(*it);
+        item.raise();
+    }
     catch ( ... ) { return; }
-
-    item->raise();
 }
 
 void WindowListBox::trussWindowDesisted ( const TrussUnitWindow& truss )

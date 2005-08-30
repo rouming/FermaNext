@@ -77,10 +77,10 @@ void CalcDataToolBar::trussUnitWindowReviveDesist ( StatefulObject& st,
                                                     bool action )
 {
     try { 
-        TrussUnitWindow* trussWindow = dynamic_cast<TrussUnitWindow*>(&st);
-        if ( ! calcDataWidgets.contains( trussWindow ) )
+        TrussUnitWindow& trussWindow = dynamic_cast<TrussUnitWindow&>(st);
+        if ( ! calcDataWidgets.contains( &trussWindow ) )
             return;       
-        QWidget* w = calcDataWidgets[trussWindow];
+        QWidget* w = calcDataWidgets[&trussWindow];
         TabbedWidget* tw = findByWidget(*w);
         if ( tw == 0 )
             return;

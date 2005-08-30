@@ -752,7 +752,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                 // Save remove node action
                 ObjectStateManager* mng = selectedNode->getStateManager();
                 mng->startStateBlock();
-                selectedWindow->desistAdjoingPivots ( *selectedNode );
+                selectedWindow->desistAdjoiningPivots( *selectedNode );
                 ObjectState& state = selectedNode->createState();
                 state.addAction( new TrussNodeRemoveAction( *selectedNode ) );
                 state.save();

@@ -8,6 +8,7 @@
 #include <qpoint.h>
 
 #include "StatefulObject.h"
+#include "TrussLoad.h"
 
 // Basic classes for truss unit construction. 
 template <class N, class P> class Truss;
@@ -344,6 +345,11 @@ public:
         return alivePivots;
     }
 
+    virtual TrussLoadCaseArray<N>& getLoadCases ()
+    {
+        return loadCases;
+    }
+
 protected:
     virtual void nodeBeforeRevive ( StatefulObject& st )
     {
@@ -370,18 +376,18 @@ protected:
     virtual void nodeBeforeDesist ( StatefulObject& st )
     {
         // Safe conversion
-        N* node = 0;
-        try { node = dynamic_cast<N*>(&st); }
-        catch ( ... ) { return; }
-
-        PivotList pivotsToDesist = findAdjoiningPivots( *node, false );
-        PivotListIter iter = pivotsToDesist.begin();
-        for ( ; iter != pivotsToDesist.end(); ++iter ) {
-            P* pivot = *iter;
-            if ( pivot->isAlive() )
-                (*iter)->desist();
+        try { 
+            N& node = dynamic_cast<N&>(st);
+            PivotList pivotsToDesist = findAdjoiningPivots( node, false );
+            PivotListIter iter = pivotsToDesist.begin();
+            for ( ; iter != pivotsToDesist.end(); ++iter ) {
+                P* pivot = *iter;
+                if ( pivot->isAlive() )
+                    (*iter)->desist();
+            }
+            emit beforeNodeDesist(node);
         }
-        emit beforeNodeDesist(*node);
+        catch ( ... ) { return; }
     }
 
     virtual void nodeAfterDesist ( StatefulObject& st )
@@ -533,6 +539,7 @@ protected:
 private:
     NodeList  nodes;
     PivotList pivots;
+    TrussLoadCaseArray<N> loadCases;
 };
 
 /*****************************************************************************

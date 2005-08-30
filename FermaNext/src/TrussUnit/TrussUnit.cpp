@@ -82,8 +82,8 @@ TrussUnit::TrussUnit ( const QString& name, ObjectStateManager* mng ) :
     trussAreaSize( 300, 300 )
 {
     // We should render again when state has been changed
-    QObject::connect( this, SIGNAL(onStateChange()), SLOT(trussUnitStateIsChanged()) );
-
+    QObject::connect( this, SIGNAL(onStateChange()), 
+                            SLOT(trussUnitStateIsChanged()) );
     QObject::connect( this, SIGNAL(afterNodeDesist( Node& )),
                             SLOT(clearFrontNodePointer( Node& )) );
     frontNode = 0;
@@ -132,13 +132,16 @@ void TrussUnit::clearFrontNodePointer ( Node& node )
         frontNode = 0;
 }
 
-void TrussUnit::desistAdjoingPivots ( TrussNode &node )
+void TrussUnit::desistAdjoiningPivots ( const TrussNode& node )
 {
-    PivotList pivotList = findAdjoiningPivots ( node );
+    // Find all pivots
+    PivotList pivotList = findAdjoiningPivots( node, false );
     PivotListIter iter = pivotList.begin();
     for ( ; iter != pivotList.end(); ++iter )
     {
         TrussPivot* pivot = *iter;
+        if ( ! pivot->isAlive() )
+            continue;
         // Save remove pivot action
         ObjectState& state = pivot->createState();
         state.addAction( new TrussPivotRemoveAction( *pivot ) );
@@ -157,13 +160,28 @@ void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMu
     PivotList::const_iterator pivotsIter = pivotList.begin();
     for ( ; pivotsIter != pivotList.end(); ++pivotsIter )
         (*pivotsIter)->paint ( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
+
+    TrussUnitLoadCase* loadCase = getLoadCases().getCurrentLoadCase();
     NodeList nodeList = getNodeList ();
     NodeList::const_iterator nodesIter = nodeList.begin();
     for ( ; nodesIter != nodeList.end(); ++nodesIter )
-        if ( *nodesIter != frontNode )
-            (*nodesIter)->paint ( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
-    if ( frontNode )
+        if ( *nodesIter != frontNode ) {
+            TrussNode* node = *nodesIter;
+            node->paint ( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
+            if ( loadCase ) {
+                // TODO: write TrussUnit method to paint truss load
+                //TrussLoad* load = loadCase->findLoad( *node );
+                //if ( load ) paintLoad( *load,  ......  );
+            }
+        }
+    if ( frontNode ) {
         frontNode->paint ( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
+        if ( loadCase ) {
+            // TODO: write TrussUnit method to paint truss load
+            //TrussLoad* load = loadCase->findLoad( *frontNode );
+            //if ( load ) paintLoad( *load, ...... );
+        }
+    }
 }
 
 /****************************************************************************/
