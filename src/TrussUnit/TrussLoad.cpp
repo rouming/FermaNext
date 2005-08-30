@@ -7,19 +7,28 @@
  *****************************************************************************/
 
 TrussLoad::TrussLoad () :
+    enabled(true),
+    removed(false),
     x(0), y(0)
 {}
 
 TrussLoad::TrussLoad ( double x_, double y_ ) :
+    enabled(true),
+    removed(false),
     x(x_), y(y_)
 {}
 
 TrussLoad::TrussLoad ( const TrussLoad& load ) :
+    QObject(),
+    enabled(load.enabled),
+    removed(load.removed),
     x(load.x), y(load.y)
 {}
  
 TrussLoad& TrussLoad::operator= ( const TrussLoad& load )
 {
+    enabled = load.enabled;
+    removed = load.removed;
     x = load.x;
     y = load.y;
     return *this;
@@ -49,6 +58,32 @@ void TrussLoad::setForces ( double x_, double y_ )
 {
     x = x_;
     y = y_;
+}
+
+bool TrussLoad::isEnabled () const
+{
+    return enabled;
+}
+
+bool TrussLoad::isRemoved () const
+{
+    return removed;
+}
+
+void TrussLoad::disable ()
+{
+    enabled = false;
+}
+
+void TrussLoad::enable ()
+{
+    enabled = true;
+}
+
+void TrussLoad::remove ()
+{
+    disable();
+    removed = true;    
 }
 
 /*****************************************************************************/
