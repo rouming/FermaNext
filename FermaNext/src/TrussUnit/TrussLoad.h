@@ -3,14 +3,16 @@
 #define TRUSSLOAD_H
 
 #include <vector>
+#include <qobject.h>
 #include <qmap.h>
 
 /*****************************************************************************
  * Truss Load
  *****************************************************************************/
 
-class TrussLoad 
+class TrussLoad : public QObject
 {
+    Q_OBJECT
 public:
     TrussLoad ();
     TrussLoad ( double x, double y );
@@ -24,7 +26,17 @@ public:
     void setYForce ( double );
     void setForces ( double, double );
 
+    bool isEnabled () const;
+    bool isRemoved () const;
+
+public slots:
+    void disable ();
+    void enable ();
+    void remove ();
+
 private:
+    bool enabled;
+    bool removed;
     double x;
     double y;
 };
@@ -39,12 +51,18 @@ class TrussLoadCase
 public:
     virtual ~TrussLoadCase ()
     { 
-        clean();
+        TrussLoadMapIter iter = loads.begin();
+        for ( ; iter != loads.end(); ++iter )
+            delete iter.data();
+        loads.clear();
     }
 
     // Add new node load
     virtual void addLoad ( const N& node, double x, double y )
     {
+        // Do suspended clean
+        suspendedClean();
+
         TrussLoad* load = 0;
         if ( loads.contains(&node) ) {
             load = loads[&node];
@@ -52,6 +70,14 @@ public:
         }
         else {
             load = new TrussLoad( x, y );
+            // Catch life time changes
+            QObject::connect( &node, SIGNAL(onBeforeDesist(StatefulObject&)),
+                              load, SLOT(disable()) );
+            QObject::connect( &node, SIGNAL(onAfterRevive(StatefulObject&)),
+                              load, SLOT(enable()) );
+            QObject::connect( &node, SIGNAL(destroyed()),
+                              load, SLOT(remove()) );
+
             loads[&node] = load;
         }
     }
@@ -59,8 +85,13 @@ public:
     // Remove node load
     virtual bool removeLoad ( const N& node )
     {
+        // Do suspended clean
+        suspendedClean();
+
         if ( loads.contains(&node) ) {
-            delete loads[&node];
+            TrussLoad* load = loads[&node];
+            QObject::disconnect( &node, 0, load, 0 );
+            delete load;
             loads.remove(&node);
             return true;
         }
@@ -71,28 +102,42 @@ public:
     virtual TrussLoad* findLoad ( const N& node ) const
     {
         if ( loads.contains(&node) ) {
-            return loads[&node];
+            TrussLoad* load = loads[&node];
+            if ( load->isEnabled() )
+                return load;
+            return 0;
         }
         return 0;
     }
 
     virtual size_t countLoads () const
     {
-        return loads.size();
+        size_t loadsNum = 0;
+        TrussLoadMapConstIter iter = loads.begin();
+        for ( ; iter != loads.end(); ++iter ) {
+            if ( iter.data()->isEnabled() ) 
+                ++loadsNum;
+        }
+        return loadsNum;
     }
 
 protected:
-    void clean ()
+    void suspendedClean ()
     {
         TrussLoadMapIter iter = loads.begin();
-        for ( ; iter != loads.end(); ++iter )
-            delete iter.data();
-        loads.clear();
+        for ( ; iter != loads.end(); ++iter ) {
+            TrussLoad* load = iter.data();
+            if ( load->isRemoved() ) {
+                delete iter.data();
+                loads.remove(iter);
+            }
+        }
     }
 
 private:
     typedef QMap<const N*, TrussLoad*> TrussLoadMap;
     typedef typename TrussLoadMap::iterator TrussLoadMapIter;
+    typedef typename TrussLoadMap::const_iterator TrussLoadMapConstIter;
 
     TrussLoadMap loads;
 };
