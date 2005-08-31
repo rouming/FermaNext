@@ -1,29 +1,67 @@
 
-const char* PLUGIN_INFO_CALL = "get_plugin_info";
+#ifndef PLUGINLOADER_H
+#define PLUGINLOADER_H
 
-enum PluginType { CALCULATION_PLUGIN = 0, 
-                  OPTIMIZATION_PLUGIN };
+#include <vector>
+#include <qmap.h>
+#include <qstringlist.h>
+#include "FermaNextPlugin.h"
+#include "DynaLoader.h"
 
-struct PluginInfo
+const QString PLUGIN_EXTENSION = "fpl";
+
+typedef uint PluginHandle;
+typedef std::vector<PluginHandle> PluginHandleList ;
+
+// Safe wrapper of POD plugin structure
+struct FermaNextPluginInfo
 {
-    const char* name;
-    const char* description;
+    QString name;
+    QString description;
     PluginType type;
+
+    FermaNextPluginInfo& operator = ( const PluginInfo& info_ )
+    {
+        name = info_.name;
+        description = info_.description;
+        type = info_.type;
+        return *this;
+    }
 };
-
-FermaNextPlugin.h
-
-typedef PluginHandle uint;
-typedef PluginHandleList std::vector<PluginHandle>;
 
 class PluginLoader 
 {
+protected:
+    struct FermaNextPlugin
+    {
+        FermaNextPluginInfo info;
+        DynaLoader loader;
+    };
+
+    void clean ();
+
 public:
-    virtual void findAndLoadPlugins ( const QString& path );
+    // Exceptions
+    class FindException {};
+
+    virtual ~PluginLoader ();
+
+    virtual void loadPlugins ( const QString& path );
     virtual void unloadPlugins ();
-    virtual PluginHandle loadPlugin ( const QString& pluginName );
-    virtual void unloadPlugin ( const QString& pluginName );
+    virtual void unloadPlugin ( const PluginHandle& );
+    virtual FermaNextPluginInfo& findPluginInfo ( const PluginHandle& ) 
+        throw (FindException);
 
     virtual PluginHandleList loadedPlugins () const;
-    virtual PluginHandleList loadedPluginsOfType( const PluginType& ) const;
+    virtual QStringList loadedPluginsNames () const;
+    virtual PluginHandleList loadedPluginsOfType ( const PluginType& ) const;
+
+private:
+    typedef QMap<PluginHandle, FermaNextPlugin*> PluginsMap;
+    typedef PluginsMap::iterator PluginsMapIter;
+    typedef PluginsMap::const_iterator PluginsMapConstIter;
+
+    PluginsMap plugins;
 };
+
+#endif //PLUGINLOADER_H

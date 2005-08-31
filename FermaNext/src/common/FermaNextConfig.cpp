@@ -57,6 +57,8 @@ QDomNode FermaNextConfig::findConfigNode ( const QDomNode& node, const QString& 
 ConfigItems FermaNextConfig::getConfigItems ( const QDomNode& node ) const
 {
     ConfigItems items;
+    if ( node.isNull() )
+        return items;
     QDomNode n = node.firstChild();
     while( !n.isNull() ) {
         if ( n.hasChildNodes() ) {
@@ -66,9 +68,21 @@ ConfigItems FermaNextConfig::getConfigItems ( const QDomNode& node ) const
                 items[n.nodeName()] = text.data();           
            }
         }
+        else {
+            if ( n.isText() ) {
+                QDomText text = n.toText();
+                items[node.nodeName()] = text.data();
+                break;
+            }            
+        }
         n = n.nextSibling();
     }
     return items;
+}
+
+ConfigItems FermaNextConfig::getConfigItems ( const QString& name ) const
+{
+    return getConfigItems( findConfigNode(name) );
 }
 
 /****************************************************************************/

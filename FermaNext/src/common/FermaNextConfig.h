@@ -25,6 +25,7 @@ public:
     QDomNode findConfigNode ( const QString& name ) const;
     QDomNode findConfigNode ( const QDomNode& node, const QString& name ) const;
     ConfigItems getConfigItems ( const QDomNode& node ) const;
+    ConfigItems getConfigItems ( const QString& name ) const;
 
 protected:
     void parseConfig () throw (ConfigReadException, ConfigParseException);

@@ -144,4 +144,20 @@ FermaNextConfig& FermaNextWorkspace::config ()
     return fermaConfig;
 }
 
+bool FermaNextWorkspace::loadPlugins ()
+{
+    FermaNextConfig& conf = config();
+    ConfigItems items = conf.getConfigItems("PluginsDir");
+    if ( ! items.contains("PluginsDir") )
+        return false;
+    QString pluginsDir = items["PluginsDir"].toString();
+    plgLoader.loadPlugins( pluginsDir );
+    return true;
+}
+
+PluginLoader& FermaNextWorkspace::pluginLoader ()
+{
+    return plgLoader;
+}
+
 /*****************************************************************************/

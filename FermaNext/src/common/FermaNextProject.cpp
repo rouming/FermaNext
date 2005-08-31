@@ -4,12 +4,11 @@
 
 #include <qtabwidget.h>
 #include <qwidgetstack.h>
-/*TODO:remove*/#include <qpushbutton.h>
-/*TODO:remove*/#include <qlabel.h>
 
 /*****************************************************************************
  * FermaNext Project
  *****************************************************************************/
+
 FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack ) :
     name(name_),
     stateManager(),
