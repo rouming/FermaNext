@@ -23,6 +23,7 @@ public slots:
     void someProjectCreated ( FermaNextProject& );
 
     void createProject ();
+    void reloadPlugins ();
     
 protected:
     void init ();
@@ -31,6 +32,7 @@ protected:
     void setupProjectActions ();
     void setupWindowActions ();
     void setupHelpActions ();
+    void setupPluginActions ();
 
 protected slots:
     void fileNew ();
@@ -71,6 +73,7 @@ private:
     // Some actions
     QAction* undoAction;
     QAction* redoAction;
+    QPopupMenu* pluginsMenu;
 };
 
 #endif //FERMANEXTFRAME_H
