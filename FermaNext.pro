@@ -35,6 +35,7 @@ SOURCES = src/FermaNext.cpp \
           src/common/SubsidiaryConstants.cpp \
           src/common/Benchmark.cpp \
           src/common/DynaLoader.cpp \
+          src/common/PluginLoader.cpp \
           \
           src/gui/FermaNextMainFrame.cpp \
           src/gui/ProjectToolBox.cpp \
@@ -64,6 +65,7 @@ HEADERS = src/common/AggQWidget.h \
           src/common/SubsidiaryConstants.h \
           src/common/Benchmark.h \
           src/common/DynaLoader.h \
+          src/common/PluginLoader.h \
           \
           src/gui/FermaNextMainFrame.h \
           src/gui/ProjectToolBox.h \
