@@ -21,6 +21,7 @@ protected:
     class StateBlock
     {   
     public:
+        StateBlock ( ObjectStateManager& );
         ~StateBlock ();
         
         // Manage states
@@ -46,6 +47,7 @@ protected:
         typedef StateList::reverse_iterator StateListRevIter;
         
         StateList states;
+        ObjectStateManager& stateMng;
         bool blockIsClosed;
     };
 
@@ -131,10 +133,10 @@ private:
 
     BlockList stateBlocks;
     StateBlock* currentBlock;
-    StateBlock* newlyCreatedBlock;
     size_t possibleStackSize;
     size_t startedBlocks;
     bool isStateCallFlag;
+    bool newlyCreatedBlock;
 };
 
 #endif //STATEMANAGER_H
