@@ -32,11 +32,11 @@ public:
     DynaLoader ( const QString& fileName ) throw (LibraryLoadException);
     ~DynaLoader ();
 
-    bool loadLibrary ( const QString& fileName );
+    void loadLibrary ( const QString& fileName ) throw (LibraryLoadException);
 
     template <class AddressPointer>
     AddressPointer getAddress ( const QString& funcName ) 
-                                                      throw (AddressException)
+        throw (AddressException)
     { return (AddressPointer)getAddressHandler(funcName); }
 
     bool freeLibrary ();

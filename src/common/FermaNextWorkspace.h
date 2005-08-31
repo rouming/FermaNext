@@ -8,6 +8,7 @@
 #include <qmutex.h> 
 #include "FermaNextProject.h"
 #include "FermaNextConfig.h"
+#include "PluginLoader.h"
 
 class QWidgetStack;
 class FermaNextMainFrame;
@@ -39,7 +40,11 @@ public:
     virtual const QString& getName () const;
     virtual void setName ( const QString& );
 
-    virtual FermaNextConfig& config ();    
+    virtual FermaNextConfig& config ();
+    virtual PluginLoader& pluginLoader ();
+
+public slots:
+    virtual bool loadPlugins ();
 
 private:
     FermaNextWorkspace ();
@@ -65,6 +70,7 @@ private:
     QWidgetStack* widgetStack;    
     ProjectList projects;
     FermaNextConfig fermaConfig;    
+    PluginLoader plgLoader;
 };
 
 #endif //FERMANEXTWORKSPACE_H

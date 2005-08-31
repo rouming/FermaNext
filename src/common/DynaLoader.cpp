@@ -15,8 +15,7 @@ DynaLoader::DynaLoader ( const QString& fileName )
     throw (LibraryLoadException) :
     handle(0)
 {
-    if ( ! loadLibrary( fileName ) )
-        throw LibraryLoadException();
+    loadLibrary( fileName );
 }
 
 DynaLoader::~DynaLoader ()
@@ -24,7 +23,8 @@ DynaLoader::~DynaLoader ()
     freeLibrary();
 }
 
-bool DynaLoader::loadLibrary ( const QString& fileName )
+void DynaLoader::loadLibrary ( const QString& fileName ) 
+    throw (LibraryLoadException)
 {
     freeLibrary();
 #if defined UNICODE && (defined WINDOWS || defined WIN32)
@@ -32,7 +32,8 @@ bool DynaLoader::loadLibrary ( const QString& fileName )
 #else
     handle = dl_open(QFile::encodeName(fileName));
 #endif
-    return handle == 0 ? false : true;
+    if ( handle == 0 )
+        throw LibraryLoadException();
 }
 
 bool DynaLoader::freeLibrary ()
