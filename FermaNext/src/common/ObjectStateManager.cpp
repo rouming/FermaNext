@@ -8,6 +8,10 @@
  * State Block
  *****************************************************************************/
 
+ObjectStateManager::StateBlock::StateBlock ( ObjectStateManager& mng ) : 
+    stateMng(mng)
+{}
+
 ObjectStateManager::StateBlock::~StateBlock ()
 {
     clear();
@@ -63,8 +67,12 @@ void ObjectStateManager::StateBlock::redo ()
 void ObjectStateManager::StateBlock::clear ()
 {
     StateListIter iter = states.begin();
-    for ( ; iter != states.end(); ++iter )
-        (*iter)->disable();
+    for ( ; iter != states.end(); ++iter ) {
+        ObjectState* state = *iter;
+        // Disconnect all states
+        QObject::disconnect( state, 0, &stateMng, 0 );
+        state->disable();
+    }
     states.clear();
 }
 
@@ -74,10 +82,10 @@ void ObjectStateManager::StateBlock::clear ()
 
 ObjectStateManager::ObjectStateManager ( size_t stackSize ) :
     currentBlock(0),
-    newlyCreatedBlock(0),
     possibleStackSize(stackSize),
     startedBlocks(0),
-    isStateCallFlag(false)
+    isStateCallFlag(false),
+    newlyCreatedBlock(false)
 {
     stateBlocks.reserve(possibleStackSize);
 }
@@ -111,10 +119,7 @@ void ObjectStateManager::endStateBlock ()
 
     // Outer last block is ended and something was saved in it
     if ( startedBlocks == 0 && newlyCreatedBlock ) {
-        tryToShiftStack();
-        currentBlock = newlyCreatedBlock;
-        stateBlocks.push_back(currentBlock);
-        newlyCreatedBlock = 0;
+        newlyCreatedBlock = false;
     }
 }
 
@@ -237,20 +242,24 @@ bool ObjectStateManager::tryToShiftStack ()
 
 ObjectStateManager::StateBlock& ObjectStateManager::tryToCreateStateBlock ()
 {
-    if ( newlyCreatedBlock == 0 ) {
-        newlyCreatedBlock = new StateBlock();
+    if ( ! newlyCreatedBlock ) {
+        tryToShiftStack();
+        currentBlock = new StateBlock(*this);
+        stateBlocks.push_back(currentBlock);
+        newlyCreatedBlock = true;
     }   
-    return *newlyCreatedBlock;
+    return *currentBlock;
 }
 
 void ObjectStateManager::saveState ( ObjectState& st )
 {
     startStateBlock();
     // Save state
-    tryToCreateStateBlock().addState(st);    
+    tryToCreateStateBlock().addState(st);
     endStateBlock();
 
-    // Connect to know when state is ready to be destroyed
+    // Connect to know when state is ready to be destroyed.
+    // Beware! All state signals are disconnected in destructor of state block.
     QObject::connect(&st, SIGNAL(onStateDestroy(ObjectState&)), 
                           SLOT(removeBlockByState(ObjectState&)));
     
