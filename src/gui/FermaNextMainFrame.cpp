@@ -32,7 +32,8 @@ const QString mainFrameCaption( QObject::tr( "Educational CAD System 'Ferma'" ) 
 
 FermaNextMainFrame::FermaNextMainFrame ( QWidget* p, const char* n, 
                                          WFlags f ) :
-    QMainWindow(p, n, f)    
+    QMainWindow(p, n, f),
+    pluginsMenu(0)
 {      
     init();
 
@@ -41,7 +42,8 @@ FermaNextMainFrame::FermaNextMainFrame ( QWidget* p, const char* n,
     setupEditActions();
     setupProjectActions();
     setupWindowActions();
-    setupHelpActions();    
+    setupPluginActions();
+    setupHelpActions();
 }
 
 void FermaNextMainFrame::init ()
@@ -349,6 +351,38 @@ void FermaNextMainFrame::setupHelpActions ()
                      tr( "About FermaNext" ), 0, this, "helpAbout" );
     connect( a, SIGNAL( activated() ), this, SLOT( helpAbout() ) );    
     a->addTo( menu );    
+}
+
+void FermaNextMainFrame::setupPluginActions ()
+{
+    reloadPlugins();
+}
+
+void FermaNextMainFrame::reloadPlugins ()
+{
+    FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
+    bool pluginsLoaded = wsp.loadPlugins();
+    if ( ! pluginsLoaded )
+        return;
+    PluginLoader& loader = wsp.pluginLoader();
+    QStringList names = loader.loadedPluginsNames();
+
+    if ( pluginsMenu == 0 ) {
+        pluginsMenu = new QPopupMenu( this );
+        menuBar()->insertItem( tr( "&Plugins" ), pluginsMenu );
+    }
+    else 
+        pluginsMenu->clear();
+
+    QStringList::iterator i = names.begin();
+    for ( ; i != names.end(); ++i ) {
+        pluginsMenu->insertItem( *i );
+    }
+    pluginsMenu->insertSeparator();
+
+    // Reload plugins
+    pluginsMenu->insertItem( tr("Reload plugins"), this, 
+                             SLOT(reloadPlugins()) );
 }
 
 void FermaNextMainFrame::refreshUndoRedoActions ()
