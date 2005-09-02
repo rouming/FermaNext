@@ -129,22 +129,23 @@ void TrussUnitDesignerWidget::clearWindowFocus ()
 
 void TrussUnitDesignerWidget::removeAllHighlight ()
 {
-    if ( nodeBehaviour == onNodeSelect )
+    WindowListIter iter = trussWindows.begin();
+    for ( ; iter != trussWindows.end(); ++iter ) 
     {
-        WindowListIter iter = trussWindows.begin();
-        for ( ; iter != trussWindows.end(); ++iter ) 
-            (*iter)->removeNodesHighlight ();
-        nodeBehaviour = nodeIdle;
-        update ();
+        TrussUnitWindow* window = (*iter);
+        if ( nodeBehaviour == onNodeSelect && nodeBehaviour != nodeIdle )
+        {
+            window->removeNodesHighlight ();
+            nodeBehaviour = nodeIdle;
+        }
+        if ( pivotBehaviour == onPivotSelect && pivotBehaviour != pivotIdle )
+        {
+            window->removePivotsHighlight ();
+            pivotBehaviour = pivotIdle;
+        }
+        window->setResizeEllipseHighlighted ( TrussUnitWindow::None );
     }
-    if ( pivotBehaviour == onPivotSelect )
-    {
-        WindowListIter iter = trussWindows.begin();
-        for ( ; iter != trussWindows.end(); ++iter ) 
-            (*iter)->removePivotsHighlight ();
-        pivotBehaviour = pivotIdle;
-        update ();
-    }
+    update ();
 }
 
 bool TrussUnitDesignerWidget::nodeCanBeDrawn ( int x, int y )
@@ -548,9 +549,12 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                 else if ( designerBehaviour == onSelect || 
                           designerBehaviour == onErase )
                 {
-                    selectedNode = selectedWindow->findNodeByWidgetPos( x, y );
+                    int nodePrecision = selectedWindow->getNodeFindingPrecision ();
+                    int pivotPrecision = selectedWindow->getPivotFindingPrecision ();
+                    selectedNode = selectedWindow->findNodeByWidgetPos( x, y, 
+                                                                  nodePrecision );
                     selectedPivot = selectedWindow->findPivotByWidgetPos( x, y,
-                                                                  pivotFindingPrecision);
+                                                                  pivotPrecision);
                     if ( selectedNode )
                     {
                         removeAllHighlight ();
@@ -617,7 +621,7 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         ObjectStateManager* mng = selectedWindow->getStateManager();
         mng->startStateBlock();
 
-        selectedWindow->checkAfterPivotManipulation ( selectedPivot, false );
+        selectedWindow->updateAfterPivotManipulation ( selectedPivot, false );
 
         mng->endStateBlock();
 
@@ -635,7 +639,7 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
 
         // Save state in Undo/Redo stack
         saveNodeStateAfterDrag( selectedNode->getPoint() );
-        selectedWindow->checkAfterNodeManipulation ( selectedNode, true );
+        selectedWindow->updateAfterNodeManipulation ( selectedNode, true );
 
         mng->endStateBlock();
 
@@ -644,7 +648,8 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         selectedWindow = findWindowByWidgetPos ( x, y );
         if ( selectedWindow )
         {
-            selectedNode = selectedWindow->findNodeByWidgetPos( x, y );
+            int nodePrecision = selectedWindow->getNodeFindingPrecision ();
+            selectedNode = selectedWindow->findNodeByWidgetPos( x, y, nodePrecision );
             selectedWindow->removeNodesHighlight ();
             if ( !selectedNode )
                 nodeBehaviour = nodeIdle;
@@ -669,7 +674,7 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
 
         // Save state in Undo/Redo stack
         savePivotStateAfterDrag( firstPos, lastPos );
-        selectedWindow->checkAfterPivotManipulation ( selectedPivot, true );
+        selectedWindow->updateAfterPivotManipulation ( selectedPivot, true );
 
         mng->endStateBlock();
 
@@ -679,8 +684,8 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         if ( selectedWindow )
         {
             selectedWindow->removePivotsHighlight();
-            selectedPivot = selectedWindow->findPivotByWidgetPos( x, y,
-                                                          pivotFindingPrecision);
+            int pivotPrecision = selectedWindow->getPivotFindingPrecision();
+            selectedPivot = selectedWindow->findPivotByWidgetPos( x, y, pivotPrecision);
             if ( !selectedPivot )
                 pivotBehaviour = pivotIdle;
             else
@@ -806,7 +811,9 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
         {
             if ( nodeCanBeDrawn ( clickX, clickY ) )
             {
-                TrussNode* node = selectedWindow->findNodeByWidgetPos ( clickX, clickY );
+                int nodePrecision = selectedWindow->getNodeFindingPrecision();
+                TrussNode* node = selectedWindow->findNodeByWidgetPos ( clickX, clickY, 
+                                                                    nodePrecision );
                 if ( node )
                     return;
 
@@ -820,7 +827,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                 mng->startStateBlock();
 
                 saveNodeStateAfterCreate( newNode );
-                selectedWindow->checkAfterNodeManipulation ( &newNode, true );
+                selectedWindow->updateAfterNodeManipulation ( &newNode, true );
 
                 mng->endStateBlock();
                 update();
@@ -832,7 +839,9 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
             {
                 QPoint nodeCoord = selectedWindow->getTrussCoordFromWidgetPos( clickX, 
                                                                                clickY );
-                TrussNode* firstNode = selectedWindow->findNodeByWidgetPos( clickX, clickY );
+                int nodePrecision = selectedWindow->getNodeFindingPrecision();
+                TrussNode* firstNode = selectedWindow->findNodeByWidgetPos( clickX, clickY, 
+                                                                    nodePrecision );
                 bool wasCreated = false;
                 if ( firstNode == 0 ) {
                     firstNode = &selectedWindow->createNode( nodeCoord.x(), nodeCoord.y() );

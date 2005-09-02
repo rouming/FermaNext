@@ -1,5 +1,7 @@
 #include "TrussUnitWindow.h"
 #include "TrussUnitActions.h"
+#include <qpointarray.h>
+#include <qrect.h> 
 #include <algorithm>
 
 
@@ -64,6 +66,8 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name, ObjectStateManager* mng 
     windowSize ( 250, 250),
     coordFieldSize ( 49, 12 )
 {
+    nodeFindingPrecision = 4;
+    pivotFindingPrecision = 100;
     setCanvasColor ( 8, 10, 12 );
     setHighlighted(false);    
 }
@@ -112,6 +116,11 @@ QPoint TrussUnitWindow::getTrussCoordFromWidgetPos ( int x, int y ) const
     return trussCoord;
 }
 
+QPoint TrussUnitWindow::getTrussCoordFromWidgetPos ( QPoint pos ) const
+{
+    return getTrussCoordFromWidgetPos ( pos.x(), pos.y() );
+}
+
 QPoint TrussUnitWindow::getWidgetPosFromTrussCoord ( int x, int y ) const
 {
     double scaleMultX = getScaleMultiplierX ();
@@ -122,6 +131,11 @@ QPoint TrussUnitWindow::getWidgetPosFromTrussCoord ( int x, int y ) const
                    int(y * scaleMultY) + topWindowIndent + windowLeftTopPos.y() );
     QPoint widgetCoord ( widgetX, widgetY );
     return widgetCoord;
+}
+
+QPoint TrussUnitWindow::getWidgetPosFromTrussCoord ( QPoint coord ) const
+{
+    return getWidgetPosFromTrussCoord ( coord.x(), coord.y() );
 }
 
 double TrussUnitWindow::getScaleMultiplierX () const
@@ -257,34 +271,70 @@ bool TrussUnitWindow::inVerResizeRect ( int x, int y ) const
     return false;
 }
 
-bool TrussUnitWindow::inBDiagResizeRect ( int x, int y ) const
+bool TrussUnitWindow::inBDiagResizeRect ( int x, int y )
 {
     if ( sqrt( (x - (windowRightBottomPos.x() - bordWidth)) * 
         (x - (windowRightBottomPos.x() - bordWidth)) +
         (y - (windowLeftTopPos.y() + bordWidth)) * 
-        (y - (windowLeftTopPos.y() + bordWidth)) ) <= resEllRad + 2 ||
-        sqrt( (x - (windowLeftTopPos.x() + bordWidth)) * 
-        (x - (windowLeftTopPos.x() + bordWidth)) + 
-        (y - (windowRightBottomPos.y() - bordWidth)) * 
-        (y - (windowRightBottomPos.y() - bordWidth)) ) <= resEllRad + 2 )
+        (y - (windowLeftTopPos.y() + bordWidth)) ) <= resEllRad + 2 )
     {
+        if ( resEll != RightTop )
+        {
+            resEll = RightTop;
+            rendered( false );
+        }
         return true;
+    }
+    else if ( sqrt( (x - (windowLeftTopPos.x() + bordWidth)) * 
+            (x - (windowLeftTopPos.x() + bordWidth)) + 
+            (y - (windowRightBottomPos.y() - bordWidth)) * 
+            (y - (windowRightBottomPos.y() - bordWidth)) ) <= resEllRad + 2 )
+    {
+        if ( resEll != LeftBottom )
+        {
+            resEll = LeftBottom;
+            rendered( false );
+        }
+        return true;
+    }
+    else if ( resEll != None )
+    {
+        resEll = None;
+        rendered( false );
     }
     return false;
 }
 
-bool TrussUnitWindow::inFDiagResizeRect ( int x, int y ) const
+bool TrussUnitWindow::inFDiagResizeRect ( int x, int y )
 {
     if ( sqrt( (x - (windowLeftTopPos.x() + bordWidth)) * 
         (x - (windowLeftTopPos.x() + bordWidth)) +
         (y - (windowLeftTopPos.y() + bordWidth)) * 
-        (y - (windowLeftTopPos.y() + bordWidth)) ) <= resEllRad + 2 ||
-        sqrt( (x - (windowRightBottomPos.x() - bordWidth)) * 
-        (x - (windowRightBottomPos.x() - bordWidth)) +
-        (y - (windowRightBottomPos.y() - bordWidth)) * 
-        (y - (windowRightBottomPos.y() - bordWidth)) ) <= resEllRad + 2 )
+        (y - (windowLeftTopPos.y() + bordWidth)) ) <= resEllRad + 2 )
     {
+        if ( resEll != LeftTop )
+        {
+            resEll = LeftTop;
+            rendered( false );
+        }
         return true;
+    }
+    else if ( sqrt( (x - (windowRightBottomPos.x() - bordWidth)) * 
+            (x - (windowRightBottomPos.x() - bordWidth)) +
+            (y - (windowRightBottomPos.y() - bordWidth)) * 
+            (y - (windowRightBottomPos.y() - bordWidth)) ) <= resEllRad + 2 )
+    {
+        if ( resEll != RightBottom )
+        {
+            resEll = RightBottom;
+            rendered( false );
+        }
+        return true;
+    }
+    else if ( resEll != None )
+    {
+        resEll = None;
+        rendered( false );
     }
     return false;
 }
@@ -307,11 +357,17 @@ void TrussUnitWindow::setHighlighted ( bool h )
     TrussUnit::setHighlighted(h);
 }
 
+void TrussUnitWindow::setResizeEllipseHighlighted ( selectedEllipse ellipseType )
+{
+    resEll = ellipseType;
+    rendered( false );
+}
+
 void TrussUnitWindow::setFocusOnNode ( TrussNode* selectedNode )
 {
     selectedNode->setHighlighted ( true );
     nodeToFront ( *selectedNode );
-    rendered(false);
+    rendered( false );
 }
 
 void TrussUnitWindow::setFocusOnPivot ( TrussPivot* selectedPivot )
@@ -319,7 +375,7 @@ void TrussUnitWindow::setFocusOnPivot ( TrussPivot* selectedPivot )
     selectedPivot->setHighlighted ( true );
     nodeToFront ( selectedPivot->getFirstNode() );
     nodeToFront ( selectedPivot->getLastNode() );
-    rendered(false);
+    rendered( false );
 }
 
 void TrussUnitWindow::removeNodesHighlight ()
@@ -332,7 +388,7 @@ void TrussUnitWindow::removeNodesHighlight ()
         if ( node->isHighlighted () )
         {
             node->setHighlighted ( false );
-            rendered(false);
+            rendered( false );
         }
     }
 }
@@ -349,12 +405,12 @@ void TrussUnitWindow::removePivotsHighlight ()
             pivot->setHighlighted ( false );
             pivot->getFirstNode().setHighlighted ( false );
             pivot->getLastNode().setHighlighted ( false );
-            rendered(false);
+            rendered( false );
         }
     }
 }
 
-TrussNode* TrussUnitWindow::findNodeByWidgetPos ( int x, int y ) const
+TrussNode* TrussUnitWindow::findNodeByWidgetPos ( int x, int y, int precision ) const
 {
     QPoint nodePos;
     NodeList nodeList = getNodeList ();
@@ -364,9 +420,9 @@ TrussNode* TrussUnitWindow::findNodeByWidgetPos ( int x, int y ) const
         TrussNode* node = *iter;
         if ( !node->isEnabled() )
             continue;
-        nodePos = getWidgetPosFromTrussCoord ( node->getX(), node->getY() );
-        if ( abs ( nodePos.x() - x ) < nodesRadius && 
-             abs ( nodePos.y() - y ) < nodesRadius )
+        nodePos = getWidgetPosFromTrussCoord ( node->getPoint() );
+        if ( abs ( nodePos.x() - x ) < precision && 
+             abs ( nodePos.y() - y ) < precision )
         {
             return node;
         }
@@ -374,9 +430,14 @@ TrussNode* TrussUnitWindow::findNodeByWidgetPos ( int x, int y ) const
     return 0;
 }
 
+TrussNode* TrussUnitWindow::findNodeByWidgetPos ( QPoint pos, int precision ) const
+{
+    return findNodeByWidgetPos ( pos.x(), pos.y(), precision );
+}
+
 TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y, int precision ) const
 {
-    QPoint trussCoord1, trussCoord2, widgetPos1, widgetPos2, firstNodePos, lastNodePos;
+    QPoint widgetPos1, widgetPos2, firstNodePos, lastNodePos;
     int Y;
     PivotList pivotList = getPivotList ();
     PivotListIter iter = pivotList.begin();
@@ -385,10 +446,8 @@ TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y, int precision 
         TrussPivot* pivot = *iter;
         if ( !pivot->isEnabled() )
             continue;
-        trussCoord1 = pivot->getFirstNode ().getPoint ();
-        trussCoord2 = pivot->getLastNode ().getPoint ();
-        widgetPos1 = getWidgetPosFromTrussCoord ( trussCoord1.x(), trussCoord1.y() );
-        widgetPos2 = getWidgetPosFromTrussCoord ( trussCoord2.x(), trussCoord2.y() );
+        widgetPos1 = getWidgetPosFromTrussCoord ( pivot->getFirstNode().getPoint() );
+        widgetPos2 = getWidgetPosFromTrussCoord ( pivot->getLastNode().getPoint() );
 
         if ( ( x - widgetPos1.x() ) * ( x - widgetPos1.x() ) + 
              ( y - widgetPos1.y() ) * ( y - widgetPos1.y() ) > 
@@ -409,6 +468,21 @@ TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y, int precision 
         }
     }
     return 0;
+}
+
+TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( QPoint pos, int precision ) const
+{
+    return findPivotByWidgetPos ( pos.x(), pos.y(), precision );
+}
+
+int TrussUnitWindow::getNodeFindingPrecision () const
+{
+    return nodeFindingPrecision;
+}
+
+int TrussUnitWindow::getPivotFindingPrecision () const
+{
+    return pivotFindingPrecision;
 }
 
 void TrussUnitWindow::moveTrussNode ( int x, int y, TrussNode* node )
@@ -499,8 +573,10 @@ TrussNode* TrussUnitWindow::nodesMergingComparison ( TrussNode& comparableNode,
                                                      int precision, bool fixationCheck )
 {
     comparableNode.setEnabled ( false );
-    TrussNode* node = findNodeByCoord ( comparableNode.getPoint(), precision );
+    QPoint nodePos = getWidgetPosFromTrussCoord ( comparableNode.getPoint() );
+    TrussNode* node = findNodeByWidgetPos ( nodePos, precision );
     comparableNode.setEnabled ( true );
+
     if ( node != 0 && node != &comparableNode )
     {
         if ( fixationCheck )
@@ -586,13 +662,12 @@ void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
             pivot->setLastNode ( node );  
         }
     }
-    if ( mergingNode->isHighlighted() )
-        node->setHighlighted ( true );
 
     // Save remove node action
     ObjectState& state = mergingNode->createState();
     state.addAction( new TrussNodeRemoveAction( *mergingNode ) );
     state.save();
+
     mergingNode->desist();
 
     mng->endStateBlock();
@@ -660,8 +735,23 @@ void TrussUnitWindow::dividePivot ( TrussPivot& dividualPivot, TrussNode& dividi
     rendered(false);
 }
 
-QPoint TrussUnitWindow::getLineSegmentsIntersectionPoint ( QPoint p11, QPoint p12, 
-                                                           QPoint p21, QPoint p22 ) const
+TrussPivot* TrussUnitWindow::findDividualPivot ( TrussNode& dividingNode ) const
+// finds pivot which is intersected by incoming node, but doesn't divided as yet
+{
+    QPoint nodePos = getWidgetPosFromTrussCoord ( dividingNode.getPoint() );
+    TrussPivot* dividualPivot = findPivotByWidgetPos ( nodePos, 2 * pivotFindingPrecision );
+    if ( ! dividualPivot )
+        return 0;
+
+    if ( &dividingNode == &dividualPivot->getFirstNode() || 
+         &dividingNode == &dividualPivot->getLastNode() )
+        return 0;
+
+    return dividualPivot;
+}
+
+QPoint TrussUnitWindow::getLineSegmentsCrossPoint ( QPoint p11, QPoint p12, 
+                                                    QPoint p21, QPoint p22 ) const
 {
     QPoint crossPoint ( -1, -1 ); // intersection point
 
@@ -703,109 +793,195 @@ QPoint TrussUnitWindow::getLineSegmentsIntersectionPoint ( QPoint p11, QPoint p1
         return crossPoint;
 }
 
-void TrussUnitWindow::createPivotCrossPoints ( TrussPivot* selectedPivot )
+QRect TrussUnitWindow::getPivotsArea ( PivotList pivots ) const
 {
-    removePivotsHighlight ();
+    QRect pivotsArea;
 
-    TrussNode& firstNode = selectedPivot->getFirstNode();
-    TrussNode& lastNode = selectedPivot->getLastNode();
-    QPoint p11 = firstNode.getPoint();
-    QPoint p12 = lastNode.getPoint();
+    if ( pivots.empty() )
+        return pivotsArea;
 
+    PivotListIter iter = pivots.begin() + 1;
+    for ( ; iter != pivots.end(); ++iter )
+    {
+        TrussPivot* pivot = *iter;
+        QRect area ( pivot->getFirstNode().getPoint(), pivot->getLastNode().getPoint() );
+        pivotsArea.unite ( area );
+    }
+    return pivotsArea;
+}
+
+QPointArray TrussUnitWindow::getPivotCrossPoints ( PivotList nonCrossingPivots ) const
+{
+    QPointArray crossPoints;
+
+    if ( nonCrossingPivots.empty() )
+        return crossPoints;
+
+    // find points at which pivots from incoming list intersect with other pivots
     PivotList pivotList = getPivotList ();
     PivotList::reverse_iterator rev_iter = pivotList.rbegin();
     for ( ; rev_iter != pivotList.rend(); ++rev_iter )
     {
         TrussPivot* pivot = *rev_iter;
-        QPoint p21 = pivot->getFirstNode().getPoint();
-        QPoint p22 = pivot->getLastNode().getPoint();
+        QPoint p11 = pivot->getFirstNode().getPoint();
+        QPoint p12 = pivot->getLastNode().getPoint();
 
-        QPoint crossPoint = getLineSegmentsIntersectionPoint ( p11, p12, p21, p22 );
-        if ( crossPoint.x() == -1 )
-            continue;
+        PivotListIter iter = nonCrossingPivots.begin();
+        for ( ; iter != nonCrossingPivots.end(); ++iter )
+        {   
+            TrussPivot* adjPivot = *iter;
+            if ( adjPivot == pivot )
+                break;  // taken pivot is one of the noncrossing pivots
+            QPoint p21 = adjPivot->getFirstNode().getPoint();
+            QPoint p22 = adjPivot->getLastNode().getPoint();
 
-        TrussNode* crossNode = &createNode ( crossPoint.x(), crossPoint.y() );
+            QPoint crossPoint = getLineSegmentsCrossPoint ( p11, p12, p21, p22 );
+            if ( crossPoint.x() == -1 )
+                continue;   // there are no intersections between these pivots
+
+            if ( crossPoints.contains( crossPoint ) == 0 )
+                crossPoints.putPoints ( crossPoints.size(), 1, 
+                                        crossPoint.x(), crossPoint.y() );
+        }
+    }
+
+    // find points at which pivots from incoming list intersect with nodes
+    NodeList nodeList = getNodeList ();
+    NodeListIter iter = nodeList.begin();
+    for ( ; iter != nodeList.end(); ++iter )
+    {
+        TrussNode* node = *iter;
+        TrussPivot* pivot = findDividualPivot ( *node );
+        // check if node belongs to one of the incoming pivots
+        if ( pivot && 
+             std::find( nonCrossingPivots.begin(), nonCrossingPivots.end(), pivot ) != 
+             nonCrossingPivots.end() )
+        {
+            if ( crossPoints.contains( node->getPoint() ) == 0 )
+                crossPoints.putPoints ( crossPoints.size(), 1, 
+                                        node->getX(), node->getY() );
+        }
+    }
+    return crossPoints;
+}
+
+void TrussUnitWindow::createPivotCrossNodes ( QPointArray crossPoints )
+{
+    if ( crossPoints.isEmpty() )
+        return;
+
+    TrussNode *crossNode, *node;
+    // create nodes at found points
+    NodeList crossNodes;
+    QPointArray::Iterator iter = crossPoints.begin();
+    for ( ; iter != crossPoints.end(); ++iter )
+    {
+        crossNode = &createCrossNode ( *iter );
+        if ( crossNode )
+            crossNodes.push_back ( crossNode );
+    }
+    // check created nodes for merging
+    NodeListIter nodeIter = crossNodes.begin();
+    for ( ; nodeIter != crossNodes.end(); ++nodeIter )
+    {
+        crossNode = *nodeIter;
+        // can not allow unfixed node to "eat" a fixed one
+        if ( crossNode->getFixation() == Node::Unfixed )
+            node = nodesMergingComparison( *crossNode, 1.5 * nodeFindingPrecision, false );
+        else
+            node = nodesMergingComparison( *crossNode, 1.5 * nodeFindingPrecision, true );
+
+        if ( node )
+            mergeNodes ( crossNode, node );
+    }
+}
+
+TrussNode& TrussUnitWindow::createCrossNode ( QPoint crossPoint )
+{
+    TrussNode* crossNode = findNodeByCoord ( crossPoint );
+
+    if ( !crossNode )
+    {
+        crossNode = &createNode ( crossPoint.x(), crossPoint.y() );
         // Save create node action
         ObjectState& state = crossNode->createState();
         TrussNodeCreateAction* action = 
             new TrussNodeCreateAction( *crossNode );
         state.addAction( action );
         state.save();
-        checkNodePosition ( crossNode, false );
     }
-}
 
-void TrussUnitWindow::checkNodePosition ( TrussNode* selectedNode, bool fixationCheck )
-{
-    QPoint nodePos = getWidgetPosFromTrussCoord ( selectedNode->getX(), 
-                                                  selectedNode->getY() );
     TrussPivot* pivot = 0;
+
     PivotList pivotList = getPivotList ();
     uint i;
     for ( i = 0; i < pivotList.size(); i++ )
     {
-        pivot = findPivotByWidgetPos ( nodePos.x(), nodePos.y(), 250 );
+        pivot = findDividualPivot ( *crossNode );
         if ( pivot )
-            dividePivot ( *pivot, *selectedNode );
+            dividePivot ( *pivot, *crossNode );
     }
-
-    TrussNode* node = nodesMergingComparison( *selectedNode, 100, fixationCheck );
-    if ( node )
-    {
-        mergeNodes ( selectedNode, node );
-    }
+    return *crossNode;
 }
 
-void TrussUnitWindow::checkAfterNodeManipulation ( TrussNode* selectedNode, 
-                                                   bool fixationCheck )
+void TrussUnitWindow::updateNodePosition ( TrussNode* selectedNode, bool fixationCheck )
+// Updates new position of selected node: merge with other node and(or) 
+// divide pivot if necessary.
 {
-    QPoint nodeCoord = selectedNode->getPoint();
+    TrussPivot* pivot = findDividualPivot ( *selectedNode );
+    if ( pivot )
+        dividePivot ( *pivot, *selectedNode );
 
-    // Check new position of selected node: merge with other node and(or) 
-    // divide pivot if necessary.
-    checkNodePosition ( selectedNode, fixationCheck );
-
-    selectedNode = findNodeByCoord ( nodeCoord );
-
-    // Check pivots coordinates to find their intersections.
-    PivotList pivotList = getPivotList ();
-    PivotListIter iter = pivotList.begin();
-    for ( ; iter != pivotList.end(); ++iter )
-    {   
-        TrussPivot* pivot = *iter;
-        if ( &pivot->getFirstNode() == selectedNode || 
-             &pivot->getLastNode() == selectedNode )
-        {
-            createPivotCrossPoints ( pivot );
-        }
-    }
+    TrussNode* node = nodesMergingComparison( *selectedNode, 2 * nodeFindingPrecision, 
+                                              fixationCheck );
+    if ( node )
+        mergeNodes ( selectedNode, node );
 }
 
-void TrussUnitWindow::checkAfterPivotManipulation ( TrussPivot* selectedPivot,
+void TrussUnitWindow::updateAfterNodeManipulation ( TrussNode* selectedNode, 
                                                     bool fixationCheck )
+// Analyses positions of selected node and its adjoining pivots
+// relative to other truss elements.
+{
+    QPoint nodePos = getWidgetPosFromTrussCoord ( selectedNode->getPoint() );
+
+    PivotList adjPivotList = findAdjoiningPivots ( *selectedNode );
+    QPointArray crossPoints = getPivotCrossPoints ( adjPivotList );
+    createPivotCrossNodes ( crossPoints );
+
+    selectedNode = findNodeByWidgetPos ( nodePos, nodeFindingPrecision );
+    if ( !selectedNode )
+        return;
+
+    updateNodePosition ( selectedNode, fixationCheck );
+}
+
+void TrussUnitWindow::updateAfterPivotManipulation ( TrussPivot* selectedPivot,
+                                                    bool fixationCheck )
+// Analyses positions of selected pivot with adjoining pivots of its nodes
+// relative to other truss elements.
 {
     TrussNode& first = selectedPivot->getFirstNode();
     TrussNode& last = selectedPivot->getLastNode();
-    QPoint firstCoord = first.getPoint();
-    QPoint lastCoord = last.getPoint();
+    QPointArray crossPoints;
 
-    NodeList nodeList = getNodeList ();
-    NodeListIter iter = nodeList.begin();
-    for ( ; iter != nodeList.end(); ++iter )
+    PivotList firstAdjPivots = findAdjoiningPivots ( first );
+    PivotList lastAdjPivots = findAdjoiningPivots ( last );
+
+    PivotListIter pivotIter = std::find( lastAdjPivots.begin(), lastAdjPivots.end(), 
+                                         selectedPivot );
+    if ( pivotIter != lastAdjPivots.end() )
     {
-        TrussNode* node = *iter;
-        if ( ( node->getX() <= firstCoord.x() && node->getX() >= lastCoord.x() ||
-               node->getX() <= lastCoord.x() && node->getX() >= firstCoord.x() ) &&
-             ( node->getY() <= firstCoord.y() && node->getY() >= lastCoord.y() ||
-               node->getY() <= lastCoord.y() && node->getY() >= firstCoord.y() ) )
-        {
-            if ( node == &first || node == &last )
-                checkAfterNodeManipulation ( node, fixationCheck );
-            else
-                checkAfterNodeManipulation ( node, true );
-        }
-
+        lastAdjPivots.erase ( pivotIter );
+        crossPoints = getPivotCrossPoints ( lastAdjPivots );
+        createPivotCrossNodes ( crossPoints );
     }
+
+    crossPoints = getPivotCrossPoints ( firstAdjPivots );
+    createPivotCrossNodes ( crossPoints );
+
+    updateNodePosition ( &first, fixationCheck );
+    updateNodePosition ( &last, fixationCheck );
 }
 
 color_type TrussUnitWindow::getCanvasColor () const
@@ -882,7 +1058,7 @@ QString TrussUnitWindow::fitTextToWindowSize ( QString str, int lengthLimit,
     return str;
 }
 
-void TrussUnitWindow::drawText ( ren_dynarow&, textRenderer& textRend,
+void TrussUnitWindow::drawText ( textRenderer& textRend,
                                  const QString& str, color_type col, 
                                  QPoint point ) const 
 {
@@ -980,7 +1156,7 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
         drawLine ( ras, solidRend, sl, p1, p2 );
         QPoint textPos ( p2.x() - 23, p2.y() + 3 );
         str = QString("%1").arg( i * scaleFactorYInAbs );   
-        drawText ( baseRend, textRend, str, agg::rgba(100, 100, 100), textPos );
+        drawText ( textRend, str, agg::rgba(100, 100, 100), textPos );
     }
 
     p1 = rightBottomAreaPos;
@@ -994,7 +1170,7 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
         drawLine ( ras, solidRend, sl, p1, p2 );
         QPoint textPos ( p2.x() - 10, p2.y() + 10 );
         str = QString("%1").arg( (i + 1) * scaleFactorXInAbs );   
-        drawText ( baseRend, textRend, str, agg::rgba(100, 100, 100), textPos );
+        drawText ( textRend, str, agg::rgba(100, 100, 100), textPos );
     }
 
     p1 = leftTopAreaPos;
@@ -1002,17 +1178,17 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
     p1.setX (p1.x() - 23 - scalePieceLength );
     p1.setY (p1.y() + 3 );
     str = QString("%1").arg( getTrussAreaSize().height() );
-    drawText  ( baseRend, textRend, str, agg::rgba(100, 100, 100), p1 );
+    drawText  ( textRend, str, agg::rgba(100, 100, 100), p1 );
     p2.setX (p2.x() - 10 );
     p2.setY (p2.y() + 10 + scalePieceLength );
     str = QString("%1").arg( getTrussAreaSize().width() );
-    drawText  ( baseRend, textRend, str, agg::rgba(100, 100, 100), p2 );
+    drawText  ( textRend, str, agg::rgba(100, 100, 100), p2 );
 
     p1 = leftTopAreaPos;
     p2 = rightBottomAreaPos;
     p1.setX ( p1.x() - scaleTextLeftBottomIndent );
     p1.setY ( p2.y() + scaleTextLeftBottomIndent );
-    drawText  ( baseRend, textRend, "0", agg::rgba(100, 100, 100), p1 );
+    drawText  ( textRend, "0", agg::rgba(100, 100, 100), p1 );
     
 }
 
@@ -1063,11 +1239,11 @@ void TrussUnitWindow::drawCursorCoordinatesField ( ren_dynarow& baseRend,
     if ( cursorCoord.x() == -1 )
     {
         textPos.setX ( 4 );
-        drawText ( baseRend, textRend, "---", textColor, textPos );
+        drawText ( textRend, "---", textColor, textPos );
         textPos.setX ( 22 );
-        drawText ( baseRend, textRend, ":", textColor, textPos );
+        drawText ( textRend, ":", textColor, textPos );
         textPos.setX ( 31 );
-        drawText ( baseRend, textRend, "---", textColor, textPos );
+        drawText ( textRend, "---", textColor, textPos );
     }
     else
     {
@@ -1079,14 +1255,14 @@ void TrussUnitWindow::drawCursorCoordinatesField ( ren_dynarow& baseRend,
             textPos.setX ( 7 );
         else
             textPos.setX ( 0 );
-        drawText ( baseRend, textRend, str, textColor, textPos );
+        drawText ( textRend, str, textColor, textPos );
 
         textPos.setX ( 22 );
-        drawText ( baseRend, textRend, ":", textColor, textPos );
+        drawText ( textRend, ":", textColor, textPos );
 
         str = QString("%1").arg( cursorCoord.y() );  
         textPos.setX ( 28 );
-        drawText ( baseRend, textRend, str, textColor, textPos );
+        drawText ( textRend, str, textColor, textPos );
     }
 }
 
@@ -1133,22 +1309,216 @@ void TrussUnitWindow::drawNumbersField ( ren_dynarow& baseRend,
 
     if ( pivotNumb )
     {
-        drawText ( baseRend, textRend, "Pivot #", textColor, textPos );
+        drawText ( textRend, "Pivot #", textColor, textPos );
 
         QString str;
         str = QString("%1").arg( pivotNumb );
         textPos.setX ( 41 );
-        drawText ( baseRend, textRend, str, textColor, textPos );
+        drawText ( textRend, str, textColor, textPos );
     }
     else if ( nodeNumb )
     {
-        drawText ( baseRend, textRend, "Node #", textColor, textPos );
+        drawText ( textRend, "Node #", textColor, textPos );
 
         QString str;
         str = QString("%1").arg( nodeNumb );
         textPos.setX ( 41 );
-        drawText ( baseRend, textRend, str, textColor, textPos );
+        drawText ( textRend, str, textColor, textPos );
     }    
+}
+
+void TrussUnitWindow::drawNodeNumber( TrussNode* node, 
+                                      ren_dynarow& baseRend, 
+                                      solidRenderer& solidRend, 
+                                      scanline_rasterizer& ras, 
+                                      agg::scanline_p8& sl ) const
+{
+    if ( ! node->isVisible() )
+        return;
+
+    QPoint nodePos = getWidgetPosFromTrussCoord ( node->getPoint() );
+    int rad;
+    glyph_gen glyph( 0 );
+    textFont numbFont;
+    color_type textColor, backColor;
+    QPoint textPos, backLeftTopPos, backRightBottomPos;
+
+    if ( ! node->isHighlighted() )
+    {
+        backColor = agg::rgba(1, 1, 1, 0.7);
+        numbFont = agg::gse5x9;
+        textColor = agg::rgba(0, 100, 0);
+        if ( node->getNumber() < 10 )
+        {
+            textPos.setX ( nodePos.x() + 1 - windowLeftTopPos.x() );
+            textPos.setY ( nodePos.y() - 5 - windowLeftTopPos.y() );
+            backLeftTopPos.setX ( textPos.x() - 2 );
+            backLeftTopPos.setY ( textPos.y() );
+            backRightBottomPos.setX ( textPos.x() + 6 );
+            backRightBottomPos.setY ( textPos.y() - 9 );
+        }
+        else
+        {
+            textPos.setX ( nodePos.x() - 1 - windowLeftTopPos.x() );
+            textPos.setY ( nodePos.y() - 5 - windowLeftTopPos.y() );
+            backLeftTopPos.setX ( textPos.x() - 1 );
+            backLeftTopPos.setY ( textPos.y() );
+            backRightBottomPos.setX ( textPos.x() + 11 );
+            backRightBottomPos.setY ( textPos.y() - 9 );
+        }
+        rad = 3;
+    }
+    else
+    {
+        backColor = agg::rgba(1, 1, 1, 0.8);
+        numbFont = agg::gse6x12;
+        textColor = agg::rgba(0, 100, 0);
+        if ( node->getNumber() < 10 )
+        {
+            textPos.setX ( nodePos.x() + 1 - windowLeftTopPos.x() ) ;
+            textPos.setY ( nodePos.y() - 6 - windowLeftTopPos.y() );
+            backLeftTopPos.setX ( textPos.x() - 2 );
+            backLeftTopPos.setY ( textPos.y() - 1 );
+            backRightBottomPos.setX ( textPos.x() + 7 );
+            backRightBottomPos.setY ( textPos.y() - 12 );
+        }
+        else
+        {
+            textPos.setX ( nodePos.x() - 1 - windowLeftTopPos.x() ) ;
+            textPos.setY ( nodePos.y() - 6 - windowLeftTopPos.y() );
+            backLeftTopPos.setX ( textPos.x() - 2 );
+            backLeftTopPos.setY ( textPos.y() );
+            backRightBottomPos.setX ( textPos.x() + 13 );
+            backRightBottomPos.setY ( textPos.y() - 12 );
+        }
+        rad = 5;
+    }
+
+    agg::rounded_rect backRect ( backLeftTopPos.x(), backLeftTopPos.y(), 
+                                 backRightBottomPos.x(), backRightBottomPos.y(), rad );
+    ras.add_path ( backRect );
+    solidRend.color ( backColor );
+    agg::render_scanlines ( ras, sl, solidRend );
+    glyph.font ( numbFont );
+    textRenderer textRend ( baseRend, glyph );
+    QString str;
+    str = QString("%1").arg( node->getNumber() );
+    drawText ( textRend, str, textColor, textPos );
+}
+
+void TrussUnitWindow::drawPivotNumber( TrussPivot* pivot, 
+                                      ren_dynarow& baseRend, 
+                                      solidRenderer& solidRend, 
+                                      scanline_rasterizer& ras, 
+                                      agg::scanline_p8& sl ) const
+{
+    if ( ! pivot->isVisible() || ! pivot->getDrawingStatus() )
+        return;
+
+    QPoint p1 = getWidgetPosFromTrussCoord ( pivot->getFirstNode().getPoint() );
+    QPoint p2 = getWidgetPosFromTrussCoord ( pivot->getLastNode().getPoint() );
+
+    int rad;
+    glyph_gen glyph( 0 );
+    textFont numbFont;
+    color_type textColor, backColor;
+    QPoint textPos, backLeftTopPos, backRightBottomPos;
+
+    if ( ! pivot->isHighlighted() )
+    {
+        backColor = agg::rgba(1, 1, 1, 0.9);
+        numbFont = agg::gse5x9;
+        textColor = agg::rgba(30, 0, 0);
+        if ( pivot->getNumber() < 10 )
+        {
+            textPos.setX ( abs( p1.x() + p2.x() ) / 2 - 2 - windowLeftTopPos.x() );
+            textPos.setY ( abs( p1.y() + p2.y() ) / 2 + 4 - windowLeftTopPos.y() );
+            backLeftTopPos.setX ( textPos.x() - 2 );
+            backLeftTopPos.setY ( textPos.y() );
+            backRightBottomPos.setX ( textPos.x() + 6 );
+            backRightBottomPos.setY ( textPos.y() - 9 );
+        }
+        else
+        {
+            textPos.setX ( abs( p1.x() + p2.x() ) / 2 - 4 - windowLeftTopPos.x() );
+            textPos.setY ( abs( p1.y() + p2.y() ) / 2 + 4 - windowLeftTopPos.y() );
+            backLeftTopPos.setX ( textPos.x() - 1 );
+            backLeftTopPos.setY ( textPos.y() );
+            backRightBottomPos.setX ( textPos.x() + 11 );
+            backRightBottomPos.setY ( textPos.y() - 9 );
+        }
+        rad = 3;
+    }
+    else
+    {
+        backColor = agg::rgba(1, 1, 1, 0.9);
+        numbFont = agg::gse6x12;
+        textColor = agg::rgba(30, 0, 0);
+        if ( pivot->getNumber() < 10 )
+        {
+            textPos.setX ( abs( p1.x() + p2.x() ) / 2 - 3 - windowLeftTopPos.x() );
+            textPos.setY ( abs( p1.y() + p2.y() ) / 2 + 5 - windowLeftTopPos.y() );
+            backLeftTopPos.setX ( textPos.x() - 3 );
+            backLeftTopPos.setY ( textPos.y() );
+            backRightBottomPos.setX ( textPos.x() + 7 );
+            backRightBottomPos.setY ( textPos.y() - 12 );
+        }
+        else
+        {
+            textPos.setX ( abs( p1.x() + p2.x() ) / 2 - 5 - windowLeftTopPos.x() );
+            textPos.setY ( abs( p1.y() + p2.y() ) / 2 + 5 - windowLeftTopPos.y() );
+            backLeftTopPos.setX ( textPos.x() - 2 );
+            backLeftTopPos.setY ( textPos.y() );
+            backRightBottomPos.setX ( textPos.x() + 13 );
+            backRightBottomPos.setY ( textPos.y() - 12 );
+        }
+        rad = 5;
+    }
+
+    agg::rounded_rect backRect ( backLeftTopPos.x(), backLeftTopPos.y(), 
+                                 backRightBottomPos.x(), backRightBottomPos.y(), rad );
+    ras.add_path ( backRect );
+    solidRend.color ( backColor );
+    agg::render_scanlines ( ras, sl, solidRend );
+    glyph.font ( numbFont );
+    textRenderer textRend ( baseRend, glyph );
+    QString str;
+    str = QString("%1").arg( pivot->getNumber() );
+    drawText ( textRend, str, textColor, textPos );
+}
+
+void TrussUnitWindow::drawTrussElementsNumbers ( ren_dynarow& baseRend, 
+                                                 solidRenderer& solidRend, 
+                                                 scanline_rasterizer& ras, 
+                                                 agg::scanline_p8& sl ) const
+{
+    PivotList pivots = getPivotList ();
+    PivotListIter pivotIter = pivots.begin ();
+    for ( ; pivotIter != pivots.end(); ++pivotIter )
+        drawPivotNumber ( *pivotIter, baseRend, solidRend, ras, sl );
+
+    NodeList nodes = getNodeList ();
+    NodeListIter nodeIter = nodes.begin ();
+    for ( ; nodeIter != nodes.end(); ++nodeIter )
+        drawNodeNumber ( *nodeIter, baseRend, solidRend, ras, sl );
+}
+
+void TrussUnitWindow::drawEllipseHighlight ( solidRenderer& solidRend, 
+                                             scanline_rasterizer& ras, 
+                                             agg::scanline_p8& sl,
+                                             QPoint pos ) const
+{                                         
+        int rad = 4;
+        agg::ellipse ell;
+        solidRend.color ( agg::rgba( 1, 0, 0, 0.6 ) );
+        ell.init ( pos.x(), pos.y(), rad, rad, 10 );
+        ras.add_path ( ell );
+        agg::render_scanlines ( ras, sl, solidRend );
+
+        solidRend.color ( agg::rgba( 0, 1, 1, 0.8 ) );
+        ell.init ( pos.x(), pos.y(), 3, 3, 10 );
+        ras.add_path ( ell );
+        agg::render_scanlines ( ras, sl, solidRend );
 }
 
 void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
@@ -1156,9 +1526,9 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
     if ( !isVisible() )
         return;
 
-    glyph_gen glyph(0);
-    scanline_rasterizer   ras;    
-    agg::scanline_p8     sl;
+    glyph_gen glyph( 0 );
+    scanline_rasterizer ras;    
+    agg::scanline_p8 sl;
     agg::ellipse ell;
 
     pixf_dynarow windowPixf( *windowBuf ),
@@ -1174,22 +1544,36 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         textRenderer textRend ( baseRend, glyph );
 
         /*------draw resize ellipses------*/
+        QPoint leftTopPos ( bordWidth, bordWidth ),
+               leftBottomPos ( bordWidth, windowSize.height() - bordWidth ),
+               rightTopPos ( windowSize.width() - bordWidth, bordWidth ),
+               rightBottomPos ( windowSize.width() - bordWidth, 
+                                windowSize.height() - bordWidth );
+
         solidRend.color ( resEllColor );
-        ell.init ( bordWidth, bordWidth, resEllRad, resEllRad, 10 );
+        ell.init ( leftTopPos.x(), leftTopPos.y(), resEllRad, resEllRad, 10 );
         ras.add_path ( ell );
-        ell.init ( windowSize.width() - bordWidth, bordWidth, resEllRad, resEllRad, 10 );
+        ell.init ( rightTopPos.x(), rightTopPos.y(), resEllRad, resEllRad, 10 );
         ras.add_path ( ell );
-        ell.init ( bordWidth, windowSize.height() - bordWidth, resEllRad, resEllRad, 10 );
+        ell.init ( leftBottomPos.x(), leftBottomPos.y(), resEllRad, resEllRad, 10 );
         ras.add_path ( ell );
-        agg::render_scanlines ( ras, sl, solidRend );
-        ell.init ( windowSize.width() - bordWidth, windowSize.height() - bordWidth, 
-                  resEllRad, resEllRad, 10 );
+        ell.init ( rightBottomPos.x(), rightBottomPos.y(), resEllRad, resEllRad, 10 );
         ras.add_path(ell);
         agg::render_scanlines ( ras, sl, solidRend );
 
+        if ( resEll == LeftTop )
+            drawEllipseHighlight ( solidRend, ras, sl, leftTopPos );
+        else if ( resEll == LeftBottom )
+            drawEllipseHighlight ( solidRend, ras, sl, leftBottomPos );
+        else if ( resEll == RightTop )
+            drawEllipseHighlight ( solidRend, ras, sl, rightTopPos );
+        else if ( resEll == RightBottom )
+            drawEllipseHighlight ( solidRend, ras, sl, rightBottomPos );
+
 
         /*------draw window canvas------*/
-        QPoint rightBottomPos, leftTopPos ( 0, 0 );
+        leftTopPos.setX ( 0 );
+        leftTopPos.setY ( 0 );
         rightBottomPos.setX ( windowSize.width() );
         rightBottomPos.setY ( windowSize.height() );
         drawOutlineRoundedRect ( solidRend, ras, sl, leftTopPos, rightBottomPos, 
@@ -1223,7 +1607,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         int titleLength = (int)glyph.width( title.ascii() );
         QPoint titlePos( ( lengthLimit - titleLength ) / 2 + 20, 17 );
         color_type titleColor = agg::rgba(1, 1, 1);
-        drawText ( baseRend, textRend, title, titleColor, titlePos );
+        drawText ( textRend, title, titleColor, titlePos );
 
 
         /*------draw editable area in which canvas truss unit can be painted------*/
@@ -1234,6 +1618,9 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         /*------draw truss unit------*/
         TrussUnit::paint ( baseRend, getScaleMultiplierX (), getScaleMultiplierY (),
                            getTrussAreaSize().height() );
+
+        /*------draw truss elements numbers above them------*/
+        drawTrussElementsNumbers ( baseRend, solidRend, ras, sl );
 
         rendered( true );
     }
