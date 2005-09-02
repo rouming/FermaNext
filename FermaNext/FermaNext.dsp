@@ -248,6 +248,10 @@ InputName=FermaNextMainFrame
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\common\FermaNextPlugin.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\common\FermaNextProject.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
