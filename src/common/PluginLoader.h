@@ -8,8 +8,6 @@
 #include "FermaNextPlugin.h"
 #include "DynaLoader.h"
 
-const QString PLUGIN_EXTENSION = "fpl";
-
 typedef uint PluginHandle;
 typedef std::vector<PluginHandle> PluginHandleList ;
 
