@@ -887,9 +887,13 @@ void TrussUnitWindow::createPivotCrossNodes ( QPointArray crossPoints )
         crossNode = *nodeIter;
         // can not allow unfixed node to "eat" a fixed one
         if ( crossNode->getFixation() == Node::Unfixed )
-            node = nodesMergingComparison( *crossNode, 1.5 * nodeFindingPrecision, false );
+            node = nodesMergingComparison( *crossNode, 
+                                           int(1.5 * nodeFindingPrecision),
+                                           false );
         else
-            node = nodesMergingComparison( *crossNode, 1.5 * nodeFindingPrecision, true );
+            node = nodesMergingComparison( *crossNode, 
+                                           int(1.5 * nodeFindingPrecision),
+                                           true );
 
         if ( node )
             mergeNodes ( crossNode, node );
