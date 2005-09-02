@@ -119,7 +119,16 @@ public:
 
     virtual N* findNodeByCoord ( QPoint point ) const
     {   
-        return findNodeByCoord( point, (4 * nodesRadius * nodesRadius) );
+        NodeListConstIter iter = nodes.begin();
+        for ( ; iter != nodes.end(); ++iter )
+        {
+            N* node = *iter;
+            if ( !node->isAlive() || !node->isEnabled() )
+                continue;
+            if ( node->getPoint() == point )
+                return node;
+        }
+        return 0;
     } 
     
     virtual N* findNodeByCoord ( QPoint point, int precision ) const
@@ -145,41 +154,6 @@ public:
         {
             if ( (*iter)->isAlive() && (*iter)->isEnabled() && i++ == num )
                 return *iter;
-        }
-        return 0;
-    }
-
-    virtual P* findPivotByCoord ( double x, double y, double precision ) const
-    {
-        QPoint firstCoord, lastCoord, coord( (int)x, (int)y );
-        double Y;
-        PivotListConstIter iter = pivots.begin();
-        for ( ; iter != pivots.end(); ++iter )
-        {
-            P* pivot = *iter;
-            if ( !pivot->isEnabled() )
-                continue;
-
-            N& firstNode = pivot->getFirstNode ();
-            N& lastNode = pivot->getLastNode ();
-            firstCoord = firstNode.getPoint ();
-            lastCoord = lastNode.getPoint ();
-
-            if ( findNodeByCoord( coord ) != &firstNode && 
-                 findNodeByCoord( coord ) != &lastNode )
-            {               
-                // equation of line
-                Y = fabs( ( x - double( firstCoord.x() ) ) * 
-                          double( firstCoord.y() - lastCoord.y() ) - 
-                          ( y - double( firstCoord.y() ) ) * 
-                          double( firstCoord.x() - lastCoord.x() ) );
-
-                if ( ( x >= firstCoord.x() && x <= lastCoord.x() || 
-                       x >= lastCoord.x() && x <= firstCoord.x() ) && 
-                     ( y >= firstCoord.y() && y <= lastCoord.y() || 
-                       y >= lastCoord.y() && y <= firstCoord.y() ) && Y <= precision )
-                    return pivot;
-            }
         }
         return 0;
     }
@@ -241,8 +215,8 @@ public:
 
     virtual P& createPivot ( QPoint p1 , QPoint p2 )
     {
-        N* first = findNodeByCoord ( p1 );
-        N* last = findNodeByCoord ( p2 );
+        N* first = findNodeByCoord ( p1, 4 * nodesRadius * nodesRadius );
+        N* last = findNodeByCoord ( p2, 4 * nodesRadius * nodesRadius );
         if ( first == 0 )  
             first = &createNode( p1.x(), p1.y() );            
         

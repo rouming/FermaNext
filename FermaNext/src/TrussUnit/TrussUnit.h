@@ -52,8 +52,6 @@ typedef agg::renderer_scanline_aa<ren_dynarow,
 typedef agg::renderer_scanline_aa<ren_dynarow, 
                                   linear_gradient_span_gen> linear_gradient_renderer;
 
-/*****************************************************************************/
-
 class TrussNode;
 class TrussPivot;
 
