@@ -23,6 +23,16 @@ DynaLoader::~DynaLoader ()
     freeLibrary();
 }
 
+const QString& DynaLoader::libExtension ()
+{
+#if defined WINDOWS || defined WIN32
+    static QString extension = "dll";
+#else
+    static QString extension = "so";
+#endif
+    return extension;
+}
+
 void DynaLoader::loadLibrary ( const QString& fileName ) 
     throw (LibraryLoadException)
 {
@@ -46,10 +56,10 @@ bool DynaLoader::freeLibrary ()
     return false;
 }
 
-ProcessAddress DynaLoader::getAddressHandler ( const QString& funcName )
+ProcAddress DynaLoader::getProcAddress ( const QString& funcName ) const
     throw (AddressException)
 {
-    ProcessAddress address = dl_sym(handle, funcName.ascii());
+    ProcAddress address = dl_sym(handle, funcName.ascii());
     if ( address == 0 )
         throw AddressException();
     return address;

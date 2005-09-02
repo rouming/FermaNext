@@ -23,15 +23,16 @@ void PluginLoader::clean ()
 void PluginLoader::loadPlugins ( const QString& path )
 {
     clean();
-    QDir dir( path, "*." + PLUGIN_EXTENSION, QDir::Name | QDir::IgnoreCase, 
-              QDir::Files | QDir::Readable | QDir::Executable );
+    QDir dir( path, "*." + DynaLoader::libExtension(),
+              QDir::Name | QDir::IgnoreCase, 
+              QDir::Files | QDir::Readable );
     for ( uint i = 0; i < dir.count(); i++ ) {
         FermaNextPlugin* plugin = new FermaNextPlugin;
-        try { 
+        try {
             DynaLoader& loader = plugin->loader;
             loader.loadLibrary( path + "/" + dir[i] );
-            PluginInfoCall pluginInfoCall = loader.getAddress<PluginInfoCall>( 
-                                                           PLUGIN_INFO_CALL );
+            PluginInfoCall pluginInfoCall = reinterpret_cast<PluginInfoCall>( 
+                                  loader.getProcAddress( PLUGIN_INFO_CALL ) );
             PluginInfo& pluginInfo = pluginInfoCall();
             plugin->info = pluginInfo;
             plugins[i] = plugin;

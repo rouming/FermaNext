@@ -138,6 +138,10 @@ SOURCE=.\src\common\ObjectStateManager.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\common\PluginLoader.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\gui\ProjectToolBox.cpp
 # End Source File
 # Begin Source File
@@ -329,6 +333,10 @@ InputName=ObjectStateManager
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\common\PluginLoader.h
 # End Source File
 # Begin Source File
 
