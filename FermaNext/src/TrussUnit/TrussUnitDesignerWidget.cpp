@@ -133,18 +133,18 @@ void TrussUnitDesignerWidget::removeAllHighlight ()
     for ( ; iter != trussWindows.end(); ++iter ) 
     {
         TrussUnitWindow* window = (*iter);
-        if ( nodeBehaviour == onNodeSelect && nodeBehaviour != nodeIdle )
-        {
+        if ( nodeBehaviour == onNodeSelect )
             window->removeNodesHighlight ();
-            nodeBehaviour = nodeIdle;
-        }
-        if ( pivotBehaviour == onPivotSelect && pivotBehaviour != pivotIdle )
-        {
+        if ( pivotBehaviour == onPivotSelect )
             window->removePivotsHighlight ();
-            pivotBehaviour = pivotIdle;
-        }
         window->setResizeEllipseHighlighted ( TrussUnitWindow::None );
     }
+
+    if ( nodeBehaviour == onNodeSelect )
+        nodeBehaviour = nodeIdle;
+    if ( pivotBehaviour == onPivotSelect )
+        pivotBehaviour = pivotIdle;
+
     update ();
 }
 
@@ -353,9 +353,10 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
 {
     int x = me->x();
     int y = flipY ? height() - me->y() : me->y();
+
     if ( winBehaviour == onHorResize )
     {
-    int dx = x - clickX;
+        int dx = x - clickX;
         QPoint point1 = selectedWindow->getWindowLeftTopPos ();
         QPoint point2 = selectedWindow->getWindowRightBottomPos ();
         if ( abs ( clickX - point1.x() ) <= bordWidth )
