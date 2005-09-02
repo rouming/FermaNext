@@ -2,6 +2,20 @@
 #ifndef FERMANEXTPLUGIN_H
 #define FERMANEXTPLUGIN_H
 
+#ifdef __cplusplus
+  #define ExternC extern "C"
+#else
+  #define ExternC
+#endif
+
+#if defined WINDOWS || defined WIN32
+  #define PluginExport ExternC __declspec( dllexport )
+  #define PluginImport ExternC __declspec( dllimport )
+#else
+  #define PluginExport ExternC
+  #define PluginImport ExternC
+#endif
+
 enum PluginType { CALCULATION_PLUGIN = 0, 
                   OPTIMIZATION_PLUGIN };
 
