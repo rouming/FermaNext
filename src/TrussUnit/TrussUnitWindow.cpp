@@ -1535,6 +1535,8 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
     agg::scanline_p8 sl;
     agg::ellipse ell;
 
+    bool numbersDrawing = true;
+
     pixf_dynarow windowPixf( *windowBuf ),
                  numbersPixf( *numbersBuf ),
                  coordPixf( *coordBuf ); 
@@ -1624,7 +1626,8 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
                            getTrussAreaSize().height() );
 
         /*------draw truss elements numbers above them------*/
-        drawTrussElementsNumbers ( baseRend, solidRend, ras, sl );
+        if ( numbersDrawing )
+            drawTrussElementsNumbers ( baseRend, solidRend, ras, sl );
 
         rendered( true );
     }
