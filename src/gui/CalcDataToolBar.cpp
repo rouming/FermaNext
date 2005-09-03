@@ -30,7 +30,7 @@ void CalcDataToolBar::clear ()
 void CalcDataToolBar::initCalcDataIcons ()
 {
     // Active icons
-    calcDataIcons.setPixmap( QPixmap::fromMimeSource( "images/calcdata.png"),
+    calcDataIcons.setPixmap( QPixmap::fromMimeSource( imagesPath() + "/calcdata.png"),
                              QIconSet::Automatic, QIconSet::Active );
 }
 

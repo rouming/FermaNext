@@ -56,37 +56,37 @@ void TrussUnitWindowItem::fillPopup ( QPopupMenu* popup ) const
     if ( isShown() ) {
         if ( isSelectedInGroup() ) {
             popup->insertItem(
-                    QPixmap::fromMimeSource(imagesPath + "/unselect.png"),
+                    QPixmap::fromMimeSource(imagesPath() + "/unselect.png"),
                     "Unselect", this, SLOT(unselectFromGroup()) );
         } else {
             popup->insertItem( 
-                    QPixmap::fromMimeSource(imagesPath + "/select.png"),
+                    QPixmap::fromMimeSource(imagesPath() + "/select.png"),
                     "Select", this, SLOT(selectInGroup()) );
         }
         popup->insertSeparator();
         popup->insertItem(
-                        QPixmap::fromMimeSource(imagesPath + "/select.png"),
+                        QPixmap::fromMimeSource(imagesPath() + "/select.png"),
                         "Select All", this, SLOT(selectAllInGroup()) );
         popup->insertItem(
-                        QPixmap::fromMimeSource(imagesPath + "/unselect.png"),
+                        QPixmap::fromMimeSource(imagesPath() + "/unselect.png"),
                         "Unselect All", this, SLOT(unselectAllFromGroup()) );
         popup->insertSeparator();
         popup->insertItem(
-                        QPixmap::fromMimeSource(imagesPath + "/calculate.png"),
+                        QPixmap::fromMimeSource(imagesPath() + "/calculate.png"),
                         "Calculate", this, SLOT(calculate()) );
         popup->insertSeparator();
         popup->insertItem(
-                        QPixmap::fromMimeSource(imagesPath + "/delete.png"),
+                        QPixmap::fromMimeSource(imagesPath() + "/delete.png"),
                         "Remove", this, SLOT(remove()) );
         popup->insertSeparator();
 
         popup->insertItem( 
-                      QPixmap::fromMimeSource( imagesPath + "/hide.png"),
+                      QPixmap::fromMimeSource( imagesPath() + "/hide.png"),
                       "Hide", this, SLOT(hide()) );
 
     } else {
         popup->insertItem(
-                      QPixmap::fromMimeSource(imagesPath + "/show.png"),
+                      QPixmap::fromMimeSource(imagesPath() + "/show.png"),
                       "Show", this, SLOT(show()) );
     }
     popup->exec( QCursor::pos() );
@@ -222,8 +222,8 @@ void WindowListBox::addTrussUnitWindow ( TrussUnitWindow& truss )
 {
     TrussUnitWindowItem* item = new TrussUnitWindowItem( 
                   project, truss, *this, 
-                  QPixmap::fromMimeSource(imagesPath + "/project.png"),
-                  QPixmap::fromMimeSource(imagesPath + "/project_d.png"));
+                  QPixmap::fromMimeSource(imagesPath() + "/project.png"),
+                  QPixmap::fromMimeSource(imagesPath() + "/project_d.png"));
     IndexedItem iitem = { item, index(item) };
     windowItems[&truss] = iitem;
 }

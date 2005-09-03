@@ -46,7 +46,7 @@ int ProjectToolBox::addProject ( FermaNextProject& prj )
     QWidget* page = createSubsidiaryWidget(prj);
     projects[&prj] = page;
 
-    QIconSet iconSet( QPixmap::fromMimeSource( imagesPath + "/project_toolbox.png" ) );
+    QIconSet iconSet( QPixmap::fromMimeSource( imagesPath() + "/project_toolbox.png" ) );
     int result = addItem( page, iconSet, prj.getName() );
     setCurrentItem(page);
     prj.activate();
@@ -208,8 +208,8 @@ void ProjectToolBox::activateSelected ( int index )
             break;
         }
 
-    QIconSet activeIconSet( QPixmap::fromMimeSource( imagesPath + "/project_toolbox.png" ) );
-    QIconSet disablesIconSet( QPixmap::fromMimeSource( imagesPath + "/project_d.png" ) );
+    QIconSet activeIconSet( QPixmap::fromMimeSource( imagesPath() + "/project_toolbox.png" ) );
+    QIconSet disablesIconSet( QPixmap::fromMimeSource( imagesPath() + "/project_d.png" ) );
     for ( int ind = 0; ind < count(); ++ind )
         setItemIconSet ( ind, disablesIconSet );
     setItemIconSet ( index, activeIconSet );        

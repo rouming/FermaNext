@@ -159,28 +159,28 @@ void FermaNextMainFrame::setupFileActions ()
 
     QAction *a;
     // New
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/filenew.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filenew.xpm" ), 
                      tr( "&New..." ), CTRL + Key_N, this, "fileNew" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileNew() ) );
     a->addTo( tb );
     a->addTo( menu );
 
     // Open
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/fileopen.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/fileopen.xpm" ), 
                      tr( "&Open..." ), CTRL + Key_O, this, "fileOpen" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileOpen() ) );
     a->addTo( tb );
     a->addTo( menu );    
 
     // Save
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/filesave.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filesave.xpm" ), 
                      tr( "&Save..." ), CTRL + Key_S, this, "fileSave" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileSave() ) );
     a->addTo( tb );
     a->addTo( menu );    
 
     // Delete
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/editdelete.png" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/editdelete.png" ), 
                      tr( "&Delete" ), Key_Delete, this, "editDelete" );
     connect( a, SIGNAL( activated() ), this, SLOT( editDelete() ) );    
     a->addTo( menu );
@@ -199,64 +199,64 @@ void FermaNextMainFrame::setupFileActions ()
     menu->insertSeparator();
 
     // Open Wsp
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/fileopenwsp.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/fileopenwsp.xpm" ), 
                      tr( "Open Workspace..." ), SHIFT + Key_F2, this, "fileOpenWsp" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileOpenWsp() ) );
     a->addTo( menu );
 
     // Save Wsp
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/filesavewsp.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filesavewsp.xpm" ), 
                      tr( "Save Workspace" ), SHIFT + Key_F3, this, "fileSaveWsp" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileSaveWsp() ) );
     a->addTo( menu );
 
     // Save Wsp As
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/filesavewspas.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filesavewspas.xpm" ), 
                      tr( "Save Workspace As..." ), 0, this, "fileSaveWspAs" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileSaveWspAs() ) );
     a->addTo( menu );
 
     // Close Wsp
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/fileclosewsp.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/fileclosewsp.xpm" ), 
                      tr( "Close Workspace" ), SHIFT + Key_F4, this, "fileCloseWsp" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileCloseWsp() ) );
     a->addTo( menu );
     menu->insertSeparator();
 
     // Save All
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/filesaveall.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filesaveall.xpm" ), 
                      tr( "Save All" ), CTRL + Key_F3, this, "fileSaveAll" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileSaveAll() ) );
     a->addTo( menu );
     menu->insertSeparator();
 
     // Page Setup
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/filepagesetup.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filepagesetup.xpm" ), 
                      tr( "Page setup..." ), 0, this, "filePageSetup" );
     connect( a, SIGNAL( activated() ), this, SLOT( filePageSetup() ) );
     a->addTo( menu );
 
     // Print Preview
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/fileprintpreview.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/fileprintpreview.xpm" ), 
                      tr( "Print Preview" ), CTRL + ALT + Key_P, this, "fileprintpreview" );
     connect( a, SIGNAL( activated() ), this, SLOT( filePrintPreview() ) );
     a->addTo( menu );
 
     // Print
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/fileprint.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/fileprint.xpm" ), 
                      tr( "&Print..." ), CTRL + Key_P, this, "filePrint" );
     connect( a, SIGNAL( activated() ), this, SLOT( filePrint() ) );        
     a->addTo( menu );
     menu->insertSeparator();
 
     // Recent Prjs
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/filerecentprjs.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filerecentprjs.xpm" ), 
                      tr( "Recent Projects" ), 0, this, "fileRecentPrjs" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileRecentPrjs() ) );
     a->addTo( menu );
 
     // Recent Wsps
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/filerecentwsps.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filerecentwsps.xpm" ), 
                      tr( "Recent Workspaces" ), 0, this, "fileRecentWsps" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileRecentWsps() ) );
     a->addTo( menu );
@@ -278,7 +278,7 @@ void FermaNextMainFrame::setupEditActions ()
 
     // Undo
     undoAction = new QAction( 
-                      QPixmap::fromMimeSource( imagesPath + "/editundo.xpm" ), 
+                      QPixmap::fromMimeSource( imagesPath() + "/editundo.xpm" ), 
                       tr( "&Undo" ), CTRL + Key_Z, this, "editUndo" );
     connect( undoAction, SIGNAL( activated() ), this, SLOT( editUndo() ) );
     undoAction->setDisabled(true);
@@ -287,7 +287,7 @@ void FermaNextMainFrame::setupEditActions ()
 
     // Redo
     redoAction = new QAction( 
-                      QPixmap::fromMimeSource( imagesPath + "/editredo.xpm" ), 
+                      QPixmap::fromMimeSource( imagesPath() + "/editredo.xpm" ), 
                       tr( "&Redo" ), CTRL + Key_Y, this, "editRedo" );
     connect( redoAction, SIGNAL( activated() ), this, SLOT( editRedo() ) );
     redoAction->setDisabled(true);
@@ -298,28 +298,28 @@ void FermaNextMainFrame::setupEditActions ()
 
     QAction *a;
     // Copy
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/editcopy.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/editcopy.xpm" ), 
                      tr( "&Copy" ), CTRL + Key_C, this, "editCopy" );
     connect( a, SIGNAL( activated() ), this, SLOT( editCopy() ) );
     a->addTo( tb );
     a->addTo( menu );
 
     // Paste
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/editpaste.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/editpaste.xpm" ), 
                      tr( "&Paste" ), CTRL + Key_V, this, "editPaste" );
     connect( a, SIGNAL( activated() ), this, SLOT( editPaste() ) );
     a->addTo( tb );
     a->addTo( menu );
 
     // Cut
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/editcut.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/editcut.xpm" ), 
                      tr( "Cu&t" ), CTRL + Key_X, this, "editCut" );
     connect( a, SIGNAL( activated() ), this, SLOT( editCut() ) );
     a->addTo( tb );
     a->addTo( menu );
 
     // Select All
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/editselectall.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/editselectall.xpm" ), 
                      tr( "Select A&ll" ), CTRL + Key_A, this, "editSelectAll" );
     connect( a, SIGNAL( activated() ), this, SLOT( editSelectAll() ) );    
     a->addTo( menu );
@@ -340,14 +340,14 @@ void FermaNextMainFrame::setupHelpActions ()
 
     QAction *a;
     // Contents
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/helpcontents.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/helpcontents.xpm" ), 
                      tr( "Contents..." ), Key_F1, this, "helpContents" );
     connect( a, SIGNAL( activated() ), this, SLOT( helpContents() ) );
     a->addTo( menu );
     menu->insertSeparator();
 
     // About
-    a = new QAction( QPixmap::fromMimeSource( imagesPath + "/helpabout.xpm" ), 
+    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/helpabout.xpm" ), 
                      tr( "About FermaNext" ), 0, this, "helpAbout" );
     connect( a, SIGNAL( activated() ), this, SLOT( helpAbout() ) );    
     a->addTo( menu );    

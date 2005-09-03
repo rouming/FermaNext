@@ -2,14 +2,11 @@
 #include "FermaNextConfig.h"
 #include <qfile.h>
 
-const QString CONFIG_FILENAME = "config.xml";
-
 /*****************************************************************************
  * Ferma Next Config
  *****************************************************************************/
 
 const QDomNode FermaNextConfig::nullNode;
-
 
 FermaNextConfig::FermaNextConfig ( const QString& f )  throw (ConfigReadException, 
                                                               ConfigWriteException) :

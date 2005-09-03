@@ -7,8 +7,6 @@
 #include <qmap.h>
 #include <qvariant.h>
 
-extern const QString CONFIG_FILENAME;
-
 typedef QMap<QString, QVariant> ConfigItems;
 
 class FermaNextConfig
@@ -19,7 +17,7 @@ public:
     class ConfigWriteException {};
     class ConfigParseException {};        
 
-    FermaNextConfig ( const QString& file = CONFIG_FILENAME ) throw (ConfigReadException, 
+    FermaNextConfig ( const QString& file ) throw (ConfigReadException, 
                                                                      ConfigWriteException);
 
     QDomNode findConfigNode ( const QString& name ) const;

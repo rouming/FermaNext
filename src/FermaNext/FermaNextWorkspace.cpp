@@ -1,11 +1,10 @@
 
 #include "FermaNextWorkspace.h"
 #include "FermaNextMainFrame.h"
+#include "SubsidiaryConstants.h"
 
 #include <qapplication.h>
 #include <qwidgetstack.h>
-
-const QString untitledName( QObject::tr("Unnamed workspace") );
 
 /*****************************************************************************
  * FermaNext Workspace
@@ -15,8 +14,9 @@ FermaNextWorkspace* FermaNextWorkspace::instance = 0;
 QMutex FermaNextWorkspace::mutex;
 
 FermaNextWorkspace::FermaNextWorkspace () :
-    name(untitledName),
-    widgetStack(0)
+    name( untitledWorkspaceName ),
+    widgetStack(0),
+    fermaConfig( configFileName() )
 {
     // Singleton desist by Qt quit signal
     connect( qApp, SIGNAL(lastWindowClosed()), SLOT(clear()) );
@@ -49,8 +49,8 @@ void FermaNextWorkspace::clear ()
 void FermaNextWorkspace::reset ()
 {
     emit onReset();
-    name = untitledName;    
-    clear();    
+    name = untitledWorkspaceName;
+    clear();
 }
 
 void FermaNextWorkspace::createWidgetStack ( QMainWindow& parent )
@@ -146,12 +146,7 @@ FermaNextConfig& FermaNextWorkspace::config ()
 
 bool FermaNextWorkspace::loadPlugins ()
 {
-    FermaNextConfig& conf = config();
-    ConfigItems items = conf.getConfigItems("PluginsDir");
-    if ( ! items.contains("PluginsDir") )
-        return false;
-    QString pluginsDir = items["PluginsDir"].toString();
-    plgLoader.loadPlugins( pluginsDir );
+    plgLoader.loadPlugins( pluginsPath() );
     return true;
 }
 
