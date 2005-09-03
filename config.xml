@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <FermaNextConfig>
-   <PluginsDir>plugins</PluginsDir>
    <TrussUnitWindow>
        <BorderColor>#142328</BorderColor>
        <CanvasColor>#080A0C</CanvasColor>
