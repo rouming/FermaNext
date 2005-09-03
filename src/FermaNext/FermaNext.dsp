@@ -174,6 +174,17 @@ SOURCE=.\..\common\AbstractObjectAction.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\common
+InputPath=.\..\common\AbstractObjectAction.h
+InputName=AbstractObjectAction
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
@@ -208,6 +219,17 @@ SOURCE=.\..\gui\CalcDataToolBar.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\gui
+InputPath=.\..\gui\CalcDataToolBar.h
+InputName=CalcDataToolBar
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
@@ -238,6 +260,17 @@ SOURCE=.\..\gui\FermaNextMainFrame.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\gui
+InputPath=.\..\gui\FermaNextMainFrame.h
+InputName=FermaNextMainFrame
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
@@ -264,6 +297,17 @@ SOURCE=.\..\FermaNext\FermaNextProject.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\..\FermaNext\FermaNextProject.h
+InputName=FermaNextProject
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
@@ -285,6 +329,17 @@ InputName=FermaNextProject
 SOURCE=.\..\FermaNext\FermaNextWorkspace.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\..\FermaNext\FermaNextWorkspace.h
+InputName=FermaNextWorkspace
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
@@ -308,6 +363,17 @@ SOURCE=.\..\common\ObjectState.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\common
+InputPath=.\..\common\ObjectState.h
+InputName=ObjectState
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
@@ -329,6 +395,17 @@ InputName=ObjectState
 SOURCE=.\..\common\ObjectStateManager.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\common
+InputPath=.\..\common\ObjectStateManager.h
+InputName=ObjectStateManager
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
@@ -356,6 +433,17 @@ SOURCE=.\..\gui\ProjectToolBox.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\gui
+InputPath=.\..\gui\ProjectToolBox.h
+InputName=ProjectToolBox
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
@@ -377,6 +465,17 @@ InputName=ProjectToolBox
 SOURCE=.\..\common\StatefulObject.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\common
+InputPath=.\..\common\StatefulObject.h
+InputName=StatefulObject
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
@@ -404,6 +503,17 @@ SOURCE=.\..\gui\ToolBarManager.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\gui
+InputPath=.\..\gui\ToolBarManager.h
+InputName=ToolBarManager
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
@@ -425,6 +535,17 @@ InputName=ToolBarManager
 SOURCE=.\..\gui\WindowListBox.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\gui
+InputPath=.\..\gui\WindowListBox.h
+InputName=WindowListBox
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
