@@ -138,6 +138,17 @@ SOURCE=.\Truss.h
 
 !IF  "$(CFG)" == "TrussUnit - Win32 Release"
 
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\Truss.h
+InputName=Truss
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
@@ -160,6 +171,17 @@ SOURCE=.\TrussLoad.h
 
 !IF  "$(CFG)" == "TrussUnit - Win32 Release"
 
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\TrussLoad.h
+InputName=TrussLoad
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
@@ -181,6 +203,17 @@ InputName=TrussLoad
 SOURCE=.\TrussUnit.h
 
 !IF  "$(CFG)" == "TrussUnit - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\TrussUnit.h
+InputName=TrussUnit
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
 
@@ -208,6 +241,17 @@ SOURCE=.\TrussUnitDesignerWidget.h
 
 !IF  "$(CFG)" == "TrussUnit - Win32 Release"
 
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\TrussUnitDesignerWidget.h
+InputName=TrussUnitDesignerWidget
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
@@ -229,6 +273,17 @@ InputName=TrussUnitDesignerWidget
 SOURCE=.\TrussUnitDesignerWindow.h
 
 !IF  "$(CFG)" == "TrussUnit - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\TrussUnitDesignerWindow.h
+InputName=TrussUnitDesignerWindow
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
 
@@ -252,6 +307,17 @@ SOURCE=.\TrussUnitWindow.h
 
 !IF  "$(CFG)" == "TrussUnit - Win32 Release"
 
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\TrussUnitWindow.h
+InputName=TrussUnitWindow
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
 !ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
@@ -273,6 +339,17 @@ InputName=TrussUnitWindow
 SOURCE=.\TrussUnitWindowManager.h
 
 !IF  "$(CFG)" == "TrussUnit - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\TrussUnitWindowManager.h
+InputName=TrussUnitWindowManager
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
 
