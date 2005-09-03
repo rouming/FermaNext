@@ -8,8 +8,7 @@
  * Main Consts 
  ************************************/
 
-extern const QString imagesPath;
-
+extern const QString untitledWorkspaceName;
 
 /************************************
  * Truss Unit Consts
@@ -37,5 +36,17 @@ extern const bool flipY;
 /************************************
  * Desginer Consts
  ************************************/
+
+/************************************
+ * Main subs
+ ************************************/
+
+QString imagesPath ();
+QString pluginsPath ();
+QString configFileName ();
+
+// Sage return of the directory that 
+// contains the application executable.
+QString applicationDirPath ();
 
 #endif //SUBSIDIARYCONSTANTS_H

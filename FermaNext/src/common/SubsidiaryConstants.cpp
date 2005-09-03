@@ -1,12 +1,13 @@
 
 #include "SubsidiaryConstants.h"
+#include <qapplication.h>
+#include <qfile.h>
 
 /************************************
  * Main Consts 
  ************************************/
 
-const QString imagesPath = "images";
-
+const QString untitledWorkspaceName = QObject::tr("Unnamed workspace");
 
 /************************************
  * Truss Unit Consts
@@ -36,5 +37,33 @@ const bool flipY = true;
  * Desginer Consts
  ************************************/
 
+// Empty
+ 
+ /************************************
+ * Main subs
+ ************************************/
 
+QString imagesPath () 
+{ 
+    return applicationDirPath() + "/" + "images"; 
+}
 
+QString pluginsPath () 
+{ 
+    return applicationDirPath() + "/" + "plugins";
+}
+
+QString configFileName ()
+{
+    return applicationDirPath() + "/" + "config.xml";
+}
+
+QString applicationDirPath ()
+{
+    if ( qApp ) 
+        return qApp->applicationDirPath();
+    else 
+        return ".";
+}
+
+/*****************************************************************************/
