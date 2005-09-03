@@ -30,6 +30,7 @@ SOURCES = FermaNext.cpp \
           FermaNextWorkspace.cpp \
           \
           ../common/AggQWidget.cpp \
+          ../common/AggSubsidiary.cpp \
           ../common/Benchmark.cpp \
           ../common/DynaLoader.cpp \
           ../common/ObjectState.cpp \
@@ -51,6 +52,7 @@ HEADERS = FermaNextConfig.h \
           \
           ../common/AbstractObjectAction.h \
           ../common/AggQWidget.h \
+          ../common/AggSubsidiary.h \
           ../common/Benchmark.h \
           ../common/DynaLoader.h \
           ../common/ObjectState.h \
