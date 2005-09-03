@@ -96,3 +96,5 @@ void drawOutlineRoundedRect ( solidRenderer& solidRend, scanline_rasterizer& ras
     ras.add_path ( stroke );
     agg::render_scanlines(ras, sl, solidRend);
 }
+
+/*****************************************************************************/
