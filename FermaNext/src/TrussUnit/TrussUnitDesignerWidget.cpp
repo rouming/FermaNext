@@ -133,11 +133,11 @@ void TrussUnitDesignerWidget::removeAllHighlight ()
     for ( ; iter != trussWindows.end(); ++iter ) 
     {
         TrussUnitWindow* window = (*iter);
+        window->setResizeEllipseHighlighted ( TrussUnitWindow::None );
         if ( nodeBehaviour == onNodeSelect )
             window->removeNodesHighlight ();
         if ( pivotBehaviour == onPivotSelect )
             window->removePivotsHighlight ();
-        window->setResizeEllipseHighlighted ( TrussUnitWindow::None );
     }
 
     if ( nodeBehaviour == onNodeSelect )
@@ -547,8 +547,6 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                 else
                 {
                     clearAllCursorCoordFields ();
-                    QPoint cursorCoord ( -1, -1 );
-                    selectedWindow->setCursorCoord ( cursorCoord );
                     update();
                 }
                 if ( selectedWindow->inHorResizeRect ( x, y ) )
