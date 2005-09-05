@@ -137,6 +137,10 @@ void FermaNextMainFrame::createProject ()
         trussWindow.findNodeByNumber( 1 )->setFixation( Node::FixationByX );
         trussWindow.findNodeByNumber( 2 )->setFixation( Node::FixationByY );
         trussWindow.findNodeByNumber( 3 )->setFixation( Node::FixationByXY );
+
+        TrussUnitLoadCase& currentCase = trussWindow.getLoadCases().createLoadCase();
+        trussWindow.getLoadCases().setCurrentLoadCase ( currentCase );
+        currentCase.addLoad ( *trussWindow.findNodeByNumber( 4 ), 10, 10 );
 /*********** TEMP TRUSS UNIT **************************/
 
         prj.activate();
