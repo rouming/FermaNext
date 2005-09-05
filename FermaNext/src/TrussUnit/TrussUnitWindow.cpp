@@ -1449,7 +1449,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
     agg::scanline_p8 sl;
     agg::ellipse ell;
 
-    bool numbersDrawing = false;
+    bool numbersDrawing = true;
 
     pixf_dynarow windowPixf( *windowBuf ),
                  numbersPixf( *numbersBuf ),
