@@ -88,6 +88,7 @@ struct arrow
     concat_type    c;
 
     arrow ( line& l, double w );
+    arrow ( line& l, double w, int downLen, int upLen, int sideWid, int sideLen );
     void rewind ( unsigned id );
     unsigned vertex ( double* x, double* y );
 };
@@ -102,9 +103,12 @@ void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
 void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
                 agg::scanline_p8& sl, QPoint point1, QPoint point2 );
 void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
+                 agg::scanline_p8& sl, QPoint tail, QPoint head, color_type color,
+                 int downLen, int upLen, int sideWid, int sideLen );
+void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
                  agg::scanline_p8& sl, QPoint point1, QPoint point2 );
 void drawOutlineRoundedRect ( solidRenderer& solidRend, scanline_rasterizer& ras,
-                              agg::scanline_p8& sl, QPoint point1, QPoint point2, 
+                              agg::scanline_p8& sl, QPoint tail, QPoint head, 
                               int cornerRadius, color_type color);
 
 #endif //AGGSUBSIDIARY_H
