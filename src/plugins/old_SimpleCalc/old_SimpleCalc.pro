@@ -1,7 +1,7 @@
 
 TARGET = ../../../plugins/old_SimpleCalc
 
-TEMPLATE += lib
+TEMPLATE = lib
 CONFIG += plugin warn_on thread debug
 
 OBJECTS_DIR = obj
