@@ -141,11 +141,15 @@ void TrussUnitDesignerWidget::removeAllHighlight ()
     }
 
     if ( nodeBehaviour == onNodeSelect )
+    {
         nodeBehaviour = nodeIdle;
+        update();
+    }
     if ( pivotBehaviour == onPivotSelect )
+    {
         pivotBehaviour = pivotIdle;
-
-    update ();
+        update ();
+    }
 }
 
 bool TrussUnitDesignerWidget::nodeCanBeDrawn ( int x, int y )
@@ -175,14 +179,22 @@ bool TrussUnitDesignerWidget::nodeCanBeDrawn ( int x, int y )
     return false;
 }
 
-
 void TrussUnitDesignerWidget::clearAllCursorCoordFields ()
 {
+    bool fieldChanged = false;
     QPoint coord ( -1, -1 );
     WindowListIter iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter )
-        (*iter)->setCursorCoord( coord );
-    update();
+    {
+        TrussUnitWindow* win = *iter;
+        if ( win->getCursorCoord() != coord )
+        {
+            win->setCursorCoord( coord );
+            fieldChanged = true;
+        }
+    }
+    if ( fieldChanged )
+        update();
 }
 
 void TrussUnitDesignerWidget::saveNodeStateAfterDrag ( QPoint pos )

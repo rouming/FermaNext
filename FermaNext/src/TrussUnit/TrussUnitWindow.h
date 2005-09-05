@@ -1,26 +1,8 @@
+
 #ifndef TRUSSUNITWINDOW_H
 #define TRUSSUNITWINDOW_H
 
 #include "TrussUnit.h"
-#include <vector>
-#include <qstring.h>
-#include <qpoint.h> 
-
-#include "agg_basics.h"
-#include "agg_conv_marker.h"
-#include "agg_conv_shorten_path.h"
-#include "agg_conv_marker_adaptor.h"
-#include "agg_conv_concat.h"
-#include "agg_vcgen_markers_term.h"
-#include "agg_arrowhead.h"
-#include "agg_glyph_raster_bin.h"
-#include "agg_renderer_raster_text.h"
-#include "agg_embedded_raster_fonts.h"
-#include "agg_rounded_rect.h"
-
-typedef agg::glyph_raster_bin<agg::rgba8>                           glyph_gen;
-typedef agg::renderer_raster_htext_solid<ren_dynarow, glyph_gen>    textRenderer;
-typedef const agg::int8u*                                           textFont;
 
 class TrussUnitWindow : public TrussUnit
 {
@@ -42,6 +24,7 @@ public:
     virtual void setWindowPosition ( QPoint pos );
     virtual void resize ( QPoint leftTop, QPoint rightBottom );
     virtual void setCursorCoord ( QPoint coord );
+    virtual QPoint getCursorCoord () const;
     virtual const QSize& getWindowSize () const;
 
     virtual bool inWindowRect ( int x, int y ) const;
@@ -101,19 +84,6 @@ public:
 
     virtual QString fitTextToWindowSize ( QString str, int lengthLimit, 
                                           glyph_gen& glyph ) const;
-
-    virtual void drawText ( textRenderer& textRend, const QString& str, 
-                            color_type c, QPoint point ) const;
-    virtual void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                            agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const;
-    virtual void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                             agg::scanline_p8& sl, QPoint point1, QPoint point2 ) const;
-    virtual void drawOutlineRoundedRect ( solidRenderer& solidRend, 
-                                          scanline_rasterizer& ras,
-                                          agg::scanline_p8& sl, 
-                                          QPoint point1, QPoint point2, 
-                                          int cornerRadius,
-                                          color_type color) const;
     virtual void drawTrussArea ( ren_dynarow& baseRend, scanline_rasterizer& ras,
                                  textRenderer& textRend, solidRenderer& solidRend, 
                                  agg::scanline_p8& sl ) const;
