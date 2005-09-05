@@ -153,26 +153,40 @@ void TrussUnit::desistAdjoiningPivots ( const TrussNode& node )
 
 void TrussUnit::paintLoad ( TrussLoad& load, QPoint tailPos, ren_dynarow& baseRend ) const
 {
+    double x = load.getXForce (),
+           y = load.getYForce (), 
+           x1 = 1, y1 = 1, sinA;
+
+    if ( x == 0 && y == 0 )
+        return;
+
+    if ( x != 0 && y != 0 )
+    {
+        sinA = fabs ( y / sqrt( x * x + y * y ) );
+        y1 = sinA * 1;
+        x1 = sqrt( 1 - y1 * y1 );
+    }
+
+    QPoint forceDirection ( 0, 0 );
+
+    if ( x < 0 )
+        forceDirection.setX ( - 1 );
+    else if ( x > 0 )
+        forceDirection.setX ( 1 );
+
+    if ( y < 0 )
+        forceDirection.setY ( - 1 );
+    else if ( y > 0 )
+        forceDirection.setY ( 1 );
+
+    QPoint headPos ( tailPos.x() + 20 * x1 * forceDirection.x(), 
+                     tailPos.y() - 20 * y1 * forceDirection.y() );
+    
     solidRenderer solidRend ( baseRend );
     scanline_rasterizer   ras;
     agg::scanline_p8     sl;
     color_type color = agg::rgba( 0, 0, 25 );
 
-    QPoint forceDirection ( 0, 0 );
-
-    if ( load.getXForce () < 0 )
-        forceDirection.setX ( - 1 );
-    else if ( load.getXForce () > 0 )
-        forceDirection.setX ( 1 );
-
-    if ( load.getYForce () < 0 )
-        forceDirection.setY ( - 1 );
-    else if ( load.getYForce () > 0 )
-        forceDirection.setY ( 1 );
-    
-    QPoint headPos ( ( tailPos.x() + 16 ) * forceDirection.x(), 
-                     ( tailPos.y() - 16 ) * forceDirection.y() );
-    
     drawArrow ( ras, solidRend, sl, tailPos, headPos, color, 4, 4, 4, 6 ); 
 }
 
