@@ -31,9 +31,20 @@ arrow::arrow ( line& l, double w ) :
     m( s.markers(), ah ),
     c( s, m )
 {
-    s.width(w); 
-    ah.head(4, 4, 4, 6);
-    s.shorten(w * 2.0);
+    s.width( w ); 
+    ah.head( 4, 1, 4, 6 );
+    s.shorten( w * 2.0 );
+}
+
+arrow::arrow ( line& l, double w, int downLen, int upLen, int sideWid, int sideLen ) : 
+    s( l ),
+    ah(),
+    m( s.markers(), ah ),
+    c( s, m )
+{
+    s.width( w ); 
+    ah.head( downLen, upLen, sideWid, sideLen );
+    s.shorten( w * 2.0 );
 }
 
 void arrow::rewind ( unsigned id ) 
@@ -75,13 +86,21 @@ void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
 }
 
 void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                 agg::scanline_p8& sl, QPoint point1, QPoint point2 )
+                 agg::scanline_p8& sl, QPoint tail, QPoint head,
+                 color_type color, int downLen, int upLen, 
+                 int sideWid, int sideLen )
 {
-    line newLine ( point1.x(), point1.y(), point2.x(), point2.y() );
-    arrow newArrow ( newLine, coordLineWidth );
+    line newLine ( tail.x(), tail.y(), head.x(), head.y() );
+    arrow newArrow ( newLine, coordLineWidth, downLen, upLen, sideWid, sideLen );
     ras.add_path ( newArrow );
-    solidRend.color ( agg::rgba(90, 90, 90) );
+    solidRend.color ( color );
     agg::render_scanlines ( ras, sl, solidRend );
+}
+
+void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
+                 agg::scanline_p8& sl, QPoint tail, QPoint head )
+{
+    drawArrow ( ras, solidRend, sl, tail, head, agg::rgba(90, 90, 90), 4, 1, 4, 6 );
 }
 
 void drawOutlineRoundedRect ( solidRenderer& solidRend, scanline_rasterizer& ras,
