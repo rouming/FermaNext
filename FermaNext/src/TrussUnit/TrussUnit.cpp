@@ -158,9 +158,6 @@ void TrussUnit::paintLoad ( TrussLoad& load, QPoint tailPos, ren_dynarow& baseRe
     agg::scanline_p8     sl;
     color_type color = agg::rgba( 0, 0, 25 );
 
-    int x = load.getXForce (),
-        y = load.getYForce ();
-
     QPoint forceDirection ( 0, 0 );
 
     if ( load.getXForce () < 0 )

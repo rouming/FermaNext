@@ -31,8 +31,8 @@ void PluginLoader::loadPlugins ( const QString& path )
         try {
             DynaLoader& loader = plugin->loader;
             loader.loadLibrary( path + "/" + dir[i] );
-            PluginInfoCall pluginInfoCall = reinterpret_cast<PluginInfoCall>( 
-                                  loader.getProcAddress( PLUGIN_INFO_CALL ) );
+            PluginInfoCall pluginInfoCall = 
+                     (PluginInfoCall)loader.getProcAddress( PLUGIN_INFO_CALL );
             PluginInfo& pluginInfo = pluginInfoCall();
             plugin->info = pluginInfo;
             plugins[i] = plugin;
