@@ -14,4 +14,7 @@ unix {
 
 INCLUDEPATH = ../../FermaNext
 
-SOURCES = old_SimpleCalc.cpp
+HEADERS = CalcDataReader.h
+
+SOURCES = old_SimpleCalc.cpp \
+          CalcDataReader.cpp
