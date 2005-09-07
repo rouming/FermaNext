@@ -5,19 +5,23 @@
 #ifdef __cplusplus
   #define ExternC extern "C"
 #else
-  #define ExternC
+  #define ExternC extern
 #endif
 
 #if defined WINDOWS || defined WIN32
   #define PluginExport ExternC __declspec( dllexport )
   #define PluginImport ExternC __declspec( dllimport )
+  #define StandardCall __stdcall
 #else
   #define PluginExport ExternC
   #define PluginImport ExternC
+  #define StandardCall
 #endif
 
-enum PluginType { CALCULATION_PLUGIN = 0, 
-                  OPTIMIZATION_PLUGIN };
+enum PluginType { 
+                  CALCULATION_PLUGIN  = 0x0001, 
+                  OPTIMIZATION_PLUGIN = 0x0010
+                };
 
 // Plain Old Data for plugin info.
 // Plugin name should be short and unique.
@@ -91,7 +95,7 @@ typedef PluginInfo& (* PluginInfoCall ) ();
     __attribute__((destructor)) void fini_plugin__ ()
 
   #define FERMA_NEXT_PLUGIN(info) \
-    PluginExport PluginInfo& PLUGIN_INFO () \
+    PluginExport PluginInfo& StandardCall PLUGIN_INFO () \
     { return info; }
 #endif
 
