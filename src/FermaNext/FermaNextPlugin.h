@@ -38,7 +38,7 @@ struct PluginInfo
 
 
 // Plugin signature. 
-typedef PluginInfo& (* StandardCall PluginInfoCall ) ();
+typedef PluginInfo& ( StandardCall *PluginInfoCall ) ();
 
 #if defined WINDOWS || defined WIN32
   #include <windows.h>
