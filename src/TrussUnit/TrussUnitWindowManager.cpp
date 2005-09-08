@@ -147,8 +147,10 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
     //int ny1  = strtol( line,  NULL, 10 );
     file.readLine( line, 256 );
     //int e1   = strtod( line,  NULL );
+
     file.readLine( line, 256 );
-    //int nsn1 = strtol( line,  NULL, 10 );
+    int loadCasesNum = strtol( line,  NULL, 10 ); //nsn1
+
     file.readLine( line, 256 );
     //int sd1  = strtod( line,  NULL );
 
@@ -221,59 +223,42 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
         node->setFixation( fix );
     }
 
-    
-    /*
-    // Fixation swapping
-    for ( i = 0; i < frm.nyz1; ++i )
+    TrussUnitLoadCases& loadCases = truss.getLoadCases();
+    for ( i = 0; i < loadCasesNum; ++i )
     {
-        if ( frm.msn[i][0] == 0 )
-            frm.msn[i][0] = 1;
-        else
-            frm.msn[i][0] = 0;
-    
-        if ( frm.msn[i][1] == 0 )
-            frm.msn[i][1] = 1;
-        else
-        frm.msn[i][1] = 0;
-    }
+        TrussUnitLoadCase& loadCase = loadCases.createLoadCase();
+        if ( i == 2 )
+            loadCases.setCurrentLoadCase ( loadCase );
 
-    for ( i = 0; i < frm.nsn1; ++i )
-    {
-        for ( int j = 0; j < frm.nyz1 * 2; ++j )
+        for ( int j = 1; j <= nodesNum; ++j )
         {
             file.readLine( line, 256 );
-            frm.Pn[j][i] = strtod( line,  NULL );
+            double xForce = strtod( line,  NULL );
+            file.readLine( line, 256 );
+            double yForce = strtod( line,  NULL );
+
+            if ( xForce != 0 || yForce != 0 ) {
+                TrussNode* node = truss.findNodeByNumber( j );
+                if ( node == 0 )
+                    throw WrongFormatException();
+                loadCase.addLoad ( *node, xForce , yForce );
+            }
         }
     }
-
+   
     file.readLine( line, 256 );
-    frm.s_lin = line;
+    //frm.s_lin = line;
     
     file.readLine( line, 256 );
-    frm.s_for = line;
+    //frm.s_for = line;
     
     file.readLine( line, 256 );
-    frm.region_x = strtod( line,  NULL );
+    int width = (int)strtod( line,  NULL );
 
     file.readLine( line, 256 );
-    frm.region_y = strtod( line,  NULL );
+    int height = (int)strtod( line,  NULL );
 
-
-    for ( int i = 0; i < frm.nyz1; ++i )
-    {
-        node n( frm.corn[i][0], frm.corn[i][1] );
-        nodes.push_back( n );
-    }
-
-    for ( i = 0; i < frm.nst1; ++i )
-    {           
-        node& n1 = nodes.at( frm.iTopN[i][0] - 1 );
-        node& n2 = nodes.at( frm.iTopN[i][1] - 1 );
-
-        line p( n1.x, n1.y, n2.x, n2.y );                 
-        pivots.push_back( p );        
-    }
-*/
+    truss.setTrussAreaSize( QSize( width, height ) );
 }
 
 void TrussUnitWindowManager::load ( TrussUnit&, const QFile& )
