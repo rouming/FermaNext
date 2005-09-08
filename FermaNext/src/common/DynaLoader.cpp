@@ -65,4 +65,9 @@ ProcAddress DynaLoader::getProcAddress ( const QString& funcName ) const
     return address;
 }
 
+bool DynaLoader::isLoaded () const
+{
+    return handle != 0;
+}
+
 /*****************************************************************************/
