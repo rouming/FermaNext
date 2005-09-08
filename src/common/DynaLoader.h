@@ -46,6 +46,7 @@ public:
 
 
     bool freeLibrary ();
+    bool isLoaded () const;
 
 private:
     LibraryHandle handle;
