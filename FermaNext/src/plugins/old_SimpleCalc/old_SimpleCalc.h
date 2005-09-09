@@ -13,12 +13,12 @@
 #endif
 
 class QFile;
-class QSocket;
+class QSocketDevice;
 
 // Temp file
 QFile* tempFile = 0;
 // Temp socket
-QSocket* tempSocket = 0;
+QSocketDevice* tempSocket = 0;
 
 const char* fermaResExt = ".vyv";
 
@@ -27,8 +27,8 @@ QFile* createTempFile ();
 void destroyTempFile ( QFile*& );
 
 // Manages calculation server
-QSocket* startCalculationServer ();
-void stopCalculationServer ( QSocket*& );
+QSocketDevice* startCalculationServer ();
+void stopCalculationServer ( QSocketDevice*& );
 
 
 // Calculation thread

@@ -2,7 +2,7 @@
 #include "old_SimpleCalc.h"
 #include "FermaNextPlugin.h"
 #include <stdio.h>
-#include <qsocket.h>
+#include <qsocketdevice.h>
 #include <qfile.h>
 
 /*****************************************************************************
@@ -26,9 +26,9 @@ FERMA_NEXT_PLUGIN_FINI
 
 PluginExport void StandardCall calculation ()
 {
-    // write to calculation server
-    QTextStream os(tempSocket);
-    os << "/home/roman/devel/FermaNext/1-64578.frm" << "\n";    
+    // Send file name to calculation server
+    QString fileName( "/home/roman/devel/FermaNext/1-64578.frm\n" );
+    tempSocket->writeBlock( fileName, fileName.length() );
 }
 
 /*****************************************************************************/
@@ -53,23 +53,23 @@ void destroyTempFile ( QFile*& file )
     }
 }
 
-QSocket* startCalculationServer ()
+QSocketDevice* startCalculationServer ()
 {
     CalcThread* calc = new CalcThread;
     calc->start();
     sleep_seconds(3);
-    QSocket* socket = new QSocket();
-    socket->connectToHost( "localhost", 1212 );
+    QSocketDevice* socket = new QSocketDevice();
+    socket->connect( QHostAddress("127.0.0.1"), 1212 );
     return socket;
 }
 
-void stopCalculationServer ( QSocket*& socket )
+void stopCalculationServer ( QSocketDevice*& socket )
 {
-    QTextStream os(socket);
-    os << "quit";
+    QString msg("quit\n");
+    socket->writeBlock( msg, msg.length() );
     socket->close();
-    sleep_seconds(3);
     delete socket;
+    sleep_seconds(2);
     socket = 0;
 }
 
