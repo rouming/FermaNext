@@ -98,6 +98,10 @@ SOURCE=.\TrussLoad.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\TrussMaterial.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\TrussNode.cpp
 # End Source File
 # Begin Source File
@@ -197,6 +201,10 @@ InputName=TrussLoad
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=.\TrussMaterial.h
 # End Source File
 # Begin Source File
 

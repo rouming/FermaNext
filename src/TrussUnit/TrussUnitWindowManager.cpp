@@ -146,13 +146,17 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
     file.readLine( line, 256 );
     //int ny1  = strtol( line,  NULL, 10 );
     file.readLine( line, 256 );
-    //int e1   = strtod( line,  NULL );
+    double elasticityModule = strtod( line,  NULL ); //e1
 
     file.readLine( line, 256 );
     int loadCasesNum = strtol( line,  NULL, 10 ); //nsn1
 
     file.readLine( line, 256 );
-    //int sd1  = strtod( line,  NULL );
+    double workingStress = strtod( line,  NULL ); //sd1
+
+    TrussMaterial& material = truss.getMaterial();
+    material.setElasticityModule( elasticityModule );
+    material.setWorkingStress( workingStress );
 
     int i;
 
@@ -264,7 +268,7 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
 void TrussUnitWindowManager::load ( TrussUnit&, const QFile& )
                                                    throw (WrongFormatException)
 {
-    // Implementation is looked forward
+    // Implementation is looking forward
 }
 
 /*****************************************************************************/
