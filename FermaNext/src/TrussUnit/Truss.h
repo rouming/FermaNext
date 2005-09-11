@@ -9,6 +9,7 @@
 
 #include "StatefulObject.h"
 #include "TrussLoad.h"
+#include "TrussMaterial.h"
 
 // Basic classes for truss unit construction. 
 template <class N, class P> class Truss;
@@ -91,8 +92,7 @@ public:
     typedef typename PivotList::const_iterator PivotListConstIter;
 
     Truss ( ObjectStateManager* mng ) :
-        TrussEmitter(mng),
-        loadCases( new TrussLoadCaseArray<N> )
+        TrussEmitter(mng)
     {}
 
     virtual void clear () 
@@ -113,7 +113,6 @@ public:
 
     virtual ~Truss ()
     {
-        delete loadCases;
         clear();
     }
 
@@ -321,9 +320,24 @@ public:
         return alivePivots;
     }
 
-    virtual TrussLoadCaseArray<N>& getLoadCases () const
+    virtual const TrussLoadCaseArray<N>& getLoadCases () const
     {
-        return *loadCases;
+        return loadCases;
+    }
+
+    virtual TrussLoadCaseArray<N>& getLoadCases ()
+    {
+        return loadCases;
+    }
+
+    virtual const TrussMaterial& getMaterial () const
+    {
+        return material;
+    }
+
+    virtual TrussMaterial& getMaterial ()
+    {
+        return material;
     }
 
 protected:
@@ -515,7 +529,8 @@ protected:
 private:
     NodeList  nodes;
     PivotList pivots;
-    TrussLoadCaseArray<N>* loadCases;
+    TrussLoadCaseArray<N> loadCases;
+    TrussMaterial material;
 };
 
 /*****************************************************************************

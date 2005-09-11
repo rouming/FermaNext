@@ -20,6 +20,7 @@ INCLUDEPATH = $$(AGGDIR)/include \
 
 SOURCES = Truss.cpp \
           TrussLoad.cpp \
+          TrussMaterial.cpp \
           TrussNode.cpp \
           TrussPivot.cpp \
           TrussUnit.cpp \
@@ -31,6 +32,7 @@ SOURCES = Truss.cpp \
 
 HEADERS = Truss.h \
           TrussLoad.h \
+          TrussMaterial.h \
           TrussUnit.h \
           TrussUnitActions.h \
           TrussUnitDesignerWidget.h \
