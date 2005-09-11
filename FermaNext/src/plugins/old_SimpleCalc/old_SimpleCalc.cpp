@@ -5,6 +5,12 @@
 #include <qsocketdevice.h>
 #include <qfile.h>
 
+#if defined WINDOWS || defined WIN32  
+  #include "win_SimpleCalc.h"
+#else
+  #include "unix_SimpleCalc.h"
+#endif
+
 /*****************************************************************************
  * Old Simple Calculation plugin (main init/fini routines)
  *****************************************************************************/
@@ -14,21 +20,19 @@ FERMA_NEXT_PLUGIN(inf)
 
 FERMA_NEXT_PLUGIN_INIT
 {
+    os_dependent_init();
     tempFile = createTempFile();
-    tempSocket = startCalculationServer();
 }
 
 FERMA_NEXT_PLUGIN_FINI
 {
-    stopCalculationServer( tempSocket );
+    os_dependent_fini();
     destroyTempFile( tempFile );
 }
 
 PluginExport void StandardCall calculation ()
 {
-    // Send file name to calculation server
-    QString fileName( "/home/roman/devel/FermaNext/1-64578.frm\n" );
-    tempSocket->writeBlock( fileName, fileName.length() );
+    os_dependent_calculation();
 }
 
 /*****************************************************************************/
@@ -51,26 +55,6 @@ void destroyTempFile ( QFile*& file )
         delete file;
         file = 0;        
     }
-}
-
-QSocketDevice* startCalculationServer ()
-{
-    CalcThread* calc = new CalcThread;
-    calc->start();
-    sleep_seconds(3);
-    QSocketDevice* socket = new QSocketDevice();
-    socket->connect( QHostAddress("127.0.0.1"), 1212 );
-    return socket;
-}
-
-void stopCalculationServer ( QSocketDevice*& socket )
-{
-    QString msg("quit\n");
-    socket->writeBlock( msg, msg.length() );
-    socket->close();
-    delete socket;
-    sleep_seconds(2);
-    socket = 0;
 }
 
 /*****************************************************************************/
