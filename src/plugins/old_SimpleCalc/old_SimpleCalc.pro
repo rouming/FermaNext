@@ -8,8 +8,8 @@ OBJECTS_DIR = obj
 
 win32 {
   DEFINES += WIN32 QT_THREAD_SUPPORT
-  system("xcopy Simple_f.dll ..\..\..\plugins")
-  system("xcopy win_Simple_f.dll ..\..\..\plugins")
+  system("xcopy /y Simple_f.dll ..\..\..\plugins")
+  system("xcopy /y win_Simple_f.dll ..\..\..\plugins")
 }
 unix {
   DEFINES += QT_THREAD_SUPPORT
