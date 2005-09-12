@@ -13,8 +13,8 @@ win32 {
 }
 unix {
   DEFINES += QT_THREAD_SUPPORT
-  system("cp Simple_f.dll ../../../plugins")
-  system("cp Simple_f.exe ../../../plugins")
+  system( cp Simple_f.dll ../../../plugins/ )
+  system( cp Simple_f.exe ../../../plugins/ )
 }
 
 INCLUDEPATH = ../../FermaNext ../../common
