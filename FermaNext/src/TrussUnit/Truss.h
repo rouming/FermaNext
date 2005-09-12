@@ -20,9 +20,8 @@ class Node;
  * Truss Emitter
  *****************************************************************************/
 
-// Emitters for truss unit basic classes. 
-// All signals logic was moved to this classes 
-// because of Qt rejection to moc templates.
+// Truss emitter. All signals logic was moved to this 
+// classe because of Qt rejection to moc templates.
 
 class TrussEmitter : public StatefulObject
 {
@@ -146,10 +145,21 @@ public:
         return 0;
     }   
 
-    virtual N* findNodeByNumber ( int num ) const
+    virtual N* findNodeByNumber ( uint num ) const
     {
         NodeListConstIter iter = nodes.begin();
-        for ( int i = 1; iter != nodes.end(); ++iter ) 
+        for ( uint i = 1; iter != nodes.end(); ++iter ) 
+        {
+            if ( (*iter)->isAlive() && (*iter)->isEnabled() && i++ == num )
+                return *iter;
+        }
+        return 0;
+    }
+
+    virtual P* findPivotByNumber ( uint num ) const
+    {
+        PivotListConstIter iter = pivots.begin();
+        for ( uint i = 1; iter != pivots.end(); ++iter ) 
         {
             if ( (*iter)->isAlive() && (*iter)->isEnabled() && i++ == num )
                 return *iter;
@@ -534,24 +544,43 @@ private:
 };
 
 /*****************************************************************************
+ * Pivot Emitter
+ *****************************************************************************/
+
+// Pivot emitter. All signals logic was moved to this 
+// classe because of Qt rejection to moc templates.
+
+class PivotEmitter : public StatefulObject
+{
+    Q_OBJECT
+public:
+    PivotEmitter ( ObjectStateManager* mng );
+
+signals:
+    void onThicknessChange ( double );
+};
+
+/*****************************************************************************
  * Pivot
  *****************************************************************************/
 
 template <class N> 
-class Pivot : public StatefulObject
+class Pivot : public PivotEmitter
 {
     friend class Truss<class N_, class P_>;
 
 protected:
     Pivot ( ObjectStateManager* mng ) : 
-        StatefulObject(mng),
+        PivotEmitter(mng),
         first(0), last(0),
+        thickness(0),
         number(0)
     {}
     Pivot ( N& first_, N& last_, ObjectStateManager* mng ) :
-        StatefulObject(mng),
+        PivotEmitter(mng),
         first(&first_),
         last(&last_),
+        thickness(0),
         number(0)
     {}
     virtual ~Pivot ()
@@ -566,6 +595,11 @@ public:
     { first = first_; }
     virtual void setLastNode ( N* last_ )
     { last = last_; }
+    virtual double getThickness () const
+    { return thickness; }
+    virtual void setThickness ( double t_ )
+    { thickness = t_; 
+      emit onThicknessChange(thickness); }
     virtual int getNumber () const
     { return number; }
     virtual void setNumber ( int num )
@@ -573,6 +607,7 @@ public:
 
 private:    
     N *first, *last;
+    double thickness;
     int number;
 };
 
