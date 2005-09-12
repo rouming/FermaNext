@@ -99,7 +99,7 @@ double TrussUnitWindow::getScaleMultiplierX () const
     p1 = getTrussAreaLeftTopPos ();
     p2 = getTrussAreaRightBottomPos ();
     double realTrussAreaLen = abs ( p2.x() - p1.x() );
-    double scaleMultiplierX = realTrussAreaLen / trussAreaSize.height();
+    double scaleMultiplierX = realTrussAreaLen / trussAreaSize.width();
     return scaleMultiplierX;
 }
 
@@ -110,7 +110,7 @@ double TrussUnitWindow::getScaleMultiplierY () const
     p1 = getTrussAreaLeftTopPos ();
     p2 = getTrussAreaRightBottomPos ();
     double realTrussAreaWid = abs ( p2.y() - p1.y() );
-    double scaleMultiplierY = realTrussAreaWid / trussAreaSize.width();
+    double scaleMultiplierY = realTrussAreaWid / trussAreaSize.height();
     return scaleMultiplierY;
 }
 
@@ -906,13 +906,13 @@ void TrussUnitWindow::updateAfterNodeManipulation ( TrussNode* selectedNode,
 // Analyses positions of selected node and its adjoining pivots
 // relative to other truss elements.
 {
-    QPoint nodePos = getWidgetPosFromTrussCoord ( selectedNode->getPoint() );
+    int numb = selectedNode->getNumber();
 
     PivotList adjPivotList = findAdjoiningPivots ( *selectedNode );
     QPointArray crossPoints = getPivotCrossPoints ( adjPivotList );
     createPivotCrossNodes ( crossPoints );
 
-    selectedNode = findNodeByWidgetPos ( nodePos, nodeFindingPrecision );
+    selectedNode = findNodeByNumber( numb );
     if ( !selectedNode )
         return;
 
