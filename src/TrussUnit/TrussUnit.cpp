@@ -80,7 +80,7 @@ bool PaintableTrussElement::isRendered () const
 TrussUnit::TrussUnit ( const QString& name, ObjectStateManager* mng ) :
     Truss<TrussNode, TrussPivot>(mng),
     trussName(name),
-    trussAreaSize( 300, 300 )
+    trussAreaSize( 0, 0 )
 {
     // We should render again when state has been changed
     QObject::connect( this, SIGNAL(onStateChange()), 
@@ -190,13 +190,14 @@ void TrussUnit::paintLoad ( TrussLoad& load, QPoint tailPos, ren_dynarow& baseRe
     drawArrow ( ras, solidRend, sl, tailPos, headPos, color, 4, 4, 4, 6 ); 
 }
 
-void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
-                       int trussAreaHeight ) const
+void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX, 
+                        double scaleMultY ) const
 {
     scanline_rasterizer ras;
     agg::scanline_p8 sl;
     agg::ellipse ell;
     QPoint pos;
+    int trussAreaHeight = getTrussAreaSize().height();
     PivotList pivotList = getPivotList ();
     PivotList::const_iterator pivotsIter = pivotList.begin();
     for ( ; pivotsIter != pivotList.end(); ++pivotsIter )

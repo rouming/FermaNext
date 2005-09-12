@@ -1536,8 +1536,9 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 
 
         /*------draw truss unit------*/
-        TrussUnit::paint ( baseRend, getScaleMultiplierX (), getScaleMultiplierY (),
-                           getTrussAreaSize().height() );
+        TrussUnit::paint ( baseRend, 
+                           getScaleMultiplierX (), 
+                           getScaleMultiplierY () );
 
         /*------draw truss elements numbers above them------*/
         if ( numbersDrawing )

@@ -269,6 +269,7 @@ void ProjectToolBox::newTrussIsPressed ()
     if ( ok && !trussName.isEmpty() ) {
         TrussUnitWindowManager& trussMng = currPrj->getTrussUnitWindowManager();
         TrussUnitWindow& truss = trussMng.createTrussUnitWindow(trussName);
+        truss.setTrussAreaSize( QSize( 300, 300 ) );
         // Save truss window create state
         ObjectState& state = truss.createState();
         TrussUnitWindowCreateAction* action = 

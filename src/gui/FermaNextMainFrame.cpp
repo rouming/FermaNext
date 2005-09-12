@@ -112,7 +112,9 @@ void FermaNextMainFrame::createProject ()
 /*********** TEMP TRUSS UNIT **************************/        
         QPoint pos1, pivotPnt1, pivotPnt2;
         int X(50), Y(50);
-        TrussUnitWindow& trussWindow = mng.createTrussUnitWindow( "Truss unit" );
+        TrussUnitWindow& trussWindow = mng.createTrussUnitWindow("Truss unit");
+        trussWindow.setTrussAreaSize( QSize( 300, 300 ) );
+
         pos1.setX ( X ); 
         pos1.setY ( Y );         
         trussWindow.createNode ( 280, 30 );
