@@ -68,8 +68,8 @@ public:
     void desistAdjoiningPivots ( const TrussNode& node );
 
     void paintLoad ( TrussLoad& load, QPoint tailPos, ren_dynarow& baseRend ) const;
-    void paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
-                int trussAreaHeight ) const;
+    void paint ( ren_dynarow& baseRend, double scaleMultX, 
+                 double scaleMultY ) const;
 
 public slots:
     void setTrussName ( const QString& name );
