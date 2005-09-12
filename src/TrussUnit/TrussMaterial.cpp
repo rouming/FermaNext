@@ -18,6 +18,9 @@ TrussMaterial::TrussMaterial ( const QString& name,
     elasticityModule(elasticityModule_)
 {}
 
+TrussMaterial::~TrussMaterial ()
+{}
+
 void TrussMaterial::setMaterialName ( const QString& name )
 {
     materialName = name;
