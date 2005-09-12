@@ -2,6 +2,20 @@
 #include "TrussUnitWindowManager.h"
 #include <qregexp.h>
 
+// Indeces of povot nodes
+struct PivotNodes
+{
+    PivotNodes ( uint first_, uint last_ ) :
+        first(first_),
+        last(last_)
+    {}
+    uint first;
+    uint last;
+};
+
+typedef std::vector<PivotNodes> PivotNodesList;
+typedef PivotNodesList::iterator PivotNodesListIter;
+
 /*****************************************************************************
  * Truss Unit Window Manager
  *****************************************************************************/
@@ -132,16 +146,13 @@ bool TrussUnitWindowManager::removeTrussUnitWindow ( WindowListIter& iter )
 void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file ) 
                                                             throw (WrongFormatException)
 {
-    //TODO: convert to some pretty struct all this stuff
-
     char line[256];
-    std::vector<QPoint> pivots;
 
     file.readLine( line, 256 );
-    int pivotsNum = strtol( line,  NULL, 10 ); //nst1    
+    uint pivotsNum = strtol( line,  NULL, 10 ); //nst1    
 
     file.readLine( line, 256 );
-    int nodesNum = strtol( line,  NULL, 10 ); //nyz1
+    uint nodesNum = strtol( line,  NULL, 10 ); //nyz1
 
     file.readLine( line, 256 );
     //int ny1  = strtol( line,  NULL, 10 );
@@ -149,7 +160,7 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
     double elasticityModule = strtod( line,  NULL ); //e1
 
     file.readLine( line, 256 );
-    int loadCasesNum = strtol( line,  NULL, 10 ); //nsn1
+    uint loadCasesNum = strtol( line,  NULL, 10 ); //nsn1
 
     file.readLine( line, 256 );
     double workingStress = strtod( line,  NULL ); //sd1
@@ -158,7 +169,8 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
     material.setElasticityModule( elasticityModule );
     material.setWorkingStress( workingStress );
 
-    int i;
+    uint i;
+    PivotNodesList pivots;
 
     for ( i = 0; i < pivotsNum; ++i )
     {
@@ -169,7 +181,7 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
         file.readLine( line, 256 );
         lastNodeInd = strtol( line,  NULL, 10 );
 
-        pivots.push_back( QPoint(firstNodeInd, lastNodeInd) );
+        pivots.push_back( PivotNodes(firstNodeInd, lastNodeInd) );
     }
 
     for ( i = 0; i < nodesNum; ++i )
@@ -184,30 +196,33 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
         truss.createNode( x, y );
     }
 
-
-    std::vector<QPoint>::iterator iter;
-    for ( iter = pivots.begin(); iter != pivots.end(); ++iter ) {
+    for ( PivotNodesListIter iter = pivots.begin(); 
+          iter != pivots.end(); 
+          ++iter ) {
         try {
-            QPoint pivotInd = *iter;            
-            truss.createPivot( uint(pivotInd.x()-1), uint(pivotInd.y()-1) );
+            PivotNodes pivotInd = *iter;            
+            truss.createPivot( pivotInd.first - 1, pivotInd.last - 1 );
         } catch ( TrussUnit::NodeIndexOutOfBoundException& ) {
-            throw WrongFormatException();    
+            throw WrongFormatException();
         }
     }
 
-    for ( i = 0; i < pivotsNum; ++i )
+    for ( i = 1; i <= pivotsNum; ++i )
     {
+        TrussPivot* pivot = truss.findPivotByNumber( i );
+        if ( pivot == 0 )
+            throw WrongFormatException();
         file.readLine( line, 256 );
-        //frm.Fn[i] = strtod( line,  NULL );
+        double thickness = strtod( line,  NULL );
+        pivot->setThickness( thickness );
     }
     
     for ( i = 1; i <= nodesNum; ++i )
     {
         file.readLine( line, 256 );
         int xFixation = strtol( line,  NULL, 10 );
-        //frm.msn[i][0] = strtol( line,  NULL, 10 );
+
         file.readLine( line, 256 );
-        //frm.msn[i][1] = strtol( line,  NULL, 10 );
         int yFixation = strtol( line,  NULL, 10 );
 
         TrussNode* node = truss.findNodeByNumber( i );
@@ -234,7 +249,7 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
         if ( i == 2 )
             loadCases.setCurrentLoadCase ( loadCase );
 
-        for ( int j = 1; j <= nodesNum; ++j )
+        for ( uint j = 1; j <= nodesNum; ++j )
         {
             file.readLine( line, 256 );
             double xForce = strtod( line,  NULL );
