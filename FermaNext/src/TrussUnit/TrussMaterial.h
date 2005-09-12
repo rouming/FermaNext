@@ -12,6 +12,8 @@ public:
                     double workingStress,
                     double elasticityModule );
 
+    virtual ~TrussMaterial ();
+
     virtual void setMaterialName ( const QString& );
     virtual void setWorkingStress ( double );
     virtual void setElasticityModule ( double );
