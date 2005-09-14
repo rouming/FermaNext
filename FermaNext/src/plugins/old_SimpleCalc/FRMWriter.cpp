@@ -103,10 +103,25 @@ void FRMWriter::write ( const QString& name )
         }
     }
 
-    QSize ar = truss.getTrussAreaSize();
+    const TrussDimension& dim = truss.getDimension();
 
-    file << "ñì" << "\n"
-         << "Í" << "\n"
+    QString length;
+    if ( dim.getLengthMeasure() == TrussDimension::mm )
+        length = "ÍÍ";
+    else if ( dim.getLengthMeasure() == TrussDimension::sm )
+        length = "ÓÍ";
+    else 
+        length = "Í";
+
+    QString force;
+    if ( dim.getForceMeasure() == TrussDimension::newton )
+        force = "î";
+    else 
+        force = "ËÇ";
+
+    QSize ar = truss.getTrussAreaSize();
+    file << length.ascii() << "\n"
+         << force.ascii() << "\n"
          << ' ' << QString::number((double)ar.width(), 'E', 14) << "\n"
          << ' ' << QString::number((double)ar.height(), 'E', 14) << "\n";
 }
