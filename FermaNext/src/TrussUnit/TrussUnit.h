@@ -62,7 +62,6 @@ public:
     virtual ~TrussUnit ();
 
     const QString& getTrussName () const;
-    const QSize& getTrussAreaSize () const;
     void nodeToFront ( TrussNode& node );
     // Manually call. We should save states before pivot desist.
     void desistAdjoiningPivots ( const TrussNode& node );
@@ -73,7 +72,6 @@ public:
 
 public slots:
     void setTrussName ( const QString& name );
-    void setTrussAreaSize ( const QSize& );
 
 protected slots:
     void trussUnitStateIsChanged ();
@@ -81,7 +79,6 @@ protected slots:
 
 signals:
     void onTrussNameChange ( const QString& );
-    void onAreaChange ( const QSize& );
 // Paintable signals
     void onVisibleChange ( bool );
     void onHighlightChange ( bool );
@@ -89,9 +86,8 @@ signals:
 
 private:
     static const QString UNNAMED;
-    TrussNode* frontNode;
     QString trussName;
-    QSize trussAreaSize;
+    TrussNode* frontNode;
 };
 
 /*****************************************************************************/

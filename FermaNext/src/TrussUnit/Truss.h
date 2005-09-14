@@ -17,6 +17,29 @@ template <class N> class Pivot;
 class Node;
 
 /*****************************************************************************
+ * Truss Dimenstion
+ *****************************************************************************/
+
+class TrussDimension
+{
+public:
+    enum LengthMeasure { mm = 0, sm, m };  //millimeter, centimeter, meter
+    enum ForceMeasure  { newton = 0, kg };
+
+    TrussDimension ();
+    TrussDimension ( LengthMeasure, ForceMeasure );
+
+    LengthMeasure getLengthMeasure () const;
+    ForceMeasure getForceMeasure () const;
+
+    void setLengthMeasure ( LengthMeasure );
+    void setForceMeasure ( ForceMeasure );
+private:
+    LengthMeasure length;
+    ForceMeasure force;
+};
+
+/*****************************************************************************
  * Truss Emitter
  *****************************************************************************/
 
@@ -28,6 +51,9 @@ class TrussEmitter : public StatefulObject
     Q_OBJECT
 public:
     TrussEmitter ( ObjectStateManager* mng );
+
+public slots:
+    virtual void setTrussAreaSize ( const QSize& ) = 0;
 
 protected slots:
     void stateIsChanged ();
@@ -45,6 +71,7 @@ protected slots:
 signals:
     // Truss signals
     void onStateChange ();
+    void onAreaChange ( const QSize& );
 
     // Nodes create/remove signals
     void beforeNodeCreation ();
@@ -210,7 +237,6 @@ public:
                                  SLOT(nodeBeforeDesist(StatefulObject&)) );
         QObject::connect( node, SIGNAL(onAfterDesist(StatefulObject&)),
                                  SLOT(nodeAfterDesist(StatefulObject&)) );
-
         // Just subsidiary catches
         QObject::connect( node, SIGNAL(onFixationChange ( Fixation )),
                                 SLOT(stateIsChanged()) );
@@ -263,6 +289,10 @@ public:
                                  SLOT(pivotBeforeDesist(StatefulObject&)) );
         QObject::connect( pivot, SIGNAL(onAfterDesist(StatefulObject&)),
                                  SLOT(pivotAfterDesist(StatefulObject&)) );
+        // Just subsidiary catches
+        QObject::connect( pivot, SIGNAL(onThicknessChange(double)),
+                                 SLOT(stateIsChanged()) );
+
         pivots.push_back(pivot);
         emit afterPivotCreation(pivot->getFirstNode(), 
                                 pivot->getLastNode());
@@ -330,6 +360,18 @@ public:
         return alivePivots;
     }
 
+    virtual const QSize& getTrussAreaSize () const
+    {
+        return trussAreaSize;
+    }
+
+    virtual void setTrussAreaSize ( const QSize& area )
+    {    
+        trussAreaSize = area;
+        emit onAreaChange( trussAreaSize );
+        emit onStateChange();
+    }
+
     virtual const TrussLoadCaseArray<N>& getLoadCases () const
     {
         return loadCases;
@@ -348,6 +390,16 @@ public:
     virtual TrussMaterial& getMaterial ()
     {
         return material;
+    }
+
+    virtual const TrussDimension& getDimension () const
+    {
+        return dimension;
+    }
+
+    virtual TrussDimension& getDimension ()
+    {
+        return dimension;
     }
 
 protected:
@@ -539,8 +591,10 @@ protected:
 private:
     NodeList  nodes;
     PivotList pivots;
+    QSize trussAreaSize;
     TrussLoadCaseArray<N> loadCases;
     TrussMaterial material;
+    TrussDimension dimension;
 };
 
 /*****************************************************************************

@@ -264,12 +264,26 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
             }
         }
     }
+
+    TrussDimension& dim = truss.getDimension();
+
+    QString dimensionStr;
    
     file.readLine( line, 256 );
-    //frm.s_lin = line;
-    
+    dimensionStr = line;
+    if ( dimensionStr.contains("μμ", 0) )
+        dim.setLengthMeasure( TrussDimension::mm );
+    else if ( dimensionStr.contains("ρμ", 0) )
+        dim.setLengthMeasure( TrussDimension::sm );
+    else
+        dim.setLengthMeasure( TrussDimension::m );        
+
     file.readLine( line, 256 );
-    //frm.s_for = line;
+    dimensionStr = line;
+    if ( dimensionStr.contains("Ν", 0) )
+        dim.setForceMeasure( TrussDimension::newton );
+    else
+        dim.setForceMeasure( TrussDimension::kg );
     
     file.readLine( line, 256 );
     int width = (int)strtod( line,  NULL );

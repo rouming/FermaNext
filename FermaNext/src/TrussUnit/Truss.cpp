@@ -3,6 +3,30 @@
 #include <algorithm>
 
 /*****************************************************************************
+ * Truss Dimenstion
+ *****************************************************************************/
+
+TrussDimension::TrussDimension () :
+    length(sm), force(newton)
+{}
+
+TrussDimension::TrussDimension ( LengthMeasure lm, ForceMeasure fm ) :
+    length(lm), force(fm)
+{}
+
+TrussDimension::LengthMeasure TrussDimension::getLengthMeasure () const
+{ return length; }
+
+TrussDimension::ForceMeasure TrussDimension::getForceMeasure () const
+{ return force; }
+
+void TrussDimension::setLengthMeasure ( LengthMeasure lm )
+{ length = lm; }
+
+void TrussDimension::setForceMeasure ( ForceMeasure fm )
+{ force = fm; }
+
+/*****************************************************************************
  * Truss Emitter
  *****************************************************************************/
 
