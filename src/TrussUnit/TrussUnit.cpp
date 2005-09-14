@@ -80,14 +80,13 @@ bool PaintableTrussElement::isRendered () const
 TrussUnit::TrussUnit ( const QString& name, ObjectStateManager* mng ) :
     Truss<TrussNode, TrussPivot>(mng),
     trussName(name),
-    trussAreaSize( 0, 0 )
+    frontNode(0)
 {
     // We should render again when state has been changed
     QObject::connect( this, SIGNAL(onStateChange()), 
                             SLOT(trussUnitStateIsChanged()) );
     QObject::connect( this, SIGNAL(afterNodeDesist( Node& )),
                             SLOT(clearFrontNodePointer( Node& )) );
-    frontNode = 0;
 }
 
 TrussUnit::~TrussUnit ()
@@ -108,18 +107,6 @@ void TrussUnit::setTrussName ( const QString& name )
     trussName = name;    
     emit onTrussNameChange( trussName );
     emit onStateChange();
-}
-
-void TrussUnit::setTrussAreaSize ( const QSize& area )
-{    
-    trussAreaSize = area;    
-    emit onAreaChange( trussAreaSize );
-    emit onStateChange();
-}
-
-const QSize& TrussUnit::getTrussAreaSize () const
-{
-    return trussAreaSize;
 }
 
 void TrussUnit::nodeToFront ( TrussNode& node )
