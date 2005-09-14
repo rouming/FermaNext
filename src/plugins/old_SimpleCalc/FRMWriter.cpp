@@ -111,13 +111,13 @@ void FRMWriter::write ( const QString& name )
     else if ( dim.getLengthMeasure() == TrussDimension::sm )
         length = "ÒÏ";
     else 
-        length = "Ï";
+        length = "Ã";
 
     QString force;
     if ( dim.getForceMeasure() == TrussDimension::newton )
         force = "Õ";
     else 
-        force = "Í„";
+        force = "Í√";
 
     QSize ar = truss.getTrussAreaSize();
     file << length.ascii() << "\n"
