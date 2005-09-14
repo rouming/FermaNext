@@ -107,17 +107,17 @@ void FRMWriter::write ( const QString& name )
 
     QString length;
     if ( dim.getLengthMeasure() == TrussDimension::mm )
-        length = "ÕÕ";
+        length = "ÏÏ";
     else if ( dim.getLengthMeasure() == TrussDimension::sm )
-        length = "”Õ";
+        length = "ÒÏ";
     else 
-        length = "Õ";
+        length = "Ï";
 
     QString force;
     if ( dim.getForceMeasure() == TrussDimension::newton )
-        force = "Ó";
+        force = "Õ";
     else 
-        force = "À«";
+        force = "Í„";
 
     QSize ar = truss.getTrussAreaSize();
     file << length.ascii() << "\n"
