@@ -91,6 +91,10 @@ LIB32=link.exe -lib
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;f90;for;f;fpp"
 # Begin Source File
 
+SOURCE=.\AggButton.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\AggToolBar.cpp
 # End Source File
 # Begin Source File
@@ -145,6 +149,28 @@ SOURCE=.\TrussUnitWindowManager.cpp
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
+# Begin Source File
+
+SOURCE=.\AggButton.h
+
+!IF  "$(CFG)" == "TrussUnit - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\AggButton.h
+InputName=AggButton
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # Begin Source File
 
 SOURCE=.\AggToolBar.h
@@ -425,6 +451,10 @@ InputName=TrussUnitWindowManager
 # Begin Group "Moc Files"
 
 # PROP Default_Filter "cpp"
+# Begin Source File
+
+SOURCE=.\mocs\moc_AggButton.cpp
+# End Source File
 # Begin Source File
 
 SOURCE=.\mocs\moc_AggToolBar.cpp
