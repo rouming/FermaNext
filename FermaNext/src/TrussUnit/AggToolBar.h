@@ -2,8 +2,7 @@
 #ifndef AGGTOOLBAR_H
 #define AGGTOOLBAR_H
 
-#include "AggSubsidiary.h"
-#include "SubsidiaryConstants.h"
+#include "AggButton.h"
 #include "qstring.h"
 #include "qpoint.h"
 #include "qsize.h"
@@ -12,55 +11,19 @@
 
 /*****************************************************************************/
 
-class AggToolBarButton : public QObject
+class AggToolBarButton : public AggButton
 {
-    Q_OBJECT
 public:
     AggToolBarButton ( QString fname, QString label_, QPoint leftTopPos, 
                        int width, int height );
     virtual ~AggToolBarButton ();
-    
-    virtual void setHint ( QString hint_ );
-    virtual QString getHint () const;
-
-    virtual void setLabel ( QString label_ );
-    virtual QString getLabel () const;
-
-    virtual void setPosition ( QPoint newPos );
-    virtual QPoint getPosition () const;
-
-    virtual void setWidth ( int w );
-    virtual int getWidth () const;
-
-    virtual void setHeight ( int h );
-    virtual int getHeight () const;
-
-    virtual bool isHighlighted () const;
-    virtual void setHighlighted ( bool );
-
-    virtual bool inButtonRect ( int x, int y ) const;
-
-    virtual bool isPressed () const;
-    virtual void setPressed ( bool );
 
     virtual void paint ( ren_dynarow& baseRend, scanline_rasterizer& ras,
                          agg::scanline_p8& sl, solidRenderer& solidRend,
                          agg::trans_affine& mtx, double scaleX, double scaleY  ) const;
-
-signals:
-    void onButtonHighlightChange ();
-    void onButtonPress();
-    void buttonIsPressed();
-
-protected slots:
-    void pressButton ();
-
 private:
     mutable pathRenderer pathRend;
-    int width, height;
-    bool highlighted, pressed;
-    QPoint leftTopPos;
-    QString label, hint;
+    color_type fillCol, lineCol, highlightFill, highlightLine;
 };
 
 /*****************************************************************************/

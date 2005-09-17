@@ -7,12 +7,11 @@
 
 AggToolBarButton::AggToolBarButton ( QString fname, QString l, QPoint pos, 
                                      int w, int h  ) :
-    leftTopPos ( pos ),
-    width ( w ),
-    height ( h ),
-    label ( l ),
-    pressed ( false ),
-    highlighted ( false )
+    AggButton ( l, pos, w, h ),
+    fillCol( agg::rgba( 0, 0, 0, 0.3 ) ),
+    lineCol( agg::rgba( 0, 0, 0 ) ), 
+    highlightFill( agg::rgba( 0, 0, 0, 0.15 ) ),
+    highlightLine( agg::rgba( 0, 0, 0, 0.7 ) )
 {
     parseSvg ( pathRend, fname.ascii() );
 }
@@ -20,122 +19,29 @@ AggToolBarButton::AggToolBarButton ( QString fname, QString l, QPoint pos,
 AggToolBarButton::~AggToolBarButton ()
 {}
 
-void AggToolBarButton::setLabel ( QString l )
-{
-    label = l;
-}
-
-QString AggToolBarButton::getLabel () const
-{
-    return label;
-}
-
-void AggToolBarButton::setHint ( QString hint_ )
-{
-    label = hint_;
-}
-
-QString AggToolBarButton::getHint () const
-{
-    return hint;
-}
-
-void AggToolBarButton::setPosition ( QPoint newPos )
-{
-    leftTopPos = newPos;
-}
-
-QPoint AggToolBarButton::getPosition () const
-{
-    return leftTopPos;
-}
-
-void AggToolBarButton::setWidth ( int w )
-{
-    width = w;
-}
-
-int AggToolBarButton::getWidth () const
-{
-    return width;
-}
-
-void AggToolBarButton::setHeight ( int h )
-{
-    height = h;
-}
-
-int AggToolBarButton::getHeight () const
-{
-    return height;
-}
-
-void AggToolBarButton::setHighlighted ( bool h_ )
-{
-    if ( highlighted == h_ )
-        return;
-    highlighted = h_;
-    emit onButtonHighlightChange ();
-}
-
-bool AggToolBarButton::isHighlighted () const
-{
-    return highlighted;
-}
-
-bool AggToolBarButton::inButtonRect ( int x, int y ) const
-{
-    if ( x > leftTopPos.x() && x < leftTopPos.x() + width &&
-         y > leftTopPos.y() && y < leftTopPos.y() + height )
-        return true;
-    return false;
-}
-
-bool AggToolBarButton::isPressed () const
-{
-    return pressed;
-}
-
-void AggToolBarButton::setPressed ( bool status )
-{
-    if ( pressed == status )
-        return;
-
-    if ( status )
-        emit onButtonPress();
-
-    pressed = status;
-    emit buttonIsPressed();
-}
-
-void AggToolBarButton::pressButton ()
-{
-    setPressed ( true );
-}
-
 void AggToolBarButton::paint ( ren_dynarow& baseRend, scanline_rasterizer& ras,
                                agg::scanline_p8& sl, solidRenderer& solidRend,
                                agg::trans_affine& mtx, double scaleX, double scaleY ) const
 {
+    QPoint pos = getPosition ();
+    int width = getWidth ();
+    int height = getHeight ();
     if ( isPressed() )
     {
         primitivesRenderer primRend ( baseRend );
-        primRend.fill_color ( agg::rgba( 0, 0, 0, 0.3 ) );
-        primRend.line_color ( agg::rgba( 0, 0, 0 ) );
-        primRend.outlined_rectangle ( leftTopPos.x() + 1, leftTopPos.y() + 1, 
-                                      leftTopPos.x() + width - 1, 
-                                      leftTopPos.y() + height - 1 );
+        primRend.fill_color ( fillCol );
+        primRend.line_color ( lineCol );
+        primRend.outlined_rectangle ( pos.x() + 1, pos.y() + 1, pos.x() + width - 1, 
+                                      pos.y() + height - 1 );
     }   
     else if ( isHighlighted() )
     {
         primitivesRenderer primRend ( baseRend );
-        primRend.fill_color ( agg::rgba( 0, 0, 0, 0.15 ) );
-        primRend.line_color ( agg::rgba( 0, 0, 0, 0.7 ) );
-        primRend.outlined_rectangle ( leftTopPos.x(), leftTopPos.y(), 
-                                      leftTopPos.x() + width, leftTopPos.y() + height );
+        primRend.fill_color ( highlightFill );
+        primRend.line_color ( highlightLine );
+        primRend.outlined_rectangle ( pos.x(), pos.y(), pos.x() + width, pos.y() + height );
     }
-    QPoint iconPos ( ( leftTopPos.x() + width / 4 ) / scaleX,
-                     ( leftTopPos.y() + height / 8 ) / scaleY );
+    QPoint iconPos ( ( pos.x() + width / 4 ) / scaleX, ( pos.y() + height / 8 ) / scaleY );
     drawSvg ( baseRend, ras, sl, pathRend, solidRend, mtx, iconPos.x(), 
               iconPos.y(), scaleX, scaleY, svgExpand, svgGamma );
 }
