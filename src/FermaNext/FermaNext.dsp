@@ -26,6 +26,7 @@ CFG=FermaNext - Win32 Debug
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
+F90=df.exe
 RSC=rc.exe
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
@@ -41,11 +42,10 @@ RSC=rc.exe
 # PROP Intermediate_Dir "../../Release"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-F90=df.exe
 # ADD BASE F90 /compile_only /nologo /warn:nofileopt
 # ADD F90 /compile_only /nologo /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "." /I "..\common" /I "..\TrussUnit" /I "..\gui" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "." /I "..\common" /I "..\Agg" /I "..\TrussUnit" /I "..\gui" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /c
 # ADD BASE RSC /l 0x419 /d "NDEBUG"
 # ADD RSC /l 0x419 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 LibAGG.lib LibSVG.lib libexpat.lib TrussUnit.lib qt-mt.lib qtmain_rel.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /machine:I386 /out:"../../FermaNext.exe" /libpath:"..\..\\" /libpath:"..\..\build" /libpath:"$(QTDIR)\lib" /libpath:"$(EXPATDIR)\Libs"
+# ADD LINK32 qt-mt.lib qtmain_rel.lib ole32.lib odbc32.lib odbccp32.lib LibAGG.lib LibSVG.lib libexpat.lib TrussUnit.lib Agg.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib oleaut32.lib uuid.lib winspool.lib /nologo /subsystem:windows /machine:I386 /out:"../../FermaNext.exe" /libpath:"..\..\\" /libpath:"..\..\build" /libpath:"$(QTDIR)\lib" /libpath:"$(EXPATDIR)\Libs"
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
@@ -69,11 +69,10 @@ LINK32=link.exe
 # PROP Intermediate_Dir "../../Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-F90=df.exe
 # ADD BASE F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /Od /I "." /I "..\common" /I "..\TrussUnit" /I "..\gui" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /D "BENCHMARK_ON" /YX /FD /GZ -Zm200 /c
+# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /Od /I "." /I "..\common" /I "..\Agg" /I "..\TrussUnit" /I "..\gui" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /GZ -Zm200 /c
 # ADD BASE RSC /l 0x419 /d "_DEBUG"
 # ADD RSC /l 0x419 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -81,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 LibAGG.lib LibSVG.lib libexpat.lib TrussUnit.lib qt-mt332.lib qtmain.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib oleaut32.lib uuid.lib imm32.lib winmm.lib wsock32.lib winspool.lib /nologo /subsystem:console /debug /machine:I386 /out:"../../FermaNext.exe" /pdbtype:sept /libpath:"..\..\\" /libpath:"..\..\build" /libpath:"$(QTDIR)\lib" /libpath:"$(EXPATDIR)\Libs"
+# ADD LINK32 qt-mt332.lib qtmain.lib imm32.lib winmm.lib wsock32.lib LibAGG.lib LibSVG.lib libexpat.lib TrussUnit.lib Agg.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib oleaut32.lib uuid.lib winspool.lib /nologo /subsystem:console /debug /machine:I386 /out:"../../FermaNext.exe" /pdbtype:sept /libpath:"..\..\\" /libpath:"..\..\build" /libpath:"$(QTDIR)\lib" /libpath:"$(EXPATDIR)\Libs"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
@@ -95,23 +94,11 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;f90;for;f;fpp"
 # Begin Source File
 
-SOURCE=.\..\common\AggQWidget.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\AggSubsidiary.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\..\common\Benchmark.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\..\gui\CalcDataToolBar.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\common\DynaLoader.cpp
 # End Source File
 # Begin Source File
 
@@ -147,6 +134,10 @@ SOURCE=.\..\common\PluginLoader.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\PluginManager.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\..\gui\ProjectToolBox.cpp
 # End Source File
 # Begin Source File
@@ -176,7 +167,7 @@ SOURCE=.\..\common\AbstractObjectAction.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\common
+InputDir=\ferma\Source\FermaNext\src\common
 InputPath=.\..\common\AbstractObjectAction.h
 InputName=AbstractObjectAction
 
@@ -189,7 +180,7 @@ InputName=AbstractObjectAction
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\common
+InputDir=\ferma\Source\FermaNext\src\common
 InputPath=.\..\common\AbstractObjectAction.h
 InputName=AbstractObjectAction
 
@@ -201,14 +192,6 @@ InputName=AbstractObjectAction
 
 !ENDIF 
 
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\common\AggQWidget.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\AggSubsidiary.h
 # End Source File
 # Begin Source File
 
@@ -221,7 +204,7 @@ SOURCE=.\..\gui\CalcDataToolBar.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+InputDir=\ferma\Source\FermaNext\src\gui
 InputPath=.\..\gui\CalcDataToolBar.h
 InputName=CalcDataToolBar
 
@@ -234,7 +217,7 @@ InputName=CalcDataToolBar
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+InputDir=\ferma\Source\FermaNext\src\gui
 InputPath=.\..\gui\CalcDataToolBar.h
 InputName=CalcDataToolBar
 
@@ -249,10 +232,6 @@ InputName=CalcDataToolBar
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\common\DynaLoader.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\..\FermaNext\FermaNextConfig.h
 # End Source File
 # Begin Source File
@@ -262,7 +241,7 @@ SOURCE=.\..\gui\FermaNextMainFrame.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+InputDir=\ferma\Source\FermaNext\src\gui
 InputPath=.\..\gui\FermaNextMainFrame.h
 InputName=FermaNextMainFrame
 
@@ -275,7 +254,7 @@ InputName=FermaNextMainFrame
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+InputDir=\ferma\Source\FermaNext\src\gui
 InputPath=.\..\gui\FermaNextMainFrame.h
 InputName=FermaNextMainFrame
 
@@ -365,7 +344,7 @@ SOURCE=.\..\common\ObjectState.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\common
+InputDir=\ferma\Source\FermaNext\src\common
 InputPath=.\..\common\ObjectState.h
 InputName=ObjectState
 
@@ -378,7 +357,7 @@ InputName=ObjectState
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\common
+InputDir=\ferma\Source\FermaNext\src\common
 InputPath=.\..\common\ObjectState.h
 InputName=ObjectState
 
@@ -398,7 +377,7 @@ SOURCE=.\..\common\ObjectStateManager.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\common
+InputDir=\ferma\Source\FermaNext\src\common
 InputPath=.\..\common\ObjectStateManager.h
 InputName=ObjectStateManager
 
@@ -411,7 +390,7 @@ InputName=ObjectStateManager
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\common
+InputDir=\ferma\Source\FermaNext\src\common
 InputPath=.\..\common\ObjectStateManager.h
 InputName=ObjectStateManager
 
@@ -430,12 +409,16 @@ SOURCE=.\..\common\PluginLoader.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\PluginManager.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\..\gui\ProjectToolBox.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+InputDir=\ferma\Source\FermaNext\src\gui
 InputPath=.\..\gui\ProjectToolBox.h
 InputName=ProjectToolBox
 
@@ -448,7 +431,7 @@ InputName=ProjectToolBox
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+InputDir=\ferma\Source\FermaNext\src\gui
 InputPath=.\..\gui\ProjectToolBox.h
 InputName=ProjectToolBox
 
@@ -468,7 +451,7 @@ SOURCE=.\..\common\StatefulObject.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\common
+InputDir=\ferma\Source\FermaNext\src\common
 InputPath=.\..\common\StatefulObject.h
 InputName=StatefulObject
 
@@ -481,7 +464,7 @@ InputName=StatefulObject
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\common
+InputDir=\ferma\Source\FermaNext\src\common
 InputPath=.\..\common\StatefulObject.h
 InputName=StatefulObject
 
@@ -505,7 +488,7 @@ SOURCE=.\..\gui\ToolBarManager.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+InputDir=\ferma\Source\FermaNext\src\gui
 InputPath=.\..\gui\ToolBarManager.h
 InputName=ToolBarManager
 
@@ -518,7 +501,7 @@ InputName=ToolBarManager
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+InputDir=\ferma\Source\FermaNext\src\gui
 InputPath=.\..\gui\ToolBarManager.h
 InputName=ToolBarManager
 
@@ -538,7 +521,7 @@ SOURCE=.\..\gui\WindowListBox.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+InputDir=\ferma\Source\FermaNext\src\gui
 InputPath=.\..\gui\WindowListBox.h
 InputName=WindowListBox
 
@@ -551,7 +534,7 @@ InputName=WindowListBox
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+InputDir=\ferma\Source\FermaNext\src\gui
 InputPath=.\..\gui\WindowListBox.h
 InputName=WindowListBox
 
@@ -569,7 +552,7 @@ InputName=WindowListBox
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 # End Group
-# Begin Group "Moc files"
+# Begin Group "Moc Files"
 
 # PROP Default_Filter "cpp"
 # Begin Source File

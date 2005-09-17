@@ -2,64 +2,54 @@
 #ifndef PLUGINLOADER_H
 #define PLUGINLOADER_H
 
-#include <vector>
-#include <qmap.h>
-#include <qstringlist.h>
-#include "FermaNextPlugin.h"
-#include "DynaLoader.h"
+#if defined WINDOWS || defined WIN32  
+  #include <windows.h>
+  typedef HMODULE LibraryHandle;
+  typedef FARPROC ProcAddress;
+  #define dl_open(filename) (LibraryHandle)LoadLibrary(filename)
+  #define dl_sym(handler, funcname) GetProcAddress(handler, funcname)
+  #define dl_close(handler) FreeLibrary(handler)
+#else
+  #include <dlfcn.h>
+  typedef void* LibraryHandle;
+  typedef void* ProcAddress;
+  #define dl_open(filename) dlopen(filename, RTLD_LAZY)
+  #define dl_sym(handler, funcname) dlsym(handler, funcname)
+  #define dl_close(handler) dlclose(handler)
+#endif
 
-typedef uint PluginHandle;
-typedef std::vector<PluginHandle> PluginHandleList ;
+#include <qstring.h>
 
-// Safe wrapper of POD plugin structure
-struct FermaNextPluginInfo
+
+class PluginLoader
 {
-    QString name;
-    QString description;
-    PluginType type;
-
-    FermaNextPluginInfo& operator = ( const PluginInfo& info_ )
-    {
-        name = info_.name;
-        description = info_.description;
-        type = info_.type;
-        return *this;
-    }
-};
-
-class PluginLoader 
-{
-protected:
-    struct FermaNextPlugin
-    {
-        FermaNextPluginInfo info;
-        DynaLoader loader;
-    };
-
-    void clean ();
-
 public:
-    // Exceptions
-    class FindException {};
+    // Excceptions
+    class LibraryLoadException {};
+    class AddressException {};
 
-    virtual ~PluginLoader ();
+    PluginLoader ();
+    PluginLoader ( const QString& fileName ) throw (LibraryLoadException);
+    ~PluginLoader ();
 
-    virtual void loadPlugins ( const QString& path );
-    virtual void unloadPlugins ();
-    virtual void unloadPlugin ( const PluginHandle& );
-    virtual FermaNextPluginInfo& findPluginInfo ( const PluginHandle& ) 
-        throw (FindException);
+    static const QString& libExtension ();
 
-    virtual PluginHandleList loadedPlugins () const;
-    virtual QStringList loadedPluginsNames () const;
-    virtual PluginHandleList loadedPluginsOfType ( const PluginType& ) const;
+    void loadLibrary ( const QString& fileName ) throw (LibraryLoadException);
+
+    ProcAddress getProcAddress ( const QString& funcName ) const
+                                                     throw (AddressException);
+
+    template <class AddressPointer>
+    ProcAddress getAddress ( const QString& funcName ) const
+        throw (AddressException)
+    { return (AddressPointer)getProcAddress(funcName); }
+
+
+    bool freeLibrary ();
+    bool isLoaded () const;
 
 private:
-    typedef QMap<PluginHandle, FermaNextPlugin*> PluginsMap;
-    typedef PluginsMap::iterator PluginsMapIter;
-    typedef PluginsMap::const_iterator PluginsMapConstIter;
-
-    PluginsMap plugins;
+    LibraryHandle handle;
 };
 
 #endif //PLUGINLOADER_H

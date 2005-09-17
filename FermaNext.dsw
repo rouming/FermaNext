@@ -3,6 +3,18 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
+Project: "Agg"=.\src\Agg\Agg.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "FermaNext"=.\src\FermaNext\FermaNext.dsp - Package Owner=<4>
 
 Package=<5>
@@ -15,7 +27,7 @@ Package=<4>
     Project_Dep_Name TrussUnit
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name old_SimpleCalc
+    Project_Dep_Name Agg
     End Project Dependency
 }}}
 
