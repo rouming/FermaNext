@@ -107,15 +107,15 @@ PostBuild_Cmds=xcopy /y Simple_f.dll ..\..\..\plugins	xcopy /y win_Simple_f.dll 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;f90;for;f;fpp"
 # Begin Source File
 
-SOURCE=.\CalcDataReader.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\common\DynaLoader.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\old_SimpleCalc.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\common\PluginLoader.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\VYVReader.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -123,11 +123,15 @@ SOURCE=.\old_SimpleCalc.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
 # Begin Source File
 
-SOURCE=.\CalcDataReader.h
+SOURCE=.\FRMWriter.h
 # End Source File
 # Begin Source File
 
 SOURCE=.\old_SimpleCalc.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\VYVReader.h
 # End Source File
 # Begin Source File
 

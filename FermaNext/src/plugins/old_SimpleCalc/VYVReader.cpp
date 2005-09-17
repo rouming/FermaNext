@@ -1,18 +1,18 @@
 
-#include "CalcDataReader.h"
+#include "VYVReader.h"
 #include <qfile.h>
 #include <cmath>
 
-CalcDataReader::CalcDataReader( const QString &filename )
+VYVReader::VYVReader( const QString &filename )
 {
     File = filename;
     while ( readCalcData() == FALSE );
 } 
 
-CalcDataReader::~CalcDataReader()
+VYVReader::~VYVReader()
 {}
 
-void CalcDataReader::output( const QString &outfilename ) const
+void VYVReader::output( const QString &outfilename ) const
 {
     QFile OutFile(outfilename);
     QString Message;
@@ -110,7 +110,7 @@ void CalcDataReader::output( const QString &outfilename ) const
     }
 }
 
-bool CalcDataReader::readCalcData()
+bool VYVReader::readCalcData()
 {
     QFile ResFile(File);
     QString str;
@@ -239,7 +239,7 @@ bool CalcDataReader::readCalcData()
     return TRUE;
 }
 
-CalcData CalcDataReader::getData() const
+CalcData VYVReader::getData() const
 {
     return Data;
 }
