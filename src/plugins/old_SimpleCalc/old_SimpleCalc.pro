@@ -8,8 +8,8 @@ OBJECTS_DIR = obj
 
 win32 {
   DEFINES += WIN32 QT_THREAD_SUPPORT
-  system("xcopy /y Simple_f.dll ..\..\..\plugins")
-  system("xcopy /y win_Simple_f.dll ..\..\..\plugins")
+  system( xcopy /y Simple_f.dll ..\..\..\plugins )
+  system( xcopy /y win_Simple_f.dll ..\..\..\plugins )
 }
 unix {
   DEFINES += QT_THREAD_SUPPORT
@@ -19,8 +19,8 @@ unix {
 
 INCLUDEPATH = ../../FermaNext ../../common
 
-HEADERS = CalcDataReader.h
+HEADERS = VYVReader.h
 
 SOURCES = old_SimpleCalc.cpp \
-          CalcDataReader.cpp \
+          VYVReader.cpp \
           ../../common/DynaLoader.cpp

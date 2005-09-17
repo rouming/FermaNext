@@ -1,6 +1,6 @@
 
-#ifndef CAlCDATAREADER_H
-#define CAlCDATAREADER_H
+#ifndef VYVREADER_H
+#define VYVREADER_H
 
 #include <qmemarray.h>
 #include <qstring.h>
@@ -25,11 +25,11 @@ struct CalcData
     QMemArray <double> PivotLength;   //длина Стержня
 };
 
-class CalcDataReader
+class VYVReader
 {
 public:
-    CalcDataReader ( const QString &filename );
-    ~CalcDataReader ();
+    VYVReader ( const QString &filename );
+    ~VYVReader ();
     bool readCalcData ();
     CalcData getData () const;
     void output ( const QString &outfilename ) const;
@@ -39,4 +39,4 @@ private:
     CalcData Data;
 };
 
-#endif //CAlCDATAREADER_H
+#endif //VYVREADER_H
