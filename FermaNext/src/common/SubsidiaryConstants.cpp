@@ -13,6 +13,13 @@ const QString untitledWorkspaceName = QObject::tr("Unnamed workspace");
  * Truss Unit Consts
  ************************************/
 
+const int nodesRadius = 4,
+          pivotsWidth = 2;
+
+/************************************
+ * Truss Unit Window Consts
+ ************************************/
+
 const int leftWindowIndent = 38,
           rigthWindowIndent = 28,
           topWindowIndent = 52,
@@ -26,18 +33,19 @@ const int leftWindowIndent = 38,
           coordLineWidth = 1,
           resizeLimit = 200,
           winCornerRadius = 25,
-          resEllRad = 3,
-          nodesRadius = 4,
-          pivotsWidth = 2;
+          resEllRad = 3;
 
 const bool flipY = true;
 
-
 /************************************
- * Desginer Consts
+ * Truss Unit Tool Bar Consts
  ************************************/
 
-// Empty
+extern const int bufferEmptyArea = 30,
+                 buttonHeight = 25,
+                 buttonWidth = 25;
+extern const double svgGamma = 1.0,
+                    svgExpand = 0.3;
  
  /************************************
  * Main subs
@@ -46,6 +54,11 @@ const bool flipY = true;
 QString imagesPath () 
 { 
     return applicationDirPath() + "/" + "images"; 
+}
+
+QString imagesSvgPath ()
+{
+    return applicationDirPath() + "/" + "images/svg";
 }
 
 QString pluginsPath () 

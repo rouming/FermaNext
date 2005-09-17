@@ -14,6 +14,13 @@ extern const QString untitledWorkspaceName;
  * Truss Unit Consts
  ************************************/
 
+extern const int nodesRadius,
+                 pivotsWidth;
+
+/************************************
+ * Truss Unit Window Consts
+ ************************************/
+
 extern const int leftWindowIndent,
                  rigthWindowIndent,
                  topWindowIndent,
@@ -27,21 +34,26 @@ extern const int leftWindowIndent,
                  coordLineWidth,
                  resizeLimit,
                  winCornerRadius,
-                 resEllRad,
-                 nodesRadius,
-                 pivotsWidth;
+                 resEllRad;
 
 extern const bool flipY;
 
 /************************************
- * Desginer Consts
+ * Truss Unit Tool Bar Consts
  ************************************/
+
+extern const int bufferEmptyArea, 
+                 buttonHeight,
+                 buttonWidth;
+extern const double svgGamma,
+                    svgExpand;
 
 /************************************
  * Main subs
  ************************************/
 
 QString imagesPath ();
+QString imagesSvgPath (); 
 QString pluginsPath ();
 QString configFileName ();
 

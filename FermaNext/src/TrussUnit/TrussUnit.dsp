@@ -26,7 +26,6 @@ CFG=TrussUnit - Win32 Debug
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
-F90=df.exe
 RSC=rc.exe
 
 !IF  "$(CFG)" == "TrussUnit - Win32 Release"
@@ -41,6 +40,7 @@ RSC=rc.exe
 # PROP Output_Dir "../../Release"
 # PROP Intermediate_Dir "../../Release"
 # PROP Target_Dir ""
+F90=df.exe
 # ADD BASE F90 /compile_only /nologo /warn:nofileopt
 # ADD F90 /compile_only /nologo /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
@@ -66,6 +66,7 @@ LIB32=link.exe -lib
 # PROP Output_Dir "../../Debug"
 # PROP Intermediate_Dir "../../Debug"
 # PROP Target_Dir ""
+F90=df.exe
 # ADD BASE F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
@@ -88,6 +89,10 @@ LIB32=link.exe -lib
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;f90;for;f;fpp"
+# Begin Source File
+
+SOURCE=.\AggToolBar.cpp
+# End Source File
 # Begin Source File
 
 SOURCE=.\Truss.cpp
@@ -126,6 +131,10 @@ SOURCE=.\TrussUnitDesignerWindow.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\TrussUnitToolBar.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\TrussUnitWindow.cpp
 # End Source File
 # Begin Source File
@@ -136,6 +145,39 @@ SOURCE=.\TrussUnitWindowManager.cpp
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
+# Begin Source File
+
+SOURCE=.\AggToolBar.h
+
+!IF  "$(CFG)" == "TrussUnit - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\AggToolBar.h
+InputName=AggToolBar
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\AggToolBar.h
+InputName=AggToolBar
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # Begin Source File
 
 SOURCE=.\Truss.h
@@ -311,6 +353,10 @@ InputName=TrussUnitDesignerWindow
 # End Source File
 # Begin Source File
 
+SOURCE=.\TrussUnitToolBar.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\TrussUnitWindow.h
 
 !IF  "$(CFG)" == "TrussUnit - Win32 Release"
@@ -379,6 +425,10 @@ InputName=TrussUnitWindowManager
 # Begin Group "Moc Files"
 
 # PROP Default_Filter "cpp"
+# Begin Source File
+
+SOURCE=.\mocs\moc_AggToolBar.cpp
+# End Source File
 # Begin Source File
 
 SOURCE=.\mocs\moc_Truss.cpp

@@ -166,8 +166,8 @@ void TrussUnit::paintLoad ( TrussLoad& load, QPoint tailPos, ren_dynarow& baseRe
     else if ( y > 0 )
         forceDirection.setY ( 1 );
 
-    QPoint headPos ( int(tailPos.x() + 20 * x1 * forceDirection.x()), 
-                     int(tailPos.y() - 20 * y1 * forceDirection.y()) );
+    QPoint headPos ( tailPos.x() + 22 * x1 * forceDirection.x(), 
+                     tailPos.y() - 22 * y1 * forceDirection.y() );
     
     solidRenderer solidRend ( baseRend );
     scanline_rasterizer   ras;

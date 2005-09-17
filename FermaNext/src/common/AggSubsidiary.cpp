@@ -116,4 +116,23 @@ void drawOutlineRoundedRect ( solidRenderer& solidRend, scanline_rasterizer& ras
     agg::render_scanlines(ras, sl, solidRend);
 }
 
+void parseSvg ( pathRenderer& pathRend, const char* fname )
+{
+    agg::svg::parser svgParcer ( pathRend );
+    svgParcer.parse ( fname );
+    pathRend.arrange_orientations ();
+}
+
+void drawSvg ( ren_dynarow& baseRend, scanline_rasterizer& ras, 
+               agg::scanline_p8& sl, pathRenderer& pathRend, 
+               solidRenderer& solidRend, agg::trans_affine mtx, int dx, int dy,
+               double scaleX, double scaleY, double expand, double gamma )
+{
+    mtx *= agg::trans_affine_translation( dx, dy );
+    mtx *= agg::trans_affine_scaling( scaleX, scaleY );
+    pathRend.expand( expand );
+    ras.gamma( agg::gamma_power( gamma ) );
+    pathRend.render ( ras, sl, solidRend, mtx, baseRend.clip_box(), 1.0 );
+}
+
 /*****************************************************************************/

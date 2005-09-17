@@ -26,6 +26,8 @@
 #include "agg_span_gradient.h"
 #include "agg_span_interpolator_linear.h"
 #include "agg_rendering_buffer_dynarow.h"
+#include "agg_svg_parser.h"
+#include "agg_renderer_primitives.h"
 
 typedef agg::rendering_buffer_dynarow<4>                    rbuf_dynarow;
 typedef agg::pixfmt_custom_rbuf_rgba<agg::blender_rgba32, 
@@ -61,6 +63,8 @@ typedef agg::glyph_raster_bin<agg::rgba8>                   glyph_gen;
 typedef agg::renderer_raster_htext_solid<ren_dynarow, 
                                          glyph_gen>         textRenderer;
 typedef const agg::int8u*                                   textFont;
+typedef agg::svg::path_renderer                             pathRenderer;
+typedef agg::renderer_primitives<ren_dynarow>               primitivesRenderer;
 
 /*****************************************************************************/
 
@@ -110,5 +114,11 @@ void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
 void drawOutlineRoundedRect ( solidRenderer& solidRend, scanline_rasterizer& ras,
                               agg::scanline_p8& sl, QPoint tail, QPoint head, 
                               int cornerRadius, color_type color);
+
+void parseSvg ( pathRenderer& pathRend, const char* fname );
+
+void drawSvg ( ren_dynarow& baseRend, scanline_rasterizer& ras, agg::scanline_p8& sl, 
+               pathRenderer& pathRend, solidRenderer& solidRend, agg::trans_affine mtx, 
+               int dx, int dy, double scaleX, double scaleY, double expand, double gamma );
 
 #endif //AGGSUBSIDIARY_H
