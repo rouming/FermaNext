@@ -23,4 +23,4 @@ HEADERS = VYVReader.h
 
 SOURCES = old_SimpleCalc.cpp \
           VYVReader.cpp \
-          ../../common/DynaLoader.cpp
+          ../../common/PluginLoader.cpp

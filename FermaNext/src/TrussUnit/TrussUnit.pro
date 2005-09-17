@@ -16,7 +16,8 @@ unix {
 
 INCLUDEPATH = $$(AGGDIR)/include \
               $$(AGGDIR)/svg \
-              ../common
+              ../common \
+              ../Agg
 
 SOURCES = Truss.cpp \
           TrussLoad.cpp \
@@ -27,6 +28,7 @@ SOURCES = Truss.cpp \
           TrussUnitActions.cpp \
           TrussUnitDesignerWidget.cpp \
           TrussUnitDesignerWindow.cpp \
+          TrussUnitToolBar.cpp \
           TrussUnitWindow.cpp \
           TrussUnitWindowManager.cpp
 
@@ -37,6 +39,7 @@ HEADERS = Truss.h \
           TrussUnitActions.h \
           TrussUnitDesignerWidget.h \
           TrussUnitDesignerWindow.h \
+          TrussUnitToolBar.h \
           TrussUnitWindow.h \
           TrussUnitWindowManager.h
 

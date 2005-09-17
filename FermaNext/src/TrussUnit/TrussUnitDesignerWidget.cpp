@@ -37,7 +37,7 @@ TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
     QWidget::setMouseTracking( true );
     initToolBar();
     designerBehaviour = onSelect;
-    emit ( pressSelectButton() );
+    emit pressSelectButton();
 }
 
 TrussUnitDesignerWidget::~TrussUnitDesignerWidget ()
@@ -404,25 +404,25 @@ void TrussUnitDesignerWidget::aggKeyPressEvent ( QKeyEvent* ke )
     if ( ke->key() == Qt::Key_N && designerBehaviour != onNodeDraw )
     {
         designerBehaviour = onNodeDraw;
-        emit ( pressNodeDrawButton() );
+        emit pressNodeDrawButton();
         removeAllHighlight ();
     }
     if ( ke->key() == Qt::Key_P && designerBehaviour != onPivotFirstNodeDraw )
     {
         designerBehaviour = onPivotFirstNodeDraw;
-        emit ( pressPivotDrawButton() );
+        emit pressPivotDrawButton();
         removeAllHighlight ();
     }
     if ( ke->key() == Qt::Key_R && designerBehaviour != onErase )
     {
         designerBehaviour = onErase;
-        emit ( pressEraseButton() );
+        emit pressEraseButton();
         removeAllHighlight ();
     }
     if ( ke->key() == Qt::Key_Escape  && designerBehaviour != onSelect )
     {
         designerBehaviour = onSelect;
-        emit ( pressSelectButton() );
+        emit pressSelectButton();
         QWidget::setCursor ( Qt::ArrowCursor );
     }
 }

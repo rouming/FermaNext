@@ -1,98 +1,73 @@
 
 #include "PluginLoader.h"
-#include <qdir.h>
 
 /*****************************************************************************
- * Plugin Loader
+ * Dynamic Plugin Loader
  *****************************************************************************/
+
+#include <qfile.h>
+
+PluginLoader::PluginLoader () :
+    handle(0)
+{}
+
+PluginLoader::PluginLoader ( const QString& fileName )
+    throw (LibraryLoadException) :
+    handle(0)
+{
+    loadLibrary( fileName );
+}
 
 PluginLoader::~PluginLoader ()
 {
-    clean();
+    freeLibrary();
 }
 
-void PluginLoader::clean ()
+const QString& PluginLoader::libExtension ()
 {
-    PluginsMapIter iter = plugins.begin();
-    for ( ; iter != plugins.end(); ++iter ) {
-        delete iter.data();
+#if defined WINDOWS || defined WIN32
+    static QString extension = "dll";
+#else
+    static QString extension = "so";
+#endif
+    return extension;
+}
+
+void PluginLoader::loadLibrary ( const QString& fileName ) 
+    throw (LibraryLoadException)
+{
+    freeLibrary();
+#if defined UNICODE && (defined WINDOWS || defined WIN32)
+    handle = dl_open(fileName.ucs2());
+#else
+    handle = dl_open(QFile::encodeName(fileName));
+#endif
+    if ( handle == 0 )
+        throw LibraryLoadException();
+}
+
+bool PluginLoader::freeLibrary ()
+{
+    if ( handle ) {
+        bool res = dl_close(handle);
+        handle = 0;
+        return res;
     }
-    plugins.clear();
+    return false;
 }
 
-void PluginLoader::loadPlugins ( const QString& path )
+ProcAddress PluginLoader::getProcAddress ( const QString& funcName ) const
+    throw (AddressException)
 {
-    clean();
-    QDir dir( path, "*." + DynaLoader::libExtension(),
-              QDir::Name | QDir::IgnoreCase, 
-              QDir::Files | QDir::Readable );
-    for ( uint i = 0; i < dir.count(); i++ ) {
-        FermaNextPlugin* plugin = new FermaNextPlugin;
-        try {
-            DynaLoader& loader = plugin->loader;
-            loader.loadLibrary( path + "/" + dir[i] );
-            PluginInfoCall pluginInfoCall = 
-                     (PluginInfoCall)loader.getProcAddress( PLUGIN_INFO_CALL );
-            PluginInfo& pluginInfo = pluginInfoCall();
-            plugin->info = pluginInfo;
-            plugins[i] = plugin;
-        } catch ( ... ) {
-            delete plugin;
-        }
-    }
+    ProcAddress address = dl_sym(handle, funcName.ascii());
+    if ( address == 0 )
+        throw AddressException();
+    return address;
 }
 
-void PluginLoader::unloadPlugins ()
+bool PluginLoader::isLoaded () const
 {
-    clean();
-}
-
-void PluginLoader::unloadPlugin ( const PluginHandle& h )
-{
-    if ( plugins.contains(h) ) {
-        delete plugins[h];
-        plugins.erase(h);
-    }
-}
-
-FermaNextPluginInfo& PluginLoader::findPluginInfo ( const PluginHandle& h ) 
-    throw (FindException)
-{
-    if ( ! plugins.contains(h) )
-        throw FindException();
-    FermaNextPlugin* plugin = plugins[h];
-    return plugin->info;
-}
-
-PluginHandleList PluginLoader::loadedPlugins () const
-{
-    PluginHandleList handles;
-    PluginsMapConstIter iter = plugins.begin();
-    for ( ; iter != plugins.end(); ++iter ) {
-        handles.push_back( iter.key() );
-    }    
-    return handles;
-}
-
-QStringList PluginLoader::loadedPluginsNames () const
-{
-    QStringList names;
-    PluginsMapConstIter iter = plugins.begin();
-    for ( ; iter != plugins.end(); ++iter ) {
-        names.push_back( iter.data()->info.name );
-    }        
-    return names;
-}
-
-PluginHandleList PluginLoader::loadedPluginsOfType ( const PluginType& type ) const
-{
-    PluginHandleList handles;
-    PluginsMapConstIter iter = plugins.begin();
-    for ( ; iter != plugins.end(); ++iter ) {
-        if ( iter.data()->info.type == type )
-            handles.push_back( iter.key() );
-    }    
-    return handles;
+    return handle != 0;
 }
 
 /*****************************************************************************/

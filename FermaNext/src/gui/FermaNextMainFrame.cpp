@@ -370,7 +370,7 @@ void FermaNextMainFrame::reloadPlugins ()
     bool pluginsLoaded = wsp.loadPlugins();
     if ( ! pluginsLoaded )
         return;
-    PluginLoader& loader = wsp.pluginLoader();
+    PluginManager& loader = wsp.pluginManager();
     QStringList names = loader.loadedPluginsNames();
 
     if ( pluginsMenu == 0 ) {

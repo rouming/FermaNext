@@ -146,13 +146,13 @@ FermaNextConfig& FermaNextWorkspace::config ()
 
 bool FermaNextWorkspace::loadPlugins ()
 {
-    plgLoader.loadPlugins( pluginsPath() );
+    plgManager.loadPlugins( pluginsPath() );
     return true;
 }
 
-PluginLoader& FermaNextWorkspace::pluginLoader ()
+PluginManager& FermaNextWorkspace::pluginManager ()
 {
-    return plgLoader;
+    return plgManager;
 }
 
 /*****************************************************************************/
