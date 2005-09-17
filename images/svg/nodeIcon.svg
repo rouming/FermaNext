@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docbase="D:\Development\Visual Studio projects\FermaNext\src\FermaNext"
+   sodipodi:docname="nodeIdle.svg"
+   inkscape:version="0.40+cvs"
+   sodipodi:version="0.32"
+   id="svg2"
+   height="85.000000pt"
+   width="55.000000pt">
+  <metadata
+     id="metadata971">
+    <rdf:RDF
+       id="RDF973">
+      <cc:Work
+         id="Work975"
+         rdf:about="">
+        <dc:format
+           id="format977">image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+           id="type979" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs969" />
+  <sodipodi:namedview
+     inkscape:current-layer="svg2"
+     inkscape:window-y="-4"
+     inkscape:window-x="1"
+     inkscape:cy="-15.889255"
+     inkscape:cx="532.10096"
+     inkscape:zoom="0.60333335"
+     inkscape:window-height="719"
+     inkscape:window-width="1024"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base" />
+  <title
+     id="title4">A less cute tiger
+</title>
+  <g
+     transform="translate(-142.3099,192.0243)"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1" />
+  <path
+     id="path1295"
+     style="fill:#ffffff;fill-opacity:1.0000000;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.00000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:6.7294121;stroke-opacity:1.0000000;marker-start:none;marker-mid:none;marker-end:none"
+     d="M 59.816248,53.377772 C 59.821178,67.848392 48.512198,79.581857 34.560148,79.581857 C 20.608098,79.581857 9.2991180,67.848392 9.3040480,53.377772 C 9.2991180,38.907147 20.608098,27.173681 34.560148,27.173681 C 48.512198,27.173681 59.821178,38.907147 59.816248,53.377772 z " />
+</svg>

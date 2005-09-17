@@ -4,7 +4,7 @@
 
 #include "AggQWidget.h"
 #include "TrussUnitWindowManager.h"
-#include "agg_svg_parser.h"
+#include "TrussUnitToolBar.h"
 
 class TrussUnitDesignerWidget : public AggQWidget
 {
@@ -32,11 +32,6 @@ protected:
                                              bool firstPivotWasCreated,
                                              TrussNode& lastNode, 
                                              TrussPivot& );
-
-    // SVG viewer methods
-    virtual void parseSvg ( const char* fname );
-    virtual void drawSvg ( base_renderer&, solid_renderer&, int x, int y );
-
 public:
     // Handlers on events
     void aggPaintEvent ( QPaintEvent* );
@@ -47,11 +42,27 @@ public:
     void aggMousePressEvent ( QMouseEvent* );
     void aggCtrlChangedEvent ( const agg::ctrl* );
 
+signals:
+    void pressSelectButton ();
+    void pressNodeDrawButton ();
+    void pressPivotDrawButton ();
+    void pressFixDrawButton ();
+    void pressForceDrawButton ();
+    void pressEraseButton ();
+
 public slots:
     virtual void addTrussUnitWindow ( TrussUnitWindow& );    
     virtual bool removeTrussUnitWindow ( TrussUnitWindow& );
+    virtual void changeBehaviourToSelect ();
+    virtual void changeBehaviourToNodeDraw ();
+    virtual void changeBehaviourToPivotDraw ();
+    virtual void changeBehaviourToFixDraw ();
+    virtual void changeBehaviourToForceDraw ();
+    virtual void changeBehaviourToErase ();
+    virtual void updateDesignerWidget ();
 
 protected:
+    virtual void initToolBar ();
     virtual void clearTrussUnitWindows ();
 
 private:
@@ -61,7 +72,7 @@ private:
     enum TrussNodeBehaviour { nodeIdle = 0, onNodeSelect, onNodeDrag };
     enum TrussPivotBehaviour { pivotIdle = 0, onPivotSelect, onPivotDrag };
     enum DesignerBehaviour { onSelect = 0, onNodeDraw, onPivotFirstNodeDraw, 
-                            onPivotLastNodeDraw, onErase, onFixSet };
+                            onPivotLastNodeDraw, onFixDraw, onForceDraw, onErase };
 
     // Windows to show
     WindowList trussWindows;
@@ -78,12 +89,12 @@ private:
     DesignerBehaviour designerBehaviour;
     // Subsidiary vars
     int clickX, clickY;
-    QPoint firstNodeClickDist, lastNodeClickDist;
+    QPoint firstNodeClickDist, lastNodeClickDist, toolBarCenterPos;
     // Undo/Redo
     QPoint beforeDragNodePos;
     QPoint beforeDragFirstPos, beforeDragLastPos;
 
-    agg::svg::path_renderer pathRend;
+    TrussUnitToolBar* toolBar;
 
     // TODO: in future to remove
     int X, Y; //temp    

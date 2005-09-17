@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="55.000000pt"
+   height="85.000000pt"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.40+cvs"
+   sodipodi:docname="PIVOTI~1.SVG"
+   sodipodi:docbase="D:\DEVELO~1\VISUAL~2\FERMAN~1\src\FERMAN~1">
+  <metadata
+     id="metadata971">
+    <rdf:RDF
+       id="RDF973">
+      <cc:Work
+         rdf:about=""
+         id="Work975">
+        <dc:format
+           id="format977">image/svg+xml</dc:format>
+        <dc:type
+           id="type979"
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs969" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1024"
+     inkscape:window-height="719"
+     inkscape:zoom="0.60333335"
+     inkscape:cx="532.10096"
+     inkscape:cy="-15.889255"
+     inkscape:window-x="1"
+     inkscape:window-y="-4"
+     inkscape:current-layer="svg2" />
+  <title
+     id="title4">A less cute tiger
+</title>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1"
+     transform="translate(-142.3099,192.0243)" />
+  <path
+     d="M 43.883553,26.440255 L 18.880994,77.322358 C 20.999668,77.490705 22.965704,78.617758 24.615567,80.238443 L 49.817619,29.699910 C 47.467970,29.192550 45.349780,27.960669 43.883553,26.440255 z "
+     style="fill:#ffffff;fill-opacity:1.0000000;fill-rule:evenodd;stroke:#000000;stroke-width:0.00000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:6.7294121;stroke-opacity:1.0000000;marker-start:none;marker-mid:none;marker-end:none"
+     id="path1297"
+     sodipodi:nodetypes="ccccc" />
+  <path
+     d="M 24.584123,93.611237 C 22.819753,98.409343 17.639173,100.81551 13.013023,98.985573 C 8.3868665,97.155613 6.0669273,91.782505 7.8313066,86.984400 C 9.5956675,82.186318 14.776219,79.780143 19.402405,81.610087 C 24.028572,83.440031 26.348512,88.813131 24.584123,93.611237 z "
+     style="fill:#ffffff;fill-opacity:1.0000000;fill-rule:evenodd;stroke:#000000;stroke-width:0.00000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:6.7294121;stroke-opacity:1.0000000;marker-start:none;marker-mid:none;marker-end:none"
+     id="path1301" />
+  <path
+     d="M 61.180573,20.222880 C 59.416203,25.020994 54.235641,27.427154 49.609479,25.597213 C 44.983293,23.767268 42.663373,18.394160 44.427761,13.596050 C 46.192113,8.7979530 51.372678,6.3917769 55.998854,8.2217250 C 60.625022,10.051668 62.944961,15.424780 61.180573,20.222880 z "
+     style="fill:#ffffff;fill-opacity:1.0000000;fill-rule:evenodd;stroke:#000000;stroke-width:0.00000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:6.7294121;stroke-opacity:1.0000000;marker-start:none;marker-mid:none;marker-end:none"
+     id="path3600" />
+</svg>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docbase="D:\Development\Visual Studio projects\FermaNext\src\FermaNext"
+   sodipodi:docname="arrowIcon.svg"
+   inkscape:version="0.40+cvs"
+   sodipodi:version="0.32"
+   id="svg2"
+   height="85.000000pt"
+   width="45.000000pt">
+  <metadata
+     id="metadata971">
+    <rdf:RDF
+       id="RDF973">
+      <cc:Work
+         id="Work975"
+         rdf:about="">
+        <dc:format
+           id="format977">image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+           id="type979" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs969" />
+  <sodipodi:namedview
+     inkscape:current-layer="svg2"
+     inkscape:window-y="-4"
+     inkscape:window-x="1"
+     inkscape:cy="-15.889255"
+     inkscape:cx="589.85953"
+     inkscape:zoom="0.60333335"
+     inkscape:window-height="719"
+     inkscape:window-width="1024"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base" />
+  <title
+     id="title4">A less cute tiger
+</title>
+  <g
+     transform="translate(-142.3099,192.0243)"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1" />
+  <path
+     id="path1293"
+     style="fill:#ffffff;fill-opacity:1.0000000;fill-rule:evenodd;stroke:none;stroke-width:0.00000000;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:6.7294121;stroke-opacity:1.0000000;marker-start:none;marker-mid:none;marker-end:none"
+     d="M 10.221821,10.652956 L 9.9099514,67.993298 L 22.264012,55.131248 L 36.603792,98.476553 L 43.751872,91.039733 L 29.773122,52.285648 L 47.672382,53.081848 L 10.221821,10.652956 z " />
+</svg>

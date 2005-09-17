@@ -25,15 +25,19 @@ TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
     winBehaviour(windowIdle),
     nodeBehaviour(nodeIdle),
     pivotBehaviour(pivotIdle),
-    designerBehaviour(onSelect),
     clickX(0), clickY(0), 
     firstNodeClickDist(0,0), 
     lastNodeClickDist(0,0),
+    toolBarCenterPos(0,0),
+    toolBar ( new TrussUnitToolBar( toolBarCenterPos, 15, 15, 5, 5, 5, 30 ) ), 
     // Temp
     X(50), Y(50)
 {
     QWidget::setFocus();
     QWidget::setMouseTracking( true );
+    initToolBar();
+    designerBehaviour = onSelect;
+    emit ( pressSelectButton() );
 }
 
 TrussUnitDesignerWidget::~TrussUnitDesignerWidget ()
@@ -78,6 +82,80 @@ bool TrussUnitDesignerWidget::removeTrussUnitWindow ( TrussUnitWindow& window )
             return true;
         }
     return false; 
+}
+
+void TrussUnitDesignerWidget::initToolBar ()
+{
+    QObject::connect( toolBar, SIGNAL( onRenderingStatusCleared() ),
+                      this, SLOT( updateDesignerWidget() ) );
+
+    int separation = toolBar->getButtonSeparation();
+
+    QPoint leftTopPos ( bufferEmptyArea + toolBar->getBorderLeft() + separation, 
+                        bufferEmptyArea + toolBar->getBorderTop() );
+    toolBar->addButton ( imagesSvgPath() + "/arrowIcon.svg", "Arrow", leftTopPos, 
+                         buttonWidth, buttonHeight, this, SIGNAL( pressSelectButton() ),
+                         SLOT( changeBehaviourToSelect() ) );
+
+    leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation);
+    toolBar->addButton ( imagesSvgPath() + "/nodeIcon.svg", "Node", leftTopPos, 
+                         buttonWidth,buttonHeight, this, SIGNAL( pressNodeDrawButton() ),
+                         SLOT( changeBehaviourToNodeDraw() ) );
+
+    leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
+    toolBar->addButton ( imagesSvgPath() + "/pivotIcon.svg", "Pivot", leftTopPos, 
+                         buttonWidth, buttonHeight, this, SIGNAL( pressPivotDrawButton() ),
+                         SLOT(changeBehaviourToPivotDraw()) );
+
+    leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
+    toolBar->addButton ( imagesSvgPath() + "/fixIcon.svg", "Fixation", leftTopPos, 
+                         buttonWidth, buttonHeight, this, SIGNAL( pressFixDrawButton() ), 
+                         SLOT( changeBehaviourToFixSet() ) );
+
+    leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
+    toolBar->addButton ( imagesSvgPath() + "/forceIcon.svg", "Force", leftTopPos, 
+                         buttonWidth, buttonHeight, this, SIGNAL( pressForceDrawButton() ),
+                         SLOT( changeBehaviourToForceDraw() ) );
+
+    leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
+    toolBar->addButton ( imagesSvgPath() + "/eraseIcon.svg", "Erase", leftTopPos, 
+                         buttonWidth, buttonHeight, this, SIGNAL( pressEraseButton() ),
+                         SLOT( changeBehaviourToErase() ) );
+}
+
+void TrussUnitDesignerWidget::changeBehaviourToSelect ()
+{
+    designerBehaviour = onSelect;
+}
+
+void TrussUnitDesignerWidget::changeBehaviourToNodeDraw ()
+{
+    designerBehaviour = onNodeDraw;
+}
+
+void TrussUnitDesignerWidget::changeBehaviourToPivotDraw ()
+{
+    designerBehaviour = onPivotFirstNodeDraw;
+}
+
+void TrussUnitDesignerWidget::changeBehaviourToFixDraw ()
+{
+//    designerBehaviour = onFixDraw;
+}
+
+void TrussUnitDesignerWidget::changeBehaviourToForceDraw ()
+{
+//    designerBehaviour = onForceDraw;
+}
+
+void TrussUnitDesignerWidget::changeBehaviourToErase ()
+{
+    designerBehaviour = onErase;
+}
+
+void TrussUnitDesignerWidget::updateDesignerWidget ()
+{
+    update();
 }
 
 TrussUnitWindow* TrussUnitDesignerWidget::findWindowByWidgetPos ( int x, int y )
@@ -296,25 +374,6 @@ void TrussUnitDesignerWidget::savePivotStateAfterCreate ( TrussNode& firstNode,
     mng->endStateBlock();
 }
 
-void TrussUnitDesignerWidget::parseSvg ( const char* fname )
-{
-    agg::svg::parser svgParcer ( pathRend );
-    svgParcer.parse ( fname );
-    pathRend.arrange_orientations ();
-}
-
-void TrussUnitDesignerWidget::drawSvg ( base_renderer& baseRend, 
-                                        solid_renderer& solidRend,
-                                        int x, int y )
-{
-    scanline_rasterizer& ras = getAggRasterizerScanline ();    
-    agg::scanline_p8& sl = getAggScanline ();
-    agg::trans_affine mtx = getAggResizeMatrix ();
-    mtx *= agg::trans_affine_scaling(0.1);
-    mtx *= agg::trans_affine_translation( x, y );
-    pathRend.render ( ras, sl, solidRend, mtx, baseRend.clip_box(), 1.0 );
-}
-
 /*****************************************************************************/
 // Event handlers
 
@@ -323,14 +382,17 @@ void TrussUnitDesignerWidget::aggPaintEvent ( QPaintEvent* )
     pixfmt pixf ( getAggRenderingBuffer() );
     base_renderer baseRend ( pixf );
     solid_renderer solidRend ( baseRend );
-    baseRend.clear ( agg::rgba (10, 10, 10) );
+    baseRend.clear ( agg::rgba( 10, 10, 10 ) );
     WindowListIter iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter ) {
         TrussUnitWindow* w = *iter;
         if ( w->isAlive() )
             w->paint( baseRend );
     }
-//    drawSvg ( baseRend, solidRend, 10, 500 );
+    toolBarCenterPos.setX ( width() / 2 );
+    toolBarCenterPos.setY ( height() );
+    toolBar->setCenterPoint ( toolBarCenterPos );
+    toolBar->paint ( baseRend );
 }
 
 void TrussUnitDesignerWidget::aggResizeEvent ( QResizeEvent* )
@@ -342,21 +404,25 @@ void TrussUnitDesignerWidget::aggKeyPressEvent ( QKeyEvent* ke )
     if ( ke->key() == Qt::Key_N && designerBehaviour != onNodeDraw )
     {
         designerBehaviour = onNodeDraw;
+        emit ( pressNodeDrawButton() );
         removeAllHighlight ();
     }
     if ( ke->key() == Qt::Key_P && designerBehaviour != onPivotFirstNodeDraw )
     {
         designerBehaviour = onPivotFirstNodeDraw;
+        emit ( pressPivotDrawButton() );
         removeAllHighlight ();
     }
     if ( ke->key() == Qt::Key_R && designerBehaviour != onErase )
     {
         designerBehaviour = onErase;
+        emit ( pressEraseButton() );
         removeAllHighlight ();
     }
     if ( ke->key() == Qt::Key_Escape  && designerBehaviour != onSelect )
     {
         designerBehaviour = onSelect;
+        emit ( pressSelectButton() );
         QWidget::setCursor ( Qt::ArrowCursor );
     }
 }
@@ -366,7 +432,12 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     int x = me->x();
     int y = flipY ? height() - me->y() : me->y();
 
-    if ( winBehaviour == onHorResize )
+    toolBar->checkMouseMoveEvent ( x, y );
+
+    if ( toolBar->inToolBarRect ( x, y ) )
+        QWidget::setCursor ( Qt::ArrowCursor );
+
+    else if ( winBehaviour == onHorResize )
     {
         int dx = x - clickX;
         QPoint point1 = selectedWindow->getWindowLeftTopPos ();
@@ -728,6 +799,14 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
     QWidget::setFocus();
     clickX = me->x();
     clickY = flipY ? height() - me->pos().y() : me->pos().y();
+
+    if ( toolBar->inToolBarRect( clickX, clickY ) )
+    {
+        toolBar->checkMousePressEvent ( clickX, clickY );
+        update();
+    } 
+    else 
+    {
     selectedWindow = findWindowByWidgetPos ( clickX, clickY );
     if ( selectedWindow )
     {
@@ -873,6 +952,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
     }
     else
         clearWindowFocus();
+    }
 }
 
 void TrussUnitDesignerWidget::aggCtrlChangedEvent ( const agg::ctrl* )

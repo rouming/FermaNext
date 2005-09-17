@@ -142,7 +142,7 @@ void FermaNextMainFrame::createProject ()
 
         TrussUnitLoadCase& currentCase = trussWindow.getLoadCases().createLoadCase();
         trussWindow.getLoadCases().setCurrentLoadCase ( currentCase );
-        currentCase.addLoad ( *trussWindow.findNodeByNumber( 4 ), 10, 10 );
+        currentCase.addLoad ( *trussWindow.findNodeByNumber( 4 ), 300, 100 );
 /*********** TEMP TRUSS UNIT **************************/
 
         prj.activate();
