@@ -43,11 +43,12 @@ TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
 TrussUnitDesignerWidget::~TrussUnitDesignerWidget ()
 {
     clearTrussUnitWindows();
+    delete toolBar;
 }
 
 void TrussUnitDesignerWidget::clearTrussUnitWindows ()
 {
-    trussWindows.clear();    
+    trussWindows.clear();
 }
 
 void TrussUnitDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow )
