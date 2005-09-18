@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 qt-mt.lib qtmain_rel.lib ole32.lib odbc32.lib odbccp32.lib LibAGG.lib LibSVG.lib libexpat.lib TrussUnit.lib Agg.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib oleaut32.lib uuid.lib winspool.lib /nologo /subsystem:windows /machine:I386 /out:"../../FermaNext.exe" /libpath:"..\..\\" /libpath:"..\..\build" /libpath:"$(QTDIR)\lib" /libpath:"$(EXPATDIR)\Libs"
+# ADD LINK32 qt-mt.lib qtmain_rel.lib ole32.lib odbc32.lib odbccp32.lib LibAGG.lib LibSVG.lib libexpat.lib common.lib TrussUnit.lib Agg.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib oleaut32.lib uuid.lib winspool.lib /nologo /subsystem:windows /machine:I386 /out:"../../FermaNext.exe" /libpath:"..\..\\" /libpath:"..\..\build" /libpath:"$(QTDIR)\lib" /libpath:"$(EXPATDIR)\Libs"
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
@@ -80,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 qt-mt332.lib qtmain.lib imm32.lib winmm.lib wsock32.lib LibAGG.lib LibSVG.lib libexpat.lib TrussUnit.lib Agg.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib oleaut32.lib uuid.lib winspool.lib /nologo /subsystem:console /debug /machine:I386 /out:"../../FermaNext.exe" /pdbtype:sept /libpath:"..\..\\" /libpath:"..\..\build" /libpath:"$(QTDIR)\lib" /libpath:"$(EXPATDIR)\Libs"
+# ADD LINK32 qt-mt332.lib qtmain.lib imm32.lib winmm.lib wsock32.lib LibAGG.lib LibSVG.lib libexpat.lib common.lib TrussUnit.lib Agg.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib oleaut32.lib uuid.lib winspool.lib /nologo /subsystem:console /debug /machine:I386 /out:"../../FermaNext.exe" /pdbtype:sept /libpath:"..\..\\" /libpath:"..\..\build" /libpath:"$(QTDIR)\lib" /libpath:"$(EXPATDIR)\Libs"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
@@ -92,10 +92,6 @@ LINK32=link.exe
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;f90;for;f;fpp"
-# Begin Source File
-
-SOURCE=.\..\common\Benchmark.cpp
-# End Source File
 # Begin Source File
 
 SOURCE=.\..\gui\CalcDataToolBar.cpp
@@ -122,31 +118,7 @@ SOURCE=.\..\FermaNext\FermaNextWorkspace.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\common\ObjectState.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\common\ObjectStateManager.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\common\PluginLoader.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\PluginManager.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\..\gui\ProjectToolBox.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\common\StatefulObject.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\common\SubsidiaryConstants.cpp
 # End Source File
 # Begin Source File
 
@@ -160,39 +132,6 @@ SOURCE=.\..\gui\WindowListBox.cpp
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
-# Begin Source File
-
-SOURCE=.\..\common\AbstractObjectAction.h
-
-!IF  "$(CFG)" == "FermaNext - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\common
-InputPath=.\..\common\AbstractObjectAction.h
-InputName=AbstractObjectAction
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\common
-InputPath=.\..\common\AbstractObjectAction.h
-InputName=AbstractObjectAction
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
 # Begin Source File
 
 SOURCE=.\..\common\Benchmark.h
@@ -269,10 +208,6 @@ InputName=FermaNextMainFrame
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\FermaNext\FermaNextPlugin.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\..\FermaNext\FermaNextProject.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
@@ -339,80 +274,6 @@ InputName=FermaNextWorkspace
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\common\ObjectState.h
-
-!IF  "$(CFG)" == "FermaNext - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\common
-InputPath=.\..\common\ObjectState.h
-InputName=ObjectState
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\common
-InputPath=.\..\common\ObjectState.h
-InputName=ObjectState
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\common\ObjectStateManager.h
-
-!IF  "$(CFG)" == "FermaNext - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\common
-InputPath=.\..\common\ObjectStateManager.h
-InputName=ObjectStateManager
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\common
-InputPath=.\..\common\ObjectStateManager.h
-InputName=ObjectStateManager
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\common\PluginLoader.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\PluginManager.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\..\gui\ProjectToolBox.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
@@ -443,43 +304,6 @@ InputName=ProjectToolBox
 
 !ENDIF 
 
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\common\StatefulObject.h
-
-!IF  "$(CFG)" == "FermaNext - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\common
-InputPath=.\..\common\StatefulObject.h
-InputName=StatefulObject
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\common
-InputPath=.\..\common\StatefulObject.h
-InputName=StatefulObject
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\common\SubsidiaryConstants.h
 # End Source File
 # Begin Source File
 
