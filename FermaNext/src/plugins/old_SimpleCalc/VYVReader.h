@@ -7,22 +7,22 @@
 
 struct CalcData
 {
-    int NumNods;                      //количество Узлов
-    int NumPivots;                    //количество Стержней
-    int NumLoads;                     //количество Случаев нагружения 
-    double StressLimit;               //Допускаемое напряжение
-    QMemArray <int> PivotsFirstNod;   //массив первых номеров Узлов в Стержнях
-    QMemArray <int> PivotsSecondNod;  // "__" вторых "__"
-    QMemArray <double> X;             //массив X координат Узлов
-    QMemArray <double> Y;             //"__" Y "__"
-    QMemArray <double> TransX;        //массив перемещений по X
-    QMemArray <double> TransY;        //массив перемещений по Y
-    QMemArray <double> Stress;        //напряжения в Стержнях
-    QMemArray <double> StressReserve; //запас Прочности
-    QMemArray <double> S;             //потребные площади Стержней
-    double V;                         //Объём
-    double Sg;                        //Силовой вес конструкции
-    QMemArray <double> PivotLength;   //длина Стержня
+    int nodesNum;                     //nodes number
+    int pivotsNum;                    //pivots number
+    int loadsNum;                     //load cases number
+    double v;                         //volume
+    double stressLimit;               //stress limit    
+    double forceWeight;               //truss force weight
+    QMemArray<int> pivotsFirstNodes;  //first nodes list of pivots
+    QMemArray<int> pivotsLastNodes;   //last nodes list of pivots
+    QMemArray<double> x;              //list of x nodes coord
+    QMemArray<double> y;              //list of y nodes coord
+    QMemArray<double> xTrans;         //list of nodes transference by x
+    QMemArray<double> yTrans;         //list of nodes transference by y
+    QMemArray<double> stress;         //list of pivots stresses
+    QMemArray<double> safetyFactor;   //list of pivots safety factor
+    QMemArray<double> pivotSquare;    //list of pivots square
+    QMemArray<double> pivotLength;    //list of pivots length
 };
 
 class VYVReader

@@ -1,6 +1,6 @@
 
 #include "old_SimpleCalc.h"
-#include "FermaNextPlugin.h"
+#include "Plugin.h"
 #include <stdio.h>
 #include <qsocketdevice.h>
 #include <qfile.h>
