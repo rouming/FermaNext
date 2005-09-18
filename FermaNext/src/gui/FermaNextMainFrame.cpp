@@ -109,40 +109,34 @@ void FermaNextMainFrame::createProject ()
         TrussUnitWindowManager& mng = prj.getTrussUnitWindowManager();
 
 //TODO: remove this in future
-/*********** TEMP TRUSS UNIT **************************/        
-        QPoint pos1, pivotPnt1, pivotPnt2;
-        int X(50), Y(50);
+/*********** TEMP TRUSS UNIT **************************/
+#ifndef NDEBUG
         TrussUnitWindow& trussWindow = mng.createTrussUnitWindow("Truss unit");
         trussWindow.setTrussAreaSize( QSize( 300, 300 ) );
 
-        pos1.setX ( X ); 
-        pos1.setY ( Y );         
-        trussWindow.createNode ( 280, 30 );
-        pivotPnt1.setX ( 0 );
-        pivotPnt1.setY ( 0 );
-        pivotPnt2.setX ( 130 );
-        pivotPnt2.setY ( 130 );
-        trussWindow.createPivot ( pivotPnt1, pivotPnt2 );
-        pivotPnt1.setX ( 252 );
-        pivotPnt1.setY ( 300 );
-        trussWindow.createPivot ( pivotPnt1, pivotPnt2 );
-        pivotPnt1.setX ( 0 );
-        pivotPnt1.setY ( 300 );
-        trussWindow.createPivot ( pivotPnt1, pivotPnt2 );
-        pivotPnt2.setX ( 250 );
-        pivotPnt2.setY ( 300 );
-        trussWindow.createPivot ( pivotPnt1, pivotPnt2 );
-        pivotPnt2.setX ( 0 );
-        pivotPnt2.setY ( 0 );
-        trussWindow.createPivot ( pivotPnt1, pivotPnt2 );
+        TrussNode& node1 = trussWindow.createNode ( 280, 30 );
+        TrussNode& node2 = trussWindow.createNode( 0, 0 );
+        TrussNode& node3 = trussWindow.createNode( 130, 130 );
+        trussWindow.createPivot( node2, node3 );
 
-        trussWindow.findNodeByNumber( 1 )->setFixation( Node::FixationByX );
-        trussWindow.findNodeByNumber( 2 )->setFixation( Node::FixationByY );
-        trussWindow.findNodeByNumber( 3 )->setFixation( Node::FixationByXY );
+        TrussNode& node4 = trussWindow.createNode( 250, 300 );
+        trussWindow.createPivot ( node4, node3 );
+
+        TrussNode& node5 = trussWindow.createNode( 0, 300 );
+        trussWindow.createPivot ( node5, node3 );
+
+        trussWindow.createPivot ( node5, node4 );
+
+        trussWindow.createPivot ( node5, node2 );
+
+        node1.setFixation( Node::FixationByX );
+        node2.setFixation( Node::FixationByY );
+        node3.setFixation( Node::FixationByXY );
 
         TrussUnitLoadCase& currentCase = trussWindow.getLoadCases().createLoadCase();
         trussWindow.getLoadCases().setCurrentLoadCase ( currentCase );
-        currentCase.addLoad ( *trussWindow.findNodeByNumber( 4 ), 300, 100 );
+        currentCase.addLoad ( node4, 300, 100 );
+#endif
 /*********** TEMP TRUSS UNIT **************************/
 
         prj.activate();

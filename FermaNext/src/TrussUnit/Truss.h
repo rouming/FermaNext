@@ -248,19 +248,6 @@ public:
         return *node;
     }
 
-    virtual P& createPivot ( QPoint p1 , QPoint p2 )
-    {
-        N* first = findNodeByCoord ( p1, 4 * nodesRadius * nodesRadius );
-        N* last = findNodeByCoord ( p2, 4 * nodesRadius * nodesRadius );
-        if ( first == 0 )  
-            first = &createNode( p1.x(), p1.y() );            
-        
-        if ( last == 0 )        
-            last = &createNode( p2.x(), p2.y() );
-
-        return createPivot( *first, *last );
-    }
-
     virtual P& createPivot ( uint firstNodeIndex, uint lastNodeIndex ) 
                                                         throw (NodeIndexOutOfBoundException) 
     {
@@ -621,9 +608,7 @@ signals:
 template <class N> 
 class Pivot : public PivotEmitter
 {
-    friend class Truss<class N_, class P_>;
-
-protected:
+public:
     Pivot ( ObjectStateManager* mng ) : 
         PivotEmitter(mng),
         first(0), last(0),
@@ -640,7 +625,6 @@ protected:
     virtual ~Pivot ()
     {}
 
-public:
     virtual N& getFirstNode () const
     { return *first; }
     virtual N& getLastNode () const
@@ -672,8 +656,6 @@ private:
 class Node : public StatefulObject
 {
     Q_OBJECT
-    friend class Truss<Node, class P>;
-
 public:
     typedef enum { Unfixed = 0,
                    FixationByX, 
@@ -684,12 +666,11 @@ signals:
     void onFixationChange ( Fixation );
     void onPositionChange ( int, int );
 
-protected:
+public:
     Node ( ObjectStateManager* mng );
     Node ( int x, int y, ObjectStateManager* mng );
     Node ( int x, int y, Fixation, ObjectStateManager* mng );
 
-public:
     virtual void setFixation ( Fixation );
     virtual Fixation getFixation () const;
     
