@@ -5,7 +5,7 @@
 #include <vector>
 #include <qmap.h>
 #include <qstringlist.h>
-#include "FermaNextPlugin.h"
+#include "Plugin.h"
 #include "PluginLoader.h"
 
 typedef uint PluginHandle;

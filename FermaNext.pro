@@ -1,7 +1,8 @@
 
 TEMPLATE = subdirs
 
-SUBDIRS = src/Agg \
+SUBDIRS = src/common \
+          src/Agg \
           src/TrussUnit \
           src/FermaNext \
           src/plugins/old_SimpleCalc
