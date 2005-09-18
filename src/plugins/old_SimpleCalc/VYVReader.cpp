@@ -23,88 +23,88 @@ void VYVReader::output( const QString &outfilename ) const
         Message = "Чтение из файла : " + File + "\n";
         OutFile.writeBlock(Message, Message.length());
         Message = "Ферменная конструкция состоит из : " + 
-                  QString::number(Data.NumNods) + " Узлов и " + 
-                  QString::number(Data.NumPivots) + " Стержней\n\n";
+                  QString::number(Data.nodesNum) + " Узлов и " + 
+                  QString::number(Data.pivotsNum) + " Стержней\n\n";
         OutFile.writeBlock(Message, Message.length());
         Message = "Количество случаев нагружения : " + 
-                  QString::number(Data.NumLoads) + "\n\n";
+                  QString::number(Data.loadsNum) + "\n\n";
         OutFile.writeBlock(Message, Message.length());
         Message = "Допускаемое Напряжение \n" + 
-                  QString::number(Data.StressLimit,'e',3) + "\n\n";
+                  QString::number(Data.stressLimit,'e',3) + "\n\n";
         OutFile.writeBlock(Message, Message.length());
         Message = "Топология стержней : \n";
         OutFile.writeBlock(Message, Message.length());
-        for (i=0;i<Data.NumPivots;i++) {
+        for (i=0;i<Data.pivotsNum;i++) {
             Message = QString::number(i+1) + " Стержень : " + 
-                      QString::number(Data.PivotsFirstNod[i]) + " " +
-                      QString::number(Data.PivotsSecondNod[i]) + "\n";
+                      QString::number(Data.pivotsFirstNodes[i]) + " " +
+                      QString::number(Data.pivotsLastNodes[i]) + "\n";
             OutFile.writeBlock(Message, Message.length());
         }
         Message = "\nКоординаты Узлов : \n";
         OutFile.writeBlock(Message, Message.length());
-        for (i = 0; i < Data.NumNods; i++) {
+        for (i = 0; i < Data.nodesNum; i++) {
             Message = QString::number(i+1) + " Узел : [" + 
-                      QString::number(Data.X[i],'e',3) + "," + 
-                      QString::number(Data.Y[i],'e',3) + "] \n";
+                      QString::number(Data.x[i],'e',3) + "," + 
+                      QString::number(Data.y[i],'e',3) + "] \n";
             OutFile.writeBlock(Message, Message.length());
         }
         Message = "\nПеремещения узлов :\n";
         OutFile.writeBlock(Message, Message.length());
-        for (i = 0; i < Data.NumLoads; i++) {
+        for (i = 0; i < Data.loadsNum; i++) {
             Message = "Случай нагружения " + QString::number(i+1) + "\n";
             OutFile.writeBlock(Message, Message.length());
-            for (j = 0; j < Data.NumNods; j++) {
+            for (j = 0; j < Data.nodesNum; j++) {
                 Message = 
                     QString::number( j+1) + "Узел : [" + 
-                    QString::number(Data.TransX[Data.NumNods*i+j],'e',3) +
+                    QString::number(Data.xTrans[Data.nodesNum*i+j],'e',3) +
                     " , " +    
-                    QString::number(Data.TransY[Data.NumNods*i+j],'e',3) + 
+                    QString::number(Data.yTrans[Data.nodesNum*i+j],'e',3) + 
                     "] \n";
                 OutFile.writeBlock(Message, Message.length());
             }
         }
         Message = "\nНапряжения в стержнях \n";
         OutFile.writeBlock(Message, Message.length());
-        for (i = 0; i < Data.NumLoads; i++) {
+        for (i = 0; i < Data.loadsNum; i++) {
             Message = "Случай нагружения " + QString::number(i+1) + "\n";
             OutFile.writeBlock(Message, Message.length());
-            for (j = 0; j < Data.NumPivots; j++) {
+            for (j = 0; j < Data.pivotsNum; j++) {
                 Message = 
                     QString::number( j+1) + " Стержень : " + 
-                    QString::number(Data.Stress[Data.NumPivots*i+j],'e',3) + 
+                    QString::number(Data.stress[Data.pivotsNum*i+j],'e',3) + 
                     "\n";
                 OutFile.writeBlock(Message, Message.length());
             }
         }
         Message = "\nЗапас прочности \n";
         OutFile.writeBlock(Message, Message.length());
-        for (i = 0; i < Data.NumLoads; i++) {
+        for (i = 0; i < Data.loadsNum; i++) {
             Message = "Случай нагружения " + QString::number(i+1) + "\n";
             OutFile.writeBlock(Message, Message.length());
-            for (j = 0; j < Data.NumPivots; j++) {
+            for (j = 0; j < Data.pivotsNum; j++) {
                 Message = 
                     QString::number( j+1) + " Стержень : " + 
-                    QString::number(Data.StressReserve[Data.NumPivots*i+j],'e',3) + "\n";
+                    QString::number(Data.safetyFactor[Data.pivotsNum*i+j],'e',3) + "\n";
                 OutFile.writeBlock(Message, Message.length());
             }
         }
         Message = "\nНачальные площади\n";
         OutFile.writeBlock(Message, Message.length());
-        for (i = 0; i < Data.NumPivots; i++) {
+        for (i = 0; i < Data.pivotsNum; i++) {
             Message = QString::number(i+1) + "Стержень : " + 
-                      QString::number(Data.S[i],'e',3) + "\n";
+                      QString::number(Data.pivotSquare[i],'e',3) + "\n";
             OutFile.writeBlock(Message, Message.length());
         }
-        Message = "\nОбъём = " + QString::number(Data.V) + "\n";
+        Message = "\nОбъём = " + QString::number(Data.v) + "\n";
         OutFile.writeBlock(Message, Message.length());
         Message = "\nСиловой вес конструкции = " + 
-                  QString::number(Data.Sg) + "\n";
+                  QString::number(Data.forceWeight) + "\n";
         OutFile.writeBlock(Message, Message.length());
         Message = "\nДлины Стержней : \n\n";
         OutFile.writeBlock(Message, Message.length());
-        for (i = 0; i < Data.NumPivots; i++) {
+        for (i = 0; i < Data.pivotsNum; i++) {
             Message = QString::number(i+1) + "Стержень : " + 
-                      QString::number(Data.PivotLength[i],'e',3) + "\n";
+                      QString::number(Data.pivotLength[i],'e',3) + "\n";
             OutFile.writeBlock(Message, Message.length());
         }
     }
@@ -124,81 +124,81 @@ bool VYVReader::readCalcData()
     if (ResFile.open(IO_ReadOnly)) {
         ResFile.readLine( str, 256 );
         ResFile.readLine( str, 256 );
-        Data.NumPivots = str.toInt();
-        Data.PivotsFirstNod.resize(Data.NumPivots);
-        Data.PivotsSecondNod.resize(Data.NumPivots);
-        Data.PivotLength.resize(Data.NumPivots);
-        Data.S.resize(Data.NumPivots);
+        Data.pivotsNum = str.toInt();
+        Data.pivotsFirstNodes.resize(Data.pivotsNum);
+        Data.pivotsLastNodes.resize(Data.pivotsNum);
+        Data.pivotLength.resize(Data.pivotsNum);
+        Data.pivotSquare.resize(Data.pivotsNum);
         ResFile.readLine( str, 256 );
-        Data.NumNods = str.toInt();
-        Data.X.resize(Data.NumNods);
-        Data.Y.resize(Data.NumNods);
+        Data.nodesNum = str.toInt();
+        Data.x.resize(Data.nodesNum);
+        Data.y.resize(Data.nodesNum);
         for ( i = 0; i < 3; i++) {
             ResFile.readLine( str, 256 );
         }
-        Data.NumLoads = str.toInt();
-        Data.TransX.resize(Data.NumNods * Data.NumLoads);
-        Data.TransY.resize(Data.NumNods * Data.NumLoads);
-        Data.Stress.resize(Data.NumPivots * Data.NumLoads);
-        Data.StressReserve.resize(Data.NumPivots * Data.NumLoads);
+        Data.loadsNum = str.toInt();
+        Data.xTrans.resize(Data.nodesNum * Data.loadsNum);
+        Data.yTrans.resize(Data.nodesNum * Data.loadsNum);
+        Data.stress.resize(Data.pivotsNum * Data.loadsNum);
+        Data.safetyFactor.resize(Data.pivotsNum * Data.loadsNum);
         ResFile.readLine( str, 256 );
-        Data.StressLimit = str.toDouble();
+        Data.stressLimit = str.toDouble();
 //---------------------------------------------------------------------------//
         while (str.contains("Массив топологий стержней")==0) 
             ResFile.readLine( str, 256 );
-        for (i = 0;i < Data.NumPivots;i++) {
+        for (i = 0;i < Data.pivotsNum;i++) {
             ResFile.readLine(str,256);
             buff = str[0];
-            Data.PivotsFirstNod[i] = buff.toInt();
+            Data.pivotsFirstNodes[i] = buff.toInt();
             buff = str[1];
-            Data.PivotsSecondNod[i] = buff.toInt();
+            Data.pivotsLastNodes[i] = buff.toInt();
         }
 //---------------------------------------------------------------------------//
         while ( str.contains("Массив координат узлов")==0) 
             ResFile.readLine(str,256);
-        for (i = 0;i < Data.NumNods;i++) {
+        for (i = 0;i < Data.nodesNum;i++) {
             ResFile.readLine(str,256);
             buff = str;
             len = str.length();
             str.remove(0,pos);
             buff.remove(pos,len - pos + 1);
-            Data.X[i] = buff.toDouble();
-            Data.Y[i] = str.toDouble();
+            Data.x[i] = buff.toDouble();
+            Data.y[i] = str.toDouble();
         }
 //---------------------------------------------------------------------------//
         while ( str.contains("Массив начальных площадей")==0) 
             ResFile.readLine(str,256);
-        for (i = 0; i < Data.NumPivots; i++) {
+        for (i = 0; i < Data.pivotsNum; i++) {
             ResFile.readLine(str,256);
-            Data.S[i] = str.toDouble();
+            Data.pivotSquare[i] = str.toDouble();
         }
 //---------------------------------------------------------------------------//
-        Data.V = 0;
-        for (i = 0; i < Data.NumPivots; i++) {
-            length = sqrt( (Data.X[ Data.PivotsFirstNod[i] -1] - 
-                            Data.X[ Data.PivotsSecondNod[i] -1])*
-                           (Data.X[ Data.PivotsFirstNod[i] -1] - 
-                            Data.X[ Data.PivotsSecondNod[i] -1])+
-                           (Data.Y[ Data.PivotsFirstNod[i] -1] - 
-                            Data.Y[ Data.PivotsSecondNod[i] -1])*
-                           (Data.Y[ Data.PivotsFirstNod[i] -1] - 
-                            Data.Y[ Data.PivotsSecondNod[i] -1]) );
-            Data.PivotLength[i] = length;
-            Data.V = Data.V + length * Data.S[i];
+        Data.v = 0;
+        for (i = 0; i < Data.pivotsNum; i++) {
+            length = sqrt( (Data.x[ Data.pivotsFirstNodes[i] -1] - 
+                            Data.x[ Data.pivotsLastNodes[i] -1])*
+                           (Data.x[ Data.pivotsFirstNodes[i] -1] - 
+                            Data.x[ Data.pivotsLastNodes[i] -1])+
+                           (Data.y[ Data.pivotsFirstNodes[i] -1] - 
+                            Data.y[ Data.pivotsLastNodes[i] -1])*
+                           (Data.y[ Data.pivotsFirstNodes[i] -1] - 
+                            Data.y[ Data.pivotsLastNodes[i] -1]) );
+            Data.pivotLength[i] = length;
+            Data.v = Data.v + length * Data.pivotSquare[i];
         }
 //---------------------------------------------------------------------------//
         while ( str.contains("Перемещения узлов")==0) 
             ResFile.readLine( str, 256 );
         ResFile.readLine( str, 256 );
-        for (i = 0; i < Data.NumLoads; i++) {
-            for (j = 0; j < Data.NumNods; j++) {
+        for (i = 0; i < Data.loadsNum; i++) {
+            for (j = 0; j < Data.nodesNum; j++) {
                 ResFile.readLine(str,256 );
                 buff = str;
                 len = str.length();
                 str.remove( 0, pos );
                 buff.remove( pos, len - pos + 1 );
-                Data.TransX[Data.NumNods*i+j] = buff.toDouble();
-                Data.TransY[Data.NumNods*i+j] = str.toDouble();
+                Data.xTrans[Data.nodesNum*i+j] = buff.toDouble();
+                Data.yTrans[Data.nodesNum*i+j] = str.toDouble();
             }
             ResFile.readLine( str, 256 );
         }
@@ -206,31 +206,31 @@ bool VYVReader::readCalcData()
         while ( str.contains("Напряжения в стержнях")==0) 
             ResFile.readLine( str, 256 );
         ResFile.readLine( str, 256 );
-        for (i = 0; i < Data.NumLoads; i++) {
-            for (j = 0; j < Data.NumPivots; j++) {
+        for (i = 0; i < Data.loadsNum; i++) {
+            for (j = 0; j < Data.pivotsNum; j++) {
                 ResFile.readLine(str,256);
-                Data.Stress[Data.NumPivots*i+j] = str.toDouble();;
-                Data.StressReserve[Data.NumPivots*i+j] = 
-                    Data.StressLimit/Data.Stress[Data.NumPivots*i+j];
+                Data.stress[Data.pivotsNum*i+j] = str.toDouble();;
+                Data.safetyFactor[Data.pivotsNum*i+j] = 
+                    Data.stressLimit/Data.stress[Data.pivotsNum*i+j];
             }
             ResFile.readLine( str, 256 );
         }
 //---------------------------------------------------------------------------//
-        Data.Sg = 0;
-        for (i = 0; i < Data.NumPivots; i++) {
+        Data.forceWeight = 0;
+        for (i = 0; i < Data.pivotsNum; i++) {
             MaxStress = 0;
-            for (j = 0; j < Data.NumLoads; j++) {
-                if (fabs(Data.Stress[Data.NumPivots*j+i]) > MaxStress)
-                    MaxStress = fabs(Data.Stress[Data.NumPivots*j+i]);
+            for (j = 0; j < Data.loadsNum; j++) {
+                if (fabs(Data.stress[Data.pivotsNum*j+i]) > MaxStress)
+                    MaxStress = fabs(Data.stress[Data.pivotsNum*j+i]);
             }
-            Data.Sg = Data.Sg + MaxStress*Data.PivotLength[i];
+            Data.forceWeight = Data.forceWeight + MaxStress*Data.pivotLength[i];
         }
 //---------------------------------------------------------------------------//
         /*while ( str.contains("Потребные площади стержней")==0) 
           ResFile.readLine(str,256);
-          for (i = 0; i < Data.NumPivots; i++) {
+          for (i = 0; i < Data.pivotsNum; i++) {
           ResFile.readLine(str,256);
-          Data.S[i] = str.toDouble();
+          Data.pivotSquare[i] = str.toDouble();
           }*/
 //---------------------------------------------------------------------------//
     }
