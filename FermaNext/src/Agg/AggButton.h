@@ -13,7 +13,9 @@ class AggButton : public QObject
 {
     Q_OBJECT
 public:
+    // leftTopPos - button position in inner dynarow buffer coords
     AggButton ( QString label_, QPoint leftTopPos, int width, int height );
+    AggButton ( QPoint leftTopPos, int width, int height );
     virtual ~AggButton ();
     
     virtual void setHint ( QString hint_ );
@@ -42,7 +44,8 @@ public:
 signals:
     void onButtonHighlightChange ();
     void onButtonPress();
-    void buttonIsPressed();
+    void onButtonRelease();
+    void onChangeButtonState();
 
 protected slots:
     void pressButton ();

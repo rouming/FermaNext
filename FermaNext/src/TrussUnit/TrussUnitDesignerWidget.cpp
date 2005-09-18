@@ -29,7 +29,7 @@ TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
     firstNodeClickDist(0,0), 
     lastNodeClickDist(0,0),
     toolBarCenterPos(0,0),
-    toolBar ( new TrussUnitToolBar( toolBarCenterPos, 15, 15, 5, 5, 5, 30 ) ), 
+    toolBar ( new TrussUnitToolBar( toolBarCenterPos, 15, 15, 8, 5, 5, 30 ) ), 
     // Temp
     X(50), Y(50)
 {
@@ -122,6 +122,13 @@ void TrussUnitDesignerWidget::initToolBar ()
     toolBar->addButton ( imagesSvgPath() + "/eraseIcon.svg", "Erase", leftTopPos, 
                          buttonWidth, buttonHeight, this, SIGNAL( pressEraseButton() ),
                          SLOT( changeBehaviourToErase() ) );
+
+    int width = buttonWidth * 3;
+    int height = 6;
+    leftTopPos.setX( ( toolBar->getWidth() - width ) / 2 + bufferEmptyArea );
+    leftTopPos.setY( bufferEmptyArea - height / 2 );
+
+    toolBar->addHideButton ( leftTopPos, width, height, this );
 }
 
 void TrussUnitDesignerWidget::changeBehaviourToSelect ()

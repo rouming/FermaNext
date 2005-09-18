@@ -26,9 +26,11 @@ void AggToolBarButton::paint ( ren_dynarow& baseRend, scanline_rasterizer& ras,
     QPoint pos = getPosition ();
     int width = getWidth ();
     int height = getHeight ();
+
+    primitivesRenderer primRend ( baseRend );
+
     if ( isPressed() )
     {
-        primitivesRenderer primRend ( baseRend );
         primRend.fill_color ( fillCol );
         primRend.line_color ( lineCol );
         primRend.outlined_rectangle ( pos.x() + 1, pos.y() + 1, pos.x() + width - 1, 
@@ -36,7 +38,6 @@ void AggToolBarButton::paint ( ren_dynarow& baseRend, scanline_rasterizer& ras,
     }   
     else if ( isHighlighted() )
     {
-        primitivesRenderer primRend ( baseRend );
         primRend.fill_color ( highlightFill );
         primRend.line_color ( highlightLine );
         primRend.outlined_rectangle ( pos.x(), pos.y(), pos.x() + width, pos.y() + height );
@@ -69,7 +70,10 @@ AggToolBar::AggToolBar( QPoint pos, int bordLeft, int bordRight, int bordTop,
     toolBarHeight = bordTop + bordBottom;
     // Centering tool bar
     toolBarLeftTopPos.setX( centerPos.x() - toolBarWidth/2 );
-    toolBarLeftTopPos.setY( centerPos.y() - toolBarHeight );  
+    toolBarLeftTopPos.setY( centerPos.y() - toolBarHeight );
+
+    QObject::connect( this, SIGNAL( onChangeToolBarPosition() ),
+                      SLOT( clearToolBarRenderedFlag() ) );
 }
 
 AggToolBar::~AggToolBar ()
@@ -91,7 +95,7 @@ AggToolBarButton& AggToolBar::addButton ( QString fname, QString label, QPoint l
     QObject::connect( button, SIGNAL( onButtonPress() ),
                       SLOT( releaseButtons() ) );
 
-    QObject::connect( button, SIGNAL( buttonIsPressed() ),
+    QObject::connect( button, SIGNAL( onChangeButtonState() ),
                       SLOT( clearToolBarRenderedFlag() ) );
 
     if ( signal && widget )
@@ -223,9 +227,17 @@ QPoint AggToolBar::getCenterPoint () const
     return centerPos;
 }
 
-QPoint AggToolBar::getLeftTopPos () const
+QPoint AggToolBar::getPosition () const
 {
     return toolBarLeftTopPos;
+}
+
+void AggToolBar::setPosition ( QPoint newPos )
+{
+    if ( toolBarLeftTopPos == newPos )
+        return;
+    toolBarLeftTopPos = newPos;
+    emit onChangeToolBarPosition ();
 }
 
 void AggToolBar::setButtonSeparation ( int s )
@@ -302,12 +314,12 @@ int AggToolBar::getBorderTop () const
     return borderTop;
 }
 
-int AggToolBar::getToolBarWidth () const
+int AggToolBar::getWidth () const
 {
     return toolBarWidth;
 }
 
-int AggToolBar::getToolBarHeight () const
+int AggToolBar::getHeight () const
 {
     return toolBarHeight;
 }
