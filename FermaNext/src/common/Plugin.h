@@ -1,6 +1,6 @@
 
-#ifndef FERMANEXTPLUGIN_H
-#define FERMANEXTPLUGIN_H
+#ifndef PLUGIN_H
+#define PLUGIN_H
 
 #ifdef __cplusplus
   #define ExternC extern "C"
@@ -100,4 +100,4 @@ typedef PluginInfo& ( StandardCall *PluginInfoCall ) ();
 #endif
 
 
-#endif //FERMANEXTPLUGIN_H
+#endif //PLUGIN_H
