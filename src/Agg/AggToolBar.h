@@ -51,7 +51,8 @@ public:
     virtual void setCenterPoint ( QPoint pos );
     virtual QPoint getCenterPoint () const; 
 
-    virtual QPoint getLeftTopPos () const;
+    virtual QPoint getPosition () const;
+    virtual void setPosition ( QPoint pos );
 
     virtual void setButtonSeparation ( int separation_ );
     virtual int getButtonSeparation () const;
@@ -68,6 +69,9 @@ public:
     virtual void setBorderTop ( int width );
     virtual int getBorderTop () const;
 
+    virtual int getWidth () const;
+    virtual int getHeight () const;
+
     virtual bool isVisible () const;
     virtual void setVisible ( bool );
     virtual bool isRendered () const;
@@ -76,6 +80,7 @@ public:
 
 signals:
     void onRenderingStatusCleared ();
+    void onChangeToolBarPosition ();
 
 protected slots:
     void releaseButtons ();
@@ -84,8 +89,6 @@ protected slots:
 protected:
     virtual void removeButtonHighlight ();
     virtual int findMaxButtonHeight () const;
-    virtual int getToolBarWidth () const;
-    virtual int getToolBarHeight () const;
     virtual rbuf_dynarow& getRenderingBuffer () const;
     virtual void setRendered ( bool ) const;
 

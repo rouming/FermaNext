@@ -316,6 +316,35 @@ InputName=TrussUnitDesignerWindow
 # Begin Source File
 
 SOURCE=.\TrussUnitToolBar.h
+
+!IF  "$(CFG)" == "TrussUnit - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\TrussUnitToolBar.h
+InputName=TrussUnitToolBar
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\TrussUnitToolBar.h
+InputName=TrussUnitToolBar
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -406,6 +435,10 @@ SOURCE=.\mocs\moc_TrussUnitDesignerWidget.cpp
 # Begin Source File
 
 SOURCE=.\mocs\moc_TrussUnitDesignerWindow.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mocs\moc_TrussUnitToolBar.cpp
 # End Source File
 # Begin Source File
 

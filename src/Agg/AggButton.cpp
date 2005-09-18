@@ -5,11 +5,19 @@
  * Agg Button
  *****************************************************************************/
 
-AggButton::AggButton ( QString l, QPoint pos, int w, int h  ) :
+AggButton::AggButton ( QString l, QPoint pos, int w, int h ) :
     leftTopPos ( pos ),
     width ( w ),
     height ( h ),
     label ( l ),
+    pressed ( false ),
+    highlighted ( false )
+{}
+
+AggButton::AggButton ( QPoint pos, int w, int h ) :
+    leftTopPos ( pos ),
+    width ( w ),
+    height ( h ),
     pressed ( false ),
     highlighted ( false )
 {}
@@ -100,9 +108,11 @@ void AggButton::setPressed ( bool status )
 
     if ( status )
         emit onButtonPress();
+    else
+        emit onButtonRelease();
 
     pressed = status;
-    emit buttonIsPressed();
+    emit onChangeButtonState();
 }
 
 void AggButton::pressButton ()
