@@ -587,7 +587,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         else if ( pivotBehaviour == onPivotDrag )
         {
             clearAllCursorCoordFields ();
-            QPoint cursorCoord = selectedWindow->getTrussCoordFromWidgetPos( x, y );
+            DoublePoint cursorCoord = selectedWindow->getTrussCoordFromWidgetPos( x, y );
             const DoubleSize& size = selectedWindow->getTrussAreaSize();
             if ( cursorCoord.x() > size.width() || cursorCoord.x() < 0 ||
                  cursorCoord.y() > size.height() || cursorCoord.y() < 0 )
@@ -616,7 +616,8 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                 if ( selectedWindow->inTrussAreaRect( x, y ) )
                 {
                     clearAllCursorCoordFields ();
-                    QPoint cursorCoord = selectedWindow->getTrussCoordFromWidgetPos( x, y );
+                    DoublePoint cursorCoord = 
+                        selectedWindow->getTrussCoordFromWidgetPos( x, y );
                     selectedWindow->setCursorCoord ( cursorCoord );
                     update();
                 }
@@ -663,7 +664,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                         removeAllHighlight ();
                         clearAllCursorCoordFields ();
                         selectedWindow->setFocusOnPivot ( selectedPivot );
-                        QPoint cursorCoord = 
+                        DoublePoint cursorCoord = 
                             selectedWindow->getTrussCoordFromWidgetPos( x, y );
                         selectedWindow->setCursorCoord ( cursorCoord );
                         pivotBehaviour = onPivotSelect;
@@ -887,7 +888,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
             else
             {
                 // Convert widget coordinates into truss (absolute) coordinates
-                QPoint trussCoord = selectedWindow->getTrussCoordFromWidgetPos(clickX, 
+                DoublePoint trussCoord = selectedWindow->getTrussCoordFromWidgetPos(clickX, 
                                                                                clickY);
                 const DoublePoint& firstPos = selectedPivot->
                                                      getFirstNode().getPoint();

@@ -290,8 +290,10 @@ inline const DoubleSize operator/ ( const DoubleSize& s, double c )
  * Subsidiary 2D inline functions
  *****************************************************************************/
 
-inline DoublePoint crossPoint ( const DoublePoint& p11, const DoublePoint& p12,
-                                const DoublePoint& p21, const DoublePoint& p22)
+inline DoublePoint getLineSegmentsCrossPoint ( const DoublePoint& p11, 
+                                               const DoublePoint& p12,
+                                               const DoublePoint& p21, 
+                                               const DoublePoint& p22)
 {
     DoublePoint crossPoint ( -1, -1 ); // intersection point
 

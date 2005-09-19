@@ -66,7 +66,7 @@ public:
     // Manually call. We should save states before pivot desist.
     void desistAdjoiningPivots ( const TrussNode& node );
 
-    void paintLoad ( const TrussLoad& load, const DoublePoint& tailPos, 
+    void paintLoad ( const TrussLoad& load, const QPoint& tailPos, 
                      ren_dynarow& baseRend ) const;
     void paint ( ren_dynarow& baseRend, double scaleMultX, 
                  double scaleMultY ) const;

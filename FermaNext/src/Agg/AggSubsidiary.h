@@ -103,29 +103,29 @@ struct arrow
 /*****************************************************************************/
 
 void drawText ( textRenderer& textRend, const QString& str, 
-                color_type c, const DoublePoint& point );
+                color_type c, const QPoint& point );
 
 void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                agg::scanline_p8& sl, const DoublePoint& point1, 
-                const DoublePoint& point2, int width, color_type col );
+                agg::scanline_p8& sl, const QPoint& point1, 
+                const QPoint& point2, int width, color_type col );
 
 void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                agg::scanline_p8& sl, const DoublePoint& point1, 
-                const DoublePoint& point2 );
+                agg::scanline_p8& sl, const QPoint& point1, 
+                const QPoint& point2 );
 
 void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                 agg::scanline_p8& sl, const DoublePoint& tail, 
-                 const DoublePoint& head, color_type color,
+                 agg::scanline_p8& sl, const QPoint& tail, 
+                 const QPoint& head, color_type color,
                  int downLen, int upLen, int sideWid, int sideLen );
 
 void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                 agg::scanline_p8& sl, const DoublePoint& point1, 
-                 const DoublePoint& point2 );
+                 agg::scanline_p8& sl, const QPoint& point1, 
+                 const QPoint& point2 );
 
 void drawOutlineRoundedRect ( solidRenderer& solidRend, 
                               scanline_rasterizer& ras,
-                              agg::scanline_p8& sl, const DoublePoint& tail, 
-                              const DoublePoint& head, 
+                              agg::scanline_p8& sl, const QPoint& tail, 
+                              const QPoint& head, 
                               int cornerRadius, color_type color);
 
 void parseSvg ( pathRenderer& pathRend, const char* fname );

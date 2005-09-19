@@ -62,15 +62,15 @@ unsigned arrow::vertex ( double* x, double* y )
 /*****************************************************************************/
 
 void drawText ( textRenderer& textRend, const QString& str, color_type col, 
-                const DoublePoint& point )
+                const QPoint& point )
 {
     textRend.color( col );    
     textRend.render_text( point.x(), point.y(), str.ascii(), flipY );
 }
 
 void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                agg::scanline_p8& sl, const DoublePoint& point1, 
-                const DoublePoint& point2, int width, color_type col )
+                agg::scanline_p8& sl, const QPoint& point1, 
+                const QPoint& point2, int width, color_type col )
 {
     line newLine ( point1.x(), point1.y(), point2.x(), point2.y() );
     agg::conv_stroke<line> stroke ( newLine );
@@ -81,16 +81,16 @@ void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
 }
 
 void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                agg::scanline_p8& sl, const DoublePoint& point1, 
-                const DoublePoint& point2 )
+                agg::scanline_p8& sl, const QPoint& point1, 
+                const QPoint& point2 )
 {
     drawLine ( ras, solidRend, sl, point1, point2, 
                coordLineWidth, agg::rgba(90, 90, 90) );
 }
 
 void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                 agg::scanline_p8& sl, const DoublePoint& tail, 
-                 const DoublePoint& head,  color_type color, int downLen, 
+                 agg::scanline_p8& sl, const QPoint& tail, 
+                 const QPoint& head,  color_type color, int downLen, 
                  int upLen, int sideWid, int sideLen )
 {
     line newLine ( tail.x(), tail.y(), head.x(), head.y() );
@@ -101,15 +101,15 @@ void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
 }
 
 void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                 agg::scanline_p8& sl, const DoublePoint& tail, 
-                 const DoublePoint& head )
+                 agg::scanline_p8& sl, const QPoint& tail, 
+                 const QPoint& head )
 {
     drawArrow ( ras, solidRend, sl, tail, head, agg::rgba(90, 90, 90), 4, 1, 4, 6 );
 }
 
 void drawOutlineRoundedRect ( solidRenderer& solidRend, scanline_rasterizer& ras,
-                              agg::scanline_p8& sl, const DoublePoint& point1, 
-                              const DoublePoint& point2, int cornerRadius, 
+                              agg::scanline_p8& sl, const QPoint& point1, 
+                              const QPoint& point2, int cornerRadius, 
                               color_type color)
 {
     agg::rounded_rect rectangle ( point1.x(), point1.y(), 
