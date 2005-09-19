@@ -219,7 +219,7 @@ public:
         return findAdjoiningPivots( node, true );
     }
 
-    virtual N& createNode ( int x, int y )
+    virtual N& createNode ( double x, double y )
     {
         // Clean earlier desisted nodes/pivots
         suspendedClean();
@@ -241,7 +241,7 @@ public:
         // Just subsidiary catches
         QObject::connect( node, SIGNAL(onFixationChange ( Fixation )),
                                 SLOT(stateIsChanged()) );
-        QObject::connect( node, SIGNAL(onPositionChange ( int, int )),
+        QObject::connect( node, SIGNAL(onPositionChange(double, double)),
                                 SLOT(stateIsChanged()) );
 
         emit afterNodeCreation(*node);

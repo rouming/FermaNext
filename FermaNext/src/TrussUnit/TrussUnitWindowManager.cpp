@@ -186,12 +186,12 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
 
     for ( i = 0; i < nodesNum; ++i )
     {
-        int x, y;
+        double x, y;
         file.readLine( line, 256 );
-        x = (int)strtod( line,  NULL );
+        x = strtod( line,  NULL );
     
         file.readLine( line, 256 );
-        y = (int)strtod( line,  NULL );
+        y = strtod( line,  NULL );
 
         truss.createNode( x, y );
     }
@@ -286,12 +286,12 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
         dim.setForceMeasure( TrussDimension::kg );
     
     file.readLine( line, 256 );
-    int width = (int)strtod( line,  NULL );
+    double width = strtod( line,  NULL );
 
     file.readLine( line, 256 );
-    int height = (int)strtod( line,  NULL );
+    double height = strtod( line,  NULL );
 
-    truss.setTrussAreaSize( QSize( width, height ) );
+    truss.setTrussAreaSize( DoubleSize( width, height ) );
 }
 
 void TrussUnitWindowManager::load ( TrussUnit&, const QFile& )
