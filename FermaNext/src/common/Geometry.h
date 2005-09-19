@@ -9,8 +9,10 @@ class DoubleSize;
  * Subsidiary 2D functions
  *****************************************************************************/
 
-inline DoublePoint crossPoint ( const DoublePoint&, const DoublePoint&,
-                                const DoublePoint&, const DoublePoint& );
+inline DoublePoint getLineSegmentsCrossPoint ( const DoublePoint&, 
+                                               const DoublePoint&,
+                                               const DoublePoint&, 
+                                               const DoublePoint& );
 
 /*****************************************************************************
  * Double Point
