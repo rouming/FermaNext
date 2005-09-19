@@ -94,7 +94,7 @@ QPoint TrussUnitWindow::getWidgetPosFromTrussCoord ( QPoint coord ) const
 
 double TrussUnitWindow::getScaleMultiplierX () const
 {
-    const QSize trussAreaSize = getTrussAreaSize();
+    const DoubleSize& trussAreaSize = getTrussAreaSize();
     QPoint p1, p2;
     p1 = getTrussAreaLeftTopPos ();
     p2 = getTrussAreaRightBottomPos ();
@@ -105,7 +105,7 @@ double TrussUnitWindow::getScaleMultiplierX () const
 
 double TrussUnitWindow::getScaleMultiplierY () const
 {
-    const QSize trussAreaSize = getTrussAreaSize();
+    const DoubleSize& trussAreaSize = getTrussAreaSize();
     QPoint p1, p2;
     p1 = getTrussAreaLeftTopPos ();
     p2 = getTrussAreaRightBottomPos ();

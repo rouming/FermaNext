@@ -53,21 +53,20 @@ PivotEmitter::PivotEmitter ( ObjectStateManager* mng ) :
 
 Node::Node ( ObjectStateManager* mng ) : 
     StatefulObject(mng),
-    x(0), y(0), 
     fix(Unfixed),
     number(0)
 {}
 
-Node::Node ( int x_, int y_, ObjectStateManager* mng ) :
+Node::Node ( double x_, double y_, ObjectStateManager* mng ) :
     StatefulObject(mng),
-    x(x_), y(y_), 
+    pos(x_, y_), 
     fix(Unfixed),
     number(0)
 {}
 
-Node::Node ( int x_, int y_, Fixation fix_, ObjectStateManager* mng ) :
+Node::Node ( double x_, double y_, Fixation fix_, ObjectStateManager* mng ) :
     StatefulObject(mng),
-    x(x_), y(y_), 
+    pos(x_, y_), 
     fix(fix_),
     number(0)
 {}
@@ -83,31 +82,30 @@ Node::Fixation Node::getFixation () const
     return fix;
 }
 
-void Node::setPoint ( QPoint p )
+void Node::setPoint ( DoublePoint p )
 {
-    setPoint(p.x(), p.y());
+    pos = p;
+    emit onPositionChange(pos.x(), pos.y());
 }
 
-void Node::setPoint ( int x_, int y_ )
+void Node::setPoint ( double x_, double y_ )
 {
-    x = x_;
-    y = y_;
-    emit onPositionChange(x, y);    
+    setPoint(DoublePoint(x_, y_));
 }
 
-QPoint Node::getPoint () const
+const DoublePoint& Node::getPoint () const
 {
-    return QPoint(x, y);
+    return pos;
 }
 
-int Node::getX () const
+double Node::getX () const
 {
-    return x;
+    return pos.x();
 }
 
-int Node::getY () const
+double Node::getY () const
 {
-    return y;
+    return pos.y();
 }
 
 void Node::setNumber ( int num_ )

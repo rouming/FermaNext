@@ -5,8 +5,8 @@
 #include <vector>
 #include <algorithm>
 #include <qobject.h>
-#include <qpoint.h>
 
+#include "Geometry.h"
 #include "StatefulObject.h"
 #include "TrussLoad.h"
 #include "TrussMaterial.h"
@@ -53,7 +53,7 @@ public:
     TrussEmitter ( ObjectStateManager* mng );
 
 public slots:
-    virtual void setTrussAreaSize ( const QSize& ) = 0;
+    virtual void setTrussAreaSize ( const DoubleSize& ) = 0;
 
 protected slots:
     void stateIsChanged ();
@@ -71,7 +71,7 @@ protected slots:
 signals:
     // Truss signals
     void onStateChange ();
-    void onAreaChange ( const QSize& );
+    void onAreaChange ( const DoubleSize& );
 
     // Nodes create/remove signals
     void beforeNodeCreation ();
@@ -142,7 +142,7 @@ public:
         clear();
     }
 
-    virtual N* findNodeByCoord ( QPoint point ) const
+    virtual N* findNodeByCoord ( const DoublePoint& point ) const
     {   
         NodeListConstIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
@@ -156,7 +156,8 @@ public:
         return 0;
     } 
     
-    virtual N* findNodeByCoord ( QPoint point, int precision ) const
+    virtual N* findNodeByCoord ( const DoublePoint& point, 
+                                 double precision ) const
     {        
         NodeListConstIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
@@ -164,7 +165,7 @@ public:
             N* node = *iter;
             if ( !node->isAlive() || !node->isEnabled() )
                 continue;
-            QPoint pos = node->getPoint();
+            const DoublePoint& pos = node->getPoint();
             if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
                    (point.y() - pos.y()) * (point.y() - pos.y()) ) < precision )
                 return node;
@@ -347,12 +348,12 @@ public:
         return alivePivots;
     }
 
-    virtual const QSize& getTrussAreaSize () const
+    virtual const DoubleSize& getTrussAreaSize () const
     {
         return trussAreaSize;
     }
 
-    virtual void setTrussAreaSize ( const QSize& area )
+    virtual void setTrussAreaSize ( const DoubleSize& area )
     {    
         trussAreaSize = area;
         emit onAreaChange( trussAreaSize );
@@ -578,7 +579,7 @@ protected:
 private:
     NodeList  nodes;
     PivotList pivots;
-    QSize trussAreaSize;
+    DoubleSize trussAreaSize;
     TrussLoadCaseArray<N> loadCases;
     TrussMaterial material;
     TrussDimension dimension;
@@ -664,28 +665,28 @@ public:
 
 signals:
     void onFixationChange ( Fixation );
-    void onPositionChange ( int, int );
+    void onPositionChange ( double, double );
 
 public:
     Node ( ObjectStateManager* mng );
-    Node ( int x, int y, ObjectStateManager* mng );
-    Node ( int x, int y, Fixation, ObjectStateManager* mng );
+    Node ( double x, double y, ObjectStateManager* mng );
+    Node ( double x, double y, Fixation, ObjectStateManager* mng );
 
     virtual void setFixation ( Fixation );
     virtual Fixation getFixation () const;
     
-    virtual void setPoint ( QPoint );
-    virtual void setPoint ( int x, int y );
+    virtual void setPoint ( DoublePoint );
+    virtual void setPoint ( double x, double y );
         
-    virtual QPoint getPoint () const;
-    virtual int getX () const;
-    virtual int getY () const;
+    virtual const DoublePoint& getPoint () const;
+    virtual double getX () const;
+    virtual double getY () const;
 
     virtual int getNumber () const;
     virtual void setNumber ( int );
 
 private:
-    int x, y;
+    DoublePoint pos;
     Fixation fix;
     int number;
 };

@@ -138,7 +138,8 @@ void TrussUnit::desistAdjoiningPivots ( const TrussNode& node )
     }
 }
 
-void TrussUnit::paintLoad ( TrussLoad& load, QPoint tailPos, ren_dynarow& baseRend ) const
+void TrussUnit::paintLoad ( const TrussLoad& load, const DoublePoint& tailPos, 
+                            ren_dynarow& baseRend ) const
 {
     double x = load.getXForce (),
            y = load.getYForce (), 
@@ -154,7 +155,7 @@ void TrussUnit::paintLoad ( TrussLoad& load, QPoint tailPos, ren_dynarow& baseRe
         x1 = sqrt( 1 - y1 * y1 );
     }
 
-    QPoint forceDirection ( 0, 0 );
+    DoublePoint forceDirection;
 
     if ( x < 0 )
         forceDirection.setX ( - 1 );
@@ -166,8 +167,8 @@ void TrussUnit::paintLoad ( TrussLoad& load, QPoint tailPos, ren_dynarow& baseRe
     else if ( y > 0 )
         forceDirection.setY ( 1 );
 
-    QPoint headPos( int( tailPos.x() + 22 * x1 * forceDirection.x() ), 
-                    int( tailPos.y() - 22 * y1 * forceDirection.y() ) );
+    DoublePoint headPos( tailPos.x() + 22 * x1 * forceDirection.x(), 
+                         tailPos.y() - 22 * y1 * forceDirection.y() );
     
     solidRenderer solidRend ( baseRend );
     scanline_rasterizer   ras;
@@ -183,12 +184,12 @@ void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX,
     scanline_rasterizer ras;
     agg::scanline_p8 sl;
     agg::ellipse ell;
-    QPoint pos;
-    int trussAreaHeight = getTrussAreaSize().height();
+    DoublePoint pos;
+    double trussAreaHeight = getTrussAreaSize().height();
     PivotList pivotList = getPivotList ();
     PivotList::const_iterator pivotsIter = pivotList.begin();
     for ( ; pivotsIter != pivotList.end(); ++pivotsIter )
-        (*pivotsIter)->paint ( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
+        (*pivotsIter)->paint( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
 
     TrussUnitLoadCase* loadCase = getLoadCases().getCurrentLoadCase();
     NodeList nodeList = getNodeList ();

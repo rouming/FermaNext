@@ -12,14 +12,15 @@ TrussNode::TrussNode ( ObjectStateManager* mng ) :
                             SLOT(removeNodeHighlight()) );   
 }
 
-TrussNode::TrussNode ( int x, int y, ObjectStateManager* mng ) :
+TrussNode::TrussNode ( double x, double y, ObjectStateManager* mng ) :
     Node(x, y, mng)
 {
     QObject::connect( this, SIGNAL(onAfterDesist( StatefulObject& )),
                             SLOT(removeNodeHighlight()) );   
 }
 
-TrussNode::TrussNode ( int x, int y, Fixation fix, ObjectStateManager* mng ) :
+TrussNode::TrussNode ( double x, double y, Fixation fix, 
+                       ObjectStateManager* mng ) :
     Node(x, y, fix, mng)
 {
     QObject::connect( this, SIGNAL(onAfterDesist( StatefulObject& )),
@@ -32,14 +33,14 @@ void TrussNode::removeNodeHighlight ()
 }
 
 void TrussNode::drawFixation ( scanline_rasterizer& ras, solidRenderer& solidRend, 
-                               agg::scanline_p8& sl, int trussAreaHeight,
+                               agg::scanline_p8& sl, double trussAreaHeight,
                                double scaleMultX, double scaleMultY,
                                int lineWidth, color_type color ) const
 {
-    QPoint leftPnt, rightPnt, nodePos = getPoint();
-    nodePos.setX ( int(nodePos.x() * scaleMultX) + leftWindowIndent );
-    nodePos.setY ( flipY ? int(( trussAreaHeight - nodePos.y() ) * scaleMultY) + 
-                  topWindowIndent : int(nodePos.y() * scaleMultY) + topWindowIndent );
+    DoublePoint leftPnt, rightPnt, nodePos = getPoint();
+    nodePos.setX ( nodePos.x() * scaleMultX + leftWindowIndent );
+    nodePos.setY ( flipY ? ( trussAreaHeight - nodePos.y() ) * scaleMultY + 
+                  topWindowIndent : nodePos.y() * scaleMultY + topWindowIndent );
 
     if ( getFixation() == FixationByX )
     {
@@ -110,10 +111,11 @@ void TrussNode::drawFixation ( scanline_rasterizer& ras, solidRenderer& solidRen
     }
 }
 
-void TrussNode::drawGradientEllipse ( scanline_rasterizer& ras, ren_dynarow& baseRend, 
-                                     agg::scanline_p8& sl, int x, int y, int radius, 
-                                     color_type begin, color_type middle, 
-                                     color_type end ) const
+void TrussNode::drawGradientEllipse ( scanline_rasterizer& ras, 
+                                      ren_dynarow& baseRend, 
+                                      agg::scanline_p8& sl, double x, double y,
+                                      int radius, color_type begin, 
+                                      color_type middle, color_type end ) const
 {
     agg::ellipse ell;
     ell.init ( x, y, radius, radius, 16 );
@@ -144,15 +146,16 @@ void TrussNode::drawGradientEllipse ( scanline_rasterizer& ras, ren_dynarow& bas
 
 
 void TrussNode::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
-                       int trussAreaHeight ) const
+                       double trussAreaHeight ) const
 {
     if ( !isVisible() )
         return;
 
-    QPoint pos = getPoint();
-    int x = int(pos.x() * scaleMultX) + leftWindowIndent;
-    int y = flipY ? int(( trussAreaHeight - pos.y() ) * scaleMultY) + topWindowIndent :
-                    int(pos.y() * scaleMultY) + topWindowIndent;
+    DoublePoint pos = getPoint();
+    double x = (pos.x() * scaleMultX) + leftWindowIndent;
+    double y = flipY ? 
+              ( trussAreaHeight - pos.y() ) * scaleMultY + topWindowIndent :
+                pos.y() * scaleMultY + topWindowIndent;
 
     solidRenderer solidRend ( baseRend );
     scanline_rasterizer   ras;
