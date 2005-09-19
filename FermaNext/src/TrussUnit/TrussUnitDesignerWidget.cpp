@@ -578,34 +578,23 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         }
         if ( nodeBehaviour == onNodeDrag )
         {
-            const DoublePoint& pos = selectedNode->getPoint();
             selectedWindow->moveTrussNode ( x, y, selectedNode );
-            selectedWindow->setCursorCoord ( QPoint( int(pos.x()), 
-                                                     int(pos.y()) ) );
+            selectedWindow->setCursorCoord ( selectedNode->getPoint() );
             update();
         }
         else if ( pivotBehaviour == onPivotDrag )
         {
             clearAllCursorCoordFields ();
-            DoublePoint cursorCoord = selectedWindow->getTrussCoordFromWidgetPos( x, y );
-            const DoubleSize& size = selectedWindow->getTrussAreaSize();
-            if ( cursorCoord.x() > size.width() || cursorCoord.x() < 0 ||
-                 cursorCoord.y() > size.height() || cursorCoord.y() < 0 )
-            {
-                 cursorCoord.setX ( -1 );
-                 cursorCoord.setY ( -1 );
-            }
-            selectedWindow->setCursorCoord ( cursorCoord );
+            selectedWindow->setCursorCoord ( QPoint(x, y) );
             selectedWindow->moveTrussPivot( x, y, selectedPivot, 
-                                           firstNodeClickDist, lastNodeClickDist );     
+                                            firstNodeClickDist, 
+                                            lastNodeClickDist );     
             update();
         }
         else if ( designerBehaviour  == onPivotLastNodeDraw )
         {
-            const DoublePoint& pos = selectedNode->getPoint();
             selectedWindow->moveTrussNode ( x, y, selectedNode );
-            selectedWindow->setCursorCoord ( QPoint( int(pos.x()),
-                                                     int(pos.y()) ) );
+            selectedWindow->setCursorCoord( selectedNode->getPoint() );
             update();
         }
         else
@@ -616,9 +605,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                 if ( selectedWindow->inTrussAreaRect( x, y ) )
                 {
                     clearAllCursorCoordFields ();
-                    DoublePoint cursorCoord = 
-                        selectedWindow->getTrussCoordFromWidgetPos( x, y );
-                    selectedWindow->setCursorCoord ( cursorCoord );
+                    selectedWindow->setCursorCoord ( QPoint(x, y) );
                     update();
                 }
                 else
@@ -647,11 +634,9 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                     {
                         removeAllHighlight ();
                         clearAllCursorCoordFields ();
-
-                        const DoublePoint& pos = selectedNode->getPoint();
                         selectedWindow->setFocusOnNode( selectedNode );
-                        selectedWindow->setCursorCoord( QPoint( int(pos.x()), 
-                                                                int(pos.y())));
+                        selectedWindow->setCursorCoord( 
+                                                  selectedNode->getPoint() );
                         nodeBehaviour = onNodeSelect;
                         if ( designerBehaviour == onErase )
                             QWidget::setCursor ( Qt::CrossCursor );
@@ -664,9 +649,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                         removeAllHighlight ();
                         clearAllCursorCoordFields ();
                         selectedWindow->setFocusOnPivot ( selectedPivot );
-                        DoublePoint cursorCoord = 
-                            selectedWindow->getTrussCoordFromWidgetPos( x, y );
-                        selectedWindow->setCursorCoord ( cursorCoord );
+                        selectedWindow->setCursorCoord ( QPoint(x, y) );
                         pivotBehaviour = onPivotSelect;
                         if ( designerBehaviour == onErase )
                             QWidget::setCursor ( Qt::CrossCursor );

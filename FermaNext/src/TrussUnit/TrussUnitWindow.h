@@ -23,7 +23,10 @@ public:
     virtual QPoint getWidgetPosFromTrussCoord ( DoublePoint coord ) const;
     virtual void setWindowPosition ( QPoint pos );
     virtual void resize ( QPoint leftTop, QPoint rightBottom );
-    virtual void setCursorCoord ( QPoint coord );
+    virtual void setCursorCoord ( const QPoint& );
+    // Assuming this coords are from truss node position, 
+    // so we don't want to convert them from widget position
+    virtual void setCursorCoord ( const DoublePoint& );
     virtual QPoint getCursorCoord () const;
     virtual const QSize& getWindowSize () const;
 

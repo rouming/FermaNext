@@ -146,9 +146,26 @@ void TrussUnitWindow::setWindowSize ( int width, int height )
     emit onResize( oldSize, windowSize );
 }
 
-void TrussUnitWindow::setCursorCoord ( QPoint coord )
+void TrussUnitWindow::setCursorCoord ( const QPoint& p )
 {
-    cursorCoord = coord;
+    if ( p.x() != -1 && p.y() != -1 ) {
+        QPoint coord = getTrussCoordFromWidgetPos( p.x(), p.y() );
+        const DoubleSize& size = getTrussAreaSize();
+        if ( coord.x() > size.width() || coord.x() < 0 ||
+             coord.y() > size.height() || coord.y() < 0 ) {
+            cursorCoord.setX( -1 );
+            cursorCoord.setY( -1 );
+        }
+        else 
+            cursorCoord = coord;
+    }
+    else
+        cursorCoord = p;
+}
+
+void TrussUnitWindow::setCursorCoord ( const DoublePoint& p )
+{
+    cursorCoord = QPoint( int(p.x()), int(p.y()) );
 }
 
 QPoint TrussUnitWindow::getCursorCoord () const
