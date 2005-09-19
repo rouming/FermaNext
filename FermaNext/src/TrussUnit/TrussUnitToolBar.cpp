@@ -5,8 +5,8 @@
  * Agg Tool Bar Hide Button
  *****************************************************************************/
 
-AggToolBarHideButton::AggToolBarHideButton ( QPoint pos, int w, int h  ) :
-    AggButton ( pos, w, h ),
+AggToolBarHideButton::AggToolBarHideButton () :
+    AggButton ( QPoint(0,0), buttonWidth * 3, 6 ),
     fillCol( agg::rgba( 65, 90, 110, 0.5 ) ),
     lineCol( agg::rgba( 10, 10, 10 ) ), 
     highlightFill( agg::rgba( 1, 1, 1, 0.5 ) )
@@ -15,8 +15,10 @@ AggToolBarHideButton::AggToolBarHideButton ( QPoint pos, int w, int h  ) :
 AggToolBarHideButton::~AggToolBarHideButton ()
 {}
 
-void AggToolBarHideButton::paint ( ren_dynarow& baseRend, scanline_rasterizer& ras,
-                                   agg::scanline_p8& sl, solidRenderer& solidRend ) const
+void AggToolBarHideButton::paint ( ren_dynarow& baseRend, 
+                                   scanline_rasterizer&,
+                                   agg::scanline_p8&, 
+                                   solidRenderer& ) const
 {
     QPoint pos = getPosition ();
     int width = getWidth ();
@@ -64,31 +66,56 @@ void AggToolBarHideButton::paint ( ren_dynarow& baseRend, scanline_rasterizer& r
  *****************************************************************************/
 
 TrussUnitToolBar::TrussUnitToolBar  ( QPoint pos, int bordLeft, int bordRight, 
-                                      int bordTop, int bordBottom, int separation, 
+                                      int bordTop, int bordBottom, int separ, 
                                       int rad ) :
-    AggToolBar( pos, bordLeft, bordRight, bordTop, bordBottom, separation ),
-    cornerRadius( rad ),
-    hideButton( 0 ),
-    enabled( true ),
-    timer ( new QTimer( this ) ),
+    AggToolBar( pos, bordLeft, bordRight, bordTop, bordBottom, separ ),
+    cornerRadius(rad),
+    hideButton(0),
+    enabled(true),
+    timer( new QTimer( this ) ),
     // gradient colors
     barFirstColor ( agg::rgba( 35, 50, 60, 0.8 ) ),
     barMiddleColor ( agg::rgba( 20, 60, 80, 0.8 ) ),
     barLastColor ( agg::rgba( 20, 60, 80, 0.8 ) )
 {
+    initHideButton();
     QObject::connect( timer, SIGNAL( timeout() ),
                       SLOT( changeToolBarPosition() ) );    
 }
 
 TrussUnitToolBar::~TrussUnitToolBar ()
 {
+    delete timer;
     delete hideButton;
 }
 
-void TrussUnitToolBar::addHideButton ( QPoint leftTopPos, int width, int height, 
-                                       QObject* widget )
+AggToolBarButton& TrussUnitToolBar::addButton ( const QString& fn, 
+                                                const QString& l, 
+                                                QPoint pos, 
+                                                uint w,
+                                                uint h,
+                                                QObject* r,  
+                                                const char* sig,
+                                                const char* sl )
 {
-    hideButton = new AggToolBarHideButton ( leftTopPos, width, height );
+    AggToolBarButton& b = AggToolBar::addButton( fn, l, pos, w, h, r, sig, sl);
+    if ( hideButton )
+        hideButton->setPosition( hideButtonPos() );
+    return b;
+}
+
+QPoint TrussUnitToolBar::hideButtonPos ()
+{
+    if ( hideButton == 0 )
+        return QPoint(0,0);
+    return QPoint( (getWidth() - hideButton->getWidth()) / 2 + bufferEmptyArea,
+                   bufferEmptyArea - hideButton->getHeight() / 2 );
+}
+
+void TrussUnitToolBar::initHideButton ()
+{
+    hideButton = new AggToolBarHideButton ();
+    hideButton->setPosition( hideButtonPos() );
     
     QObject::connect( hideButton, SIGNAL( onButtonHighlightChange() ),
                       SLOT( clearToolBarRenderedFlag() ) );
@@ -103,21 +130,6 @@ void TrussUnitToolBar::addHideButton ( QPoint leftTopPos, int width, int height,
                       SLOT( showToolBar() ) );
 
     setRendered( false );
-}
-
-void TrussUnitToolBar::removeHideButton ()
-{
-    if ( ! hideButton )
-        return;
-
-    delete hideButton;
-    hideButton = 0;
-    setRendered( false );
-}
-
-AggToolBarHideButton* TrussUnitToolBar::getHideButton () const
-{
-    return hideButton;
 }
 
 void TrussUnitToolBar::showToolBar ()

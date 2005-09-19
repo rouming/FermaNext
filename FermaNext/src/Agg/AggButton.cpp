@@ -1,46 +1,46 @@
 
 #include "AggButton.h"
+#include "AggSubsidiary.h"
+#include "SubsidiaryConstants.h"
 
 /*****************************************************************************
  * Agg Button
  *****************************************************************************/
 
-AggButton::AggButton ( QString l, QPoint pos, int w, int h ) :
-    leftTopPos ( pos ),
-    width ( w ),
-    height ( h ),
-    label ( l ),
-    pressed ( false ),
-    highlighted ( false )
+AggButton::AggButton ( const QString& l, QPoint pos, int w, int h ) :
+    width(w), height(h),
+    highlighted(false),
+    pressed(false),
+    leftTopPos(pos),
+    label(l)
 {}
 
 AggButton::AggButton ( QPoint pos, int w, int h ) :
-    leftTopPos ( pos ),
-    width ( w ),
-    height ( h ),
-    pressed ( false ),
-    highlighted ( false )
+    width(w), height(h),
+    highlighted(false),
+    pressed(false),
+    leftTopPos(pos)
 {}
 
 AggButton::~AggButton ()
 {}
 
-void AggButton::setLabel ( QString l )
+void AggButton::setLabel ( const QString& l )
 {
     label = l;
 }
 
-QString AggButton::getLabel () const
+const QString& AggButton::getLabel () const
 {
     return label;
 }
 
-void AggButton::setHint ( QString hint_ )
+void AggButton::setHint ( const QString& hint_ )
 {
     label = hint_;
 }
 
-QString AggButton::getHint () const
+const QString& AggButton::getHint () const
 {
     return hint;
 }

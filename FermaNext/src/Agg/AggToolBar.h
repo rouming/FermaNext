@@ -3,6 +3,7 @@
 #define AGGTOOLBAR_H
 
 #include "AggButton.h"
+#include "AggSubsidiary.h"
 #include "qstring.h"
 #include "qpoint.h"
 #include "qsize.h"
@@ -14,8 +15,8 @@
 class AggToolBarButton : public AggButton
 {
 public:
-    AggToolBarButton ( QString fname, QString label_, QPoint leftTopPos, 
-                       int width, int height );
+    AggToolBarButton ( const QString& fname, const QString& label, 
+                       QPoint leftTopPos, int width, int height );
     virtual ~AggToolBarButton ();
 
     virtual void paint ( ren_dynarow& baseRend, scanline_rasterizer& ras,
@@ -32,29 +33,27 @@ class AggToolBar : public QObject
 {
     Q_OBJECT
 public:
-    typedef std::vector<AggToolBarButton*> ButtonList;
-    typedef ButtonList::iterator ButtonListIter;
-    typedef ButtonList::const_iterator ButtonListConstIter;
-
     AggToolBar ( QPoint pos, int bordLeft, int bordRight, int bordTop, 
                  int bordBottom, int separation_ );
     virtual ~AggToolBar ();
 
-    AggToolBarButton& addButton ( QString fname, QString label, QPoint leftTopPos, 
-                                  int width, int height, QObject* widget, 
-                                  char* signal, char* slot );
-    virtual void removeButton ( QString label );
+    virtual AggToolBarButton& addButton ( const QString& fname, 
+                                          const QString& label, 
+                                          QPoint leftTopPos, 
+                                          uint width, uint height, 
+                                          QObject* widget, 
+                                          const char* signal, 
+                                          const char* slot );
+    virtual void removeButton ( const QString& label );
     virtual void clearToolBar ();
 
-    ButtonList getButtonList () const;
-
-    virtual void setCenterPoint ( QPoint pos );
+    virtual void setCenterPoint ( QPoint );
     virtual QPoint getCenterPoint () const; 
 
     virtual QPoint getPosition () const;
-    virtual void setPosition ( QPoint pos );
+    virtual void setPosition ( QPoint );
 
-    virtual void setButtonSeparation ( int separation_ );
+    virtual void setButtonSeparation ( int );
     virtual int getButtonSeparation () const;
 
     virtual void setBorderLeft ( int width );
@@ -87,20 +86,26 @@ protected slots:
     void clearToolBarRenderedFlag ();
 
 protected:
+    typedef std::vector<AggToolBarButton*> ButtonList;
+    typedef ButtonList::iterator ButtonListIter;
+    typedef ButtonList::const_iterator ButtonListConstIter;
+
+    ButtonList getButtonList () const;
+
     virtual void removeButtonHighlight ();
     virtual int findMaxButtonHeight () const;
     virtual rbuf_dynarow& getRenderingBuffer () const;
     virtual void setRendered ( bool ) const;
 
 private:
-    mutable rbuf_dynarow* toolBarBuf;
-    mutable bool renderedFlag;
     bool visible;
     ButtonList buttons;
     // tool bar main geometry
     QPoint toolBarLeftTopPos, centerPos;
     int borderLeft, borderRight, borderTop, borderBottom, separation; 
-    int toolBarWidth, toolBarHeight;
+    uint toolBarWidth, toolBarHeight;
+    mutable rbuf_dynarow* toolBarBuf;
+    mutable bool renderedFlag;
 };
 
 #endif //AGGTOOLBAR_H

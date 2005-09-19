@@ -2,8 +2,6 @@
 #ifndef AGGBUTTON_H
 #define AGGBUTTON_H
 
-#include "AggSubsidiary.h"
-#include "SubsidiaryConstants.h"
 #include "qstring.h"
 #include "qpoint.h"
 #include "qsize.h"
@@ -14,15 +12,15 @@ class AggButton : public QObject
     Q_OBJECT
 public:
     // leftTopPos - button position in inner dynarow buffer coords
-    AggButton ( QString label_, QPoint leftTopPos, int width, int height );
+    AggButton ( const QString&, QPoint leftTopPos, int width, int height );
     AggButton ( QPoint leftTopPos, int width, int height );
     virtual ~AggButton ();
     
-    virtual void setHint ( QString hint_ );
-    virtual QString getHint () const;
+    virtual void setHint ( const QString& );
+    virtual const QString& getHint () const;
 
-    virtual void setLabel ( QString label_ );
-    virtual QString getLabel () const;
+    virtual void setLabel ( const QString& );
+    virtual const QString& getLabel () const;
 
     virtual void setPosition ( QPoint newPos );
     virtual QPoint getPosition () const;
