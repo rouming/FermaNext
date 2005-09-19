@@ -54,16 +54,17 @@ void TrussPivot::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleM
     agg::scanline_p8     sl;
     agg::ellipse ell;
 
-    DoublePoint coord1, coord2;
     QPoint pos1, pos2;
-    coord1 = getFirstNode().getPoint();
-    coord2 = getLastNode().getPoint();
-    pos1.setX ( coord1.x() * scaleMultX + leftWindowIndent );
-    pos1.setY ( flipY ? ( trussAreaHeight - coord1.y() ) * scaleMultY + topWindowIndent :
-              coord1.y() * scaleMultY + topWindowIndent );
-    pos2.setX ( coord2.x() * scaleMultX + leftWindowIndent );
-    pos2.setY ( flipY ? ( trussAreaHeight - coord2.y() ) * scaleMultY + topWindowIndent :
-             coord2.y() * scaleMultY + topWindowIndent );
+    const DoublePoint& coord1 = getFirstNode().getPoint();
+    const DoublePoint& coord2 = getLastNode().getPoint();
+    pos1.setX( int(coord1.x() * scaleMultX + leftWindowIndent) );
+    pos1.setY( flipY ? int(( trussAreaHeight - coord1.y() ) * 
+                             scaleMultY + topWindowIndent ) :
+                       int( coord1.y() * scaleMultY + topWindowIndent ) );
+    pos2.setX( int(coord2.x() * scaleMultX + leftWindowIndent) );
+    pos2.setY( flipY ? int(( trussAreaHeight - coord2.y() ) * 
+                             scaleMultY + topWindowIndent ):
+                       int(coord2.y() * scaleMultY + topWindowIndent ) );
     if ( isHighlighted () )
         drawLine ( ras, solidRend, sl, pos1, pos2, pivotsWidth + 5, 
                   agg::rgba(200, 135, 15, 0.45) );

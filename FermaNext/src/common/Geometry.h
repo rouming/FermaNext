@@ -185,9 +185,9 @@ public:
     friend inline bool operator== ( const DoubleSize&, const DoubleSize& );
     friend inline bool operator!= (  const DoubleSize&, const DoubleSize& );
     friend inline const DoubleSize operator+ ( const DoubleSize&, 
-                                                const DoubleSize&  );
+                                               const DoubleSize&  );
     friend inline const DoubleSize operator- (  const DoubleSize&, 
-                                                 const DoubleSize& );
+                                                const DoubleSize& );
     friend inline const DoubleSize operator* ( const DoubleSize&, double );
     friend inline const DoubleSize operator* ( double, const DoubleSize& );
     friend inline const DoubleSize operator- ( const DoubleSize& );
