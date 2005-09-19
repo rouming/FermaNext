@@ -69,10 +69,10 @@ TrussUnitToolBar::TrussUnitToolBar  ( QPoint pos, int bordLeft, int bordRight,
                                       int bordTop, int bordBottom, int separ, 
                                       int rad ) :
     AggToolBar( pos, bordLeft, bordRight, bordTop, bordBottom, separ ),
-    cornerRadius(rad),
-    hideButton(0),
-    enabled(true),
-    timer( new QTimer( this ) ),
+    cornerRadius( rad ),
+    enabled( true ),
+    pixNumb ( 0 ),
+    timer ( new QTimer( this ) ),
     // gradient colors
     barFirstColor ( agg::rgba( 35, 50, 60, 0.8 ) ),
     barMiddleColor ( agg::rgba( 20, 60, 80, 0.8 ) ),
@@ -137,15 +137,15 @@ void TrussUnitToolBar::showToolBar ()
     removeButtonHighlight();
     enabled = false;
     setVisible ( true );
-    timer->start( 20, false );
+    timer->start( 1, false );
 }
 
 void TrussUnitToolBar::hideToolBar ()
 {
     removeButtonHighlight();
+    pixNumb = getHeight();
     enabled = false;
-    topPos = getPosition ();
-    timer->start( 20, false );
+    timer->start( 1, false );
 }
 
 void TrussUnitToolBar::changeToolBarPosition ()
@@ -153,8 +153,9 @@ void TrussUnitToolBar::changeToolBarPosition ()
     QPoint pos = getPosition();
     if ( hideButton->isPressed() )
     {
+        pixNumb -= 2;
         pos.setY ( pos.y() + 2 );
-        if ( pos.y() == getCenterPoint().y() - hideButton->getHeight() )
+        if ( pixNumb == hideButton->getHeight() )
         {
             timer->stop();
             setVisible ( false );
@@ -163,8 +164,9 @@ void TrussUnitToolBar::changeToolBarPosition ()
     }
     else
     {
+        pixNumb += 2;
         pos.setY ( pos.y() - 2 );
-        if ( pos.y() == topPos.y() )
+        if ( pixNumb == getHeight() )
         {
             timer->stop();
             enabled = true;
