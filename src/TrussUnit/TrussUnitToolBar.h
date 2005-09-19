@@ -10,7 +10,7 @@
 class AggToolBarHideButton : public AggButton
 {
 public:
-    AggToolBarHideButton ( QPoint leftTopPos, int width, int height );
+    AggToolBarHideButton ();
     virtual ~AggToolBarHideButton ();
     virtual void paint ( ren_dynarow& baseRend, scanline_rasterizer& ras,
                          agg::scanline_p8& sl, solidRenderer& solidRend  ) const;
@@ -28,9 +28,13 @@ public:
                        int bordBottom, int separation, int rad );
     ~TrussUnitToolBar ();
 
-    void addHideButton ( QPoint leftTopPos, int width, int height, QObject* widget );
-    AggToolBarHideButton* getHideButton () const;
-    virtual void removeHideButton ();
+    virtual AggToolBarButton& addButton ( const QString& fname, 
+                                          const QString& label, 
+                                          QPoint leftTopPos, 
+                                          uint width, uint height, 
+                                          QObject* widget, 
+                                          const char* signal, 
+                                          const char* slot );
 
     virtual QPoint getDynarowBufPos ( int x, int y ) const;
     virtual bool inToolBarRect ( int x, int y ) const;
@@ -48,16 +52,18 @@ protected slots:
     void changeToolBarPosition ();
 
 protected:
+    virtual QPoint hideButtonPos ();
+    virtual void initHideButton ();
     virtual void removeButtonHighlight ();
     virtual AggToolBarButton* getSelectedButton ( int x, int y ) const;
 
 private:
     QPoint topPos;
+    int cornerRadius;
+    AggToolBarHideButton* hideButton;
     bool enabled;
     QTimer* timer;
-    int cornerRadius;
     color_type barFirstColor, barMiddleColor, barLastColor, selectionColor;
-    AggToolBarHideButton* hideButton;
 };
 
 #endif //TRUSSUNITTOOLBAR_H

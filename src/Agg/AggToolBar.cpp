@@ -5,8 +5,8 @@
  * Agg Tool Bar Button
  *****************************************************************************/
 
-AggToolBarButton::AggToolBarButton ( QString fname, QString l, QPoint pos, 
-                                     int w, int h  ) :
+AggToolBarButton::AggToolBarButton ( const QString& fname, const QString& l, 
+                                     QPoint pos, int w, int h  ) :
     AggButton ( l, pos, w, h ),
     fillCol( agg::rgba( 0, 0, 0, 0.3 ) ),
     lineCol( agg::rgba( 0, 0, 0 ) ), 
@@ -42,7 +42,8 @@ void AggToolBarButton::paint ( ren_dynarow& baseRend, scanline_rasterizer& ras,
         primRend.line_color ( highlightLine );
         primRend.outlined_rectangle ( pos.x(), pos.y(), pos.x() + width, pos.y() + height );
     }
-    QPoint iconPos ( ( pos.x() + width / 4 ) / scaleX, ( pos.y() + height / 8 ) / scaleY );
+    QPoint iconPos( int((pos.x() + width/4) / scaleX), 
+                    int((pos.y() + height/8) / scaleY) );
     drawSvg ( baseRend, ras, sl, pathRend, solidRend, mtx, iconPos.x(), 
               iconPos.y(), scaleX, scaleY, svgExpand, svgGamma );
 }
@@ -53,18 +54,18 @@ void AggToolBarButton::paint ( ren_dynarow& baseRend, scanline_rasterizer& ras,
 
 AggToolBar::AggToolBar( QPoint pos, int bordLeft, int bordRight, int bordTop, 
                         int bordBottom, int separation_ ) :
-    renderedFlag ( false ),
-    borderLeft ( bordLeft ),
-    borderRight ( bordRight ),
-    borderTop ( bordTop ),
-    borderBottom ( bordBottom ),
-    separation( separation_ ),
-    visible ( true ),
-    centerPos ( pos ),
+    visible(true),
+    centerPos(pos),
+    borderLeft(bordLeft),
+    borderRight(bordRight),
+    borderTop(bordTop),
+    borderBottom(bordBottom),
+    separation(separation_),
     // Consider that we may need additional space (bufferEmptyArea)
     // for the different agg effects
-    toolBarBuf ( new rbuf_dynarow( bordLeft + bordRight + 2 * bufferEmptyArea, 
-                                   bordTop + bordBottom + bufferEmptyArea ) )
+    toolBarBuf( new rbuf_dynarow( bordLeft + bordRight + 2 * bufferEmptyArea,
+                                  bordTop + bordBottom + bufferEmptyArea ) ),
+    renderedFlag(false)
 {
     toolBarWidth = bordLeft + bordRight + separation_;
     toolBarHeight = bordTop + bordBottom;
@@ -81,12 +82,15 @@ AggToolBar::~AggToolBar ()
     delete toolBarBuf;
 }
 
-AggToolBarButton& AggToolBar::addButton ( QString fname, QString label, QPoint leftTopPos, 
-                                          int buttonWidth, int buttonHeight, 
-                                          QObject* widget, char* signal, char* slot )
+AggToolBarButton& AggToolBar::addButton ( const QString& fname, 
+                                          const QString& label, 
+                                          QPoint leftTopPos, 
+                                          uint buttonWidth, uint buttonHeight, 
+                                          QObject* widget,  const char* signal,
+                                          const char* slot )
 {
-    AggToolBarButton* button = new AggToolBarButton ( fname, label, leftTopPos, 
-                                                      buttonWidth, buttonHeight );
+    AggToolBarButton* button = new AggToolBarButton( fname, label, leftTopPos, 
+                                                     buttonWidth, buttonHeight );
     buttons.push_back ( button );
 
     QObject::connect( button, SIGNAL( onButtonHighlightChange() ),
@@ -122,7 +126,7 @@ AggToolBarButton& AggToolBar::addButton ( QString fname, QString label, QPoint l
     return *button;
 }
 
-void AggToolBar::removeButton ( QString label )
+void AggToolBar::removeButton ( const QString& label )
 {
     if ( buttons.empty() )
         return;

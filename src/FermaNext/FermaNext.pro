@@ -10,12 +10,13 @@ OBJECTS_DIR = obj
 win32 {
   DEFINES += WIN32
   LIBS = common.lib Agg.lib TrussUnit.lib LibAgg.lib LibSVG.lib libexpat.lib \
-          -L../../build \
-          -L../.. \
-          -L$$(EXPATDIR)/Libs
+         -L../../build \
+         -L../.. \
+         -L$$(EXPATDIR)/Libs
 }
 unix {
-  LIBS = -lcommon -lAgg -lTrussUnit -lsvg -lagg -L../../build -L../../
+  LIBS = -L../../build -L../../ \
+         -lTrussUnit -lAgg -lcommon -lsvg -lagg
 }
 
 INCLUDEPATH = $$(AGGDIR)/include \

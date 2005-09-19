@@ -41,9 +41,9 @@ const bool flipY = true;
  * Truss Unit Tool Bar Consts
  ************************************/
 
-extern const int bufferEmptyArea = 30,
-                 buttonHeight = 25,
-                 buttonWidth = 25;
+extern const uint bufferEmptyArea = 30,
+                  buttonHeight = 25,
+                  buttonWidth = 25;
 extern const double svgGamma = 1.0,
                     svgExpand = 0.3;
  
