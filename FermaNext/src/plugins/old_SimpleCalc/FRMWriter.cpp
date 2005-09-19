@@ -64,8 +64,8 @@ void FRMWriter::write ( const QString& name )
 
     for ( nIter = nodes.begin(); nIter != nodes.end(); ++nIter ) {
         TrussNode* n = *nIter;
-        file << ' ' << QString::number(n->x(), 'E', 14) << "\n" << 
-                ' ' << QString::number(n->y(), 'E', 14) << "\n";
+        file << ' ' << QString::number(n->getX(), 'E', 14) << "\n" << 
+                ' ' << QString::number(n->getY(), 'E', 14) << "\n";
     }
 
     for ( pIter = pivots.begin(); pIter != pivots.end(); ++pIter ) {
@@ -119,7 +119,7 @@ void FRMWriter::write ( const QString& name )
     else 
         force = "êÃ";
 
-    DoubleSize ar = truss.getTrussAreaSize();
+    const DoubleSize& ar = truss.getTrussAreaSize();
     file << length.ascii() << "\n"
          << force.ascii() << "\n"
          << ' ' << QString::number(ar.width(), 'E', 14) << "\n"
