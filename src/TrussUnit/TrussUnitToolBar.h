@@ -58,7 +58,7 @@ protected:
     virtual AggToolBarButton* getSelectedButton ( int x, int y ) const;
 
 private:
-    QPoint topPos;
+    int pixNumb;
     int cornerRadius;
     AggToolBarHideButton* hideButton;
     bool enabled;

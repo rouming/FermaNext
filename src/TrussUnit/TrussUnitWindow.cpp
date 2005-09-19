@@ -576,49 +576,55 @@ void TrussUnitWindow::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
         TrussNode* lastNode = &pivot->getLastNode();
         if ( firstNode == mergingNode )
         {
-            fakePivot = findPivotByNodes ( *node, *lastNode );
-            if ( fakePivot ) 
+            if ( findPivotByNodes ( *node, *lastNode ) ) 
+            // remove fake pivot
             {
                 // Save remove pivot action
-                ObjectState& state = fakePivot->createState();
-                state.addAction( new TrussPivotRemoveAction( *fakePivot ) );
+                ObjectState& state = pivot->createState();
+                state.addAction( new TrussPivotRemoveAction( *pivot ) );
                 state.save();
-                fakePivot->desist();
+                pivot->desist();
             }
-            // Save action of node changing
-            ObjectState& state = pivot->createState();
-            state.addAction( 
-                new ConcreteObjectAction<TrussPivot, TrussNode*>(
-                                                    *pivot,
-                                                    &TrussPivot::setFirstNode,
-                                                    &TrussPivot::setFirstNode,
-                                                    node,
-                                                    firstNode ) );
-            state.save();
-            pivot->setFirstNode( node );
+            else
+            {
+                // Save action of node changing
+                ObjectState& state = pivot->createState();
+                state.addAction( 
+                    new ConcreteObjectAction<TrussPivot, TrussNode*>(
+                                                        *pivot,
+                                                        &TrussPivot::setFirstNode,
+                                                        &TrussPivot::setFirstNode,
+                                                        node,
+                                                        firstNode ) );
+                state.save();
+                pivot->setFirstNode( node );
+            }
         }
         else if ( lastNode == mergingNode )
         {
-            fakePivot = findPivotByNodes ( *node, *firstNode );
-            if ( fakePivot ) 
+            if ( findPivotByNodes ( *node, *firstNode ) ) 
+            // remove fake pivot
             {
                 // Save remove pivot action
-                ObjectState& state = fakePivot->createState();
-                state.addAction( new TrussPivotRemoveAction( *fakePivot ) );
+                ObjectState& state = pivot->createState();
+                state.addAction( new TrussPivotRemoveAction( *pivot ) );
                 state.save();
-                fakePivot->desist();
+                pivot->desist();
             }
-            // Save action of node changing
-            ObjectState& state = pivot->createState();
-            state.addAction( 
-                new ConcreteObjectAction<TrussPivot, TrussNode*>(
-                                                    *pivot,
-                                                    &TrussPivot::setLastNode,
-                                                    &TrussPivot::setLastNode,
-                                                    node,
-                                                    lastNode ) );
-            state.save();
-            pivot->setLastNode ( node );  
+            else
+            {
+                // Save action of node changing
+                ObjectState& state = pivot->createState();
+                state.addAction( 
+                    new ConcreteObjectAction<TrussPivot, TrussNode*>(
+                                                        *pivot,
+                                                        &TrussPivot::setLastNode,
+                                                        &TrussPivot::setLastNode,
+                                                        node,
+                                                        lastNode ) );
+                state.save();
+                pivot->setLastNode ( node );
+            }
         }
     }
 

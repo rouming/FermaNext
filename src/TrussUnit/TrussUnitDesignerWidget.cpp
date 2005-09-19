@@ -704,7 +704,7 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         ObjectStateManager* mng = selectedWindow->getStateManager();
         mng->startStateBlock();
 
-        selectedWindow->updateAfterPivotManipulation ( selectedPivot, false );
+        selectedWindow->updateAfterNodeManipulation ( selectedNode, false );
 
         mng->endStateBlock();
 
