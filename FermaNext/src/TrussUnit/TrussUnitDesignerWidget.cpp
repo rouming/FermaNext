@@ -918,7 +918,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                 if ( node )
                     return;
 
-                QPoint nodeCoord = selectedWindow->
+                DoublePoint nodeCoord = selectedWindow->
                                             getTrussCoordFromWidgetPos ( clickX, clickY );
                 
                 TrussNode& newNode = selectedWindow->createNode ( nodeCoord.x(), 
@@ -938,8 +938,8 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
         {
             if ( nodeCanBeDrawn ( clickX, clickY ) )
             {
-                QPoint nodeCoord = selectedWindow->getTrussCoordFromWidgetPos( clickX, 
-                                                                               clickY );
+                DoublePoint nodeCoord = 
+                    selectedWindow->getTrussCoordFromWidgetPos( clickX, clickY );
                 int nodePrecision = selectedWindow->getNodeFindingPrecision();
                 TrussNode* firstNode = selectedWindow->findNodeByWidgetPos( clickX, clickY, 
                                                                     nodePrecision );
