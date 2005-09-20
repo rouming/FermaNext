@@ -870,6 +870,7 @@ void TrussUnitWindow::updateAfterNodeManipulation ( TrussNode* selectedNode,
 // Analyses positions of selected node and its adjoining pivots
 // relative to other truss elements.
 {
+    NodeList nodeList = getNodeList ();
     int numb = selectedNode->getNumber();
 
     PivotList adjPivotList = findAdjoiningPivots ( *selectedNode );

@@ -41,7 +41,7 @@ void TrussNode::drawFixation ( scanline_rasterizer& ras, solidRenderer& solidRen
     QPoint leftPnt, rightPnt, nodePos;
     nodePos.setX ( int( nodeCoord.x() * scaleMultX ) + leftWindowIndent );
     nodePos.setY ( flipY ? int( ( trussAreaHeight - nodeCoord.y() ) * scaleMultY ) + 
-                  topWindowIndent : int( nodeCoord.y() * scaleMultY + topWindowIndent ) );
+                   topWindowIndent : int( nodeCoord.y() * scaleMultY + topWindowIndent ) );
 
     if ( getFixation() == FixationByX )
     {
@@ -152,15 +152,15 @@ void TrussNode::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMu
     if ( !isVisible() )
         return;
 
-    DoublePoint pos = getPoint();
-    int x = (pos.x() * scaleMultX) + leftWindowIndent;
-    int y = flipY ? 
-              ( trussAreaHeight - pos.y() ) * scaleMultY + topWindowIndent :
-                pos.y() * scaleMultY + topWindowIndent;
+    DoublePoint nodeCoord = getPoint();
+    QPoint nodePos;
+    nodePos.setX( int( nodeCoord.x() * scaleMultX ) + leftWindowIndent );
+    nodePos.setY( flipY ? int( ( trussAreaHeight - nodeCoord.y() ) * scaleMultY ) + 
+                  topWindowIndent : int( nodeCoord.y() * scaleMultY + topWindowIndent ) );
 
     solidRenderer solidRend ( baseRend );
-    scanline_rasterizer   ras;
-    agg::scanline_p8     sl;
+    scanline_rasterizer ras;
+    agg::scanline_p8 sl;
     agg::ellipse ell;
 
     int highlightKoeff = 0;
@@ -171,8 +171,8 @@ void TrussNode::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMu
 
 //  draw node' outline
     solidRend.color ( agg::rgba(10, 10, 10) );
-    ell.init ( x, y, nodesRadius + highlightKoeff + 1, 
-                     nodesRadius + highlightKoeff + 1, 16 );
+    ell.init ( nodePos.x(), nodePos.y(), nodesRadius + highlightKoeff + 1, 
+                                         nodesRadius + highlightKoeff + 1, 16 );
     ras.add_path ( ell );
     agg::render_scanlines ( ras, sl, solidRend );
 
@@ -185,7 +185,8 @@ void TrussNode::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMu
     {
         // draw translucent highlight
         solidRend.color ( agg::rgba(200, 135, 15, 0.45) );
-        ell.init ( x, y, nodesRadius + 5, nodesRadius + 5, 16 );
+        ell.init ( nodePos.x(), nodePos.y(), nodesRadius + 5, 
+                                             nodesRadius + 5, 16 );
         ras.add_path ( ell );
         agg::render_scanlines ( ras, sl, solidRend );
     }
@@ -198,16 +199,16 @@ void TrussNode::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMu
         color_type end ( 130 - highlightKoeff * 100, 
                         90 - highlightKoeff * 60, 
                         70 - highlightKoeff * 50 );
-        drawGradientEllipse ( ras, baseRend, sl, x, y, nodesRadius + highlightKoeff, 
-                             begin, middle, end );
+        drawGradientEllipse ( ras, baseRend, sl, nodePos.x(), nodePos.y(), 
+                              nodesRadius + highlightKoeff, begin, middle, end );
     }
     else 
     {
         color_type begin ( 255, 255, 255 ); 
         color_type middle ( 80, 100, 195 ); 
         color_type end ( 0, 0, 80 );
-        drawGradientEllipse ( ras, baseRend, sl, x, y, nodesRadius + highlightKoeff, 
-                             begin, middle, end );
+        drawGradientEllipse ( ras, baseRend, sl, nodePos.x(), nodePos.y(), 
+                              nodesRadius + highlightKoeff, begin, middle, end );
     }
 }
 
