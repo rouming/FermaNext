@@ -188,7 +188,9 @@ void AggToolBar::clearToolBar ()
     if ( buttons.empty() )
         return;
 
-    buttons.clear();
+    // Clear all buttons.
+    clean();
+
     toolBarBuf->init( borderLeft + borderRight + separation + 2 * bufferEmptyArea, 
                       toolBarBuf->height() );
 
