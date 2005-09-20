@@ -1,7 +1,7 @@
 
 #include "TrussUnitWindow.h"
 #include "TrussUnitActions.h"
-#include <qpointarray.h>
+#include <qmemarray.h>
 #include <qrect.h> 
 #include <algorithm>
 
@@ -149,7 +149,7 @@ void TrussUnitWindow::setWindowSize ( int width, int height )
 void TrussUnitWindow::setCursorCoord ( const QPoint& p )
 {
     if ( p.x() != -1 && p.y() != -1 ) {
-        QPoint coord = getTrussCoordFromWidgetPos( p.x(), p.y() );
+        DoublePoint coord = getTrussCoordFromWidgetPos( p.x(), p.y() );
         const DoubleSize& size = getTrussAreaSize();
         if ( coord.x() > size.width() || coord.x() < 0 ||
              coord.y() > size.height() || coord.y() < 0 ) {
@@ -157,7 +157,7 @@ void TrussUnitWindow::setCursorCoord ( const QPoint& p )
             cursorCoord.setY( -1 );
         }
         else 
-            cursorCoord = coord;
+            cursorCoord = QPoint( int(coord.x()), int(coord.y()) );
     }
     else
         cursorCoord = p;
@@ -733,9 +733,10 @@ TrussPivot* TrussUnitWindow::findDividualPivot ( TrussNode& dividingNode ) const
 }
 
 
-QPointArray TrussUnitWindow::getPivotCrossPoints ( PivotList nonCrossingPivots ) const
+DoublePointArray TrussUnitWindow::getPivotCrossPoints ( 
+                                             PivotList nonCrossingPivots ) const
 {
-    QPointArray crossPoints;
+    DoublePointArray crossPoints;
 
     if ( nonCrossingPivots.empty() )
         return crossPoints;
@@ -762,9 +763,11 @@ QPointArray TrussUnitWindow::getPivotCrossPoints ( PivotList nonCrossingPivots )
             if ( crossPoint.x() == -1 )
                 continue;   // there are no intersections between these pivots
 
-            if ( crossPoints.contains( crossPoint ) == 0 )
-                crossPoints.putPoints ( crossPoints.size(), 1, 
-                                        crossPoint.x(), crossPoint.y() );
+            if ( crossPoints.contains( crossPoint ) == 0 ) {
+                uint size = crossPoints.size();
+                crossPoints.resize( size + 1 );
+                crossPoints.at( size ) = crossPoint;
+            }
         }
     }
 
@@ -780,15 +783,18 @@ QPointArray TrussUnitWindow::getPivotCrossPoints ( PivotList nonCrossingPivots )
              std::find( nonCrossingPivots.begin(), nonCrossingPivots.end(), pivot ) != 
              nonCrossingPivots.end() )
         {
-            if ( crossPoints.contains( node->getPoint() ) == 0 )
-                crossPoints.putPoints ( crossPoints.size(), 1, 
-                                        node->getX(), node->getY() );
+            if ( crossPoints.contains( node->getPoint() ) == 0 ) {
+                uint size = crossPoints.size();
+                crossPoints.resize( size + 1 );
+                crossPoints.at( size ) = node->getPoint();
+            }
         }
     }
     return crossPoints;
 }
 
-void TrussUnitWindow::createPivotCrossNodes ( QPointArray crossPoints )
+void TrussUnitWindow::createPivotCrossNodes ( 
+                                         const DoublePointArray& crossPoints )
 {
     if ( crossPoints.isEmpty() )
         return;
@@ -796,7 +802,7 @@ void TrussUnitWindow::createPivotCrossNodes ( QPointArray crossPoints )
     TrussNode *crossNode, *node;
     // create nodes at found points
     NodeList crossNodes;
-    QPointArray::Iterator iter = crossPoints.begin();
+    DoublePointArray::ConstIterator iter = crossPoints.begin();
     for ( ; iter != crossPoints.end(); ++iter )
     {
         crossNode = &createCrossNode ( *iter );
@@ -873,7 +879,7 @@ void TrussUnitWindow::updateAfterNodeManipulation ( TrussNode* selectedNode,
     int numb = selectedNode->getNumber();
 
     PivotList adjPivotList = findAdjoiningPivots ( *selectedNode );
-    QPointArray crossPoints = getPivotCrossPoints ( adjPivotList );
+    DoublePointArray crossPoints = getPivotCrossPoints ( adjPivotList );
     createPivotCrossNodes ( crossPoints );
 
     selectedNode = findNodeByNumber( numb );
@@ -890,7 +896,7 @@ void TrussUnitWindow::updateAfterPivotManipulation ( TrussPivot* selectedPivot,
 {
     TrussNode& first = selectedPivot->getFirstNode();
     TrussNode& last = selectedPivot->getLastNode();
-    QPointArray crossPoints;
+    DoublePointArray crossPoints;
 
     PivotList firstAdjPivots = findAdjoiningPivots ( first );
     PivotList lastAdjPivots = findAdjoiningPivots ( last );

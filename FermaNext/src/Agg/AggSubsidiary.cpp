@@ -2,6 +2,7 @@
 #include "AggSubsidiary.h"
 #include "Geometry.h"
 #include <qstring.h>
+#include <qpoint.h>
 
 /*****************************************************************************
  * line

@@ -4,6 +4,8 @@
 
 #include "TrussUnit.h"
 
+typedef QMemArray<DoublePoint> DoublePointArray;
+
 class TrussUnitWindow : public TrussUnit
 {
     Q_OBJECT
@@ -60,9 +62,9 @@ public:
     virtual void mergeNodes ( TrussNode* mergingNode, TrussNode* node );
     virtual void dividePivot ( TrussPivot& dividualPivot, TrussNode& dividingNode );
     virtual TrussPivot* findDividualPivot ( TrussNode& dividingNode ) const;
-    virtual QPointArray getPivotCrossPoints ( PivotList nonCrossingPivots ) const;
+    virtual DoublePointArray getPivotCrossPoints ( PivotList nonCrossingPivots ) const;
     virtual TrussNode& createCrossNode ( DoublePoint crossPoint );
-    virtual void createPivotCrossNodes ( QPointArray crossPoints );
+    virtual void createPivotCrossNodes ( const DoublePointArray& );
     virtual void updateNodePosition ( TrussNode* selectedNode, bool fixationCheck );
     virtual void updateAfterNodeManipulation ( TrussNode* selectedNode, 
                                               bool fixationCheck );

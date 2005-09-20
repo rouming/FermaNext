@@ -68,6 +68,7 @@ typedef agg::renderer_primitives<ren_dynarow>               primitivesRenderer;
 
 class DoublePoint;
 class QString;
+class QPoint;
 
 /*****************************************************************************/
 
