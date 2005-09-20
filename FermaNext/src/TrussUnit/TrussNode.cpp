@@ -39,9 +39,9 @@ void TrussNode::drawFixation ( scanline_rasterizer& ras, solidRenderer& solidRen
 {
     DoublePoint nodeCoord = getPoint();
     QPoint leftPnt, rightPnt, nodePos;
-    nodePos.setX ( int( nodePos.x() * scaleMultX ) + leftWindowIndent );
-    nodePos.setY ( flipY ? int( ( trussAreaHeight - nodePos.y() ) * scaleMultY ) + 
-                  topWindowIndent : int( nodePos.y() * scaleMultY + topWindowIndent ) );
+    nodePos.setX ( int( nodeCoord.x() * scaleMultX ) + leftWindowIndent );
+    nodePos.setY ( flipY ? int( ( trussAreaHeight - nodeCoord.y() ) * scaleMultY ) + 
+                  topWindowIndent : int( nodeCoord.y() * scaleMultY + topWindowIndent ) );
 
     if ( getFixation() == FixationByX )
     {
@@ -153,8 +153,8 @@ void TrussNode::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMu
         return;
 
     DoublePoint pos = getPoint();
-    double x = (pos.x() * scaleMultX) + leftWindowIndent;
-    double y = flipY ? 
+    int x = (pos.x() * scaleMultX) + leftWindowIndent;
+    int y = flipY ? 
               ( trussAreaHeight - pos.y() ) * scaleMultY + topWindowIndent :
                 pos.y() * scaleMultY + topWindowIndent;
 
