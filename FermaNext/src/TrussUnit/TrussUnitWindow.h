@@ -4,7 +4,7 @@
 
 #include "TrussUnit.h"
 
-typedef QMemArray<DoublePoint> DoublePointArray;
+typedef QValueList<DoublePoint> DoublePointArray;
 
 class TrussUnitWindow : public TrussUnit
 {

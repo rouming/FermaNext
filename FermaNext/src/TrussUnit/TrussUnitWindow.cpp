@@ -1,9 +1,6 @@
 
 #include "TrussUnitWindow.h"
 #include "TrussUnitActions.h"
-#include <qmemarray.h>
-#include <qrect.h> 
-#include <algorithm>
 
 /*****************************************************************************
  * Truss Unit Window
@@ -28,8 +25,9 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name, ObjectStateManager* mng 
 
 TrussUnitWindow::~TrussUnitWindow ()
 {
-    delete windowBuf;
+    delete numbersBuf;
     delete coordBuf;
+    delete windowBuf;    
 }
 
 QPoint TrussUnitWindow::getWindowLeftTopPos () const
@@ -764,9 +762,7 @@ DoublePointArray TrussUnitWindow::getPivotCrossPoints (
                 continue;   // there are no intersections between these pivots
 
             if ( crossPoints.contains( crossPoint ) == 0 ) {
-                uint size = crossPoints.size();
-                crossPoints.resize( size + 1 );
-                crossPoints.at( size ) = crossPoint;
+                crossPoints.append( crossPoint );
             }
         }
     }
@@ -784,9 +780,7 @@ DoublePointArray TrussUnitWindow::getPivotCrossPoints (
              nonCrossingPivots.end() )
         {
             if ( crossPoints.contains( node->getPoint() ) == 0 ) {
-                uint size = crossPoints.size();
-                crossPoints.resize( size + 1 );
-                crossPoints.at( size ) = node->getPoint();
+                crossPoints.append( node->getPoint() );
             }
         }
     }
