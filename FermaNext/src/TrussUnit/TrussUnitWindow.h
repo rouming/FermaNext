@@ -22,7 +22,7 @@ public:
     virtual DoublePoint getTrussCoordFromWidgetPos ( int x, int y ) const;
     virtual DoublePoint getTrussCoordFromWidgetPos ( QPoint pos ) const;
     virtual QPoint getWidgetPosFromTrussCoord ( double x, double y ) const;
-    virtual QPoint getWidgetPosFromTrussCoord ( DoublePoint coord ) const;
+    virtual QPoint getWidgetPosFromTrussCoord ( const DoublePoint& ) const;
     virtual void setWindowPosition ( QPoint pos );
     virtual void resize ( QPoint leftTop, QPoint rightBottom );
     virtual void setCursorCoord ( const QPoint& );
@@ -62,8 +62,8 @@ public:
     virtual void mergeNodes ( TrussNode* mergingNode, TrussNode* node );
     virtual void dividePivot ( TrussPivot& dividualPivot, TrussNode& dividingNode );
     virtual TrussPivot* findDividualPivot ( TrussNode& dividingNode ) const;
-    virtual DoublePointArray getPivotCrossPoints ( PivotList nonCrossingPivots ) const;
-    virtual TrussNode& createCrossNode ( DoublePoint crossPoint );
+    virtual DoublePointArray getPivotCrossPoints ( const PivotList& nonCrossingPivots ) const;
+    virtual TrussNode& createCrossNode ( const DoublePoint& crossPoint );
     virtual void createPivotCrossNodes ( const DoublePointArray& );
     virtual void updateNodePosition ( TrussNode* selectedNode, bool fixationCheck );
     virtual void updateAfterNodeManipulation ( TrussNode* selectedNode, 

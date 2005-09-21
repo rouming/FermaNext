@@ -37,7 +37,7 @@ void TrussNode::drawFixation ( scanline_rasterizer& ras, solidRenderer& solidRen
                                double scaleMultX, double scaleMultY,
                                int lineWidth, color_type color ) const
 {
-    DoublePoint nodeCoord = getPoint();
+    const DoublePoint& nodeCoord = getPoint();
     QPoint leftPnt, rightPnt, nodePos;
     nodePos.setX ( int( nodeCoord.x() * scaleMultX ) + leftWindowIndent );
     nodePos.setY ( flipY ? int( ( trussAreaHeight - nodeCoord.y() ) * scaleMultY ) + 
@@ -152,7 +152,7 @@ void TrussNode::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMu
     if ( !isVisible() )
         return;
 
-    DoublePoint nodeCoord = getPoint();
+    const DoublePoint& nodeCoord = getPoint();
     QPoint nodePos;
     nodePos.setX( int( nodeCoord.x() * scaleMultX ) + leftWindowIndent );
     nodePos.setY( flipY ? int( ( trussAreaHeight - nodeCoord.y() ) * scaleMultY ) + 

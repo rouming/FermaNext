@@ -483,7 +483,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     else if ( winBehaviour == onBDiagResize )
     {
         int dx = x - clickX;
-            int dy = y - clickY;
+        int dy = y - clickY;
         QPoint point1 = selectedWindow->getWindowLeftTopPos ();
         QPoint point2 = selectedWindow->getWindowRightBottomPos ();
         if ( abs ( clickX - (point1.x() + bordWidth) ) <= bordWidth )
@@ -871,8 +871,8 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
             else
             {
                 // Convert widget coordinates into truss (absolute) coordinates
-                DoublePoint trussCoord = selectedWindow->getTrussCoordFromWidgetPos(clickX, 
-                                                                               clickY);
+                DoublePoint trussCoord = selectedWindow->
+                                  getTrussCoordFromWidgetPos( clickX, clickY );
                 const DoublePoint& firstPos = selectedPivot->
                                                      getFirstNode().getPoint();
                 const DoublePoint& lastPos  = selectedPivot->
@@ -896,13 +896,15 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
             if ( nodeCanBeDrawn ( clickX, clickY ) )
             {
                 int nodePrecision = selectedWindow->getNodeFindingPrecision();
-                TrussNode* node = selectedWindow->findNodeByWidgetPos ( clickX, clickY, 
-                                                                    nodePrecision );
+                TrussNode* node = selectedWindow->findNodeByWidgetPos( 
+                                                               clickX,
+                                                               clickY, 
+                                                               nodePrecision );
                 if ( node )
                     return;
 
                 DoublePoint nodeCoord = selectedWindow->
-                                            getTrussCoordFromWidgetPos ( clickX, clickY );
+                                  getTrussCoordFromWidgetPos( clickX, clickY );
                 
                 TrussNode& newNode = selectedWindow->createNode ( nodeCoord.x(), 
                                                                nodeCoord.y() );
@@ -921,11 +923,12 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
         {
             if ( nodeCanBeDrawn ( clickX, clickY ) )
             {
-                DoublePoint nodeCoord = 
-                    selectedWindow->getTrussCoordFromWidgetPos( clickX, clickY );
+                DoublePoint nodeCoord = selectedWindow->
+                                  getTrussCoordFromWidgetPos( clickX, clickY );
                 int nodePrecision = selectedWindow->getNodeFindingPrecision();
-                TrussNode* firstNode = selectedWindow->findNodeByWidgetPos( clickX, clickY, 
-                                                                    nodePrecision );
+                TrussNode* firstNode = selectedWindow->
+                                          findNodeByWidgetPos( clickX, clickY,
+                                                               nodePrecision );
                 bool wasCreated = false;
                 if ( firstNode == 0 ) {
                     firstNode = &selectedWindow->createNode( nodeCoord.x(), nodeCoord.y() );

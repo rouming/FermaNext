@@ -184,7 +184,6 @@ void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX,
     scanline_rasterizer ras;
     agg::scanline_p8 sl;
     agg::ellipse ell;
-    DoublePoint coord;
     QPoint pos;
     double trussAreaHeight = getTrussAreaSize().height();
     PivotList pivotList = getPivotList ();
@@ -198,7 +197,7 @@ void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX,
     for ( ; nodesIter != nodeList.end(); ++nodesIter )
         if ( *nodesIter != frontNode ) {
             TrussNode* node = *nodesIter;
-            coord = node->getPoint();
+            const DoublePoint& coord = node->getPoint();
             pos.setX( int(coord.x() * scaleMultX) + leftWindowIndent );
             pos.setY( flipY ? int(( trussAreaHeight - coord.y() ) * scaleMultY) + 
                       topWindowIndent : int(pos.y() * scaleMultY) + topWindowIndent );
@@ -212,7 +211,7 @@ void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX,
     if ( frontNode ) {
         if ( loadCase ) 
         {
-            coord = frontNode->getPoint();
+            const DoublePoint& coord = frontNode->getPoint();
             pos.setX( int(coord.x() * scaleMultX) + leftWindowIndent );
             pos.setY( flipY ? int(( trussAreaHeight - coord.y() ) * scaleMultY) + 
                       topWindowIndent : int(coord.y() * scaleMultY) + topWindowIndent );

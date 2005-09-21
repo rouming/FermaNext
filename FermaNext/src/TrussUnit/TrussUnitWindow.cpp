@@ -64,8 +64,7 @@ DoublePoint TrussUnitWindow::getTrussCoordFromWidgetPos ( int x, int y ) const
     double absX = ( x - windowLeftTopPos.x() - leftWindowIndent ) / scaleMultX;
     double absY = ( windowSize.height() - y + windowLeftTopPos.y() - bottomWindowIndent )
                    / scaleMultY;
-    DoublePoint trussCoord ( absX, absY );
-    return trussCoord;
+    return DoublePoint( absX, absY );
 }
 
 DoublePoint TrussUnitWindow::getTrussCoordFromWidgetPos ( QPoint pos ) const
@@ -81,11 +80,10 @@ QPoint TrussUnitWindow::getWidgetPosFromTrussCoord ( double x, double y ) const
     int widgetY = ( flipY ? int( ( getTrussAreaSize().height() - y ) * 
                    scaleMultY ) + topWindowIndent + windowLeftTopPos.y() : 
                    int(y * scaleMultY) + topWindowIndent + windowLeftTopPos.y() );
-    QPoint widgetCoord ( widgetX, widgetY );
-    return widgetCoord;
+    return QPoint( widgetX, widgetY );
 }
 
-QPoint TrussUnitWindow::getWidgetPosFromTrussCoord ( DoublePoint coord ) const
+QPoint TrussUnitWindow::getWidgetPosFromTrussCoord ( const DoublePoint& coord ) const
 {
     return getWidgetPosFromTrussCoord ( coord.x(), coord.y() );
 }
@@ -462,9 +460,10 @@ int TrussUnitWindow::getPivotFindingPrecision () const
 void TrussUnitWindow::moveTrussNode ( int x, int y, TrussNode* node )
 {
     DoublePoint newCoord = getTrussCoordFromWidgetPos ( x, y );
+    const DoubleSize& size = getTrussAreaSize();
 
-    int areaWidth = getTrussAreaSize().width();
-    int areaHeight = getTrussAreaSize().height();
+    double areaWidth = size.width();
+    double areaHeight = size.height();
     if ( newCoord.x() < 0 )
         newCoord.setX( 0 );
     if ( newCoord.x() > areaWidth )
@@ -479,23 +478,25 @@ void TrussUnitWindow::moveTrussNode ( int x, int y, TrussNode* node )
 }
 
 void TrussUnitWindow::moveTrussPivot ( int x, int y, TrussPivot* pivot, 
-                                      QPoint firstNodeClickDist, QPoint lastNodeClickDist )
+                                      QPoint firstNodeClickDist, 
+                                      QPoint lastNodeClickDist )
 {
     DoublePoint newCoord = getTrussCoordFromWidgetPos ( x, y );
-    int newXFirst = newCoord.x()  + firstNodeClickDist.x();
-    int newYFirst = newCoord.y() + firstNodeClickDist.y();
-    int newXLast = newCoord.x() + lastNodeClickDist.x();
-    int newYLast = newCoord.y() + lastNodeClickDist.y();
+    double newXFirst = newCoord.x()  + firstNodeClickDist.x();
+    double newYFirst = newCoord.y() + firstNodeClickDist.y();
+    double newXLast = newCoord.x() + lastNodeClickDist.x();
+    double newYLast = newCoord.y() + lastNodeClickDist.y();
     
-    DoublePoint oldFirstCoord = pivot->getFirstNode().getPoint();
-    DoublePoint oldLastCoord  = pivot->getLastNode().getPoint();
+    const DoublePoint& oldFirstCoord = pivot->getFirstNode().getPoint();
+    const DoublePoint& oldLastCoord  = pivot->getLastNode().getPoint();
+    const DoubleSize& size = getTrussAreaSize();
 
-    int oldXFirst = pivot->getFirstNode().getPoint().x();
-    int oldYFirst = pivot->getFirstNode().getPoint().y();
-    int oldXLast  = pivot->getLastNode().getPoint().x();
-    int oldYLast  = pivot->getLastNode().getPoint().y();
-    int areaWidth = getTrussAreaSize().width();
-    int areaHeight = getTrussAreaSize().height();
+    double oldXFirst = oldFirstCoord.x();
+    double oldYFirst = oldFirstCoord.y();
+    double oldXLast  = oldLastCoord.x();
+    double oldYLast  = oldLastCoord.y();
+    double areaWidth = size.width();
+    double areaHeight = size.height();
 
     if ( newXFirst < 0 )
     {
@@ -732,7 +733,7 @@ TrussPivot* TrussUnitWindow::findDividualPivot ( TrussNode& dividingNode ) const
 
 
 DoublePointArray TrussUnitWindow::getPivotCrossPoints ( 
-                                             PivotList nonCrossingPivots ) const
+                                     const PivotList& nonCrossingPivots ) const
 {
     DoublePointArray crossPoints;
 
@@ -745,19 +746,20 @@ DoublePointArray TrussUnitWindow::getPivotCrossPoints (
     for ( ; rev_iter != pivotList.rend(); ++rev_iter )
     {
         TrussPivot* pivot = *rev_iter;
-        DoublePoint p11 = pivot->getFirstNode().getPoint();
-        DoublePoint p12 = pivot->getLastNode().getPoint();
+        const DoublePoint& p11 = pivot->getFirstNode().getPoint();
+        const DoublePoint& p12 = pivot->getLastNode().getPoint();
 
-        PivotListIter iter = nonCrossingPivots.begin();
+        PivotListConstIter iter = nonCrossingPivots.begin();
         for ( ; iter != nonCrossingPivots.end(); ++iter )
         {   
             TrussPivot* adjPivot = *iter;
             if ( adjPivot == pivot )
                 break;  // taken pivot is one of the noncrossing pivots
-            DoublePoint p21 = adjPivot->getFirstNode().getPoint();
-            DoublePoint p22 = adjPivot->getLastNode().getPoint();
+            const DoublePoint& p21 = adjPivot->getFirstNode().getPoint();
+            const DoublePoint& p22 = adjPivot->getLastNode().getPoint();
 
-            DoublePoint crossPoint = getLineSegmentsCrossPoint ( p11, p12, p21, p22 );
+            DoublePoint crossPoint = getLineSegmentsCrossPoint( p11, p12, 
+                                                                p21, p22 );
             if ( crossPoint.x() == -1 )
                 continue;   // there are no intersections between these pivots
 
@@ -776,7 +778,8 @@ DoublePointArray TrussUnitWindow::getPivotCrossPoints (
         TrussPivot* pivot = findDividualPivot ( *node );
         // check if node belongs to one of the incoming pivots
         if ( pivot && 
-             std::find( nonCrossingPivots.begin(), nonCrossingPivots.end(), pivot ) != 
+             std::find( nonCrossingPivots.begin(), 
+                        nonCrossingPivots.end(), pivot ) != 
              nonCrossingPivots.end() )
         {
             if ( crossPoints.contains( node->getPoint() ) == 0 ) {
@@ -823,7 +826,7 @@ void TrussUnitWindow::createPivotCrossNodes (
     }
 }
 
-TrussNode& TrussUnitWindow::createCrossNode ( DoublePoint crossPoint )
+TrussNode& TrussUnitWindow::createCrossNode ( const DoublePoint& crossPoint )
 {
     TrussNode* crossNode = findNodeByCoord ( crossPoint );
 
