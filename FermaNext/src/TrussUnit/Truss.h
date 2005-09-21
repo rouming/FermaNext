@@ -227,6 +227,7 @@ public:
         emit beforeNodeCreation();
         N* node = new N(getStateManager());
         node->setPoint( x, y );
+        node->setNumber( countNodes() + 1 );
         nodes.push_back(node);
 
         // Signal connects to catch life time changing
@@ -268,6 +269,7 @@ public:
 
         emit beforePivotCreation();
         P* pivot = new P( first, last, getStateManager() );
+        pivot->setNumber( countPivots() + 1 );
         // Signal connects to catch life time changing
         QObject::connect( pivot, SIGNAL(onBeforeRevive(StatefulObject&)),
                                  SLOT(pivotBeforeRevive(StatefulObject&)) );
@@ -316,6 +318,30 @@ public:
                 return removeNode(iter);
             }            
         return false;    
+    }
+
+    virtual uint countNodes ()
+    {
+        uint nodesNum = 0;
+        NodeListIter nIter = nodes.begin();
+        for ( ; nIter != nodes.end(); ++nIter ) {
+            N* node = *nIter;
+            if ( node->isAlive() && node->isEnabled() )
+                ++nodesNum;
+        }
+        return nodesNum;
+    }
+
+    virtual uint countPivots ()
+    {
+        uint pivotsNum = 0;
+        PivotListIter pIter = pivots.begin();
+        for ( ; pIter != pivots.end(); ++pIter ) {
+            P* pivot = *pIter;
+            if ( pivot->isAlive() && pivot->isEnabled() )
+                ++pivotsNum;
+        }
+        return pivotsNum;
     }
 
     // Returns alive nodes
