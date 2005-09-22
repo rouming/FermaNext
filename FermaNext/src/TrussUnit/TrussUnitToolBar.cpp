@@ -69,9 +69,9 @@ TrussUnitToolBar::TrussUnitToolBar  ( QPoint pos, int bordLeft, int bordRight,
                                       int bordTop, int bordBottom, int separ, 
                                       int rad ) :
     AggToolBar( pos, bordLeft, bordRight, bordTop, bordBottom, separ ),
+    pixNumb ( 0 ),
     cornerRadius( rad ),
     enabled( true ),
-    pixNumb ( 0 ),
     timer ( new QTimer( this ) ),
     // gradient colors
     barFirstColor ( agg::rgba( 35, 50, 60, 0.8 ) ),

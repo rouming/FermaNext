@@ -1028,8 +1028,8 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
     double areaWidInPix = p2.y() - p1.y();
     double scaleFactorXInPix = areaLenInPix / 5;
     double scaleFactorYInPix = areaWidInPix / 5;
-    int scaleFactorXInAbs = getTrussAreaSize().height() / 5;
-    int scaleFactorYInAbs = getTrussAreaSize().width() / 5;
+    int scaleFactorXInAbs = int(getTrussAreaSize().height() / 5);
+    int scaleFactorYInAbs = int(getTrussAreaSize().width() / 5);
 
     p2.setX ( p1.x() - scalePieceLength );
     QString str;
