@@ -887,7 +887,7 @@ void TrussUnitWindow::updateAfterNodeManipulation ( TrussNode* selectedNode,
 }
 
 void TrussUnitWindow::updateAfterPivotManipulation ( TrussPivot* selectedPivot,
-                                                    bool fixationCheck )
+                                                     bool fixationCheck )
 // Analyses positions of selected pivot with adjoining pivots of its nodes
 // relative to other truss elements.
 {
@@ -988,9 +988,11 @@ QString TrussUnitWindow::fitTextToWindowSize ( QString str, int lengthLimit,
     return str;
 }
 
-void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend, 
-                               scanline_rasterizer& ras, textRenderer& textRend, 
-                               solidRenderer& solidRend, agg::scanline_p8& sl ) const
+void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
+                                      scanline_rasterizer& ras, 
+                                      textRenderer& textRend, 
+                                      solidRenderer& solidRend, 
+                                      agg::scanline_p8& sl ) const
 {
 //  draw coordinate lines with arrow heads
     QPoint leftTopAreaPos ( leftWindowIndent, topWindowIndent ),
@@ -1078,10 +1080,13 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
 }
 
 void TrussUnitWindow::drawHeadline ( ren_dynarow& baseRend, 
-                               solidRenderer& solidRend, scanline_rasterizer& ras,
-                               agg::scanline_p8& sl, gradient_span_alloc& gradSpan,
-                               linear_gradient& gradFunc, color_array_type& gradColors,
-                               agg::trans_affine& mtx ) const
+                                     solidRenderer& solidRend, 
+                                     scanline_rasterizer& ras,
+                                     agg::scanline_p8& sl, 
+                                     gradient_span_alloc& gradSpan,
+                                     linear_gradient& gradFunc, 
+                                     color_array_type& gradColors,
+                                     agg::trans_affine& mtx ) const
 {
     QPoint p1, p2;
     p1.setX ( 3 * bordWidth );
@@ -1393,17 +1398,17 @@ void TrussUnitWindow::drawEllipseHighlight ( solidRenderer& solidRend,
                                              agg::scanline_p8& sl,
                                              QPoint pos ) const
 {                                         
-        int rad = 4;
-        agg::ellipse ell;
-        solidRend.color ( agg::rgba( 1, 0, 0, 0.6 ) );
-        ell.init ( pos.x(), pos.y(), rad, rad, 10 );
-        ras.add_path ( ell );
-        agg::render_scanlines ( ras, sl, solidRend );
-
-        solidRend.color ( agg::rgba( 0, 1, 1, 0.8 ) );
-        ell.init ( pos.x(), pos.y(), 3, 3, 10 );
-        ras.add_path ( ell );
-        agg::render_scanlines ( ras, sl, solidRend );
+    int rad = 4;
+    agg::ellipse ell;
+    solidRend.color ( agg::rgba( 1, 0, 0, 0.6 ) );
+    ell.init ( pos.x(), pos.y(), rad, rad, 10 );
+    ras.add_path ( ell );
+    agg::render_scanlines ( ras, sl, solidRend );
+    
+    solidRend.color ( agg::rgba( 0, 1, 1, 0.8 ) );
+    ell.init ( pos.x(), pos.y(), 3, 3, 10 );
+    ras.add_path ( ell );
+    agg::render_scanlines ( ras, sl, solidRend );
 }
 
 void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
