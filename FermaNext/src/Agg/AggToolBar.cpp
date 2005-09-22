@@ -79,7 +79,16 @@ AggToolBar::AggToolBar( QPoint pos, int bordLeft, int bordRight, int bordTop,
 
 AggToolBar::~AggToolBar ()
 {
+    clean();
     delete toolBarBuf;
+}
+
+void AggToolBar::clean ()
+{
+    ButtonListIter iter = buttons.begin();
+    for ( ; iter != buttons.end(); ++iter )
+        delete *iter;
+    buttons.clear();
 }
 
 AggToolBarButton& AggToolBar::addButton ( const QString& fname, 
@@ -138,8 +147,9 @@ void AggToolBar::removeButton ( const QString& label )
         AggToolBarButton* button = *iter;
         if ( button->getLabel() == label )
         {
-            delWidth = button->getWidth();
-            buttons.erase ( iter );
+            delWidth = button->getWidth();            
+            buttons.erase( iter );
+            delete button;
         }
     }
     toolBarHeight = findMaxButtonHeight ();
@@ -178,7 +188,9 @@ void AggToolBar::clearToolBar ()
     if ( buttons.empty() )
         return;
 
-    buttons.clear();
+    // Clear all buttons.
+    clean();
+
     toolBarBuf->init( borderLeft + borderRight + separation + 2 * bufferEmptyArea, 
                       toolBarBuf->height() );
 

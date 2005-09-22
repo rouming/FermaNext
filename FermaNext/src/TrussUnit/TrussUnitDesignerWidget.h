@@ -24,10 +24,11 @@ protected:
     virtual void clearAllCursorCoordFields ();
 
     // Save states to Undo/Redo stack
-    virtual void saveNodeStateAfterDrag ( QPoint );
+    virtual void saveNodeStateAfterDrag ( DoublePoint );
     virtual void saveNodeStateAfterCreate ( TrussNode& );
     virtual void saveNodeStateAfterRemove ( TrussNode& );
-    virtual void savePivotStateAfterDrag ( QPoint first, QPoint last );    
+    virtual void savePivotStateAfterDrag ( DoublePoint first, 
+                                           DoublePoint last );
     virtual void savePivotStateAfterCreate ( TrussNode& firstNode, 
                                              bool firstPivotWasCreated,
                                              TrussNode& lastNode, 
@@ -91,8 +92,8 @@ private:
     int clickX, clickY;
     QPoint firstNodeClickDist, lastNodeClickDist, toolBarCenterPos;
     // Undo/Redo
-    QPoint beforeDragNodePos;
-    QPoint beforeDragFirstPos, beforeDragLastPos;
+    DoublePoint beforeDragNodePos;
+    DoublePoint beforeDragFirstPos, beforeDragLastPos;
 
     TrussUnitToolBar* toolBar;
 

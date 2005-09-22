@@ -138,7 +138,8 @@ void TrussUnit::desistAdjoiningPivots ( const TrussNode& node )
     }
 }
 
-void TrussUnit::paintLoad ( TrussLoad& load, QPoint tailPos, ren_dynarow& baseRend ) const
+void TrussUnit::paintLoad ( const TrussLoad& load, const QPoint& tailPos, 
+                            ren_dynarow& baseRend ) const
 {
     double x = load.getXForce (),
            y = load.getYForce (), 
@@ -154,7 +155,7 @@ void TrussUnit::paintLoad ( TrussLoad& load, QPoint tailPos, ren_dynarow& baseRe
         x1 = sqrt( 1 - y1 * y1 );
     }
 
-    QPoint forceDirection ( 0, 0 );
+    QPoint forceDirection;
 
     if ( x < 0 )
         forceDirection.setX ( - 1 );
@@ -184,11 +185,11 @@ void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX,
     agg::scanline_p8 sl;
     agg::ellipse ell;
     QPoint pos;
-    int trussAreaHeight = getTrussAreaSize().height();
+    double trussAreaHeight = getTrussAreaSize().height();
     PivotList pivotList = getPivotList ();
     PivotList::const_iterator pivotsIter = pivotList.begin();
     for ( ; pivotsIter != pivotList.end(); ++pivotsIter )
-        (*pivotsIter)->paint ( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
+        (*pivotsIter)->paint( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
 
     TrussUnitLoadCase* loadCase = getLoadCases().getCurrentLoadCase();
     NodeList nodeList = getNodeList ();
@@ -196,9 +197,9 @@ void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX,
     for ( ; nodesIter != nodeList.end(); ++nodesIter )
         if ( *nodesIter != frontNode ) {
             TrussNode* node = *nodesIter;
-            pos = node->getPoint();
-            pos.setX( int(pos.x() * scaleMultX) + leftWindowIndent );
-            pos.setY( flipY ? int(( trussAreaHeight - pos.y() ) * scaleMultY) + 
+            const DoublePoint& coord = node->getPoint();
+            pos.setX( int(coord.x() * scaleMultX) + leftWindowIndent );
+            pos.setY( flipY ? int(( trussAreaHeight - coord.y() ) * scaleMultY) + 
                       topWindowIndent : int(pos.y() * scaleMultY) + topWindowIndent );
             if ( loadCase ) 
             {
@@ -210,10 +211,10 @@ void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX,
     if ( frontNode ) {
         if ( loadCase ) 
         {
-            pos = frontNode->getPoint();
-            pos.setX( int(pos.x() * scaleMultX) + leftWindowIndent );
-            pos.setY( flipY ? int(( trussAreaHeight - pos.y() ) * scaleMultY) + 
-                      topWindowIndent : int(pos.y() * scaleMultY) + topWindowIndent );
+            const DoublePoint& coord = frontNode->getPoint();
+            pos.setX( int(coord.x() * scaleMultX) + leftWindowIndent );
+            pos.setY( flipY ? int(( trussAreaHeight - coord.y() ) * scaleMultY) + 
+                      topWindowIndent : int(coord.y() * scaleMultY) + topWindowIndent );
             TrussLoad* load = loadCase->findLoad( *frontNode );
             if ( load ) paintLoad( *load, pos, baseRend );
         }

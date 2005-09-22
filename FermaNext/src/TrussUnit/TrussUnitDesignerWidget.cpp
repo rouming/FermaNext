@@ -276,7 +276,7 @@ void TrussUnitDesignerWidget::clearAllCursorCoordFields ()
         update();
 }
 
-void TrussUnitDesignerWidget::saveNodeStateAfterDrag ( QPoint pos )
+void TrussUnitDesignerWidget::saveNodeStateAfterDrag ( DoublePoint pos )
 {
     // Actually nothing to save.
     if ( selectedNode == 0 )
@@ -286,13 +286,12 @@ void TrussUnitDesignerWidget::saveNodeStateAfterDrag ( QPoint pos )
         return;
 
     ObjectState& state = selectedNode->createState();
-    ConcreteObjectAction<TrussNode, QPoint>* action = 
-        new ConcreteObjectAction<TrussNode, QPoint>( *selectedNode, 
+    state.addAction( new ConcreteObjectAction<TrussNode, DoublePoint>( 
+                                                     *selectedNode, 
                                                      &TrussNode::setPoint,
                                                      &TrussNode::setPoint,
                                                      pos,
-                                                     beforeDragNodePos);
-    state.addAction( action );
+                                                     beforeDragNodePos) );
     state.save();    
 }
 
@@ -312,7 +311,8 @@ void TrussUnitDesignerWidget::saveNodeStateAfterRemove ( TrussNode& node )
     state.save();
 }
 
-void TrussUnitDesignerWidget::savePivotStateAfterDrag ( QPoint firstPos, QPoint lastPos )
+void TrussUnitDesignerWidget::savePivotStateAfterDrag ( DoublePoint firstPos, 
+                                                        DoublePoint lastPos )
 {
     // Actually nothing to save.
     if ( selectedPivot == 0 )
@@ -332,7 +332,7 @@ void TrussUnitDesignerWidget::savePivotStateAfterDrag ( QPoint firstPos, QPoint 
     ObjectState& firstState = firstNode.createState();
 
     // First pos    
-    firstState.addAction( new ConcreteObjectAction<TrussNode, QPoint>( 
+    firstState.addAction( new ConcreteObjectAction<TrussNode, DoublePoint>( 
                                                          firstNode, 
                                                          &TrussNode::setPoint,
                                                          &TrussNode::setPoint,
@@ -344,7 +344,7 @@ void TrussUnitDesignerWidget::savePivotStateAfterDrag ( QPoint firstPos, QPoint 
     ObjectState& lastState = lastNode.createState();
 
     // Last pos
-    lastState.addAction( new ConcreteObjectAction<TrussNode, QPoint>( 
+    lastState.addAction( new ConcreteObjectAction<TrussNode, DoublePoint>( 
                                                           lastNode, 
                                                           &TrussNode::setPoint,
                                                           &TrussNode::setPoint,
@@ -483,7 +483,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     else if ( winBehaviour == onBDiagResize )
     {
         int dx = x - clickX;
-            int dy = y - clickY;
+        int dy = y - clickY;
         QPoint point1 = selectedWindow->getWindowLeftTopPos ();
         QPoint point2 = selectedWindow->getWindowRightBottomPos ();
         if ( abs ( clickX - (point1.x() + bordWidth) ) <= bordWidth )
@@ -585,23 +585,16 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         else if ( pivotBehaviour == onPivotDrag )
         {
             clearAllCursorCoordFields ();
-            QPoint cursorCoord = selectedWindow->getTrussCoordFromWidgetPos( x, y );
-            QSize size = selectedWindow->getTrussAreaSize();
-            if ( cursorCoord.x() > size.width() || cursorCoord.x() < 0 ||
-                 cursorCoord.y() > size.height() || cursorCoord.y() < 0 )
-            {
-                 cursorCoord.setX ( -1 );
-                 cursorCoord.setY ( -1 );
-            }
-            selectedWindow->setCursorCoord ( cursorCoord );
+            selectedWindow->setCursorCoord ( QPoint(x, y) );
             selectedWindow->moveTrussPivot( x, y, selectedPivot, 
-                                           firstNodeClickDist, lastNodeClickDist );     
+                                            firstNodeClickDist, 
+                                            lastNodeClickDist );     
             update();
         }
         else if ( designerBehaviour  == onPivotLastNodeDraw )
         {
             selectedWindow->moveTrussNode ( x, y, selectedNode );
-            selectedWindow->setCursorCoord ( selectedNode->getPoint() );
+            selectedWindow->setCursorCoord( selectedNode->getPoint() );
             update();
         }
         else
@@ -612,8 +605,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                 if ( selectedWindow->inTrussAreaRect( x, y ) )
                 {
                     clearAllCursorCoordFields ();
-                    QPoint cursorCoord = selectedWindow->getTrussCoordFromWidgetPos( x, y );
-                    selectedWindow->setCursorCoord ( cursorCoord );
+                    selectedWindow->setCursorCoord ( QPoint(x, y) );
                     update();
                 }
                 else
@@ -642,8 +634,9 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                     {
                         removeAllHighlight ();
                         clearAllCursorCoordFields ();
-                        selectedWindow->setFocusOnNode ( selectedNode );
-                        selectedWindow->setCursorCoord ( selectedNode->getPoint() );
+                        selectedWindow->setFocusOnNode( selectedNode );
+                        selectedWindow->setCursorCoord( 
+                                                  selectedNode->getPoint() );
                         nodeBehaviour = onNodeSelect;
                         if ( designerBehaviour == onErase )
                             QWidget::setCursor ( Qt::CrossCursor );
@@ -656,9 +649,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                         removeAllHighlight ();
                         clearAllCursorCoordFields ();
                         selectedWindow->setFocusOnPivot ( selectedPivot );
-                        QPoint cursorCoord = 
-                            selectedWindow->getTrussCoordFromWidgetPos( x, y );
-                        selectedWindow->setCursorCoord ( cursorCoord );
+                        selectedWindow->setCursorCoord ( QPoint(x, y) );
                         pivotBehaviour = onPivotSelect;
                         if ( designerBehaviour == onErase )
                             QWidget::setCursor ( Qt::CrossCursor );
@@ -749,8 +740,8 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
     else if ( pivotBehaviour == onPivotDrag ) 
     {
         pivotBehaviour = onPivotSelect;
-        QPoint firstPos = selectedPivot->getFirstNode().getPoint();
-        QPoint lastPos  = selectedPivot->getLastNode().getPoint();
+        const DoublePoint& firstPos = selectedPivot->getFirstNode().getPoint();
+        const DoublePoint& lastPos  = selectedPivot->getLastNode().getPoint();
 
         ObjectStateManager* mng = selectedWindow->getStateManager();
         mng->startStateBlock();
@@ -880,16 +871,18 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
             else
             {
                 // Convert widget coordinates into truss (absolute) coordinates
-                QPoint trussCoord = selectedWindow->getTrussCoordFromWidgetPos(clickX, 
-                                                                               clickY);
-                QPoint firstPos = selectedPivot->getFirstNode().getPoint();
-                QPoint lastPos  = selectedPivot->getLastNode().getPoint();
+                DoublePoint trussCoord = selectedWindow->
+                                  getTrussCoordFromWidgetPos( clickX, clickY );
+                const DoublePoint& firstPos = selectedPivot->
+                                                     getFirstNode().getPoint();
+                const DoublePoint& lastPos  = selectedPivot->
+                                                     getLastNode().getPoint();
 
                 // Get first and last nodes displacements about a clicked point 
-                firstNodeClickDist.setX ( firstPos.x() - trussCoord.x() );
-                firstNodeClickDist.setY ( firstPos.y() - trussCoord.y() );
-                lastNodeClickDist.setX (  lastPos.x()  - trussCoord.x() );
-                lastNodeClickDist.setY ( lastPos.y()  - trussCoord.y() );
+                firstNodeClickDist.setX( int(firstPos.x() - trussCoord.x()) );
+                firstNodeClickDist.setY( int(firstPos.y() - trussCoord.y()) );
+                lastNodeClickDist.setX( int(lastPos.x()  - trussCoord.x()) );
+                lastNodeClickDist.setY( int(lastPos.y()  - trussCoord.y()) );
 
                 // Save pos for Undo/Redo
                 beforeDragFirstPos = firstPos;
@@ -903,13 +896,15 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
             if ( nodeCanBeDrawn ( clickX, clickY ) )
             {
                 int nodePrecision = selectedWindow->getNodeFindingPrecision();
-                TrussNode* node = selectedWindow->findNodeByWidgetPos ( clickX, clickY, 
-                                                                    nodePrecision );
+                TrussNode* node = selectedWindow->findNodeByWidgetPos( 
+                                                               clickX,
+                                                               clickY, 
+                                                               nodePrecision );
                 if ( node )
                     return;
 
-                QPoint nodeCoord = selectedWindow->
-                                            getTrussCoordFromWidgetPos ( clickX, clickY );
+                DoublePoint nodeCoord = selectedWindow->
+                                  getTrussCoordFromWidgetPos( clickX, clickY );
                 
                 TrussNode& newNode = selectedWindow->createNode ( nodeCoord.x(), 
                                                                nodeCoord.y() );
@@ -928,11 +923,12 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
         {
             if ( nodeCanBeDrawn ( clickX, clickY ) )
             {
-                QPoint nodeCoord = selectedWindow->getTrussCoordFromWidgetPos( clickX, 
-                                                                               clickY );
+                DoublePoint nodeCoord = selectedWindow->
+                                  getTrussCoordFromWidgetPos( clickX, clickY );
                 int nodePrecision = selectedWindow->getNodeFindingPrecision();
-                TrussNode* firstNode = selectedWindow->findNodeByWidgetPos( clickX, clickY, 
-                                                                    nodePrecision );
+                TrussNode* firstNode = selectedWindow->
+                                          findNodeByWidgetPos( clickX, clickY,
+                                                               nodePrecision );
                 bool wasCreated = false;
                 if ( firstNode == 0 ) {
                     firstNode = &selectedWindow->createNode( nodeCoord.x(), nodeCoord.y() );

@@ -9,8 +9,10 @@ class DoubleSize;
  * Subsidiary 2D functions
  *****************************************************************************/
 
-inline DoublePoint crossPoint ( const DoublePoint&, const DoublePoint&,
-                                const DoublePoint&, const DoublePoint& );
+inline DoublePoint getLineSegmentsCrossPoint ( const DoublePoint&, 
+                                               const DoublePoint&,
+                                               const DoublePoint&, 
+                                               const DoublePoint& );
 
 /*****************************************************************************
  * Double Point
@@ -183,9 +185,9 @@ public:
     friend inline bool operator== ( const DoubleSize&, const DoubleSize& );
     friend inline bool operator!= (  const DoubleSize&, const DoubleSize& );
     friend inline const DoubleSize operator+ ( const DoubleSize&, 
-                                                const DoubleSize&  );
+                                               const DoubleSize&  );
     friend inline const DoubleSize operator- (  const DoubleSize&, 
-                                                 const DoubleSize& );
+                                                const DoubleSize& );
     friend inline const DoubleSize operator* ( const DoubleSize&, double );
     friend inline const DoubleSize operator* ( double, const DoubleSize& );
     friend inline const DoubleSize operator- ( const DoubleSize& );
@@ -290,8 +292,10 @@ inline const DoubleSize operator/ ( const DoubleSize& s, double c )
  * Subsidiary 2D inline functions
  *****************************************************************************/
 
-inline DoublePoint crossPoint ( const DoublePoint& p11, const DoublePoint& p12,
-                                const DoublePoint& p21, const DoublePoint& p22)
+inline DoublePoint getLineSegmentsCrossPoint ( const DoublePoint& p11, 
+                                               const DoublePoint& p12,
+                                               const DoublePoint& p21, 
+                                               const DoublePoint& p22)
 {
     DoublePoint crossPoint ( -1, -1 ); // intersection point
 

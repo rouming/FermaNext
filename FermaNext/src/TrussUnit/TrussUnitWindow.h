@@ -4,6 +4,8 @@
 
 #include "TrussUnit.h"
 
+typedef QValueList<DoublePoint> DoublePointArray;
+
 class TrussUnitWindow : public TrussUnit
 {
     Q_OBJECT
@@ -17,13 +19,16 @@ public:
     virtual QPoint getWindowRightBottomPos () const;
     virtual QPoint getTrussAreaLeftTopPos () const;
     virtual QPoint getTrussAreaRightBottomPos () const;
-    virtual QPoint getTrussCoordFromWidgetPos ( int x, int y ) const;
-    virtual QPoint getTrussCoordFromWidgetPos ( QPoint pos ) const;
-    virtual QPoint getWidgetPosFromTrussCoord ( int x, int y ) const;
-    virtual QPoint getWidgetPosFromTrussCoord ( QPoint coord ) const;
+    virtual DoublePoint getTrussCoordFromWidgetPos ( int x, int y ) const;
+    virtual DoublePoint getTrussCoordFromWidgetPos ( QPoint pos ) const;
+    virtual QPoint getWidgetPosFromTrussCoord ( double x, double y ) const;
+    virtual QPoint getWidgetPosFromTrussCoord ( const DoublePoint& ) const;
     virtual void setWindowPosition ( QPoint pos );
     virtual void resize ( QPoint leftTop, QPoint rightBottom );
-    virtual void setCursorCoord ( QPoint coord );
+    virtual void setCursorCoord ( const QPoint& );
+    // Assuming this coords are from truss node position, 
+    // so we don't want to convert them from widget position
+    virtual void setCursorCoord ( const DoublePoint& );
     virtual QPoint getCursorCoord () const;
     virtual const QSize& getWindowSize () const;
 
@@ -57,12 +62,9 @@ public:
     virtual void mergeNodes ( TrussNode* mergingNode, TrussNode* node );
     virtual void dividePivot ( TrussPivot& dividualPivot, TrussNode& dividingNode );
     virtual TrussPivot* findDividualPivot ( TrussNode& dividingNode ) const;
-    virtual QPoint getLineSegmentsCrossPoint ( QPoint p11, QPoint p12, 
-                                               QPoint p21, QPoint p22 ) const;
-    virtual QRect getPivotsArea ( PivotList pivots ) const;
-    virtual QPointArray getPivotCrossPoints ( PivotList nonCrossingPivots ) const;
-    virtual TrussNode& createCrossNode ( QPoint crossPoint );
-    virtual void createPivotCrossNodes ( QPointArray crossPoints );
+    virtual DoublePointArray getPivotCrossPoints ( const PivotList& nonCrossingPivots ) const;
+    virtual TrussNode& createCrossNode ( const DoublePoint& crossPoint );
+    virtual void createPivotCrossNodes ( const DoublePointArray& );
     virtual void updateNodePosition ( TrussNode* selectedNode, bool fixationCheck );
     virtual void updateAfterNodeManipulation ( TrussNode* selectedNode, 
                                               bool fixationCheck );

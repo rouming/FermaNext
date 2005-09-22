@@ -112,7 +112,7 @@ void FermaNextMainFrame::createProject ()
 /*********** TEMP TRUSS UNIT **************************/
 #ifndef NDEBUG
         TrussUnitWindow& trussWindow = mng.createTrussUnitWindow("Truss unit");
-        trussWindow.setTrussAreaSize( QSize( 300, 300 ) );
+        trussWindow.setTrussAreaSize( DoubleSize( 300, 300 ) );
 
         TrussNode& node1 = trussWindow.createNode ( 280, 30 );
         TrussNode& node2 = trussWindow.createNode( 0, 0 );
