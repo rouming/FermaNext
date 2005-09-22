@@ -3,8 +3,6 @@
 #define AGGSUBSIDIARY_H
 
 #include "SubsidiaryConstants.h"
-#include "qpoint.h"
-#include "qstring.h"
 #include "agg_basics.h"
 #include "agg_conv_marker.h"
 #include "agg_conv_shorten_path.h"
@@ -68,6 +66,11 @@ typedef agg::renderer_primitives<ren_dynarow>               primitivesRenderer;
 
 /*****************************************************************************/
 
+class QString;
+class QPoint;
+
+/*****************************************************************************/
+
 struct line
 {
     double x1, y1, x2, y2;
@@ -100,25 +103,37 @@ struct arrow
 /*****************************************************************************/
 
 void drawText ( textRenderer& textRend, const QString& str, 
-                color_type c, QPoint point );
+                color_type c, const QPoint& point );
+
 void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                agg::scanline_p8& sl, QPoint point1, QPoint point2,
-                int width, color_type col );
+                agg::scanline_p8& sl, const QPoint& point1, 
+                const QPoint& point2, int width, color_type col );
+
 void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                agg::scanline_p8& sl, QPoint point1, QPoint point2 );
+                agg::scanline_p8& sl, const QPoint& point1, 
+                const QPoint& point2 );
+
 void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                 agg::scanline_p8& sl, QPoint tail, QPoint head, color_type color,
+                 agg::scanline_p8& sl, const QPoint& tail, 
+                 const QPoint& head, color_type color,
                  int downLen, int upLen, int sideWid, int sideLen );
+
 void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                 agg::scanline_p8& sl, QPoint point1, QPoint point2 );
-void drawOutlineRoundedRect ( solidRenderer& solidRend, scanline_rasterizer& ras,
-                              agg::scanline_p8& sl, QPoint tail, QPoint head, 
+                 agg::scanline_p8& sl, const QPoint& point1, 
+                 const QPoint& point2 );
+
+void drawOutlineRoundedRect ( solidRenderer& solidRend, 
+                              scanline_rasterizer& ras,
+                              agg::scanline_p8& sl, const QPoint& tail, 
+                              const QPoint& head, 
                               int cornerRadius, color_type color);
 
 void parseSvg ( pathRenderer& pathRend, const char* fname );
 
-void drawSvg ( ren_dynarow& baseRend, scanline_rasterizer& ras, agg::scanline_p8& sl, 
-               pathRenderer& pathRend, solidRenderer& solidRend, agg::trans_affine mtx, 
-               int dx, int dy, double scaleX, double scaleY, double expand, double gamma );
+void drawSvg ( ren_dynarow& baseRend, scanline_rasterizer& ras, 
+               agg::scanline_p8& sl,  pathRenderer& pathRend, 
+               solidRenderer& solidRend, agg::trans_affine mtx, 
+               int dx, int dy, double scaleX, double scaleY, double expand, 
+               double gamma );
 
 #endif //AGGSUBSIDIARY_H

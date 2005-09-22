@@ -90,7 +90,9 @@ protected:
     typedef ButtonList::iterator ButtonListIter;
     typedef ButtonList::const_iterator ButtonListConstIter;
 
-    ButtonList getButtonList () const;
+    virtual void clean ();
+
+    virtual ButtonList getButtonList () const;
 
     virtual void removeButtonHighlight ();
     virtual int findMaxButtonHeight () const;

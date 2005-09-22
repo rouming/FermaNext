@@ -66,7 +66,8 @@ public:
     // Manually call. We should save states before pivot desist.
     void desistAdjoiningPivots ( const TrussNode& node );
 
-    void paintLoad ( TrussLoad& load, QPoint tailPos, ren_dynarow& baseRend ) const;
+    void paintLoad ( const TrussLoad& load, const QPoint& tailPos, 
+                     ren_dynarow& baseRend ) const;
     void paint ( ren_dynarow& baseRend, double scaleMultX, 
                  double scaleMultY ) const;
 
@@ -97,20 +98,21 @@ class TrussNode: public Node, public PaintableTrussElement
     Q_OBJECT
 public:
     TrussNode ( ObjectStateManager* );
-    TrussNode ( int x, int y, ObjectStateManager* );
-    TrussNode ( int x, int y, Fixation, ObjectStateManager* );
+    TrussNode ( double x, double y, ObjectStateManager* );
+    TrussNode ( double x, double y, Fixation, ObjectStateManager* );
 
     void drawFixation ( scanline_rasterizer& ras, solidRenderer& solidRend, 
-                        agg::scanline_p8& sl, int trussAreaHeight,
+                        agg::scanline_p8& sl, double trussAreaHeight,
                         double scaleMultX, double scaleMultY,
                         int lineWidth, color_type color ) const;
 
-    void drawGradientEllipse ( scanline_rasterizer& ras, ren_dynarow& baseRend, 
-                               agg::scanline_p8& sl, int x, int y, int radius, 
-                               color_type begin, color_type middle, color_type end ) const;
+    void drawGradientEllipse ( scanline_rasterizer& ras, ren_dynarow& baseRend,
+                               agg::scanline_p8& sl, double x, double y, 
+                               int radius, color_type begin, color_type middle,
+                               color_type end ) const;
 
     void paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
-                int trussAreaHeight ) const;
+                double trussAreaHeight ) const;
 
 signals:
 // Paintable signals
@@ -137,7 +139,7 @@ public:
     void setHighlighted ( bool h );
 
     void paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
-                int trussAreaHeight) const;
+                double trussAreaHeight) const;
 
 signals:
 // Paintable signals
