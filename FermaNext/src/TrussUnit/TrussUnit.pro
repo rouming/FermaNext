@@ -35,6 +35,7 @@ SOURCES = Truss.cpp \
 HEADERS = Truss.h \
           TrussLoad.h \
           TrussMaterial.h \
+          TrussTopology.h \
           TrussUnit.h \
           TrussUnitActions.h \
           TrussUnitDesignerWidget.h \
