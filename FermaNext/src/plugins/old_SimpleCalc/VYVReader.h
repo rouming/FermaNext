@@ -3,7 +3,6 @@
 #define VYVREADER_H
 
 #include <qmemarray.h>
-#include <qstring.h>
 
 struct CalcData
 {
@@ -25,18 +24,17 @@ struct CalcData
     QMemArray<double> pivotLength;    //list of pivots length
 };
 
+class QString;
+
 class VYVReader
 {
 public:
-    VYVReader ( const QString &filename );
-    ~VYVReader ();
-    bool readCalcData ();
-    CalcData getData () const;
-    void output ( const QString &outfilename ) const;
+    VYVReader ( CalcData& );
+    bool read ( const QString& fileName );
+    bool write ( const QString& fileName ) const;
 
 private:
-    QString File;
-    CalcData Data;
+    CalcData& Data;
 };
 
 #endif //VYVREADER_H
