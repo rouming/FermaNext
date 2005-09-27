@@ -10,8 +10,8 @@
 #include "StatefulObject.h"
 #include "TrussUnitWindow.h"
 
-typedef std::vector<TrussUnitWindow*>  WindowList;
-typedef std::vector<TrussUnitWindow*>::iterator  WindowListIter;
+typedef std::vector<TrussUnitWindow*> WindowList;
+typedef WindowList::iterator WindowListIter;
 
 class TrussUnitWindowManager : public QObject
 {
