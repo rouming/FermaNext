@@ -3,60 +3,65 @@
 #define UNIX_SIMPLECALC_H
 
 #include <unistd.h>
+#include <qsocketdevice.h>
+#include <qthread.h>
 
-// Temp socket
-QSocketDevice* tempSocket = 0;
-
-// Calculation thread
-class CalcThread : public QThread 
+class UnixSimpleCalcPlugin : public SimpleCalcPlugin
 {
-public:
-    virtual void run()
+private:
+    // Calculation thread
+    class CalcThread : public QThread 
     {
-        // Wine call. Assuming wine is installed
-        system("wine plugins/Simple_f.exe 1212");
+    public:
+        virtual void run()
+        {
+            // Wine call. Assuming wine is installed
+            system("wine plugins/Simple_f.exe 1212 "); //> /dev/null 2>&1
+        }
+    };
+
+public:    
+    UnixSimpleCalcPlugin ()
+    {
+        calcThread.start();
+        // Should wait a little to be sure server is started
+        sleep(3);        
+        socket.connect( QHostAddress("127.0.0.1"), 1212 );
     }
+
+    ~UnixSimpleCalcPlugin ()
+    {
+        QString msg("quit\n");
+        socket.writeBlock( msg, msg.length() );
+        socket.close();
+
+        // Workaround of vague segmentation fault after direct call
+        // of wait of calculation thread.
+        class Waiter : public QThread 
+        {
+        public:
+            Waiter ( QThread& t_ ) : t(t_) {}
+            virtual void run()
+            { t.wait(); }                
+        private:
+            QThread& t;
+        };
+        Waiter w(calcThread);
+        w.start();
+        w.wait();
+    }
+
+    void startCalculation ( const QString& fileName ) 
+    {
+        // Send file name to calculation server
+        socket.writeBlock( fileName, fileName.length() ); 
+    }
+    
+private:
+    QSocketDevice socket;
+    CalcThread calcThread;
 };
 
-
-// Manages calculation server
-QSocketDevice* startCalculationServer ()
-{
-    CalcThread* calc = new CalcThread;
-    calc->start();
-    // Should wait a little to be sure server is started
-    sleep(3);
-    QSocketDevice* socket = new QSocketDevice();
-    socket->connect( QHostAddress("127.0.0.1"), 1212 );
-    return socket;
-}
-
-void stopCalculationServer ( QSocketDevice*& socket )
-{
-    QString msg("quit\n");
-    socket->writeBlock( msg, msg.length() );
-    socket->close();
-    delete socket;
-    // Should wait a little
-    sleep(2);
-    socket = 0;
-}
-
-void os_dependent_init ()
-{
-    tempSocket = startCalculationServer();
-}
-
-void os_dependent_fini ()
-{
-    stopCalculationServer( tempSocket );
-}
-
-void os_dependent_calculation ()
-{
-    // Send file name to calculation server
-    QString fileName( "/home/roman/devel/FermaNext/1-64578.frm\n" );
-    tempSocket->writeBlock( fileName, fileName.length() );
-}
+UnixSimpleCalcPlugin plugin;
 
 #endif //UNIX_SIMPLECALC_H

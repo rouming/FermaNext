@@ -2,15 +2,16 @@
 #ifndef FRMWRITER_H
 #define FRMWRITER_H
 
-#include "TrussUnit.h"
+class TrussTopology;
+class QString;
 
 class FRMWriter
 {
 public:
-    FRMWriter ( const TrussUnit& );
+    FRMWriter ( const TrussTopology& );
     void write ( const QString& fileName );
 private:
-    const TrussUnit& truss;
+    const TrussTopology& truss;
 };
 
 #endif //FRMWRITER_H

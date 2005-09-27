@@ -8,19 +8,24 @@ OBJECTS_DIR = obj
 
 win32 {
   DEFINES += WIN32 QT_THREAD_SUPPORT
+  LIBS = -L../../../build TrussUnit.lib common.lib
+
   system( xcopy /y Simple_f.dll ..\..\..\plugins )
   system( xcopy /y win_Simple_f.dll ..\..\..\plugins )
 }
 unix {
   DEFINES += QT_THREAD_SUPPORT
+  LIBS = -L../../../build -lTrussUnit -lcommon
+
   system( cp Simple_f.dll ../../../plugins/ )
   system( cp Simple_f.exe ../../../plugins/ )
 }
 
-INCLUDEPATH = ../../FermaNext ../../common
+INCLUDEPATH = ../../TrussUnit ../../common
 
-HEADERS = VYVReader.h
+HEADERS = VYVReader.h \
+          FRMWriter.h
 
 SOURCES = old_SimpleCalc.cpp \
           VYVReader.cpp \
-          ../../common/PluginLoader.cpp
+          FRMWriter.cpp
