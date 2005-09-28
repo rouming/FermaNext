@@ -14,7 +14,7 @@ public:
         simpleCalc(0)
     {
         loader.loadLibrary( calcDLLName );
-        simpleCalc = (SimpleFerma)loader->getProcAddress( calcProcName );
+        simpleCalc = (SimpleFerma)loader.getProcAddress( calcProcName );
     }
 
     ~WinSimpleCalcPlugin ()
@@ -31,7 +31,7 @@ private:
     typedef void  ( StandardCall *SimpleFerma ) ( const char* );
     PluginLoader loader;
     SimpleFerma simpleCalc;
-}
+};
 
 WinSimpleCalcPlugin plugin;
 
