@@ -20,9 +20,11 @@ struct FermaNextPluginInfo
 
     FermaNextPluginInfo& operator = ( const PluginInfo& info_ )
     {
+        /*
         name = info_.name;
         description = info_.description;
         type = info_.type;
+        */
         return *this;
     }
 };

@@ -18,28 +18,72 @@
   #define StandardCall
 #endif
 
+class Plugin;
+class TrussTopology;
+class CalcData;
+
+// Plugin signature.
+typedef Plugin& ( StandardCall *PluginInstanceCall ) ();
+
 enum PluginType { 
                   CALCULATION_PLUGIN  = 0x0001, 
                   OPTIMIZATION_PLUGIN = 0x0010
                 };
 
 // Plain Old Data for plugin info.
-// Plugin name should be short and unique.
+// Plugin name should be short and unique in system context.
 struct PluginInfo
 {
     const char* name;
     const char* description;
-    PluginType type;
 };
 
+// Main plugin class
+class Plugin
+{
+public:
+    virtual PluginInfo& pluginInfo () const = 0;
+    virtual PluginType pluginType () const = 0;
+    virtual bool dependsOn ( PluginType ) const = 0;
+    //    virtual void calculate ( TrussTopology&, CalcData& ) const = 0;
+};
 
-#define PLUGIN_INFO ferma_next_plugin_info
-#define PLUGIN_INFO_CALL "ferma_next_plugin_info"
+// Calculation plugin
+class CalculationPlugin : public Plugin
+{
+public:
+    PluginType pluginType () 
+    { return CALCULATION_PLUGIN; }
+};
+
+// Optimization plugin
+class OptimizationPlugin : public Plugin
+{
+public:
+    PluginType pluginType ()
+    { return OPTIMIZATION_PLUGIN; }
+};
+
+#define PLUGIN_INSTANCE ferma_next_plugin_instance
+#define PLUGIN_INSTANCE_CALL "ferma_next_plugin_instance"
 
 
-// Plugin signature. 
-typedef PluginInfo& ( StandardCall *PluginInfoCall ) ();
-
+// Define OS independent macros to provide init and fini functions
+// in dynamic libraries.
+// Example:
+// 
+// Init code: 
+// FERMA_NEXT_PLUGIN_INIT
+// {
+//   /* some init code goes here */
+// }
+//
+// Fini code: 
+// FERMA_NEXT_PLUGIN_FINI
+// {
+//   /* some fini code goes here */
+// }
+//
 #if defined WINDOWS || defined WIN32
   #include <windows.h>
 
