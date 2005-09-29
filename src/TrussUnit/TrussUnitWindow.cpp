@@ -431,18 +431,28 @@ QPoint TrussUnitWindow::getButtonBufPos () const
                    windowLeftTopPos.y() + 6 );
 }
 
-void TrussUnitWindow::checkMouseMoveEvent ( int x, int y )
+void TrussUnitWindow::checkMouseMoveEvent ( int x, int y, bool mousePressed )
 {
     removeButtonsHighlight();
 
     if ( inHideButtonRect( x, y ) )
+    {
         hideButton->setHighlighted( true );
+        if( mousePressed )
+            hideButton->setPressed( true );
+    }
     else if ( inRollUpButtonRect( x, y ) )
+    {
         rollUpButton->setHighlighted( true );
+        if( mousePressed )
+            rollUpButton->setPressed( true );
+    }
 }
 
 void TrussUnitWindow::checkMousePressEvent ( int x, int y )
 {
+    releaseButtons();
+
     if ( inHideButtonRect( x, y ) )
         hideButton->setPressed( true );
     else if ( inRollUpButtonRect( x, y ) )
@@ -653,7 +663,7 @@ TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( const QPoint& pos,
                                                     double precision ) const
 {
     DoublePoint coord = getTrussCoordFromWidgetPos ( pos );
-    return findPivotByCoord ( coord );
+    return findPivotByCoord ( coord, precision );
 }
 
 TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( const QPoint& pos ) const
@@ -664,7 +674,7 @@ TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( const QPoint& pos ) const
 TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y, 
                                                     double precision ) const
 {
-    return findPivotByWidgetPos ( QPoint( x, y ) );
+    return findPivotByWidgetPos ( QPoint( x, y ), precision );
 }
 
 TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y ) const
@@ -693,8 +703,8 @@ void TrussUnitWindow::moveTrussNode ( int x, int y, TrussNode* node )
 }
 
 void TrussUnitWindow::moveTrussPivot ( int x, int y, TrussPivot* pivot, 
-                                      QPoint firstNodeClickDist, 
-                                      QPoint lastNodeClickDist )
+                                       QPoint firstNodeClickDist, 
+                                       QPoint lastNodeClickDist )
 {
     DoublePoint newCoord = getTrussCoordFromWidgetPos ( x, y );
     double newXFirst = newCoord.x()  + firstNodeClickDist.x();
@@ -760,7 +770,7 @@ void TrussUnitWindow::moveTrussPivot ( int x, int y, TrussPivot* pivot,
 }
 
 TrussNode* TrussUnitWindow::nodesMergingComparison ( TrussNode& comparableNode, 
-                                                     int precision, 
+                                                     double precision, 
                                                      bool fixationCheck )
 {
     QPoint nodePos = getWidgetPosFromTrussCoord ( comparableNode.getPoint() );
@@ -1741,7 +1751,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 
 
         /*------draw window title text and background rounded rectangle------*/
-        int lengthLimit = windowSize.width()/2;
+        int lengthLimit = windowSize.width()/2 - 20;
         QString title = fitTextToWindowSize ( getTrussName (), lengthLimit, glyph );
         int titleLength = (int)glyph.width( title.ascii() );
         QPoint titlePos( ( windowSize.width() - 2 * bordWidth - 
