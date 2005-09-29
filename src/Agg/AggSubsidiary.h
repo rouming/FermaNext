@@ -39,24 +39,28 @@ typedef agg::renderer_base<pixfmt>                          base_renderer;
 typedef agg::renderer_scanline_aa_solid<base_renderer>      solid_renderer;
 typedef agg::gradient_circle                                radial_gradient;
 typedef agg::gradient_y                                     linear_gradient;
+typedef agg::gradient_diamond                               diamond_gradient;
 typedef agg::span_interpolator_linear<>                     interpolator;
 typedef agg::pod_auto_array<color_type, 256>                color_array_type;
 typedef agg::span_gradient<color_type, interpolator, 
                            radial_gradient, 
                            color_array_type>                radial_gradient_span_gen;
-
 typedef agg::span_gradient<color_type, interpolator, 
                            linear_gradient, 
                            color_array_type>                linear_gradient_span_gen;
+typedef agg::span_gradient<color_type, interpolator, 
+                           diamond_gradient, 
+                           color_array_type>                diamond_gradient_span_gen;
 
 typedef agg::span_allocator<color_type>                     gradient_span_alloc;
 
-
 typedef agg::renderer_scanline_aa<ren_dynarow, 
                                   radial_gradient_span_gen> radial_gradient_renderer;
-
 typedef agg::renderer_scanline_aa<ren_dynarow, 
                                   linear_gradient_span_gen> linear_gradient_renderer;
+typedef agg::renderer_scanline_aa<ren_dynarow, 
+                                  diamond_gradient_span_gen> diamond_gradient_renderer;
+
 typedef agg::glyph_raster_bin<agg::rgba8>                   glyph_gen;
 typedef agg::renderer_raster_htext_solid<ren_dynarow, 
                                          glyph_gen>         textRenderer;

@@ -26,7 +26,6 @@ CFG=TrussUnit - Win32 Debug
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
-F90=df.exe
 RSC=rc.exe
 
 !IF  "$(CFG)" == "TrussUnit - Win32 Release"
@@ -41,6 +40,7 @@ RSC=rc.exe
 # PROP Output_Dir "../../Release"
 # PROP Intermediate_Dir "../../Release"
 # PROP Target_Dir ""
+F90=df.exe
 # ADD BASE F90 /compile_only /nologo /warn:nofileopt
 # ADD F90 /compile_only /nologo /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
@@ -66,6 +66,7 @@ LIB32=link.exe -lib
 # PROP Output_Dir "../../Debug"
 # PROP Intermediate_Dir "../../Debug"
 # PROP Target_Dir ""
+F90=df.exe
 # ADD BASE F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
@@ -131,6 +132,10 @@ SOURCE=.\TrussUnitToolBar.cpp
 # Begin Source File
 
 SOURCE=.\TrussUnitWindow.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\TrussUnitWindowButton.cpp
 # End Source File
 # Begin Source File
 
@@ -381,6 +386,39 @@ InputName=TrussUnitWindow
 # End Source File
 # Begin Source File
 
+SOURCE=.\TrussUnitWindowButton.h
+
+!IF  "$(CFG)" == "TrussUnit - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\TrussUnitWindowButton.h
+InputName=TrussUnitWindowButton
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\TrussUnitWindowButton.h
+InputName=TrussUnitWindowButton
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\TrussUnitWindowManager.h
 
 !IF  "$(CFG)" == "TrussUnit - Win32 Release"
@@ -443,6 +481,10 @@ SOURCE=.\mocs\moc_TrussUnitToolBar.cpp
 # Begin Source File
 
 SOURCE=.\mocs\moc_TrussUnitWindow.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mocs\moc_TrussUnitWindowButton.cpp
 # End Source File
 # Begin Source File
 

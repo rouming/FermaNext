@@ -2,6 +2,8 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
+#include "math.h"
+
 class DoublePoint;
 class DoubleSize;
 
@@ -292,16 +294,22 @@ inline const DoubleSize operator/ ( const DoubleSize& s, double c )
  * Subsidiary 2D inline functions
  *****************************************************************************/
 
+typedef DoublePoint Vector;
+
+inline bool comparePoints ( const DoublePoint& p1, const DoublePoint& p2, 
+                            double precision )
+{
+    if ( fabs( p1.x() - p2.x() ) < precision &&
+         fabs( p1.y() - p2.y() ) < precision )
+         return true;
+    return false;
+}
+
 inline DoublePoint getLineSegmentsCrossPoint ( const DoublePoint& p11, 
                                                const DoublePoint& p12,
                                                const DoublePoint& p21, 
                                                const DoublePoint& p22)
 {
-    DoublePoint crossPoint ( -1, -1 ); // intersection point
-
-    if ( p11 == p21 && p12 == p22 )
-        return crossPoint;
-
     // denominator
     double div  = ( p12.y() - p11.y() ) * ( p21.x() - p22.x() ) - 
                   ( p21.y() - p22.y() ) * ( p12.x() - p11.x() );
@@ -316,24 +324,61 @@ inline DoublePoint getLineSegmentsCrossPoint ( const DoublePoint& p11,
 
     if ( div == 0 && mul1 == 0 && mul2 == 0 )
         // line sgments are the same or they are parallel
-        return crossPoint;
+        return DoublePoint( -1.0, -1.0 );
 
     // intersection indicators
     double Ua1 = mul1 / div;
     double Ua2 = mul2 / div;
 
-    if ( ( 0 < Ua1 ) && ( Ua1 < 1 ) && 
-         ( 0 < Ua2 ) && ( Ua2 < 1 ) ) {
+    if ( ( 0 < Ua1 ) && ( Ua1 < 1.0 ) && 
+         ( 0 < Ua2 ) && ( Ua2 < 1.0 ) ) 
+    {
         // intersection point is within both line segments
         double x = p11.x() + ( p12.x() - p11.x() ) * Ua2;
         double y = p11.y() + ( p12.y() - p11.y() ) * Ua2;
-        crossPoint.setX( x );
-        crossPoint.setY( y );
-        return crossPoint;
+        return DoublePoint( x, y );
     }
     else
         // intersection point is outside both line segments
-        return crossPoint;    
+        return DoublePoint( -1.0, -1.0 );    
+}
+
+inline double dotProduct ( const Vector& v1, const Vector& v2 ) 
+// returns dot product which allows vector operations in arguments
+{
+    return ( v1.x() * v2.x() + v1.y() * v2.y() );
+}
+
+inline double normalize ( const Vector& v )
+// returns length of vector
+{
+    return sqrt( dotProduct( v, v ) );
+}
+
+inline double normDifference ( const Vector& v1, const Vector& v2 )
+// returns distance = norm of difference of two vectors
+{
+    return normalize( v1 - v2 );
+}
+
+inline double pointToSegmentDist ( const DoublePoint& p, const DoublePoint& p1,
+                                      const DoublePoint& p2 )
+// returns the shortest distance from point p to line segment (p1,p2)
+{
+    Vector v1 = p2 - p1;
+    Vector v2 = p - p1;
+
+    double dotProd1 = dotProduct( v2, v1 );
+    if ( dotProd1 <= 0 )
+        return normDifference( p, p1 );
+
+    double dotProd2 = dotProduct( v1, v1 );
+    if ( dotProd2 <= dotProd1 )
+        return normDifference( p, p2 );
+
+    double koeff = dotProd1 / dotProd2;
+    DoublePoint segmPnt = p1 + koeff * v1;
+    return normDifference( p, segmPnt );
 }
 
 /*****************************************************************************/

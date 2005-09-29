@@ -18,10 +18,18 @@ public:
 
 protected:
     virtual void clearWindowFocus ();
-    virtual TrussUnitWindow* findWindowByWidgetPos ( int x, int y );    
-    virtual void removeAllHighlight ();
-    virtual bool nodeCanBeDrawn ( int x, int y );
+    virtual TrussUnitWindow* findWindowByWidgetPos ( int x, int y );
+    
+    // remove highlight from nodes and pivots and renew their behaviour  
+    virtual void removeTrussElemHighlight ();
+    // remove highlight from all window buttons
+    virtual void removeWindowButtonHighlight ();
+    // set release status for all window buttons
+    virtual void releaseWindowButtons ();
+    // clear window cursor position field
     virtual void clearAllCursorCoordFields ();
+
+    virtual bool nodeCanBeDrawn ( int x, int y );
 
     // Save states to Undo/Redo stack
     virtual void saveNodeStateAfterDrag ( DoublePoint );
@@ -90,7 +98,7 @@ private:
     DesignerBehaviour designerBehaviour;
     // Subsidiary vars
     int clickX, clickY;
-    QPoint firstNodeClickDist, lastNodeClickDist, toolBarCenterPos;
+    QPoint firstNodeClickDist, lastNodeClickDist;
     // Undo/Redo
     DoublePoint beforeDragNodePos;
     DoublePoint beforeDragFirstPos, beforeDragLastPos;

@@ -148,7 +148,7 @@ public:
         for ( ; iter != nodes.end(); ++iter )
         {
             N* node = *iter;
-            if ( !node->isAlive() || !node->isEnabled() )
+            if ( !node->isAlive() )
                 continue;
             if ( node->getPoint() == point )
                 return node;
@@ -163,11 +163,11 @@ public:
         for ( ; iter != nodes.end(); ++iter )
         {
             N* node = *iter;
-            if ( !node->isAlive() || !node->isEnabled() )
+            if ( !node->isAlive() )
                 continue;
             const DoublePoint& pos = node->getPoint();
             if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
-                   (point.y() - pos.y()) * (point.y() - pos.y()) ) < precision )
+                   (point.y() - pos.y()) * (point.y() - pos.y()) ) < sqrt( precision ) )
                 return node;
         }
         return 0;
@@ -178,7 +178,7 @@ public:
         NodeListConstIter iter = nodes.begin();
         for ( uint i = 1; iter != nodes.end(); ++iter ) 
         {
-            if ( (*iter)->isAlive() && (*iter)->isEnabled() && i++ == num )
+            if ( (*iter)->isAlive() && i++ == num )
                 return *iter;
         }
         return 0;
@@ -189,7 +189,7 @@ public:
         PivotListConstIter iter = pivots.begin();
         for ( uint i = 1; iter != pivots.end(); ++iter ) 
         {
-            if ( (*iter)->isAlive() && (*iter)->isEnabled() && i++ == num )
+            if ( (*iter)->isAlive() && i++ == num )
                 return *iter;
         }
         return 0;
@@ -201,7 +201,7 @@ public:
         for ( ; iter != pivots.end(); ++iter )
         {
             P* pivot = (*iter);
-            if ( ! pivot->isAlive() || !pivot->isEnabled() )
+            if ( ! pivot->isAlive() )
                 continue;
             if ( &(pivot->getFirstNode()) == &node1 && 
                  &(pivot->getLastNode()) == &node2 ||
@@ -326,7 +326,7 @@ public:
         NodeListIter nIter = nodes.begin();
         for ( ; nIter != nodes.end(); ++nIter ) {
             N* node = *nIter;
-            if ( node->isAlive() && node->isEnabled() )
+            if ( node->isAlive() )
                 ++nodesNum;
         }
         return nodesNum;
@@ -338,7 +338,7 @@ public:
         PivotListIter pIter = pivots.begin();
         for ( ; pIter != pivots.end(); ++pIter ) {
             P* pivot = *pIter;
-            if ( pivot->isAlive() && pivot->isEnabled() )
+            if ( pivot->isAlive() )
                 ++pivotsNum;
         }
         return pivotsNum;
@@ -565,7 +565,7 @@ protected:
         for ( ; iter != pivots.end(); ++iter ) {
             P* pivot = (*iter);
             if ( selectAlive && 
-                 ( !pivot->isAlive() || !pivot->isEnabled() ) )
+                 ( !pivot->isAlive() ) )
                 continue;
             if ( &(pivot->getFirstNode()) == &node ||
                  &(pivot->getLastNode()) == &node )
