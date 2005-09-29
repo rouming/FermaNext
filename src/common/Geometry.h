@@ -7,14 +7,33 @@
 class DoublePoint;
 class DoubleSize;
 
+typedef DoublePoint Vector;
+
 /*****************************************************************************
  * Subsidiary 2D functions
  *****************************************************************************/
+
+inline bool comparePoints ( const DoublePoint&, const DoublePoint&,
+                            double precision );
 
 inline DoublePoint getLineSegmentsCrossPoint ( const DoublePoint&, 
                                                const DoublePoint&,
                                                const DoublePoint&, 
                                                const DoublePoint& );
+
+// returns dot product which allows vector operations in arguments
+inline double dotProduct ( const Vector&, const Vector& );
+
+// returns length of vector
+inline double normalize ( const Vector& );
+
+// returns distance = norm of difference of two vectors
+inline double normDifference ( const Vector&, const Vector& );
+
+// returns the shortest distance from point p to line segment (p1,p2)
+inline double pointToSegmentDist ( const DoublePoint& p, 
+                                   const DoublePoint& p1,
+                                   const DoublePoint& p2 );
 
 /*****************************************************************************
  * Double Point
@@ -294,8 +313,6 @@ inline const DoubleSize operator/ ( const DoubleSize& s, double c )
  * Subsidiary 2D inline functions
  *****************************************************************************/
 
-typedef DoublePoint Vector;
-
 inline bool comparePoints ( const DoublePoint& p1, const DoublePoint& p2, 
                             double precision )
 {
@@ -344,26 +361,22 @@ inline DoublePoint getLineSegmentsCrossPoint ( const DoublePoint& p11,
 }
 
 inline double dotProduct ( const Vector& v1, const Vector& v2 ) 
-// returns dot product which allows vector operations in arguments
 {
     return ( v1.x() * v2.x() + v1.y() * v2.y() );
 }
 
 inline double normalize ( const Vector& v )
-// returns length of vector
 {
     return sqrt( dotProduct( v, v ) );
 }
 
 inline double normDifference ( const Vector& v1, const Vector& v2 )
-// returns distance = norm of difference of two vectors
 {
     return normalize( v1 - v2 );
 }
 
 inline double pointToSegmentDist ( const DoublePoint& p, const DoublePoint& p1,
                                       const DoublePoint& p2 )
-// returns the shortest distance from point p to line segment (p1,p2)
 {
     Vector v1 = p2 - p1;
     Vector v2 = p - p1;
