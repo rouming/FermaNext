@@ -199,11 +199,11 @@ private:
     textFont headFont, numbersFont;
     rbuf_dynarow *windowBuf, *coordBuf, *numbersBuf, *buttonBuf;
     QPoint windowLeftTopPos, windowRightBottomPos; 
-    DoublePoint cursorCoord;
-    QSize windowSize, coordFieldSize;
     color_type canvColor, headFirstColor, headMiddleColor, 
                headLastColor, borderColor, resEllColor;
     TrussUnitWindowButton *hideButton, *rollUpButton;
+    DoublePoint cursorCoord;
+    QSize windowSize, coordFieldSize;
     mutable bool buttonBufRendered;
 
     // minimize/maximize subsidiaries

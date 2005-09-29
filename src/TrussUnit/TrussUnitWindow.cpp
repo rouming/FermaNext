@@ -1776,7 +1776,8 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
             middleColor = agg::rgba( 100, 120, 120 );
         color_type lastColor ( agg::rgba( 0, 0, 0 ) );
 
-        for( uint i = 0; i < 128; ++i)
+        uint i = 0;
+        for( ; i < 128; ++i)
             gradColors[i] = firstColor.gradient ( middleColor, i / 128.0 );
         for( ; i < 256; ++i)
             gradColors[i] = middleColor.gradient ( lastColor, (i - 128) / 128.0 );
