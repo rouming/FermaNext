@@ -27,18 +27,20 @@ void PluginManager::loadPlugins ( const QString& path )
               QDir::Name | QDir::IgnoreCase, 
               QDir::Files | QDir::Readable );
     for ( uint i = 0; i < dir.count(); i++ ) {
+        /*
         FermaNextPlugin* plugin = new FermaNextPlugin;
         try {
             PluginLoader& loader = plugin->loader;
             loader.loadLibrary( path + "/" + dir[i] );
-            PluginInfoCall pluginInfoCall = 
-                     (PluginInfoCall)loader.getProcAddress( PLUGIN_INFO_CALL );
-            PluginInfo& pluginInfo = pluginInfoCall();
-            plugin->info = pluginInfo;
+            PluginInfoCall pluginInstanceCall = 
+             (PluginInstanceCall)loader.getProcAddress( PLUGIN_INSTANCE_CALL );
+            Plugin& pluginInstance = pluginInstanceCall();
+            plugin->info = pluginInstance;
             plugins[i] = plugin;
         } catch ( ... ) {
             delete plugin;
         }
+        */
     }
 }
 
