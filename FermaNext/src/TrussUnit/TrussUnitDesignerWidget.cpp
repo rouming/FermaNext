@@ -601,7 +601,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         {
             removeWindowButtonHighlight ();
             window->releaseButtons ();
-            window->checkMouseMoveEvent( x, y );
+            window->checkMouseMoveEvent( x, y, false );
             update();
         }
         else

@@ -49,7 +49,7 @@ public:
 
     virtual QPoint getButtonBufPos () const;
 
-    virtual void checkMouseMoveEvent ( int x, int y );
+    virtual void checkMouseMoveEvent ( int x, int y, bool mousePressed );
     virtual void checkMousePressEvent ( int x, int y );
     virtual void checkMouseReleaseEvent ( int x, int y );
 
@@ -90,7 +90,7 @@ public:
                                   QPoint lastNodeClickDist );
 
     virtual TrussNode* nodesMergingComparison ( TrussNode& comparableNode, 
-                                                int precision, 
+                                                double precision, 
                                                 bool fixationCheck );
 
     virtual void mergeNodes ( TrussNode* mergingNode, TrussNode* node );
@@ -98,13 +98,6 @@ public:
     virtual void dividePivot ( TrussPivot& dividualPivot, TrussNode& dividingNode );
 
     virtual TrussPivot* findDividualPivot ( TrussNode& dividingNode ) const;
-
-    virtual DoublePointArray getPivotCrossPoints ( 
-                                    const PivotList& nonCrossingPivots ) const;
-
-    virtual TrussNode& createCrossNode ( const DoublePoint& crossPoint );
-
-    virtual void createPivotCrossNodes ( const DoublePointArray& );
 
     virtual void updateNodePosition ( TrussNode* selectedNode, 
                                       bool fixationCheck );
@@ -139,6 +132,11 @@ protected:
     virtual void hide ();
     virtual void maximize ();
     virtual void minimize ();
+
+    virtual DoublePointArray getPivotCrossPoints ( 
+                                    const PivotList& nonCrossingPivots ) const;
+    virtual TrussNode& createCrossNode ( const DoublePoint& crossPoint );
+    virtual void createPivotCrossNodes ( const DoublePointArray& );
 
     virtual QString fitTextToWindowSize ( QString str, int lengthLimit, 
                                           glyph_gen& glyph ) const;
