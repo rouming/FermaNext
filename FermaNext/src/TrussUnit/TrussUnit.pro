@@ -19,7 +19,8 @@ INCLUDEPATH = $$(AGGDIR)/include \
               ../common \
               ../Agg
 
-SOURCES = Truss.cpp \
+SOURCES = \
+          Truss.cpp \
           TrussLoad.cpp \
           TrussMaterial.cpp \
           TrussNode.cpp \
@@ -30,9 +31,11 @@ SOURCES = Truss.cpp \
           TrussUnitDesignerWindow.cpp \
           TrussUnitToolBar.cpp \
           TrussUnitWindow.cpp \
+          TrussUnitWindowButton.cpp \
           TrussUnitWindowManager.cpp
 
-HEADERS = Truss.h \
+HEADERS = \
+          Truss.h \
           TrussLoad.h \
           TrussMaterial.h \
           TrussTopology.h \
@@ -42,6 +45,7 @@ HEADERS = Truss.h \
           TrussUnitDesignerWindow.h \
           TrussUnitToolBar.h \
           TrussUnitWindow.h \
+          TrussUnitWindowButton.h \
           TrussUnitWindowManager.h
 
 

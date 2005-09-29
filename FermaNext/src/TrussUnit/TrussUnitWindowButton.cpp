@@ -8,12 +8,12 @@
 TrussUnitWindowButton::TrussUnitWindowButton ( const QPoint& pos, 
                                                const QString& fname ) :
     AggButton ( pos, headWidth - 11, headWidth - 11 ),
+    windowHighlighted( true ),
     edgingCol( agg::rgba( 0, 0, 0, 0.7 ) ),
     normalCol( agg::rgba( 20, 60, 80, 0.5 ) ),
     highlightCol( agg::rgba( 1, 1, 1, 0.5 ) ), 
     pressedCol( agg::rgba( 65, 90, 110, 0.7 ) ),
-    lineCol( agg::rgba( 10, 10, 10 ) ),
-    windowHighlighted( true )
+    lineCol( agg::rgba( 10, 10, 10 ) )
 {
     parseSvg ( pathRend, fname.ascii() );    
 }
@@ -77,7 +77,8 @@ void TrussUnitWindowButton::paint ( ren_dynarow& baseRend,
 
     mtx *= agg::trans_affine_translation( 0, 1 );
     interpolator inter ( mtx );
-    for( uint i = 0; i < 128; ++i)
+    uint i = 0;
+    for(; i < 128; ++i)
     {
         gradColors[i] = barFirstColor.gradient ( barMiddleColor, i / 128.0 );
     }
