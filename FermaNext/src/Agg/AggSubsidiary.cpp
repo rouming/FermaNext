@@ -117,7 +117,7 @@ void drawOutlineRoundedRect ( solidRenderer& solidRend, scanline_rasterizer& ras
                                   point2.x(), point2.y(), cornerRadius );
     solidRend.color ( color );
     agg::conv_stroke<agg::rounded_rect> stroke(rectangle);
-    stroke.width ( 1.0 );
+    stroke.width ( 1.2 );
     ras.add_path ( stroke );
     agg::render_scanlines(ras, sl, solidRend);
 }
