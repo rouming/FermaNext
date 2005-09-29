@@ -212,8 +212,7 @@ void TrussUnitDesignerWidget::removeTrussElemHighlight ()
     {
         TrussUnitWindow* window = (*iter);
         window->setResizeEllipseHighlighted ( TrussUnitWindow::None );
-
-        window->releaseButtons ();
+        //window->releaseButtons ();
         if ( nodeBehaviour == onNodeSelect )
             window->removeNodesHighlight ();
         if ( pivotBehaviour == onPivotSelect )
@@ -601,6 +600,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         if ( window )
         {
             removeWindowButtonHighlight ();
+            window->releaseButtons ();
             window->checkMouseMoveEvent( x, y );
             update();
         }
