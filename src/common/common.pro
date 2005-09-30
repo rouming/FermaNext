@@ -14,7 +14,9 @@ win32 {
 unix {
 }
 
-SOURCES = Benchmark.cpp \
+SOURCES = \
+          Benchmark.cpp \
+          DynaLoader.cpp \
           ObjectState.cpp \
           ObjectStateManager.cpp \
           PluginLoader.cpp \
@@ -22,8 +24,10 @@ SOURCES = Benchmark.cpp \
           StatefulObject.cpp \
           SubsidiaryConstants.cpp \
 
-HEADERS = AbstractObjectAction.h \
+HEADERS = \
+          AbstractObjectAction.h \
           Benchmark.h \
+          DynaLoader.h \
           Geometry.h \
           ObjectState.h \
           ObjectStateManager.h \

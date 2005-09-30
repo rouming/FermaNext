@@ -18,12 +18,17 @@
   #define StandardCall
 #endif
 
+#include <qglobal.h>
+#include <qcstring.h>
+
 class Plugin;
 class TrussTopology;
 class CalcData;
 
+typedef Q_UINT16 PluginChecksum;
+
 // Plugin signature.
-typedef Plugin& ( StandardCall *PluginInstanceCall ) ();
+typedef Plugin* ( StandardCall *PluginInstanceCall ) ();
 
 enum PluginType { 
                   CALCULATION_PLUGIN  = 0x0001, 
@@ -31,7 +36,7 @@ enum PluginType {
                 };
 
 // Plain Old Data for plugin info.
-// Plugin name should be short and unique in system context.
+// Plugin name should be short and unique in a system context.
 struct PluginInfo
 {
     const char* name;
@@ -42,7 +47,9 @@ struct PluginInfo
 class Plugin
 {
 public:
-    virtual PluginInfo& pluginInfo () const = 0;
+    virtual PluginChecksum pluginChecksum () const
+    { return qChecksum( pluginInfo().name, qstrlen(pluginInfo().name) ); }
+    virtual const PluginInfo& pluginInfo () const = 0;
     virtual PluginType pluginType () const = 0;
     virtual bool dependsOn ( PluginType ) const = 0;
     //    virtual void calculate ( TrussTopology&, CalcData& ) const = 0;
@@ -69,8 +76,14 @@ public:
 
 
 // Define OS independent macros to provide init and fini functions
-// in dynamic libraries.
+// in dynamic libraries and plugin export macros.
 // Example:
+//
+// Export plugin: 
+// class SomeCalcPlugin : public CalculationPlugin
+// {   
+// };
+// FERMA_NEXT_PLUGIN(SomeCalcPlugin);
 // 
 // Init code: 
 // FERMA_NEXT_PLUGIN_INIT
@@ -101,9 +114,10 @@ public:
     caller_fini__ fini__; \
     void fini_plugin__ ()
 
-  #define FERMA_NEXT_PLUGIN(info) \
-    PluginExport PluginInfo& PLUGIN_INFO () \
-    { return info; } \
+  #define FERMA_NEXT_PLUGIN(PluginClass) \
+    static PluginClass plugin_instance__; \
+    PluginExport Plugin* StandardCall PLUGIN_INSTANCE () \
+    { return &plugin_instance__; } \
     \
     typedef void (* InitFiniCall__) (); \
     template <typename Call> \
@@ -138,9 +152,10 @@ public:
   #define FERMA_NEXT_PLUGIN_FINI \
     __attribute__((destructor)) void fini_plugin__ ()
 
-  #define FERMA_NEXT_PLUGIN(info) \
-    PluginExport PluginInfo& StandardCall PLUGIN_INFO () \
-    { return info; }
+  #define FERMA_NEXT_PLUGIN(PluginClass) \
+    static PluginClass plugin_instance__; \
+    PluginExport Plugin* StandardCall PLUGIN_INSTANCE () \
+    { return &plugin_instance__; }
 #endif
 
 

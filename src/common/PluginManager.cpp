@@ -1,5 +1,6 @@
 
 #include "PluginManager.h"
+#include "PluginLoader.h"
 #include <qdir.h>
 
 /*****************************************************************************
@@ -23,24 +24,16 @@ void PluginManager::clean ()
 void PluginManager::loadPlugins ( const QString& path )
 {
     clean();
-    QDir dir( path, "*." + PluginLoader::libExtension(),
+    QDir dir( path, "*." + DynaLoader::libExtension(),
               QDir::Name | QDir::IgnoreCase, 
               QDir::Files | QDir::Readable );
     for ( uint i = 0; i < dir.count(); i++ ) {
-        /*
-        FermaNextPlugin* plugin = new FermaNextPlugin;
         try {
-            PluginLoader& loader = plugin->loader;
-            loader.loadLibrary( path + "/" + dir[i] );
-            PluginInfoCall pluginInstanceCall = 
-             (PluginInstanceCall)loader.getProcAddress( PLUGIN_INSTANCE_CALL );
-            Plugin& pluginInstance = pluginInstanceCall();
-            plugin->info = pluginInstance;
-            plugins[i] = plugin;
-        } catch ( ... ) {
-            delete plugin;
-        }
-        */
+            PluginLoader* loader = new PluginLoader( path + "/" + dir[i] );
+            Plugin& pluginInstance = loader->pluginInstance();
+            PluginHandle handle = pluginInstance.pluginChecksum();
+            plugins[handle] = loader;
+        } catch ( ... ) { }
     }
 }
 
@@ -57,13 +50,13 @@ void PluginManager::unloadPlugin ( const PluginHandle& h )
     }
 }
 
-FermaNextPluginInfo& PluginManager::findPluginInfo ( const PluginHandle& h ) 
+Plugin& PluginManager::findPlugin ( const PluginHandle& h ) 
     throw (FindException)
 {
     if ( ! plugins.contains(h) )
         throw FindException();
-    FermaNextPlugin* plugin = plugins[h];
-    return plugin->info;
+    PluginLoader* loader = plugins[h];
+    return loader->pluginInstance();
 }
 
 PluginHandleList PluginManager::loadedPlugins () const
@@ -81,17 +74,18 @@ QStringList PluginManager::loadedPluginsNames () const
     QStringList names;
     PluginsMapConstIter iter = plugins.begin();
     for ( ; iter != plugins.end(); ++iter ) {
-        names.push_back( iter.data()->info.name );
+        names.push_back( iter.data()->pluginInstance().pluginInfo().name );
     }        
     return names;
 }
 
-PluginHandleList PluginManager::loadedPluginsOfType ( const PluginType& type ) const
+PluginHandleList PluginManager::loadedPluginsOfType ( 
+                                                 const PluginType& type ) const
 {
     PluginHandleList handles;
     PluginsMapConstIter iter = plugins.begin();
     for ( ; iter != plugins.end(); ++iter ) {
-        if ( iter.data()->info.type == type )
+        if ( iter.data()->pluginInstance().pluginType() == type )
             handles.push_back( iter.key() );
     }    
     return handles;
