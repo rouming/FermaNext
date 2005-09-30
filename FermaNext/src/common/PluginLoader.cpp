@@ -1,73 +1,39 @@
 
 #include "PluginLoader.h"
+#include "Plugin.h"
 
 /*****************************************************************************
- * Dynamic Plugin Loader
+ * Plugin Loader
  *****************************************************************************/
 
-#include <qfile.h>
-
-PluginLoader::PluginLoader () :
-    handle(0)
-{}
-
-PluginLoader::PluginLoader ( const QString& fileName )
-    throw (LibraryLoadException) :
-    handle(0)
+PluginLoader::PluginLoader ( const QString& pluginName ) 
+    throw (PluginLoadException) 
+    try :  dynaLoader( pluginName )
 {
-    loadLibrary( fileName );
+    PluginInstanceCall pluginInstanceCall = 
+         (PluginInstanceCall)dynaLoader.getProcAddress( PLUGIN_INSTANCE_CALL );
+    plugin = pluginInstanceCall();
+    if ( plugin == 0 )
+        throw PluginLoadException();
+}
+catch ( ... )
+{
+    throw PluginLoadException();
 }
 
 PluginLoader::~PluginLoader ()
 {
-    freeLibrary();
+    dynaLoader.freeLibrary();
 }
 
-const QString& PluginLoader::libExtension ()
-{
-#if defined WINDOWS || defined WIN32
-    static QString extension = "dll";
-#else
-    static QString extension = "so";
-#endif
-    return extension;
+Plugin& PluginLoader::pluginInstance ()
+{ 
+    return *plugin;
 }
 
-void PluginLoader::loadLibrary ( const QString& fileName ) 
-    throw (LibraryLoadException)
-{
-    freeLibrary();
-#if defined UNICODE && (defined WINDOWS || defined WIN32)
-    handle = dl_open(fileName.ucs2());
-#else
-    handle = dl_open(QFile::encodeName(fileName));
-#endif
-    if ( handle == 0 )
-        throw LibraryLoadException();
-}
-
-bool PluginLoader::freeLibrary ()
-{
-    if ( handle ) {
-        bool res = dl_close(handle);
-        handle = 0;
-        return res;
-    }
-    return false;
-}
-
-ProcAddress PluginLoader::getProcAddress ( const QString& funcName ) const
-    throw (AddressException)
-{
-    ProcAddress address = dl_sym(handle, funcName.ascii());
-    if ( address == 0 )
-        throw AddressException();
-    return address;
-}
-
-bool PluginLoader::isLoaded () const
-{
-    return handle != 0;
+const Plugin& PluginLoader::pluginInstance () const
+{ 
+    return *plugin;
 }
 
 /*****************************************************************************/
