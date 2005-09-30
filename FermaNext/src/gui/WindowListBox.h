@@ -24,6 +24,9 @@ public:
     virtual bool isShown () const;
     virtual bool isAlive () const;
 
+protected:
+    virtual void saveVisibilityChange ( bool );
+
 public slots:
     virtual void setText ( const QString& );
 
@@ -40,6 +43,7 @@ public slots:
 protected slots:
     virtual void trussWindowDesisted ();
     virtual void trussWindowRevived ();
+    virtual void update ();
 
 private:
     WindowListBox& listBox;

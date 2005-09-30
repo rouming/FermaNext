@@ -26,6 +26,9 @@ TrussUnitWindowItem::TrussUnitWindowItem ( FermaNextProject& prj,
     // Catch renaming
     QObject::connect( &truss, SIGNAL(onTrussNameChange(const QString&)),
                               SLOT(setText(const QString&)) );
+    //Catch visible changing
+    QObject::connect( &truss, SIGNAL(onVisibleChange(bool)),
+                              SLOT(update()) );
     // Catch life time changing
     QObject::connect( &truss, SIGNAL(onAfterDesist(StatefulObject&)), 
                               SLOT(trussWindowDesisted()) );
@@ -41,6 +44,20 @@ void TrussUnitWindowItem::trussWindowDesisted ()
 void TrussUnitWindowItem::trussWindowRevived ()
 {
     listBox.trussWindowRevived( trussWindow );
+}
+
+void TrussUnitWindowItem::update ()
+{
+    listBox.triggerUpdate(true);
+}
+
+void TrussUnitWindowItem::saveVisibilityChange ( bool visible )
+{
+    // Save visibility change to undo-redo
+    ObjectState& state = trussWindow.createState();
+    state.addAction( new TrussUnitWindowVisibilityChange( trussWindow, 
+                                                          visible ) );
+    state.save();
 }
 
 const QPixmap* TrussUnitWindowItem::pixmap () const
@@ -126,7 +143,9 @@ void TrussUnitWindowItem::show ()
     if ( trussWindow.isVisible() )
         return;
     trussWindow.setVisible( true );
+    saveVisibilityChange( true );
     raise();
+    update();
 }
 
 void TrussUnitWindowItem::hide ()
@@ -134,7 +153,8 @@ void TrussUnitWindowItem::hide ()
     if ( ! trussWindow.isVisible() )
         return;
     trussWindow.setVisible( false );
-
+    saveVisibilityChange( false );
+    update();
 }
 
 void TrussUnitWindowItem::selectInGroup ()

@@ -70,6 +70,11 @@ void TrussUnitWindow::clearButtonBufRenderedFlag ()
 
 void TrussUnitWindow::hide ()
 {
+    // Save visibility change to undo-redo
+    ObjectState& state = createState();
+    state.addAction( new TrussUnitWindowVisibilityChange( *this, false ) );
+    state.save();
+
     setVisible( false );
 }
 

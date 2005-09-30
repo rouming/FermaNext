@@ -120,4 +120,16 @@ public:
     void unexecute ();
 };
 
+class TrussUnitWindowVisibilityChange : public TrussUnitWindowAction
+{
+public:
+    TrussUnitWindowVisibilityChange ( TrussUnitWindow&, bool );
+
+    void execute ();
+    void unexecute ();
+
+private:
+    bool visible;
+};
+
 #endif //TRUSSUNITACTIONS_H
