@@ -32,6 +32,8 @@ void PluginManager::loadPlugins ( const QString& path )
             PluginLoader* loader = new PluginLoader( path + "/" + dir[i] );
             Plugin& pluginInstance = loader->pluginInstance();
             PluginHandle handle = pluginInstance.pluginChecksum();
+            if ( plugins.contains(handle) )
+                delete plugins[handle];
             plugins[handle] = loader;
         } catch ( ... ) { }
     }
