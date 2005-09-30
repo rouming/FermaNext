@@ -2,6 +2,7 @@
 #ifndef OLD_SIMPLECALC_H
 #define OLD_SIMPLECALC_H
 
+#include "Plugin.h"
 #include "TrussTopology.h"
 #include "FRMWriter.h"
 #include "VYVReader.h"
@@ -10,13 +11,24 @@
 
 const QString fermaResExt = ".vyv";
 
-class SimpleCalcPlugin //: public Plugin
+PluginInfo inf = { "SimpleOldCalcPlugin", "Just calculation" };
+
+class SimpleCalcPlugin : public Plugin
 {
 public:
     SimpleCalcPlugin ()
     { createTempFile(); }
     virtual ~SimpleCalcPlugin ()
     { destroyTempFile(); }
+
+    const PluginInfo& pluginInfo () const
+    { return inf; }
+
+    PluginType pluginType () const
+    { return CALCULATION_PLUGIN; }
+
+    bool dependsOn ( PluginType ) const
+    { return false; }
 
     void calculate ( TrussTopology& truss, CalcData& data )
     {
