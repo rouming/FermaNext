@@ -13,13 +13,13 @@
  * Old Simple Calculation plugin (main init/fini routines)
  *****************************************************************************/
 
-PluginInfo inf = { "SimpleOldCalc", "Just calculation", CALCULATION_PLUGIN };
-FERMA_NEXT_PLUGIN(inf)
+FERMA_NEXT_PLUGIN(os_dependent_SimpleCalcPlugin)
 
+    /*
 PluginExport void StandardCall calculation ( TrussTopology& truss,
                                              CalcData& data  )
 {
     plugin.calculate( truss, data );
 }
-
+*/
 /*****************************************************************************/

@@ -6,7 +6,7 @@
 #include <qsocketdevice.h>
 #include <qthread.h>
 
-class UnixSimpleCalcPlugin : public SimpleCalcPlugin
+class os_dependent_SimpleCalcPlugin : public SimpleCalcPlugin
 {
 private:
     // Calculation thread
@@ -21,7 +21,7 @@ private:
     };
 
 public:    
-    UnixSimpleCalcPlugin ()
+    os_dependent_SimpleCalcPlugin ()
     {
         calcThread.start();
         // Should wait a little to be sure server is started
@@ -29,7 +29,7 @@ public:
         socket.connect( QHostAddress("127.0.0.1"), 1212 );
     }
 
-    ~UnixSimpleCalcPlugin ()
+    ~os_dependent_SimpleCalcPlugin ()
     {
         QString msg("quit\n");
         socket.writeBlock( msg, msg.length() );
@@ -61,7 +61,5 @@ private:
     QSocketDevice socket;
     CalcThread calcThread;
 };
-
-UnixSimpleCalcPlugin plugin;
 
 #endif //UNIX_SIMPLECALC_H

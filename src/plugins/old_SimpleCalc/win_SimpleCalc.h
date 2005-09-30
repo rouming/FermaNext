@@ -2,22 +2,22 @@
 #ifndef WIN_SIMPLECALC_H
 #define WIN_SIMPLECALC_H
 
-#include "PluginLoader.h"
+#include "DynaLoader.h"
 
 const QString calcDLLName = "plugins/win_Simple_f.dll";
 const QString calcProcName = "SimpleFerma";
 
-class WinSimpleCalcPlugin : public SimpleCalcPlugin
+class os_dependent_SimpleCalcPlugin : public SimpleCalcPlugin
 {
 public:
-    WinSimpleCalcPlugin () :
+    os_dependent_SimpleCalcPlugin () :
         simpleCalc(0)
     {
         loader.loadLibrary( calcDLLName );
         simpleCalc = (SimpleFerma)loader.getProcAddress( calcProcName );
     }
 
-    ~WinSimpleCalcPlugin ()
+    ~os_dependent_SimpleCalcPlugin ()
     {
         loader.freeLibrary();
     }
@@ -29,10 +29,8 @@ public:
 
 private:
     typedef void  ( StandardCall *SimpleFerma ) ( const char* );
-    PluginLoader loader;
+    DynaLoader loader;
     SimpleFerma simpleCalc;
 };
-
-WinSimpleCalcPlugin plugin;
 
 #endif //WIN_SIMPLECALC_H
