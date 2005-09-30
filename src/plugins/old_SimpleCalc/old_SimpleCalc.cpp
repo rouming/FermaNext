@@ -1,7 +1,6 @@
 
 #include "old_SimpleCalc.h"
 #include "Plugin.h"
-#include <stdio.h>
 
 #if defined WINDOWS || defined WIN32  
   #include "win_SimpleCalc.h"
