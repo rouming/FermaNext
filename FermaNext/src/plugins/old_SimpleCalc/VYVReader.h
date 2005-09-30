@@ -4,8 +4,9 @@
 
 #include <qmemarray.h>
 
-struct CalcData
+class CalcData
 {
+public:
     int nodesNum;                     //nodes number
     int pivotsNum;                    //pivots number
     int loadsNum;                     //load cases number
