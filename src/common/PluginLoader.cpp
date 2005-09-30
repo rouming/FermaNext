@@ -7,18 +7,22 @@
  *****************************************************************************/
 
 PluginLoader::PluginLoader ( const QString& pluginName ) 
-    throw (PluginLoadException) 
-    try :  dynaLoader( pluginName )
+    throw (PluginLoadException)
 {
-    PluginInstanceCall pluginInstanceCall = 
-         (PluginInstanceCall)dynaLoader.getProcAddress( PLUGIN_INSTANCE_CALL );
-    plugin = pluginInstanceCall();
-    if ( plugin == 0 )
+    try {
+        dynaLoader.loadLibrary( pluginName );
+        PluginInstanceCall pluginInstanceCall = (PluginInstanceCall)
+                   dynaLoader.getProcAddress( PLUGIN_INSTANCE_CALL );
+        plugin = pluginInstanceCall();
+        if ( plugin == 0 )
+            throw PluginLoadException();
+    }
+    catch ( ... )
+    {
+        if ( dynaLoader.isLoaded() )
+            dynaLoader.freeLibrary();
         throw PluginLoadException();
-}
-catch ( ... )
-{
-    throw PluginLoadException();
+    }
 }
 
 PluginLoader::~PluginLoader ()
