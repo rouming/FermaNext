@@ -130,7 +130,7 @@ void TrussPivotChangeNodeAction::unexecute ()
 }
 
 /*****************************************************************************
- * Truss Unit Actions
+ * Truss Unit Window Actions
  *****************************************************************************/
 
 TrussUnitWindowAction::TrussUnitWindowAction ( TrussUnitWindow& t_ ) :
@@ -142,7 +142,7 @@ TrussUnitWindow& TrussUnitWindowAction::getTruss ()
     return truss; 
 }
 
-/**** Truss Unit Create Action ***/
+/**** Truss Unit Window Create Action ***/
 
 TrussUnitWindowCreateAction::TrussUnitWindowCreateAction (
                                                TrussUnitWindow& t_ ) :
@@ -161,7 +161,7 @@ void TrussUnitWindowCreateAction::unexecute ()
     emit actionUnexecuted(*this);
 }
 
-/**** Truss Unit Remove Action ***/
+/**** Truss Unit Window Remove Action ***/
 
 TrussUnitWindowRemoveAction::TrussUnitWindowRemoveAction (
                                              TrussUnitWindow& t_ ) :
@@ -177,6 +177,26 @@ void TrussUnitWindowRemoveAction::execute ()
 void TrussUnitWindowRemoveAction::unexecute ()
 {
     getTruss().revive();
+    emit actionUnexecuted(*this);
+}
+
+/**** Truss Unit Window Visibility Change  ***/
+
+TrussUnitWindowVisibilityChange::TrussUnitWindowVisibilityChange ( 
+                                              TrussUnitWindow& t_, bool v_ ) :
+    TrussUnitWindowAction( t_ ), 
+    visible( v_ )
+{}
+
+void TrussUnitWindowVisibilityChange::execute ()
+{        
+    getTruss().setVisible(visible);
+    emit actionExecuted(*this);
+}
+
+void TrussUnitWindowVisibilityChange::unexecute ()
+{
+    getTruss().setVisible(!visible);
     emit actionUnexecuted(*this);
 }
 
