@@ -116,7 +116,7 @@ public:
 
   #define FERMA_NEXT_PLUGIN(PluginClass) \
     static PluginClass plugin_instance__; \
-    PluginExport Plugin* StandardCall PLUGIN_INSTANCE () \
+    PluginExport Plugin* PLUGIN_INSTANCE () \
     { return &plugin_instance__; } \
     \
     typedef void (* InitFiniCall__) (); \
@@ -154,7 +154,7 @@ public:
 
   #define FERMA_NEXT_PLUGIN(PluginClass) \
     static PluginClass plugin_instance__; \
-    PluginExport Plugin* StandardCall PLUGIN_INSTANCE () \
+    PluginExport Plugin* PLUGIN_INSTANCE () \
     { return &plugin_instance__; }
 #endif
 
