@@ -94,6 +94,10 @@ SOURCE=.\Benchmark.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\DynaLoader.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\ObjectState.cpp
 # End Source File
 # Begin Source File
@@ -156,6 +160,10 @@ InputName=AbstractObjectAction
 # Begin Source File
 
 SOURCE=.\Benchmark.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\DynaLoader.h
 # End Source File
 # Begin Source File
 
