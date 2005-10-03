@@ -2,6 +2,7 @@
 #include "WindowListBox.h"
 #include "SubsidiaryConstants.h"
 #include "TrussUnitActions.h"
+#include "FermaNextWorkspace.h"
 
 #include <qstring.h>
 #include <qcursor.h>
@@ -179,7 +180,22 @@ void TrussUnitWindowItem::unselectAllFromGroup ()
 
 void TrussUnitWindowItem::calculate ()
 {
-    //TODO: add calculation call here!
+    FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
+    bool pluginsLoaded = wsp.loadPlugins();
+    if ( ! pluginsLoaded )
+        // Plugins are not supported
+        return;
+    PluginManager& plgManager = wsp.pluginManager();
+    PluginHandleList pluginHandles = 
+                          plgManager.loadedPluginsOfType( CALCULATION_PLUGIN );
+    if ( pluginHandles.size() == 0 )
+        return;
+    try {
+        Plugin& calcPlugin = plgManager.findPlugin( pluginHandles[0] );
+        //Truss
+        //calcPlugin.calculate( trussWindow,
+    }
+    catch ( ... ) {}                
 }
 
 void TrussUnitWindowItem::remove ()

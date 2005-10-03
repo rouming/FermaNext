@@ -364,8 +364,8 @@ void FermaNextMainFrame::reloadPlugins ()
     bool pluginsLoaded = wsp.loadPlugins();
     if ( ! pluginsLoaded )
         return;
-    PluginManager& loader = wsp.pluginManager();
-    QStringList names = loader.loadedPluginsNames();
+    PluginManager& plgManager = wsp.pluginManager();
+    QStringList names = plgManager.loadedPluginsNames();
 
     if ( pluginsMenu == 0 ) {
         pluginsMenu = new QPopupMenu( this );
