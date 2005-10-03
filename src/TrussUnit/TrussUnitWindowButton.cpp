@@ -7,7 +7,7 @@
 
 TrussUnitWindowButton::TrussUnitWindowButton ( const QPoint& pos, 
                                                const QString& fname ) :
-    AggButton ( pos, headWidth - 11, headWidth - 11 ),
+    AggButton ( pos, headWidth - 6, headWidth - 6 ),
     windowHighlighted( true ),
     edgingCol( agg::rgba( 0, 0, 0, 0.7 ) ),
     normalCol( agg::rgba( 20, 60, 80, 0.5 ) ),
@@ -31,7 +31,7 @@ void TrussUnitWindowButton::paint ( ren_dynarow& baseRend,
                                     agg::scanline_p8& sl, 
                                     solidRenderer& solidRend ) const
 {
-    double scaleX = 0.15, scaleY = 0.15;
+    double scaleX = 0.13, scaleY = 0.13;
     int width = getWidth ();
     int height = getHeight ();
     QPoint topPos = getPosition ();
@@ -47,7 +47,7 @@ void TrussUnitWindowButton::paint ( ren_dynarow& baseRend,
 
     color_type barMiddleColor ( agg::rgba( 1, 15, 25 ) );
     if ( ! windowHighlighted )
-        barMiddleColor = agg::rgba( 25, 35, 25 );
+        barMiddleColor = agg::rgba( 1, 1, 1 );
 
     color_type barLastColor ( agg::rgba( 0, 0, 0 ) );
 
@@ -59,14 +59,14 @@ void TrussUnitWindowButton::paint ( ren_dynarow& baseRend,
         
         if ( isHighlighted() )
             if ( ! windowHighlighted )
-                barMiddleColor = agg::rgba( 1, 1, 1 );
+                barMiddleColor = agg::rgba( 30, 30, 1 );
             else
-                barMiddleColor = agg::rgba( 70, 1, 1 );
+                barMiddleColor = agg::rgba( 50, 1, 1 );
     }
     else
     {
-        agg::rounded_rect button ( topPos.x() + 1, topPos.y() + 2, bottomPos.x() - 1, 
-                                   bottomPos.y(), width / 4 );
+        agg::rounded_rect button ( topPos.x(), topPos.y() + 2, bottomPos.x(), 
+                                   bottomPos.y() + 1, width / 4 );
         ras.add_path ( button );
     }
 
@@ -77,23 +77,20 @@ void TrussUnitWindowButton::paint ( ren_dynarow& baseRend,
 
     mtx *= agg::trans_affine_translation( 0, 1 );
     interpolator inter ( mtx );
-    uint i = 0;
-    for(; i < 128; ++i)
-    {
-        gradColors[i] = barFirstColor.gradient ( barMiddleColor, i / 128.0 );
-    }
-    for(; i < 256; ++i)
-    {
-        gradColors[i] = barMiddleColor.gradient ( barLastColor, (i - 128) / 128.0 );
-    }
+    fillColorArray( gradColors, barFirstColor, barMiddleColor, barLastColor );
     linear_gradient_span_gen gradSpanGen ( gradSpan, inter, gradFunc, gradColors, 
                                            -height, 2*height );
     linear_gradient_renderer gradRend ( baseRend, gradSpanGen );
 
     agg::render_scanlines( ras, sl, gradRend );
-
+    if( isPressed() )
+    {
+        scaleX = 0.12; 
+        scaleY = 0.12;
+        mtx *= agg::trans_affine_translation( 0, 11 );
+    }
     QPoint iconPos( int(( topPos.x() + width / 6 ) / scaleX), 
-                    int(( topPos.y() - 1 ) / scaleY) );
+                    int(( topPos.y() + 1 ) / scaleY) );
     drawSvg ( baseRend, ras, sl, pathRend, solidRend, mtx, iconPos.x(), 
               iconPos.y(), scaleX, scaleY, svgExpand, svgGamma );
 }

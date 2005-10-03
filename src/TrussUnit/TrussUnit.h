@@ -106,11 +106,6 @@ public:
                         double scaleMultX, double scaleMultY,
                         int lineWidth, color_type color ) const;
 
-    void drawGradientEllipse ( scanline_rasterizer& ras, ren_dynarow& baseRend,
-                               agg::scanline_p8& sl, double x, double y, 
-                               int radius, color_type begin, color_type middle,
-                               color_type end ) const;
-
     void paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
                 double trussAreaHeight ) const;
 

@@ -151,10 +151,7 @@ protected:
                                 solidRenderer& solidRend,
                                 scanline_rasterizer& ras, 
                                 agg::scanline_p8& sl, 
-                                gradient_span_alloc& gradSpan, 
-                                linear_gradient& gradFunc, 
-                                color_array_type& gradColors, 
-                                agg::trans_affine& mtx ) const;
+                                color_array_type& gradColors ) const;
 
     virtual void drawCursorCoordinatesField ( ren_dynarow& baseRend,
                                               textRenderer& textRend,
@@ -167,7 +164,7 @@ protected:
                                   ren_dynarow& baseRend, 
                                   solidRenderer& solidRend, 
                                   scanline_rasterizer& ras, 
-                                 agg::scanline_p8& sl ) const;
+                                  agg::scanline_p8& sl ) const;
 
     virtual void drawPivotNumber ( TrussPivot* pivot, 
                                    ren_dynarow& baseRend, 
@@ -185,6 +182,16 @@ protected:
                                         agg::scanline_p8& sl, 
                                         QPoint pos ) const;
 
+    virtual void drawResizeEllipses ( solidRenderer& solidRend, 
+                                      scanline_rasterizer& ras, 
+                                      agg::scanline_p8& sl ) const;
+
+    virtual void drawCalcIndicator ( ren_dynarow& baseRend, 
+                                     solidRenderer& solidRend,
+                                     scanline_rasterizer& ras, 
+                                     agg::scanline_p8& sl, 
+                                     color_array_type& gradColors,
+                                     const QPoint& pos ) const;
 signals:
     void onResize ( QSize oldS, QSize newS );
     void onMove ( QPoint oldP, QPoint newP );
@@ -204,7 +211,7 @@ private:
     TrussUnitWindowButton *hideButton, *rollUpButton;
     DoublePoint cursorCoord;
     QSize windowSize, coordFieldSize;
-    mutable bool buttonBufRendered;
+    mutable bool buttonBufRendered, coordFieldRendered;
 
     // minimize/maximize subsidiaries
     bool maximized;
