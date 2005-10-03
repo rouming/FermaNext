@@ -1,5 +1,6 @@
 
 #include "VYVReader.h"
+#include "TrussCalcData.h"
 #include <qfile.h>
 #include <cmath>
 #include <qstring.h>
@@ -8,7 +9,7 @@
  * VYV Reader
  *****************************************************************************/
 
-VYVReader::VYVReader ( CalcData& data_ ) :
+VYVReader::VYVReader ( TrussCalcData& data_ ) :
     Data(data_)
 {} 
 
