@@ -2,6 +2,7 @@
 #ifndef TRUSSUNITCALCDATAMANAGER_H
 #define TRUSSUNITCALCDATAMANAGER_H
 
+#include "TrussCalcData.h"
 #include <vector>
 #include <qmap.h>
 #include <qdatetime.h>
@@ -17,9 +18,9 @@ protected:
     protected:
         class CalcCortege
         {
-            PluginInfo plugin;
+            PluginHandle plugin;
             TrussTopology& topology;
-            CalcData calcData;
+            TrussCalcData calcData;
             QDateTime calcDateTime;
         };
 

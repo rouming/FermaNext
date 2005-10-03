@@ -44,7 +44,7 @@ public:
 class TrussTopology : public Truss<TrussTopologyNode, TrussTopologyPivot>
 {
 public:
-    TrussTopology ( ObjectStateManager* mng ) :
+    TrussTopology ( ObjectStateManager* mng = 0 ) :
         Truss<TrussTopologyNode, TrussTopologyPivot>(mng)
     {}
 };
