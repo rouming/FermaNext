@@ -29,6 +29,7 @@ TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
     firstNodeClickDist(0,0), 
     lastNodeClickDist(0,0),
     toolBar( new TrussUnitToolBar( QPoint(0,0), 15, 15, 8, 5, 5, 30 ) ),
+    buttonPressed(false),
     // Temp
     X(50), Y(50)
 {
@@ -601,7 +602,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         {
             removeWindowButtonHighlight ();
             window->releaseButtons ();
-            window->checkMouseMoveEvent( x, y, false );
+            window->checkMouseMoveEvent( x, y, buttonPressed );
             update();
         }
         else
@@ -715,6 +716,8 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
 
 void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
 {
+    buttonPressed = false;
+
     int x = me->x();
     int y = flipY ? height() - me->y() : me->y();
 
@@ -849,6 +852,7 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
         if ( selectedWindow->inHideButtonRect( clickX, clickY ) ||
              selectedWindow->inRollUpButtonRect( clickX, clickY ) )
         {
+            buttonPressed = true;
             selectedWindow->checkMousePressEvent( clickX, clickY );
             update();
         }

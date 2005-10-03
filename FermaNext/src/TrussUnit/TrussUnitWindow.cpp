@@ -9,19 +9,20 @@
 TrussUnitWindow::TrussUnitWindow ( const QString& name, 
                                    ObjectStateManager* mng ) :
     TrussUnit(name, mng),
-    headFont(agg::verdana16_bold),
+    headFont(agg::verdana14_bold),
     numbersFont(agg::verdana13),
     windowBuf( new rbuf_dynarow( 250, 250 ) ),
-    coordBuf( new rbuf_dynarow( 100, 12 ) ),
-    numbersBuf( new rbuf_dynarow( 60, 12 ) ),
-    buttonBuf( new rbuf_dynarow( 40, 18 ) ),
-    hideButton( new TrussUnitWindowButton( QPoint( 25, 1 ),
+    coordBuf( new rbuf_dynarow( 100, 10 ) ),
+    numbersBuf( new rbuf_dynarow( 60, 10 ) ),
+    buttonBuf( new rbuf_dynarow( 36, 16 ) ),
+    hideButton( new TrussUnitWindowButton( QPoint( 22, 1 ),
                 imagesSvgPath() + "/closeIcon.svg" ) ),
-    rollUpButton( new TrussUnitWindowButton( QPoint( 8, 1 ),
+    rollUpButton( new TrussUnitWindowButton( QPoint( 7, 1 ),
                   imagesSvgPath() + "/rollUpIcon.svg" ) ),
     cursorCoord ( -1, -1 ),
     windowSize ( 250, 250),
     coordFieldSize ( 49, 12 ),
+    coordFieldRendered( false ),
     buttonBufRendered( false ),
     maximized( false )
 {
@@ -212,7 +213,11 @@ void TrussUnitWindow::setWindowSize ( int width, int height )
 
 void TrussUnitWindow::setCursorCoord ( const QPoint& p )
 {
-    if ( p.x() != -1 && p.y() != -1 ) {
+    if ( cursorCoord == DoublePoint( p.x(), p.y() ) )
+        return;
+
+    if ( p.x() != -1 && p.y() != -1 ) 
+    {
         DoublePoint coord = getTrussCoordFromWidgetPos( p.x(), p.y() );
         const DoubleSize& size = getTrussAreaSize();
         if ( coord.x() > size.width() || coord.x() < 0 ||
@@ -225,11 +230,16 @@ void TrussUnitWindow::setCursorCoord ( const QPoint& p )
     }
     else
         cursorCoord = DoublePoint( p.x(), p.y() );
+
+    coordFieldRendered = false;
 }
 
 void TrussUnitWindow::setCursorCoord ( const DoublePoint& p )
 {
-    cursorCoord = DoublePoint( p.x(), p.y() );
+    if ( cursorCoord == p )
+        return;
+    cursorCoord = p;
+    coordFieldRendered = false;
 }
 
 DoublePoint TrussUnitWindow::getCursorCoord () const
@@ -432,8 +442,8 @@ bool TrussUnitWindow::inRollUpButtonRect ( int x, int y ) const
 
 QPoint TrussUnitWindow::getButtonBufPos () const
 {
-    return QPoint( windowRightBottomPos.x() - 60, 
-                   windowLeftTopPos.y() + 6 );
+    return QPoint( windowRightBottomPos.x() - 54, 
+                   windowLeftTopPos.y() + 4 );
 }
 
 void TrussUnitWindow::checkMouseMoveEvent ( int x, int y, bool mousePressed )
@@ -503,6 +513,7 @@ void TrussUnitWindow::setHighlighted ( bool h )
         setHeadlineLastColor( 150, 90, 110 );        
     }
     TrussUnit::setHighlighted(h);
+    coordFieldRendered = false;
     buttonBufRendered = false;
 }
 
@@ -668,7 +679,7 @@ TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( const QPoint& pos,
                                                     double precision ) const
 {
     DoublePoint coord = getTrussCoordFromWidgetPos ( pos );
-    return findPivotByCoord ( coord, precision );
+    return findPivotByCoord ( coord );
 }
 
 TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( const QPoint& pos ) const
@@ -679,7 +690,7 @@ TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( const QPoint& pos ) const
 TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y, 
                                                     double precision ) const
 {
-    return findPivotByWidgetPos ( QPoint( x, y ), precision );
+    return findPivotByWidgetPos ( QPoint( x, y ) );
 }
 
 TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y ) const
@@ -1255,7 +1266,7 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
     QPoint p1, p2;
     p2 = leftTopAreaPos;
     p1 = rightBottomAreaPos;
-    baseRend.copy_bar ( p2.x(), p2.y(), p1.x(), p1.y(), agg::rgba8(255,255,255) );
+    baseRend.copy_bar ( p2.x(), p2.y(), p1.x(), p1.y(), agg::rgba(1,1,1) );
     p2.setY ( p2.y() - arrowHeadIndent );
     p1.setX ( p2.x() );
     p1.setY ( p1.y() + arrowTailIndent );
@@ -1278,51 +1289,74 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
     drawLine ( ras, solidRend, sl, p1, p2 );
 
 //  draw scale strokes and figure it
+
+    double areaLenInPix = rightBottomAreaPos.x() - leftTopAreaPos.x();
+    double areaWidInPix = rightBottomAreaPos.y() - leftTopAreaPos.y();
+
+    int strokeNumbX = areaLenInPix / 36;
+    int strokeNumbY = areaWidInPix / 32;
+
+    double scaleFactorXInPix = areaLenInPix / strokeNumbX;
+    double scaleFactorYInPix = areaWidInPix / strokeNumbY;
+
+    double scaleFactorXInAbs = getTrussAreaSize().height() / strokeNumbX;
+    double scaleFactorYInAbs = getTrussAreaSize().width() / strokeNumbY;
+
+    // left point of the scale stroke
+    QPoint strokePnt1( leftTopAreaPos.x() - scalePieceLength,
+                       leftTopAreaPos.y() + scaleFactorYInPix );
+    // right point of the scale stroke
+    QPoint strokePnt2( leftTopAreaPos.x(),
+                       strokePnt1.y() );
+    QPoint textPos ( bordWidth + 3, strokePnt1.y() + 3 );
+    QString str;
+    uint i;
+    for (i = 1; i < strokeNumbY; i++ )
+    {
+        strokePnt1.setY( int(leftTopAreaPos.y() + i * scaleFactorYInPix) );
+        strokePnt2.setY( strokePnt1.y() );
+        drawLine ( ras, solidRend, sl, strokePnt1, strokePnt2 );
+        textPos.setY( strokePnt1.y() + 3 );
+        str = QString("%1").arg( getTrussAreaSize().height() - 
+                                 i * scaleFactorYInAbs,0,'f',2 );   
+        drawText ( textRend, str, agg::rgba(100, 100, 100), textPos ); 
+    }
+
+    // top point of the scale stroke
+    strokePnt1.setX( leftTopAreaPos.x() + scaleFactorXInPix );
+    strokePnt1.setY( rightBottomAreaPos.y() );
+    // bottom point of the scale stroke
+    strokePnt2.setX( strokePnt1.x() );
+    strokePnt2.setY( rightBottomAreaPos.y() + scalePieceLength );
+
+    textPos.setY ( strokePnt2.y() + 10 );
+    for (i = 1; i < strokeNumbX; i++ )
+    {
+        strokePnt1.setX( int(rightBottomAreaPos.x() - i * scaleFactorXInPix) );
+        strokePnt2.setX( strokePnt1.x() );
+        drawLine ( ras, solidRend, sl, strokePnt1, strokePnt2 );
+        textPos.setX( strokePnt1.x() - 12 );
+        str = QString("%1").arg( getTrussAreaSize().width() - 
+                                 i * scaleFactorXInAbs,0,'f',2 );   
+        drawText ( textRend, str, agg::rgba(100, 100, 100), textPos ); 
+    }
+
     p1 = leftTopAreaPos;
     p2 = rightBottomAreaPos;
-    double areaLenInPix = p2.x() - p1.x();
-    double areaWidInPix = p2.y() - p1.y();
-    double scaleFactorXInPix = areaLenInPix / 5;
-    double scaleFactorYInPix = areaWidInPix / 5;
-    int scaleFactorXInAbs = int(getTrussAreaSize().height() / 5);
-    int scaleFactorYInAbs = int(getTrussAreaSize().width() / 5);
 
     p2.setX ( p1.x() - scalePieceLength );
-    QString str;
-    unsigned i;
-    for (i = 4; i > 0; i-- )
-    {
-        p1.setY ( int(p1.y() + scaleFactorYInPix) );
-        p2.setY ( p1.y() );
-        drawLine ( ras, solidRend, sl, p1, p2 );
-        QPoint textPos ( p2.x() - 23, p2.y() + 3 );
-        str = QString("%1").arg( i * scaleFactorYInAbs );   
-        drawText ( textRend, str, agg::rgba(100, 100, 100), textPos );
-    }
-
-    p1 = rightBottomAreaPos;
-    p2 = leftTopAreaPos;
-    p1.setX ( p2.x() );
-    p2.setY ( p1.y() + scalePieceLength );
-    for (i = 0; i < 4; i++ )
-    {
-        p1.setX ( int(p1.x() + scaleFactorXInPix) );
-        p2.setX ( p1.x() );
-        drawLine ( ras, solidRend, sl, p1, p2 );
-        QPoint textPos ( p2.x() - 10, p2.y() + 10 );
-        str = QString("%1").arg( (i + 1) * scaleFactorXInAbs );   
-        drawText ( textRend, str, agg::rgba(100, 100, 100), textPos );
-    }
+    p1.setY ( p1.y() + scaleFactorYInPix );
+    p2.setY ( p1.y() );
 
     p1 = leftTopAreaPos;
     p2 = rightBottomAreaPos;
-    p1.setX (p1.x() - 23 - scalePieceLength );
-    p1.setY (p1.y() + 3 );
-    str = QString("%1").arg( getTrussAreaSize().height() );
+    p1.setX ( bordWidth + 3 );
+    p1.setY ( p1.y() + 3 );
+    str = QString("%1").arg( getTrussAreaSize().height(),0,'f',2 );
     drawText  ( textRend, str, agg::rgba(100, 100, 100), p1 );
     p2.setX (p2.x() - 10 );
     p2.setY (p2.y() + 10 + scalePieceLength );
-    str = QString("%1").arg( getTrussAreaSize().width() );
+    str = QString("%1").arg( getTrussAreaSize().width(),0,'f',2 );
     drawText  ( textRend, str, agg::rgba(100, 100, 100), p2 );
 
     p1 = leftTopAreaPos;
@@ -1337,37 +1371,33 @@ void TrussUnitWindow::drawHeadline ( ren_dynarow& baseRend,
                                      solidRenderer& solidRend, 
                                      scanline_rasterizer& ras,
                                      agg::scanline_p8& sl, 
-                                     gradient_span_alloc& gradSpan,
-                                     linear_gradient& gradFunc, 
-                                     color_array_type& gradColors,
-                                     agg::trans_affine& mtx ) const
+                                     color_array_type& gradColors ) const
 {
     QPoint p1, p2;
     p1.setX ( 3 * bordWidth );
-    p1.setY ( bordWidth );
+    p1.setY ( bordWidth / 2 );
     p2.setX ( windowSize.width() - 3 * bordWidth );
-    p2.setY ( headWidth );
-    agg::rounded_rect headline ( p1.x(), p1.y(), p2.x(), p2.y(), winCornerRadius/2 );
-    unsigned i;
-    for(i = 0; i < 128; ++i)
-    {
-        gradColors[i] = headFirstColor.gradient ( headMiddleColor, i / 128.0 );
-    }
-    for(; i < 256; ++i)
-    {
-        gradColors[i] = headMiddleColor.gradient ( headLastColor, (i - 128) / 128.0 );
-    }
+    p2.setY ( p1.y() + headWidth );
 
+    agg::rounded_rect headline ( p1.x(), p1.y(), p2.x(), p2.y(), 9 );
+
+    gradient_span_alloc gradSpan;
+    linear_gradient gradFunc;
+    agg::trans_affine mtx;
     interpolator inter ( mtx );
     mtx *= agg::trans_affine_translation( 0, -1 );
     linear_gradient_span_gen gradSpanGen ( gradSpan, inter, gradFunc, gradColors, 
-                                          0, headWidth);
+                                           0, headWidth );
     linear_gradient_renderer gradRend ( baseRend, gradSpanGen );
     ras.add_path ( headline );
     agg::render_scanlines ( ras, sl, gradRend );
 
-    drawOutlineRoundedRect ( solidRend, ras, sl, p1, p2, 
-                             winCornerRadius/2, agg::rgba(30,20,10) ); 
+    agg::rounded_rect outline ( p1.x(), p1.y(), p2.x(), p2.y(), headWidth / 2 );
+    solidRend.color ( agg::rgba( 30, 20, 10 ) );
+    agg::conv_stroke<agg::rounded_rect> stroke( outline );
+    stroke.width ( 1.2 );
+    ras.add_path ( stroke );
+    agg::render_scanlines(ras, sl, solidRend);
 }
 
 void TrussUnitWindow::drawCursorCoordinatesField ( ren_dynarow& baseRend,
@@ -1542,10 +1572,10 @@ void TrussUnitWindow::drawNodeNumber( TrussNode* node,
 }
 
 void TrussUnitWindow::drawPivotNumber( TrussPivot* pivot, 
-                                      ren_dynarow& baseRend, 
-                                      solidRenderer& solidRend, 
-                                      scanline_rasterizer& ras, 
-                                      agg::scanline_p8& sl ) const
+                                       ren_dynarow& baseRend, 
+                                       solidRenderer& solidRend, 
+                                       scanline_rasterizer& ras, 
+                                       agg::scanline_p8& sl ) const
 {
     if ( ! pivot->isVisible() || ! pivot->getDrawingStatus() )
         return;
@@ -1611,7 +1641,8 @@ void TrussUnitWindow::drawPivotNumber( TrussPivot* pivot,
     }
 
     agg::rounded_rect backRect ( backLeftTopPos.x(), backLeftTopPos.y(), 
-                                 backRightBottomPos.x(), backRightBottomPos.y(), rad );
+                                 backRightBottomPos.x(), 
+                                 backRightBottomPos.y(), rad );
     ras.add_path ( backRect );
     solidRend.color ( backColor );
     agg::render_scanlines ( ras, sl, solidRend );
@@ -1656,6 +1687,81 @@ void TrussUnitWindow::drawEllipseHighlight ( solidRenderer& solidRend,
     agg::render_scanlines ( ras, sl, solidRend );
 }
 
+void TrussUnitWindow::drawResizeEllipses ( solidRenderer& solidRend, 
+                                           scanline_rasterizer& ras, 
+                                           agg::scanline_p8& sl ) const
+{
+    QPoint leftTopPos ( bordWidth, bordWidth ),
+           leftBottomPos ( bordWidth, windowSize.height() - bordWidth ),
+           rightTopPos ( windowSize.width() - bordWidth, bordWidth ),
+           rightBottomPos ( windowSize.width() - bordWidth, 
+                            windowSize.height() - bordWidth );
+
+    agg::ellipse ell;
+    solidRend.color ( resEllColor );
+    ell.init ( leftTopPos.x(), leftTopPos.y(), 
+               resEllRad, resEllRad, 10 );
+    ras.add_path ( ell );
+    ell.init ( rightTopPos.x(), rightTopPos.y(), 
+               resEllRad, resEllRad, 10 );
+    ras.add_path ( ell );
+    ell.init ( leftBottomPos.x(), leftBottomPos.y(), 
+               resEllRad, resEllRad, 10 );
+    ras.add_path ( ell );
+    ell.init ( rightBottomPos.x(), rightBottomPos.y(), 
+               resEllRad, resEllRad, 10 );
+    ras.add_path(ell);
+    agg::render_scanlines ( ras, sl, solidRend );
+
+    if ( resEll == LeftTop )
+        drawEllipseHighlight ( solidRend, ras, sl, leftTopPos );
+    else if ( resEll == LeftBottom )
+        drawEllipseHighlight ( solidRend, ras, sl, leftBottomPos );
+    else if ( resEll == RightTop )
+        drawEllipseHighlight ( solidRend, ras, sl, rightTopPos );
+    else if ( resEll == RightBottom )
+        drawEllipseHighlight ( solidRend, ras, sl, rightBottomPos );
+}
+
+void TrussUnitWindow::drawCalcIndicator ( ren_dynarow& baseRend, 
+                                          solidRenderer& solidRend,
+                                          scanline_rasterizer& ras, 
+                                          agg::scanline_p8& sl,
+                                          color_array_type& gradColors,
+                                          const QPoint& pos ) const
+{
+    int rad =  headWidth/4 + 2;
+    agg::ellipse ell;
+
+    ell.init ( pos.x(), pos.y(), rad + 1, rad + 1, 100 );
+    solidRend.color ( agg::rgba( 0, 0, 0, 0.4 ) );
+    ras.add_path(ell);
+    agg::render_scanlines ( ras, sl, solidRend );
+
+    agg::trans_affine mtx;
+
+    linear_gradient gradFunc;
+    color_type firstColor ( agg::rgba( 0, 0, 0 ) );
+    color_type middleColor ( agg::rgba( 1, 15, 25 ) );
+    if ( ! isHighlighted() )
+        middleColor = agg::rgba( 1, 1, 1 );
+    color_type lastColor ( agg::rgba( 0, 0, 0 ) );
+    fillColorArray ( gradColors, firstColor, middleColor, lastColor );
+    drawGradientEllipse( baseRend, ras, sl, gradFunc, gradColors, mtx, 
+                         pos.x(), pos.y(), rad, -6, headWidth + 8 );
+
+    radial_gradient gradRadFunc;
+    mtx *= agg::trans_affine_translation( pos.x(), pos.y() );
+    mtx.invert ();
+    firstColor = agg::rgba8( 155, 155, 255 );
+    middleColor = agg::rgba8( 80, 100, 195 );
+    lastColor = agg::rgba8( 10, 10, 120 );
+    fillColorArray ( gradColors, firstColor, middleColor, lastColor );
+
+    drawGradientEllipse( baseRend, ras, sl, gradRadFunc, gradColors, mtx, 
+                         pos.x(), pos.y(), rad - 2, 0, rad - 2 );
+}
+
 void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 {
     if ( !isVisible() )
@@ -1664,7 +1770,6 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
     glyph_gen glyph( 0 );
     scanline_rasterizer ras;    
     agg::scanline_p8 sl;
-    agg::ellipse ell;
 
     bool numbersDrawing = true;
 
@@ -1681,99 +1786,71 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         solidRenderer solidRend ( baseRend );    
         textRenderer textRend ( baseRend, glyph );
 
+
+        /*------draw resize ellipses------*/
         if ( ! maximized )
-        {
-            /*------draw resize ellipses------*/
-            QPoint leftTopPos ( bordWidth, bordWidth ),
-                   leftBottomPos ( bordWidth, windowSize.height() - bordWidth ),
-                   rightTopPos ( windowSize.width() - bordWidth, bordWidth ),
-                   rightBottomPos ( windowSize.width() - bordWidth, 
-                                    windowSize.height() - bordWidth );
-
-            solidRend.color ( resEllColor );
-            ell.init ( leftTopPos.x(), leftTopPos.y(), 
-                       resEllRad, resEllRad, 10 );
-            ras.add_path ( ell );
-            ell.init ( rightTopPos.x(), rightTopPos.y(), 
-                       resEllRad, resEllRad, 10 );
-            ras.add_path ( ell );
-            ell.init ( leftBottomPos.x(), leftBottomPos.y(), 
-                       resEllRad, resEllRad, 10 );
-            ras.add_path ( ell );
-            ell.init ( rightBottomPos.x(), rightBottomPos.y(), 
-                       resEllRad, resEllRad, 10 );
-            ras.add_path(ell);
-            agg::render_scanlines ( ras, sl, solidRend );
-
-            if ( resEll == LeftTop )
-                drawEllipseHighlight ( solidRend, ras, sl, leftTopPos );
-            else if ( resEll == LeftBottom )
-                drawEllipseHighlight ( solidRend, ras, sl, leftBottomPos );
-            else if ( resEll == RightTop )
-                drawEllipseHighlight ( solidRend, ras, sl, rightTopPos );
-            else if ( resEll == RightBottom )
-                drawEllipseHighlight ( solidRend, ras, sl, rightBottomPos );
-        }
+            drawResizeEllipses( solidRend, ras, sl );
 
 
-        /*------draw window canvas------*/
+        /*------draw window border------*/
         if ( maximized )
             baseRend.copy_bar( 0, 0, windowSize.width(), 
                                      windowSize.height(), borderColor );
         else
         {
-            QPoint leftTopPos( 0, 0 );
-            QPoint rightBottomPos( windowSize.width(), 
+            QPoint borderLeftTop( 0, 0 );
+            QPoint borderRightBottom( windowSize.width(), 
                                    windowSize.height() );
 
-            drawOutlineRoundedRect ( solidRend, ras, sl, 
-                                     leftTopPos, rightBottomPos, 
-                                     winCornerRadius, agg::rgba(1,1,1) );
-            agg::rounded_rect border ( leftTopPos.x(), leftTopPos.y(), 
-                                       rightBottomPos.x(), rightBottomPos.y(), 
+            agg::rounded_rect border ( borderLeftTop.x(), 
+                                       borderLeftTop.y(), 
+                                       borderRightBottom.x(), 
+                                       borderRightBottom.y(), 
                                        winCornerRadius );
             ras.add_path ( border );
             solidRend.color ( borderColor );
-            agg::render_scanlines(ras, sl, solidRend);
+            agg::render_scanlines ( ras, sl, solidRend );
         }
 
-        agg::rounded_rect canvas ( bordWidth, bordWidth + headWidth, 
-                                   windowSize.width() - bordWidth, 
-                                   windowSize.height() - bordWidth - headWidth/2, 
-                                   winCornerRadius/3 );
+
+        /*------draw window canvas------*/
+        QPoint canvasLeftTop( bordWidth, bordWidth + headWidth );
+        QPoint canvasRightBottom( windowSize.width() - bordWidth, 
+                                  windowSize.height() - coordBuf->height() - 4 );
+
+        agg::rounded_rect canvas ( canvasLeftTop.x(), 
+                                   canvasLeftTop.y(), 
+                                   canvasRightBottom.x(), 
+                                   canvasRightBottom.y(), 
+                                   winCornerRadius / 3 );
         ras.add_path ( canvas );
         solidRend.color ( canvColor );
         agg::render_scanlines ( ras, sl, solidRend );
 
+
         /*------draw window headline------*/
-        gradient_span_alloc gradSpan;
-        linear_gradient gradFunc;
         color_array_type gradColors;
-        agg::trans_affine mtx;
-        glyph.font ( headFont );
-        drawHeadline ( baseRend, solidRend, ras, sl, 
-                       gradSpan, gradFunc, gradColors, mtx );
+        fillColorArray ( gradColors, headFirstColor, 
+                         headMiddleColor, headLastColor );
+        drawHeadline ( baseRend, solidRend, ras, sl, gradColors );
+
+
+        /*------draw simple calculation indicator------*/
+        QPoint centerPos( 22, bordWidth/2 + headWidth/2 );
+        drawCalcIndicator( baseRend, solidRend, ras, sl, 
+                           gradColors, centerPos );
 
 
         /*------draw window title text and background rounded rectangle------*/
-        int lengthLimit = windowSize.width()/2 - 20;
+        glyph.font ( headFont );
+        int lengthLimit = windowSize.width() / 2 - 20;
         QString title = fitTextToWindowSize ( getTrussName (), lengthLimit, glyph );
         int titleLength = (int)glyph.width( title.ascii() );
         QPoint titlePos( ( windowSize.width() - 2 * bordWidth - 
-                           titleLength ) / 2, 18 );
+                           titleLength ) / 2, 14 );
 
-        agg::rounded_rect titleRectOutline ( titlePos.x() - 15, 3, 
-                                             titlePos.x() + titleLength + 15, 
-                                             headWidth + 1, 
-                                             10 );
-        ras.add_path ( titleRectOutline );
-        solidRend.color ( agg::rgba( 1, 1, 1 ) );
-        agg::render_scanlines ( ras, sl, solidRend );
-
-        agg::rounded_rect titleRect ( titlePos.x() - 14, 4, 
-                                      titlePos.x() + titleLength + 14, 
-                                      headWidth, 10 );
-        ras.add_path ( titleRect );
+        QPoint rectPos1( titlePos.x() - 15, bordWidth / 2 ),
+               rectPos2( titlePos.x() + titleLength + 15, rectPos1.y() + headWidth -1 );
 
         color_type firstColor ( agg::rgba( 0, 0, 0 ) );
         color_type middleColor ( agg::rgba8( 180, 130, 100 ) );
@@ -1781,26 +1858,18 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
             middleColor = agg::rgba( 100, 120, 120 );
         color_type lastColor ( agg::rgba( 0, 0, 0 ) );
 
-        uint i = 0;
-        for( ; i < 128; ++i)
-            gradColors[i] = firstColor.gradient ( middleColor, i / 128.0 );
-        for( ; i < 256; ++i)
-            gradColors[i] = middleColor.gradient ( lastColor, (i - 128) / 128.0 );
-
-        interpolator inter ( mtx );
-        mtx *= agg::trans_affine_translation( 0, 0 );
-        linear_gradient_span_gen gradSpanGen ( gradSpan, inter, gradFunc, 
-                                               gradColors, -headWidth, 
-                                               headWidth * 2);
-        linear_gradient_renderer gradRend ( baseRend, gradSpanGen );
-        agg::render_scanlines ( ras, sl, gradRend );
+        fillColorArray ( gradColors, firstColor, middleColor, lastColor );
+        agg::trans_affine mtx;
+        drawOutlineRoundedRect( baseRend, solidRend, ras, sl, gradColors, 
+                                mtx, rectPos1, rectPos2, agg::rgba( 1, 1, 1, 0.6 ),
+                                8, 1, 0, headWidth * 2 );
 
         color_type titleColor = agg::rgba(1, 1, 1);
         drawText ( textRend, title, titleColor, titlePos );
 
 
         /*------draw editable area in which canvas truss unit can be painted------*/
-        glyph.font ( numbersFont );
+        glyph.font ( agg::mcs11_prop_condensed );
         drawTrussArea ( baseRend, ras, textRend, solidRend, sl );
 
 
@@ -1809,6 +1878,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
                            getScaleMultiplierX (), 
                            getScaleMultiplierY () );
 
+
         /*------draw truss elements numbers above them------*/
         if ( numbersDrawing )
             drawTrussElementsNumbers ( baseRend, solidRend, ras, sl );
@@ -1816,14 +1886,21 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         rendered( true );
     }
 
-    /*------draw coordinates field------*/
-    ren_dynarow baseRend ( coordPixf );
-    textRenderer textRend ( baseRend, glyph );
-    glyph.font ( numbersFont );
-    drawCursorCoordinatesField ( baseRend, textRend, glyph );
+    if ( ! coordFieldRendered )
+    {
+        /*------draw coordinates field------*/
+        ren_dynarow baseRend ( coordPixf );
+        textRenderer textRend ( baseRend, glyph );
+        glyph.font ( numbersFont );
+        drawCursorCoordinatesField ( baseRend, textRend, glyph );
+        coordFieldRendered = true;
+    }
+
 
     /*------draw truss elements numbers field------*/
-    baseRend = numbersPixf;
+    ren_dynarow baseRend = numbersPixf;
+    textRenderer textRend ( baseRend, glyph );
+    glyph.font ( numbersFont );
     drawNumbersField ( baseRend, textRend );
 
     if ( ! buttonBufRendered )
@@ -1837,14 +1914,18 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         buttonBufRendered = true;
     }
 
+
     /*------blend buffers------*/
-    baseRenderer.blend_from ( windowPixf, 0, windowLeftTopPos.x(), windowLeftTopPos.y(), 
-                             unsigned(1.0 * 255) );
-    baseRenderer.blend_from ( coordPixf, 0, windowLeftTopPos.x() + 25, 
-                                        windowRightBottomPos.y() - 14, 
-                                        unsigned(1.0 * 255) );
+    baseRenderer.blend_from ( windowPixf, 0, windowLeftTopPos.x(), 
+                              windowLeftTopPos.y(), unsigned(1.0 * 255) );
+
+    baseRenderer.blend_from ( coordPixf, 0, windowLeftTopPos.x() + winCornerRadius, 
+                              windowRightBottomPos.y() - coordBuf->height() - 3, 
+                              unsigned(1.0 * 255) );
+
     baseRenderer.blend_from ( numbersPixf, 0, windowRightBottomPos.x() - 80, 
-                              windowRightBottomPos.y() - 14, unsigned(1.0 * 255) );
+                              windowRightBottomPos.y() - coordBuf->height() - 3, 
+                              unsigned(1.0 * 255) );
 
     baseRenderer.blend_from ( buttonPixf, 0, getButtonBufPos().x(), 
                               getButtonBufPos().y(), unsigned(1.0 * 255) );

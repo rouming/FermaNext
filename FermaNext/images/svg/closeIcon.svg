@@ -7,59 +7,59 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   sodipodi:docbase="D:\DEVELO~1\VISUAL~2\FERMAN~1\images\svg"
-   sodipodi:docname="CLOSEI~1.SVG"
-   inkscape:version="0.40+cvs"
-   sodipodi:version="0.32"
+   width="53.000000pt"
+   height="60.000000pt"
    id="svg2"
-   height="85.000000pt"
-   width="50.000000pt">
+   sodipodi:version="0.32"
+   inkscape:version="0.40+cvs"
+   sodipodi:docname="CLOSEI~1.SVG"
+   sodipodi:docbase="D:\DEVELO~1\VISUAL~2\FERMAN~1\images\svg">
   <metadata
      id="metadata971">
     <rdf:RDF
        id="RDF973">
       <cc:Work
-         id="Work975"
-         rdf:about="">
+         rdf:about=""
+         id="Work975">
         <dc:format
            id="format977">image/svg+xml</dc:format>
         <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage"
-           id="type979" />
+           id="type979"
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <defs
      id="defs969" />
   <sodipodi:namedview
-     inkscape:current-layer="svg2"
-     inkscape:window-y="-4"
-     inkscape:window-x="1"
-     inkscape:cy="45.025392"
-     inkscape:cx="64.466018"
-     inkscape:zoom="3.4129688"
-     inkscape:window-height="719"
-     inkscape:window-width="1024"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0.0"
-     borderopacity="1.0"
-     bordercolor="#666666"
+     id="base"
      pagecolor="#ffffff"
-     id="base" />
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1024"
+     inkscape:window-height="719"
+     inkscape:zoom="3.4129688"
+     inkscape:cx="64.466018"
+     inkscape:cy="45.025392"
+     inkscape:window-x="1"
+     inkscape:window-y="-4"
+     inkscape:current-layer="svg2" />
   <title
      id="title4">A less cute tiger
 </title>
   <g
-     transform="translate(-142.3099,192.0243)"
-     inkscape:label="Layer 1"
+     id="layer1"
      inkscape:groupmode="layer"
-     id="layer1" />
+     inkscape:label="Layer 1"
+     transform="translate(-142.3099,192.0243)" />
   <path
-     style="stroke-dasharray:none;stroke-opacity:1.0000000;stroke-miterlimit:4.0000000;stroke-linejoin:miter;stroke-linecap:round;stroke-width:6.2500000;stroke:#000000;fill-rule:evenodd;fill-opacity:0.75000000;fill:none"
-     d="M 12.784114,80.260620 L 52.728669,31.114829"
-     id="path1322" />
+     id="path1322"
+     d="M 13.077114,62.680618 L 53.021669,13.534827"
+     style="fill:none;fill-opacity:0.75000000;fill-rule:evenodd;stroke:#000000;stroke-width:6.2500000;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4.0000000;stroke-opacity:1.0000000" />
   <path
-     style="stroke-dasharray:none;stroke-opacity:1.0000000;stroke-miterlimit:4.0000000;stroke-linejoin:miter;stroke-linecap:round;stroke-width:6.2500000;stroke:#000000;fill-rule:evenodd;fill-opacity:0.75000000;fill:none"
-     d="M 52.368022,80.380860 L 12.423467,31.235068"
-     id="path2083" />
+     id="path2083"
+     d="M 52.661022,62.800858 L 12.716467,13.655066"
+     style="fill:none;fill-opacity:0.75000000;fill-rule:evenodd;stroke:#000000;stroke-width:6.2500000;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4.0000000;stroke-opacity:1.0000000" />
 </svg>

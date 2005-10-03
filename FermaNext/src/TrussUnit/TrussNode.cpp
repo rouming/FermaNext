@@ -112,40 +112,6 @@ void TrussNode::drawFixation ( scanline_rasterizer& ras, solidRenderer& solidRen
     }
 }
 
-void TrussNode::drawGradientEllipse ( scanline_rasterizer& ras, 
-                                      ren_dynarow& baseRend, 
-                                      agg::scanline_p8& sl, double x, double y,
-                                      int radius, color_type begin, 
-                                      color_type middle, color_type end ) const
-{
-    agg::ellipse ell;
-    ell.init ( x, y, radius, radius, 16 );
-    gradient_span_alloc gradSpan;
-    radial_gradient gradFunc;
-    color_array_type gradColors;
-
-    unsigned i;
-    for(i = 0; i < 128; ++i)
-    {
-        gradColors[i] = begin.gradient ( middle, i / 128.0 );
-    }
-    for(; i < 256; ++i)
-    {
-        gradColors[i] = middle.gradient ( end, (i - 128) / 128.0 );
-    }
-    agg::trans_affine mtx;
-    mtx *= agg::trans_affine_scaling ( 1 / 2.0 );
-    mtx *= agg::trans_affine_translation ( x, y );
-    mtx.invert ();
-    interpolator inter(mtx);
-    radial_gradient_span_gen gradSpanGen ( gradSpan, inter, gradFunc, 
-                                          gradColors, 0.0, 10.0 );
-    radial_gradient_renderer gradRend ( baseRend, gradSpanGen );
-    ras.add_path(ell);
-    agg::render_scanlines ( ras, sl, gradRend );
-}
-
-
 void TrussNode::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
                        double trussAreaHeight ) const
 {
@@ -192,6 +158,13 @@ void TrussNode::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMu
     }
 
 //  draw node
+    agg::trans_affine mtx;
+    mtx *= agg::trans_affine_scaling ( 1 / 2.0 );
+    mtx *= agg::trans_affine_translation ( nodePos.x(), nodePos.y() );
+    mtx.invert ();
+    color_array_type gradColors;
+    radial_gradient gradFunc;
+
     if ( getFixation() == Unfixed )
     {
         color_type begin ( 255, 255, 255 ); 
@@ -199,16 +172,20 @@ void TrussNode::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMu
         color_type end ( 130 - highlightKoeff * 100, 
                         90 - highlightKoeff * 60, 
                         70 - highlightKoeff * 50 );
-        drawGradientEllipse ( ras, baseRend, sl, nodePos.x(), nodePos.y(), 
-                              nodesRadius + highlightKoeff, begin, middle, end );
+        fillColorArray( gradColors, begin, middle, end );
+        drawGradientEllipse( baseRend, ras, sl, gradFunc, gradColors, 
+                             mtx, nodePos.x(), nodePos.y(), 
+                             nodesRadius + highlightKoeff, 0, 10 ); 
     }
     else 
     {
         color_type begin ( 255, 255, 255 ); 
         color_type middle ( 80, 100, 195 ); 
         color_type end ( 0, 0, 80 );
-        drawGradientEllipse ( ras, baseRend, sl, nodePos.x(), nodePos.y(), 
-                              nodesRadius + highlightKoeff, begin, middle, end );
+        fillColorArray( gradColors, begin, middle, end );
+        drawGradientEllipse( baseRend, ras, sl, gradFunc, gradColors, 
+                             mtx, nodePos.x(), nodePos.y(), 
+                             nodesRadius + highlightKoeff, 0, 10 ); 
     }
 }
 

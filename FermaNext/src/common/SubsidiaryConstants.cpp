@@ -20,19 +20,19 @@ const int nodesRadius = 4,
  * Truss Unit Window Consts
  ************************************/
 
-const int leftWindowIndent = 38,
+const int leftWindowIndent = 42,
           rigthWindowIndent = 28,
-          topWindowIndent = 52,
-          bottomWindowIndent = 40,
+          topWindowIndent = 48,
+          bottomWindowIndent = 38,
           scaleTextLeftBottomIndent = 17,
           arrowTailIndent = 10,
           arrowHeadIndent = 16,
-          scalePieceLength = 8,
+          scalePieceLength = 6,
           bordWidth = 4,
-          headWidth = 25,
+          headWidth = 18,
           coordLineWidth = 1,
           resizeLimit = 200,
-          winCornerRadius = 25,
+          winCornerRadius = 24,
           resEllRad = 3;
 
 const bool flipY = true;

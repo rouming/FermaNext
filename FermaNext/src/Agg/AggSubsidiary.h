@@ -27,6 +27,8 @@
 #include "agg_svg_parser.h"
 #include "agg_renderer_primitives.h"
 
+/*****************************************************************************/
+
 typedef agg::rendering_buffer_dynarow<4>                    rbuf_dynarow;
 typedef agg::pixfmt_custom_rbuf_rgba<agg::blender_rgba32, 
                                           rbuf_dynarow>     pixf_dynarow;
@@ -39,7 +41,6 @@ typedef agg::renderer_base<pixfmt>                          base_renderer;
 typedef agg::renderer_scanline_aa_solid<base_renderer>      solid_renderer;
 typedef agg::gradient_circle                                radial_gradient;
 typedef agg::gradient_y                                     linear_gradient;
-typedef agg::gradient_diamond                               diamond_gradient;
 typedef agg::span_interpolator_linear<>                     interpolator;
 typedef agg::pod_auto_array<color_type, 256>                color_array_type;
 typedef agg::span_gradient<color_type, interpolator, 
@@ -48,9 +49,6 @@ typedef agg::span_gradient<color_type, interpolator,
 typedef agg::span_gradient<color_type, interpolator, 
                            linear_gradient, 
                            color_array_type>                linear_gradient_span_gen;
-typedef agg::span_gradient<color_type, interpolator, 
-                           diamond_gradient, 
-                           color_array_type>                diamond_gradient_span_gen;
 
 typedef agg::span_allocator<color_type>                     gradient_span_alloc;
 
@@ -58,8 +56,6 @@ typedef agg::renderer_scanline_aa<ren_dynarow,
                                   radial_gradient_span_gen> radial_gradient_renderer;
 typedef agg::renderer_scanline_aa<ren_dynarow, 
                                   linear_gradient_span_gen> linear_gradient_renderer;
-typedef agg::renderer_scanline_aa<ren_dynarow, 
-                                  diamond_gradient_span_gen> diamond_gradient_renderer;
 
 typedef agg::glyph_raster_bin<agg::rgba8>                   glyph_gen;
 typedef agg::renderer_raster_htext_solid<ren_dynarow, 
@@ -126,11 +122,39 @@ void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
                  agg::scanline_p8& sl, const QPoint& point1, 
                  const QPoint& point2 );
 
-void drawOutlineRoundedRect ( solidRenderer& solidRend, 
+void fillColorArray ( color_array_type& colArray, color_type first, 
+                      color_type middle, color_type last );
+
+void drawOutlineRoundedRect ( ren_dynarow& baseRend,
+                              solidRenderer& solidRend, 
                               scanline_rasterizer& ras,
-                              agg::scanline_p8& sl, const QPoint& tail, 
-                              const QPoint& head, 
-                              int cornerRadius, color_type color);
+                              agg::scanline_p8& sl,
+                              color_array_type& gradColors,
+                              agg::trans_affine& mtx,
+                              const QPoint& point1, 
+                              const QPoint& point2, 
+                              color_type outlineCol, 
+                              int cornerRadius, 
+                              int lineWidth, 
+                              int bound1, int bound2 );
+
+void drawGradientEllipse ( ren_dynarow& baseRend, 
+                           scanline_rasterizer& ras,
+                           agg::scanline_p8& sl, 
+                           radial_gradient& gradFunc,
+                           color_array_type gradColors,
+                           agg::trans_affine& mtx, 
+                           int x, int y, int radius, 
+                           int bound1, int bound2 );
+
+void drawGradientEllipse ( ren_dynarow& baseRend, 
+                           scanline_rasterizer& ras,
+                           agg::scanline_p8& sl, 
+                           linear_gradient& gradFunc,
+                           color_array_type gradColors,
+                           agg::trans_affine& mtx, 
+                           int x, int y, int radius, 
+                           int bound1, int bound2 );
 
 void parseSvg ( pathRenderer& pathRend, const char* fname );
 

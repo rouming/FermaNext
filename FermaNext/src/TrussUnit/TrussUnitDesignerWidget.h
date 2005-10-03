@@ -97,6 +97,7 @@ private:
     TrussPivotBehaviour pivotBehaviour;
     DesignerBehaviour designerBehaviour;
     // Subsidiary vars
+    bool buttonPressed;
     int clickX, clickY;
     QPoint firstNodeClickDist, lastNodeClickDist;
     // Undo/Redo

@@ -108,18 +108,88 @@ void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
     drawArrow ( ras, solidRend, sl, tail, head, agg::rgba(90, 90, 90), 4, 1, 4, 6 );
 }
 
-void drawOutlineRoundedRect ( solidRenderer& solidRend, scanline_rasterizer& ras,
-                              agg::scanline_p8& sl, const QPoint& point1, 
-                              const QPoint& point2, int cornerRadius, 
-                              color_type color)
+void fillColorArray ( color_array_type& colArray, color_type first, 
+                      color_type middle, color_type last )
 {
-    agg::rounded_rect rectangle ( point1.x(), point1.y(), 
-                                  point2.x(), point2.y(), cornerRadius );
-    solidRend.color ( color );
-    agg::conv_stroke<agg::rounded_rect> stroke(rectangle);
-    stroke.width ( 1.2 );
-    ras.add_path ( stroke );
-    agg::render_scanlines(ras, sl, solidRend);
+    uint i = 0;
+    for( ; i < 128; ++i)
+        colArray[i] = first.gradient ( middle, i / 128.0 );
+    for( ; i < 256; ++i)
+        colArray[i] = middle.gradient ( last, (i - 128) / 128.0 );
+}
+
+void drawOutlineRoundedRect ( ren_dynarow& baseRend,
+                              solidRenderer& solidRend, 
+                              scanline_rasterizer& ras,
+                              agg::scanline_p8& sl, 
+                              color_array_type& gradColors,
+                              agg::trans_affine& mtx,
+                              const QPoint& point1, 
+                              const QPoint& point2, 
+                              color_type outlineCol, 
+                              int cornerRadius, 
+                              int lineWidth, 
+                              int bound1, int bound2  )
+{
+    gradient_span_alloc gradSpan;
+    linear_gradient gradFunc;
+
+    agg::rounded_rect outline ( point1.x(), point1.y(), 
+                                point2.x(), point2.y(), cornerRadius );
+    ras.add_path ( outline );
+    solidRend.color ( outlineCol );
+    agg::render_scanlines ( ras, sl, solidRend );
+
+    agg::rounded_rect rect ( point1.x() + lineWidth, point1.y() + lineWidth, 
+                             point2.x() - lineWidth, point2.y() - lineWidth, 
+                             cornerRadius );
+    ras.add_path ( rect );
+
+    interpolator inter ( mtx );
+    linear_gradient_span_gen gradSpanGen ( gradSpan, inter, gradFunc, 
+                                           gradColors, bound1, bound2 );
+    linear_gradient_renderer gradRend ( baseRend, gradSpanGen );
+    agg::render_scanlines ( ras, sl, gradRend );
+}
+
+void drawGradientEllipse ( ren_dynarow& baseRend, 
+                           scanline_rasterizer& ras,
+                           agg::scanline_p8& sl, 
+                           radial_gradient& gradFunc,
+                           color_array_type gradColors,
+                           agg::trans_affine& mtx, 
+                           int x, int y, int radius, 
+                           int bound1, int bound2 )
+{
+    agg::ellipse ell;
+    ell.init ( x, y, radius, radius, 16 );
+    gradient_span_alloc gradSpan;
+    interpolator inter(mtx);
+    radial_gradient_span_gen gradSpanGen ( gradSpan, inter, gradFunc, 
+                                           gradColors, bound1, bound2 );
+    radial_gradient_renderer gradRend ( baseRend, gradSpanGen );
+    ras.add_path(ell);
+    agg::render_scanlines ( ras, sl, gradRend );
+}
+
+void drawGradientEllipse ( ren_dynarow& baseRend, 
+                           scanline_rasterizer& ras,
+                           agg::scanline_p8& sl, 
+                           linear_gradient& gradFunc,
+                           color_array_type gradColors,
+                           agg::trans_affine& mtx, 
+                           int x, int y, int radius, 
+                           int bound1, int bound2 )
+{
+    agg::ellipse ell;
+    ell.init ( x, y, radius, radius, 16 );
+    gradient_span_alloc gradSpan;
+    interpolator inter(mtx);
+    linear_gradient_span_gen gradSpanGen ( gradSpan, inter, gradFunc, 
+                                           gradColors, bound1, bound2 );
+    linear_gradient_renderer gradRend ( baseRend, gradSpanGen );
+    ras.add_path(ell);
+    agg::render_scanlines ( ras, sl, gradRend );
 }
 
 void parseSvg ( pathRenderer& pathRend, const char* fname )

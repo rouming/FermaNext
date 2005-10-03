@@ -8,12 +8,12 @@
    xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="53.000000pt"
-   height="85.000000pt"
+   height="60.000000pt"
    id="svg2"
    sodipodi:version="0.32"
    inkscape:version="0.40+cvs"
-   sodipodi:docname="rollUpIcon.svg"
-   sodipodi:docbase="D:\Development\Visual Studio projects\FermaNext\images\svg">
+   sodipodi:docname="ROLLUP~1.SVG"
+   sodipodi:docbase="D:\DEVELO~1\VISUAL~2\FERMAN~1\images\svg">
   <metadata
      id="metadata971">
     <rdf:RDF
@@ -42,7 +42,7 @@
      inkscape:window-height="719"
      inkscape:zoom="3.4129688"
      inkscape:cx="64.466018"
-     inkscape:cy="37.121481"
+     inkscape:cy="65.546384"
      inkscape:window-x="1"
      inkscape:window-y="-4"
      inkscape:current-layer="svg2" />
@@ -56,11 +56,11 @@
      transform="translate(-142.3099,192.0243)" />
   <path
      id="path2089"
-     d="M 5.3206992,81.821842 L 5.3206992,27.525490 L 61.811514,27.525490 L 61.811514,81.130169 L 5.3206992,81.821842 z "
-     style="fill:none;fill-opacity:0.75000000;fill-rule:evenodd;stroke:#000000;stroke-width:4.6249990;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4.0000000;stroke-opacity:1.0000000" />
+     d="M 2.9766990,65.413840 L 2.9766990,11.117488 L 59.467514,11.117488 L 59.467514,64.722167 L 2.9766990,65.413840 z "
+     style="fill:none;fill-opacity:0.75000000;fill-rule:evenodd;stroke:#000000;stroke-width:6.2500000;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4.0000000;stroke-opacity:1.0000000" />
   <path
      sodipodi:nodetypes="cc"
      id="path2095"
-     d="M 6.0872191,39.209499 L 61.811514,39.209499"
-     style="fill:none;fill-opacity:0.75000000;fill-rule:evenodd;stroke:#000000;stroke-width:4.6249990;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4.0000000;stroke-opacity:1.0000000" />
+     d="M 3.7432189,22.801497 L 59.467514,22.801497"
+     style="fill:none;fill-opacity:0.75000000;fill-rule:evenodd;stroke:#000000;stroke-width:6.2500000;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4.0000000;stroke-opacity:1.0000000" />
 </svg>
