@@ -51,7 +51,7 @@ public:
         w.wait();
     }
 
-    void startCalculation ( const QString& fileName ) 
+    void startCalculation ( const QString& fileName ) const
     {
         // Send file name to calculation server
         socket.writeBlock( fileName, fileName.length() ); 

@@ -22,7 +22,7 @@ public:
         loader.freeLibrary();
     }
 
-    void startCalculation ( const QString& fileName )
+    void startCalculation ( const QString& fileName ) const
     {
         simpleCalc( fileName.ascii() );
     }

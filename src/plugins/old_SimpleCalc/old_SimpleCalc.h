@@ -3,57 +3,33 @@
 #define OLD_SIMPLECALC_H
 
 #include "Plugin.h"
-#include "TrussTopology.h"
-#include "FRMWriter.h"
-#include "VYVReader.h"
 #include <qstring.h>
-#include <qfile.h>
 
 const QString fermaResExt = ".vyv";
 
-PluginInfo inf = { "SimpleOldCalcPlugin", "Just calculation" };
+class TrussTopology;
+class TrussCalcData;
 
 class SimpleCalcPlugin : public Plugin
 {
 public:
-    SimpleCalcPlugin ()
-    { createTempFile(); }
-    virtual ~SimpleCalcPlugin ()
-    { destroyTempFile(); }
+    SimpleCalcPlugin ();
+    virtual ~SimpleCalcPlugin ();
+    
 
-    const PluginInfo& pluginInfo () const
-    { return inf; }
+    const PluginInfo& pluginInfo () const;
+    PluginType pluginType () const;
+    bool dependsOn ( PluginType ) const;
+    void calculate ( TrussTopology&, TrussCalcData& ) const;
 
-    PluginType pluginType () const
-    { return CALCULATION_PLUGIN; }
-
-    bool dependsOn ( PluginType ) const
-    { return false; }
-
-    void calculate ( TrussTopology& truss, CalcData& data )
-    {
-        FRMWriter frm(truss);
-        frm.write( tempFileName() );
-        startCalculation( tempFileName() );
-        VYVReader vyv(data);
-        vyv.read( tempFileName() + fermaResExt );
-    }
-
-    virtual void startCalculation ( const QString& fileName ) = 0;
+    virtual void startCalculation ( const QString& fileName ) const = 0;
 
 protected:
     // Manages temp file
-    void createTempFile ()
-    {  tempFile = tmpnam(0); }
+    void createTempFile ();
+    void destroyTempFile ();
 
-    void destroyTempFile () 
-    { 
-        QFile::remove( tempFile + fermaResExt );
-        QFile::remove( tempFile ); 
-    }
-
-    const QString& tempFileName () const
-    { return tempFile; }
+    const QString& tempFileName () const;
 
 private:
     QString tempFile;
