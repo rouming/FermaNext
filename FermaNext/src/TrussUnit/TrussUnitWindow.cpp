@@ -79,13 +79,16 @@ void TrussUnitWindow::hide ()
     setVisible( false );
 }
 
-void TrussUnitWindow::maximize ()
+void TrussUnitWindow::maximize ( bool saveOldSize )
 {
     removeButtonsHighlight();
 
-    // save old window position for future minimization
-    minLeftTopPos = windowLeftTopPos;
-    minRightBottomPos = windowRightBottomPos;
+    if ( saveOldSize )
+    {
+        // save old window position for future minimization
+        minLeftTopPos = windowLeftTopPos;
+        minRightBottomPos = windowRightBottomPos;
+    }
     resize ( QPoint( 0, 0 ), 
              QPoint( maxSize.width(), maxSize.height() ) );
     maximized = true;
@@ -335,7 +338,7 @@ bool TrussUnitWindow::inVerResizeRect ( int x, int y ) const
     if ( x >= windowLeftTopPos.x() + winCornerRadius && 
          x <= windowRightBottomPos.x() - winCornerRadius && 
          y >= windowLeftTopPos.y() && 
-         y <= windowLeftTopPos.y() + bordWidth ||
+         y <= windowLeftTopPos.y() + bordWidth / 2 ||
          x >= windowLeftTopPos.x() + winCornerRadius && 
          x <= windowRightBottomPos.x() - winCornerRadius && 
          y >= windowRightBottomPos.y() - bordWidth && 

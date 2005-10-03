@@ -35,6 +35,9 @@ public:
 
     virtual void setMaxSize ( int x, int y );
     virtual bool isMaximized () const;
+    virtual void hide ();
+    virtual void maximize ( bool saveOldSize = true );
+    virtual void minimize ();
 
     virtual bool inWindowRect ( int x, int y ) const;
     virtual bool inCanvasRect ( int  x, int  y ) const;
@@ -128,10 +131,6 @@ protected:
     virtual double getScaleMultiplierY () const;
 
     virtual void setWindowSize ( int w, int h );
-
-    virtual void hide ();
-    virtual void maximize ();
-    virtual void minimize ();
 
     virtual DoublePointArray getPivotCrossPoints ( 
                                     const PivotList& nonCrossingPivots ) const;
