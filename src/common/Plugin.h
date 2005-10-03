@@ -23,7 +23,7 @@
 
 class Plugin;
 class TrussTopology;
-class CalcData;
+class TrussCalcData;
 
 typedef Q_UINT16 PluginChecksum;
 
@@ -52,7 +52,7 @@ public:
     virtual const PluginInfo& pluginInfo () const = 0;
     virtual PluginType pluginType () const = 0;
     virtual bool dependsOn ( PluginType ) const = 0;
-    //    virtual void calculate ( TrussTopology&, CalcData& ) const = 0;
+    virtual void calculate ( TrussTopology&, TrussCalcData& ) const = 0;
 };
 
 // Calculation plugin
