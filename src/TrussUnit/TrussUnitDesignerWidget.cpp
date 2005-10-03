@@ -111,12 +111,12 @@ void TrussUnitDesignerWidget::initToolBar ()
     leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
     toolBar->addButton ( imagesSvgPath() + "/fixIcon.svg", "Fixation", leftTopPos, 
                          buttonWidth, buttonHeight, this, SIGNAL( pressFixDrawButton() ), 
-                         SLOT( changeBehaviourToFixSet() ) );
+                         SLOT( changeBehaviourToFixDraw() ) );
 
     leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
-    toolBar->addButton ( imagesSvgPath() + "/forceIcon.svg", "Force", leftTopPos, 
-                         buttonWidth, buttonHeight, this, SIGNAL( pressForceDrawButton() ),
-                         SLOT( changeBehaviourToForceDraw() ) );
+    toolBar->addButton ( imagesSvgPath() + "/forceIcon.svg", "Load", leftTopPos, 
+                         buttonWidth, buttonHeight, this, SIGNAL( pressLoadDrawButton() ),
+                         SLOT( changeBehaviourToLoadDraw() ) );
 
     leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
     toolBar->addButton ( imagesSvgPath() + "/eraseIcon.svg", "Erase", leftTopPos, 
@@ -141,12 +141,12 @@ void TrussUnitDesignerWidget::changeBehaviourToPivotDraw ()
 
 void TrussUnitDesignerWidget::changeBehaviourToFixDraw ()
 {
-//    designerBehaviour = onFixDraw;
+    designerBehaviour = onFixDraw;
 }
 
-void TrussUnitDesignerWidget::changeBehaviourToForceDraw ()
+void TrussUnitDesignerWidget::changeBehaviourToLoadDraw ()
 {
-//    designerBehaviour = onForceDraw;
+    designerBehaviour = onLoadDraw;
 }
 
 void TrussUnitDesignerWidget::changeBehaviourToErase ()
@@ -213,11 +213,8 @@ void TrussUnitDesignerWidget::removeTrussElemHighlight ()
     {
         TrussUnitWindow* window = (*iter);
         window->setResizeEllipseHighlighted ( TrussUnitWindow::None );
-        //window->releaseButtons ();
-        if ( nodeBehaviour == onNodeSelect )
-            window->removeNodesHighlight ();
-        if ( pivotBehaviour == onPivotSelect )
-            window->removePivotsHighlight ();
+        window->removeNodesHighlight ();
+        window->removePivotsHighlight ();
     }
     if ( nodeBehaviour == onNodeSelect )
         nodeBehaviour = nodeIdle;
@@ -417,6 +414,16 @@ void TrussUnitDesignerWidget::aggPaintEvent ( QPaintEvent* )
 
 void TrussUnitDesignerWidget::aggResizeEvent ( QResizeEvent* )
 {
+    WindowListIter iter = trussWindows.begin();
+    for ( ; iter != trussWindows.end(); ++iter ) 
+    {
+        TrussUnitWindow* w = *iter;
+        if ( w->isAlive() && w->isMaximized() )
+        {
+            w->setMaxSize( width(), height() );
+            w->maximize( false );
+        }
+    }
 }
 
 void TrussUnitDesignerWidget::aggKeyPressEvent ( QKeyEvent* ke )
@@ -437,6 +444,18 @@ void TrussUnitDesignerWidget::aggKeyPressEvent ( QKeyEvent* ke )
     {
         designerBehaviour = onErase;
         emit pressEraseButton();
+        removeTrussElemHighlight ();
+    }
+    if ( ke->key() == Qt::Key_F && designerBehaviour != onFixDraw )
+    {
+        designerBehaviour = onFixDraw;
+        emit pressFixDrawButton();
+        removeTrussElemHighlight ();
+    }
+    if ( ke->key() == Qt::Key_L && designerBehaviour != onLoadDraw )
+    {
+        designerBehaviour = onLoadDraw;
+        emit pressLoadDrawButton();
         removeTrussElemHighlight ();
     }
     if ( ke->key() == Qt::Key_Escape  && designerBehaviour != onSelect )
@@ -658,7 +677,9 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                 else if ( selectedWindow->inFDiagResizeRect ( x, y ) )
                     QWidget::setCursor ( Qt::SizeFDiagCursor );
                 else if ( designerBehaviour == onSelect || 
-                          designerBehaviour == onErase )
+                          designerBehaviour == onErase ||
+                          designerBehaviour == onFixDraw ||
+                          designerBehaviour == onLoadDraw )
                 {
                     selectedNode = selectedWindow->findNodeByWidgetPos( x, y );
                     selectedPivot = selectedWindow->findPivotByWidgetPos( x, y );
@@ -669,13 +690,16 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                         selectedWindow->setFocusOnNode( selectedNode );
                         selectedWindow->setCursorCoord( selectedNode->getPoint() );
                         nodeBehaviour = onNodeSelect;
-                        if ( designerBehaviour == onErase )
+                        if ( designerBehaviour == onErase ||
+                             designerBehaviour == onFixDraw ||
+                             designerBehaviour == onLoadDraw )
                             QWidget::setCursor ( Qt::CrossCursor );
                         else
                             QWidget::setCursor ( Qt::ArrowCursor );
                         update();
                     }
-                    else if ( selectedPivot )
+                    else if ( selectedPivot && designerBehaviour == onSelect ||
+                              selectedPivot && designerBehaviour == onErase )
                     {
                         removeTrussElemHighlight ();
                         clearAllCursorCoordFields ();
@@ -900,10 +924,18 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
             else
             {
                 selectedWindow->nodeToFront ( *selectedNode );
+
+                if ( designerBehaviour == onFixDraw )
+                    emit onFixationSet( *selectedNode );
+                else if ( designerBehaviour == onLoadDraw )
+                    emit onLoadSet( *selectedNode );                
+                else
+                {
+                    // Save pos for Undo/Redo
+                    beforeDragNodePos = selectedNode->getPoint();
+                    nodeBehaviour = onNodeDrag;
+                }
                 update();
-                // Save pos for Undo/Redo
-                beforeDragNodePos = selectedNode->getPoint();
-                nodeBehaviour = onNodeDrag;
             }
         }
         else if ( pivotBehaviour == onPivotSelect )

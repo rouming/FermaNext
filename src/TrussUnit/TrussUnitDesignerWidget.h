@@ -56,8 +56,11 @@ signals:
     void pressNodeDrawButton ();
     void pressPivotDrawButton ();
     void pressFixDrawButton ();
-    void pressForceDrawButton ();
+    void pressLoadDrawButton ();
     void pressEraseButton ();
+    // popup list signals
+    void onFixationSet ( TrussNode& );
+    void onLoadSet ( TrussNode& );
 
 public slots:
     virtual void addTrussUnitWindow ( TrussUnitWindow& );    
@@ -66,7 +69,7 @@ public slots:
     virtual void changeBehaviourToNodeDraw ();
     virtual void changeBehaviourToPivotDraw ();
     virtual void changeBehaviourToFixDraw ();
-    virtual void changeBehaviourToForceDraw ();
+    virtual void changeBehaviourToLoadDraw ();
     virtual void changeBehaviourToErase ();
     virtual void updateDesignerWidget ();
 
@@ -81,7 +84,7 @@ private:
     enum TrussNodeBehaviour { nodeIdle = 0, onNodeSelect, onNodeDrag };
     enum TrussPivotBehaviour { pivotIdle = 0, onPivotSelect, onPivotDrag };
     enum DesignerBehaviour { onSelect = 0, onNodeDraw, onPivotFirstNodeDraw, 
-                            onPivotLastNodeDraw, onFixDraw, onForceDraw, onErase };
+                            onPivotLastNodeDraw, onFixDraw, onLoadDraw, onErase };
 
     // Windows to show
     WindowList trussWindows;
