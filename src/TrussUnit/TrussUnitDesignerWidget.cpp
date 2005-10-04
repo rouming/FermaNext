@@ -25,11 +25,11 @@ TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
     winBehaviour(windowIdle),
     nodeBehaviour(nodeIdle),
     pivotBehaviour(pivotIdle),
+    buttonPressed(false),
     clickX(0), clickY(0), 
     firstNodeClickDist(0,0), 
     lastNodeClickDist(0,0),
     toolBar( new TrussUnitToolBar( QPoint(0,0), 15, 15, 8, 5, 5, 30 ) ),
-    buttonPressed(false),
     // Temp
     X(50), Y(50)
 {

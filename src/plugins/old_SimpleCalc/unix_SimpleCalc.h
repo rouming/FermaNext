@@ -58,7 +58,7 @@ public:
     }
     
 private:
-    QSocketDevice socket;
+    mutable QSocketDevice socket;
     CalcThread calcThread;
 };
 

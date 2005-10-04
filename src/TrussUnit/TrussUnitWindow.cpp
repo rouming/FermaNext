@@ -22,8 +22,8 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name,
     cursorCoord ( -1, -1 ),
     windowSize ( 250, 250),
     coordFieldSize ( 49, 12 ),
-    coordFieldRendered( false ),
     buttonBufRendered( false ),
+    coordFieldRendered( false ),
     maximized( false )
 {
     QObject::connect( hideButton, SIGNAL( onButtonHighlightChange() ),
