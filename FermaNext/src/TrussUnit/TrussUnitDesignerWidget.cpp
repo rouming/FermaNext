@@ -38,7 +38,40 @@ TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
     initToolBar();
     designerBehaviour = onSelect;
     emit pressSelectButton();
+    Popup = new QPopupMenu;
+    Popup -> insertItem ( "Fixation by X", this, SLOT( fixbyX() ));
+    Popup -> insertItem ( "Fixation by Y", this, SLOT( fixbyY() ));
+    Popup -> insertItem ( "Fixation by XY", this, SLOT( fixbyXY() ));
+    Popup ->insertSeparator();
+    Popup -> insertItem ( "Unfixed", this, SLOT( unfix()));
+    connect (this, SIGNAL( onFixationSet( TrussNode& ) ), this, SLOT(showMenu()));
+}   
+
+//-------------------------------------------
+
+void TrussUnitDesignerWidget::showMenu()
+{
+    Popup -> exec(QCursor::pos());
 }
+
+void TrussUnitDesignerWidget::fixbyX()
+{
+}
+
+void TrussUnitDesignerWidget::fixbyY()
+{
+}
+
+void TrussUnitDesignerWidget::fixbyXY()
+{
+}
+
+void TrussUnitDesignerWidget::unfix()
+{
+}
+
+
+//-------------------------------------------
 
 TrussUnitDesignerWidget::~TrussUnitDesignerWidget ()
 {
