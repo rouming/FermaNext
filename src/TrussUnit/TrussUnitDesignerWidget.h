@@ -5,6 +5,7 @@
 #include "AggQWidget.h"
 #include "TrussUnitWindowManager.h"
 #include "TrussUnitToolBar.h"
+#include <qpopupmenu.h>
 
 class TrussUnitDesignerWidget : public AggQWidget
 {
@@ -41,6 +42,8 @@ protected:
                                              bool firstPivotWasCreated,
                                              TrussNode& lastNode, 
                                              TrussPivot& );
+    QPopupMenu * Popup;
+
 public:
     // Handlers on events
     void aggPaintEvent ( QPaintEvent* );
@@ -72,6 +75,13 @@ public slots:
     virtual void changeBehaviourToLoadDraw ();
     virtual void changeBehaviourToErase ();
     virtual void updateDesignerWidget ();
+
+protected slots:
+    void fixbyX ();
+    void fixbyY ();
+    void fixbyXY ();
+    void unfix();
+    void showMenu();
 
 protected:
     virtual void initToolBar ();
