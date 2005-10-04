@@ -682,7 +682,7 @@ TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( const QPoint& pos,
                                                     double precision ) const
 {
     DoublePoint coord = getTrussCoordFromWidgetPos ( pos );
-    return findPivotByCoord ( coord );
+    return findPivotByCoord ( coord, precision );
 }
 
 TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( const QPoint& pos ) const
@@ -693,7 +693,7 @@ TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( const QPoint& pos ) const
 TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y, 
                                                     double precision ) const
 {
-    return findPivotByWidgetPos ( QPoint( x, y ) );
+    return findPivotByWidgetPos ( QPoint( x, y ), precision );
 }
 
 TrussPivot* TrussUnitWindow::findPivotByWidgetPos ( int x, int y ) const
@@ -1296,8 +1296,8 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
     double areaLenInPix = rightBottomAreaPos.x() - leftTopAreaPos.x();
     double areaWidInPix = rightBottomAreaPos.y() - leftTopAreaPos.y();
 
-    int strokeNumbX = areaLenInPix / 36;
-    int strokeNumbY = areaWidInPix / 32;
+    int strokeNumbX = int(areaLenInPix / 36);
+    int strokeNumbY = int(areaWidInPix / 32);
 
     double scaleFactorXInPix = areaLenInPix / strokeNumbX;
     double scaleFactorYInPix = areaWidInPix / strokeNumbY;
@@ -1306,14 +1306,14 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
     double scaleFactorYInAbs = getTrussAreaSize().width() / strokeNumbY;
 
     // left point of the scale stroke
-    QPoint strokePnt1( leftTopAreaPos.x() - scalePieceLength,
-                       leftTopAreaPos.y() + scaleFactorYInPix );
+    QPoint strokePnt1( int(leftTopAreaPos.x() - scalePieceLength),
+                       int(leftTopAreaPos.y() + scaleFactorYInPix) );
     // right point of the scale stroke
     QPoint strokePnt2( leftTopAreaPos.x(),
                        strokePnt1.y() );
     QPoint textPos ( bordWidth + 3, strokePnt1.y() + 3 );
     QString str;
-    uint i;
+    int i;
     for (i = 1; i < strokeNumbY; i++ )
     {
         strokePnt1.setY( int(leftTopAreaPos.y() + i * scaleFactorYInPix) );
@@ -1326,7 +1326,7 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
     }
 
     // top point of the scale stroke
-    strokePnt1.setX( leftTopAreaPos.x() + scaleFactorXInPix );
+    strokePnt1.setX( int(leftTopAreaPos.x() + scaleFactorXInPix) );
     strokePnt1.setY( rightBottomAreaPos.y() );
     // bottom point of the scale stroke
     strokePnt2.setX( strokePnt1.x() );
@@ -1348,7 +1348,7 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
     p2 = rightBottomAreaPos;
 
     p2.setX ( p1.x() - scalePieceLength );
-    p1.setY ( p1.y() + scaleFactorYInPix );
+    p1.setY ( int(p1.y() + scaleFactorYInPix) );
     p2.setY ( p1.y() );
 
     p1 = leftTopAreaPos;
