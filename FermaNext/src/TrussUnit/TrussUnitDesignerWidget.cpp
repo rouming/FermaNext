@@ -38,35 +38,37 @@ TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
     initToolBar();
     designerBehaviour = onSelect;
     emit pressSelectButton();
-    Popup = new QPopupMenu;
-    Popup -> insertItem ( "Fixation by X", this, SLOT( fixbyX() ));
-    Popup -> insertItem ( "Fixation by Y", this, SLOT( fixbyY() ));
-    Popup -> insertItem ( "Fixation by XY", this, SLOT( fixbyXY() ));
-    Popup ->insertSeparator();
-    Popup -> insertItem ( "Unfixed", this, SLOT( unfix()));
-    connect (this, SIGNAL( onFixationSet( TrussNode& ) ), this, SLOT(showMenu()));
+    fixationPopup=new QPopupMenu;
+    fixationPopup->insertItem("Fixation by X",this,SLOT( fixNodeByX()));
+    fixationPopup->insertItem("Fixation by Y",this,SLOT( fixNodeByY()));
+    fixationPopup->insertItem("Fixation by XY",this,SLOT( fixNodeByXY()));
+    fixationPopup->insertSeparator();
+    fixationPopup->insertItem("Unfixed",this,SLOT(unFixNode()));
+    connect(this,SIGNAL(onFixationSet(TrussNode&)),this,SLOT(showFixationPopup()));
 }   
 
 //-------------------------------------------
 
-void TrussUnitDesignerWidget::showMenu()
+void TrussUnitDesignerWidget::showFixationPopup()
 {
-    Popup -> exec(QCursor::pos());
+    fixationPopup->exec(QCursor::pos());
+    QMouseEvent me( QEvent::MouseButtonRelease, QPoint(0,0), QPoint(0,0), QMouseEvent::LeftButton, QMouseEvent::NoButton);
+    QApplication::sendEvent( this, &me );
 }
 
-void TrussUnitDesignerWidget::fixbyX()
-{
-}
-
-void TrussUnitDesignerWidget::fixbyY()
+void TrussUnitDesignerWidget::fixNodeByX()
 {
 }
 
-void TrussUnitDesignerWidget::fixbyXY()
+void TrussUnitDesignerWidget::fixNodeByY()
 {
 }
 
-void TrussUnitDesignerWidget::unfix()
+void TrussUnitDesignerWidget::fixNodeByXY()
+{
+}
+
+void TrussUnitDesignerWidget::unFixNode()
 {
 }
 
@@ -77,6 +79,7 @@ TrussUnitDesignerWidget::~TrussUnitDesignerWidget ()
 {
     clearTrussUnitWindows();
     delete toolBar;
+    delete fixationPopup;
 }
 
 void TrussUnitDesignerWidget::clearTrussUnitWindows ()
