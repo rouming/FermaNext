@@ -36,7 +36,7 @@ void FixationPopupMenu::showFixationPopup ( QMouseEvent* e, TrussNode* n )
     node = n;
     releaseEvent = QMouseEvent( QEvent::MouseButtonRelease,  e->pos(), 
                                 e->globalPos(), e->button(), e->button() );
-    exec( e->globalPos() );
+    popup( e->globalPos() );
 }
 
 void FixationPopupMenu::popupHide ()
