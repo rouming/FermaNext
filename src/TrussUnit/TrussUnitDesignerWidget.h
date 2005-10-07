@@ -6,7 +6,28 @@
 #include "TrussUnitWindowManager.h"
 #include "TrussUnitToolBar.h"
 #include <qpopupmenu.h>
-#include <qapplication.h>
+
+class FixationPopupMenu : public QPopupMenu
+{
+    Q_OBJECT
+public:
+    FixationPopupMenu ( QWidget* parent = 0, const char*  name = 0 );
+    void showFixationPopup ( QMouseEvent* pressEvent, TrussNode* );
+
+protected slots:
+    void popupHide ();
+
+    void fixNodeByX ();
+    void fixNodeByY ();
+    void fixNodeByXY ();
+    void unfixNode ();
+
+private:
+    QMouseEvent releaseEvent;
+    TrussNode* node;
+};
+
+/*****************************************************************************/
 
 class TrussUnitDesignerWidget : public AggQWidget
 {
@@ -43,7 +64,6 @@ protected:
                                              bool firstPivotWasCreated,
                                              TrussNode& lastNode, 
                                              TrussPivot& );
-    QPopupMenu * fixationPopup;
 
 public:
     // Handlers on events
@@ -77,13 +97,6 @@ public slots:
     virtual void changeBehaviourToErase ();
     virtual void updateDesignerWidget ();
 
-protected slots:
-    void fixNodeByX ();
-    void fixNodeByY ();
-    void fixNodeByXY ();
-    void unFixNode();
-    void showFixationPopup();
-
 protected:
     virtual void initToolBar ();
     virtual void clearTrussUnitWindows ();
@@ -99,6 +112,8 @@ private:
 
     // Windows to show
     WindowList trussWindows;
+    // Node fixation popup menu
+    FixationPopupMenu* fixationPopup;
     // Focused truss unit window
     TrussUnitWindow* focusedWindow;
     // Current selected truss elements
