@@ -21,8 +21,12 @@
 #include <qglobal.h>
 #include <qcstring.h>
 
+template <class N, class P> class Truss;
+template <class N> class Pivot;
+class Node;
+typedef Truss< Node, Pivot<Node> > TrussTopology;
+
 class Plugin;
-class TrussTopology;
 class TrussCalcData;
 
 typedef Q_UINT16 PluginChecksum;
