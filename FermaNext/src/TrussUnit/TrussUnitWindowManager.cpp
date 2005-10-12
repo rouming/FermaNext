@@ -242,10 +242,10 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
         node->setFixation( fix );
     }
 
-    TrussUnitLoadCases& loadCases = truss.getLoadCases();
+    TrussUnit::LoadCases& loadCases = truss.getLoadCases();
     for ( i = 0; i < loadCasesNum; ++i )
     {
-        TrussUnitLoadCase& loadCase = loadCases.createLoadCase();
+        TrussUnit::LoadCase& loadCase = loadCases.createLoadCase();
         if ( i == 2 )
             loadCases.setCurrentLoadCase ( loadCase );
 
