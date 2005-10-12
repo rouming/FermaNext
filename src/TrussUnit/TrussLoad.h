@@ -49,6 +49,12 @@ template <class N>
 class TrussLoadCase
 {
 public:
+    // Basic typedefs
+    typedef QMap<const N*, TrussLoad*> TrussLoadMap;
+
+    TrussLoadCase ()
+    {}
+
     virtual ~TrussLoadCase ()
     { 
         TrussLoadMapIter iter = loads.begin();
@@ -110,6 +116,11 @@ public:
         return 0;
     }
 
+    virtual TrussLoadMap getTrussLoadMap () const
+    {
+        return loads;
+    }
+
     virtual size_t countLoads () const
     {
         size_t loadsNum = 0;
@@ -135,7 +146,10 @@ protected:
     }
 
 private:
-    typedef QMap<const N*, TrussLoad*> TrussLoadMap;
+    TrussLoadCase ( const TrussLoadCase& );
+    TrussLoadCase& operator= ( const TrussLoadCase& );
+
+private:
     typedef typename TrussLoadMap::iterator TrussLoadMapIter;
     typedef typename TrussLoadMap::const_iterator TrussLoadMapConstIter;
 
@@ -258,6 +272,10 @@ protected:
             delete *iter;
         loadCases.clear();
     }
+
+private:
+    TrussLoadCaseArray ( const TrussLoadCaseArray& );
+    TrussLoadCaseArray& operator= ( const TrussLoadCaseArray& );
     
 private:
     typedef std::vector<TrussLoadCase<N>*> TrussLoadCaseList;

@@ -11,6 +11,7 @@ public:
     TrussMaterial ( const QString&,
                     double workingStress,
                     double elasticityModule );
+    TrussMaterial& operator= ( const TrussMaterial& );
 
     virtual ~TrussMaterial ();
 

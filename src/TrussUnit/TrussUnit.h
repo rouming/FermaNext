@@ -9,11 +9,6 @@ class TrussPivot;
 
 /*****************************************************************************/
 
-typedef TrussLoadCaseArray<TrussNode> TrussUnitLoadCases;
-typedef TrussLoadCase<TrussNode> TrussUnitLoadCase;
-
-/*****************************************************************************/
-
 class PaintableTrussElement
 {
 public:

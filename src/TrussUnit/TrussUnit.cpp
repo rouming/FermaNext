@@ -191,7 +191,7 @@ void TrussUnit::paint ( ren_dynarow& baseRend, double scaleMultX,
     for ( ; pivotsIter != pivotList.end(); ++pivotsIter )
         (*pivotsIter)->paint( baseRend, scaleMultX, scaleMultY, trussAreaHeight );
 
-    TrussUnitLoadCase* loadCase = getLoadCases().getCurrentLoadCase();
+    LoadCase* loadCase = getLoadCases().getCurrentLoadCase();
     NodeList nodeList = getNodeList ();
     NodeList::const_iterator nodesIter = nodeList.begin();
     for ( ; nodesIter != nodeList.end(); ++nodesIter )

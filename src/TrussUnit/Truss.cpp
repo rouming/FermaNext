@@ -14,6 +14,9 @@ TrussDimension::TrussDimension ( LengthMeasure lm, ForceMeasure fm ) :
     length(lm), force(fm)
 {}
 
+TrussDimension& TrussDimension::operator= ( const TrussDimension&  dim )
+{ length = dim.length; force = dim.force; return *this; }
+
 TrussDimension::LengthMeasure TrussDimension::getLengthMeasure () const
 { return length; }
 

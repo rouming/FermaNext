@@ -18,6 +18,14 @@ TrussMaterial::TrussMaterial ( const QString& name,
     elasticityModule(elasticityModule_)
 {}
 
+TrussMaterial& TrussMaterial::operator= ( const TrussMaterial& mat )
+{
+    materialName = mat.materialName;
+    workingStress = mat.workingStress;
+    elasticityModule = mat.elasticityModule;
+    return *this;
+}
+
 TrussMaterial::~TrussMaterial ()
 {}
 

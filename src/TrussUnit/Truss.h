@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <qobject.h>
+#include <qmap.h>
 
 #include "Geometry.h"
 #include "StatefulObject.h"
@@ -15,6 +16,7 @@
 template <class N, class P> class Truss;
 template <class N> class Pivot;
 class Node;
+typedef Truss< Node, Pivot<Node> > TrussTopology;
 
 /*****************************************************************************
  * Truss Dimenstion
@@ -28,6 +30,7 @@ public:
 
     TrussDimension ();
     TrussDimension ( LengthMeasure, ForceMeasure );
+    TrussDimension& operator= ( const TrussDimension& );
 
     LengthMeasure getLengthMeasure () const;
     ForceMeasure getForceMeasure () const;
@@ -68,6 +71,11 @@ protected slots:
     virtual void pivotBeforeDesist ( StatefulObject& ) = 0;
     virtual void pivotAfterDesist ( StatefulObject& ) = 0;
 
+    virtual void topologyBeforeRevive ( StatefulObject& ) = 0;
+    virtual void topologyAfterRevive ( StatefulObject& ) = 0;
+    virtual void topologyBeforeDesist ( StatefulObject& ) = 0;
+    virtual void topologyAfterDesist ( StatefulObject& ) = 0;
+
 signals:
     // Truss signals
     void onStateChange ();
@@ -96,6 +104,18 @@ signals:
     void afterPivotRevive ( Node&, Node& );
     void beforePivotDesist ( Node&, Node& );
     void afterPivotDesist ( Node&, Node& );
+
+    // Topologies create/remove signals
+    void beforeTopologyCreation ();
+    void afterTopologyCreation ( const TrussTopology& );
+    void beforeTopologyRemoval ( const TrussTopology& );
+    void afterTopologyRemoval ();
+
+    // Topologies revive/desist signals
+    void beforeTopologyRevive ( TrussTopology& );
+    void afterTopologyRevive ( TrussTopology& );
+    void beforeTopologyDesist ( TrussTopology& );
+    void afterTopologyDesist ( TrussTopology& );
 };
 
 /*****************************************************************************
@@ -109,13 +129,21 @@ public:
     // Truss exceptions
     class NodeIndexOutOfBoundException {};
 
+    // Basic typedefs
     typedef std::vector<N*> NodeList;
     typedef std::vector<P*> PivotList;
+    typedef std::vector<TrussTopology*> TopologyList;
+    typedef TrussLoadCaseArray<N> LoadCases;
+    typedef TrussLoadCase<N> LoadCase;
+    // Node iterators
     typedef typename NodeList::iterator NodeListIter;
     typedef typename NodeList::const_iterator NodeListConstIter;
+    // Pivot iterators
     typedef typename PivotList::iterator PivotListIter;
-    typedef typename NodeList::const_iterator NodeListConstIter;
     typedef typename PivotList::const_iterator PivotListConstIter;
+    // Topology iterators
+    typedef typename TopologyList::iterator TopologyListIter;
+    typedef typename TopologyList::const_iterator TopologyListConstIter;    
 
     Truss ( ObjectStateManager* mng ) :
         TrussEmitter(mng)
@@ -123,18 +151,24 @@ public:
 
     virtual void clear () 
     {
-        NodeListIter itNodes;
-        PivotListIter itPivots;
-        for ( itNodes = nodes.begin(); 
-              itNodes != nodes.end(); 
-              ++itNodes )
-            delete *itNodes;
-        for ( itPivots = pivots.begin(); 
-              itPivots != pivots.end();  
-              ++itPivots )
-            delete *itPivots;
+        NodeListIter itNode;
+        PivotListIter itPivot;
+        TopologyListIter itTopology;
+        for ( itNode = nodes.begin(); 
+              itNode != nodes.end(); 
+              ++itNode )
+            delete *itNode;
+        for ( itPivot = pivots.begin(); 
+              itPivot != pivots.end();  
+              ++itPivot )
+            delete *itPivot;
+        for ( itTopology = topologies.begin(); 
+              itTopology != topologies.end();  
+              ++itTopology )
+            delete *itTopology;
         nodes.clear();
         pivots.clear();
+        topologies.clear();
     }
 
     virtual ~Truss ()
@@ -167,7 +201,8 @@ public:
                 continue;
             const DoublePoint& pos = node->getPoint();
             if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
-                   (point.y() - pos.y()) * (point.y() - pos.y()) ) < sqrt( precision ) )
+                   (point.y() - pos.y()) * (point.y() - pos.y()) ) < 
+                 sqrt( precision ) )
                 return node;
         }
         return 0;
@@ -219,9 +254,14 @@ public:
         return findAdjoiningPivots( node, true );
     }
 
+    virtual N& createNode ( const DoublePoint& p )
+    {
+        return createNode( p.x(), p.y() );
+    }
+
     virtual N& createNode ( double x, double y )
     {
-        // Clean earlier desisted nodes/pivots
+        // Clean earlier desisted truss objects
         suspendedClean();
 
         emit beforeNodeCreation();
@@ -251,7 +291,7 @@ public:
     }
 
     virtual P& createPivot ( uint firstNodeIndex, uint lastNodeIndex ) 
-                                                        throw (NodeIndexOutOfBoundException) 
+                                          throw (NodeIndexOutOfBoundException) 
     {
         if ( lastNodeIndex >= nodes.size() || lastNodeIndex >= nodes.size() )
             throw NodeIndexOutOfBoundException();
@@ -264,12 +304,13 @@ public:
 
     virtual P& createPivot ( N& first, N& last )
     {
-        // Clean earlier desisted nodes/pivots
+        // Clean earlier desisted truss objects
         suspendedClean();
 
         emit beforePivotCreation();
         P* pivot = new P( first, last, getStateManager() );
         pivot->setNumber( countPivots() + 1 );
+
         // Signal connects to catch life time changing
         QObject::connect( pivot, SIGNAL(onBeforeRevive(StatefulObject&)),
                                  SLOT(pivotBeforeRevive(StatefulObject&)) );
@@ -290,10 +331,75 @@ public:
         return *pivot;    
     }
 
+    virtual TrussTopology& createTopology ()
+    {
+        // Clean earlier desisted truss objects
+        suspendedClean();
+
+        emit beforeTopologyCreation();
+        TrussTopology* topology = new TrussTopology( getStateManager() );
+
+        QMap<const N*, Node*> nodesMap;
+        NodeList nodes = getNodeList();
+        for ( NodeListIter nIter = nodes.begin(); nIter != nodes.end(); 
+              ++nIter ) {
+            Node& n = topology->createNode( (*nIter)->getPoint() );
+            n.setFixation( (*nIter)->getFixation() );
+            nodesMap[*nIter] = &n;
+        }
+
+        PivotList pivots = getPivotList();
+        for ( PivotListIter pIter = pivots.begin(); pIter != pivots.end(); 
+              ++pIter ) {
+            Node* firstNode = nodesMap[&(*pIter)->getFirstNode()];
+            Node* lastNode  = nodesMap[&(*pIter)->getLastNode()];
+            Pivot<Node>& p = topology->createPivot( *firstNode, *lastNode );
+            p.setThickness( (*pIter)->getThickness() );
+        }
+
+        LoadCases& loadCases = getLoadCases();
+        TrussTopology::LoadCases& topologyLoadCases = topology->getLoadCases();
+        for ( uint loadCaseInd = 1; loadCaseInd <= loadCases.countLoadCases();
+              ++loadCaseInd ) {
+            LoadCase* loadCase = loadCases.findLoadCase( loadCaseInd );
+            if ( loadCase == 0 )
+                continue;
+
+            TrussTopology::LoadCase& topologyLoadCase = 
+                topologyLoadCases.createLoadCase();
+            typename LoadCase::TrussLoadMap loads = 
+                loadCase->getTrussLoadMap();
+            typename LoadCase::TrussLoadMap::Iterator iter = loads.begin();
+            for ( ; iter != loads.end(); ++iter )
+                topologyLoadCase.addLoad( *nodesMap[iter.key()], 
+                                          iter.data()->getXForce(),
+                                          iter.data()->getYForce() );
+        }
+
+        topology->setMaterial( getMaterial()  );
+        topology->setDimension( getDimension() );
+        topology->setTrussAreaSize( getTrussAreaSize() );
+
+        // Signal connects to catch life time changing
+        QObject::connect( topology, SIGNAL(onBeforeRevive(StatefulObject&)),
+                                 SLOT(topologyBeforeRevive(StatefulObject&)) );
+        QObject::connect( topology, SIGNAL(onAfterRevive(StatefulObject&)),
+                                 SLOT(topologyAfterRevive(StatefulObject&)) );
+        QObject::connect( topology, SIGNAL(onBeforeDesist(StatefulObject&)),
+                                 SLOT(topologyBeforeDesist(StatefulObject&)) );
+        QObject::connect( topology, SIGNAL(onAfterDesist(StatefulObject&)),
+                                 SLOT(topologyAfterDesist(StatefulObject&)) );
+
+        topologies.push_back( topology );
+        emit afterTopologyCreation( *topology );
+
+        return *topology;
+    }
+
     // Momentary removing of an object. Nothing can revive it.
     virtual bool removePivot ( const P& pivot )
     {
-        // Clean earlier desisted nodes/pivots
+        // Clean earlier desisted truss objects
         suspendedClean();
         PivotListIter iter = pivots.begin();
         for ( ; iter != pivots.end(); ++iter ) 
@@ -308,7 +414,7 @@ public:
     // Momentary removing of an object. Nothing can revive it.
     virtual bool removeNode ( const N& node )
     {
-        // Clean earlier desisted nodes/pivots
+        // Clean earlier desisted truss objects
         suspendedClean();
         NodeListIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
@@ -318,6 +424,22 @@ public:
                 return removeNode(iter);
             }            
         return false;    
+    }
+
+    // Momentary removing of an object. Nothing can revive it.
+    virtual bool removeTopology ( const TrussTopology& topology )
+    {
+        // Clean earlier desisted truss objects
+        suspendedClean();
+        TopologyListIter iter = topologies.begin();
+        for ( ; iter != topologies.end(); ++iter )
+            if ( (*iter) == &topology ) {
+                // Desist first
+                (*iter)->desist();
+                return removeTopology(iter);
+
+            }
+        return false;
     }
 
     virtual uint countNodes ()
@@ -344,6 +466,18 @@ public:
         return pivotsNum;
     }
 
+    virtual uint countTopologies ()
+    {
+        uint topologiesNum = 0;
+        TopologyListIter tIter = topologies.begin();
+        for ( ; tIter != topologies.end(); ++tIter ) {
+            TrussTopology* topology = *tIter;
+            if ( topology->isAlive() )
+                ++topologiesNum;
+        }
+        return topologiesNum;
+    }
+
     // Returns alive nodes
     virtual NodeList getNodeList () const
     {
@@ -359,7 +493,7 @@ public:
         return aliveNodes;
     }
 
-    // Returns alive nodes
+    // Returns alive pivots
     virtual PivotList getPivotList () const
     {
         PivotList alivePivots;
@@ -374,6 +508,20 @@ public:
         return alivePivots;
     }
 
+    // Returns alive topologies
+    virtual TopologyList getTopologyList () const
+    {
+        TopologyList aliveTopologies;
+        TopologyListConstIter iter = topologies.begin();
+        for ( ; iter != topologies.end(); ++iter ) {
+            TrussTopology* topology = *iter;
+            if ( topology->isAlive() ) {
+                aliveTopologies.push_back( topology );
+            }
+        }
+        return aliveTopologies;
+    }
+
     virtual const DoubleSize& getTrussAreaSize () const
     {
         return trussAreaSize;
@@ -386,12 +534,12 @@ public:
         emit onStateChange();
     }
 
-    virtual const TrussLoadCaseArray<N>& getLoadCases () const
+    virtual const LoadCases& getLoadCases () const
     {
         return loadCases;
     }
 
-    virtual TrussLoadCaseArray<N>& getLoadCases ()
+    virtual LoadCases& getLoadCases ()
     {
         return loadCases;
     }
@@ -406,6 +554,11 @@ public:
         return material;
     }
 
+    virtual void setMaterial ( const TrussMaterial& mat )
+    {
+        material = mat;
+    }
+
     virtual const TrussDimension& getDimension () const
     {
         return dimension;
@@ -416,7 +569,14 @@ public:
         return dimension;
     }
 
+    virtual void setDimension ( const TrussDimension& dim )
+    {
+        dimension = dim;
+    }
+
 protected:
+/****************************** nodes ****************************************/
+
     virtual void nodeBeforeRevive ( StatefulObject& st )
     {
         // Safe conversion
@@ -467,6 +627,8 @@ protected:
         catch ( ... ) { return; }        
     }
 
+/****************************** pivots ***************************************/
+
     virtual void pivotBeforeRevive ( StatefulObject& st )
     {
         // Safe conversion
@@ -509,6 +671,50 @@ protected:
         catch ( ... ) { return; }
     }
 
+/****************************** toplogies ************************************/
+
+    virtual void topologyBeforeRevive ( StatefulObject& st )
+    {
+        // Safe conversion
+        try {
+            TrussTopology& topology = dynamic_cast<TrussTopology&>(st);
+            emit beforeTopologyRevive( topology );
+        }
+        catch ( ... ) { return; }
+    }
+
+    virtual void topologyAfterRevive ( StatefulObject& st )
+    {
+        // Safe conversion
+        try {
+            TrussTopology& topology = dynamic_cast<TrussTopology&>(st);
+            emit afterTopologyRevive( topology );
+            emit onStateChange();
+        }
+        catch ( ... ) { return; }
+    }
+
+    virtual void topologyBeforeDesist ( StatefulObject& st )
+    {
+        // Safe conversion
+        try {
+            TrussTopology& topology = dynamic_cast<TrussTopology&>(st); 
+            emit beforeTopologyDesist( topology );
+        }
+        catch ( ... ) { return; }
+    }
+
+    virtual void topologyAfterDesist ( StatefulObject& st )
+    {
+        // Safe conversion
+        try {
+            TrussTopology& topology = dynamic_cast<TrussTopology&>(st);
+            emit afterTopologyDesist( topology );
+            emit onStateChange();
+        }
+        catch ( ... ) { return; }
+    }
+
     // Physically removes nodes and pivots
     virtual void suspendedClean () 
     {
@@ -532,6 +738,18 @@ protected:
             }
             else
                 ++nIter;
+        }
+
+        // Clean desisted topologies without states
+        TopologyListIter tIter = topologies.begin();
+        for ( ; tIter != topologies.end(); ) {
+            TrussTopology* topology = *tIter;
+            if ( !topology->isAlive() && 
+                 topology->countEnabledStates() == 0 ) {
+                removeTopology(tIter);
+            }
+            else
+                ++tIter;
         }
     }
 
@@ -602,11 +820,28 @@ protected:
         return true;
     }
 
+    // Momentary removing of desisted object. Nothing can revive it.
+    virtual bool removeTopology ( TopologyListIter& iter )
+    {
+        if ( iter == topologies.end() )
+            return false;
+        TrussTopology* t = *iter;
+        if ( t->isAlive() )
+            return false;
+        emit beforeTopologyRemoval(*t);
+        topologies.erase(iter);
+        delete t;
+        emit afterTopologyRemoval();
+        emit onStateChange();
+        return true;
+    }
+
 private:
     NodeList  nodes;
     PivotList pivots;
+    TopologyList topologies;
     DoubleSize trussAreaSize;
-    TrussLoadCaseArray<N> loadCases;
+    LoadCases loadCases;
     TrussMaterial material;
     TrussDimension dimension;
 };
