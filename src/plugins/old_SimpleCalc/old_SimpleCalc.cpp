@@ -1,6 +1,6 @@
 
 #include "old_SimpleCalc.h"
-#include "TrussTopology.h"
+#include "Truss.h"
 #include "TrussCalcData.h"
 #include "FRMWriter.h"
 #include "VYVReader.h"
@@ -45,15 +45,18 @@ bool SimpleCalcPlugin::dependsOn ( PluginType ) const
 { 
     return false; 
 }
-
+#include <iostream>
 void SimpleCalcPlugin::calculate ( TrussTopology& truss, 
                                    TrussCalcData& data ) const
 {
+    QString vyvFile( tempFileName() + fermaResExt );
     FRMWriter frm(truss);
     frm.write( tempFileName() );
+    QFile::remove( vyvFile );
     startCalculation( tempFileName() );
     VYVReader vyv(data);
-    vyv.read( tempFileName() + fermaResExt );
+    vyv.read( vyvFile );
+    QFile::remove( vyvFile );
 }
 
 void SimpleCalcPlugin::createTempFile ()
@@ -63,7 +66,6 @@ void SimpleCalcPlugin::createTempFile ()
 
 void SimpleCalcPlugin::destroyTempFile () 
 { 
-    QFile::remove( tempFile + fermaResExt );
     QFile::remove( tempFile ); 
 }
 

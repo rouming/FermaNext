@@ -2,7 +2,8 @@
 #ifndef FRMWRITER_H
 #define FRMWRITER_H
 
-class TrussTopology;
+#include "Truss.h"
+
 class QString;
 
 class FRMWriter
