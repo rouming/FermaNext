@@ -47,11 +47,7 @@ public:
     virtual void removeButton ( const QString& label );
     virtual void clearToolBar ();
 
-    virtual void setCenterPoint ( QPoint );
-    virtual QPoint getCenterPoint () const; 
-
-    virtual QPoint getPosition () const;
-    virtual void setPosition ( QPoint );
+    void changeCenterPosition ( QPoint );
 
     virtual void setButtonSeparation ( int );
     virtual int getButtonSeparation () const;
@@ -79,7 +75,7 @@ public:
 
 signals:
     void onRenderingStatusCleared ();
-    void onChangeToolBarPosition ();
+    void onChangeToolBarState ();
 
 protected slots:
     void releaseButtons ();
@@ -91,6 +87,9 @@ protected:
     typedef ButtonList::const_iterator ButtonListConstIter;
 
     virtual void clean ();
+
+    virtual QPoint getPosition () const;
+    virtual void setPosition ( QPoint );
 
     virtual ButtonList getButtonList () const;
 

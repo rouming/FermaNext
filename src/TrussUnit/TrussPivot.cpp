@@ -42,8 +42,8 @@ void TrussPivot::removePivotHighlight ()
     setHighlighted ( false );
 }
 
-void TrussPivot::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
-                        double trussAreaHeight) const
+void TrussPivot::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
+                         double trussAreaHeight) const
 {
     if ( !isVisible() )
         return;
@@ -57,17 +57,17 @@ void TrussPivot::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleM
     QPoint pos1, pos2;
     const DoublePoint& coord1 = getFirstNode().getPoint();
     const DoublePoint& coord2 = getLastNode().getPoint();
-    pos1.setX( int(coord1.x() * scaleMultX + leftWindowIndent) );
+    pos1.setX( int(coord1.x() * scaleMult.x() + trussBufIndent) );
     pos1.setY( flipY ? int(( trussAreaHeight - coord1.y() ) * 
-                             scaleMultY + topWindowIndent ) :
-                       int( coord1.y() * scaleMultY + topWindowIndent ) );
-    pos2.setX( int(coord2.x() * scaleMultX + leftWindowIndent) );
+                             scaleMult.y() + trussBufIndent ) :
+                       int( coord1.y() * scaleMult.y() + trussBufIndent ) );
+    pos2.setX( int(coord2.x() * scaleMult.x() + trussBufIndent) );
     pos2.setY( flipY ? int(( trussAreaHeight - coord2.y() ) * 
-                             scaleMultY + topWindowIndent ):
-                       int(coord2.y() * scaleMultY + topWindowIndent ) );
+                             scaleMult.y() + trussBufIndent ):
+                       int(coord2.y() * scaleMult.y() + trussBufIndent ) );
     if ( isHighlighted () )
         drawLine ( ras, solidRend, sl, pos1, pos2, pivotsWidth + 5, 
-                  agg::rgba(200, 135, 15, 0.45) );
+                  agg::rgba(200, 135, 15, 0.6) );
     if ( drawingStatus )
         drawLine ( ras, solidRend, sl, pos1, pos2, pivotsWidth, agg::rgba(0, 0, 0) );
     else 

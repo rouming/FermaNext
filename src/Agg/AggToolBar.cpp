@@ -73,7 +73,7 @@ AggToolBar::AggToolBar( QPoint pos, int bordLeft, int bordRight, int bordTop,
     toolBarLeftTopPos.setX( centerPos.x() - toolBarWidth/2 );
     toolBarLeftTopPos.setY( centerPos.y() - toolBarHeight );
 
-    QObject::connect( this, SIGNAL( onChangeToolBarPosition() ),
+    QObject::connect( this, SIGNAL( onChangeToolBarState() ),
                       SLOT( clearToolBarRenderedFlag() ) );
 }
 
@@ -226,23 +226,6 @@ void AggToolBar::releaseButtons ()
         (*iter)->setPressed( false );
 }
 
-void AggToolBar::setCenterPoint ( QPoint pos )
-{
-    if ( centerPos == pos )
-        return;
-
-    centerPos = pos;
-    // Renew tool bar widget position and centering tool bar
-    toolBarLeftTopPos.setX( centerPos.x() - toolBarWidth/2 );
-    toolBarLeftTopPos.setY( centerPos.y() - toolBarHeight );  
-    setRendered( false );
-}
-
-QPoint AggToolBar::getCenterPoint () const
-{
-    return centerPos;
-}
-
 QPoint AggToolBar::getPosition () const
 {
     return toolBarLeftTopPos;
@@ -253,7 +236,16 @@ void AggToolBar::setPosition ( QPoint newPos )
     if ( toolBarLeftTopPos == newPos )
         return;
     toolBarLeftTopPos = newPos;
-    emit onChangeToolBarPosition ();
+    emit onChangeToolBarState ();
+}
+
+void AggToolBar::changeCenterPosition ( QPoint pos )
+{
+    if ( centerPos == pos )
+        return;
+    QPoint diff = centerPos - pos;
+    centerPos = pos;
+    setPosition( toolBarLeftTopPos - diff );
 }
 
 void AggToolBar::setButtonSeparation ( int s )
@@ -355,7 +347,7 @@ void AggToolBar::setVisible ( bool status )
     if ( visible == status ) 
         return;
     visible = status;
-    setRendered( false );
+    emit onChangeToolBarState ();
 }
 
 bool AggToolBar::isRendered () const

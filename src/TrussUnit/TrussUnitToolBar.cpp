@@ -2,6 +2,41 @@
 #include "TrussUnitToolBar.h"
 
 /*****************************************************************************
+ * Tool Bar Thread
+ *****************************************************************************/
+
+ToolBarThread::ToolBarThread( QWidget& p ) :
+    widgetToPaint( p ),
+    attemtsNumb( 0 ),
+    msecToSleep( 0 )
+{}
+
+ToolBarThread::~ToolBarThread ()
+{}
+
+void ToolBarThread::setSleepTime ( int timeMsec )
+{
+    msecToSleep = timeMsec;
+}
+
+void ToolBarThread::setAttemtsNumber ( int numb )
+{
+    attemtsNumb = numb;
+}
+
+void ToolBarThread::run ()
+{
+    int count = 0;
+    while ( count < attemtsNumb ) 
+    { 
+         widgetToPaint.update();
+         emit onToolBarMove();
+         QThread::msleep( msecToSleep );
+         count+=pixHideNumb;
+    }
+}
+
+/*****************************************************************************
  * Agg Tool Bar Hide Button
  *****************************************************************************/
 
@@ -33,8 +68,9 @@ void AggToolBarHideButton::paint ( ren_dynarow& baseRend,
         primRend.fill_color ( highlightFill );
 
     primRend.line_color ( lineCol );
-    primRend.outlined_rectangle ( pos.x(), pos.y(), pos.x() + width, pos.y() + height );
-
+    primRend.outlined_rectangle ( pos.x(), pos.y(), 
+                                  pos.x() + width, 
+                                  pos.y() + height );
     QPoint pos1 ( pos.x() + width / 2 - 4, pos.y() + 2 );
     QPoint pos2 ( pos.x() + width / 2 + 4, pos.y() + 4 );
     if ( ! isHighlighted() )
@@ -42,23 +78,6 @@ void AggToolBarHideButton::paint ( ren_dynarow& baseRend,
     else 
         primRend.fill_color (  agg::rgba( 120, 120, 120 ) );
     primRend.solid_rectangle ( pos1.x(), pos1.y(), pos2.x(), pos2.y() );
-
-/*
-    agg::rounded_rect button ( pos.x(), pos.y(), pos.x() + width, pos.y() + height, 
-                               height / 2 );
-
-    ras.add_path ( button );
-
-    if ( ! isHighlighted() )
-        solidRend.color ( fillCol );
-    else 
-        solidRend.color ( highlightFill );
-
-    agg::render_scanlines( ras, sl, solidRend );
-    QPoint pos2 ( pos.x() + width, pos.y() + height );
-    drawOutlineRoundedRect ( solidRend, ras, sl, pos, pos2, 
-                             height / 2, lineCol );
-*/
 }
 
 /*****************************************************************************
@@ -67,25 +86,28 @@ void AggToolBarHideButton::paint ( ren_dynarow& baseRend,
 
 TrussUnitToolBar::TrussUnitToolBar  ( QPoint pos, int bordLeft, int bordRight, 
                                       int bordTop, int bordBottom, int separ, 
-                                      int rad ) :
+                                      int rad, QWidget* widget ) :
     AggToolBar( pos, bordLeft, bordRight, bordTop, bordBottom, separ ),
-    pixNumb ( 0 ),
+    pixNumb( 0 ),
     cornerRadius( rad ),
     enabled( true ),
-    timer ( new QTimer( this ) ),
+    thread( new ToolBarThread( *widget ) ),
     // gradient colors
-    barFirstColor ( agg::rgba( 35, 50, 60, 0.8 ) ),
-    barMiddleColor ( agg::rgba( 20, 60, 80, 0.8 ) ),
-    barLastColor ( agg::rgba( 20, 60, 80, 0.8 ) )
+    barFirstColor( agg::rgba( 35, 50, 60, 0.8 ) ),
+    barMiddleColor( agg::rgba( 20, 60, 80, 0.8 ) ),
+    barLastColor( agg::rgba( 20, 60, 80, 0.8 ) )
 {
     initHideButton();
-    QObject::connect( timer, SIGNAL( timeout() ),
-                      SLOT( changeToolBarPosition() ) );    
+    thread->setSleepTime( 1 );
+    QObject::connect( thread, SIGNAL( onToolBarMove() ),
+                      SLOT( moveToolBar() ) );      
 }
 
 TrussUnitToolBar::~TrussUnitToolBar ()
 {
-    delete timer;
+    if ( thread->running() )
+        thread->wait();
+    delete thread;
     delete hideButton;
 }
 
@@ -136,41 +158,40 @@ void TrussUnitToolBar::showToolBar ()
 {
     removeButtonHighlight();
     enabled = false;
+    pixNumb = getHeight() - hideButton->getHeight();
+    thread->setAttemtsNumber( pixNumb );
     setVisible ( true );
-    timer->start( 1, false );
+    thread->start();
 }
 
 void TrussUnitToolBar::hideToolBar ()
 {
     removeButtonHighlight();
-    pixNumb = getHeight();
+    pixNumb = getHeight() - hideButton->getHeight();
+    thread->setAttemtsNumber( pixNumb );
     enabled = false;
-    timer->start( 1, false );
+    thread->start();
 }
 
-void TrussUnitToolBar::changeToolBarPosition ()
+void TrussUnitToolBar::moveToolBar ()
 {
     QPoint pos = getPosition();
     if ( hideButton->isPressed() )
     {
-        pixNumb -= 2;
-        pos.setY ( pos.y() + 2 );
-        if ( pixNumb == hideButton->getHeight() )
+        pixNumb -= pixHideNumb;
+        pos.setY ( pos.y() + pixHideNumb );
+        if ( pixNumb == pixHideNumb )
         {
-            timer->stop();
             setVisible ( false );
             enabled = true;
         }
     }
     else
     {
-        pixNumb += 2;
-        pos.setY ( pos.y() - 2 );
-        if ( pixNumb == getHeight() )
-        {
-            timer->stop();
+        pixNumb -= pixHideNumb;
+        pos.setY ( pos.y() - pixHideNumb );
+        if ( pixNumb == hideButton->getHeight() )
             enabled = true;
-        }
     }
     setPosition ( pos );
 }
@@ -270,8 +291,10 @@ AggToolBarButton* TrussUnitToolBar::getSelectedButton ( int x, int y ) const
     return 0;
 }
 
-void TrussUnitToolBar::drawButtons ( ren_dynarow& baseRend, scanline_rasterizer& ras,
-                                     agg::scanline_p8& sl, solidRenderer& solidRend ) const
+void TrussUnitToolBar::drawButtons ( ren_dynarow& baseRend, 
+                                     scanline_rasterizer& ras,
+                                     agg::scanline_p8& sl, 
+                                     solidRenderer& solidRend ) const
 {
     if ( hideButton )
         hideButton->paint( baseRend, ras, sl, solidRend );
@@ -322,16 +345,11 @@ void TrussUnitToolBar::paint ( base_renderer& baseRenderer ) const
                                     cornerRadius );
             ras.add_path ( bar );
 
-            unsigned i;
-            for(i = 0; i < 128; ++i)
-            {
-                gradColors[i] = barFirstColor.gradient ( barMiddleColor, i / 128.0 );
-            }
-            for(; i < 256; ++i)
-            {
-                gradColors[i] = barMiddleColor.gradient ( barLastColor, (i - 128) / 128.0 );
-            }
-            linear_gradient_span_gen gradSpanGen ( gradSpan, inter, gradFunc, gradColors, 
+            fillColorArray( gradColors, barFirstColor, barMiddleColor, 
+                            barLastColor );
+
+            linear_gradient_span_gen gradSpanGen ( gradSpan, inter, 
+                                                   gradFunc, gradColors, 
                                                    bufferEmptyArea, 
                                                    bufferEmptyArea + getHeight() );
             linear_gradient_renderer gradRend ( baseRend, gradSpanGen );

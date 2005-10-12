@@ -14,13 +14,18 @@ const QString untitledWorkspaceName = QObject::tr("Unnamed workspace");
  ************************************/
 
 const int nodesRadius = 4,
-          pivotsWidth = 2;
+          pivotsWidth = 2,
+          trussBufIndent = 24,
+          defaultBufWidth = 204 + trussBufIndent,
+          defaultBufHeight = 188 + trussBufIndent;
 
 /************************************
  * Truss Unit Window Consts
  ************************************/
 
-const int leftWindowIndent = 42,
+const int defaultWidth = 250,
+          defaultHeight = 250,
+          leftWindowIndent = 42,
           rigthWindowIndent = 28,
           topWindowIndent = 48,
           bottomWindowIndent = 38,
@@ -43,7 +48,8 @@ const bool flipY = true;
 
 extern const uint bufferEmptyArea = 30,
                   buttonHeight = 25,
-                  buttonWidth = 25;
+                  buttonWidth = 25,
+                  pixHideNumb = 2;
 extern const double svgGamma = 1.0,
                     svgExpand = 0.3;
  

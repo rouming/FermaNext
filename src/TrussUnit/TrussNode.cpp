@@ -33,15 +33,10 @@ void TrussNode::removeNodeHighlight ()
 }
 
 void TrussNode::drawFixation ( scanline_rasterizer& ras, solidRenderer& solidRend, 
-                               agg::scanline_p8& sl, double trussAreaHeight,
-                               double scaleMultX, double scaleMultY,
+                               agg::scanline_p8& sl, const QPoint& nodePos,
                                int lineWidth, color_type color ) const
 {
-    const DoublePoint& nodeCoord = getPoint();
-    QPoint leftPnt, rightPnt, nodePos;
-    nodePos.setX ( int( nodeCoord.x() * scaleMultX ) + leftWindowIndent );
-    nodePos.setY ( flipY ? int( ( trussAreaHeight - nodeCoord.y() ) * scaleMultY ) + 
-                   topWindowIndent : int( nodeCoord.y() * scaleMultY + topWindowIndent ) );
+    QPoint leftPnt, rightPnt;
 
     if ( getFixation() == FixationByX )
     {
@@ -112,17 +107,18 @@ void TrussNode::drawFixation ( scanline_rasterizer& ras, solidRenderer& solidRen
     }
 }
 
-void TrussNode::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMultY,
-                       double trussAreaHeight ) const
+void TrussNode::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
+                        double trussAreaHeight ) const
 {
     if ( !isVisible() )
         return;
 
     const DoublePoint& nodeCoord = getPoint();
     QPoint nodePos;
-    nodePos.setX( int( nodeCoord.x() * scaleMultX ) + leftWindowIndent );
-    nodePos.setY( flipY ? int( ( trussAreaHeight - nodeCoord.y() ) * scaleMultY ) + 
-                  topWindowIndent : int( nodeCoord.y() * scaleMultY + topWindowIndent ) );
+    nodePos.setX( int( nodeCoord.x() * scaleMult.x() ) + trussBufIndent );
+    nodePos.setY( flipY ? int( ( trussAreaHeight - nodeCoord.y() ) * 
+                  scaleMult.y() ) + trussBufIndent : int( nodeCoord.y() * 
+                  scaleMult.y() + trussBufIndent ) );
 
     solidRenderer solidRend ( baseRend );
     scanline_rasterizer ras;
@@ -144,13 +140,12 @@ void TrussNode::paint ( ren_dynarow& baseRend, double scaleMultX, double scaleMu
 
 //  draw fixation
     if ( getFixation () )
-        drawFixation ( ras, solidRend, sl, trussAreaHeight, 
-                       scaleMultX, scaleMultY, 2, agg::rgba(0, 0, 35) ); 
+        drawFixation ( ras, solidRend, sl, nodePos, 2, agg::rgba(0, 0, 35) ); 
 
     if ( isHighlighted () )
     {
         // draw translucent highlight
-        solidRend.color ( agg::rgba(200, 135, 15, 0.45) );
+        solidRend.color ( agg::rgba(200, 135, 15, 0.6) );
         ell.init ( nodePos.x(), nodePos.y(), nodesRadius + 5, 
                                              nodesRadius + 5, 16 );
         ras.add_path ( ell );
