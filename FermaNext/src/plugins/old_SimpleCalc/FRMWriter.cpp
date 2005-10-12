@@ -1,7 +1,6 @@
 
 #include "FRMWriter.h"
 
-#include "TrussTopology.h"
 #include <qfile.h>
 
 /*****************************************************************************
@@ -29,7 +28,7 @@ void FRMWriter::write ( const QString& name )
     TrussTopology::PivotListIter pIter;
 
     const TrussMaterial& mat = truss.getMaterial();
-    const TrussTopologyLoadCases& loadCases = truss.getLoadCases();
+    const TrussTopology::LoadCases& loadCases = truss.getLoadCases();
 
     uint fixNum = 0;
     for ( nIter = nodes.begin(); nIter != nodes.end(); ++nIter )
@@ -45,9 +44,9 @@ void FRMWriter::write ( const QString& name )
 
     for ( pIter = pivots.begin(); pIter != pivots.end(); ++pIter ) {
         uint firstInd = 1, lastInd = 1;
-        TrussTopologyPivot* p = *pIter;
-        TrussTopologyNode& firstNode = p->getFirstNode();
-        TrussTopologyNode& lastNode = p->getLastNode();
+        Pivot<Node>* p = *pIter;
+        Node& firstNode = p->getFirstNode();
+        Node& lastNode = p->getLastNode();
         for ( nIter = nodes.begin(); nIter != nodes.end();
               ++nIter, ++firstInd ) {
             if ( *nIter == &firstNode ) {
@@ -65,18 +64,18 @@ void FRMWriter::write ( const QString& name )
     }
 
     for ( nIter = nodes.begin(); nIter != nodes.end(); ++nIter ) {
-        TrussTopologyNode* n = *nIter;
+        Node* n = *nIter;
         out << QString::number(n->getX(), 'E', 14) << "\n" << 
                QString::number(n->getY(), 'E', 14) << "\n";
     }
 
     for ( pIter = pivots.begin(); pIter != pivots.end(); ++pIter ) {
-        TrussTopologyPivot* p = *pIter;
+        Pivot<Node>* p = *pIter;
         out << QString::number(p->getThickness(),'E', 14) << "\n";
     }
 
     for ( nIter = nodes.begin(); nIter != nodes.end(); ++nIter ) {
-        TrussTopologyNode* n = *nIter;
+        Node* n = *nIter;
         Node::Fixation fix = n->getFixation();
         if ( fix == Node::FixationByX )
             out << 0 << "\n" << 1 << "\n";
@@ -90,11 +89,11 @@ void FRMWriter::write ( const QString& name )
 
     for ( uint loadInd = 1; loadInd <= loadCases.countLoadCases(); 
           ++loadInd ) {
-        TrussTopologyLoadCase* loadCase = loadCases.findLoadCase( loadInd );
+        TrussTopology::LoadCase* loadCase = loadCases.findLoadCase( loadInd );
         if ( loadCase == 0 )
             continue;
         for ( nIter = nodes.begin(); nIter != nodes.end(); ++nIter ) {
-            TrussTopologyNode* n = *nIter;
+            Node* n = *nIter;
             TrussLoad* l = loadCase->findLoad( *n );
             if ( l )
                 out << QString::number(l->getXForce(), 'E', 14)<< "\n"

@@ -7,7 +7,6 @@
 
 const QString fermaResExt = ".vyv";
 
-class TrussTopology;
 class TrussCalcData;
 
 class SimpleCalcPlugin : public Plugin
