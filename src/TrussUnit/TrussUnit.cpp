@@ -104,6 +104,11 @@ bool TrussUnit::isCalculated () const
     return calculated;
 }
 
+void TrussUnit::setCalculatedStatus ( bool status )
+{
+    calculated = status;
+}
+
 void TrussUnit::setTrussRenderedStatus ( bool status ) const
 {
     trussRendered = status;

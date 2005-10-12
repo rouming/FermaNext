@@ -62,6 +62,9 @@ public:
 
     const QString& getTrussName () const;
 
+    virtual bool isCalculated () const;
+    virtual void setCalculatedStatus ( bool );
+
     virtual void setFocusOnNode ( TrussNode* selectedNode );
     virtual void setFocusOnPivot ( TrussPivot* selectedPivot );
     virtual void removeNodesHighlight ();
@@ -128,8 +131,6 @@ signals:
     void onEnableChange ( bool );
 
 protected:
-    virtual bool isCalculated () const;
-
     virtual void setTrussRenderedStatus ( bool ) const;
 
     virtual void setTrussPosition ( const QPoint& pos );
