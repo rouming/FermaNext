@@ -3,6 +3,7 @@
 #include "SubsidiaryConstants.h"
 #include "TrussUnitActions.h"
 #include "FermaNextWorkspace.h"
+#include "TrussCalcData.h"
 
 #include <qstring.h>
 #include <qcursor.h>
@@ -181,10 +182,6 @@ void TrussUnitWindowItem::unselectAllFromGroup ()
 void TrussUnitWindowItem::calculate ()
 {
     FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
-    bool pluginsLoaded = wsp.loadPlugins();
-    if ( ! pluginsLoaded )
-        // Plugins are not supported
-        return;
     PluginManager& plgManager = wsp.pluginManager();
     PluginHandleList pluginHandles = 
                           plgManager.loadedPluginsOfType( CALCULATION_PLUGIN );
@@ -192,8 +189,10 @@ void TrussUnitWindowItem::calculate ()
         return;
     try {
         Plugin& calcPlugin = plgManager.findPlugin( pluginHandles[0] );
-        //Truss
-        //calcPlugin.calculate( trussWindow,
+        TrussTopology& topology = trussWindow.createTopology();
+        TrussCalcData calcData;
+        calcPlugin.calculate( topology, calcData );
+        topology.desist();
     }
     catch ( ... ) {}                
 }

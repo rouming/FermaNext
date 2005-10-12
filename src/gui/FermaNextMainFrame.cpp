@@ -133,7 +133,8 @@ void FermaNextMainFrame::createProject ()
         node2.setFixation( Node::FixationByY );
         node3.setFixation( Node::FixationByXY );
 
-        TrussUnitLoadCase& currentCase = trussWindow.getLoadCases().createLoadCase();
+        TrussUnit::LoadCase& currentCase = 
+            trussWindow.getLoadCases().createLoadCase();
         trussWindow.getLoadCases().setCurrentLoadCase ( currentCase );
         currentCase.addLoad ( node4, 300, 100 );
 #endif
