@@ -15,13 +15,18 @@ extern const QString untitledWorkspaceName;
  ************************************/
 
 extern const int nodesRadius,
-                 pivotsWidth;
+                 pivotsWidth,
+                 defaultBufWidth,
+                 defaultBufHeight,
+                 trussBufIndent;
 
 /************************************
  * Truss Unit Window Consts
  ************************************/
 
-extern const int leftWindowIndent,
+extern const int defaultWidth,
+                 defaultHeight,
+                 leftWindowIndent,
                  rigthWindowIndent,
                  topWindowIndent,
                  bottomWindowIndent,
@@ -44,7 +49,8 @@ extern const bool flipY;
 
 extern const uint bufferEmptyArea, 
                   buttonHeight,
-                  buttonWidth;
+                  buttonWidth,
+                  pixHideNumb;
 extern const double svgGamma,
                     svgExpand;
 

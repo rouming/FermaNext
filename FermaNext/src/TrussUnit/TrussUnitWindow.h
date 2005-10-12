@@ -5,14 +5,10 @@
 #include "TrussUnit.h"
 #include "TrussUnitWindowButton.h"
 
-typedef QValueList<DoublePoint> DoublePointArray;
-
 class TrussUnitWindow : public TrussUnit
 {
     Q_OBJECT
 public:
-    enum selectedEllipse { None = 0, LeftTop, LeftBottom, RightTop, RightBottom };
-
     TrussUnitWindow ( const QString& name, ObjectStateManager* );
     virtual ~TrussUnitWindow ();
 
@@ -20,24 +16,20 @@ public:
     virtual QPoint getWindowRightBottomPos () const;
     virtual QPoint getTrussAreaLeftTopPos () const;
     virtual QPoint getTrussAreaRightBottomPos () const;
-    virtual DoublePoint getTrussCoordFromWidgetPos ( int x, int y ) const;
-    virtual DoublePoint getTrussCoordFromWidgetPos ( QPoint pos ) const;
-    virtual QPoint getWidgetPosFromTrussCoord ( double x, double y ) const;
-    virtual QPoint getWidgetPosFromTrussCoord ( const DoublePoint& ) const;
-    virtual void setWindowPosition ( QPoint pos );
-    virtual void resize ( QPoint leftTop, QPoint rightBottom );
-    virtual void setCursorCoord ( const QPoint& );
-    // Assuming this coords are from truss node position, 
-    // so we don't want to convert them from widget position
-    virtual void setCursorCoord ( const DoublePoint& );
-    virtual DoublePoint getCursorCoord () const;
-    virtual const QSize& getWindowSize () const;
 
-    virtual void setMaxSize ( int x, int y );
+    virtual void setWindowPosition ( QPoint pos );
+
+    virtual const QSize& getWindowSize () const;
+    virtual void resize ( QPoint leftTop, QPoint rightBottom );
+
     virtual bool isMaximized () const;
-    virtual void hide ();
+    virtual void setMaxSize ( int x, int y );
     virtual void maximize ( bool saveOldSize = true );
     virtual void minimize ();
+
+    virtual DoublePoint getCursorCoord () const;
+    virtual void setCursorCoord ( const QPoint& );
+    virtual void setCursorCoord ( const DoublePoint& );
 
     virtual bool inWindowRect ( int x, int y ) const;
     virtual bool inCanvasRect ( int  x, int  y ) const;
@@ -50,66 +42,13 @@ public:
     virtual bool inHideButtonRect ( int x, int y ) const;
     virtual bool inRollUpButtonRect ( int x, int y ) const;
 
-    virtual QPoint getButtonBufPos () const;
-
     virtual void checkMouseMoveEvent ( int x, int y, bool mousePressed );
     virtual void checkMousePressEvent ( int x, int y );
     virtual void checkMouseReleaseEvent ( int x, int y );
 
     virtual void setHighlighted ( bool );
-    virtual void setResizeEllipseHighlighted ( selectedEllipse ellipseType );
-    virtual void setFocusOnNode ( TrussNode* selectedNode );
-    virtual void setFocusOnPivot ( TrussPivot* selectedPivot );
-    virtual void removeNodesHighlight ();
-    virtual void removePivotsHighlight ();
     virtual void removeButtonsHighlight ();
     virtual void releaseButtons ();
-
-    virtual double getNodePrecision ( bool inPix = true ) const;
-    virtual double getPivotPrecision () const;
-
-    virtual TrussNode* findNodeByWidgetPos ( const QPoint& pos, 
-                                             double precision ) const;
-    virtual TrussNode* findNodeByWidgetPos ( const QPoint& pos ) const;
-    virtual TrussNode* findNodeByWidgetPos ( int x, int y, 
-                                             double precision ) const;
-    virtual TrussNode* findNodeByWidgetPos ( int x, int y ) const;
-
-    virtual TrussPivot* findPivotByCoord ( const DoublePoint& coord, 
-                                           double precision ) const;
-    virtual TrussPivot* findPivotByCoord ( const DoublePoint& coord ) const;
-
-    virtual TrussPivot* findPivotByWidgetPos ( const QPoint& pos, 
-                                               double precision ) const;
-    virtual TrussPivot* findPivotByWidgetPos ( const QPoint& pos ) const;
-    virtual TrussPivot* findPivotByWidgetPos ( int x, int y, 
-                                               double precision ) const;
-    virtual TrussPivot* findPivotByWidgetPos ( int x, int y ) const;
-
-    virtual void moveTrussNode ( int x, int y, TrussNode* node );
-
-    virtual void moveTrussPivot ( int x, int y, TrussPivot* pivot, 
-                                  QPoint firstNodeClickDist, 
-                                  QPoint lastNodeClickDist );
-
-    virtual TrussNode* nodesMergingComparison ( TrussNode& comparableNode, 
-                                                double precision, 
-                                                bool fixationCheck );
-
-    virtual void mergeNodes ( TrussNode* mergingNode, TrussNode* node );
-
-    virtual void dividePivot ( TrussPivot& dividualPivot, TrussNode& dividingNode );
-
-    virtual TrussPivot* findDividualPivot ( TrussNode& dividingNode ) const;
-
-    virtual void updateNodePosition ( TrussNode* selectedNode, 
-                                      bool fixationCheck );
-
-    virtual void updateAfterNodeManipulation ( TrussNode* selectedNode, 
-                                              bool fixationCheck );
-
-    virtual void updateAfterPivotManipulation ( TrussPivot* selectedPivot, 
-                                               bool fixationCheck );
 
     virtual color_type getCanvasColor () const;
     virtual color_type getHeadlineFirstColor () const;
@@ -127,16 +66,9 @@ public:
     virtual void paint ( base_renderer& baseRend ) const;
 
 protected:
-    virtual double getScaleMultiplierX () const;
-    virtual double getScaleMultiplierY () const;
-
     virtual void setWindowSize ( int w, int h );
-
-    virtual DoublePointArray getPivotCrossPoints ( 
-                                    const PivotList& nonCrossingPivots ) const;
-    virtual TrussNode& createCrossNode ( const DoublePoint& crossPoint );
-    virtual void createPivotCrossNodes ( const DoublePointArray& );
-
+    virtual QPoint getButtonBufPos () const;
+    virtual void hide ();
     virtual QString fitTextToWindowSize ( QString str, int lengthLimit, 
                                           glyph_gen& glyph ) const;
 
@@ -159,28 +91,6 @@ protected:
     virtual void drawNumbersField ( ren_dynarow& baseRend, 
                                     textRenderer& textRend ) const;
 
-    virtual void drawNodeNumber ( TrussNode* node, 
-                                  ren_dynarow& baseRend, 
-                                  solidRenderer& solidRend, 
-                                  scanline_rasterizer& ras, 
-                                  agg::scanline_p8& sl ) const;
-
-    virtual void drawPivotNumber ( TrussPivot* pivot, 
-                                   ren_dynarow& baseRend, 
-                                   solidRenderer& solidRend, 
-                                   scanline_rasterizer& ras, 
-                                   agg::scanline_p8& sl ) const;
-
-    virtual void drawTrussElementsNumbers ( ren_dynarow& baseRend, 
-                                            solidRenderer& solidRend, 
-                                            scanline_rasterizer& ras, 
-                                            agg::scanline_p8& sl ) const;
-
-    virtual void drawEllipseHighlight ( solidRenderer& solidRend, 
-                                        scanline_rasterizer& ras, 
-                                        agg::scanline_p8& sl, 
-                                        QPoint pos ) const;
-
     virtual void drawResizeEllipses ( solidRenderer& solidRend, 
                                       scanline_rasterizer& ras, 
                                       agg::scanline_p8& sl ) const;
@@ -201,17 +111,16 @@ protected slots:
     virtual void clearButtonBufRenderedFlag ();
 
 private:
-    selectedEllipse resEll;
-    textFont headFont, numbersFont;
-    rbuf_dynarow *windowBuf, *coordBuf, *numbersBuf, *buttonBuf;
-    QPoint windowLeftTopPos, windowRightBottomPos; 
-    color_type canvColor, headFirstColor, headMiddleColor, 
-               headLastColor, borderColor, resEllColor;
-    TrussUnitWindowButton *hideButton, *rollUpButton;
-    DoublePoint cursorCoord;
+    QPoint windowLeftTopPos, windowRightBottomPos;
     QSize windowSize, coordFieldSize;
+    DoublePoint cursorCoord;
     mutable bool buttonBufRendered, coordFieldRendered;
-
+    color_type canvColor, headFirstColor, headMiddleColor, 
+           headLastColor, borderColor, resEllColor;
+    textFont headFont, numbersFont;
+    rbuf_dynarow *windowBuf, *trussBuf, *coordBuf, 
+                 *numbersBuf, *buttonBuf;
+    TrussUnitWindowButton *hideButton, *rollUpButton;
     // minimize/maximize subsidiaries
     bool maximized;
     QSize maxSize;
