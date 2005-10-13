@@ -45,7 +45,7 @@ bool SimpleCalcPlugin::dependsOn ( PluginType ) const
 { 
     return false; 
 }
-#include <iostream>
+
 void SimpleCalcPlugin::calculate ( TrussTopology& truss, 
                                    TrussCalcData& data ) const
 {
@@ -61,7 +61,7 @@ void SimpleCalcPlugin::calculate ( TrussTopology& truss,
 
 void SimpleCalcPlugin::createTempFile ()
 {  
-    tempFile = tmpnam(0); 
+    tempFile = tmpnam(0);
 }
 
 void SimpleCalcPlugin::destroyTempFile () 

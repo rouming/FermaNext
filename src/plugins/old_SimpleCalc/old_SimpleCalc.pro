@@ -1,5 +1,5 @@
 
-TARGET = ../../../plugins/old_SimpleCalc
+TARGET = ../../../plugins/old_SimpleCalc.plg
 
 TEMPLATE = lib
 CONFIG += plugin warn_on thread debug
