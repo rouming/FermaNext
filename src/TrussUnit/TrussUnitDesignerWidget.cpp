@@ -472,7 +472,7 @@ void TrussUnitDesignerWidget::aggPaintEvent ( QPaintEvent* )
     toolBar->paint ( baseRend );
 }
 
-void TrussUnitDesignerWidget::aggResizeEvent ( QResizeEvent* re )
+void TrussUnitDesignerWidget::aggResizeEvent ( QResizeEvent* )
 {
     WindowListIter iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter ) 

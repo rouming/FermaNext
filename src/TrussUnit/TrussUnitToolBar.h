@@ -83,7 +83,7 @@ protected:
                                agg::scanline_p8& sl, 
                                solidRenderer& solidRend ) const;
 private:
-    int pixNumb;
+    uint pixNumb;
     int cornerRadius;
     AggToolBarHideButton* hideButton;
     bool enabled;
