@@ -2,6 +2,7 @@
 #include "PluginManager.h"
 #include "PluginLoader.h"
 #include <qdir.h>
+#include <qregexp.h>
 
 /*****************************************************************************
  * Plugin Manager
@@ -16,23 +17,57 @@ PluginManager::~PluginManager ()
 
 void PluginManager::clean ()
 {
-    PluginsMapIter iter = plugins.begin();
-    for ( ; iter != plugins.end(); ++iter ) {
-        delete iter.data();
-    }
+    // Free all plugins first
+    PluginsMapIter plgIter = plugins.begin();
+    for ( ; plgIter != plugins.end(); ++plgIter )
+        delete plgIter.data();
     plugins.clear();
+
+    PreloadedDynaLibsIter libsIter = dynaLibs.begin();
+    for ( ; libsIter != dynaLibs.end(); ++libsIter )
+        delete *libsIter;
+    dynaLibs.clear();
 }
 
 void PluginManager::loadPlugins ( const QString& path )
 {
+    // Clean first
     clean();
-    QDir dir( path, "*." + PluginExtension + "." + DynaLoader::LibExtension,
-              QDir::Name | QDir::IgnoreCase, 
-              QDir::Files | QDir::Readable );
-    for ( uint i = 0; i < dir.count(); i++ ) {
+
+    uint i = 0;
+
+    //
+    // Preload all dynamic libs before plugin loading. 
+    // This should be done because some plugins can require 
+    // other dynamic libs, which must be loaded first.
+    //
+    QDir preloadedLibsDir( path, "*." + DynaLoader::LibExtension,
+                           QDir::Name | QDir::IgnoreCase, 
+                           QDir::Files | QDir::Readable );
+    for ( i = 0; i < preloadedLibsDir.count(); ++i ) {
+        QString dir = preloadedLibsDir[i];
+        // Preload only simple dynamic libs. Ignore FermaNext plugins.
+        if ( dir.contains( QRegExp( QString(".*\\.") + 
+                                    PluginExtension + "\\." + 
+                                    DynaLoader::LibExtension + "$" ) ) )
+            continue;
+        try {
+            DynaLoader* dynaLib = new DynaLoader( path + "/" + dir );
+            dynaLibs.push_back( dynaLib );
+        } catch ( ... ) {}
+    }
+
+    //
+    // Load all FermaNext plugins from plugin dir.
+    //
+    QDir plgDir( path, "*." + PluginExtension + "." + DynaLoader::LibExtension,
+                 QDir::Name | QDir::IgnoreCase, 
+                 QDir::Files | QDir::Readable );
+    for ( i = 0; i < plgDir.count(); i++ ) {
+        QString dir = plgDir[i];
         PluginLoader* loader = 0;
         try {
-            loader = new PluginLoader( path + "/" + dir[i] );
+            loader = new PluginLoader( path + "/" + dir );
             Plugin& pluginInstance = loader->pluginInstance();
             PluginHandle handle = pluginInstance.pluginChecksum();
             if ( plugins.contains(handle) )
