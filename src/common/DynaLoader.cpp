@@ -5,7 +5,11 @@
  * Dynamic Loader
  *****************************************************************************/
 
-#include <qfile.h>
+#if defined WINDOWS || defined WIN32
+    const QString DynaLoader::LibExtension = "dll";
+#else
+    const QString DynaLoader::LibExtension = "so";
+#endif
 
 DynaLoader::DynaLoader () :
     handle(0)
@@ -21,16 +25,6 @@ DynaLoader::DynaLoader ( const QString& fileName )
 DynaLoader::~DynaLoader ()
 {
     freeLibrary();
-}
-
-const QString& DynaLoader::libExtension ()
-{
-#if defined WINDOWS || defined WIN32
-    static QString extension = "dll";
-#else
-    static QString extension = "so";
-#endif
-    return extension;
 }
 
 void DynaLoader::loadLibrary ( const QString& fileName ) 
