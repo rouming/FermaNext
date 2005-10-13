@@ -7,6 +7,8 @@
  * Plugin Manager
  *****************************************************************************/
 
+const QString PluginManager::PluginExtension = "plg";
+
 PluginManager::~PluginManager ()
 {
     clean();
@@ -24,18 +26,21 @@ void PluginManager::clean ()
 void PluginManager::loadPlugins ( const QString& path )
 {
     clean();
-    QDir dir( path, "*." + DynaLoader::libExtension(),
+    QDir dir( path, "*." + PluginExtension + "." + DynaLoader::LibExtension,
               QDir::Name | QDir::IgnoreCase, 
               QDir::Files | QDir::Readable );
     for ( uint i = 0; i < dir.count(); i++ ) {
+        PluginLoader* loader = 0;
         try {
-            PluginLoader* loader = new PluginLoader( path + "/" + dir[i] );
+            loader = new PluginLoader( path + "/" + dir[i] );
             Plugin& pluginInstance = loader->pluginInstance();
             PluginHandle handle = pluginInstance.pluginChecksum();
             if ( plugins.contains(handle) )
                 delete plugins[handle];
             plugins[handle] = loader;
-        } catch ( ... ) { }
+        } catch ( ... ) { 
+            delete loader;
+        }
     }
 }
 

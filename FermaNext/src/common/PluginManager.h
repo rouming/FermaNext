@@ -32,6 +32,10 @@ public:
     virtual QStringList loadedPluginsNames () const;
     virtual PluginHandleList loadedPluginsOfType ( const PluginType& ) const;
 
+public:
+    // Extension to load plugins from plugin dir.
+    static const QString PluginExtension;
+
 private:
     typedef QMap<PluginHandle, PluginLoader*> PluginsMap;
     typedef PluginsMap::iterator PluginsMapIter;

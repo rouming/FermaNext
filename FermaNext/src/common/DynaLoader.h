@@ -32,8 +32,6 @@ public:
     DynaLoader ( const QString& fileName ) throw (LibraryLoadException);
     ~DynaLoader ();
 
-    static const QString& libExtension ();
-
     void loadLibrary ( const QString& fileName ) throw (LibraryLoadException);
 
     ProcAddress getProcAddress ( const QString& funcName ) const
@@ -47,6 +45,10 @@ public:
 
     bool freeLibrary ();
     bool isLoaded () const;
+
+public:
+    // OS dependent dynamic lib extension.
+    static const QString LibExtension;
 
 private:
     LibraryHandle handle;
