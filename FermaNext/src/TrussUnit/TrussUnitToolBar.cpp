@@ -6,9 +6,9 @@
  *****************************************************************************/
 
 ToolBarThread::ToolBarThread( QWidget& p ) :
-    widgetToPaint( p ),
     attemtsNumb( 0 ),
-    msecToSleep( 0 )
+    msecToSleep( 0 ),
+    widgetToPaint( p )
 {}
 
 ToolBarThread::~ToolBarThread ()
@@ -190,7 +190,7 @@ void TrussUnitToolBar::moveToolBar ()
     {
         pixNumb -= pixHideNumb;
         pos.setY ( pos.y() - pixHideNumb );
-        if ( pixNumb == hideButton->getHeight() )
+        if ( pixNumb == (uint)hideButton->getHeight() )
             enabled = true;
     }
     setPosition ( pos );

@@ -79,9 +79,9 @@ bool PaintableTrussElement::isRendered () const
 
 TrussUnit::TrussUnit ( const QString& name, ObjectStateManager* mng ) :
     Truss<TrussNode, TrussPivot>(mng),
-    trussName(name),
     trussRendered(false),
     calculated(false),
+    trussName(name),
     frontNode(0)
 {
     // We should render again when state has been changed
