@@ -1,5 +1,6 @@
 
 #include "DynaLoader.h"
+#include <qfile.h>
 
 /*****************************************************************************
  * Dynamic Loader

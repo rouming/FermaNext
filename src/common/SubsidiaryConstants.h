@@ -51,6 +51,7 @@ extern const uint bufferEmptyArea,
                   buttonHeight,
                   buttonWidth,
                   pixHideNumb;
+
 extern const double svgGamma,
                     svgExpand;
 
