@@ -6,6 +6,7 @@ CONFIG += qt warn_on thread debug
 
 MOC_DIR = mocs
 OBJECTS_DIR = obj
+UI_DIR = ../gui/ui
 
 win32 {
   DEFINES += WIN32
@@ -26,7 +27,10 @@ INCLUDEPATH = $$(AGGDIR)/include \
               ../TrussUnit \
               ../gui
 
-SOURCES = FermaNext.cpp \
+FORMS = ../gui/CalcDataWidget.ui
+
+SOURCES = \
+          FermaNext.cpp \
           FermaNextConfig.cpp \
           FermaNextProject.cpp \
           FermaNextWorkspace.cpp \
@@ -36,8 +40,8 @@ SOURCES = FermaNext.cpp \
           ../gui/ToolBarManager.cpp \
           ../gui/WindowListBox.cpp
 
-HEADERS = FermaNextConfig.h \
-          FermaNextPlugin.h \
+HEADERS = \
+          FermaNextConfig.h \
           FermaNextProject.h \
           FermaNextWorkspace.h \
           ../gui/CalcDataToolBar.h \
