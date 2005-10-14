@@ -26,6 +26,7 @@ public:
     virtual ObjectStateManager& getStateManager ();
     virtual TrussUnitWindowManager& getTrussUnitWindowManager ();    
     virtual TrussUnitDesignerWindow& getDesignerWindow ();
+    virtual CalcDataToolBar& getCalcDataToolBar ();
 
 signals:
     void onNameChange ( const QString& );    
