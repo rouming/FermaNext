@@ -181,21 +181,30 @@ void TrussUnitWindowItem::unselectAllFromGroup ()
 }
 
 void TrussUnitWindowItem::calculate ()
-{
-    FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
+{ 
+    FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();    
     PluginManager& plgManager = wsp.pluginManager();
     PluginHandleList pluginHandles = 
                           plgManager.loadedPluginsOfType( CALCULATION_PLUGIN );
     if ( pluginHandles.size() == 0 )
         return;
     try {
+        // Try to find truss calc data widget
+        CalcDataToolBar& calcToolBar = project.getCalcDataToolBar();        
+        CalcDataWidget* calcForm = calcToolBar.findCalcDataWidget( trussWindow );
+
+        // Find first calculation plugin. 
+        // TODO: plural calculation plugin support
         Plugin& calcPlugin = plgManager.findPlugin( pluginHandles[0] );
-        TrussTopology& topology = trussWindow.createTopology();
+
+        // Do calculation with new topology and calc data
         TrussCalcData calcData;
+        TrussTopology& topology = trussWindow.createTopology();
         calcPlugin.calculate( topology, calcData );
-        CalcDataWidget* calcForm = new CalcDataWidget();
-        //calcForm->initCalc( calcData );
+        calcForm->initCalc( calcData );
         calcForm->show();
+
+        // TODO: toplogy manager
         topology.desist();
     }
     catch ( ... ) {}                

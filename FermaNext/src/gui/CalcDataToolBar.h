@@ -5,6 +5,7 @@
 #include "ToolBarManager.h"
 #include "TrussUnitWindow.h"
 
+class CalcDataWidget;
 class QIconSet;
 
 class CalcDataToolBar : public ToolBarManager
@@ -13,6 +14,8 @@ class CalcDataToolBar : public ToolBarManager
 public:
     CalcDataToolBar ( QMainWindow* parent = 0, const char* name = 0 );
     virtual ~CalcDataToolBar ();
+
+    virtual CalcDataWidget* findCalcDataWidget ( TrussUnitWindow& );
 
 protected:
     virtual void initCalcDataIcons ();
@@ -31,7 +34,7 @@ protected slots:
     virtual void trussUnitWindowReviveDesist ( StatefulObject&, bool );
 
 private:
-    typedef QMap<const TrussUnitWindow*, QWidget*> CalcDataMap;
+    typedef QMap<const TrussUnitWindow*, CalcDataWidget*> CalcDataMap;
     typedef CalcDataMap::iterator CalcDataMapIter;
 
     CalcDataMap calcDataWidgets;

@@ -87,4 +87,9 @@ TrussUnitDesignerWindow& FermaNextProject::getDesignerWindow ()
     return *designerWindow;
 }
 
+CalcDataToolBar& FermaNextProject::getCalcDataToolBar ()
+{
+    return *calcDataToolBar;
+}
+
 /*****************************************************************************/

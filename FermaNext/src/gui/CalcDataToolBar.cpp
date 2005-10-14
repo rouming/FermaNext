@@ -1,5 +1,6 @@
 
 #include "CalcDataToolBar.h"
+#include "CalcDataWidget.h"
 
 #include <qlabel.h>
 #include <qiconset.h>
@@ -17,6 +18,13 @@ CalcDataToolBar::CalcDataToolBar ( QMainWindow* parent, const char* name ) :
 CalcDataToolBar::~CalcDataToolBar ()
 {
     clear();
+}
+
+CalcDataWidget* CalcDataToolBar::findCalcDataWidget ( TrussUnitWindow& truss )
+{
+    if ( ! calcDataWidgets.contains( &truss ) )
+        return 0;
+    return calcDataWidgets[&truss];
 }
 
 void CalcDataToolBar::clear ()
@@ -41,7 +49,7 @@ void CalcDataToolBar::addWidget ( QWidget& w )
 
 void CalcDataToolBar::addTrussUnitWindow ( TrussUnitWindow& truss )
 {
-    QWidget* w = new QWidget();
+    CalcDataWidget* w = new CalcDataWidget();
     // Catch life time changing
     QObject::connect( &truss, SIGNAL(onAfterDesist(StatefulObject&)), 
                               SLOT(trussUnitWindowDesist(StatefulObject&)) );
