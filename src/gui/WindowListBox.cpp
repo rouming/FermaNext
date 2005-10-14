@@ -4,6 +4,7 @@
 #include "TrussUnitActions.h"
 #include "FermaNextWorkspace.h"
 #include "TrussCalcData.h"
+#include "CalcDataWidget.h"
 
 #include <qstring.h>
 #include <qcursor.h>
@@ -192,6 +193,9 @@ void TrussUnitWindowItem::calculate ()
         TrussTopology& topology = trussWindow.createTopology();
         TrussCalcData calcData;
         calcPlugin.calculate( topology, calcData );
+        CalcDataWidget* calcForm = new CalcDataWidget();
+        //calcForm->initCalc( calcData );
+        calcForm->show();
         topology.desist();
     }
     catch ( ... ) {}                
