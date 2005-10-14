@@ -5,6 +5,7 @@
 #include "FRMWriter.h"
 #include "VYVReader.h"
 #include <qfile.h>
+#include <qregexp.h>
 
 #if defined WINDOWS || defined WIN32  
   #include "win_SimpleCalc.h"
@@ -49,11 +50,12 @@ bool SimpleCalcPlugin::dependsOn ( PluginType ) const
 void SimpleCalcPlugin::calculate ( TrussTopology& truss, 
                                    TrussCalcData& data ) const
 {
-    QString vyvFile( tempFileName() + fermaResExt );
+    QString frmFile( tempFileName() );    
+    QString vyvFile( frmFile + fermaResExt );
     FRMWriter frm(truss);
-    frm.write( tempFileName() );
+    frm.write( frmFile );
     QFile::remove( vyvFile );
-    startCalculation( tempFileName() );
+    startCalculation( frmFile );
     VYVReader vyv(data);
     vyv.read( vyvFile );
     QFile::remove( vyvFile );
@@ -61,7 +63,9 @@ void SimpleCalcPlugin::calculate ( TrussTopology& truss,
 
 void SimpleCalcPlugin::createTempFile ()
 {  
-    tempFile = tmpnam(0);
+    tempFile = tmpnam(0);    
+    // Remove possible trailing extension
+    tempFile.remove( QRegExp("\\..*$") );
 }
 
 void SimpleCalcPlugin::destroyTempFile () 
