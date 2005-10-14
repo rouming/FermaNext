@@ -45,7 +45,7 @@ RSC=rc.exe
 # ADD BASE F90 /compile_only /nologo /warn:nofileopt
 # ADD F90 /compile_only /nologo /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "." /I "..\common" /I "..\Agg" /I "..\TrussUnit" /I "..\gui" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "." /I "..\common" /I "..\Agg" /I "..\TrussUnit" /I "..\gui" /I "..\gui\ui" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /c
 # ADD BASE RSC /l 0x419 /d "NDEBUG"
 # ADD RSC /l 0x419 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -72,7 +72,7 @@ LINK32=link.exe
 # ADD BASE F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /Od /I "." /I "..\common" /I "..\Agg" /I "..\TrussUnit" /I "..\gui" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /GZ -Zm200 /c
+# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /Od /I "." /I "..\common" /I "..\Agg" /I "..\TrussUnit" /I "..\gui" /I "..\gui\ui" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /GZ -Zm200 /c
 # ADD BASE RSC /l 0x419 /d "_DEBUG"
 # ADD RSC /l 0x419 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -385,6 +385,10 @@ SOURCE=.\..\gui\mocs\moc_CalcDataToolBar.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\gui\ui\mocs\moc_CalcDataWidget.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\..\gui\mocs\moc_FermaNextMainFrame.cpp
 # End Source File
 # Begin Source File
@@ -418,6 +422,98 @@ SOURCE=.\..\gui\mocs\moc_ToolBarManager.cpp
 # Begin Source File
 
 SOURCE=.\..\gui\mocs\moc_WindowListBox.cpp
+# End Source File
+# End Group
+# Begin Group "Ui Files"
+
+# PROP Default_Filter "ui"
+# Begin Source File
+
+SOURCE=..\gui\CalcDataWidget.ui
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# Begin Custom Build - Uic'ing $(InputName).ui ...
+InputDir=\ferma\Source\FermaNext\src\gui
+InputPath=..\gui\CalcDataWidget.ui
+InputName=CalcDataWidget
+
+BuildCmds= \
+	IF NOT EXIST "$(InputDir)\ui" mkdir "$(InputDir)\ui" \
+	"%qtdir%\bin\uic.exe" "$(InputDir)\$(InputName).ui" -o "$(InputDir)\ui\$(InputName).h" \
+	"%qtdir%\bin\uic.exe" "$(InputDir)\$(InputName).ui" -i "$(InputDir)\ui\$(InputName).h" -o "$(InputDir)\ui\$(InputName).cpp" \
+	
+
+"$(InputDir)\ui\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"$(InputDir)\ui\$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# Begin Custom Build - Uic'ing $(InputName).ui ...
+InputDir=\ferma\Source\FermaNext\src\gui
+InputPath=..\gui\CalcDataWidget.ui
+InputName=CalcDataWidget
+
+BuildCmds= \
+	IF NOT EXIST "$(InputDir)\ui" mkdir "$(InputDir)\ui" \
+	"%qtdir%\bin\uic.exe" "$(InputDir)\$(InputName).ui" -o "$(InputDir)\ui\$(InputName).h" \
+	"%qtdir%\bin\uic.exe" "$(InputDir)\$(InputName).ui" -i "$(InputDir)\ui\$(InputName).h" -o "$(InputDir)\ui\$(InputName).cpp" \
+	
+
+"$(InputDir)\ui\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"$(InputDir)\ui\$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "Ui Source Files"
+
+# PROP Default_Filter "*.cpp;*.h"
+# Begin Source File
+
+SOURCE=..\gui\ui\CalcDataWidget.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\gui\ui\CalcDataWidget.h
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\gui\ui
+InputPath=..\gui\ui\CalcDataWidget.h
+InputName=CalcDataWidget
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\gui\ui
+InputPath=..\gui\ui\CalcDataWidget.h
+InputName=CalcDataWidget
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # End Group
 # End Target
