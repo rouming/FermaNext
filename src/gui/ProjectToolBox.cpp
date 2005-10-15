@@ -3,6 +3,8 @@
 #include "WindowListBox.h"
 #include "SubsidiaryConstants.h"
 #include "TrussUnitActions.h"
+#include "TrussCalcData.h"
+#include "CalcDataWidget.h"
 
 #include <qbuttongroup.h>
 #include <qtoolbutton.h>
@@ -12,7 +14,8 @@
 #include <qmessagebox.h>
 #include <qiconset.h>
 #include <qfiledialog.h>
-#include <qinputdialog.h> 
+#include <qinputdialog.h>
+#include <qaction.h>
 
 /*****************************************************************************
  * Project ToolBox
@@ -132,11 +135,11 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
 
     WindowListBox * listBox = new WindowListBox ( prj, groupBoxWindows, "listBox" );
     groupBoxWindowsLayout->addWidget( listBox );
-    
+
     // Fonts
     QFont labelFont( "arial", 9  );
     labelFont.setUnderline(true);
-    QFont simpleFont( "arial", 9  );    
+    QFont simpleFont( "arial", 9  );
 
     // Legends     
     groupBoxInfo->setTitle( tr( "Project info" ) );
@@ -154,28 +157,44 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
     labelVisibleTrussesVal->setText( tr( "5" ) );
 
     // Some buttons at the bottom
+    QToolButton* calculateAllButton = new QToolButton( groupBoxWindows );
+    calculateAllButton->setText( tr("FFFFFFF") );
+    groupBoxWindowsLayout->addWidget( calculateAllButton );
+    calculateAllButton->setTextLabel( tr("Calculate all") );
+    calculateAllButton->setAutoRaise( TRUE );
+    calculateAllButton->setTextPosition( QToolButton::Right );
+    calculateAllButton->setUsesTextLabel( TRUE );
+    calculateAllButton->setFont( simpleFont );
+    calculateAllButton->setBackgroundMode(PaletteBase);
+    connect( calculateAllButton, SIGNAL(clicked()), SLOT(calculateAllIsPressed()) ); 
+
+    // Calculate all action
+    QAction* calculationAllAction = new QAction( "Calculate all", Key_F5, this );
+    connect( calculationAllAction, SIGNAL( activated() ) , 
+             SLOT( calculateAllIsPressed() ) );
+
     QButtonGroup* buttons = new QButtonGroup( 1, Vertical, groupBox );
     buttons->setFrameStyle( QFrame::NoFrame );
     buttons->setEraseColor(green);
     buttons->setBackgroundMode(PaletteBase);
-	
+        
     QToolButton* buttonImport = new QToolButton(buttons);
-	buttonImport->setBackgroundMode(PaletteBase);
-	buttonImport->setTextLabel( tr("Import") );
-	buttonImport->setAutoRaise( TRUE );
-	buttonImport->setTextPosition( QToolButton::Right );
-	buttonImport->setUsesTextLabel( TRUE );
+    buttonImport->setBackgroundMode(PaletteBase);
+    buttonImport->setTextLabel( tr("Import") );
+    buttonImport->setAutoRaise( TRUE );
+    buttonImport->setTextPosition( QToolButton::Right );
+    buttonImport->setUsesTextLabel( TRUE );
     buttonImport->setFont( simpleFont );
-    connect( buttonImport, SIGNAL(clicked()), this, SLOT(importIsPressed()) ); 
+    connect( buttonImport, SIGNAL(clicked()), SLOT(importIsPressed()) ); 
 
     QToolButton* buttonNewTruss = new QToolButton(buttons);
-	buttonNewTruss->setBackgroundMode(PaletteBase);
-	buttonNewTruss->setTextLabel( tr("New") );
-	buttonNewTruss->setAutoRaise( TRUE );
-	buttonNewTruss->setTextPosition( QToolButton::Right );
-	buttonNewTruss->setUsesTextLabel( TRUE );
+    buttonNewTruss->setBackgroundMode(PaletteBase);
+    buttonNewTruss->setTextLabel( tr("New") );
+    buttonNewTruss->setAutoRaise( TRUE );
+    buttonNewTruss->setTextPosition( QToolButton::Right );
+    buttonNewTruss->setUsesTextLabel( TRUE );
     buttonNewTruss->setFont( simpleFont );
-    connect( buttonNewTruss, SIGNAL(clicked()), this, SLOT(newTrussIsPressed()) ); 
+    connect( buttonNewTruss, SIGNAL(clicked()), SLOT(newTrussIsPressed()) ); 
 
     buttons->insert( buttonImport, 0 );
     buttons->insert( buttonNewTruss, 0 );
@@ -278,6 +297,62 @@ void ProjectToolBox::newTrussIsPressed ()
         state.save();
     } else {
         // user entered nothing or pressed Cancel
+    }
+}
+
+void ProjectToolBox::calculateAllIsPressed ()
+{
+    FermaNextProject* currPrj = currentProject();
+    if ( currPrj == 0 )
+        return;
+
+    FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
+    PluginManager& plgManager = wsp.pluginManager();
+    PluginHandleList pluginHandles = 
+                          plgManager.loadedPluginsOfType( CALCULATION_PLUGIN );
+    if ( pluginHandles.size() == 0 ) {
+        QMessageBox::warning( 0, tr("Plugin manager warning"), 
+                                 tr("Calculation plugin was not found "
+                                    "in the plugin dir.") );
+        return;
+    }
+
+    CalcDataToolBar& calcToolBar = currPrj->getCalcDataToolBar();
+    TrussUnitWindowManager& trussMng = currPrj->getTrussUnitWindowManager();
+    WindowList trussWindows = trussMng.getTrussUnitWindowList();
+    WindowListIter iter = trussWindows.begin();
+
+    try {
+        // Find first calculation plugin. 
+        // TODO: plural calculation plugin support
+        Plugin& calcPlugin = plgManager.findPlugin( pluginHandles[0] );
+
+        for ( ; iter != trussWindows.end(); ++iter ) {
+            TrussUnitWindow* trussWindow = *iter;
+            try {
+                // Try to find truss calc data widget
+                CalcDataWidget* calcForm = 
+                    calcToolBar.findCalcDataWidget( *trussWindow );
+            
+                // Do calculation with new topology and calc data
+                TrussCalcData calcData;
+                TrussTopology& topology = trussWindow->createTopology();
+                calcPlugin.calculate( topology, calcData );
+                calcForm->initCalc( calcData );
+
+                // TODO: toplogy manager
+                topology.desist();
+            }
+            catch ( ... ) {
+               QMessageBox::critical( 0, tr("Plugin manager error"),
+                                      tr("Internal plugin error. \n"
+                                      "Please, inform plugin developer.") );
+            }
+        }
+    }
+    catch ( PluginManager::FindException& ) {
+        QMessageBox::critical( 0, tr("Plugin manager error"),
+                               tr("Calculation plugin was not found by.") );
     }
 }
 

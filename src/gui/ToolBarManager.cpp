@@ -141,6 +141,7 @@ void TabbedWidget::show ()
 {
     if ( ! isActive() )
         return;
+    widget.show();
     widget.raise();
     emit onShow( *this );
 }

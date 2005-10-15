@@ -12,6 +12,7 @@
 CalcDataToolBar::CalcDataToolBar ( QMainWindow* parent, const char* name ) :
     ToolBarManager(parent, name)
 {
+    setLabel( tr("Calculation data") );
     initCalcDataIcons();
 }
 
@@ -49,13 +50,13 @@ void CalcDataToolBar::addWidget ( QWidget& w )
 
 void CalcDataToolBar::addTrussUnitWindow ( TrussUnitWindow& truss )
 {
-    CalcDataWidget* w = new CalcDataWidget();
     // Catch life time changing
     QObject::connect( &truss, SIGNAL(onAfterDesist(StatefulObject&)), 
                               SLOT(trussUnitWindowDesist(StatefulObject&)) );
     QObject::connect( &truss, SIGNAL(onAfterRevive(StatefulObject&)), 
                               SLOT(trussUnitWindowRevive(StatefulObject&)) );
 
+    CalcDataWidget* w = new CalcDataWidget( parentWidget(), 0, WType_TopLevel);
     w->setCaption( truss.getTrussName() );
     calcDataWidgets[&truss] = w;
     addWidget( *w );

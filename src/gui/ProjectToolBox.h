@@ -40,6 +40,7 @@ public slots:
     virtual void clear ();
     virtual void importIsPressed ();
     virtual void newTrussIsPressed ();
+    virtual void calculateAllIsPressed ();
 
 private:
     typedef QMap<FermaNextProject*, QWidget*> ProjectMap;
