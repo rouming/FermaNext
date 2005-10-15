@@ -16,7 +16,9 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack )
     widgetStack(stack),
     projectMainWidget( new QMainWindow(widgetStack, 0, 0) ),
     calcDataToolBar( new CalcDataToolBar(projectMainWidget) ),
-    projectTab( new QTabWidget(projectMainWidget) )
+    projectTab( new QTabWidget(projectMainWidget) ),
+    justStrengthAnalisysWidget( new QWidget(projectTab) ),
+    designerWindow( new TrussUnitDesignerWindow(name_, projectTab) )    
 {
     projectMainWidget->setRightJustification( true );
     projectMainWidget->setDockEnabled( DockLeft, false );
@@ -24,12 +26,7 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack )
 
     widgetStack->addWidget(projectMainWidget);
     projectMainWidget->setCentralWidget( projectTab );
-
-    calcDataToolBar->setLabel( tr("Calculation data") );
-
-    justStrengthAnalisysWidget = new QWidget(projectTab);
-    designerWindow = new TrussUnitDesignerWindow(name_, projectTab);
-
+  
     projectTab->setTabPosition( QTabWidget::Bottom );
     projectTab->addTab( designerWindow, tr("Designer") );
     projectTab->addTab( justStrengthAnalisysWidget, tr("Strength Analysis") );
