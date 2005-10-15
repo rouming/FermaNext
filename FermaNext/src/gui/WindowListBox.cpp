@@ -9,6 +9,7 @@
 #include <qstring.h>
 #include <qcursor.h>
 #include <qpopupmenu.h>
+#include <qmessagebox.h>
 
 /*****************************************************************************
  * Truss Unit Window Item
@@ -186,8 +187,12 @@ void TrussUnitWindowItem::calculate ()
     PluginManager& plgManager = wsp.pluginManager();
     PluginHandleList pluginHandles = 
                           plgManager.loadedPluginsOfType( CALCULATION_PLUGIN );
-    if ( pluginHandles.size() == 0 )
+    if ( pluginHandles.size() == 0 ) {
+        QMessageBox::warning( 0, tr("Plugin manager warning"), 
+                                 tr("Calculation plugin was not found "
+                                    "in the plugin dir.") );
         return;
+    }
     try {
         // Try to find truss calc data widget
         CalcDataToolBar& calcToolBar = project.getCalcDataToolBar();        
@@ -207,7 +212,15 @@ void TrussUnitWindowItem::calculate ()
         // TODO: toplogy manager
         topology.desist();
     }
-    catch ( ... ) {}                
+    catch ( PluginManager::FindException& ) {
+        QMessageBox::critical( 0, tr("Plugin manager error"),
+                                  tr("Calculation plugin was not found by.") );
+    }
+    catch ( ... ) {
+        QMessageBox::critical( 0, tr("Plugin manager error"),
+                                  tr("Internal plugin error. \n"
+                                     "Please, inform plugin developer.") );
+    }
 }
 
 void TrussUnitWindowItem::remove ()
