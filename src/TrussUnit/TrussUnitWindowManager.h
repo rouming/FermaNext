@@ -29,6 +29,8 @@ public:
          const QString& fileName ) throw (ReadFileException,
                                           WrongFormatException);
 
+    virtual WindowList getTrussUnitWindowList ();
+
 protected:
     virtual void clearTrussUnitWindows ();
     virtual void suspendedClean ();

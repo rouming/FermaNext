@@ -143,6 +143,17 @@ bool TrussUnitWindowManager::removeTrussUnitWindow ( WindowListIter& iter )
     return true;
 }
 
+WindowList TrussUnitWindowManager::getTrussUnitWindowList ()
+{
+    WindowList aliveTrussWindows;
+    WindowListIter iter = trussWindows.begin();
+    for ( ; iter != trussWindows.end(); ++iter )
+        if ( (*iter)->isAlive() )
+            aliveTrussWindows.push_back( *iter );
+
+    return aliveTrussWindows;
+}
+
 void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file ) 
                                                             throw (WrongFormatException)
 {
