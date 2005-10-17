@@ -46,9 +46,6 @@ FermaNextMainFrame::FermaNextMainFrame ( QWidget* p, const char* n,
     setupHelpActions();
 }
 
-FermaNextMainFrame::~FermaNextMainFrame ()
-{ int* i =((int*)0); *i = 12;}
-
 void FermaNextMainFrame::init ()
 {
     // Do not move this line. Should be the first for correct inition.

@@ -24,9 +24,6 @@ public:
     virtual bool isShown () const;
     virtual bool isAlive () const;
 
-protected:
-    virtual void saveVisibilityChange ( bool );
-
 public slots:
     virtual void setText ( const QString& );
 
@@ -41,8 +38,10 @@ public slots:
     virtual void remove ();
 
 protected slots:
+    // Life-time changes
     virtual void trussWindowDesisted ();
     virtual void trussWindowRevived ();
+
     virtual void update ();
 
 private:
@@ -73,8 +72,13 @@ public slots:
     virtual void selectAllInGroup ();
     virtual void unselectAllFromGroup ();
 
+    // Life-time changes
     virtual void trussWindowDesisted ( const TrussUnitWindow& );
     virtual void trussWindowRevived ( const TrussUnitWindow& );
+
+    // Focus changes
+    virtual void trussWindowReceivedFocus ( TrussUnitWindow& );
+    virtual void trussWindowLostFocus ( TrussUnitWindow& );
 
 protected slots:
     virtual void raiseTrussUnitWindowItem ( QListBoxItem* );

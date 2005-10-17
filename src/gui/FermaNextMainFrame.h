@@ -16,8 +16,7 @@ class FermaNextMainFrame : public QMainWindow
 public:
     FermaNextMainFrame ( QWidget * parent = 0, const char * name = 0, 
                          WFlags f = WType_TopLevel );
-    ~FermaNextMainFrame ();    
-    
+
 public slots:
     void someProjectRemoved ( FermaNextProject& );
     void someProjectCreated ( FermaNextProject& );
