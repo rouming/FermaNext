@@ -14,8 +14,6 @@ public:
     TrussUnitDesignerWindow ( const QString& caption, QWidget* p = 0, 
                               const char* n = 0, WFlags f =WType_TopLevel );
 
-    ~TrussUnitDesignerWindow ();
-    
     virtual TrussUnitDesignerWidget& getDesignerWidget ();
     
     void resizeEvent ( QResizeEvent* );
