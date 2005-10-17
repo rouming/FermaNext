@@ -256,12 +256,6 @@ void ProjectToolBox::importIsPressed ()
     try { 
         TrussUnitWindowManager& trussMng = currPrj->getTrussUnitWindowManager();
         TrussUnitWindow& truss = trussMng.createTrussUnitWindowFromFile(fileName);
-        // Save truss window create state
-        ObjectState& state = truss.createState();
-        TrussUnitWindowCreateAction* action = 
-                            new TrussUnitWindowCreateAction( truss );
-        state.addAction( action );
-        state.save();        
 
     } catch ( TrussUnitWindowManager::ReadFileException& ) {
         QMessageBox::critical( 0, "TrussUnitWindowManager::ReadFileException",
@@ -289,12 +283,6 @@ void ProjectToolBox::newTrussIsPressed ()
         TrussUnitWindowManager& trussMng = currPrj->getTrussUnitWindowManager();
         TrussUnitWindow& truss = trussMng.createTrussUnitWindow(trussName);
         truss.setTrussAreaSize( DoubleSize( 300, 300 ) );
-        // Save truss window create state
-        ObjectState& state = truss.createState();
-        TrussUnitWindowCreateAction* action = 
-                            new TrussUnitWindowCreateAction( truss );
-        state.addAction( action );
-        state.save();
     } else {
         // user entered nothing or pressed Cancel
     }

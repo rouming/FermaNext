@@ -55,15 +55,6 @@ void TrussUnitWindowItem::update ()
     listBox.triggerUpdate(true);
 }
 
-void TrussUnitWindowItem::saveVisibilityChange ( bool visible )
-{
-    // Save visibility change to undo-redo
-    ObjectState& state = trussWindow.createState();
-    state.addAction( new TrussUnitWindowVisibilityChange( trussWindow, 
-                                                          visible ) );
-    state.save();
-}
-
 const QPixmap* TrussUnitWindowItem::pixmap () const
 {
     if ( isShown() )
@@ -107,6 +98,11 @@ void TrussUnitWindowItem::fillPopup ( QPopupMenu* popup ) const
 
     } else {
         popup->insertItem(
+                        QPixmap::fromMimeSource(imagesPath() + "/delete.png"),
+                        "Remove", this, SLOT(remove()) );
+        popup->insertSeparator();
+
+        popup->insertItem(
                       QPixmap::fromMimeSource(imagesPath() + "/show.png"),
                       "Show", this, SLOT(show()) );
     }
@@ -147,7 +143,6 @@ void TrussUnitWindowItem::show ()
     if ( trussWindow.isVisible() )
         return;
     trussWindow.setVisible( true );
-    saveVisibilityChange( true );
     raise();
     update();
 }
@@ -157,7 +152,6 @@ void TrussUnitWindowItem::hide ()
     if ( ! trussWindow.isVisible() )
         return;
     trussWindow.setVisible( false );
-    saveVisibilityChange( false );
     update();
 }
 
@@ -225,12 +219,13 @@ void TrussUnitWindowItem::calculate ()
 
 void TrussUnitWindowItem::remove ()
 {
-    // Save truss window remove state
-    ObjectState& state = trussWindow.createState();
-    TrussUnitWindowRemoveAction* action = 
-                      new TrussUnitWindowRemoveAction( trussWindow );
-    state.addAction( action );
-    state.save();
+    if ( QMessageBox::question( 0, tr("Truss unit deleting - \"%1\"").
+                                  arg(trussWindow.getTrussName()),
+                                tr("Delete truss window?"),
+                                tr("&Yes"), tr("&No"),
+                                QString::null, 0, 1 ) ) {
+        return;
+    }
     // Remove truss window
     trussWindow.desist();
 }
@@ -247,6 +242,14 @@ WindowListBox::WindowListBox ( FermaNextProject& prj, QWidget* parent,
     // Catch double click on item
     QObject::connect( this, SIGNAL(doubleClicked(QListBoxItem*)),
                       SLOT(raiseTrussUnitWindowItem(QListBoxItem*)) );
+
+    // Catch focus changes
+    TrussUnitDesignerWidget& w = prj.getDesignerWindow().getDesignerWidget();
+    QObject::connect( &w, SIGNAL(onFocusReceive(TrussUnitWindow&)), 
+                          SLOT(trussWindowReceivedFocus(TrussUnitWindow&)) );
+    QObject::connect( &w, SIGNAL(onFocusLose(TrussUnitWindow&)), 
+                          SLOT(trussWindowLostFocus(TrussUnitWindow&)) );
+
     // Catch truss creation/removing
     TrussUnitWindowManager& trussMng = project.getTrussUnitWindowManager();
     QObject::connect( &trussMng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
@@ -287,6 +290,9 @@ void WindowListBox::addTrussUnitWindow ( TrussUnitWindow& truss )
                   QPixmap::fromMimeSource(imagesPath() + "/project_d.png"));
     IndexedItem iitem = { item, index(item) };
     windowItems[&truss] = iitem;
+    // Set selected newbie
+    setSelected( item, true );
+    triggerUpdate(true);
 }
 
 void WindowListBox::removeTrussUnitWindow ( TrussUnitWindow& truss )
@@ -327,7 +333,19 @@ void WindowListBox::trussWindowDesisted ( const TrussUnitWindow& truss )
 {
     TrussUnitWindowItem* item = findByTrussUnitWindow( truss );
     if ( item && index( item ) != -1 )
-        takeItem( item );
+        takeItem( item );    
+    
+    // Select focused window if it was not selected
+    if ( selectedItem() )
+        return;
+
+    TrussUnitDesignerWidget& w = 
+        project.getDesignerWindow().getDesignerWidget();
+    TrussUnitWindow* focusedWindow = w.getFocusedWindow();
+    if ( focusedWindow == 0 || ! windowItems.contains(focusedWindow) )
+        return;
+    setSelected( windowItems[focusedWindow].item, true );
+    triggerUpdate(true);    
 }
 
 void WindowListBox::trussWindowRevived ( const TrussUnitWindow& truss )
@@ -337,6 +355,22 @@ void WindowListBox::trussWindowRevived ( const TrussUnitWindow& truss )
         insertItem( item, windowItems[&truss].index );
         setCurrentItem( item );
     }
+}
+
+void WindowListBox::trussWindowReceivedFocus ( TrussUnitWindow& window )
+{
+    if ( ! windowItems.contains(&window) )
+        return;
+    setSelected( windowItems[&window].item, true );
+    triggerUpdate(true);
+}
+
+void WindowListBox::trussWindowLostFocus ( TrussUnitWindow& window )
+{
+    if ( ! windowItems.contains(&window) )
+        return;
+    setSelected( windowItems[&window].item, false );
+    triggerUpdate(true);
 }
 
 /*****************************************************************************/
