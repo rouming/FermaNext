@@ -45,6 +45,7 @@ public:
 
 public slots:
     virtual bool loadPlugins ();
+    virtual void clearProjects ();
 
 private:
     FermaNextWorkspace ();
@@ -53,9 +54,6 @@ private:
 protected:
     FermaNextWorkspace& operator= ( const FermaNextWorkspace& );
     virtual ~FermaNextWorkspace ();
-
-protected slots:
-    virtual void clear ();
 
 signals:
     void onProjectCreate ( FermaNextProject& );

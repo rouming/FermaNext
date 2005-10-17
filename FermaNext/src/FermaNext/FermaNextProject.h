@@ -37,17 +37,13 @@ private:
 
 private:
     QString name;
-    TrussUnitWindowManager trussWindowManager;
     QWidgetStack* widgetStack;
     QMainWindow* projectMainWidget;
     CalcDataToolBar* calcDataToolBar;
     QTabWidget* projectTab;
     QWidget* justStrengthAnalisysWidget;
-
-    // We own this object by pointer, because it can be destroyed
-    // by Qt deletion mechanism when the application closes.
-    // Nobody should own this member after deletion has happened.
     TrussUnitDesignerWindow* designerWindow;
+    TrussUnitWindowManager* trussWindowManager;
 };
 
 #endif //FERMANEXTPROJECT_H
