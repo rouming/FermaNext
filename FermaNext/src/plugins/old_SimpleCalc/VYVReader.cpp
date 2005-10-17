@@ -4,6 +4,8 @@
 #include <qfile.h>
 #include <cmath>
 #include <qstring.h>
+#include <qtextstream.h>
+#include <qstringlist.h>
 
 /*****************************************************************************
  * VYV Reader
@@ -115,7 +117,7 @@ bool VYVReader::write ( const QString& fileName ) const
 
 bool VYVReader::read ( const QString& fileName )
 {
-    QFile ResFile(fileName);
+    QFile resFile(fileName);
     QString str;
     QString buff;
     int i;
@@ -125,60 +127,84 @@ bool VYVReader::read ( const QString& fileName )
     double length;
     double MaxStress;
 
-    if ( ! ResFile.open(IO_ReadOnly) )
+    if ( ! resFile.open(IO_ReadOnly) )
         return false;
 
-    ResFile.readLine( str, 256 );
-    ResFile.readLine( str, 256 );
+    QTextStream stream( &resFile );
+    stream.setEncoding( QTextStream::Latin1 );
+
+    stream.readLine();
+    str = stream.readLine();
     Data.pivotsNum = str.toInt();
     Data.pivotsFirstNodes.resize(Data.pivotsNum);
     Data.pivotsLastNodes.resize(Data.pivotsNum);
     Data.pivotLength.resize(Data.pivotsNum);
     Data.pivotSquare.resize(Data.pivotsNum);
-    ResFile.readLine( str, 256 );
+    str = stream.readLine();
     Data.nodesNum = str.toInt();
     Data.x.resize(Data.nodesNum);
     Data.y.resize(Data.nodesNum);
     for ( i = 0; i < 3; i++) {
-        ResFile.readLine( str, 256 );
+        str = stream.readLine(  );
     }
     Data.loadsNum = str.toInt();
     Data.xTrans.resize(Data.nodesNum * Data.loadsNum);
     Data.yTrans.resize(Data.nodesNum * Data.loadsNum);
     Data.stress.resize(Data.pivotsNum * Data.loadsNum);
     Data.safetyFactor.resize(Data.pivotsNum * Data.loadsNum);
-    ResFile.readLine( str, 256 );
+    str = stream.readLine(  );
     Data.stressLimit = str.toDouble();
+
+    QStringList lines;
+    while ( !stream.atEnd() )
+        lines += stream.readLine();
+    resFile.close();    
+
+    QStringList::Iterator it;
 //---------------------------------------------------------------------------//
-    while (str.contains("Массив топологий стержней")==0) 
-        ResFile.readLine( str, 256 );
-    for (i = 0;i < Data.pivotsNum;i++) {
-        ResFile.readLine(str,256);
-        buff = str[0];
-        Data.pivotsFirstNodes[i] = buff.toInt();
-        buff = str[1];
-        Data.pivotsLastNodes[i] = buff.toInt();
+    for ( it = lines.begin(); it != lines.end(); ++it ) {
+        QString str = *it;
+        if ( str.contains("Массив топологий стержней") == 0 )
+            continue;
+        for (i = 0;i < Data.pivotsNum;i++) {
+            ++it; if ( it == lines.end() ) break; str = *it;
+
+            buff = str[0];
+            Data.pivotsFirstNodes[i] = buff.toInt();
+            buff = str[1];
+            Data.pivotsLastNodes[i] = buff.toInt();
+        }
+        break;
     }
 //---------------------------------------------------------------------------//
-    while ( str.contains("Массив координат узлов")==0) 
-        ResFile.readLine(str,256);
-    for (i = 0;i < Data.nodesNum;i++) {
-        ResFile.readLine(str,256);
-        buff = str;
-        len = str.length();
-        str.remove(0,pos);
-        buff.remove(pos,len - pos + 1);
-        Data.x[i] = buff.toDouble();
-        Data.y[i] = str.toDouble();
+    for ( it = lines.begin(); it != lines.end(); ++it ) {
+        QString str = *it;
+        if ( str.contains("Массив координат узлов") == 0 ) 
+            continue;
+        for (i = 0;i < Data.nodesNum;i++) {
+            ++it; if ( it == lines.end() ) break; str = *it;
+
+            buff = str;
+            len = str.length();
+            str.remove(0,pos);
+            buff.remove(pos,len - pos + 1);
+            Data.x[i] = buff.toDouble();
+            Data.y[i] = str.toDouble();
+        }
+        break;
     }
 //---------------------------------------------------------------------------//
-    while ( str.contains("Массив начальных площадей")==0) 
-        ResFile.readLine(str,256);
-    for (i = 0; i < Data.pivotsNum; i++) {
-        ResFile.readLine(str,256);
-        Data.pivotSquare[i] = str.toDouble();
+    for ( it = lines.begin(); it != lines.end(); ++it ) {
+        QString str = *it;
+        if ( str.contains("Массив начальных площадей") == 0 ) 
+            continue;
+        for (i = 0; i < Data.pivotsNum; i++) {
+            ++it; if ( it == lines.end() ) break; str = *it;
+            Data.pivotSquare[i] = str.toDouble();
+        }
+        break;
     }
-//---------------------------------------------------------------------------//
+
     Data.v = 0;
     for (i = 0; i < Data.pivotsNum; i++) {
         length = sqrt( (Data.x[ Data.pivotsFirstNodes[i] -1] - 
@@ -193,35 +219,45 @@ bool VYVReader::read ( const QString& fileName )
         Data.v = Data.v + length * Data.pivotSquare[i];
     }
 //---------------------------------------------------------------------------//
-    while ( str.contains("Перемещения узлов")==0) 
-        ResFile.readLine( str, 256 );
-    ResFile.readLine( str, 256 );
-    for (i = 0; i < Data.loadsNum; i++) {
-        for (j = 0; j < Data.nodesNum; j++) {
-            ResFile.readLine(str,256 );
-            buff = str;
-            len = str.length();
-            str.remove( 0, pos );
-            buff.remove( pos, len - pos + 1 );
-            Data.xTrans[Data.nodesNum*i+j] = buff.toDouble();
-            Data.yTrans[Data.nodesNum*i+j] = str.toDouble();
+    for ( it = lines.begin(); it != lines.end(); ++it ) {
+        QString str = *it;
+        if ( str.contains("Перемещения узлов") == 0 ) 
+            continue;
+        ++it; if ( it == lines.end() ) break; str = *it;
+        for (i = 0; i < Data.loadsNum; i++) {
+            for (j = 0; j < Data.nodesNum; j++) {
+                ++it; if ( it == lines.end() ) break; str = *it;
+
+                buff = str;
+                len = str.length();
+                str.remove( 0, pos );
+                buff.remove( pos, len - pos + 1 );
+                Data.xTrans[Data.nodesNum*i+j] = buff.toDouble();
+                Data.yTrans[Data.nodesNum*i+j] = str.toDouble();
+            }
+            ++it; if ( it == lines.end() ) break; str = *it;
         }
-        ResFile.readLine( str, 256 );
+        break;
     }
 //---------------------------------------------------------------------------//
-    while ( str.contains("Напряжения в стержнях")==0) 
-        ResFile.readLine( str, 256 );
-    ResFile.readLine( str, 256 );
-    for (i = 0; i < Data.loadsNum; i++) {
-        for (j = 0; j < Data.pivotsNum; j++) {
-            ResFile.readLine(str,256);
-            Data.stress[Data.pivotsNum*i+j] = str.toDouble();;
-            Data.safetyFactor[Data.pivotsNum*i+j] = 
-                Data.stressLimit/Data.stress[Data.pivotsNum*i+j];
+    for ( it = lines.begin(); it != lines.end(); ++it ) {
+        QString str = *it;
+        if ( str.contains("Напряжения в стержнях") == 0 ) 
+            continue;
+        ++it; if ( it == lines.end() ) break; str = *it;
+        for (i = 0; i < Data.loadsNum; i++) {
+            for (j = 0; j < Data.pivotsNum; j++) {
+                ++it; if ( it == lines.end() ) break; str = *it;
+
+                Data.stress[Data.pivotsNum*i+j] = str.toDouble();;
+                Data.safetyFactor[Data.pivotsNum*i+j] = 
+                    Data.stressLimit/Data.stress[Data.pivotsNum*i+j];
+            }
+            ++it; if ( it == lines.end() ) break; str = *it;
         }
-        ResFile.readLine( str, 256 );
+        break;
     }
-//---------------------------------------------------------------------------//
+
     Data.forceWeight = 0;
     for (i = 0; i < Data.pivotsNum; i++) {
         MaxStress = 0;
@@ -232,12 +268,16 @@ bool VYVReader::read ( const QString& fileName )
         Data.forceWeight = Data.forceWeight + MaxStress*Data.pivotLength[i];
     }
 //---------------------------------------------------------------------------//
-        /*while ( str.contains("Потребные площади стержней")==0) 
-          ResFile.readLine(str,256);
-          for (i = 0; i < Data.pivotsNum; i++) {
-          ResFile.readLine(str,256);
-          Data.pivotSquare[i] = str.toDouble();
-          }*/
+    for ( it = lines.begin(); it != lines.end(); ++it ) {
+        QString str = *it;
+        if ( str.contains("Потребные площади стержней") ==0 ) 
+            continue;
+        for (i = 0; i < Data.pivotsNum; i++) {
+            ++it; if ( it == lines.end() ) break; str = *it;
+            Data.pivotSquare[i] = str.toDouble();
+        }
+        break;
+    }
 //---------------------------------------------------------------------------//
     return true;
 }
