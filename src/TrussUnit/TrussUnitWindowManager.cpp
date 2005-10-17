@@ -151,6 +151,7 @@ bool TrussUnitWindowManager::removeTrussUnitWindow ( WindowListIter& iter )
     emit onTrussUnitWindowRemove( *w );
     trussWindows.erase(iter);
     ObjectStateManager* stateMng = stateManagerMap[w];
+    stateManagerMap.erase(w);
     delete w;
     delete stateMng;
     return true;

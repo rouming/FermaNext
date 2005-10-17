@@ -38,9 +38,14 @@ public:
 
     // Manage window focus
     virtual void focusOnWindow ( TrussUnitWindow& );
+    virtual void focusOnPrevWindow ( TrussUnitWindow& );
+    virtual void sendWindowToBack ( TrussUnitWindow& );
     virtual TrussUnitWindow* getFocusedWindow () const;
 
 protected:
+    virtual void clearTrussUnitWindows ();
+    virtual void initToolBar ();    
+
     virtual void clearWindowFocus ();
     virtual TrussUnitWindow* findWindowByWidgetPos ( int x, int y );
     
@@ -102,9 +107,10 @@ public slots:
     virtual void changeBehaviourToLoadDraw ();
     virtual void changeBehaviourToErase ();
 
-protected:
-    virtual void initToolBar ();
-    virtual void clearTrussUnitWindows ();
+protected slots:
+    // Life-time and visibility changes
+    virtual void trussWindowChangedVisibility ( bool );
+    virtual void trussWindowDesisted ( StatefulObject& );
 
 private:
     enum TrussWindowBehaviour { windowIdle = 0, onWindowDrag, 

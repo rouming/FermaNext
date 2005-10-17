@@ -124,11 +124,13 @@ void TrussUnitDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow 
     // We should repaint all area after truss changes its visibility
     // or becomes desisted/revived
     QObject::connect( &trussWindow, SIGNAL(onVisibleChange(bool)), 
-                                    SLOT(repaint()) );
+                                    SLOT(trussWindowChangedVisibility(bool)) );
     QObject::connect( &trussWindow, SIGNAL(onAfterDesist(StatefulObject&)), 
-                                    SLOT(repaint()) );
+                                    SLOT(update()) );
     QObject::connect( &trussWindow, SIGNAL(onAfterRevive(StatefulObject&)), 
-                                    SLOT(repaint()) );
+                                    SLOT(update()) );
+    QObject::connect( &trussWindow, SIGNAL(onBeforeDesist(StatefulObject&)), 
+                                    SLOT(trussWindowDesisted(StatefulObject&)) );
 
     trussWindows.push_back(&trussWindow);
     trussWindow.setWindowPosition ( QPoint( X, Y ) );
@@ -219,6 +221,33 @@ void TrussUnitDesignerWidget::changeBehaviourToErase ()
     designerBehaviour = onErase;
 }
 
+void TrussUnitDesignerWidget::trussWindowChangedVisibility ( bool visible )
+{
+    QObject* senderObj = const_cast<QObject*>(sender());
+    if ( senderObj == 0 )
+        return;
+    // Safe conversion
+    try { 
+        TrussUnitWindow& window = dynamic_cast<TrussUnitWindow&>(*senderObj);
+        if ( visible )
+            focusOnWindow( window );
+        else
+            focusOnPrevWindow( window );
+        update();
+    }
+    catch ( ... ) { return; }
+}
+
+void TrussUnitDesignerWidget::trussWindowDesisted ( StatefulObject& obj )
+{
+    // Safe conversion
+    try { 
+        TrussUnitWindow& window = dynamic_cast<TrussUnitWindow&>(obj);
+        focusOnPrevWindow( window );
+    }
+    catch ( ... ) { return; }
+}
+
 TrussUnitWindow* TrussUnitDesignerWidget::findWindowByWidgetPos ( int x, int y )
 {
     WindowList::reverse_iterator rev_iter = trussWindows.rbegin();
@@ -259,6 +288,55 @@ void TrussUnitDesignerWidget::focusOnWindow ( TrussUnitWindow& window )
     emit onFocusReceive( *focusedWindow );
 
     update();
+}
+
+/*  
+ *  Sends window to the bottom of the stack.
+ */ 
+void TrussUnitDesignerWidget::sendWindowToBack ( TrussUnitWindow& window )
+{
+    focusOnPrevWindow( window );
+    // Send to back.
+    trussWindows.erase( std::find( trussWindows.begin(), trussWindows.end(), 
+                                   &window ) );
+    trussWindows.insert( trussWindows.begin(), &window );
+}
+
+/* 
+ *  Focus on prev window, defocus old one.
+ */
+void TrussUnitDesignerWidget::focusOnPrevWindow ( TrussUnitWindow& window )
+{
+    // We start searching from the end of the vector to get the top 
+    // of the window stack.
+    WindowList::reverse_iterator windowIt = std::find( trussWindows.rbegin(),
+                                                       trussWindows.rend(), 
+                                                       &window );
+    if ( windowIt == trussWindows.rend() )
+        // Hm. Wrong argument?
+        return;
+
+    if ( &window == focusedWindow ) {
+        // We should defocus if it has focus and find 
+        // prev alive window to bring it to front.
+
+        WindowList::reverse_iterator focusedWindowIt = windowIt;
+
+        // Next window in the stack.
+        ++focusedWindowIt;
+
+        bool foundAlivePrevWindow = false;
+        for ( ; focusedWindowIt != trussWindows.rend(); ++focusedWindowIt ) {
+            TrussUnitWindow* prevWindow = *focusedWindowIt;
+            if ( prevWindow->isAlive() && prevWindow->isVisible() ) {
+                foundAlivePrevWindow = true;
+                focusOnWindow( *prevWindow );                    
+                break;
+            }
+        }
+        if ( ! foundAlivePrevWindow )
+            clearWindowFocus();
+    }
 }
 
 TrussUnitWindow* TrussUnitDesignerWidget::getFocusedWindow () const
