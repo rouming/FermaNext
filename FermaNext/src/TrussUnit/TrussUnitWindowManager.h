@@ -7,7 +7,6 @@
 #include <qfile.h>
 #include <qstring.h>
 
-#include "StatefulObject.h"
 #include "TrussUnitWindow.h"
 
 typedef std::vector<TrussUnitWindow*> WindowList;
@@ -22,7 +21,7 @@ public:
     class WriteFileException {};
     class WrongFormatException {};
 
-    TrussUnitWindowManager ( ObjectStateManager& );
+    TrussUnitWindowManager ();
     virtual ~TrussUnitWindowManager ();
 
     virtual TrussUnitWindow& createTrussUnitWindowFromFile ( 
@@ -36,8 +35,10 @@ protected:
     virtual void suspendedClean ();
     virtual bool removeTrussUnitWindow ( WindowListIter& );
 
-    virtual void loadOldVersion ( TrussUnit&, QFile& ) throw (WrongFormatException);
-    virtual void load ( TrussUnit&, const QFile& ) throw (WrongFormatException);
+    virtual void loadOldVersion ( TrussUnit&, QFile& ) 
+        throw (WrongFormatException);
+    virtual void load ( TrussUnit&, const QFile& ) 
+        throw (WrongFormatException);
 
 public slots:
     virtual TrussUnitWindow& createTrussUnitWindow ( const QString& name );    
@@ -58,9 +59,12 @@ signals:
 private:
     static const QString NEW_EXTENSION;
     static const QString OLD_EXTENSION;
+    // Every truss has it's own state manager.
+    typedef QMap<TrussUnitWindow*, ObjectStateManager*> StateManagerMap;
+    typedef StateManagerMap::Iterator StateManagerMapIter;
 
     WindowList trussWindows;
-    ObjectStateManager& stateManager;
+    StateManagerMap stateManagerMap;
 };
 
 #endif //TRUSSUNITWINDOWMANAGER_H

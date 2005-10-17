@@ -38,6 +38,7 @@ public:
 
     // Manage window focus
     virtual void focusOnWindow ( TrussUnitWindow& );
+    virtual TrussUnitWindow* getFocusedWindow () const;
 
 protected:
     virtual void clearWindowFocus ();
@@ -82,9 +83,14 @@ signals:
     void pressFixDrawButton ();
     void pressLoadDrawButton ();
     void pressEraseButton ();
-    // popup list signals
+
+    // Popup list signals
     void onFixationSet ( TrussNode& );
     void onLoadSet ( TrussNode& );
+
+    // Focus signals                          
+    void onFocusReceive ( TrussUnitWindow& );
+    void onFocusLose ( TrussUnitWindow& );
 
 public slots:
     virtual void addTrussUnitWindow ( TrussUnitWindow& );    
@@ -95,7 +101,6 @@ public slots:
     virtual void changeBehaviourToFixDraw ();
     virtual void changeBehaviourToLoadDraw ();
     virtual void changeBehaviourToErase ();
-    virtual void updateDesignerWidget ();
 
 protected:
     virtual void initToolBar ();

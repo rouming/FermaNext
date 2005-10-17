@@ -16,7 +16,7 @@ class FermaNextMainFrame : public QMainWindow
 public:
     FermaNextMainFrame ( QWidget * parent = 0, const char * name = 0, 
                          WFlags f = WType_TopLevel );
-    
+    ~FermaNextMainFrame ();    
     
 public slots:
     void someProjectRemoved ( FermaNextProject& );
@@ -66,7 +66,11 @@ protected slots:
     // Set actions enabled/disabled
     void refreshUndoRedoActions ();
 
-private:    
+    // Catch designer widget focus change
+    void trussWindowLostFocus ( TrussUnitWindow& );
+    void trussWindowReceivedFocus ( TrussUnitWindow& );
+
+private:
     QDockWindow* dw;
     ProjectToolBox* projectToolBox;
     FermaNextWorkspace* wsp;

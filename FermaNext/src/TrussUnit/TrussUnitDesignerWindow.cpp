@@ -24,6 +24,11 @@ TrussUnitDesignerWindow::TrussUnitDesignerWindow ( const QString& caption,
     setCaption( caption );
 }
 
+TrussUnitDesignerWindow::~TrussUnitDesignerWindow ()
+{
+    int i =0;
+}
+
 TrussUnitDesignerWidget& TrussUnitDesignerWindow::getDesignerWidget ()
 {
     return *designerWidget;

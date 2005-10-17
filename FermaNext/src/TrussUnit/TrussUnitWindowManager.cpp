@@ -1,5 +1,7 @@
 
 #include "TrussUnitWindowManager.h"
+#include "StatefulObject.h"
+
 #include <qregexp.h>
 
 // Indeces of povot nodes
@@ -23,8 +25,7 @@ typedef PivotNodesList::iterator PivotNodesListIter;
 const QString TrussUnitWindowManager::NEW_EXTENSION = ".fnx";
 const QString TrussUnitWindowManager::OLD_EXTENSION = ".frm";
 
-TrussUnitWindowManager::TrussUnitWindowManager ( ObjectStateManager& mng ) :
-    stateManager(mng)
+TrussUnitWindowManager::TrussUnitWindowManager ()
 {}
 
 TrussUnitWindowManager::~TrussUnitWindowManager ()
@@ -35,9 +36,14 @@ TrussUnitWindowManager::~TrussUnitWindowManager ()
 void TrussUnitWindowManager::clearTrussUnitWindows ()
 {
     WindowListIter iter = trussWindows.begin();
-    for ( ; iter != trussWindows.end(); ++iter )       
-      delete *iter;    
+    for ( ; iter != trussWindows.end(); ++iter ) {
+        TrussUnitWindow* trussWindow = *iter;
+        ObjectStateManager* stateMng = stateManagerMap[trussWindow];
+        delete trussWindow;
+        delete stateMng;
+    }
     trussWindows.clear();
+    stateManagerMap.clear();
 }
 
 void TrussUnitWindowManager::suspendedClean () 
@@ -68,17 +74,22 @@ void TrussUnitWindowManager::trussWindowAfterDesist ( StatefulObject& st )
     } catch ( ... ) {}
 }
 
-TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow ( const QString& name )
+TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow (
+    const QString& name )
 {
     // Clean earlier desisted truss windows
     suspendedClean();
 
-    TrussUnitWindow* trussWindow = new TrussUnitWindow(name, &stateManager);
+    ObjectStateManager* stateManager = new ObjectStateManager;
+    TrussUnitWindow* trussWindow = new TrussUnitWindow(name, stateManager);
+    stateManagerMap[trussWindow] = stateManager;
+
     QObject::connect( trussWindow, SIGNAL(onAfterRevive(StatefulObject&)), 
-                                   SLOT(trussWindowAfterRevive(StatefulObject&)) );
+                      SLOT(trussWindowAfterRevive(StatefulObject&)) );
     QObject::connect( trussWindow, SIGNAL(onAfterDesist(StatefulObject&)), 
-                                   SLOT(trussWindowAfterDesist(StatefulObject&)) );
+                      SLOT(trussWindowAfterDesist(StatefulObject&)) );
     trussWindows.push_back(trussWindow);
+
     emit onTrussUnitWindowCreate(*trussWindow);
     return *trussWindow;
 }
@@ -139,7 +150,9 @@ bool TrussUnitWindowManager::removeTrussUnitWindow ( WindowListIter& iter )
         return false;
     emit onTrussUnitWindowRemove( *w );
     trussWindows.erase(iter);
+    ObjectStateManager* stateMng = stateManagerMap[w];
     delete w;
+    delete stateMng;
     return true;
 }
 
@@ -155,7 +168,7 @@ WindowList TrussUnitWindowManager::getTrussUnitWindowList ()
 }
 
 void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file ) 
-                                                            throw (WrongFormatException)
+    throw (WrongFormatException)
 {
     char line[256];
 
@@ -306,7 +319,7 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
 }
 
 void TrussUnitWindowManager::load ( TrussUnit&, const QFile& )
-                                                   throw (WrongFormatException)
+    throw (WrongFormatException)
 {
     // Implementation is looking forward
 }

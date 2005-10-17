@@ -11,8 +11,6 @@
 
 FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack ) :
     name(name_),
-    stateManager(),
-    trussWindowManager(stateManager),
     widgetStack(stack),
     projectMainWidget( new QMainWindow(widgetStack, 0, 0) ),
     calcDataToolBar( new CalcDataToolBar(projectMainWidget) ),
@@ -67,11 +65,6 @@ void FermaNextProject::setName ( const QString& name_ )
 {
     name = name_;
     emit onNameChange(name);
-}
-
-ObjectStateManager& FermaNextProject::getStateManager ()
-{
-    return stateManager;
 }
 
 TrussUnitWindowManager& FermaNextProject::getTrussUnitWindowManager ()

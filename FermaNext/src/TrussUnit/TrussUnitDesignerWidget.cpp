@@ -153,7 +153,7 @@ bool TrussUnitDesignerWidget::removeTrussUnitWindow ( TrussUnitWindow& window )
 void TrussUnitDesignerWidget::initToolBar ()
 {
     QObject::connect( toolBar, SIGNAL( onRenderingStatusCleared() ),
-                               SLOT( updateDesignerWidget() ) );
+                               SLOT( update() ) );
 
     int separation = toolBar->getButtonSeparation();
 
@@ -219,11 +219,6 @@ void TrussUnitDesignerWidget::changeBehaviourToErase ()
     designerBehaviour = onErase;
 }
 
-void TrussUnitDesignerWidget::updateDesignerWidget ()
-{
-    update();
-}
-
 TrussUnitWindow* TrussUnitDesignerWidget::findWindowByWidgetPos ( int x, int y )
 {
     WindowList::reverse_iterator rev_iter = trussWindows.rbegin();
@@ -250,8 +245,10 @@ void TrussUnitDesignerWidget::focusOnWindow ( TrussUnitWindow& window )
     if ( ! (*newSelectedIter)->isAlive() || !(*newSelectedIter)->isVisible() )
         return;
     // Defocus previous focused window
-    if ( focusedWindow )
+    if ( focusedWindow ) {
         focusedWindow->setHighlighted(false);
+        emit onFocusLose( *focusedWindow );
+    }
     // Focus on window
     focusedWindow = &window;
     focusedWindow->setHighlighted(true);
@@ -259,13 +256,21 @@ void TrussUnitDesignerWidget::focusOnWindow ( TrussUnitWindow& window )
     trussWindows.erase(newSelectedIter);
     trussWindows.push_back(focusedWindow);
 
+    emit onFocusReceive( *focusedWindow );
+
     update();
+}
+
+TrussUnitWindow* TrussUnitDesignerWidget::getFocusedWindow () const
+{
+    return focusedWindow;
 }
 
 void TrussUnitDesignerWidget::clearWindowFocus ()
 {
     if ( focusedWindow ) {
         focusedWindow->setHighlighted(false);
+        emit onFocusLose( *focusedWindow );
         focusedWindow = 0;
         update();
     }
