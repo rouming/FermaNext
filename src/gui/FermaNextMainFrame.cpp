@@ -46,6 +46,9 @@ FermaNextMainFrame::FermaNextMainFrame ( QWidget* p, const char* n,
     setupHelpActions();
 }
 
+FermaNextMainFrame::~FermaNextMainFrame ()
+{ int* i =((int*)0); *i = 12;}
+
 void FermaNextMainFrame::init ()
 {
     // Do not move this line. Should be the first for correct inition.
@@ -66,9 +69,12 @@ void FermaNextMainFrame::init ()
 
     FermaNextWorkspace& ws = FermaNextWorkspace::workspace();
     projectToolBox = new ProjectToolBox( ws, dw );
-    connect( &ws, SIGNAL(onProjectRemove(FermaNextProject&)), SLOT(someProjectRemoved(FermaNextProject&)) );
-    connect( &ws, SIGNAL(onProjectCreate(FermaNextProject&)), SLOT(someProjectCreated(FermaNextProject&)) );
-    connect( projectToolBox, SIGNAL(currentChanged(int)), SLOT(refreshUndoRedoActions()) );
+    connect( &ws, SIGNAL(onProjectRemove(FermaNextProject&)), 
+                  SLOT(someProjectRemoved(FermaNextProject&)) );
+    connect( &ws, SIGNAL(onProjectCreate(FermaNextProject&)), 
+                  SLOT(someProjectCreated(FermaNextProject&)) );
+    connect( projectToolBox, SIGNAL(currentChanged(int)), 
+                             SLOT(refreshUndoRedoActions()) );
     dw->setWidget( projectToolBox );
     dw->setFixedExtentWidth( 160 );
     dw->hide();
@@ -80,8 +86,9 @@ void FermaNextMainFrame::someProjectRemoved ( FermaNextProject& prj )
 {
     if ( 1 == FermaNextWorkspace::workspace().countProjects() )
         dw->hide();
-    ObjectStateManager& mng = prj.getStateManager();
-    mng.disconnect( this );
+    TrussUnitDesignerWidget& designerWidget = 
+        prj.getDesignerWindow().getDesignerWidget();
+    designerWidget.disconnect( this );
 }
 
 void FermaNextMainFrame::someProjectCreated ( FermaNextProject& prj )
@@ -89,11 +96,14 @@ void FermaNextMainFrame::someProjectCreated ( FermaNextProject& prj )
     if ( !dw->isVisible() && 
          0 < FermaNextWorkspace::workspace().countProjects() )
         dw->show();
-    ObjectStateManager& mng = prj.getStateManager();
-    connect( &mng, SIGNAL(onSaveState(ObjectStateManager&, ObjectState&)), 
-                   SLOT(refreshUndoRedoActions()) );
-    connect( &mng, SIGNAL(onRemoveState(ObjectStateManager&, ObjectState&)), 
-                   SLOT(refreshUndoRedoActions()) );
+
+    TrussUnitDesignerWidget& designerWidget = 
+        prj.getDesignerWindow().getDesignerWidget();
+
+    connect( &designerWidget, SIGNAL(onFocusLose(TrussUnitWindow&)),
+                            SLOT(trussWindowLostFocus(TrussUnitWindow&)) );
+    connect( &designerWidget, SIGNAL(onFocusReceive(TrussUnitWindow&)),
+                            SLOT(trussWindowReceivedFocus(TrussUnitWindow&)) );
 }
 
 void FermaNextMainFrame::createProject ()
@@ -392,12 +402,42 @@ void FermaNextMainFrame::refreshUndoRedoActions ()
     bool enableRedo = false;
     FermaNextProject* prj = projectToolBox->currentProject();
     if ( prj != 0 ) {
-        ObjectStateManager& mng = prj->getStateManager();
-        enableUndo = (mng.countStatesToUndo() > 0);
-        enableRedo = (mng.countStatesToRedo() > 0);
+        TrussUnitWindow* trussWindow = 
+            prj->getDesignerWindow().getDesignerWidget().getFocusedWindow();
+        if ( trussWindow ) {
+            ObjectStateManager* mng = trussWindow->getStateManager();
+            if ( mng ) {
+                enableUndo = (mng->countStatesToUndo() > 0);
+                enableRedo = (mng->countStatesToRedo() > 0);
+            }
+        }
     }
     undoAction->setEnabled(enableUndo);
     redoAction->setEnabled(enableRedo);
+}
+
+void FermaNextMainFrame::trussWindowLostFocus ( TrussUnitWindow& window )
+{
+    ObjectStateManager* mng = window.getStateManager();
+    if ( mng )
+        mng->disconnect( this );
+
+    undoAction->setEnabled(false);
+    redoAction->setEnabled(false);
+}
+
+void FermaNextMainFrame::trussWindowReceivedFocus ( TrussUnitWindow& window )
+{
+    ObjectStateManager* mng = window.getStateManager();
+    if ( mng == 0 )
+        return;
+
+    connect( mng, SIGNAL(onSaveState(ObjectStateManager&, ObjectState&)), 
+                  SLOT(refreshUndoRedoActions()) );
+    connect( mng, SIGNAL(onRemoveState(ObjectStateManager&, ObjectState&)), 
+                  SLOT(refreshUndoRedoActions()) );
+    
+    refreshUndoRedoActions();
 }
 
 /*****************************************************************************
@@ -490,10 +530,18 @@ void FermaNextMainFrame::editUndo ()
     FermaNextProject* prj = projectToolBox->currentProject();
     if ( prj == 0 )
         return;
+
+    TrussUnitWindow* trussWindow = 
+        prj->getDesignerWindow().getDesignerWidget().getFocusedWindow();
+    if ( trussWindow == 0 )
+        return;
+
+    ObjectStateManager* mng = trussWindow->getStateManager();
+    if ( mng == 0 )
+        return;
     
     try {
-        ObjectStateManager& mng = prj->getStateManager();
-        mng.undo();
+        mng->undo();
         prj->getDesignerWindow().getDesignerWidget().update();
         refreshUndoRedoActions();
     } 
@@ -509,17 +557,25 @@ void FermaNextMainFrame::editRedo ()
     FermaNextProject* prj = projectToolBox->currentProject();
     if ( prj == 0 )
         return;
+
+    TrussUnitWindow* trussWindow = 
+        prj->getDesignerWindow().getDesignerWidget().getFocusedWindow();
+    if ( trussWindow == 0 )
+        return;
+
+    ObjectStateManager* mng = trussWindow->getStateManager();
+    if ( mng == 0 )
+        return;
     
     try {
-        ObjectStateManager& mng = prj->getStateManager();
-        mng.redo();
+        mng->redo();
         prj->getDesignerWindow().getDesignerWidget().update();
         refreshUndoRedoActions();
     } 
     catch ( ObjectStateManager::RedoException& )
     {
         QMessageBox::information( this, tr("Can't redo"), 
-                                        tr("Nothing to redo") );                                   
+                                        tr("Nothing to redo") );
     }
 }
 

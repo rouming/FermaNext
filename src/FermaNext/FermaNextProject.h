@@ -22,8 +22,7 @@ public:
     virtual const QString& getName () const;
     virtual void setName ( const QString& );
 
-    virtual void activate ();    
-    virtual ObjectStateManager& getStateManager ();
+    virtual void activate ();
     virtual TrussUnitWindowManager& getTrussUnitWindowManager ();    
     virtual TrussUnitDesignerWindow& getDesignerWindow ();
     virtual CalcDataToolBar& getCalcDataToolBar ();
@@ -38,7 +37,6 @@ private:
 
 private:
     QString name;
-    ObjectStateManager stateManager;
     TrussUnitWindowManager trussWindowManager;
     QWidgetStack* widgetStack;
     QMainWindow* projectMainWidget;
