@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <qsocketdevice.h>
 #include <qthread.h>
+#include <qdatetime.h>
 
 class os_dependent_SimpleCalcPlugin : public SimpleCalcPlugin
 {
@@ -56,6 +57,13 @@ public:
         // Send file name to calculation server
         QString fileToCalc( fileName + "\n" );
         socket.writeBlock( fileToCalc, fileToCalc.length() );
+
+        QString vyvFile( tempFileName() + fermaResExt );
+        // Wait file appearance. 
+        // 'Wine' should spend some time to flush the file.
+        uint curr = QDateTime::currentDateTime().toTime_t();
+        while ( ! QFile::exists( vyvFile ) && 
+                5 > QDateTime::currentDateTime().toTime_t() - curr );
     }
     
 private:
