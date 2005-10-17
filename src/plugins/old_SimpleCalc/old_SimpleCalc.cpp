@@ -6,6 +6,7 @@
 #include "VYVReader.h"
 #include <qfile.h>
 #include <qregexp.h>
+#include <qdatetime.h>
 
 #if defined WINDOWS || defined WIN32  
   #include "win_SimpleCalc.h"
@@ -57,6 +58,10 @@ void SimpleCalcPlugin::calculate ( TrussTopology& truss,
     QFile::remove( vyvFile );
     startCalculation( frmFile );
     VYVReader vyv(data);
+    // Wait while file doesn't exist.
+    uint curr = QDateTime::currentDateTime().toTime_t();
+    while ( ! QFile::exists( vyvFile ) && 
+            5 > QDateTime::currentDateTime().toTime_t() - curr );
     vyv.read( vyvFile );
     QFile::remove( vyvFile );
 }
