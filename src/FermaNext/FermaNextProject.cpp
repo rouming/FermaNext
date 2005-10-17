@@ -16,7 +16,8 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack )
     calcDataToolBar( new CalcDataToolBar(projectMainWidget) ),
     projectTab( new QTabWidget(projectMainWidget) ),
     justStrengthAnalisysWidget( new QWidget(projectTab) ),
-    designerWindow( new TrussUnitDesignerWindow(name_, projectTab) )    
+    designerWindow( new TrussUnitDesignerWindow(name_, projectTab) ),
+    trussWindowManager( new TrussUnitWindowManager )
 {
     projectMainWidget->setRightJustification( true );
     projectMainWidget->setDockEnabled( DockLeft, false );
@@ -33,13 +34,13 @@ FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack )
     TrussUnitDesignerWidget& designerWidget = designerWindow->getDesignerWidget();
 
     // Catch trusses creation or deletion.
-    connect( &trussWindowManager, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
+    connect( trussWindowManager, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
              &designerWidget, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
-    connect( &trussWindowManager, SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
+    connect( trussWindowManager, SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
              &designerWidget, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
-    connect( &trussWindowManager, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)),     
+    connect( trussWindowManager, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)),     
              calcDataToolBar, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
-    connect( &trussWindowManager, SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
+    connect( trussWindowManager, SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
              calcDataToolBar, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
 }
 
@@ -47,6 +48,7 @@ FermaNextProject::~FermaNextProject ()
 {
     if ( widgetStack )
         widgetStack->removeWidget( projectMainWidget );
+    delete trussWindowManager;
     delete projectMainWidget;
 }
 
@@ -69,7 +71,7 @@ void FermaNextProject::setName ( const QString& name_ )
 
 TrussUnitWindowManager& FermaNextProject::getTrussUnitWindowManager ()
 {
-    return trussWindowManager;
+    return *trussWindowManager;
 }
 
 TrussUnitDesignerWindow& FermaNextProject::getDesignerWindow ()

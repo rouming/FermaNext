@@ -19,12 +19,12 @@ FermaNextWorkspace::FermaNextWorkspace () :
     fermaConfig( configFileName() )
 {
     // Singleton desist by Qt quit signal
-    connect( qApp, SIGNAL(lastWindowClosed()), SLOT(clear()) );
+    connect( qApp, SIGNAL(lastWindowClosed()), SLOT(clearProjects()) );
 }
 
 FermaNextWorkspace::~FermaNextWorkspace ()
 {
-    clear();
+    clearProjects();
 }
 
 FermaNextWorkspace& FermaNextWorkspace::workspace ()
@@ -38,7 +38,7 @@ FermaNextWorkspace& FermaNextWorkspace::workspace ()
     return *instance;
 }
 
-void FermaNextWorkspace::clear ()
+void FermaNextWorkspace::clearProjects ()
 {
     ProjectListIter iter = projects.begin();
     for ( ; iter != projects.end(); ++iter )       
@@ -50,7 +50,7 @@ void FermaNextWorkspace::reset ()
 {
     emit onReset();
     name = untitledWorkspaceName;
-    clear();
+    clearProjects();
 }
 
 void FermaNextWorkspace::createWidgetStack ( QMainWindow& parent )
