@@ -623,4 +623,17 @@ void FermaNextMainFrame::helpAbout ()
     qWarning("Not implmented yet!");
 }
 
+/*****************************************************************************
+ * Events
+ *****************************************************************************/
+
+/*
+ *  Correct workspace clean.
+ */
+void FermaNextMainFrame::closeEvent ( QCloseEvent* event )
+{
+    FermaNextWorkspace::workspace().clearProjects();
+    event->accept();
+}
+
 /*****************************************************************************/

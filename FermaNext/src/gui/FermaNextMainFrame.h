@@ -33,6 +33,9 @@ protected:
     void setupHelpActions ();
     void setupPluginActions ();
 
+    // Provides correct workspace clean before close.
+    void closeEvent ( QCloseEvent* );
+
 protected slots:
     void fileNew ();
     void fileOpen ();
