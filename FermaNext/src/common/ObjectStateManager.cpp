@@ -343,6 +343,68 @@ void ObjectStateManager::redo () throw (UnknownException, RedoException,
     stateCall(false);
 }
 
+void ObjectStateManager::step ( uint step ) throw (UnknownException,
+                                                   OutOfBoundsException,
+                                                   RedoException,
+                                                   UndoException,
+                                                   StateBlockIsNotEnded)
+{
+    size_t stateBlocksNum = countStateBlocks();
+
+    // Wrong step
+    if ( stateBlocksNum == 0 || step >= stateBlocksNum ) 
+        throw OutOfBoundsException();
+
+    // Can't step if block is not ended
+    if ( startedBlocks )
+        throw StateBlockIsNotEnded();
+
+    StateBlock* stepToBlock = stateBlocks[step];
+
+    // Nothing to do
+    if ( stepToBlock == currentBlock )
+        return;
+
+    BlockListIter stepIter = std::find( stateBlocks.begin(), stateBlocks.end(),
+                                        stepToBlock );
+
+    // Hm. Strange.
+    if ( stepIter == stateBlocks.end() )
+        throw UnknownException();
+
+    BlockListIter currIter;
+    
+    if ( currentBlock == 0 )
+        currIter = stateBlocks.begin();
+    else
+        currIter = std::find( stateBlocks.begin(), 
+                              stateBlocks.end(), currentBlock);
+
+    // Hm. Strange.
+    if ( currIter == stateBlocks.end() )
+        throw UnknownException();
+
+    BlockListIter begin, end;
+
+    emit beforeStep( *this );
+
+    // Choose step direction
+    if ( stepIter > currIter ) {      // redo
+        begin = currIter + 1;
+        end   = stepIter;
+        for ( ; begin != end; ++begin )
+            redo();
+    } 
+    else if ( stepIter < currIter ) { // undo
+        begin = currIter;
+        end   = stepIter + 1;
+        for ( ; begin != end; --begin )
+            undo();
+    }
+
+    emit afterStep( *this );
+}
+
 size_t ObjectStateManager::countStates () const
 {
     size_t statesNum = 0;
