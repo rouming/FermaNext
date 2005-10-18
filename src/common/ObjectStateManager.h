@@ -12,6 +12,7 @@ class ObjectStateManager : public QObject
     Q_OBJECT
 public:
     // Some state manager exceptions
+    class OutOfBoundsException {};
     class UndoException {};
     class RedoException {};
     class StateBlockIsNotEnded {};
@@ -89,6 +90,13 @@ public:
     virtual void redo () throw (UnknownException, RedoException,
                                 StateBlockIsNotEnded);
 
+    // Momentary step (undo or redo from the current position) 
+    virtual void step ( uint step ) throw (UnknownException, 
+                                           OutOfBoundsException,
+                                           RedoException,
+                                           UndoException,
+                                           StateBlockIsNotEnded);
+
     // Returns number of states in all blocks
     virtual size_t countStates () const;
     // Returns number of state blocks
@@ -123,6 +131,8 @@ signals:
     void afterUndo ( ObjectStateManager& );
     void beforeRedo ( ObjectStateManager& );
     void afterRedo ( ObjectStateManager& );
+    void beforeStep ( ObjectStateManager& );
+    void afterStep ( ObjectStateManager& );
     void onSaveState ( ObjectStateManager&, ObjectState& );
     void onRemoveState ( ObjectStateManager&, ObjectState& );
 
