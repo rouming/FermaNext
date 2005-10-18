@@ -44,6 +44,11 @@ protected slots:
 
     virtual void update ();
 
+signals:
+    // Emits when item changes its visibility status
+    void onWindowItemShow ( TrussUnitWindowItem& );
+    void onWindowItemHide ( TrussUnitWindowItem& );
+
 private:
     WindowListBox& listBox;
     FermaNextProject& project;
@@ -81,7 +86,9 @@ public slots:
     virtual void trussWindowLostFocus ( TrussUnitWindow& );
 
 protected slots:
-    virtual void raiseTrussUnitWindowItem ( QListBoxItem* );
+    virtual void raiseWindowItem ( QListBoxItem* );
+    virtual void showWindowItem ( TrussUnitWindowItem& );
+    virtual void hideWindowItem ( TrussUnitWindowItem& );
 
 private:
     struct IndexedItem 

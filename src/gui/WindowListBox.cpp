@@ -145,6 +145,7 @@ void TrussUnitWindowItem::show ()
     trussWindow.setVisible( true );
     raise();
     update();
+    emit onWindowItemShow( *this );
 }
 
 void TrussUnitWindowItem::hide ()
@@ -153,6 +154,7 @@ void TrussUnitWindowItem::hide ()
         return;
     trussWindow.setVisible( false );
     update();
+    emit onWindowItemHide( *this );
 }
 
 void TrussUnitWindowItem::selectInGroup ()
@@ -241,7 +243,7 @@ WindowListBox::WindowListBox ( FermaNextProject& prj, QWidget* parent,
 {
     // Catch double click on item
     QObject::connect( this, SIGNAL(doubleClicked(QListBoxItem*)),
-                      SLOT(raiseTrussUnitWindowItem(QListBoxItem*)) );
+                      SLOT(raiseWindowItem(QListBoxItem*)) );
 
     // Catch focus changes
     TrussUnitDesignerWidget& w = prj.getDesignerWindow().getDesignerWidget();
@@ -288,6 +290,13 @@ void WindowListBox::addTrussUnitWindow ( TrussUnitWindow& truss )
                   project, truss, *this, 
                   QPixmap::fromMimeSource(imagesPath() + "/project.png"),
                   QPixmap::fromMimeSource(imagesPath() + "/project_d.png"));
+
+    // Catches item visibility changes 
+    QObject::connect( item, SIGNAL(onWindowItemShow(TrussUnitWindowItem&)), 
+                            SLOT(showWindowItem(TrussUnitWindowItem&)) );
+    QObject::connect( item, SIGNAL(onWindowItemHide(TrussUnitWindowItem&)), 
+                            SLOT(hideWindowItem(TrussUnitWindowItem&)) );
+
     IndexedItem iitem = { item, index(item) };
     windowItems[&truss] = iitem;
     // Set selected newbie
@@ -318,7 +327,7 @@ void WindowListBox::unselectAllFromGroup ()
         iter.data().item->unselectFromGroup();
 }
 
-void WindowListBox::raiseTrussUnitWindowItem ( QListBoxItem* it )
+void WindowListBox::raiseWindowItem ( QListBoxItem* it )
 {    
     if ( it == 0 )
         return;
@@ -327,6 +336,25 @@ void WindowListBox::raiseTrussUnitWindowItem ( QListBoxItem* it )
         item.raise();
     }
     catch ( ... ) { return; }
+}
+
+void WindowListBox::showWindowItem ( TrussUnitWindowItem& )
+{    
+}
+
+void WindowListBox::hideWindowItem ( TrussUnitWindowItem& item )
+{
+    TrussUnitDesignerWidget& w = 
+        project.getDesignerWindow().getDesignerWidget();
+    TrussUnitWindow* focusedWindow = w.getFocusedWindow();
+    if ( focusedWindow == 0 || ! windowItems.contains(focusedWindow) )
+        return;
+    if ( &item == windowItems[focusedWindow].item )
+        // Nothing to select
+        return;
+
+    setSelected( windowItems[focusedWindow].item, true );
+    triggerUpdate(true);
 }
 
 void WindowListBox::trussWindowDesisted ( const TrussUnitWindow& truss )

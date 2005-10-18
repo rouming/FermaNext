@@ -254,8 +254,8 @@ void ProjectToolBox::importIsPressed ()
         return;
 
     try { 
-        TrussUnitWindowManager& trussMng = currPrj->getTrussUnitWindowManager();
-        TrussUnitWindow& truss = trussMng.createTrussUnitWindowFromFile(fileName);
+        TrussUnitWindowManager& mng = currPrj->getTrussUnitWindowManager();
+        mng.createTrussUnitWindowFromFile(fileName);
 
     } catch ( TrussUnitWindowManager::ReadFileException& ) {
         QMessageBox::critical( 0, "TrussUnitWindowManager::ReadFileException",
