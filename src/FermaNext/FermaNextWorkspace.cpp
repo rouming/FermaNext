@@ -3,7 +3,6 @@
 #include "FermaNextMainFrame.h"
 #include "SubsidiaryConstants.h"
 
-#include <qapplication.h>
 #include <qwidgetstack.h>
 
 /*****************************************************************************
@@ -17,10 +16,7 @@ FermaNextWorkspace::FermaNextWorkspace () :
     name( untitledWorkspaceName ),
     widgetStack(0),
     fermaConfig( configFileName() )
-{
-    // Singleton desist by Qt quit signal
-    connect( qApp, SIGNAL(lastWindowClosed()), SLOT(clearProjects()) );
-}
+{}
 
 FermaNextWorkspace::~FermaNextWorkspace ()
 {
