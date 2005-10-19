@@ -38,6 +38,7 @@ SOURCES = \
           ../gui/FermaNextMainFrame.cpp \
           ../gui/ProjectToolBox.cpp \
           ../gui/ToolBarManager.cpp \
+          ../gui/UndoRedoListBox.cpp \
           ../gui/WindowListBox.cpp
 
 HEADERS = \
@@ -48,4 +49,5 @@ HEADERS = \
           ../gui/FermaNextMainFrame.h \
           ../gui/ProjectToolBox.h \
           ../gui/ToolBarManager.h \
+          ../gui/UndoRedoListBox.h \
           ../gui/WindowListBox.h
