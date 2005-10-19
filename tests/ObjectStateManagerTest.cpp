@@ -356,7 +356,65 @@ void block_removing_test ()
     std::cout << std::endl;
 }
 
+void step_to_block_test ()
+{
+    std::cout << std::endl << ">>>> step_to_block_test" << std::endl;
 
+    ObjectStateManager m;
+
+    SomeObject obj(0, m);
+
+    int i =0;
+
+    // Init
+    for ( i = 1; i <= 10; ++i ) {
+        obj.value( i );
+    }
+
+    m.stepToBegin();
+    my_assert( obj.value() == 0, "Step to the begin" );
+
+    m.step( 1 );
+    my_assert( obj.value() == 1, "Step to the 1 index" );
+
+    m.stepToBegin();
+    my_assert( obj.value() == 0, "Step to the begin" );
+
+    m.stepToEnd();
+    my_assert( obj.value() == 10, "Step to the end" );
+
+    m.step( m.countStateBlocks() - 1  );
+    my_assert( obj.value() == 9, "Step to the 9 index" );
+
+    m.stepToEnd();
+    my_assert( obj.value() == 10, "Step to the end" );
+
+    m.stepToBegin();
+    my_assert( obj.value() == 0, "Step to the begin" );
+
+    m.step( 4 );
+    my_assert( obj.value() == 4, "Step to the 4 index" );
+    
+    m.step( 5 );
+    my_assert( obj.value() == 5, "Step to the 5 index" );
+
+    m.step( 3 );
+    my_assert( obj.value() == 3, "Step to the 3 index" );
+
+    m.step( 1 );
+    my_assert( obj.value() == 1, "Step to the 1 index" );
+
+    m.step( m.countStateBlocks() - 1  );
+    my_assert( obj.value() == 9, "Step to the 9 index" );
+
+    m.step( 1 );
+    my_assert( obj.value() == 1, "Step to the 1 index" );
+
+    m.step( 4 );
+    my_assert( obj.value() == 4, "Step to the 4 index" );
+
+    std::cout << std::endl;
+}
 
 int main ()
 {
@@ -482,6 +540,7 @@ int main ()
     stack_shifting_test();
     block_removing_test();
     stack_top_removing_test();
+    step_to_block_test();
 
     std::cout << "\n" << "Passed: " << PASSED << "\nFailed: " << FAILED << "\n";
     return 0;    
