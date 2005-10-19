@@ -8,12 +8,16 @@
 
 class StatefulObject;
 
-// Such statefule object, that can keep one or many actions.
+/**
+ *  Such stateful object, that can keep one or many actions.
+ */
+
 class ObjectState : public QObject
 {
     Q_OBJECT
 public:
     ObjectState ( StatefulObject* );
+    ObjectState ( StatefulObject*, const QString& stateName );
     virtual ~ObjectState ();
 
 public:
@@ -22,6 +26,10 @@ public:
     // object state in destructor.
     virtual void addAction ( AbstractObjectAction* );
     virtual bool removeAction ( AbstractObjectAction* );
+
+    // Manages state name
+    virtual const QString& getStateName () const;
+    virtual void setStateName ( const QString& );
 
     // Main state operations. Commit should execute 
     // every stored action, rollback -- unexecute 
@@ -56,6 +64,7 @@ private:
     
     ActionList actions;
     StatefulObject* statefulObject;
+    QString stateName;
     bool isDisabledFlag;
 };
 

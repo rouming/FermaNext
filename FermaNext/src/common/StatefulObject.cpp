@@ -57,10 +57,16 @@ void StatefulObject::stateManagerDestroyed ()
 
 ObjectState& StatefulObject::createState ()
 {
+    QString emptyName;
+    return createState( emptyName );
+}
+
+ObjectState& StatefulObject::createState ( const QString& stateName )
+{
     // Remove already disabled states
     removeDisabledStates();
     // Create new one
-    ObjectState* state = new ObjectState(this);
+    ObjectState* state = new ObjectState(this, stateName);
     states.push_back(state);
     return *state;
 }

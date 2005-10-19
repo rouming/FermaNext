@@ -50,6 +50,15 @@ size_t ObjectStateManager::StateBlock::countStates () const
     return states.size();
 }
 
+QString ObjectStateManager::StateBlock::concatStateNames () const
+{
+    QString names;
+    StateListConstIter iter = states.begin();
+    for ( ; iter != states.end(); ++iter )
+        names += (*iter)->getStateName() + '\t';
+    return names;
+}
+
 void ObjectStateManager::StateBlock::undo ()
 {
     StateListRevIter iter = states.rbegin();
@@ -289,11 +298,10 @@ void ObjectStateManager::undo () throw (UnknownException, UndoException,
         throw UnknownException();
 
     // Safe undo
-    stateCall(true);
     emit beforeUndo(*this);
+    stateCall(true);
+
     currentBlock->undo();
-    emit afterUndo(*this);
-    stateCall(false);
     
     // Should zero current block if we undoed the first block
     if ( iter == stateBlocks.begin() )
@@ -301,13 +309,16 @@ void ObjectStateManager::undo () throw (UnknownException, UndoException,
     else {
         --iter;
         currentBlock = *iter;
-    }        
+    }
+
+    stateCall(false);
+    emit afterUndo(*this);
 }
 
 void ObjectStateManager::redo () throw (UnknownException, RedoException,
                                         StateBlockIsNotEnded)
 {
-    // Nothing to undo
+    // Nothing to redo
     if ( countStateBlocks() == 0 ) 
         throw RedoException();
 
@@ -333,40 +344,49 @@ void ObjectStateManager::redo () throw (UnknownException, RedoException,
             throw RedoException();
 
     }
-    currentBlock = *iter;
 
     // Safe redo
-    stateCall(true);
     emit beforeRedo(*this);
+    stateCall(true);
+
+    currentBlock = *iter;
     currentBlock->redo();
-    emit afterRedo(*this);
+
     stateCall(false);
+    emit afterRedo(*this);
 }
 
-void ObjectStateManager::step ( uint step ) throw (UnknownException,
-                                                   OutOfBoundsException,
-                                                   RedoException,
-                                                   UndoException,
-                                                   StateBlockIsNotEnded)
+void ObjectStateManager::step ( uint indx ) 
+    throw (UnknownException, OutOfBoundsException, StepException,
+           RedoException, UndoException, StateBlockIsNotEnded)
 {
     size_t stateBlocksNum = countStateBlocks();
 
-    // Wrong step
-    if ( stateBlocksNum == 0 || step >= stateBlocksNum ) 
+    // Nothing to do
+    if ( stateBlocksNum == 0 )
+        throw StepException();
+
+    // Wrong index
+    if ( indx > stateBlocksNum ) 
         throw OutOfBoundsException();
 
     // Can't step if block is not ended
     if ( startedBlocks )
         throw StateBlockIsNotEnded();
 
-    StateBlock* stepToBlock = stateBlocks[step];
+    StateBlock* stepToBlock = (indx == 0 ? 0 : stateBlocks[indx-1]);
 
     // Nothing to do
     if ( stepToBlock == currentBlock )
         return;
 
-    BlockListIter stepIter = std::find( stateBlocks.begin(), stateBlocks.end(),
-                                        stepToBlock );
+    BlockListIter stepIter;
+    
+    if ( stepToBlock == 0 )
+        stepIter = stateBlocks.begin();
+    else 
+        stepIter = std::find( stateBlocks.begin(), stateBlocks.end(), 
+                              stepToBlock );
 
     // Hm. Strange.
     if ( stepIter == stateBlocks.end() )
@@ -377,32 +397,70 @@ void ObjectStateManager::step ( uint step ) throw (UnknownException,
     if ( currentBlock == 0 )
         currIter = stateBlocks.begin();
     else
-        currIter = std::find( stateBlocks.begin(), 
-                              stateBlocks.end(), currentBlock);
+        currIter = std::find( stateBlocks.begin(), stateBlocks.end(), 
+                              currentBlock);
 
     // Hm. Strange.
     if ( currIter == stateBlocks.end() )
         throw UnknownException();
 
-    BlockListIter begin, end;
+    BlockListIter begin = currIter, end = stepIter;
 
     emit beforeStep( *this );
 
     // Choose step direction
-    if ( stepIter > currIter ) {      // redo
-        begin = currIter + 1;
-        end   = stepIter;
+    if ( currentBlock == 0 || stepIter > currIter ) { // redo
+        // Redo first block
+        if ( currentBlock == 0 )
+            redo();
         for ( ; begin != end; ++begin )
             redo();
     } 
-    else if ( stepIter < currIter ) { // undo
-        begin = currIter;
-        end   = stepIter + 1;
+    else {    // undo: stepIter < currIter 
         for ( ; begin != end; --begin )
+            undo();
+        // Undo first block
+        if ( stepToBlock == 0 )
             undo();
     }
 
     emit afterStep( *this );
+}
+
+void ObjectStateManager::stepToBegin () 
+    throw (UnknownException, OutOfBoundsException, StepException,
+           RedoException, UndoException, StateBlockIsNotEnded)
+{
+    step(0);
+}
+
+void ObjectStateManager::stepToEnd () 
+    throw (UnknownException, OutOfBoundsException, StepException,
+           RedoException, UndoException, StateBlockIsNotEnded)
+{
+    step( countStateBlocks() );
+}
+
+QStringList ObjectStateManager::stateBlockNames () const
+{
+    QStringList names;
+    BlockListConstIter iter = stateBlocks.begin();
+    for ( ; iter != stateBlocks.end(); ++iter )
+        names.push_back( (*iter)->concatStateNames() );
+    return names;
+}
+
+uint ObjectStateManager::currentPos () const
+{
+    if ( currentBlock == 0 )
+        return 0;
+    uint pos = 0;
+    BlockListConstIter iter = stateBlocks.begin();
+    for ( pos = 1 ; iter != stateBlocks.end(); ++iter, ++pos )
+        if ( *iter == currentBlock )
+            return pos;
+    // Unreachable line
+    return 0;
 }
 
 size_t ObjectStateManager::countStates () const
