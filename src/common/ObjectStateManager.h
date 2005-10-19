@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <qobject.h>
+#include <qstringlist.h>
 
 class ObjectState;
 
@@ -13,6 +14,7 @@ class ObjectStateManager : public QObject
 public:
     // Some state manager exceptions
     class OutOfBoundsException {};
+    class StepException {};
     class UndoException {};
     class RedoException {};
     class StateBlockIsNotEnded {};
@@ -32,6 +34,8 @@ protected:
         bool contains ( const ObjectState& ) const;
         bool isEmpty () const;
         size_t countStates () const;
+        // Returns concatenated string of state names
+        QString concatStateNames () const;
 
         // Undoes/Redoes all states of block
         void undo ();
@@ -90,12 +94,32 @@ public:
     virtual void redo () throw (UnknownException, RedoException,
                                 StateBlockIsNotEnded);
 
-    // Momentary step (undo or redo from the current position) 
-    virtual void step ( uint step ) throw (UnknownException, 
-                                           OutOfBoundsException,
-                                           RedoException,
-                                           UndoException,
-                                           StateBlockIsNotEnded);
+    // Momentary step to saved state block by index
+    // (undo or redo from the current position to defined direction) 
+    // if indx is 0 -- try to undo all states
+    virtual void step ( uint indx ) 
+        throw (UnknownException, OutOfBoundsException, StepException,
+               RedoException, UndoException, StateBlockIsNotEnded);
+
+    // Step to the begin of the stack
+    // same as 'step(0)' call
+    virtual void stepToBegin () 
+        throw (UnknownException, OutOfBoundsException, StepException,
+               RedoException, UndoException, StateBlockIsNotEnded);
+
+    // Step to the end of the stack (see step)
+    // same as 'step( countStateBlocks() )' call
+    virtual void stepToEnd () 
+        throw (UnknownException, OutOfBoundsException, StepException,
+               RedoException, UndoException, StateBlockIsNotEnded);
+
+    // Returns list of names which were concatenated from 
+    // state names of every block
+    virtual QStringList stateBlockNames () const;
+
+    // Returns current position of redoed state block.
+    // 0 is returned if all stack has been undoed or if it is empty
+    virtual uint currentPos () const;
 
     // Returns number of states in all blocks
     virtual size_t countStates () const;

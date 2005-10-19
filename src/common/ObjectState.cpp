@@ -11,6 +11,12 @@ ObjectState::ObjectState ( StatefulObject* stObj ) :
     isDisabledFlag(false)
 {}
 
+ObjectState::ObjectState ( StatefulObject* stObj, const QString& name  ) :
+    statefulObject(stObj),
+    stateName(name),
+    isDisabledFlag(false)
+{}
+
 ObjectState::~ObjectState ()
 {
     emit onStateDestroy(*this);
@@ -44,6 +50,16 @@ bool ObjectState::removeAction ( AbstractObjectAction* action )
             return true;
         }
     return false;
+}
+
+const QString& ObjectState::getStateName () const
+{
+    return stateName;
+}
+
+void ObjectState::setStateName ( const QString& name )
+{
+    stateName = name;
 }
 
 void ObjectState::commitState ()

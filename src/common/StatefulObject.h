@@ -23,6 +23,7 @@ public:
 
     // Manages states.
     virtual ObjectState& createState ();
+    virtual ObjectState& createState ( const QString& stateName );
     virtual bool removeState ( ObjectState& );
 
     // Count all states
