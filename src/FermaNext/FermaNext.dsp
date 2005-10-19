@@ -126,6 +126,10 @@ SOURCE=.\..\gui\ToolBarManager.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\gui\UndoRedoListBox.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\..\gui\WindowListBox.cpp
 # End Source File
 # End Group
@@ -333,6 +337,10 @@ InputName=ToolBarManager
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=..\gui\UndoRedoListBox.h
 # End Source File
 # Begin Source File
 
