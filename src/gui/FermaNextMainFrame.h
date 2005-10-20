@@ -25,6 +25,9 @@ public slots:
     void reloadPlugins ();
     
 protected:
+    // Provides correct last cleanup before quit.
+    void cleanBeforeQuit ();
+
     void init ();
     void setupFileActions ();
     void setupEditActions ();
@@ -33,7 +36,7 @@ protected:
     void setupHelpActions ();
     void setupPluginActions ();
 
-    // Provides correct workspace clean before close.
+    // Close handler. Calls 'clean' for correct close.
     void closeEvent ( QCloseEvent* );
 
 protected slots:
@@ -73,7 +76,9 @@ protected slots:
     void trussWindowReceivedFocus ( TrussUnitWindow& );
 
 private:
-    QDockWindow* dw;
+    // Dock window on wich all projects are located
+    QDockWindow* projectsDockWindow;
+    QWidget* undoRedoHistoryWidget;
     ProjectToolBox* projectToolBox;
     FermaNextWorkspace* wsp;
     // Some actions
