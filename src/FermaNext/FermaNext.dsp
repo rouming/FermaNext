@@ -341,6 +341,35 @@ InputName=ToolBarManager
 # Begin Source File
 
 SOURCE=..\gui\UndoRedoListBox.h
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\gui
+InputPath=..\gui\UndoRedoListBox.h
+InputName=UndoRedoListBox
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\gui
+InputPath=..\gui\UndoRedoListBox.h
+InputName=UndoRedoListBox
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -426,6 +455,10 @@ SOURCE=.\..\common\mocs\moc_StatefulObject.cpp
 # Begin Source File
 
 SOURCE=.\..\gui\mocs\moc_ToolBarManager.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\gui\mocs\moc_UndoRedoListBox.cpp
 # End Source File
 # Begin Source File
 
