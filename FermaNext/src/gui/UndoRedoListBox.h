@@ -7,6 +7,7 @@
 
 class UndoRedoListBox : public QListBox
 {
+    Q_OBJECT
 public:
     UndoRedoListBox ( QWidget* parent = 0, const char* name = 0, WFlags f = 0 );
     virtual ~UndoRedoListBox ();

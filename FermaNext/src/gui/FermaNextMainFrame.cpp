@@ -3,6 +3,7 @@
 #include "FermaNextWorkspace.h"
 #include "ProjectToolBox.h"
 #include "SubsidiaryConstants.h"
+#include "UndoRedoListBox.h"
 
 #include <qapplication.h>
 #include <qpopupmenu.h>
@@ -66,7 +67,19 @@ void FermaNextMainFrame::init ()
     statusBar()->addWidget(new QLabel( tr("Ready"), statusBar() ));
 
     undoRedoHistoryWidget = new QWidget( this, "undo_redo_history",
-                                         WStyle_Tool | WType_TopLevel );
+                                         WStyle_StaysOnTop | WStyle_Tool | 
+                                         WType_TopLevel );
+
+    int undoRedoWidth = 140, undoRedoHeight = 110;
+    undoRedoHistoryWidget->setFixedSize( undoRedoWidth, undoRedoHeight );
+    // Pretty history widget offset from the end point of the screen
+    undoRedoHistoryWidget->move( QApplication::desktop()->width() - 
+                                 undoRedoWidth*1.5, 0 + undoRedoHeight*1.5 );
+    undoRedoHistoryWidget->setCaption( tr("History") );
+
+    QVBoxLayout* vboxHistoryWidget = new QVBoxLayout( undoRedoHistoryWidget );
+    undoRedoListBox = new UndoRedoListBox( undoRedoHistoryWidget );
+    vboxHistoryWidget->addWidget( undoRedoListBox );
 
     projectsDockWindow = new QDockWindow( QDockWindow::InDock, this );
     projectsDockWindow->setResizeEnabled( TRUE );
@@ -94,8 +107,10 @@ void FermaNextMainFrame::init ()
 
 void FermaNextMainFrame::someProjectRemoved ( FermaNextProject& prj )
 {
-    if ( 1 == FermaNextWorkspace::workspace().countProjects() )
+    if ( 1 == FermaNextWorkspace::workspace().countProjects() ) {
         projectsDockWindow->hide();
+        undoRedoHistoryWidget->hide();
+    }
     TrussUnitDesignerWidget& designerWidget = 
         prj.getDesignerWindow().getDesignerWidget();
     designerWidget.disconnect( this );
@@ -104,8 +119,11 @@ void FermaNextMainFrame::someProjectRemoved ( FermaNextProject& prj )
 void FermaNextMainFrame::someProjectCreated ( FermaNextProject& prj )
 {
     if ( !projectsDockWindow->isVisible() && 
-         0 < FermaNextWorkspace::workspace().countProjects() )
+        0 < FermaNextWorkspace::workspace().countProjects() ) {
         projectsDockWindow->show();
+        // TODO: remove comment in future
+        //undoRedoHistoryWidget->show();
+    }
 
     TrussUnitDesignerWidget& designerWidget = 
         prj.getDesignerWindow().getDesignerWidget();
@@ -417,6 +435,7 @@ void FermaNextMainFrame::refreshUndoRedoActions ()
         if ( trussWindow ) {
             ObjectStateManager* mng = trussWindow->getStateManager();
             if ( mng ) {
+                undoRedoListBox->setStateManager( mng );
                 enableUndo = (mng->countStatesToUndo() > 0);
                 enableRedo = (mng->countStatesToRedo() > 0);
             }

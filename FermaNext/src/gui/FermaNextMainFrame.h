@@ -3,12 +3,13 @@
 #define FERMANEXTFRAME_H
 
 #include <qmainwindow.h>
-#include <qwidgetstack.h>
-#include <qvbox.h>
-
-#include "ProjectToolBox.h"
 
 class QAction;
+class ProjectToolBox;
+class FermaNextProject;
+class TrussUnitWindow;
+class FermaNextWorkspace;
+class UndoRedoListBox;
 
 class FermaNextMainFrame : public QMainWindow
 {
@@ -78,8 +79,13 @@ protected slots:
 private:
     // Dock window on wich all projects are located
     QDockWindow* projectsDockWindow;
+    // Undo/redo history widget
     QWidget* undoRedoHistoryWidget;
+    // Undo/redo list box to control truss states
+    UndoRedoListBox* undoRedoListBox;
+    // Tool box of all workspace projects
     ProjectToolBox* projectToolBox;
+    // Current system workspace
     FermaNextWorkspace* wsp;
     // Some actions
     QAction* undoAction;
