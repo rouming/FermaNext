@@ -4,6 +4,7 @@
 #include "ProjectToolBox.h"
 #include "SubsidiaryConstants.h"
 
+#include <qapplication.h>
 #include <qpopupmenu.h>
 #include <qmenubar.h>
 #include <qaccel.h>
@@ -46,6 +47,15 @@ FermaNextMainFrame::FermaNextMainFrame ( QWidget* p, const char* n,
     setupHelpActions();
 }
 
+/*
+ *  Last cleanup before quit.
+ */
+void FermaNextMainFrame::cleanBeforeQuit ()
+{
+    // Manually destroy all projects.
+    FermaNextWorkspace::workspace().clearProjects();
+}
+
 void FermaNextMainFrame::init ()
 {
     // Do not move this line. Should be the first for correct inition.
@@ -55,26 +65,29 @@ void FermaNextMainFrame::init ()
     setMinimumSize( 640, 480 );
     statusBar()->addWidget(new QLabel( tr("Ready"), statusBar() ));
 
-    dw = new QDockWindow( QDockWindow::InDock, this );
-    dw->setResizeEnabled( TRUE );
-    dw->setVerticalStretchable( TRUE );
-    dw->setCaption( tr("Truss Unit Projects") );
-    addDockWindow( dw, DockLeft );
-    setDockEnabled( dw, DockTop, FALSE );
-    setDockEnabled( dw, DockBottom, FALSE );
-    dw->setCloseMode( QDockWindow::Always );
+    undoRedoHistoryWidget = new QWidget( this, "undo_redo_history",
+                                         WStyle_Tool | WType_TopLevel );
+
+    projectsDockWindow = new QDockWindow( QDockWindow::InDock, this );
+    projectsDockWindow->setResizeEnabled( TRUE );
+    projectsDockWindow->setVerticalStretchable( TRUE );
+    projectsDockWindow->setCaption( tr("Truss Unit Projects") );
+    addDockWindow( projectsDockWindow, DockLeft );
+    setDockEnabled( projectsDockWindow, DockTop, FALSE );
+    setDockEnabled( projectsDockWindow, DockBottom, FALSE );
+    projectsDockWindow->setCloseMode( QDockWindow::Always );
 
     FermaNextWorkspace& ws = FermaNextWorkspace::workspace();
-    projectToolBox = new ProjectToolBox( ws, dw );
+    projectToolBox = new ProjectToolBox( ws, projectsDockWindow );
     connect( &ws, SIGNAL(onProjectRemove(FermaNextProject&)), 
                   SLOT(someProjectRemoved(FermaNextProject&)) );
     connect( &ws, SIGNAL(onProjectCreate(FermaNextProject&)), 
                   SLOT(someProjectCreated(FermaNextProject&)) );
     connect( projectToolBox, SIGNAL(currentChanged(int)), 
                              SLOT(refreshUndoRedoActions()) );
-    dw->setWidget( projectToolBox );
-    dw->setFixedExtentWidth( 160 );
-    dw->hide();
+    projectsDockWindow->setWidget( projectToolBox );
+    projectsDockWindow->setFixedExtentWidth( 160 );
+    projectsDockWindow->hide();
 
     setRightJustification( true );
 }
@@ -82,7 +95,7 @@ void FermaNextMainFrame::init ()
 void FermaNextMainFrame::someProjectRemoved ( FermaNextProject& prj )
 {
     if ( 1 == FermaNextWorkspace::workspace().countProjects() )
-        dw->hide();
+        projectsDockWindow->hide();
     TrussUnitDesignerWidget& designerWidget = 
         prj.getDesignerWindow().getDesignerWidget();
     designerWidget.disconnect( this );
@@ -90,9 +103,9 @@ void FermaNextMainFrame::someProjectRemoved ( FermaNextProject& prj )
 
 void FermaNextMainFrame::someProjectCreated ( FermaNextProject& prj )
 {
-    if ( !dw->isVisible() && 
+    if ( !projectsDockWindow->isVisible() && 
          0 < FermaNextWorkspace::workspace().countProjects() )
-        dw->show();
+        projectsDockWindow->show();
 
     TrussUnitDesignerWidget& designerWidget = 
         prj.getDesignerWindow().getDesignerWidget();
@@ -271,7 +284,7 @@ void FermaNextMainFrame::setupFileActions ()
     menu->insertSeparator();
 
     // Exit
-    a = new QAction( tr( "E&xit" ), 0, this, "fileExit" );
+    a = new QAction( tr( "E&xit" ), CTRL + Key_Q, this, "fileExit" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileExit() ) );
     a->addTo( menu );
 }
@@ -518,9 +531,9 @@ void FermaNextMainFrame::fileRecentWsps ()
 
 void FermaNextMainFrame::fileExit ()
 {
-    qWarning("Not implmented yet!");
+    cleanBeforeQuit();
+    qApp->quit();
 }
-
 
 void FermaNextMainFrame::editUndo ()
 {
@@ -628,11 +641,11 @@ void FermaNextMainFrame::helpAbout ()
  *****************************************************************************/
 
 /*
- *  Correct workspace clean.
+ *  Correct clean.
  */
 void FermaNextMainFrame::closeEvent ( QCloseEvent* event )
 {
-    FermaNextWorkspace::workspace().clearProjects();
+    cleanBeforeQuit();
     event->accept();
 }
 
