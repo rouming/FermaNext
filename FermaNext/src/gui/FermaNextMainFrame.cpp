@@ -74,7 +74,8 @@ void FermaNextMainFrame::init ()
     undoRedoHistoryWidget->setFixedSize( undoRedoWidth, undoRedoHeight );
     // Pretty history widget offset from the end point of the screen
     undoRedoHistoryWidget->move( QApplication::desktop()->width() - 
-                                 undoRedoWidth*1.5, 0 + undoRedoHeight*1.5 );
+                                 int(undoRedoWidth*1.5), 
+                                 0 + int(undoRedoHeight*1.5) );
     undoRedoHistoryWidget->setCaption( tr("History") );
 
     QVBoxLayout* vboxHistoryWidget = new QVBoxLayout( undoRedoHistoryWidget );
@@ -122,7 +123,7 @@ void FermaNextMainFrame::someProjectCreated ( FermaNextProject& prj )
         0 < FermaNextWorkspace::workspace().countProjects() ) {
         projectsDockWindow->show();
         // TODO: remove comment in future
-        //undoRedoHistoryWidget->show();
+        undoRedoHistoryWidget->show();
     }
 
     TrussUnitDesignerWidget& designerWidget = 
@@ -428,19 +429,21 @@ void FermaNextMainFrame::refreshUndoRedoActions ()
 {
     bool enableUndo = false;
     bool enableRedo = false;
+
+    ObjectStateManager* mng = 0;
     FermaNextProject* prj = projectToolBox->currentProject();
     if ( prj != 0 ) {
         TrussUnitWindow* trussWindow = 
             prj->getDesignerWindow().getDesignerWidget().getFocusedWindow();
         if ( trussWindow ) {
-            ObjectStateManager* mng = trussWindow->getStateManager();
-            if ( mng ) {
-                undoRedoListBox->setStateManager( mng );
+            mng = trussWindow->getStateManager();
+            if ( mng ) {    
                 enableUndo = (mng->countStatesToUndo() > 0);
                 enableRedo = (mng->countStatesToRedo() > 0);
             }
         }
     }
+    undoRedoListBox->setStateManager( mng );
     undoAction->setEnabled(enableUndo);
     redoAction->setEnabled(enableRedo);
 }
@@ -451,8 +454,7 @@ void FermaNextMainFrame::trussWindowLostFocus ( TrussUnitWindow& window )
     if ( mng )
         mng->disconnect( this );
 
-    undoAction->setEnabled(false);
-    redoAction->setEnabled(false);
+    refreshUndoRedoActions();
 }
 
 void FermaNextMainFrame::trussWindowReceivedFocus ( TrussUnitWindow& window )
@@ -461,9 +463,14 @@ void FermaNextMainFrame::trussWindowReceivedFocus ( TrussUnitWindow& window )
     if ( mng == 0 )
         return;
 
-    connect( mng, SIGNAL(onSaveState(ObjectStateManager&, ObjectState&)), 
+    // Catch basic state manager signals
+    connect( mng, SIGNAL(onStateBlockIsEnded(ObjectStateManager&)), 
                   SLOT(refreshUndoRedoActions()) );
     connect( mng, SIGNAL(onRemoveState(ObjectStateManager&, ObjectState&)), 
+                  SLOT(refreshUndoRedoActions()) );
+    connect( mng, SIGNAL(afterUndo(ObjectStateManager&)), 
+                  SLOT(refreshUndoRedoActions()) );
+    connect( mng, SIGNAL(afterRedo(ObjectStateManager&)), 
                   SLOT(refreshUndoRedoActions()) );
     
     refreshUndoRedoActions();
