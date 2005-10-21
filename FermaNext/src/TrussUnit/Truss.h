@@ -147,7 +147,14 @@ public:
 
     Truss ( ObjectStateManager* mng ) :
         TrussEmitter(mng)
-    {}
+    {
+        // Signal connects to catch life time changing and deligate them
+        // to common 'onStateChange' signal
+        QObject::connect( this, SIGNAL(onAfterRevive(StatefulObject&)),
+                                 SLOT(stateIsChanged()) );
+        QObject::connect( this, SIGNAL(onAfterDesist(StatefulObject&)),
+                                 SLOT(stateIsChanged()) );
+    }
 
     virtual void clear () 
     {
