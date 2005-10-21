@@ -129,7 +129,13 @@ void ObjectStateManager::endStateBlock ()
     // Outer last block is ended and something was saved in it
     if ( startedBlocks == 0 && newlyCreatedBlock ) {
         newlyCreatedBlock = false;
+        emit onStateBlockIsEnded(*this);
     }
+}
+
+bool ObjectStateManager::stateBlockisNotEnded () const
+{
+    return (startedBlocks != 0);
 }
 
 ObjectStateManager::StateBlock* ObjectStateManager::findBlock ( 

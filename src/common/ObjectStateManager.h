@@ -83,6 +83,8 @@ public:
     //Manages state blocks
     virtual void startStateBlock ();
     virtual void endStateBlock ();
+    // Returns true if newly created block is not ended.
+    virtual bool stateBlockisNotEnded () const;
 
     // Saves object state. If startStateBlock was called first, state
     // saves in this block.
@@ -159,6 +161,7 @@ signals:
     void afterStep ( ObjectStateManager& );
     void onSaveState ( ObjectStateManager&, ObjectState& );
     void onRemoveState ( ObjectStateManager&, ObjectState& );
+    void onStateBlockIsEnded ( ObjectStateManager& );
 
 private:
     typedef std::vector<StateBlock*> BlockList;
