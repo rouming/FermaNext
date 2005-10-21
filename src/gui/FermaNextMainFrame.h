@@ -69,7 +69,7 @@ protected slots:
     void helpContents ();
     void helpAbout ();
 
-    // Set actions enabled/disabled
+    // Refresh undo/redo
     void refreshUndoRedoActions ();
 
     // Catch designer widget focus change
