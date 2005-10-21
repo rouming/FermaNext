@@ -125,8 +125,15 @@ private:
     WindowList trussWindows;
     // Node fixation popup menu
     FixationPopupMenu* fixationPopup;
-    // Focused truss unit window
+
+    // Top-level truss unit window.
+    // Also, we get state manager from this window to collect 
+    // states of this window between press and release mouse events. 
+    // So, press mouse event have to start state block and release 
+    // have close it.
     TrussUnitWindow* focusedWindow;
+
+    ObjectStateManager* stateMngWithStartedBlock;
     // Current selected truss elements
     TrussUnitWindow* selectedWindow;
     TrussNode* selectedNode;

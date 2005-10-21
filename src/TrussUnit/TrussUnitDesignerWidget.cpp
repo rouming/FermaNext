@@ -121,13 +121,10 @@ void TrussUnitDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow 
     X += 15; 
     Y += 10;
 
-    // We should repaint all area after truss changes its visibility
-    // or becomes desisted/revived
+    // We should repaint all area after truss changes its visibility or state
     QObject::connect( &trussWindow, SIGNAL(onVisibleChange(bool)), 
                                     SLOT(trussWindowChangedVisibility(bool)) );
-    QObject::connect( &trussWindow, SIGNAL(onAfterDesist(StatefulObject&)), 
-                                    SLOT(update()) );
-    QObject::connect( &trussWindow, SIGNAL(onAfterRevive(StatefulObject&)), 
+    QObject::connect( &trussWindow, SIGNAL(onStateChange()),
                                     SLOT(update()) );
     QObject::connect( &trussWindow, SIGNAL(onBeforeDesist(StatefulObject&)), 
                                     SLOT(trussWindowDesisted(StatefulObject&)) );
@@ -275,8 +272,7 @@ void TrussUnitDesignerWidget::focusOnWindow ( TrussUnitWindow& window )
         return;
     // Defocus previous focused window
     if ( focusedWindow ) {
-        focusedWindow->setHighlighted(false);
-        emit onFocusLose( *focusedWindow );
+        clearWindowFocus();
     }
     // Focus on window
     focusedWindow = &window;
@@ -348,8 +344,13 @@ void TrussUnitDesignerWidget::clearWindowFocus ()
 {
     if ( focusedWindow ) {
         focusedWindow->setHighlighted(false);
-        emit onFocusLose( *focusedWindow );
+        // Correct block close if we catch focus change before release event.
+        ObjectStateManager* mng = focusedWindow->getStateManager();
+        if ( mng && mng->stateBlockisNotEnded() )
+            mng->endStateBlock();
+        TrussUnitWindow* fWindow = focusedWindow;
         focusedWindow = 0;
+        emit onFocusLose( *fWindow );
         update();
     }
 }
@@ -447,7 +448,8 @@ void TrussUnitDesignerWidget::saveNodeStateAfterDrag ( DoublePoint pos )
     if ( pos == beforeDragNodePos )
         return;
 
-    ObjectState& state = selectedNode->createState();
+    // Save move node action
+    ObjectState& state = selectedNode->createState( "move node" );
     state.addAction( new ConcreteObjectAction<TrussNode, DoublePoint>( 
                                                      *selectedNode, 
                                                      &TrussNode::setPoint,
@@ -459,7 +461,8 @@ void TrussUnitDesignerWidget::saveNodeStateAfterDrag ( DoublePoint pos )
 
 void TrussUnitDesignerWidget::saveNodeStateAfterCreate ( TrussNode& node )
 {    
-    ObjectState& state = node.createState();
+    // Save create node action
+    ObjectState& state = node.createState( "create node" );
     TrussNodeCreateAction* action = new TrussNodeCreateAction( node );
     state.addAction( action );
     state.save();
@@ -467,7 +470,8 @@ void TrussUnitDesignerWidget::saveNodeStateAfterCreate ( TrussNode& node )
 
 void TrussUnitDesignerWidget::saveNodeStateAfterRemove ( TrussNode& node )
 {
-    ObjectState& state = node.createState();
+    // Save remove node action
+    ObjectState& state = node.createState( "remove node" );
     TrussNodeRemoveAction* action = new TrussNodeRemoveAction( node );
     state.addAction( action );
     state.save();
@@ -491,7 +495,7 @@ void TrussUnitDesignerWidget::savePivotStateAfterDrag ( DoublePoint firstPos,
     mng->startStateBlock();
     
     // First node pos state to save
-    ObjectState& firstState = firstNode.createState();
+    ObjectState& firstState = firstNode.createState( "move node" );
 
     // First pos    
     firstState.addAction( new ConcreteObjectAction<TrussNode, DoublePoint>( 
@@ -503,7 +507,7 @@ void TrussUnitDesignerWidget::savePivotStateAfterDrag ( DoublePoint firstPos,
     firstState.save();
 
     // Last node pos state to save
-    ObjectState& lastState = lastNode.createState();
+    ObjectState& lastState = lastNode.createState( "move node" );
 
     // Last pos
     lastState.addAction( new ConcreteObjectAction<TrussNode, DoublePoint>( 
@@ -529,7 +533,7 @@ void TrussUnitDesignerWidget::savePivotStateAfterCreate ( TrussNode& firstNode,
         saveNodeStateAfterCreate( firstNode );
     saveNodeStateAfterCreate( lastNode );
     // Save created pivot
-    ObjectState& state = pivot.createState();
+    ObjectState& state = pivot.createState( "create pivot" );
     TrussPivotCreateAction* action = new TrussPivotCreateAction( pivot );
     state.addAction( action );
     state.save();
@@ -988,9 +992,11 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         winBehaviour = windowIdle;
     }
 
+    // End state block which was started in press mouse event.
     if ( focusedWindow ) {
         ObjectStateManager* mng = focusedWindow->getStateManager();
-        mng->endStateBlock();
+        if ( mng && mng->stateBlockisNotEnded() ) 
+            mng->endStateBlock();
     }
 }
 
@@ -1055,7 +1061,8 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                     ObjectStateManager* mng = selectedNode->getStateManager();
                     mng->startStateBlock();
                     selectedWindow->desistAdjoiningPivots( *selectedNode );
-                    ObjectState& state = selectedNode->createState();
+                    ObjectState& state = 
+                        selectedNode->createState( "remove node" );
                     state.addAction( new TrussNodeRemoveAction( *selectedNode ) );
                     state.save();
                     selectedNode->desist();
@@ -1087,7 +1094,8 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                 if ( designerBehaviour == onErase )
                 {
                     // Save remove pivot action
-                    ObjectState& state = selectedPivot->createState();
+                    ObjectState& state = 
+                        selectedPivot->createState( "remove pivot" );
                     state.addAction( new TrussPivotRemoveAction( *selectedPivot ) );
                     state.save();
                     selectedPivot->desist();
