@@ -92,26 +92,80 @@ LIB32=link.exe -lib
 # Begin Source File
 
 SOURCE=.\AggButton.cpp
+
+!IF  "$(CFG)" == "Agg - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
+
+# SUBTRACT CPP /D "BENCHMARK_ON"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\AggPaintThread.cpp
+
+!IF  "$(CFG)" == "Agg - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
+
+# SUBTRACT CPP /D "BENCHMARK_ON"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\AggPopupHint.cpp
+
+!IF  "$(CFG)" == "Agg - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
+
+# SUBTRACT CPP /D "BENCHMARK_ON"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\AggQWidget.cpp
+
+!IF  "$(CFG)" == "Agg - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
+
+# SUBTRACT CPP /D "BENCHMARK_ON"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\AggSubsidiary.cpp
+
+!IF  "$(CFG)" == "Agg - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
+
+# SUBTRACT CPP /D "BENCHMARK_ON"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\AggToolBar.cpp
+
+!IF  "$(CFG)" == "Agg - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
+
+# SUBTRACT CPP /D "BENCHMARK_ON"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -186,6 +240,35 @@ InputName=AggPaintThread
 # Begin Source File
 
 SOURCE=.\AggPopupHint.h
+
+!IF  "$(CFG)" == "Agg - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\AggPopupHint.h
+InputName=AggPopupHint
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.
+InputPath=.\AggPopupHint.h
+InputName=AggPopupHint
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -239,6 +322,10 @@ SOURCE=.\mocs\moc_AggButton.cpp
 # Begin Source File
 
 SOURCE=.\mocs\moc_AggPaintThread.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\mocs\moc_AggPopupHint.cpp
 # End Source File
 # Begin Source File
 

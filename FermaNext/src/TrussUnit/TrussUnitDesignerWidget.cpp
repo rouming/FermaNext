@@ -116,6 +116,7 @@ TrussUnitDesignerWidget::~TrussUnitDesignerWidget ()
 {
     clearTrussUnitWindows();
     delete toolBar;
+    delete aggHint;
     delete fixationPopup;
 }
 
@@ -463,9 +464,6 @@ bool TrussUnitDesignerWidget::nodeCanBeDrawn ( int x, int y )
 void TrussUnitDesignerWidget::saveNodeStateAfterDrag ( TrussNode& node,
                                                        const DoublePoint& pos )
 {
-    // Actually nothing to save.
-    if ( &node == 0 )
-        return;
     // Similar points. Nothing to save.
     if ( pos == beforeDragNodePos )
         return;
@@ -503,9 +501,6 @@ void TrussUnitDesignerWidget::savePivotStateAfterDrag ( TrussPivot& pivot,
                                                         const DoublePoint& firstPos, 
                                                         const DoublePoint& lastPos )
 {
-    // Actually nothing to save.
-    if ( &pivot == 0 )
-        return;
     // Similar points. Nothing to save.
     if ( firstPos == beforeDragFirstPos && 
          lastPos == beforeDragLastPos )
@@ -960,7 +955,9 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         mng->startStateBlock();
 
         // Save state in Undo/Redo stack
-        saveNodeStateAfterDrag( *selectedNode, selectedNode->getPoint() );
+        if( selectedNode )
+            saveNodeStateAfterDrag( *selectedNode, selectedNode->getPoint() );
+
         selectedWindow->updateAfterNodeManipulation ( selectedNode, true );
 
         mng->endStateBlock();
@@ -992,7 +989,9 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         mng->startStateBlock();
 
         // Save state in Undo/Redo stack
-        savePivotStateAfterDrag( *selectedPivot, firstPos, lastPos );
+        if( selectedPivot )
+            savePivotStateAfterDrag( *selectedPivot, firstPos, lastPos );
+
         selectedWindow->updateAfterPivotManipulation ( selectedPivot, true );
 
         mng->endStateBlock();

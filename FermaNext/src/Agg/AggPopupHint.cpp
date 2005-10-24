@@ -77,7 +77,7 @@ void AggPopupHint::renewHintGeometry ()
 
     size_ = QSize( width, height );
 
-    if( buf_->width() < size_.width() )
+    if( (int)buf_->width() < size_.width() )
         buf_->init( size_.width(), size_.height() );
 }
 

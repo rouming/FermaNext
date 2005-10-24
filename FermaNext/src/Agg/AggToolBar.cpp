@@ -61,7 +61,6 @@ void AggToolBarButton::paint ( ren_dynarow& baseRend,
 
 AggToolBar::AggToolBar( QPoint pos, int bordLeft, int bordRight, int bordTop, 
                         int bordBottom, int separation_ ) :
-    visible(true),
     centerPos(pos),
     borderLeft(bordLeft),
     borderRight(bordRight),
@@ -73,6 +72,7 @@ AggToolBar::AggToolBar( QPoint pos, int bordLeft, int bordRight, int bordTop,
     toolBarBuf( new rbuf_dynarow( bordLeft + bordRight + 2 * bufferEmptyArea,
                                   bordTop + bordBottom + bufferEmptyArea ) ),
     renderedFlag(false),
+    visible(true),
     hinted(false)
 {
     toolBarWidth = bordLeft + bordRight + separation_;

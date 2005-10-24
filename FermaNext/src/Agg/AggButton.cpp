@@ -11,7 +11,6 @@ AggButton::AggButton ( const QString& l, const QPoint& p, int w, int h ) :
     width(w), height(h),
     pressed(false),
     highlighted(false),
-    hinted(false),
     leftTopPos(p),
     label(l)
 {}   
@@ -19,7 +18,6 @@ AggButton::AggButton ( const QString& l, const QPoint& p, int w, int h ) :
 AggButton::AggButton ( QPoint p, int w, int h ) :
     width(w), height(h),
     pressed(false),
-    hinted(false),
     highlighted(false),
     leftTopPos(p)
 {}
