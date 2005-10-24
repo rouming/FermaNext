@@ -18,12 +18,18 @@ INCLUDEPATH = $$(AGGDIR)/include \
               $$(AGGDIR)/svg \
               ../common \
 
-SOURCES = AggButton.cpp \
+SOURCES = \
+          AggButton.cpp \
+          AggPaintThread.cpp \
+          AggPopupHint.cpp \
           AggQWidget.cpp \
           AggSubsidiary.cpp \
           AggToolBar.cpp
 
-HEADERS = AggButton.h \
+HEADERS = \
+          AggButton.h \
+          AggPaintThread.h \
+          AggPopupHint.h \
           AggQWidget.h \
           AggSubsidiary.h \
           AggToolBar.h
