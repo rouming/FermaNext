@@ -169,7 +169,7 @@ void TrussUnitToolBar::moveToolBar ()
     {
         pixNumb -= pixHideNumb;
         pos.setY ( pos.y() - pixHideNumb );
-        if ( pixNumb == (uint)hideButton->getHeight() )
+        if ( pixNumb == hideButton->getHeight() )
             enabled = true;
     }
     setPosition ( pos );
