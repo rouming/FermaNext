@@ -589,6 +589,7 @@ void TrussUnitDesignerWidget::aggResizeEvent ( QResizeEvent* )
             w->maximize( false );
     }
     toolBar->changeCenterPosition ( QPoint( width()/2, height() ) );
+    aggHint->renewWidgetSize ( this->size() );
 }
 
 void TrussUnitDesignerWidget::aggKeyPressEvent ( QKeyEvent* ke )

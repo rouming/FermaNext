@@ -9,6 +9,7 @@
 
 AggPopupHint::AggPopupHint ( QWidget& widget ) :
     font_( agg::verdana13 ),
+    widgetSize_( widget.size() ),
     alphaCoeff( 0 ),
     rendered_( false ),
     buf_( new rbuf_dynarow( 100, 20 ) ),
@@ -21,6 +22,11 @@ AggPopupHint::~AggPopupHint ()
     if ( thread_->running() )
         thread_->wait();
     delete thread_;
+}
+
+void AggPopupHint::renewWidgetSize ( const QSize& wSize )
+{
+    widgetSize_ = wSize;
 }
 
 void AggPopupHint::show ( const QString& hintText, 
@@ -83,8 +89,17 @@ void AggPopupHint::renewHintGeometry ()
 
 QPoint AggPopupHint::getHintPosition () const
 {
-    // TODO: dependence from widget boundaries
     QPoint pos( cursorPos_.x() - 3, cursorPos_.y() - size_.height() );
+
+    if( pos.x() < 0 )
+        pos.setX( 0 );
+    if( pos.y() < 0 )
+        pos.setY( 0 );
+
+    int dx = pos.x() + size_.width() - widgetSize_.width();
+    if( dx > 0 )
+        pos.setX( pos.x() - dx );
+    
     return pos;
 }    
 
