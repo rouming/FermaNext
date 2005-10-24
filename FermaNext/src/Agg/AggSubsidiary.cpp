@@ -3,6 +3,7 @@
 #include "Geometry.h"
 #include <qstring.h>
 #include <qpoint.h>
+#include <qsize.h>
 
 /*****************************************************************************
  * line
@@ -87,6 +88,21 @@ void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
 {
     drawLine ( ras, solidRend, sl, point1, point2, 
                coordLineWidth, agg::rgba(90, 90, 90) );
+}
+
+void drawCurve ( scanline_rasterizer& ras, solidRenderer& solidRend,
+                 agg::scanline_p8& sl, const QPoint& point1, 
+                 const QPoint& point2, const QPoint& point3, 
+                 int width, color_type col )
+{
+    agg::curve3 newCurve ( point1.x(), point1.y(), 
+                      point2.x(), point2.y(),
+                      point3.x(), point3.y() );
+    agg::conv_stroke<agg::curve3> stroke ( newCurve );
+    stroke.width ( width ); 
+    ras.add_path ( stroke );
+    solidRend.color ( col );
+    agg::render_scanlines ( ras, sl, solidRend );
 }
 
 void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,

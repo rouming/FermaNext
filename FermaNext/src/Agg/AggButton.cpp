@@ -7,57 +7,34 @@
  * Agg Button
  *****************************************************************************/
 
-AggButton::AggButton ( const QString& l, QPoint pos, int w, int h ) :
+AggButton::AggButton ( const QString& l, const QPoint& p, int w, int h ) :
     width(w), height(h),
-    highlighted(false),
     pressed(false),
-    leftTopPos(pos),
+    highlighted(false),
+    hinted(false),
+    leftTopPos(p),
     label(l)
-{}
+{}   
 
-AggButton::AggButton ( QPoint pos, int w, int h ) :
+AggButton::AggButton ( QPoint p, int w, int h ) :
     width(w), height(h),
-    highlighted(false),
     pressed(false),
-    leftTopPos(pos)
+    hinted(false),
+    highlighted(false),
+    leftTopPos(p)
 {}
 
 AggButton::~AggButton ()
 {}
 
-void AggButton::setLabel ( const QString& l )
-{
-    label = l;
-}
-
-const QString& AggButton::getLabel () const
-{
-    return label;
-}
-
-void AggButton::setHint ( const QString& hint_ )
-{
-    label = hint_;
-}
-
-const QString& AggButton::getHint () const
-{
-    return hint;
-}
-
-void AggButton::setPosition ( QPoint newPos )
-{
-    leftTopPos = newPos;
-}
-
-QPoint AggButton::getPosition () const
+const QPoint& AggButton::getPosition () const
 {
     return leftTopPos;
 }
 
-void AggButton::setWidth ( int w )
+void AggButton::setPosition ( const QPoint& newPos )
 {
-    width = w;
+    leftTopPos = newPos;
 }
 
 int AggButton::getWidth () const
@@ -65,9 +42,9 @@ int AggButton::getWidth () const
     return width;
 }
 
-void AggButton::setHeight ( int h )
+void AggButton::setWidth ( int w )
 {
-    height = h;
+    width = w;
 }
 
 int AggButton::getHeight () const
@@ -75,25 +52,29 @@ int AggButton::getHeight () const
     return height;
 }
 
-void AggButton::setHighlighted ( bool h_ )
+void AggButton::setHeight ( int h )
 {
-    if ( highlighted == h_ )
-        return;
-    highlighted = h_;
-    emit onButtonHighlightChange ();
+    height = h;
 }
 
-bool AggButton::isHighlighted () const
+const QString& AggButton::getLabel () const
 {
-    return highlighted;
+    return label;
 }
 
-bool AggButton::inButtonRect ( int x, int y ) const
+void AggButton::setLabel ( const QString& l )
 {
-    if ( x > leftTopPos.x() && x < leftTopPos.x() + width &&
-         y > leftTopPos.y() && y < leftTopPos.y() + height )
-        return true;
-    return false;
+    label = l;
+}
+
+const QString& AggButton::getHint () const
+{
+    return hint;
+}
+
+void AggButton::setHint ( const QString& hint_ )
+{
+    hint = hint_;
 }
 
 bool AggButton::isPressed () const
@@ -113,6 +94,27 @@ void AggButton::setPressed ( bool status )
 
     pressed = status;
     emit onChangeButtonState();
+}
+
+bool AggButton::isHighlighted () const
+{
+    return highlighted;
+}
+
+void AggButton::setHighlighted ( bool h_ )
+{
+    if ( highlighted == h_ )
+        return;
+    highlighted = h_;
+    emit onChangeButtonState ();
+}
+
+bool AggButton::inButtonRect ( int x, int y ) const
+{
+    if ( x > leftTopPos.x() && x < leftTopPos.x() + width &&
+         y > leftTopPos.y() && y < leftTopPos.y() + height )
+        return true;
+    return false;
 }
 
 void AggButton::pressButton ()

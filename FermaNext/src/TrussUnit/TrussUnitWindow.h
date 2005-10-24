@@ -68,6 +68,7 @@ public:
 protected:
     virtual void setWindowSize ( int w, int h );
     virtual QPoint getButtonBufPos () const;
+    virtual bool inButtonsRect ( int x, int y ) const;
     virtual void hide ();
     virtual QString fitTextToWindowSize ( QString str, int lengthLimit, 
                                           glyph_gen& glyph ) const;
@@ -106,9 +107,12 @@ signals:
     void onMove ( QPoint oldP, QPoint newP );
     void onTrussUnitWindowHide ();
     void onTrussUnitWindowRollUp ();
+    void onHintShowsUp ( const QString& hint, const QPoint pos, bool smooth );
+    void onHintHides ( bool smooth );
 
 protected slots:
     virtual void clearButtonBufRenderedFlag ();
+    virtual void setWindowButtonHinted ();
 
 private:
     QPoint windowLeftTopPos, windowRightBottomPos;
@@ -121,6 +125,12 @@ private:
     rbuf_dynarow *windowBuf, *trussBuf, *coordBuf, 
                  *numbersBuf, *buttonBuf;
     TrussUnitWindowButton *hideButton, *rollUpButton;
+    TrussUnitWindowButton *currentPressedButton;
+    // hints subsidiaries
+    TrussUnitWindowButton *currentHintedButton;
+    QTimer *timer;
+    QPoint hintCurrentPos;
+    bool hinted;
     // minimize/maximize subsidiaries
     bool maximized;
     QSize maxSize;

@@ -67,8 +67,9 @@ public:
 
     virtual void setFocusOnNode ( TrussNode* selectedNode );
     virtual void setFocusOnPivot ( TrussPivot* selectedPivot );
-    virtual void removeNodesHighlight ();
-    virtual void removePivotsHighlight ();
+    virtual void removeNodesHighlight ( const TrussNode* node1 = 0, 
+                                        const TrussNode* node2 = 0 );
+    virtual void removePivotsHighlight ( const TrussPivot* pivot = 0 );
 
     virtual DoublePoint getTrussCoordFromWidgetPos ( int x, int y ) const;
     virtual DoublePoint getTrussCoordFromWidgetPos ( QPoint pos ) const;
@@ -102,6 +103,8 @@ public:
 
     virtual void dividePivot ( TrussPivot& dividualPivot, TrussNode& dividingNode );
 
+    virtual TrussPivot* findDividualPivot ( TrussNode& dividingNode,
+                                            double precision ) const;
     virtual TrussPivot* findDividualPivot ( TrussNode& dividingNode ) const;
 
     virtual void updateAfterNodeManipulation ( TrussNode* selectedNode, 

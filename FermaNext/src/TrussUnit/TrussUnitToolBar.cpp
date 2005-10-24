@@ -1,40 +1,6 @@
 
 #include "TrussUnitToolBar.h"
-
-/*****************************************************************************
- * Tool Bar Thread
- *****************************************************************************/
-
-ToolBarThread::ToolBarThread( QWidget& p ) :
-    attemtsNumb( 0 ),
-    msecToSleep( 0 ),
-    widgetToPaint( p )
-{}
-
-ToolBarThread::~ToolBarThread ()
-{}
-
-void ToolBarThread::setSleepTime ( int timeMsec )
-{
-    msecToSleep = timeMsec;
-}
-
-void ToolBarThread::setAttemtsNumber ( int numb )
-{
-    attemtsNumb = numb;
-}
-
-void ToolBarThread::run ()
-{
-    int count = 0;
-    while ( count < attemtsNumb ) 
-    { 
-         widgetToPaint.update();
-         emit onToolBarMove();
-         QThread::msleep( msecToSleep );
-         count+=pixHideNumb;
-    }
-}
+#include "qtimer.h"
 
 /*****************************************************************************
  * Agg Tool Bar Hide Button
@@ -62,6 +28,7 @@ void AggToolBarHideButton::paint ( ren_dynarow& baseRend,
     agg::trans_affine mtx;
     primitivesRenderer primRend ( baseRend );
 
+    // draw button
     if ( ! isHighlighted() )
         primRend.fill_color ( fillCol );
     else 
@@ -71,6 +38,8 @@ void AggToolBarHideButton::paint ( ren_dynarow& baseRend,
     primRend.outlined_rectangle ( pos.x(), pos.y(), 
                                   pos.x() + width, 
                                   pos.y() + height );
+
+    // draw button icon
     QPoint pos1 ( pos.x() + width / 2 - 4, pos.y() + 2 );
     QPoint pos2 ( pos.x() + width / 2 + 4, pos.y() + 4 );
     if ( ! isHighlighted() )
@@ -91,16 +60,27 @@ TrussUnitToolBar::TrussUnitToolBar  ( QPoint pos, int bordLeft, int bordRight,
     pixNumb( 0 ),
     cornerRadius( rad ),
     enabled( true ),
-    thread( new ToolBarThread( *widget ) ),
+    currentHintedButton( 0 ),
+    hideButton( 0 ),
+    thread( new AggPaintThread( *widget ) ),
+    timer( new QTimer( this ) ),
     // gradient colors
     barFirstColor( agg::rgba( 35, 50, 60, 0.8 ) ),
     barMiddleColor( agg::rgba( 20, 60, 80, 0.8 ) ),
     barLastColor( agg::rgba( 20, 60, 80, 0.8 ) )
 {
     initHideButton();
-    thread->setSleepTime( 1 );
-    QObject::connect( thread, SIGNAL( onToolBarMove() ),
-                      SLOT( moveToolBar() ) );      
+    thread->setFrameDelayMsec( 1 );
+    thread->setFrameRate( pixHideNumb );
+
+    QObject::connect( thread, SIGNAL( onAnimationRun() ),
+                      SLOT( moveToolBar() ) );
+
+    QObject::connect( timer, SIGNAL( timeout() ),
+                      SLOT( setToolBarHinted() ) );
+
+    QObject::connect( timer, SIGNAL( timeout() ),
+                      widget, SLOT( update() ) );
 }
 
 TrussUnitToolBar::~TrussUnitToolBar ()
@@ -108,6 +88,7 @@ TrussUnitToolBar::~TrussUnitToolBar ()
     if ( thread->running() )
         thread->wait();
     delete thread;
+    delete timer;
     delete hideButton;
 }
 
@@ -116,7 +97,7 @@ AggToolBarButton& TrussUnitToolBar::addButton ( const QString& fn,
                                                 QPoint pos, 
                                                 uint w,
                                                 uint h,
-                                                QObject* r,  
+                                                QWidget* r,  
                                                 const char* sig,
                                                 const char* sl )
 {
@@ -138,10 +119,8 @@ void TrussUnitToolBar::initHideButton ()
 {
     hideButton = new AggToolBarHideButton ();
     hideButton->setPosition( hideButtonPos() );
+    hideButton->setHint( "Hide tool bar" );
     
-    QObject::connect( hideButton, SIGNAL( onButtonHighlightChange() ),
-                      SLOT( clearToolBarRenderedFlag() ) );
-
     QObject::connect( hideButton, SIGNAL( onChangeButtonState() ),
                       SLOT( clearToolBarRenderedFlag() ) );
 
@@ -159,7 +138,7 @@ void TrussUnitToolBar::showToolBar ()
     removeButtonHighlight();
     enabled = false;
     pixNumb = getHeight() - hideButton->getHeight();
-    thread->setAttemtsNumber( pixNumb );
+    thread->setFramesNumber( pixNumb );
     setVisible ( true );
     thread->start();
 }
@@ -168,7 +147,7 @@ void TrussUnitToolBar::hideToolBar ()
 {
     removeButtonHighlight();
     pixNumb = getHeight() - hideButton->getHeight();
-    thread->setAttemtsNumber( pixNumb );
+    thread->setFramesNumber( pixNumb );
     enabled = false;
     thread->start();
 }
@@ -196,6 +175,14 @@ void TrussUnitToolBar::moveToolBar ()
     setPosition ( pos );
 }
 
+void TrussUnitToolBar::setToolBarHinted ()
+{
+    setHinted( true );
+    if ( currentHintedButton )
+        emit onHintShowsUp( currentHintedButton->getHint(), 
+                            hintCurrentPos, false );
+}
+
 void TrussUnitToolBar::removeButtonHighlight ()
 {
     if ( hideButton )
@@ -219,36 +206,85 @@ QPoint TrussUnitToolBar::getDynarowBufPos ( int x, int y ) const
     return pos;
 }
 
-bool TrussUnitToolBar::inToolBarRect ( int x, int y ) const
+bool TrussUnitToolBar::inToolBarRect ( int x, int y, bool bordCheck ) const
 {
     // consider that buttons know only about dynarow buffer coords
     QPoint bufPos = getDynarowBufPos ( x, y );
 
     //TODO: define more accurately rounded boundaries of the tool bar
     QPoint pos = getPosition ();
-    if ( x > pos.x() && x < pos.x() + getWidth() &&
-         y > pos.y() && y < pos.y() + getHeight() ||
-         hideButton && hideButton->inButtonRect( bufPos.x(), bufPos.y() ) )
-         return true;
-    return false;
+    if ( bordCheck )
+    {
+        if ( x > pos.x() + getBorderLeft() && 
+             x < pos.x() + getWidth() - getBorderRight() - getButtonSeparation() &&
+             y > pos.y() + getBorderTop() && 
+             y < pos.y() + getHeight() - getBorderBottom() ||
+             hideButton && hideButton->inButtonRect( bufPos.x(), bufPos.y() ) )
+            return true;
+        else
+            return false;
+    }
+    else 
+    {
+        if ( x > pos.x() && x < pos.x() + getWidth() &&
+             y > pos.y() && y < pos.y() + getHeight() ||
+             hideButton && hideButton->inButtonRect( bufPos.x(), bufPos.y() ) )
+            return true;
+        else
+            return false;
+    }
 }
 
 void TrussUnitToolBar::checkMouseMoveEvent ( int x, int y )
 {
+    if ( timer->isActive() )
+        timer->stop();
+
     if ( ! enabled )
         return;
 
     removeButtonHighlight();
 
-    AggToolBarButton* button = getSelectedButton( x, y );
+    AggButton* button = getSelectedButton( x, y );
     if ( button )
+    {
         button->setHighlighted( true );
 
-    // consider that buttons know only about dynarow buffer coords
-    QPoint pos = getDynarowBufPos ( x, y );
+        if ( isHinted() )
+        {
+            if ( button != currentHintedButton )
+            {
+                currentHintedButton = button;
+                hintCurrentPos = QPoint( x, y );
+                emit onHintShowsUp( currentHintedButton->getHint(), 
+                                    hintCurrentPos, false );
+            }
+        }   
+        else
+        {
+            currentHintedButton = button;
+            hintCurrentPos = QPoint( x, y );
+            timer->start( 1000, false );
+        }
+    }
+    else
+    {
+        if ( currentHintedButton != 0 )
+        {
+            currentHintedButton = 0;
+            emit onHintHides( false );
+        }
+    }
 
-    if ( hideButton && hideButton->inButtonRect( pos.x(), pos.y() ) )
-        hideButton->setHighlighted( true );
+    if ( ! inToolBarRect( x, y, true ) )
+    {
+        if ( isHinted() )
+        {
+            setHinted( false );
+            currentHintedButton = 0;
+            emit onHintHides( false );
+        }
+    }
 }
 
 void TrussUnitToolBar::checkMousePressEvent ( int x, int y )
@@ -256,26 +292,29 @@ void TrussUnitToolBar::checkMousePressEvent ( int x, int y )
     if ( ! enabled )
         return;
 
-    AggToolBarButton* button = getSelectedButton( x, y );
-    if ( button )
-        button->setPressed( true );
-
-    // consider that buttons know only about dynarow buffer coords
-    QPoint pos = getDynarowBufPos ( x, y );
-
-    if ( hideButton && hideButton->inButtonRect( pos.x(), pos.y() ) )
+    if ( isHinted() )
     {
-        if ( hideButton->isPressed() )
-            hideButton->setPressed( false );
-        else
-            hideButton->setPressed( true );
+        setHinted( false );
+        currentHintedButton = 0;
+        emit onHintHides( false );
     }
+
+    AggButton* button = getSelectedButton( x, y );
+    if ( ! button )
+        return;
+
+    if ( button != hideButton )
+        button->setPressed( true );
+    else if ( ! hideButton->isPressed() )
+        button->setPressed( true );
+    else
+        button->setPressed( false );
 }
 
-AggToolBarButton* TrussUnitToolBar::getSelectedButton ( int x, int y ) const
+AggButton* TrussUnitToolBar::getSelectedButton ( int x, int y ) const
 {
     ButtonList buttons = getButtonList ();
-    if ( buttons.empty() )
+    if ( buttons.empty() && ! hideButton )
         return 0;
 
     // consider that buttons know only about dynarow buffer coords
@@ -288,6 +327,10 @@ AggToolBarButton* TrussUnitToolBar::getSelectedButton ( int x, int y ) const
         if ( button->inButtonRect( bufPos.x(), bufPos.y() ) )
             return button;
     }
+
+    if ( hideButton && hideButton->inButtonRect( bufPos.x(), bufPos.y() ) )
+        return hideButton;
+
     return 0;
 }
 
@@ -363,6 +406,7 @@ void TrussUnitToolBar::paint ( base_renderer& baseRenderer ) const
     }
 
     QPoint pos = getPosition ();
+
     baseRenderer.blend_from ( toolBarPixf, 0, pos.x() - bufferEmptyArea, 
                               pos.y() - bufferEmptyArea, unsigned(1.0 * 255) );
 

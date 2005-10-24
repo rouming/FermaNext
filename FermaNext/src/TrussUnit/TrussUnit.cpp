@@ -141,14 +141,19 @@ void TrussUnit::setFocusOnPivot ( TrussPivot* selectedPivot )
     setTrussRenderedStatus(false);
 }
 
-void TrussUnit::removeNodesHighlight ()
+/* 
+    Removes highlight from all the truss unit nodes except
+    node1 and node2 if assigned.
+*/
+void TrussUnit::removeNodesHighlight ( const TrussNode* node1,
+                                       const TrussNode* node2 )
 {
     NodeList nodeList = getNodeList ();
     NodeListIter iter = nodeList.begin();
     for ( ; iter != nodeList.end(); ++iter )
     {
         TrussNode* node = *iter;
-        if ( node->isHighlighted () )
+        if ( node->isHighlighted () && node != node1 && node != node2 )
         {
             node->setHighlighted ( false );
             setTrussRenderedStatus(false);
@@ -156,14 +161,14 @@ void TrussUnit::removeNodesHighlight ()
     }
 }
 
-void TrussUnit::removePivotsHighlight ()
+void TrussUnit::removePivotsHighlight ( const TrussPivot* excPivot )
 {
     PivotList pivotList = getPivotList ();
     PivotListIter iter = pivotList.begin();
     for ( ; iter != pivotList.end(); ++iter )
     {
         TrussPivot* pivot = *iter;
-        if ( pivot->isHighlighted () )
+        if ( pivot->isHighlighted () && pivot != excPivot )
         {
             pivot->setHighlighted ( false );
             pivot->getFirstNode().setHighlighted ( false );
@@ -255,7 +260,7 @@ double TrussUnit::getPivotPrecision () const
 }
 
 TrussNode* TrussUnit::findNodeByWidgetPos ( const QPoint& pos, 
-                                                  double precision ) const
+                                            double precision ) const
 {
     QPoint nodePos;
     NodeList nodeList = getNodeList ();
@@ -279,7 +284,7 @@ TrussNode* TrussUnit::findNodeByWidgetPos ( const QPoint& pos ) const
 }
 
 TrussNode* TrussUnit::findNodeByWidgetPos ( int x, int y, 
-                                                  double precision ) const
+                                            double precision ) const
 {
     return findNodeByWidgetPos ( QPoint( x, y ), precision );
 }
@@ -290,7 +295,7 @@ TrussNode* TrussUnit::findNodeByWidgetPos ( int x, int y ) const
 }
 
 TrussPivot* TrussUnit::findPivotByCoord ( const DoublePoint& coord, 
-                                                double precision ) const
+                                          double precision ) const
 {
     DoublePoint firstNodeCoord, lastNodeCoord;
     PivotList pivotList = getPivotList ();
@@ -334,7 +339,7 @@ TrussPivot* TrussUnit::findPivotByWidgetPos ( const QPoint& pos ) const
 }
 
 TrussPivot* TrussUnit::findPivotByWidgetPos ( int x, int y, 
-                                                    double precision ) const
+                                              double precision ) const
 {
     return findPivotByWidgetPos ( QPoint( x, y ), precision );
 }
@@ -361,12 +366,36 @@ void TrussUnit::moveTrussNode ( int x, int y, TrussNode* node )
         newCoord.setY( areaHeight );
 
     node->setPoint( newCoord.x(), newCoord.y() );
-    setTrussRenderedStatus(false);
+
+    // remove highlight from nodes except moved one
+    removeNodesHighlight ( node );
+
+    removePivotsHighlight ();
+
+    // highlight the merging node
+    TrussNode* mergeNode = 0;
+    if ( ! node->isVisible() )
+        mergeNode = nodesMergingComparison( *node, 2 * getNodePrecision(), 
+                                            false );
+    else
+        mergeNode = nodesMergingComparison( *node, 2 * getNodePrecision(), 
+                                            true );
+
+    TrussPivot* divPivot = findDividualPivot( *node, getPivotPrecision() );
+
+    if ( mergeNode )
+        mergeNode->setHighlighted( true );
+
+    else if ( divPivot )
+        divPivot->setHighlighted( true );
+
+
+    setTrussRenderedStatus( false );
 }
 
 void TrussUnit::moveTrussPivot ( int x, int y, TrussPivot* pivot, 
-                                       QPoint firstNodeClickDist, 
-                                       QPoint lastNodeClickDist )
+                                 QPoint firstNodeClickDist, 
+                                 QPoint lastNodeClickDist )
 {
     DoublePoint newCoord = getTrussCoordFromWidgetPos ( x, y );
     double newXFirst = newCoord.x()  + firstNodeClickDist.x();
@@ -374,8 +403,11 @@ void TrussUnit::moveTrussPivot ( int x, int y, TrussPivot* pivot,
     double newXLast = newCoord.x() + lastNodeClickDist.x();
     double newYLast = newCoord.y() + lastNodeClickDist.y();
     
-    const DoublePoint& oldFirstCoord = pivot->getFirstNode().getPoint();
-    const DoublePoint& oldLastCoord  = pivot->getLastNode().getPoint();
+    TrussNode& first = pivot->getFirstNode();
+    TrussNode& last = pivot->getLastNode();
+
+    const DoublePoint& oldFirstCoord = first.getPoint();
+    const DoublePoint& oldLastCoord  = last.getPoint();
     const DoubleSize& size = getTrussAreaSize();
 
     double oldXFirst = oldFirstCoord.x();
@@ -426,14 +458,39 @@ void TrussUnit::moveTrussPivot ( int x, int y, TrussPivot* pivot,
         newYFirst = oldYFirst + ( areaHeight - oldYLast);
     }
 
-    pivot->getFirstNode().setPoint( newXFirst, newYFirst );
-    pivot->getLastNode().setPoint( newXLast, newYLast );
+    first.setPoint( newXFirst, newYFirst );
+    last.setPoint( newXLast, newYLast );
+
+    // remove highlight from nodes except moved one
+    removeNodesHighlight ( &first, &last );
+
+    removePivotsHighlight ( pivot );
+
+    // highlight the merging node
+    TrussNode* mergeNode = nodesMergingComparison( first, 
+                                                   2 * getNodePrecision(), 
+                                                   true );
+    TrussPivot* divPivot = findDividualPivot( first, getPivotPrecision() );
+
+    if ( mergeNode )
+        mergeNode->setHighlighted( true );
+    else if ( divPivot )
+        divPivot->setHighlighted( true );
+
+    mergeNode = nodesMergingComparison( last, 2 * getNodePrecision(), true );
+    divPivot = findDividualPivot( last, getPivotPrecision() );
+
+    if ( mergeNode )
+        mergeNode->setHighlighted( true );
+    else if ( divPivot )
+        divPivot->setHighlighted( true );
+
     setTrussRenderedStatus(false);
 }
 
 TrussNode* TrussUnit::nodesMergingComparison ( TrussNode& comparableNode, 
-                                                     double precision, 
-                                                     bool fixationCheck )
+                                               double precision, 
+                                               bool fixationCheck )
 {
     QPoint nodePos = getWidgetPosFromTrussCoord ( comparableNode.getPoint() );
     TrussNode* node = 0;
@@ -619,10 +676,11 @@ void TrussUnit::dividePivot ( TrussPivot& dividualPivot,
     Finds pivot which is intersected by incoming node, but 
     doesn't divided as yet.
 */
-TrussPivot* TrussUnit::findDividualPivot ( TrussNode& dividingNode ) const
+TrussPivot* TrussUnit::findDividualPivot ( TrussNode& dividingNode,
+                                           double precision ) const
 {
     TrussPivot* dividualPivot = findPivotByCoord ( dividingNode.getPoint(), 
-                                                  2 * getPivotPrecision() );
+                                                   precision );
     if ( ! dividualPivot )
         return 0;
 
@@ -631,6 +689,15 @@ TrussPivot* TrussUnit::findDividualPivot ( TrussNode& dividingNode ) const
         return 0;
 
     return dividualPivot;
+}
+
+/*
+    Finds pivot which is intersected by incoming node, but 
+    doesn't divided as yet. Half precision is used by default.
+*/
+TrussPivot* TrussUnit::findDividualPivot ( TrussNode& dividingNode ) const
+{
+    return findDividualPivot( dividingNode, 2 * getPivotPrecision() );
 }
 
 
@@ -788,7 +855,7 @@ void TrussUnit::updateNodePosition ( TrussNode* selectedNode,
     adjoining pivots relative to other truss elements.
 */
 void TrussUnit::updateAfterNodeManipulation ( TrussNode* selectedNode, 
-                                                    bool fixationCheck )
+                                              bool fixationCheck )
 {
     int numb = selectedNode->getNumber();
 
@@ -808,7 +875,7 @@ void TrussUnit::updateAfterNodeManipulation ( TrussNode* selectedNode,
     pivots of its nodes relative to other truss elements.
 */
 void TrussUnit::updateAfterPivotManipulation ( TrussPivot* selectedPivot,
-                                                     bool fixationCheck )
+                                               bool fixationCheck )
 {
     TrussNode& first = selectedPivot->getFirstNode();
     TrussNode& last = selectedPivot->getLastNode();
@@ -904,10 +971,10 @@ void TrussUnit::drawLoad ( ren_dynarow& baseRend, const TrussLoad& load,
 }
 
 void TrussUnit::drawNodeNumber( TrussNode* node, 
-                                      ren_dynarow& baseRend, 
-                                      solidRenderer& solidRend, 
-                                      scanline_rasterizer& ras, 
-                                      agg::scanline_p8& sl ) const
+                                ren_dynarow& baseRend, 
+                                solidRenderer& solidRend, 
+                                scanline_rasterizer& ras, 
+                                agg::scanline_p8& sl ) const
 {
     if ( ! node->isVisible() )
         return;

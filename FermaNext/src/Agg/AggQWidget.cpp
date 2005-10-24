@@ -135,23 +135,6 @@ agg::rendering_buffer& AggQWidget::getAggRenderingBuffer ()
     return aggBuffer;
 }
 
-agg::rasterizer_scanline_aa<>& AggQWidget::getAggRasterizerScanline ()
-{
-    return aggRas;
-}
-
-agg::scanline_p8& AggQWidget::getAggScanline ()
-{
-    return aggScanline;
-}
-
-agg::trans_affine AggQWidget::getAggResizeMatrix ()
-{
-    return agg::trans_affine_scaling(
-                      double(width()) / double(initialWidth),
-                      double(height()) /double(initialHeight) );
-}
-
 QImage& AggQWidget::getMainImage ()
 {
     return *mainQImage;
@@ -164,6 +147,7 @@ QImage& AggQWidget::getMainImage ()
 void AggQWidget::paintEvent ( QPaintEvent* event )
 {
     BEGIN_BENCHMARK("AggQWidget::paintEvent");
+
     // Notice other agg paintable elements 
     aggPaintEvent( event );
 
@@ -192,7 +176,7 @@ void AggQWidget::resizeEvent ( QResizeEvent* event )
                       mainQImage->height(), 
                       aggFlipY ?  mainQImage->bytesPerLine() : 
                                  -mainQImage->bytesPerLine() );
-	
+
     // Notice other agg paintable elements 
     aggResizeEvent( event ); 
 }

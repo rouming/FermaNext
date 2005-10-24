@@ -15,7 +15,7 @@ public:
                          agg::scanline_p8& sl, solidRenderer& solidRend  ) const;
 
 protected slots:
-    void setWindowHighlightStatus ( bool );
+    void setButtonHighlightType ( bool );
 
 private:
     mutable pathRenderer pathRend;

@@ -21,9 +21,14 @@ TrussUnitWindowButton::TrussUnitWindowButton ( const QPoint& pos,
 TrussUnitWindowButton::~TrussUnitWindowButton ()
 {}
 
-void TrussUnitWindowButton::setWindowHighlightStatus ( bool status )
+/*
+    Gets flag type to draw button highlight in colors, 
+    corresponding to the truss unit window current 
+    highlight status.
+*/
+void TrussUnitWindowButton::setButtonHighlightType ( bool type )
 {
-    windowHighlighted = status;
+    windowHighlighted = type;
 }
 
 void TrussUnitWindowButton::paint ( ren_dynarow& baseRend, 
