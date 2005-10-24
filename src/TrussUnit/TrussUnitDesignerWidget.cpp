@@ -2,6 +2,7 @@
 #include "TrussUnitDesignerWidget.h"
 #include "SubsidiaryConstants.h"
 #include "TrussUnitActions.h"
+#include "AggPopupHint.h"
 
 #include <algorithm>
 #include <vector>
@@ -94,9 +95,16 @@ TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
     firstNodeClickDist(0,0), 
     lastNodeClickDist(0,0),
     toolBar( new TrussUnitToolBar( QPoint(0,0), 15, 15, 8, 5, 5, 30, this ) ),
+    aggHint( new AggPopupHint( *this ) ),
     // Temp
     X(50), Y(50)
 {
+    QObject::connect( toolBar, SIGNAL(onHintShowsUp(const QString&,const QPoint,bool)),
+                      aggHint, SLOT(show(const QString&,const QPoint,bool)) );
+
+    QObject::connect( toolBar, SIGNAL( onHintHides(bool) ),
+                      aggHint, SLOT( hide(bool) ) );
+
     QWidget::setFocus();
     QWidget::setMouseTracking( true );
     initToolBar();
@@ -129,9 +137,22 @@ void TrussUnitDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow 
     QObject::connect( &trussWindow, SIGNAL(onBeforeDesist(StatefulObject&)), 
                                     SLOT(trussWindowDesisted(StatefulObject&)) );
 
+    QObject::connect( &trussWindow, SIGNAL(onHintShowsUp(const QString&, 
+                                                         const QPoint,bool)),
+                           aggHint, SLOT(show(const QString&,const QPoint,bool)) );
+    QObject::connect( &trussWindow, SIGNAL(onHintShowsUp(const QString&, 
+                                                         const QPoint,bool)),
+                                    SLOT( update() ) );
+
+    QObject::connect( &trussWindow, SIGNAL( onHintHides(bool) ),
+                           aggHint, SLOT( hide(bool) ) );
+    QObject::connect( &trussWindow, SIGNAL( onHintHides(bool) ),
+                                    SLOT( update() ) );
+
     trussWindows.push_back(&trussWindow);
     trussWindow.setWindowPosition ( QPoint( X, Y ) );
     focusOnWindow(trussWindow);
+    trussWindow.setMaxSize( width(), height() );
 }
 
 bool TrussUnitDesignerWidget::removeTrussUnitWindow ( TrussUnitWindow& window )
@@ -160,32 +181,32 @@ void TrussUnitDesignerWidget::initToolBar ()
                         bufferEmptyArea + toolBar->getBorderTop() );
     toolBar->addButton ( imagesSvgPath() + "/arrowIcon.svg", "Arrow", leftTopPos, 
                          buttonWidth, buttonHeight, this, SIGNAL( pressSelectButton() ),
-                         SLOT( changeBehaviourToSelect() ) );
+                         SLOT( changeBehaviourToSelect() ) ).setHint("Select 'Esc'");
 
     leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation);
     toolBar->addButton ( imagesSvgPath() + "/nodeIcon.svg", "Node", leftTopPos, 
                          buttonWidth,buttonHeight, this, SIGNAL( pressNodeDrawButton() ),
-                         SLOT( changeBehaviourToNodeDraw() ) );
+                         SLOT( changeBehaviourToNodeDraw() ) ).setHint("Draw node 'N'");
 
     leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
     toolBar->addButton ( imagesSvgPath() + "/pivotIcon.svg", "Pivot", leftTopPos, 
                          buttonWidth, buttonHeight, this, SIGNAL( pressPivotDrawButton() ),
-                         SLOT(changeBehaviourToPivotDraw()) );
+                         SLOT(changeBehaviourToPivotDraw()) ).setHint("Draw pivot 'P'");
 
     leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
     toolBar->addButton ( imagesSvgPath() + "/fixIcon.svg", "Fixation", leftTopPos, 
                          buttonWidth, buttonHeight, this, SIGNAL( pressFixDrawButton() ), 
-                         SLOT( changeBehaviourToFixDraw() ) );
+                         SLOT( changeBehaviourToFixDraw() ) ).setHint("Set node fixation 'F'");
 
     leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
     toolBar->addButton ( imagesSvgPath() + "/forceIcon.svg", "Load", leftTopPos, 
                          buttonWidth, buttonHeight, this, SIGNAL( pressLoadDrawButton() ),
-                         SLOT( changeBehaviourToLoadDraw() ) );
+                         SLOT( changeBehaviourToLoadDraw() ) ).setHint("Load node 'L'");
 
     leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
     toolBar->addButton ( imagesSvgPath() + "/eraseIcon.svg", "Erase", leftTopPos, 
                          buttonWidth, buttonHeight, this, SIGNAL( pressEraseButton() ),
-                         SLOT( changeBehaviourToErase() ) );
+                         SLOT( changeBehaviourToErase() ) ).setHint("Erase 'E'");
 }
 
 void TrussUnitDesignerWidget::changeBehaviourToSelect ()
@@ -439,19 +460,20 @@ bool TrussUnitDesignerWidget::nodeCanBeDrawn ( int x, int y )
     return false;
 }
 
-void TrussUnitDesignerWidget::saveNodeStateAfterDrag ( DoublePoint pos )
+void TrussUnitDesignerWidget::saveNodeStateAfterDrag ( TrussNode& node,
+                                                       const DoublePoint& pos )
 {
     // Actually nothing to save.
-    if ( selectedNode == 0 )
+    if ( &node == 0 )
         return;
     // Similar points. Nothing to save.
     if ( pos == beforeDragNodePos )
         return;
 
     // Save move node action
-    ObjectState& state = selectedNode->createState( "move node" );
+    ObjectState& state = node.createState( "move node" );
     state.addAction( new ConcreteObjectAction<TrussNode, DoublePoint>( 
-                                                     *selectedNode, 
+                                                     node, 
                                                      &TrussNode::setPoint,
                                                      &TrussNode::setPoint,
                                                      pos,
@@ -477,21 +499,22 @@ void TrussUnitDesignerWidget::saveNodeStateAfterRemove ( TrussNode& node )
     state.save();
 }
 
-void TrussUnitDesignerWidget::savePivotStateAfterDrag ( DoublePoint firstPos, 
-                                                        DoublePoint lastPos )
+void TrussUnitDesignerWidget::savePivotStateAfterDrag ( TrussPivot& pivot,
+                                                        const DoublePoint& firstPos, 
+                                                        const DoublePoint& lastPos )
 {
     // Actually nothing to save.
-    if ( selectedPivot == 0 )
+    if ( &pivot == 0 )
         return;
     // Similar points. Nothing to save.
     if ( firstPos == beforeDragFirstPos && 
          lastPos == beforeDragLastPos )
         return;
 
-    TrussNode& firstNode = selectedPivot->getFirstNode();
-    TrussNode& lastNode  = selectedPivot->getLastNode();    
+    TrussNode& firstNode = pivot.getFirstNode();
+    TrussNode& lastNode  = pivot.getLastNode();    
 
-    ObjectStateManager* mng = selectedPivot->getStateManager();
+    ObjectStateManager* mng = pivot.getStateManager();
     mng->startStateBlock();
     
     // First node pos state to save
@@ -557,6 +580,7 @@ void TrussUnitDesignerWidget::aggPaintEvent ( QPaintEvent* )
             w->paint( baseRend );
     }
     toolBar->paint ( baseRend );
+    aggHint->paint ( baseRend );
 }
 
 void TrussUnitDesignerWidget::aggResizeEvent ( QResizeEvent* )
@@ -749,7 +773,6 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         clickX += dx;
         clickY += dy;
     }
-
     else
     {
         if ( designerBehaviour == onNodeDraw || 
@@ -760,6 +783,26 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                 QWidget::setCursor ( Qt::CrossCursor );
             else
                 QWidget::setCursor ( Qt::ArrowCursor );
+
+            TrussUnitWindow* w = findWindowByWidgetPos( x, y );
+            if ( w )
+            {
+                removeTrussElemHighlight ();
+                TrussNode* node = w->findNodeByWidgetPos( x, y );
+                TrussPivot* pivot = 
+                    w->findPivotByWidgetPos( x, y, 2 * w->getPivotPrecision() );
+                if ( node )
+                {
+                    w->setFocusOnNode( node );
+                    update();
+                }
+                else if ( pivot )
+                {
+                    
+                    w->setFocusOnPivot ( pivot );
+                    update();
+                }
+            }
         }
 
         TrussUnitWindow* window = findWindowByWidgetPos ( x, y );
@@ -891,6 +934,7 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
     int x = me->x();
     int y = flipY ? height() - me->y() : me->y();
 
+    removeTrussElemHighlight();
     if ( designerBehaviour == onPivotLastNodeDraw )
     {
         selectedPivot->getLastNode().setVisible ( true );
@@ -916,7 +960,7 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         mng->startStateBlock();
 
         // Save state in Undo/Redo stack
-        saveNodeStateAfterDrag( selectedNode->getPoint() );
+        saveNodeStateAfterDrag( *selectedNode, selectedNode->getPoint() );
         selectedWindow->updateAfterNodeManipulation ( selectedNode, true );
 
         mng->endStateBlock();
@@ -927,7 +971,6 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         if ( window && window == selectedWindow )
         {
             selectedNode = window->findNodeByWidgetPos( x, y );
-            window->removeNodesHighlight ();
             if ( !selectedNode )
                 nodeBehaviour = nodeIdle;
             else
@@ -935,7 +978,6 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         }
         else
         {
-            removeTrussElemHighlight ();
             selectedNode = 0;
             nodeBehaviour = nodeIdle;
         }
@@ -950,7 +992,7 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         mng->startStateBlock();
 
         // Save state in Undo/Redo stack
-        savePivotStateAfterDrag( firstPos, lastPos );
+        savePivotStateAfterDrag( *selectedPivot, firstPos, lastPos );
         selectedWindow->updateAfterPivotManipulation ( selectedPivot, true );
 
         mng->endStateBlock();
@@ -960,7 +1002,6 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         TrussUnitWindow* window = findWindowByWidgetPos ( x, y );
         if ( window && window == selectedWindow )
         {
-            window->removePivotsHighlight();
             selectedPivot = window->findPivotByWidgetPos( x, y );
             if ( !selectedPivot )
                 pivotBehaviour = pivotIdle;
@@ -969,7 +1010,6 @@ void TrussUnitDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         }
         else
         {
-            removeTrussElemHighlight ();
             selectedPivot = 0;
             pivotBehaviour = pivotIdle;
         }

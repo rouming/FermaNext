@@ -1,6 +1,7 @@
 
 #include "TrussUnitWindow.h"
 #include "TrussUnitActions.h"
+#include "qtimer.h"
 
 /*****************************************************************************
  * Truss Unit Window
@@ -24,39 +25,36 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name,
     coordBuf( new rbuf_dynarow( 100, 10 ) ),
     numbersBuf( new rbuf_dynarow( 60, 10 ) ),
     buttonBuf( new rbuf_dynarow( 36, 16 ) ),
-    hideButton( new TrussUnitWindowButton( QPoint( 22, 1 ),
+    hideButton( new TrussUnitWindowButton( QPoint( 15, 1 ),
                 imagesSvgPath() + "/closeIcon.svg" ) ),
-    rollUpButton( new TrussUnitWindowButton( QPoint( 7, 1 ),
+    rollUpButton( new TrussUnitWindowButton( QPoint( 1, 1 ),
                   imagesSvgPath() + "/rollUpIcon.svg" ) ),
+    currentPressedButton( 0 ),
+    currentHintedButton( 0 ),
+    timer( new QTimer( this ) ),
     maximized(false)
 {
     const QPoint& pixAreaSize = getTrussAreaRightBottomPos() -
                                 getTrussAreaLeftTopPos();
     setTrussAreaSizeInPix( QSize(pixAreaSize.x(),pixAreaSize.y()) );
 
-    QObject::connect( hideButton, SIGNAL( onButtonHighlightChange() ),
-                      SLOT( clearButtonBufRenderedFlag() ) );
+    hideButton->setHint( "Hide truss unit" );
+    rollUpButton->setHint( "Maximize truss unit" );
 
-    QObject::connect( rollUpButton, SIGNAL( onButtonHighlightChange() ),
-                      SLOT( clearButtonBufRenderedFlag() ) );
+    QObject::connect( hideButton, SIGNAL( onChangeButtonState() ),
+                                  SLOT( clearButtonBufRenderedFlag() ) );
 
-    QObject::connect( hideButton, SIGNAL( onButtonPress() ),
-                      SLOT( clearButtonBufRenderedFlag() ) );
-
-    QObject::connect( rollUpButton, SIGNAL( onButtonPress() ),
-                      SLOT( clearButtonBufRenderedFlag() ) );
-
-    QObject::connect( hideButton, SIGNAL( onButtonRelease() ),
-                      SLOT( clearButtonBufRenderedFlag() ) );
-
-    QObject::connect( rollUpButton, SIGNAL( onButtonRelease() ),
-                      SLOT( clearButtonBufRenderedFlag() ) );
+    QObject::connect( rollUpButton, SIGNAL( onChangeButtonState() ),
+                                    SLOT( clearButtonBufRenderedFlag() ) );
 
     QObject::connect( this, SIGNAL( onHighlightChange( bool ) ),
-                      hideButton, SLOT( setWindowHighlightStatus( bool ) ) );
+                      hideButton, SLOT( setButtonHighlightType( bool ) ) );
 
     QObject::connect( this, SIGNAL( onHighlightChange( bool ) ),
-                      rollUpButton, SLOT( setWindowHighlightStatus( bool ) ) );
+                      rollUpButton, SLOT( setButtonHighlightType( bool ) ) );
+
+    QObject::connect( timer, SIGNAL( timeout() ),
+                             SLOT( setWindowButtonHinted() ) );
 
     setCanvasColor( 8, 10, 12 );
     setHighlighted( false );    
@@ -147,7 +145,7 @@ void TrussUnitWindow::setWindowPosition ( QPoint pos )
 */
 QPoint TrussUnitWindow::getButtonBufPos () const
 {
-    return QPoint( windowRightBottomPos.x() - 54, 
+    return QPoint( windowRightBottomPos.x() - 46, 
                    windowLeftTopPos.y() + 4 );
 }
 
@@ -225,6 +223,8 @@ void TrussUnitWindow::maximize ( bool saveOldSize )
     }
     resize ( QPoint( 0, 0 ), 
              QPoint( maxSize.width(), maxSize.height() ) );
+
+    rollUpButton->setHint( "Minimize truss unit" );
     maximized = true;
 }
 
@@ -235,8 +235,9 @@ void TrussUnitWindow::maximize ( bool saveOldSize )
 void TrussUnitWindow::minimize ()
 {
     removeButtonsHighlight();
-
     resize ( minLeftTopPos, minRightBottomPos );
+
+    rollUpButton->setHint( "Maximize truss unit" );
     maximized = false;
 }
 
@@ -328,8 +329,7 @@ bool TrussUnitWindow::inHeadlineRect ( int x, int y ) const
          x <= windowRightBottomPos.x() - 3 * bordWidth && y >= 
          windowLeftTopPos.y() + bordWidth && 
          y <= windowLeftTopPos.y() + headWidth + bordWidth / 2 &&
-         ! inHideButtonRect( x, y ) && 
-         ! inRollUpButtonRect( x, y ) )
+         ! inButtonsRect( x, y ) )
     {
         return true;
     }
@@ -430,14 +430,22 @@ bool TrussUnitWindow::inFDiagResizeRect ( int x, int y )
     return false;
 }
 
+void TrussUnitWindow::setWindowButtonHinted ()
+{
+    hinted = true;
+    if( currentHintedButton )
+        emit onHintShowsUp( currentHintedButton->getHint(), 
+                            hintCurrentPos, false );
+}
+
 bool TrussUnitWindow::inHideButtonRect ( int x, int y ) const
 {
     QPoint widgetPos( x, y );
     // inner buffer cordinates
     QPoint pos = widgetPos - getButtonBufPos();    
-   if ( hideButton->inButtonRect( pos.x(), pos.y() ) )
-       return true;
-   return false;
+    if ( hideButton->inButtonRect( pos.x(), pos.y() ) )
+        return true;
+    return false;
 }
 
 bool TrussUnitWindow::inRollUpButtonRect ( int x, int y ) const
@@ -445,26 +453,89 @@ bool TrussUnitWindow::inRollUpButtonRect ( int x, int y ) const
     QPoint widgetPos( x, y );
     // inner buffer cordinates
     QPoint pos = widgetPos - getButtonBufPos();    
-   if ( rollUpButton->inButtonRect( pos.x(), pos.y() ) )
-       return true;
-   return false;
+    if ( rollUpButton->inButtonRect( pos.x(), pos.y() ) )
+        return true;
+    return false;
+}
+
+bool TrussUnitWindow::inButtonsRect ( int x, int y ) const
+{
+    QPoint rectLeftTopPnt = getButtonBufPos();
+    QPoint rectRightBottomPnt( rectLeftTopPnt.x() + 2 + 
+                               rollUpButton->getWidth() +
+                               hideButton->getWidth(),
+                               rectLeftTopPnt.y() + 1 +
+                               rollUpButton->getHeight() ); 
+
+    if ( x > getButtonBufPos().x() && x < rectRightBottomPnt.x() &&
+         y > getButtonBufPos().y() && y < rectRightBottomPnt.y() )
+         return true;
+    return false;
 }
 
 void TrussUnitWindow::checkMouseMoveEvent ( int x, int y, bool mousePressed )
 {
+    if ( timer->isActive() )
+        timer->stop();
+
     removeButtonsHighlight();
 
     if ( inHideButtonRect( x, y ) )
     {
         hideButton->setHighlighted( true );
-        if( mousePressed )
+        if( mousePressed && hideButton == currentPressedButton )
+        {
             hideButton->setPressed( true );
+        }
+        else if ( hinted )
+        {
+            if ( hideButton != currentHintedButton )
+            {
+                currentHintedButton = hideButton;
+                hintCurrentPos = QPoint( x, y );
+                emit onHintShowsUp( currentHintedButton->getHint(), 
+                                    hintCurrentPos, false );
+            }
+        }
+        else
+        {
+            currentHintedButton = hideButton;
+            hintCurrentPos = QPoint( x, y );
+            timer->start( 1000, false );
+        }
     }
     else if ( inRollUpButtonRect( x, y ) )
     {
         rollUpButton->setHighlighted( true );
-        if( mousePressed )
+        if( mousePressed && currentPressedButton == rollUpButton )
+        {
             rollUpButton->setPressed( true );
+        }
+        else if ( hinted )
+        {
+            if ( rollUpButton != currentHintedButton )
+            {
+                currentHintedButton = rollUpButton;
+                hintCurrentPos = QPoint( x, y );
+                emit onHintShowsUp( currentHintedButton->getHint(), 
+                                    hintCurrentPos, false );
+            }
+        }
+        else
+        {
+            currentHintedButton = rollUpButton;
+            hintCurrentPos = QPoint( x, y );
+            timer->start( 1000, false );
+        }
+    }
+    else if ( ! inButtonsRect( x, y ) )
+    {
+        if ( hinted )
+        {
+            hinted = false;
+            currentHintedButton = 0;
+            emit onHintHides( false );
+        }
     }
 }
 
@@ -472,10 +543,23 @@ void TrussUnitWindow::checkMousePressEvent ( int x, int y )
 {
     releaseButtons();
 
+    if ( hinted )
+    {
+        hinted = false;
+        currentHintedButton = 0;
+        emit onHintHides( false );
+    }
+
     if ( inHideButtonRect( x, y ) )
+    {
         hideButton->setPressed( true );
+        currentPressedButton = hideButton;
+    }
     else if ( inRollUpButtonRect( x, y ) )
+    {
         rollUpButton->setPressed( true );
+        currentPressedButton = rollUpButton;
+    }
 }
 
 void TrussUnitWindow::checkMouseReleaseEvent ( int x, int y )
@@ -485,6 +569,7 @@ void TrussUnitWindow::checkMouseReleaseEvent ( int x, int y )
         if ( hideButton->isPressed() )
         {
             hideButton->setPressed( false );
+            currentPressedButton = 0;
             hide();
         }
     }
@@ -493,6 +578,7 @@ void TrussUnitWindow::checkMouseReleaseEvent ( int x, int y )
         if ( rollUpButton->isPressed() )
         {
             rollUpButton->setPressed( false );
+            currentPressedButton = 0;
             if ( maximized )
                 minimize ();
             else

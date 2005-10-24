@@ -4,10 +4,7 @@
 
 #include "AggButton.h"
 #include "AggSubsidiary.h"
-#include "qstring.h"
-#include "qpoint.h"
-#include "qsize.h"
-#include <qobject.h>
+#include "AggPaintThread.h"
 #include <vector>
 
 /*****************************************************************************/
@@ -19,9 +16,13 @@ public:
                        QPoint leftTopPos, int width, int height );
     virtual ~AggToolBarButton ();
 
-    virtual void paint ( ren_dynarow& baseRend, scanline_rasterizer& ras,
-                         agg::scanline_p8& sl, solidRenderer& solidRend,
-                         agg::trans_affine& mtx, double scaleX, double scaleY  ) const;
+    virtual void paint ( ren_dynarow& baseRend, 
+                         scanline_rasterizer& ras,
+                         agg::scanline_p8& sl, 
+                         solidRenderer& solidRend,
+                         agg::trans_affine& mtx, 
+                         double scaleX, double scaleY  ) const;
+
 private:
     mutable pathRenderer pathRend;
     color_type fillCol, lineCol, highlightFill, highlightLine;
@@ -41,7 +42,7 @@ public:
                                           const QString& label, 
                                           QPoint leftTopPos, 
                                           uint width, uint height, 
-                                          QObject* widget, 
+                                          QWidget* widget, 
                                           const char* signal, 
                                           const char* slot );
     virtual void removeButton ( const QString& label );
@@ -66,6 +67,9 @@ public:
 
     virtual int getWidth () const;
     virtual int getHeight () const;
+
+    virtual bool isHinted () const;
+    virtual void setHinted ( bool );
 
     virtual bool isVisible () const;
     virtual void setVisible ( bool );
@@ -99,7 +103,6 @@ protected:
     virtual void setRendered ( bool ) const;
 
 private:
-    bool visible;
     ButtonList buttons;
     // tool bar main geometry
     QPoint toolBarLeftTopPos, centerPos;
@@ -107,6 +110,7 @@ private:
     uint toolBarWidth, toolBarHeight;
     mutable rbuf_dynarow* toolBarBuf;
     mutable bool renderedFlag;
+    bool visible, hinted;
 };
 
 #endif //AGGTOOLBAR_H

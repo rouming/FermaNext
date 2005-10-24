@@ -6,7 +6,7 @@
  *****************************************************************************/
 
 AggToolBarButton::AggToolBarButton ( const QString& fname, const QString& l, 
-                                     QPoint pos, int w, int h  ) :
+                                     QPoint pos, int w, int h ) :
     AggButton ( l, pos, w, h ),
     fillCol( agg::rgba( 0, 0, 0, 0.3 ) ),
     lineCol( agg::rgba( 0, 0, 0 ) ), 
@@ -19,9 +19,12 @@ AggToolBarButton::AggToolBarButton ( const QString& fname, const QString& l,
 AggToolBarButton::~AggToolBarButton ()
 {}
 
-void AggToolBarButton::paint ( ren_dynarow& baseRend, scanline_rasterizer& ras,
-                               agg::scanline_p8& sl, solidRenderer& solidRend,
-                               agg::trans_affine& mtx, double scaleX, double scaleY ) const
+void AggToolBarButton::paint ( ren_dynarow& baseRend, 
+                               scanline_rasterizer& ras,
+                               agg::scanline_p8& sl, 
+                               solidRenderer& solidRend,
+                               agg::trans_affine& mtx, 
+                               double scaleX, double scaleY ) const
 {
     QPoint pos = getPosition ();
     int width = getWidth ();
@@ -33,17 +36,21 @@ void AggToolBarButton::paint ( ren_dynarow& baseRend, scanline_rasterizer& ras,
     {
         primRend.fill_color ( fillCol );
         primRend.line_color ( lineCol );
-        primRend.outlined_rectangle ( pos.x() + 1, pos.y() + 1, pos.x() + width - 1, 
+        primRend.outlined_rectangle ( pos.x() + 1, pos.y() + 1, 
+                                      pos.x() + width - 1, 
                                       pos.y() + height - 1 );
     }   
     else if ( isHighlighted() )
     {
         primRend.fill_color ( highlightFill );
         primRend.line_color ( highlightLine );
-        primRend.outlined_rectangle ( pos.x(), pos.y(), pos.x() + width, pos.y() + height );
+        primRend.outlined_rectangle ( pos.x(), pos.y(), 
+                                      pos.x() + width, 
+                                      pos.y() + height );
     }
     QPoint iconPos( int((pos.x() + width/4) / scaleX), 
                     int((pos.y() + height/8) / scaleY) );
+
     drawSvg ( baseRend, ras, sl, pathRend, solidRend, mtx, iconPos.x(), 
               iconPos.y(), scaleX, scaleY, svgExpand, svgGamma );
 }
@@ -65,7 +72,8 @@ AggToolBar::AggToolBar( QPoint pos, int bordLeft, int bordRight, int bordTop,
     // for the different agg effects
     toolBarBuf( new rbuf_dynarow( bordLeft + bordRight + 2 * bufferEmptyArea,
                                   bordTop + bordBottom + bufferEmptyArea ) ),
-    renderedFlag(false)
+    renderedFlag(false),
+    hinted(false)
 {
     toolBarWidth = bordLeft + bordRight + separation_;
     toolBarHeight = bordTop + bordBottom;
@@ -74,7 +82,7 @@ AggToolBar::AggToolBar( QPoint pos, int bordLeft, int bordRight, int bordTop,
     toolBarLeftTopPos.setY( centerPos.y() - toolBarHeight );
 
     QObject::connect( this, SIGNAL( onChangeToolBarState() ),
-                      SLOT( clearToolBarRenderedFlag() ) );
+                            SLOT( clearToolBarRenderedFlag() ) );
 }
 
 AggToolBar::~AggToolBar ()
@@ -95,15 +103,12 @@ AggToolBarButton& AggToolBar::addButton ( const QString& fname,
                                           const QString& label, 
                                           QPoint leftTopPos, 
                                           uint buttonWidth, uint buttonHeight, 
-                                          QObject* widget,  const char* signal,
+                                          QWidget* widget,  const char* signal,
                                           const char* slot )
 {
     AggToolBarButton* button = new AggToolBarButton( fname, label, leftTopPos, 
                                                      buttonWidth, buttonHeight );
     buttons.push_back ( button );
-
-    QObject::connect( button, SIGNAL( onButtonHighlightChange() ),
-                      SLOT( clearToolBarRenderedFlag() ) );
 
     QObject::connect( button, SIGNAL( onButtonPress() ),
                       SLOT( releaseButtons() ) );
@@ -335,6 +340,19 @@ int AggToolBar::getHeight () const
 rbuf_dynarow& AggToolBar::getRenderingBuffer () const
 {
     return *toolBarBuf;
+}
+
+bool AggToolBar::isHinted () const
+{
+    return hinted;
+}
+
+void AggToolBar::setHinted ( bool status )
+{
+    if ( hinted == status )
+        return;
+
+    hinted = status;
 }
 
 bool AggToolBar::isVisible () const

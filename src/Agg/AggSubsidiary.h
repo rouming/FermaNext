@@ -8,7 +8,13 @@
 #include "agg_conv_shorten_path.h"
 #include "agg_conv_marker_adaptor.h"
 #include "agg_conv_concat.h"
+#include "agg_conv_curve.h"
+#include "agg_conv_contour.h"
+#include "agg_conv_smooth_poly1.h"
+#include "agg_path_storage.h"
+#include "agg_vertex_sequence.h"
 #include "agg_vcgen_markers_term.h"
+#include "agg_vcgen_smooth_poly1.h"
 #include "agg_arrowhead.h"
 #include "agg_glyph_raster_bin.h"
 #include "agg_renderer_raster_text.h"
@@ -68,6 +74,7 @@ typedef agg::renderer_primitives<ren_dynarow>               primitivesRenderer;
 
 class QString;
 class QPoint;
+class QSize;
 
 /*****************************************************************************/
 
@@ -112,6 +119,11 @@ void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
 void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
                 agg::scanline_p8& sl, const QPoint& point1, 
                 const QPoint& point2 );
+
+void drawCurve ( scanline_rasterizer& ras, solidRenderer& solidRend,
+                 agg::scanline_p8& sl, const QPoint& point1, 
+                 const QPoint& point2, const QPoint& point3, 
+                 int width, color_type col );
 
 void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
                  agg::scanline_p8& sl, const QPoint& tail, 

@@ -7,6 +7,8 @@
 #include "TrussUnitToolBar.h"
 #include <qpopupmenu.h>
 
+class AggPopupHint;
+
 class FixationPopupMenu : public QPopupMenu
 {
     Q_OBJECT
@@ -61,11 +63,12 @@ protected:
     virtual bool nodeCanBeDrawn ( int x, int y );
 
     // Save states to Undo/Redo stack
-    virtual void saveNodeStateAfterDrag ( DoublePoint );
+    virtual void saveNodeStateAfterDrag ( TrussNode&, const DoublePoint& );
     virtual void saveNodeStateAfterCreate ( TrussNode& );
     virtual void saveNodeStateAfterRemove ( TrussNode& );
-    virtual void savePivotStateAfterDrag ( DoublePoint first, 
-                                           DoublePoint last );
+    virtual void savePivotStateAfterDrag ( TrussPivot& pivot,
+                                           const DoublePoint& first, 
+                                           const DoublePoint& last );
     virtual void savePivotStateAfterCreate ( TrussNode& firstNode, 
                                              bool firstPivotWasCreated,
                                              TrussNode& lastNode, 
@@ -152,6 +155,7 @@ private:
     DoublePoint beforeDragFirstPos, beforeDragLastPos;
 
     TrussUnitToolBar* toolBar;
+    AggPopupHint* aggHint;
 
     // TODO: in future to remove
     int X, Y; //temp    
