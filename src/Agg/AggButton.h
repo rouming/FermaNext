@@ -50,7 +50,7 @@ protected slots:
 
 private:
     int width, height;
-    bool pressed, highlighted, hinted;
+    bool pressed, highlighted;
     // leftTopPos - button position in inner dynarow buffer coords
     QPoint leftTopPos;
     QString label, hint;

@@ -95,10 +95,6 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;f90;for;f;fpp"
 # Begin Source File
 
-SOURCE=..\Agg\AggSubsidiary.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\..\gui\CalcDataToolBar.cpp
 # End Source File
 # Begin Source File
@@ -350,7 +346,7 @@ SOURCE=..\gui\UndoRedoListBox.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=..\gui\UndoRedoListBox.h
 InputName=UndoRedoListBox
 
@@ -363,7 +359,7 @@ InputName=UndoRedoListBox
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=..\gui\UndoRedoListBox.h
 InputName=UndoRedoListBox
 

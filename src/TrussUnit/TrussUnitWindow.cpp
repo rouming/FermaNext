@@ -72,6 +72,7 @@ TrussUnitWindow::~TrussUnitWindow ()
     delete buttonBuf;
     delete hideButton;
     delete rollUpButton;
+    delete timer;
 }
 
 /* 

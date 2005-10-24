@@ -47,7 +47,7 @@ extern const bool flipY;
  * Truss Unit Tool Bar Consts
  ************************************/
 
-extern const uint bufferEmptyArea, 
+extern const int bufferEmptyArea, 
                   buttonHeight,
                   buttonWidth,
                   pixHideNumb;
