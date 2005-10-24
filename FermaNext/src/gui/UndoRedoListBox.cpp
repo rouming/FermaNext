@@ -43,7 +43,8 @@ void UndoRedoListBox::setStateManager ( ObjectStateManager* newMng )
 void UndoRedoListBox::clickOnItem ( QListBoxItem* item )
 {
     int itemIndx = index( item );
-    if ( itemIndx == -1 || stateManager == 0 )
+    if ( itemIndx == -1 || stateManager == 0 || 
+         stateManager->countStateBlocks() == 0 )
         return;
     stateManager->step( itemIndx );
 }
