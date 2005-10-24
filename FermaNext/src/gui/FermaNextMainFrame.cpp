@@ -67,8 +67,7 @@ void FermaNextMainFrame::init ()
     statusBar()->addWidget(new QLabel( tr("Ready"), statusBar() ));
 
     undoRedoHistoryWidget = new QWidget( this, "undo_redo_history",
-                                         WStyle_StaysOnTop | WStyle_Tool | 
-                                         WType_TopLevel );
+                                         WStyle_Tool | WType_TopLevel );
 
     int undoRedoWidth = 140, undoRedoHeight = 110;
     undoRedoHistoryWidget->setFixedSize( undoRedoWidth, undoRedoHeight );
