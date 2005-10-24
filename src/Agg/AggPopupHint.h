@@ -18,9 +18,11 @@ public:
     AggPopupHint ( QWidget& widget );
     virtual ~AggPopupHint ();
 
+    virtual void renewWidgetSize ( const QSize& );
+
     virtual void paint ( base_renderer& baseRenderer ) const;
 
-public slots:
+protected slots:
     virtual void show ( const QString&, const QPoint, bool );
     virtual void hide ( bool );
 
@@ -34,7 +36,7 @@ private:
     QString text_;
     textFont font_;
     QPoint cursorPos_;
-    QSize size_;
+    QSize size_, widgetSize_;
     double alphaCoeff; // alpha coefficient for smooth changing 
                        // of alpha channel
     SmoothType smooth_;
