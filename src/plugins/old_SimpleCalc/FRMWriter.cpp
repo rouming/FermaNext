@@ -17,6 +17,7 @@ void FRMWriter::write ( const QString& name )
     if ( ! file.open( IO_WriteOnly ) ) {
         return;
     } 
+    file.reset();
 
     QTextStream out( &file );
     out.setEncoding( QTextStream::Latin1 );
