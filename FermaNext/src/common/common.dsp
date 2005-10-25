@@ -26,6 +26,7 @@ CFG=common - Win32 Debug
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
+F90=df.exe
 RSC=rc.exe
 
 !IF  "$(CFG)" == "common - Win32 Release"
@@ -40,7 +41,6 @@ RSC=rc.exe
 # PROP Output_Dir "../../Release"
 # PROP Intermediate_Dir "../../Release"
 # PROP Target_Dir ""
-F90=df.exe
 # ADD BASE F90 /compile_only /nologo /warn:nofileopt
 # ADD F90 /compile_only /nologo /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
@@ -66,7 +66,6 @@ LIB32=link.exe -lib
 # PROP Output_Dir "../../Debug"
 # PROP Intermediate_Dir "../../Debug"
 # PROP Target_Dir ""
-F90=df.exe
 # ADD BASE F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
@@ -120,6 +119,10 @@ SOURCE=.\StatefulObject.cpp
 # Begin Source File
 
 SOURCE=.\SubsidiaryConstants.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\UUIDGen.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -284,6 +287,10 @@ InputName=StatefulObject
 # Begin Source File
 
 SOURCE=.\SubsidiaryConstants.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\UUIDGen.h
 # End Source File
 # End Group
 # Begin Group "Moc Files"
