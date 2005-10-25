@@ -30,6 +30,8 @@
 void CalcDataWidget::initCalc ( TrussCalcData data )
 {
     Res = data;
+    comboBox->clear();
+
     radio1->setChecked ( TRUE );
     table1->resize(387,table1->height());
     for ( int i = 1; i <= Res.loadsNum; i++ )
@@ -40,10 +42,12 @@ void CalcDataWidget::initCalc ( TrussCalcData data )
     lineEdit2->setText(QString::number(Res.v,'e',3));
     lineEdit3->setText(QString::number(Res.forceWeight,'e',3));
     textLabel7->setText(toUnicode("из ") + QString::number(Res.loadsNum));
-    connect ( pushButton1, SIGNAL( clicked() ), this, SLOT( close() ) );
-    connect ( radio1, SIGNAL( clicked() ), this, SLOT( radio1_clicked() ) );
-    connect ( radio2, SIGNAL( clicked() ), this, SLOT( radio2_clicked() ) ); 
-    connect ( comboBox, SIGNAL( activated(int)), this, SLOT ( combo_activated() ) );
+
+    connect ( pushButton1, SIGNAL(clicked()), SLOT(close()) );
+    connect ( radio1, SIGNAL(clicked()), SLOT( radio1_clicked()) );
+    connect ( radio2, SIGNAL(clicked()), SLOT( radio2_clicked()) ); 
+    connect ( comboBox, SIGNAL(activated(int)), SLOT (combo_activated()) );
+
     radio1_clicked();
 }
 
