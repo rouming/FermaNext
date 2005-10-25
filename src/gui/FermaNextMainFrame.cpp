@@ -121,7 +121,6 @@ void FermaNextMainFrame::someProjectCreated ( FermaNextProject& prj )
     if ( !projectsDockWindow->isVisible() && 
         0 < FermaNextWorkspace::workspace().countProjects() ) {
         projectsDockWindow->show();
-        // TODO: remove comment in future
         undoRedoHistoryWidget->show();
     }
 
