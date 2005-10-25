@@ -23,6 +23,7 @@ SOURCES = \
           PluginManager.cpp \
           StatefulObject.cpp \
           SubsidiaryConstants.cpp \
+          UUIDGen.cpp \
 
 HEADERS = \
           AbstractObjectAction.h \
@@ -35,4 +36,5 @@ HEADERS = \
           PluginLoader.h \
           PluginManager.h \
           StatefulObject.h \
-          SubsidiaryConstants.h
+          SubsidiaryConstants.h \
+          UUIDGen.h \
