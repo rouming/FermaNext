@@ -74,11 +74,32 @@ void UUIDGen::nextRandomBytes( QByteArray& bytes) const
     }
 }
 
-// POSIX  1003.1-2003 example
+
+// Reentrant random function frm POSIX.1c.
+// Was taken from original glibc rand_r.c
+
 int UUIDGen::nextInt () const
 {
-  seed = seed * 1103515245 + 12345;
-  return((unsigned)(seed/65536) % 32768) << 16;
+  unsigned int next = seed;
+  int result;
+
+  next *= 1103515245;
+  next += 12345;
+  result = (unsigned int) (next / 65536) % 2048;
+
+  next *= 1103515245;
+  next += 12345;
+  result <<= 10;
+  result ^= (unsigned int) (next / 65536) % 1024;
+
+  next *= 1103515245;
+  next += 12345;
+  result <<= 10;
+  result ^= (unsigned int) (next / 65536) % 1024;
+
+  seed = next;
+
+  return result;
 }
 
 void UUIDGen::setSeed ( int s )
