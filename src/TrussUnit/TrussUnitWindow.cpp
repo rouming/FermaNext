@@ -247,6 +247,12 @@ void TrussUnitWindow::minimize ()
 */
 void TrussUnitWindow::hide ()
 {
+    if ( hinted )
+    {
+        hinted = false;
+        currentHintedButton = 0;
+        emit onHintHides( false );
+    }
     setVisible( false );
 }
 
