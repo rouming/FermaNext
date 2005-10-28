@@ -548,6 +548,9 @@ void TrussUnitWindow::checkMouseMoveEvent ( int x, int y, bool mousePressed )
 
 void TrussUnitWindow::checkMousePressEvent ( int x, int y )
 {
+    if ( timer->isActive() )
+        timer->stop();
+
     releaseButtons();
 
     if ( hinted )
