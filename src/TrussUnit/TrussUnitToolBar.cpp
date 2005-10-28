@@ -289,6 +289,9 @@ void TrussUnitToolBar::checkMouseMoveEvent ( int x, int y )
 
 void TrussUnitToolBar::checkMousePressEvent ( int x, int y )
 {
+    if ( timer->isActive() )
+        timer->stop();
+
     if ( ! enabled )
         return;
 
