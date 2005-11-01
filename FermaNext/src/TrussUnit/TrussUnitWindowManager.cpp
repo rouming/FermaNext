@@ -77,6 +77,13 @@ void TrussUnitWindowManager::trussWindowAfterDesist ( StatefulObject& st )
 TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow (
     const QString& name )
 {
+    return createTrussUnitWindow( false, name );
+}
+
+TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow (
+    bool silence, 
+    const QString& name )
+{
     // Clean earlier desisted truss windows
     suspendedClean();
 
@@ -90,7 +97,8 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow (
                       SLOT(trussWindowAfterDesist(StatefulObject&)) );
     trussWindows.push_back(trussWindow);
 
-    emit onTrussUnitWindowCreate(*trussWindow);
+    if ( ! silence )
+        emit onTrussUnitWindowCreate(*trussWindow);
     return *trussWindow;
 }
 
@@ -102,16 +110,19 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindowFromFile (
     if ( !file.open( IO_ReadOnly ) )
 	    throw ReadFileException();
 
-    QRegExp re("([^/\\\\]*)(\\" + OLD_EXTENSION + ")$");
+    QRegExp re("([^/\\\\]*)((\\" + OLD_EXTENSION + ")|"
+                           "(\\" + NEW_EXTENSION + "))$");
     re.search(fileName);
     QString trussName = re.cap(1);
     if ( trussName.isEmpty() )        
         throw ReadFileException();
 
-    TrussUnitWindow& trussWindow = createTrussUnitWindow(trussName);
+    // Use 'silence' method to create truss and then to remove it if
+    // exception has happened.
+    TrussUnitWindow& trussWindow = createTrussUnitWindow( true, trussName );
     try {
         if( fileName.contains(NEW_EXTENSION) ) 
-            load( trussWindow, file );
+            loadNewVersion( trussWindow, file );
         else if ( fileName.contains(OLD_EXTENSION) ) 
             loadOldVersion( trussWindow, file );
         else 
@@ -121,6 +132,7 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindowFromFile (
         removeTrussUnitWindow(trussWindow);
         throw;
     }
+    emit onTrussUnitWindowCreate(trussWindow);
     return trussWindow;
 }
 
@@ -319,10 +331,24 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
     truss.setTrussAreaSize( DoubleSize( width, height ) );
 }
 
-void TrussUnitWindowManager::load ( TrussUnit&, const QFile& )
+void TrussUnitWindowManager::loadNewVersion ( TrussUnit& truss, 
+                                              const QFile& xmlFile )
     throw (WrongFormatException)
 {
-    // Implementation is looking forward
+    QDomDocument doc;
+    if ( !doc.setContent( (QIODevice*)&xmlFile ) ) {
+        throw WrongFormatException();
+    }
+
+    QDomElement docElem = doc.documentElement();
+    if ( docElem.isNull() )
+        throw WrongFormatException();
+
+    try { 
+        truss.loadFromXML( docElem );
+    } catch ( XMLSerializableObject::LoadException& ) {
+        throw WrongFormatException();
+    }
 }
 
 /*****************************************************************************/

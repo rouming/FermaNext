@@ -75,6 +75,37 @@ TrussUnitWindow::~TrussUnitWindow ()
     delete timer;
 }
 
+/** 
+ * Loads truss window from XML format
+ */
+void TrussUnitWindow::loadFromXML ( const QDomElement& elem ) 
+    throw (LoadException)
+{
+    TrussUnit::loadFromXML( elem );
+
+    if ( ! elem.hasAttribute( "windowWidth" ) )
+        throw LoadException();
+
+    if ( ! elem.hasAttribute( "windowHeight" ) )
+        throw LoadException();
+
+    bool ok;
+    int width = elem.attribute( "windowWidth" ).toInt( &ok );
+    if ( !ok ) throw LoadException();
+
+    int height = elem.attribute( "windowHeight" ).toInt( &ok );
+    if ( !ok ) throw LoadException();
+
+    setWindowSize( width, height );
+}
+
+/** 
+ * Saves truss window to XML format
+ */
+void TrussUnitWindow::saveToXML ( QDomElement& )
+{
+}
+
 /* 
    Sets rendered flag of the button buffer to FALSE, so it 
    will be repainted, when the paint method will be called.
