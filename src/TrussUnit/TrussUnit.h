@@ -2,8 +2,10 @@
 #define TRUSSUNIT_H
 
 #include "Truss.h"
+#include "XMLSerializableObject.h"
 #include "AggSubsidiary.h"
 
+class TrussUnit;
 class TrussNode;
 class TrussPivot;
 
@@ -53,12 +55,17 @@ private:
 /*****************************************************************************/
 
 class TrussUnit : public Truss<TrussNode, TrussPivot>,                  
-                  public PaintableTrussElement
+                  public PaintableTrussElement,
+                  public XMLSerializableObject
 {
     Q_OBJECT
 public:        
     TrussUnit ( const QString& name, ObjectStateManager* mng );
     virtual ~TrussUnit ();
+
+    // XML serialization
+    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
+    virtual void saveToXML ( QDomElement& );
 
     const QString& getTrussName () const;
 
@@ -101,7 +108,8 @@ public:
 
     virtual void mergeNodes ( TrussNode* mergingNode, TrussNode* node );
 
-    virtual void dividePivot ( TrussPivot& dividualPivot, TrussNode& dividingNode );
+    virtual void dividePivot ( TrussPivot& dividualPivot, 
+                               TrussNode& dividingNode );
 
     virtual TrussPivot* findDividualPivot ( TrussNode& dividingNode,
                                             double precision ) const;
@@ -187,7 +195,9 @@ private:
 
 /*****************************************************************************/
 
-class TrussNode: public Node, public PaintableTrussElement
+class TrussNode: public Node, 
+                 public PaintableTrussElement,
+                 public XMLSerializableObject
 {    
     Q_OBJECT
 public:
@@ -214,7 +224,9 @@ public slots:
 
 /*****************************************************************************/
 
-class TrussPivot : public Pivot<TrussNode>, public PaintableTrussElement
+class TrussPivot : public Pivot<TrussNode>, 
+                   public PaintableTrussElement,
+                   public XMLSerializableObject
 {
     Q_OBJECT
 public:

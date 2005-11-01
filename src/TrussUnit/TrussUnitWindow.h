@@ -12,6 +12,10 @@ public:
     TrussUnitWindow ( const QString& name, ObjectStateManager* );
     virtual ~TrussUnitWindow ();
 
+    // XML serialization
+    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
+    virtual void saveToXML ( QDomElement& );
+
     virtual QPoint getWindowLeftTopPos () const;
     virtual QPoint getWindowRightBottomPos () const;
     virtual QPoint getTrussAreaLeftTopPos () const;

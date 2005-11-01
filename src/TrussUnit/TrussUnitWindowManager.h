@@ -37,7 +37,7 @@ protected:
 
     virtual void loadOldVersion ( TrussUnit&, QFile& ) 
         throw (WrongFormatException);
-    virtual void load ( TrussUnit&, const QFile& ) 
+    virtual void loadNewVersion ( TrussUnit&, const QFile& ) 
         throw (WrongFormatException);
 
 public slots:
@@ -45,6 +45,16 @@ public slots:
     virtual bool removeTrussUnitWindow ( TrussUnitWindow& );
 
 protected slots:
+    // If 'silence' is true, truss manager doesn't emit 
+    // 'onTrussUnitWindowCreate' signal. "Quiet" creation used to create truss
+    // and then to construct all its memebers (e.g. reading from file). While
+    // members construction exception can occur, so if it happens we should 
+    // free all the memory, remove truss and nobody should know about this 
+    // failed creation attempt.
+    virtual TrussUnitWindow& createTrussUnitWindow ( bool silence,
+                                                     const QString& name );
+
+
     // Just wrappers to cast stateful object to truss window
     // and to emit the signal further
     virtual void trussWindowAfterRevive ( StatefulObject& );

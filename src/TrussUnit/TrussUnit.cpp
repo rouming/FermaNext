@@ -94,6 +94,38 @@ TrussUnit::TrussUnit ( const QString& name, ObjectStateManager* mng ) :
 TrussUnit::~TrussUnit ()
 {}
 
+
+void TrussUnit::loadFromXML ( const QDomElement& elem ) 
+    throw (LoadException)
+{
+    XMLSerializableObject::loadFromXML( elem );
+
+    if ( ! elem.hasAttribute( "trussName" ) )
+        throw LoadException();
+
+    if ( ! elem.hasAttribute( "trussWidth" ) )
+        throw LoadException();
+
+    if ( ! elem.hasAttribute( "trussHeight" ) )
+        throw LoadException();
+
+    bool ok;
+    double width = elem.attribute( "trussWidth" ).toDouble( &ok );
+    if ( !ok ) throw LoadException();
+
+    double height = elem.attribute( "trussHeight" ).toDouble( &ok );
+    if ( !ok ) throw LoadException();
+
+    QString name = elem.attribute( "trussName" );
+
+    setTrussName( name );
+    setTrussAreaSize( DoubleSize( width, height ) );
+}
+
+void TrussUnit::saveToXML ( QDomElement& )
+{
+}
+
 void TrussUnit::trussUnitStateIsChanged ()
 {
     setTrussRenderedStatus(false);
