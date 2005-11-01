@@ -4,6 +4,7 @@
 
 #include <qstring.h>
 
+#include "XMLSerializableObject.h"
 #include "TrussUnitDesignerWindow.h"
 #include "TrussUnitWindowManager.h"
 #include "ObjectStateManager.h"
@@ -13,7 +14,7 @@ class FermaNextWorkspace;
 class QWidgetStack;
 class QTabWidget;
 
-class FermaNextProject : public QObject
+class FermaNextProject : public QObject, public XMLSerializableObject
 {
     Q_OBJECT
 public:
