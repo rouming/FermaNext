@@ -24,6 +24,7 @@ SOURCES = \
           StatefulObject.cpp \
           SubsidiaryConstants.cpp \
           UUIDGen.cpp \
+          XMLSerializableObject.cpp
 
 HEADERS = \
           AbstractObjectAction.h \
@@ -38,3 +39,4 @@ HEADERS = \
           StatefulObject.h \
           SubsidiaryConstants.h \
           UUIDGen.h \
+          XMLSerializableObject.h
