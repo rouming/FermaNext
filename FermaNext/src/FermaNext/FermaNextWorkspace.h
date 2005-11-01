@@ -6,6 +6,7 @@
 #include <qobject.h>
 #include <qstring.h>
 #include <qmutex.h> 
+#include "XMLSerializableObject.h"
 #include "FermaNextProject.h"
 #include "FermaNextConfig.h"
 #include "PluginManager.h"
@@ -13,7 +14,7 @@
 class QWidgetStack;
 class FermaNextMainFrame;
 
-class FermaNextWorkspace : public QObject
+class FermaNextWorkspace : public QObject, public XMLSerializableObject
 {
     Q_OBJECT
 public:
