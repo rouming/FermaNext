@@ -124,6 +124,10 @@ SOURCE=.\SubsidiaryConstants.cpp
 
 SOURCE=.\UUIDGen.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\XMLSerializableObject.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -291,6 +295,14 @@ SOURCE=.\SubsidiaryConstants.h
 # Begin Source File
 
 SOURCE=.\UUIDGen.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\UUIDObject.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\XMLSerializableObject.h
 # End Source File
 # End Group
 # Begin Group "Moc Files"

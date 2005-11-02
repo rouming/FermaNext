@@ -18,6 +18,11 @@ const QString UUIDGen::hexChars = "0123456789abcdef";
 const int UUIDGen::INDEX_TYPE = 6;
 const int UUIDGen::INDEX_VARIATION = 8;
 const int UUIDGen::TYPE_RANDOM_BASED = 4;
+const QRegExp UUIDGen::uuidValidator( "^([0-9A-Fa-f]{8})-"
+                                       "([0-9A-Fa-f]{4})-"
+                                       "([0-9A-Fa-f]{4})-"
+                                       "([0-9A-Fa-f]{4})-"
+                                       "([0-9A-Fa-f]{12})$" );
 
 /*****************************************************************************/
 
@@ -34,7 +39,12 @@ QString UUIDGen::uuid ()
     QString uuid = gen.generateUUID();
     mutex.unlock();
     return uuid;
-}    
+}
+
+bool UUIDGen::isValidUUID ( const QString& uuid )
+{
+    return uuidValidator.search(uuid) == 0;
+}
 
 QString UUIDGen::generateUUID () const
 {
@@ -80,26 +90,26 @@ void UUIDGen::nextRandomBytes( QByteArray& bytes) const
 
 int UUIDGen::nextInt () const
 {
-  unsigned int next = seed;
-  int result;
+    unsigned int next = seed;
+    int result;
 
-  next *= 1103515245;
-  next += 12345;
-  result = (unsigned int) (next / 65536) % 2048;
+    next *= 1103515245;
+    next += 12345;
+    result = (unsigned int) (next / 65536) % 2048;
 
-  next *= 1103515245;
-  next += 12345;
-  result <<= 10;
-  result ^= (unsigned int) (next / 65536) % 1024;
+    next *= 1103515245;
+    next += 12345;
+    result <<= 10;
+    result ^= (unsigned int) (next / 65536) % 1024;
 
-  next *= 1103515245;
-  next += 12345;
-  result <<= 10;
-  result ^= (unsigned int) (next / 65536) % 1024;
+    next *= 1103515245;
+    next += 12345;
+    result <<= 10;
+    result ^= (unsigned int) (next / 65536) % 1024;
 
-  seed = next;
+    seed = next;
 
-  return result;
+    return result;
 }
 
 void UUIDGen::setSeed ( int s )

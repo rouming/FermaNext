@@ -10,6 +10,7 @@
 #define UUIDGEN_H
 
 #include <qstring.h>
+#include <qregexp.h>
 
 class UUIDGen
 {
@@ -20,6 +21,11 @@ public:
      * Thread-safe static UUID random generation
      */
     static QString uuid ();
+
+    /** 
+     * Validates uuid
+     */
+    static bool isValidUUID ( const QString& );
 
     /**
      * Generates a random UUID and returns the QString representation of it.
@@ -50,6 +56,7 @@ private:
     static const int INDEX_TYPE;
     static const int INDEX_VARIATION;
     static const int TYPE_RANDOM_BASED;
+    static const QRegExp uuidValidator;
 
     mutable int seed;
 };

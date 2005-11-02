@@ -39,4 +39,5 @@ HEADERS = \
           StatefulObject.h \
           SubsidiaryConstants.h \
           UUIDGen.h \
+          UUIDObject.h \
           XMLSerializableObject.h
