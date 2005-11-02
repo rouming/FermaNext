@@ -3,16 +3,6 @@
 #define UUIDOBJECT_H
 
 #include "UUIDGen.h"
-#include <qregexp.h>
-
-const QRegExp uuidValidator(
-                            "([0-9A-Fa-f]{8})-"
-                            "([0-9A-Fa-f]{4})-"
-                            "([0-9A-Fa-f]{4})-"
-                            "([0-9A-Fa-f]{4})-"
-                            "([0-9A-Fa-f]{12})"
-                            );
-
 
 /**
  * UUID object provides basic functionality of getting and setting UUID.
@@ -33,7 +23,7 @@ public:
 
     inline void setUUID ( const QString& id ) throw (WrongUUIDException)
     { 
-        if ( -1 == uuidValidator.search( id ) )
+        if ( ! UUIDGen::isValidUUID( id ) )
             throw WrongUUIDException();
         uuid = id;
     }
