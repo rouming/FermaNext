@@ -21,9 +21,14 @@ public:
     virtual QPoint getTrussAreaLeftTopPos () const;
     virtual QPoint getTrussAreaRightBottomPos () const;
 
+    // Move window
     virtual void setWindowPosition ( QPoint pos );
 
+    // Get/set window size
+    virtual void setWindowSize ( int w, int h );
+    virtual void setWindowSize ( const QSize& size );
     virtual const QSize& getWindowSize () const;
+    // Resize and then move window
     virtual void resize ( QPoint leftTop, QPoint rightBottom );
 
     virtual bool isMaximized () const;
@@ -70,7 +75,6 @@ public:
     virtual void paint ( base_renderer& baseRend ) const;
 
 protected:
-    virtual void setWindowSize ( int w, int h );
     virtual QPoint getButtonBufPos () const;
     virtual bool inButtonsRect ( int x, int y ) const;
     virtual void hide ();

@@ -167,8 +167,8 @@ void TrussUnitWindow::setWindowPosition ( QPoint pos )
     windowLeftTopPos = pos;
     windowRightBottomPos.setX ( windowLeftTopPos.x() + windowSize.width() );
     windowRightBottomPos.setY ( windowLeftTopPos.y() + windowSize.height() );
-    emit onMove( oldPos, pos );
     setTrussPosition( getTrussAreaLeftTopPos() );
+    emit onMove( oldPos, pos );
 }
 
 /* 
@@ -194,31 +194,34 @@ const QSize& TrussUnitWindow::getWindowSize () const
 */
 void TrussUnitWindow::setWindowSize ( int width, int height )
 {
-    QSize oldSize = windowSize;
-    windowSize.setWidth ( width );
-    windowSize.setHeight ( height );
-    rendered(false);
-    emit onResize( oldSize, windowSize );
+    setWindowSize( QSize(width, height) );
 }
 
-/* 
-   Resizes truss unit window. New size is described by 
-   leftTop and rightBottom points.
-*/
-void TrussUnitWindow::resize ( QPoint leftTop, QPoint rightBottom )
+void TrussUnitWindow::setWindowSize ( const QSize& size )
 {
-    int dx = rightBottom.x() - leftTop.x();
-    int dy = rightBottom.y() - leftTop.y();
-    windowBuf->init( dx, dy );
-    setWindowSize( dx, dy );
+    windowBuf->init( size.width(), size.height() );
+    QSize oldSize = windowSize;
+    windowSize = size;
 
-    const QPoint& pixAreaSize = getTrussAreaRightBottomPos() -
-                                getTrussAreaLeftTopPos();
+    QPoint pixAreaSize = getTrussAreaRightBottomPos() -
+                         getTrussAreaLeftTopPos();
     trussBuf->init( pixAreaSize.x() + 2 * trussBufIndent, 
                     pixAreaSize.y() + 2 * trussBufIndent );
 
     setTrussAreaSizeInPix( QSize(pixAreaSize.x(),pixAreaSize.y()) );
 
+    rendered(false);
+    emit onResize( oldSize, windowSize );
+}
+
+/* 
+   Resizes truss unit window and moves it to the leftTop pos.
+*/
+void TrussUnitWindow::resize ( QPoint leftTop, QPoint rightBottom )
+{
+    int dx = rightBottom.x() - leftTop.x();
+    int dy = rightBottom.y() - leftTop.y();
+    setWindowSize( dx, dy );
     setWindowPosition( leftTop );
 }
 
