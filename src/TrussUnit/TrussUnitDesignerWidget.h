@@ -6,6 +6,12 @@
 #include "TrussUnitWindowManager.h"
 #include "TrussUnitToolBar.h"
 #include <qpopupmenu.h>
+#include <qlabel.h>
+#include <qlineedit.h>
+#include <qpushbutton.h>
+#include <qhbox.h>
+#include <qvbox.h>
+#include <qvalidator.h>
 
 class AggPopupHint;
 
@@ -27,6 +33,31 @@ protected slots:
 private:
     QMouseEvent releaseEvent;
     TrussNode* node;
+};
+
+class LoadPopupMenu : public QPopupMenu
+{
+    Q_OBJECT
+public:
+    LoadPopupMenu (QWidget* parent=0, const char* name=0);
+    void showLoadPopup (QMouseEvent* pressEvent, TrussNode*, TrussUnitWindow*);
+protected slots:
+    void hideLoadPopup();
+    void okClicked();
+private:
+    QMouseEvent releaseEvent;
+    TrussNode* node;
+    TrussUnitWindow* selectedWindow;
+    QPushButton* Ok;
+    QPushButton* Cancel;
+    QLabel* LoadXLab;
+    QLabel* LoadYLab;
+    QLineEdit* LoadXLine;
+    QLineEdit* LoadYLine;
+    QHBox* XHB;
+    QHBox* YHB;
+    QHBox* ButtonHB;
+    QVBox* VB;
 };
 
 /*****************************************************************************/
@@ -128,6 +159,8 @@ private:
     WindowList trussWindows;
     // Node fixation popup menu
     FixationPopupMenu* fixationPopup;
+    // Node load popup menu
+    LoadPopupMenu* loadPopup;
 
     // Top-level truss unit window.
     // Also, we get state manager from this window to collect 
