@@ -150,6 +150,17 @@ void drawOutlineRoundedRect ( ren_dynarow& baseRend,
                               int lineWidth, 
                               int bound1, int bound2 );
 
+void drawOutlineRoundedRect ( ren_dynarow& baseRend,
+                              solidRenderer& solidRend, 
+                              scanline_rasterizer& ras,
+                              agg::scanline_p8& sl,
+                              const QPoint& point1, 
+                              const QPoint& point2, 
+                              color_type outlineCol,
+                              color_type rectCol,  
+                              int cornerRadius, 
+                              int lineWidth );
+
 void drawGradientEllipse ( ren_dynarow& baseRend, 
                            scanline_rasterizer& ras,
                            agg::scanline_p8& sl, 

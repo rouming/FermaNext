@@ -49,7 +49,7 @@ const bool flipY = true;
 const int bufferEmptyArea = 30,
           buttonHeight = 25,
           buttonWidth = 25,
-          pixHideNumb = 2;
+          pixHideNumb = 1;
 
 const double svgGamma = 1.0,
              svgExpand = 0.3;
@@ -66,6 +66,11 @@ QString imagesPath ()
 QString imagesSvgPath ()
 {
     return applicationDirPath() + "/" + "images/svg";
+}
+
+QString imagesCursorsPath ()
+{
+    return applicationDirPath() + "/" + "images/cursors";
 }
 
 QString pluginsPath () 

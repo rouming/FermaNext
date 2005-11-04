@@ -61,6 +61,7 @@ protected:
     virtual void initHideButton ();
     virtual void removeButtonHighlight ();
     virtual AggButton* getSelectedButton ( int x, int y ) const;
+    virtual void clearButtonHint ();
     virtual void drawButtons ( ren_dynarow& baseRend, 
                                scanline_rasterizer& ras,
                                agg::scanline_p8& sl, 

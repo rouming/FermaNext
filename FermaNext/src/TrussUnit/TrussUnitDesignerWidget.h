@@ -90,6 +90,7 @@ protected:
     virtual void releaseWindowButtons ();
     // clear window cursor position field
     virtual void clearAllCursorCoordFields ();
+    virtual void clearHintsFromNonSelectedWindows ( TrussUnitWindow* selectedWindow );
 
     virtual bool nodeCanBeDrawn ( int x, int y );
 
