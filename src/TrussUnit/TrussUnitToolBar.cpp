@@ -180,7 +180,7 @@ void TrussUnitToolBar::setToolBarHinted ()
     setHinted( true );
     if ( currentHintedButton )
         emit onHintShowsUp( currentHintedButton->getHint(), 
-                            hintCurrentPos, false );
+                            hintCurrentPos, true );
 }
 
 void TrussUnitToolBar::removeButtonHighlight ()
@@ -195,6 +195,19 @@ void TrussUnitToolBar::removeButtonHighlight ()
     ButtonListIter iter = buttons.begin();
     for ( ; iter != buttons.end(); ++iter )
         (*iter)->setHighlighted( false );
+}
+
+void TrussUnitToolBar::clearButtonHint ()
+{
+    if ( timer->isActive() )
+        timer->stop();
+
+    if ( isHinted() )
+    {
+        setHinted( false );
+        currentHintedButton = 0;
+        emit onHintHides( false );
+    }
 }
 
 QPoint TrussUnitToolBar::getDynarowBufPos ( int x, int y ) const
@@ -277,30 +290,15 @@ void TrussUnitToolBar::checkMouseMoveEvent ( int x, int y )
     }
 
     if ( ! inToolBarRect( x, y, true ) )
-    {
-        if ( isHinted() )
-        {
-            setHinted( false );
-            currentHintedButton = 0;
-            emit onHintHides( false );
-        }
-    }
+        clearButtonHint ();
 }
 
 void TrussUnitToolBar::checkMousePressEvent ( int x, int y )
 {
-    if ( timer->isActive() )
-        timer->stop();
-
     if ( ! enabled )
         return;
 
-    if ( isHinted() )
-    {
-        setHinted( false );
-        currentHintedButton = 0;
-        emit onHintHides( false );
-    }
+    clearButtonHint ();
 
     AggButton* button = getSelectedButton( x, y );
     if ( ! button )

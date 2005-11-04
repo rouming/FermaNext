@@ -48,9 +48,9 @@ extern const bool flipY;
  ************************************/
 
 extern const int bufferEmptyArea, 
-                  buttonHeight,
-                  buttonWidth,
-                  pixHideNumb;
+                 buttonHeight,
+                 buttonWidth,
+                 pixHideNumb;
 
 extern const double svgGamma,
                     svgExpand;
@@ -60,7 +60,8 @@ extern const double svgGamma,
  ************************************/
 
 QString imagesPath ();
-QString imagesSvgPath (); 
+QString imagesSvgPath ();
+QString imagesCursorsPath ();
 QString pluginsPath ();
 QString configFileName ();
 

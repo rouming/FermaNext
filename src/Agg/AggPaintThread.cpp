@@ -56,27 +56,27 @@ void AggPaintThread::run ()
     while ( frameCount < framesNumb ) 
     {
         if ( alphaCoeff )
+        {
             *alphaCoeff+=alphaChange;
-        /*
-        if ( alphaCoeff < 0 )
-        {
-            alphaCoeff = 0;
-            alphaChange = 0;
+            if ( *alphaCoeff < 0 )
+            {
+                *alphaCoeff = 0;
+                alphaChange = 0;
+            }
+            if ( *alphaCoeff > 1.0 )
+            {
+                *alphaCoeff = 1.0;
+                alphaChange = 0;
+            }
         }
-        if ( alphaCoeff > 1.0 )
-        {
-            alphaCoeff = 1.0 )
-            alphaChange = 0;
-        }
-        */
         widgetToRepaint.update();
         emit onAnimationRun();
         time.addMSecs ( frameDelay );
-        /*
-        int delay = time.msec() - QTime::currentTime().msec();
-        if ( delay > 0 )
-            msleep( delay );
-        */
+        
+        //int delay = time.msec() - QTime::currentTime().msec();
+        //if ( delay > 0 )
+        //    msleep( delay );
+        
         msleep( frameDelay );
         frameCount+=frameRate;
     }

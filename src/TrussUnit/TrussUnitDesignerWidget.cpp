@@ -309,7 +309,7 @@ void TrussUnitDesignerWidget::initToolBar ()
     leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
     toolBar->addButton ( imagesSvgPath() + "/eraseIcon.svg", "Erase", leftTopPos, 
                          buttonWidth, buttonHeight, this, SIGNAL( pressEraseButton() ),
-                         SLOT( changeBehaviourToErase() ) ).setHint("Erase 'E'");
+                         SLOT( changeBehaviourToErase() ) ).setHint("Erase 'R'");
 }
 
 void TrussUnitDesignerWidget::changeBehaviourToSelect ()
@@ -534,6 +534,18 @@ void TrussUnitDesignerWidget::clearAllCursorCoordFields ()
     }
     if ( fieldChanged )
         update();
+}
+
+void TrussUnitDesignerWidget::clearHintsFromNonSelectedWindows ( 
+                                       TrussUnitWindow* selWindow )
+{
+    WindowListIter iter = trussWindows.begin();
+    for ( ; iter != trussWindows.end(); ++iter )
+    {
+        TrussUnitWindow* window = *iter;
+        if ( window != selWindow )
+            window->clearButtonHint();
+    }
 }
 
 bool TrussUnitDesignerWidget::nodeCanBeDrawn ( int x, int y )
@@ -873,15 +885,33 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
     }
     else
     {
+        TrussUnitWindow* window = findWindowByWidgetPos ( x, y );
+        if ( window )
+        {
+            if ( window->inTrussAreaRect( x, y ) )
+            {
+                clearAllCursorCoordFields ();
+                window->setCursorCoord ( QPoint(x, y) );
+            }
+            else
+                clearAllCursorCoordFields ();
+
+            removeWindowButtonHighlight ();
+            clearHintsFromNonSelectedWindows ( window );
+            window->releaseButtons ();
+            window->checkMouseMoveEvent( x, y, buttonPressed );
+            update();
+        }
+        else
+        {
+            clearHintsFromNonSelectedWindows ( 0 );
+            removeWindowButtonHighlight ();
+        }
+
         if ( designerBehaviour == onNodeDraw || 
              designerBehaviour == onPivotFirstNodeDraw ||
              designerBehaviour == onErase )
         {
-            if ( nodeCanBeDrawn ( x, y ) )
-                QWidget::setCursor ( Qt::CrossCursor );
-            else
-                QWidget::setCursor ( Qt::ArrowCursor );
-
             TrussUnitWindow* w = findWindowByWidgetPos( x, y );
             if ( w )
             {
@@ -891,6 +921,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                     w->findPivotByWidgetPos( x, y, 2 * w->getPivotPrecision() );
                 if ( node )
                 {
+                    w->setCursorCoord( node->getPoint() );
                     w->setFocusOnNode( node );
                     update();
                 }
@@ -900,21 +931,13 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                     w->setFocusOnPivot ( pivot );
                     update();
                 }
+                if ( nodeCanBeDrawn ( x, y ) || node )
+                    QWidget::setCursor ( Qt::CrossCursor );
+                else
+                    QWidget::setCursor ( Qt::ArrowCursor );
             }
         }
-
-        TrussUnitWindow* window = findWindowByWidgetPos ( x, y );
-        if ( window )
-        {
-            removeWindowButtonHighlight ();
-            window->releaseButtons ();
-            window->checkMouseMoveEvent( x, y, buttonPressed );
-            update();
-        }
-        else
-            removeWindowButtonHighlight ();
-
-        if ( nodeBehaviour == onNodeDrag )
+        else if ( nodeBehaviour == onNodeDrag )
         {
             selectedWindow->moveTrussNode ( x, y, selectedNode );
             selectedWindow->setCursorCoord ( selectedNode->getPoint() );
@@ -933,7 +956,8 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         {
             selectedWindow->moveTrussNode ( x, y, selectedNode );
             selectedWindow->setCursorCoord( selectedNode->getPoint() );
-            if ( nodeCanBeDrawn ( x, y ) )
+            TrussNode* node = selectedWindow->findNodeByWidgetPos( x, y );
+            if ( nodeCanBeDrawn ( x, y ) || node )
                 QWidget::setCursor ( Qt::CrossCursor );
             else
                 QWidget::setCursor ( Qt::ArrowCursor );
@@ -944,17 +968,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
             selectedWindow = findWindowByWidgetPos ( x, y );
             if ( selectedWindow )
             {
-                if ( selectedWindow->inTrussAreaRect( x, y ) )
-                {
-                    clearAllCursorCoordFields ();
-                    selectedWindow->setCursorCoord ( QPoint(x, y) );
-                    update();
-                }
-                else
-                {
-                    clearAllCursorCoordFields ();
-                    update();
-                }
+
                 if ( selectedWindow->inHorResizeRect ( x, y ) )
                     QWidget::setCursor ( Qt::SizeHorCursor );
                 else if ( selectedWindow->inVerResizeRect ( x, y ) )
@@ -1011,7 +1025,6 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                         selectedPivot = 0;
                     }
                 }
-
             }
             else
             {
@@ -1295,13 +1308,14 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
             }
             else if ( designerBehaviour == onPivotFirstNodeDraw )
             {
-                if ( nodeCanBeDrawn ( clickX, clickY ) )
+                TrussNode* firstNode = 
+                         selectedWindow->findNodeByWidgetPos( clickX, clickY );
+
+                if ( nodeCanBeDrawn ( clickX, clickY ) || firstNode )
                 {
                     DoublePoint nodeCoord = selectedWindow->
                                       getTrussCoordFromWidgetPos( clickX, clickY );
 
-                    TrussNode* firstNode = 
-                             selectedWindow->findNodeByWidgetPos( clickX, clickY );
                     bool wasCreated = false;
                     if ( firstNode == 0 ) 
                     {

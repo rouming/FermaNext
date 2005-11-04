@@ -281,12 +281,6 @@ void TrussUnitWindow::minimize ()
 */
 void TrussUnitWindow::hide ()
 {
-    if ( hinted )
-    {
-        hinted = false;
-        currentHintedButton = 0;
-        emit onHintHides( false );
-    }
     setVisible( false );
 }
 
@@ -394,12 +388,12 @@ bool TrussUnitWindow::inHorResizeRect ( int x, int y ) const
     if ( maximized )
         return false;
 
-    if ( x >= windowLeftTopPos.x() && 
+    if ( x >= windowLeftTopPos.x() + 1 && 
          x <= windowLeftTopPos.x() + bordWidth && 
          y >= windowLeftTopPos.y() + winCornerRadius && 
          y <= windowRightBottomPos.y() - winCornerRadius ||
          x >= windowRightBottomPos.x() - bordWidth && 
-         x <= windowRightBottomPos.x() && 
+         x <= windowRightBottomPos.x() - 1 && 
          y >= windowLeftTopPos.y() + winCornerRadius && 
          y <= windowRightBottomPos.y() - winCornerRadius )
     {
@@ -471,14 +465,6 @@ bool TrussUnitWindow::inFDiagResizeRect ( int x, int y )
     return false;
 }
 
-void TrussUnitWindow::setWindowButtonHinted ()
-{
-    hinted = true;
-    if( currentHintedButton )
-        emit onHintShowsUp( currentHintedButton->getHint(), 
-                            hintCurrentPos, false );
-}
-
 bool TrussUnitWindow::inHideButtonRect ( int x, int y ) const
 {
     QPoint widgetPos( x, y );
@@ -512,6 +498,59 @@ bool TrussUnitWindow::inButtonsRect ( int x, int y ) const
          y > getButtonBufPos().y() && y < rectRightBottomPnt.y() )
          return true;
     return false;
+}
+
+void TrussUnitWindow::setHighlighted ( bool h )
+{
+    if ( h ) {
+        setBorderColor( 25,55,65 );
+        setResEllColor( 120, 120, 120 );
+        setHeadlineFirstColor(180, 130, 100 );
+        setHeadlineMiddleColor( 230, 190, 170 );
+        setHeadlineLastColor( 150, 90, 80 );
+    } else {
+        setBorderColor( 40,65,60 );
+        setResEllColor( 50, 50, 50 );
+        setHeadlineFirstColor( 180, 130, 150 );
+        setHeadlineMiddleColor( 230, 210, 200 );
+        setHeadlineLastColor( 150, 90, 110 );        
+    }
+    TrussUnit::setHighlighted(h);
+    coordFieldRendered = false;
+    buttonBufRendered = false;
+}
+
+void TrussUnitWindow::setWindowButtonHinted ()
+{
+    hinted = true;
+    if( currentHintedButton )
+        emit onHintShowsUp( currentHintedButton->getHint(), 
+                            hintCurrentPos, true );
+}
+
+void TrussUnitWindow::removeButtonsHighlight ()
+{
+    hideButton->setHighlighted( false );
+    rollUpButton->setHighlighted( false );
+}
+
+void TrussUnitWindow::releaseButtons ()
+{
+    hideButton->setPressed( false );
+    rollUpButton->setPressed( false );
+}
+
+void TrussUnitWindow::clearButtonHint ()
+{
+    if ( timer->isActive() )
+        timer->stop();
+
+    if ( hinted )
+    {
+        hinted = false;
+        currentHintedButton = 0;
+        emit onHintHides( false );
+    }
 }
 
 void TrussUnitWindow::checkMouseMoveEvent ( int x, int y, bool mousePressed )
@@ -570,29 +609,13 @@ void TrussUnitWindow::checkMouseMoveEvent ( int x, int y, bool mousePressed )
         }
     }
     else if ( ! inButtonsRect( x, y ) )
-    {
-        if ( hinted )
-        {
-            hinted = false;
-            currentHintedButton = 0;
-            emit onHintHides( false );
-        }
-    }
+        clearButtonHint();
 }
 
 void TrussUnitWindow::checkMousePressEvent ( int x, int y )
 {
-    if ( timer->isActive() )
-        timer->stop();
-
     releaseButtons();
-
-    if ( hinted )
-    {
-        hinted = false;
-        currentHintedButton = 0;
-        emit onHintHides( false );
-    }
+    clearButtonHint();
 
     if ( inHideButtonRect( x, y ) )
     {
@@ -629,38 +652,6 @@ void TrussUnitWindow::checkMouseReleaseEvent ( int x, int y )
                 maximize ();
         }
     }
-}
-
-void TrussUnitWindow::setHighlighted ( bool h )
-{
-    if ( h ) {
-        setBorderColor( 25,55,65 );
-        setResEllColor( 120, 120, 120 );
-        setHeadlineFirstColor(180, 130, 100 );
-        setHeadlineMiddleColor( 230, 190, 170 );
-        setHeadlineLastColor( 150, 90, 80 );
-    } else {
-        setBorderColor( 40,65,60 );
-        setResEllColor( 50, 50, 50 );
-        setHeadlineFirstColor( 180, 130, 150 );
-        setHeadlineMiddleColor( 230, 210, 200 );
-        setHeadlineLastColor( 150, 90, 110 );        
-    }
-    TrussUnit::setHighlighted(h);
-    coordFieldRendered = false;
-    buttonBufRendered = false;
-}
-
-void TrussUnitWindow::removeButtonsHighlight ()
-{
-    hideButton->setHighlighted( false );
-    rollUpButton->setHighlighted( false );
-}
-
-void TrussUnitWindow::releaseButtons ()
-{
-    hideButton->setPressed( false );
-    rollUpButton->setPressed( false );
 }
 
 color_type TrussUnitWindow::getCanvasColor () const
@@ -1077,18 +1068,14 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
                                      windowSize.height(), borderColor );
         else
         {
-            QPoint borderLeftTop( 0, 0 );
+            QPoint borderLeftTop( 0, -1 );
             QPoint borderRightBottom( windowSize.width(), 
                                    windowSize.height() );
 
-            agg::rounded_rect border ( borderLeftTop.x(), 
-                                       borderLeftTop.y(), 
-                                       borderRightBottom.x(), 
-                                       borderRightBottom.y(), 
-                                       winCornerRadius );
-            ras.add_path ( border );
-            solidRend.color ( borderColor );
-            agg::render_scanlines ( ras, sl, solidRend );
+            drawOutlineRoundedRect( baseRend, solidRend, ras, sl,
+                                    borderLeftTop, borderRightBottom, 
+                                    agg::rgba( 1, 1, 1, 0.6 ), borderColor,
+                                    winCornerRadius, 1 );
         }
 
         /*------draw window canvas------*/

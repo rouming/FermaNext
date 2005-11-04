@@ -145,7 +145,7 @@ void drawOutlineRoundedRect ( ren_dynarow& baseRend,
                               color_type outlineCol, 
                               int cornerRadius, 
                               int lineWidth, 
-                              int bound1, int bound2  )
+                              int bound1, int bound2 )
 {
     gradient_span_alloc gradSpan;
     linear_gradient gradFunc;
@@ -166,6 +166,31 @@ void drawOutlineRoundedRect ( ren_dynarow& baseRend,
                                            gradColors, bound1, bound2 );
     linear_gradient_renderer gradRend ( baseRend, gradSpanGen );
     agg::render_scanlines ( ras, sl, gradRend );
+}
+
+void drawOutlineRoundedRect ( ren_dynarow& baseRend,
+                              solidRenderer& solidRend, 
+                              scanline_rasterizer& ras,
+                              agg::scanline_p8& sl,
+                              const QPoint& point1, 
+                              const QPoint& point2,
+                              color_type outlineCol, 
+                              color_type rectCol,
+                              int cornerRadius, 
+                              int lineWidth )
+{
+    agg::rounded_rect outline ( point1.x(), point1.y(), 
+                                point2.x(), point2.y(), cornerRadius );
+    ras.add_path ( outline );
+    solidRend.color ( outlineCol );
+    agg::render_scanlines ( ras, sl, solidRend );
+
+    agg::rounded_rect rect ( point1.x() + lineWidth, point1.y() + lineWidth, 
+                             point2.x() - lineWidth, point2.y() - lineWidth, 
+                             cornerRadius );
+    ras.add_path ( rect );
+    solidRend.color ( rectCol );
+    agg::render_scanlines ( ras, sl, solidRend );
 }
 
 void drawGradientEllipse ( ren_dynarow& baseRend, 

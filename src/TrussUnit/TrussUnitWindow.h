@@ -51,13 +51,14 @@ public:
     virtual bool inHideButtonRect ( int x, int y ) const;
     virtual bool inRollUpButtonRect ( int x, int y ) const;
 
-    virtual void checkMouseMoveEvent ( int x, int y, bool mousePressed );
-    virtual void checkMousePressEvent ( int x, int y );
-    virtual void checkMouseReleaseEvent ( int x, int y );
-
     virtual void setHighlighted ( bool );
     virtual void removeButtonsHighlight ();
     virtual void releaseButtons ();
+    virtual void clearButtonHint ();
+
+    virtual void checkMouseMoveEvent ( int x, int y, bool mousePressed );
+    virtual void checkMousePressEvent ( int x, int y );
+    virtual void checkMouseReleaseEvent ( int x, int y );
 
     virtual color_type getCanvasColor () const;
     virtual color_type getHeadlineFirstColor () const;
