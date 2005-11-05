@@ -937,7 +937,8 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                     QWidget::setCursor ( Qt::ArrowCursor );
             }
         }
-        else if ( nodeBehaviour == onNodeDrag )
+
+        if ( nodeBehaviour == onNodeDrag )
         {
             selectedWindow->moveTrussNode ( x, y, selectedNode );
             selectedWindow->setCursorCoord ( selectedNode->getPoint() );
