@@ -133,6 +133,7 @@ public slots:
 protected slots:
     void trussUnitStateIsChanged ();
     void clearFrontNodePointer ( Node& node );
+    void clearFrontPivotPointer ( Node& first, Node& last );
 
 signals:
     void onTrussNameChange ( const QString& );
@@ -142,6 +143,8 @@ signals:
     void onEnableChange ( bool );
 
 protected:
+    void pivotToFront ( TrussPivot& pivot );
+
     virtual void setTrussRenderedStatus ( bool ) const;
 
     virtual void setTrussPosition ( const QPoint& pos );
@@ -191,6 +194,7 @@ private:
     QSize pixAreaSize;
     QString trussName;
     TrussNode* frontNode;
+    TrussPivot* frontPivot;
 };
 
 /*****************************************************************************/
