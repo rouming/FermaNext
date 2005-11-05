@@ -193,8 +193,7 @@ private:
     QPoint leftTopPos;
     QSize pixAreaSize;
     QString trussName;
-    TrussNode* frontNode;
-    TrussPivot* frontPivot;
+    TrussNode *frontNode, *firstFront, *lastFront;
 };
 
 /*****************************************************************************/

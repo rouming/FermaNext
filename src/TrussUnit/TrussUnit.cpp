@@ -83,7 +83,8 @@ TrussUnit::TrussUnit ( const QString& name, ObjectStateManager* mng ) :
     calculated(false),
     trussName(name),
     frontNode(0),
-    frontPivot(0)
+    firstFront(0),
+    lastFront(0)
 {
     // We should render again when state has been changed
     QObject::connect( this, SIGNAL(onStateChange()), 
@@ -942,20 +943,28 @@ void TrussUnit::nodeToFront ( TrussNode& node )
 
 void TrussUnit::pivotToFront ( TrussPivot& pivot )
 {
-    frontPivot = &pivot;
+    firstFront = &pivot.getFirstNode();
+    lastFront = &pivot.getLastNode();
 }
 
 void TrussUnit::clearFrontNodePointer ( Node& node )
 {
     if ( &node == frontNode )
         frontNode = 0;
+    if ( &node == firstFront )
+        firstFront = 0;
+    else if ( &node == lastFront )
+        lastFront = 0;
 }
 
 void TrussUnit::clearFrontPivotPointer ( Node& first, Node& last )
 {
-    if ( &first == &frontPivot->getFirstNode() &&
-         &last == &frontPivot->getLastNode() )
-        frontPivot = 0;
+    if ( &first == firstFront &&
+         &last == lastFront )
+    {
+        firstFront = 0;
+        lastFront = 0;
+    }
 }
 
 void TrussUnit::desistAdjoiningPivots ( const TrussNode& node )
@@ -1216,19 +1225,12 @@ void TrussUnit::paint ( ren_dynarow& baseRend ) const
 
         LoadCase* loadCase = getLoadCases().getCurrentLoadCase();
         
-        TrussNode *firstFront = 0, 
-                  *lastFront = 0;
-        if ( frontPivot )
-        {
-            firstFront = &frontPivot->getFirstNode();
-            lastFront = &frontPivot->getLastNode();
-        }
         NodeList nodeList = getNodeList ();
         NodeList::const_iterator nodesIter = nodeList.begin();
         for ( ; nodesIter != nodeList.end(); ++nodesIter )
             if ( *nodesIter != frontNode &&
-                 *nodesIter != firstFront && 
-                 *nodesIter != lastFront ) 
+                 *nodesIter != firstFront &&
+                 *nodesIter != lastFront )
             {
                 TrussNode* node = *nodesIter;
                 QPoint nodePos = getWidgetPosFromTrussCoord( node->getPoint() ) - 
@@ -1254,12 +1256,30 @@ void TrussUnit::paint ( ren_dynarow& baseRend ) const
             frontNode->paint( baseRend, scaleMult, trussAreaHeight );
         }
 
-        if ( frontPivot )
+        if ( firstFront && firstFront != frontNode ) 
         {
-            if ( firstFront != frontNode )
-                firstFront->paint( baseRend, scaleMult, trussAreaHeight );
-            if ( lastFront != frontNode )
-                lastFront->paint( baseRend, scaleMult, trussAreaHeight );
+            QPoint nodePos = getWidgetPosFromTrussCoord( firstFront->getPoint() ) - 
+                             leftTopPos;
+            if ( loadCase ) 
+            {
+                pos = getWidgetPosFromTrussCoord( firstFront->getPoint() );
+                TrussLoad* load = loadCase->findLoad( *firstFront );
+                if ( load ) drawLoad( baseRend, *load, nodePos );
+            }
+            firstFront->paint( baseRend, scaleMult, trussAreaHeight );
+        }
+
+        if ( lastFront && lastFront != frontNode ) 
+        {
+            QPoint nodePos = getWidgetPosFromTrussCoord( lastFront->getPoint() ) - 
+                             leftTopPos;
+            if ( loadCase ) 
+            {
+                pos = getWidgetPosFromTrussCoord( lastFront->getPoint() );
+                TrussLoad* load = loadCase->findLoad( *lastFront );
+                if ( load ) drawLoad( baseRend, *load, nodePos );
+            }
+            lastFront->paint( baseRend, scaleMult, trussAreaHeight );
         }
 
         /*------draw truss elements numbers------*/
