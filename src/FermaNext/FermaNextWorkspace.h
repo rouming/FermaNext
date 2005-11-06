@@ -18,11 +18,18 @@ class FermaNextWorkspace : public QObject, public XMLSerializableObject
 {
     Q_OBJECT
 public:
+    // File format extension
+    static const QString FormatExtension;
+
     // Inner exceptions
     class WorkspaceIsNotInitedCorrectly {};
 
     typedef std::vector<FermaNextProject*> ProjectList;
     typedef std::vector<FermaNextProject*>::iterator ProjectListIter;
+
+    // XML serialization
+    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
+    virtual QDomElement saveToXML ( QDomDocument& );
 
     static FermaNextWorkspace& workspace ();
     virtual void reset ();
@@ -30,6 +37,10 @@ public:
 
     virtual FermaNextProject& createProject ( const QString& name ) 
                                     throw (WorkspaceIsNotInitedCorrectly);
+    virtual FermaNextProject& createProject ( QDomElement& ) 
+                                    throw (WorkspaceIsNotInitedCorrectly,
+                                           LoadException);
+
     virtual bool removeProject ( FermaNextProject& );
     virtual bool removeProject ( const QString& name );
     virtual void activateProject ( const QString& prjName );
@@ -53,12 +64,15 @@ private:
     FermaNextWorkspace ( const FermaNextWorkspace& );
 
 protected:
+    virtual bool removeProject ( ProjectListIter& );
+
     FermaNextWorkspace& operator= ( const FermaNextWorkspace& );
     virtual ~FermaNextWorkspace ();
 
 signals:
     void onProjectCreate ( FermaNextProject& );
-    void onProjectRemove ( FermaNextProject& );
+    void onBeforeProjectRemove ( FermaNextProject& );
+    void onAfterProjectRemove ();
     void onReset ();
     void onNameChange ( const QString& name );
     

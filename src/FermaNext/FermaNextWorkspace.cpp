@@ -9,6 +9,10 @@
  * FermaNext Workspace
  *****************************************************************************/
 
+const QString FermaNextWorkspace::FormatExtension = ".fws";
+
+/*****************************************************************************/
+
 FermaNextWorkspace* FermaNextWorkspace::instance = 0;
 QMutex FermaNextWorkspace::mutex;
 
@@ -21,6 +25,20 @@ FermaNextWorkspace::FermaNextWorkspace () :
 FermaNextWorkspace::~FermaNextWorkspace ()
 {
     clearProjects();
+}
+
+void FermaNextWorkspace::loadFromXML ( const QDomElement& elem )
+    throw (LoadException)
+{
+    XMLSerializableObject::loadFromXML( elem );
+
+    // Destroy existent projects
+    reset();
+}
+
+QDomElement FermaNextWorkspace::saveToXML ( QDomDocument& doc )
+{
+    return XMLSerializableObject::saveToXML( doc );
 }
 
 FermaNextWorkspace& FermaNextWorkspace::workspace ()
@@ -37,9 +55,11 @@ FermaNextWorkspace& FermaNextWorkspace::workspace ()
 void FermaNextWorkspace::clearProjects ()
 {
     ProjectListIter iter = projects.begin();
-    for ( ; iter != projects.end(); ++iter )       
-      delete *iter;    
-    projects.clear();
+    for ( ; iter != projects.end(); ) {
+        bool res = removeProject(iter);
+        if ( ! res )
+            ++iter;
+    }
 }
 
 void FermaNextWorkspace::reset ()
@@ -58,7 +78,7 @@ void FermaNextWorkspace::createWidgetStack ( QMainWindow& parent )
 }
 
 FermaNextProject& FermaNextWorkspace::createProject ( const QString& name )
-                                     throw (WorkspaceIsNotInitedCorrectly)
+    throw (WorkspaceIsNotInitedCorrectly)
 {
     // Assuming widget stack was created.
     if ( widgetStack == 0 )
@@ -69,17 +89,36 @@ FermaNextProject& FermaNextWorkspace::createProject ( const QString& name )
     return *project;
 }
 
+FermaNextProject& FermaNextWorkspace::createProject ( QDomElement& elem ) 
+    throw (WorkspaceIsNotInitedCorrectly, LoadException)
+{
+    FermaNextProject& prj = createProject( QString::null );
+    try { prj.loadFromXML( elem ); }
+    catch ( LoadException& ) {
+        removeProject(prj);
+        throw;
+    }
+    return prj;
+}
+
+bool FermaNextWorkspace::removeProject ( ProjectListIter& iter )
+{
+    if ( iter == projects.end() )
+        return false;
+    FermaNextProject* prj = *iter;
+    emit onBeforeProjectRemove(*prj);
+    projects.erase(iter);
+    delete prj;
+    emit onAfterProjectRemove();
+    return true;        
+}
+
 bool FermaNextWorkspace::removeProject ( FermaNextProject& project )
 {    
     ProjectListIter iter = projects.begin();
     for ( ; iter != projects.end(); ++iter ) 
-        if ( (*iter) == &project ) {  
-            FermaNextProject* prj = *iter;
-            emit onProjectRemove(*prj);
-            projects.erase(iter);
-            delete prj;
-            return true;
-    }
+        if ( (*iter) == &project )
+            return removeProject(iter);    
     return false; 
 }
 
@@ -87,12 +126,8 @@ bool FermaNextWorkspace::removeProject ( const QString& name )
 { 
     ProjectListIter iter = projects.begin();
     for ( ; iter != projects.end(); ++iter ) 
-        if ( (*iter)->getName() == name ) {  
-            FermaNextProject* prj = *iter;
-            emit onProjectRemove(*prj);
-            projects.erase(iter);
-            delete prj;
-            return true;
+        if ( (*iter)->getName() == name ) {
+            return removeProject( iter );
     }
     return false; 
 }

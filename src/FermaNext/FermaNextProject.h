@@ -18,7 +18,13 @@ class FermaNextProject : public QObject, public XMLSerializableObject
 {
     Q_OBJECT
 public:
+    // File format extension
+    static const QString FormatExtension;
+
     virtual ~FermaNextProject ();
+
+    // XML serialization
+    virtual QDomElement saveToXML ( QDomDocument& );
 
     virtual const QString& getName () const;
     virtual void setName ( const QString& );
@@ -27,6 +33,10 @@ public:
     virtual TrussUnitWindowManager& getTrussUnitWindowManager ();    
     virtual TrussUnitDesignerWindow& getDesignerWindow ();
     virtual CalcDataToolBar& getCalcDataToolBar ();
+
+protected:
+    // XML serialization
+    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
 
 signals:
     void onNameChange ( const QString& );    
