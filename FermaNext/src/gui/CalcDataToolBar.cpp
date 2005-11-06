@@ -50,6 +50,9 @@ void CalcDataToolBar::addWidget ( QWidget& w )
 
 void CalcDataToolBar::addTrussUnitWindow ( TrussUnitWindow& truss )
 {
+    // Catch renaming
+    QObject::connect( &truss, SIGNAL(onTrussNameChange(const QString&)),
+                              SLOT(trussUnitWindowRename(const QString&)) );
     // Catch life time changing
     QObject::connect( &truss, SIGNAL(onAfterDesist(StatefulObject&)), 
                               SLOT(trussUnitWindowDesist(StatefulObject&)) );
@@ -70,6 +73,21 @@ void CalcDataToolBar::removeTrussUnitWindow ( TrussUnitWindow& truss )
     removeWidget( *w );
     calcDataWidgets.remove( &truss );
     delete w;
+}
+
+void CalcDataToolBar::trussUnitWindowRename ( const QString& newName )
+{
+    try { 
+        const TrussUnitWindow& trussWindow = 
+            dynamic_cast<const TrussUnitWindow&>( *sender() );
+        if ( calcDataWidgets.contains( &trussWindow ) ) {
+            QWidget* w = calcDataWidgets[&trussWindow];
+            w->setCaption( newName );
+            TabbedWidget* tw = findByWidget( *w );
+            if ( tw )
+                tw->setName( newName );
+        }
+    } catch ( ... ) {}
 }
 
 void CalcDataToolBar::trussUnitWindowDesist ( StatefulObject& st )

@@ -48,6 +48,7 @@ protected:
     void loadWidgetState ();
 
 public slots:
+    void setName ( const QString& );
     void activate ();
     void activate ( bool );
     void disactivate ();

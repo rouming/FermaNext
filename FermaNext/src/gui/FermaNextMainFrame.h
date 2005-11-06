@@ -10,6 +10,7 @@ class FermaNextProject;
 class TrussUnitWindow;
 class FermaNextWorkspace;
 class UndoRedoListBox;
+class QFile;
 
 class FermaNextMainFrame : public QMainWindow
 {
@@ -26,6 +27,9 @@ public slots:
     void reloadPlugins ();
     
 protected:
+    //Exceptions
+    class WrongXMLFormatException {};
+
     // Provides correct last cleanup before quit.
     void cleanBeforeQuit ();
 
@@ -36,6 +40,12 @@ protected:
     void setupWindowActions ();
     void setupHelpActions ();
     void setupPluginActions ();
+
+    // Manages project/workspace files
+    void openProject ( QFile& ) throw (WrongXMLFormatException);
+    void openWorkspace ( QFile& ) throw (WrongXMLFormatException);
+    void saveProject ( QFile& );
+    void saveWorkspace ( QFile& );
 
     // Close handler. Calls 'clean' for correct close.
     void closeEvent ( QCloseEvent* );
@@ -54,16 +64,13 @@ protected slots:
     void filePageSetup ();
     void filePrintPreview ();
     void filePrint ();
-    void fileRecentPrjs ();
-    void fileRecentWsps ();
     void fileExit ();
 
     void editUndo ();
     void editRedo ();
     void editCopy ();
     void editPaste ();
-    void editCut ();
-    void editDelete ();
+    void editCut ();    
     void editSelectAll ();
 
     void helpContents ();
@@ -71,6 +78,8 @@ protected slots:
 
     // Refresh undo/redo
     void refreshUndoRedoActions ();
+    // Refresh project actions
+    void refreshProjectActions ();
 
     // Catch designer widget focus change
     void trussWindowLostFocus ( TrussUnitWindow& );
@@ -87,9 +96,15 @@ private:
     ProjectToolBox* projectToolBox;
     // Current system workspace
     FermaNextWorkspace* wsp;
+
     // Some actions
     QAction* undoAction;
     QAction* redoAction;
+    QAction* saveProjectAction;
+    QAction* saveAsProjectAction;
+    QAction* closeProjectAction;
+    
+    // Plugins menu
     QPopupMenu* pluginsMenu;
 };
 

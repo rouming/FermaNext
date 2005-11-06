@@ -25,6 +25,7 @@
 #include <qpushbutton.h>
 #include <qinputdialog.h> 
 #include <qmessagebox.h>
+#include <qfiledialog.h>
 
 const QString mainFrameCaption( QObject::tr( "Educational CAD System 'Ferma'" ) );
 
@@ -92,12 +93,14 @@ void FermaNextMainFrame::init ()
 
     FermaNextWorkspace& ws = FermaNextWorkspace::workspace();
     projectToolBox = new ProjectToolBox( ws, projectsDockWindow );
-    connect( &ws, SIGNAL(onProjectRemove(FermaNextProject&)), 
+    connect( &ws, SIGNAL(onBeforeProjectRemove(FermaNextProject&)), 
                   SLOT(someProjectRemoved(FermaNextProject&)) );
     connect( &ws, SIGNAL(onProjectCreate(FermaNextProject&)), 
                   SLOT(someProjectCreated(FermaNextProject&)) );
     connect( projectToolBox, SIGNAL(currentChanged(int)), 
                              SLOT(refreshUndoRedoActions()) );
+    connect( projectToolBox, SIGNAL(currentChanged(int)), 
+                             SLOT(refreshProjectActions()) );
     projectsDockWindow->setWidget( projectToolBox );
     projectsDockWindow->setFixedExtentWidth( 160 );
     projectsDockWindow->hide();
@@ -211,74 +214,78 @@ void FermaNextMainFrame::setupFileActions ()
     a->addTo( menu );    
 
     // Save
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filesave.xpm" ), 
+    saveProjectAction = 
+        new QAction( QPixmap::fromMimeSource( imagesPath() + "/filesave.xpm" ),
                      tr( "&Save..." ), CTRL + Key_S, this, "fileSave" );
-    connect( a, SIGNAL( activated() ), this, SLOT( fileSave() ) );
-    a->addTo( tb );
-    a->addTo( menu );    
-
-    // Delete
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/editdelete.png" ), 
-                     tr( "&Delete" ), Key_Delete, this, "editDelete" );
-    connect( a, SIGNAL( activated() ), this, SLOT( editDelete() ) );    
-    a->addTo( menu );
-    a->addTo( tb );
+    connect( saveProjectAction, SIGNAL( activated() ), 
+             this, SLOT( fileSave() ) );
+    saveProjectAction->addTo( tb );
+    saveProjectAction->addTo( menu );
+    saveProjectAction->setDisabled(true);
     menu->insertSeparator();
 
     // Save As
-    a = new QAction( tr( "Save &As..." ), 0, this, "fileSaveAs" );
-    connect( a, SIGNAL( activated() ), this, SLOT( fileSaveAs() ) );
-    a->addTo( menu );
+    saveAsProjectAction = 
+        new QAction( tr( "Save &As..." ), 0, this, "fileSaveAs" );
+    connect( saveAsProjectAction, SIGNAL( activated() ), 
+             this, SLOT( fileSaveAs() ) );
+    saveAsProjectAction->addTo( menu );
+    saveAsProjectAction->setDisabled(true);
 
     // Close
-    a = new QAction( tr( "&Close" ), CTRL + ALT + Key_F4, this, "fileClose" );
-    connect( a, SIGNAL( activated() ), this, SLOT( fileClose() ) );
-    a->addTo( menu );
+    closeProjectAction = 
+        new QAction( tr( "&Close" ), CTRL + ALT + Key_F4, 
+                     this, "fileClose" );
+    connect( closeProjectAction, SIGNAL( activated() ), 
+             this, SLOT( fileClose() ) );
+    closeProjectAction->addTo( menu );
+    closeProjectAction->setDisabled(true);
     menu->insertSeparator();
 
     // Open Wsp
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/fileopenwsp.xpm" ), 
-                     tr( "Open Workspace..." ), SHIFT + Key_F2, this, "fileOpenWsp" );
+    a = new QAction( tr( "Open Workspace..." ), SHIFT + Key_F2, 
+                     this, "fileOpenWsp" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileOpenWsp() ) );
     a->addTo( menu );
 
     // Save Wsp
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filesavewsp.xpm" ), 
-                     tr( "Save Workspace" ), SHIFT + Key_F3, this, "fileSaveWsp" );
+    a = new QAction( tr( "Save Workspace" ), SHIFT + Key_F3, 
+                     this, "fileSaveWsp" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileSaveWsp() ) );
     a->addTo( menu );
 
     // Save Wsp As
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filesavewspas.xpm" ), 
-                     tr( "Save Workspace As..." ), 0, this, "fileSaveWspAs" );
+    a = new QAction( tr( "Save Workspace As..." ), 0, 
+                     this, "fileSaveWspAs" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileSaveWspAs() ) );
     a->addTo( menu );
 
     // Close Wsp
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/fileclosewsp.xpm" ), 
-                     tr( "Close Workspace" ), SHIFT + Key_F4, this, "fileCloseWsp" );
+    a = new QAction( tr( "Close Workspace" ), SHIFT + Key_F4, 
+                     this, "fileCloseWsp" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileCloseWsp() ) );
     a->addTo( menu );
     menu->insertSeparator();
 
     // Save All
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filesaveall.xpm" ), 
-                     tr( "Save All" ), CTRL + Key_F3, this, "fileSaveAll" );
+    a = new QAction( tr( "Save All" ), CTRL + Key_F3, 
+                     this, "fileSaveAll" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileSaveAll() ) );
     a->addTo( menu );
     menu->insertSeparator();
 
     // Page Setup
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filepagesetup.xpm" ), 
-                     tr( "Page setup..." ), 0, this, "filePageSetup" );
+    a = new QAction( tr( "Page setup..." ), 0, this, "filePageSetup" );
     connect( a, SIGNAL( activated() ), this, SLOT( filePageSetup() ) );
     a->addTo( menu );
+    a->setDisabled(true);
 
     // Print Preview
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/fileprintpreview.xpm" ), 
-                     tr( "Print Preview" ), CTRL + ALT + Key_P, this, "fileprintpreview" );
+    a = new QAction( tr( "Print Preview" ), CTRL + ALT + Key_P, 
+                     this, "fileprintpreview" );
     connect( a, SIGNAL( activated() ), this, SLOT( filePrintPreview() ) );
     a->addTo( menu );
+    a->setDisabled(true);
 
     // Print
     a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/fileprint.xpm" ), 
@@ -286,26 +293,13 @@ void FermaNextMainFrame::setupFileActions ()
     connect( a, SIGNAL( activated() ), this, SLOT( filePrint() ) );        
     a->addTo( menu );
     menu->insertSeparator();
-
-    // Recent Prjs
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filerecentprjs.xpm" ), 
-                     tr( "Recent Projects" ), 0, this, "fileRecentPrjs" );
-    connect( a, SIGNAL( activated() ), this, SLOT( fileRecentPrjs() ) );
-    a->addTo( menu );
-
-    // Recent Wsps
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filerecentwsps.xpm" ), 
-                     tr( "Recent Workspaces" ), 0, this, "fileRecentWsps" );
-    connect( a, SIGNAL( activated() ), this, SLOT( fileRecentWsps() ) );
-    a->addTo( menu );
-    menu->insertSeparator();
+    a->setDisabled(true);
 
     // Exit
     a = new QAction( tr( "E&xit" ), CTRL + Key_Q, this, "fileExit" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileExit() ) );
     a->addTo( menu );
 }
-
 
 void FermaNextMainFrame::setupEditActions ()
 {
@@ -333,34 +327,6 @@ void FermaNextMainFrame::setupEditActions ()
     redoAction->addTo( menu );
     menu->insertSeparator();
     tb->addSeparator();
-
-    QAction *a;
-    // Copy
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/editcopy.xpm" ), 
-                     tr( "&Copy" ), CTRL + Key_C, this, "editCopy" );
-    connect( a, SIGNAL( activated() ), this, SLOT( editCopy() ) );
-    a->addTo( tb );
-    a->addTo( menu );
-
-    // Paste
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/editpaste.xpm" ), 
-                     tr( "&Paste" ), CTRL + Key_V, this, "editPaste" );
-    connect( a, SIGNAL( activated() ), this, SLOT( editPaste() ) );
-    a->addTo( tb );
-    a->addTo( menu );
-
-    // Cut
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/editcut.xpm" ), 
-                     tr( "Cu&t" ), CTRL + Key_X, this, "editCut" );
-    connect( a, SIGNAL( activated() ), this, SLOT( editCut() ) );
-    a->addTo( tb );
-    a->addTo( menu );
-
-    // Select All
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/editselectall.xpm" ), 
-                     tr( "Select A&ll" ), CTRL + Key_A, this, "editSelectAll" );
-    connect( a, SIGNAL( activated() ), this, SLOT( editSelectAll() ) );    
-    a->addTo( menu );
 }
 
 void FermaNextMainFrame::setupProjectActions ()
@@ -378,22 +344,70 @@ void FermaNextMainFrame::setupHelpActions ()
 
     QAction *a;
     // Contents
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/helpcontents.xpm" ), 
-                     tr( "Contents..." ), Key_F1, this, "helpContents" );
+    a = new QAction( tr( "Contents..." ), Key_F1, this, "helpContents" );
     connect( a, SIGNAL( activated() ), this, SLOT( helpContents() ) );
     a->addTo( menu );
+    a->setDisabled(true);
     menu->insertSeparator();
 
     // About
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/helpabout.xpm" ), 
-                     tr( "About FermaNext" ), 0, this, "helpAbout" );
+    a = new QAction( tr( "About FermaNext" ), 0, this, "helpAbout" );
     connect( a, SIGNAL( activated() ), this, SLOT( helpAbout() ) );    
-    a->addTo( menu );    
+    a->addTo( menu );
+    a->setDisabled(true);
 }
 
 void FermaNextMainFrame::setupPluginActions ()
 {
     reloadPlugins();
+}
+
+void FermaNextMainFrame::openProject ( QFile& xmlFile )
+    throw (WrongXMLFormatException)
+{
+    QIODevice* xmlIODev = &xmlFile;
+    QDomDocument doc;
+    if ( !doc.setContent( xmlIODev ) )
+        throw WrongXMLFormatException();
+
+    QDomElement docElem = doc.documentElement();
+    if ( docElem.isNull() )
+        throw WrongXMLFormatException();
+
+    FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();    
+
+    try { wsp.createProject( docElem ); } 
+    catch ( ... ) {
+        throw WrongXMLFormatException();
+    }
+}
+
+void FermaNextMainFrame::openWorkspace ( QFile& xmlFile )
+    throw (WrongXMLFormatException)
+{
+    QDomDocument doc;
+    QIODevice* xmlIODev = &xmlFile;
+    if ( !doc.setContent( xmlIODev ) )
+        throw WrongXMLFormatException();
+
+    QDomElement docElem = doc.documentElement();
+    if ( docElem.isNull() )
+        throw WrongXMLFormatException();
+
+    FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
+
+    try { wsp.loadFromXML( docElem ); }
+    catch ( FermaNextWorkspace::LoadException& ) {
+        throw WrongXMLFormatException();
+    }
+}
+
+void FermaNextMainFrame::saveProject ( QFile& xmlFile )
+{
+}
+
+void FermaNextMainFrame::saveWorkspace ( QFile& xmlFile )
+{
 }
 
 void FermaNextMainFrame::reloadPlugins ()
@@ -446,6 +460,19 @@ void FermaNextMainFrame::refreshUndoRedoActions ()
     redoAction->setEnabled(enableRedo);
 }
 
+void FermaNextMainFrame::refreshProjectActions ()
+{
+    bool enableActions = false;
+
+    FermaNextProject* prj = projectToolBox->currentProject();
+    if ( prj )
+        enableActions = true;
+
+    saveProjectAction->setEnabled(enableActions);
+    saveAsProjectAction->setEnabled(enableActions);
+    closeProjectAction->setEnabled(enableActions);
+}
+
 void FermaNextMainFrame::trussWindowLostFocus ( TrussUnitWindow& window )
 {
     ObjectStateManager* mng = window.getStateManager();
@@ -485,7 +512,25 @@ void FermaNextMainFrame::fileNew ()
 
 void FermaNextMainFrame::fileOpen ()
 {
-    qWarning("Not implmented yet!");
+    QString fileName = QFileDialog::getOpenFileName( QString::null, 
+        "Ferma project (*" + FermaNextProject::FormatExtension + ")", 
+        this );
+
+    if ( fileName.isEmpty() )
+        return;
+
+    QFile xmlFile( fileName );
+    if ( ! xmlFile.open( IO_ReadOnly ) ) {
+        QMessageBox::critical( this, tr("Read file error"),
+                               tr("Can't read file: %1").arg(fileName) );
+        return;
+    }
+
+    try { openProject( xmlFile ); }
+    catch ( WrongXMLFormatException& ) {
+        QMessageBox::critical( this, tr("Error reading project file"),
+                               tr("Wrong XML format.") );
+    }    
 }
 
 void FermaNextMainFrame::fileSave ()
@@ -495,17 +540,93 @@ void FermaNextMainFrame::fileSave ()
 
 void FermaNextMainFrame::fileSaveAs ()
 {
-    qWarning("Not implmented yet!");
+    FermaNextProject* currentPrj = projectToolBox->currentProject();
+    if ( currentPrj == 0 )
+        return;
+
+    QString fileName = QFileDialog::getSaveFileName( QString::null, 
+        "Ferma project (*" + FermaNextProject::FormatExtension + ")", 
+        this );
+
+    if ( fileName.isEmpty() )
+        return;
+
+    QRegExp rx( ".*\\" + FermaNextProject::FormatExtension + "$" );
+    if ( -1 == rx.search( fileName ) )
+        fileName += FermaNextProject::FormatExtension;
+
+    if ( QFile::exists( fileName ) ) {
+        if ( QMessageBox::question( this,
+                                    tr("File exists - \"%1\"").arg(fileName),                                      
+                                    tr("Rewrite file?"),
+                                    tr("&Yes"), tr("&No"),
+                                    QString::null, 0, 1 ) )
+            return;
+    }
+
+    QFile xmlFile( fileName );
+    if ( ! xmlFile.open( IO_WriteOnly ) ) {
+        QMessageBox::critical( this, tr("Write file error"),
+                               tr("Can't write to file: %1").arg(fileName) );
+        return;
+    }
+
+    QTextStream stream( &xmlFile );
+
+    QDomDocument doc;
+    QDomNode node = doc.createProcessingInstruction(
+                        "xml", QString("version=\"1.0\" encoding=\"UTF8\"") );
+    doc.insertBefore( node, doc.firstChild() );
+
+    doc.appendChild( currentPrj->saveToXML( doc ) );
+
+    doc.save( stream, 4 );
 }
 
 void FermaNextMainFrame::fileClose ()
 {
-    qWarning("Not implmented yet!");
+    FermaNextProject* currentPrj = projectToolBox->currentProject();
+    if ( currentPrj == 0 )
+        return;
+    if ( QMessageBox::question( this,
+                                tr("Project closing - \"%1\"").
+                                  arg(currentPrj->getName()),
+                                tr("Close current project?"),
+                                tr("&Yes"), tr("&No"),
+                                QString::null, 0, 1 ) )
+        return;
+    
+    FermaNextWorkspace::workspace().removeProject( *currentPrj );
 }
 
 void FermaNextMainFrame::fileOpenWsp ()
 {
-    qWarning("Not implmented yet!");
+    if ( QMessageBox::question( this,
+                                tr("Open workspace"),                                  
+                                tr("Open workspace and don't save this one?"),
+                                tr("&Yes"), tr("&No"),
+                                QString::null, 0, 1 ) )
+        return;
+
+    QString fileName = QFileDialog::getOpenFileName( QString::null, 
+        "Ferma workspace (*" + FermaNextWorkspace::FormatExtension + ")", 
+        this );
+
+    if ( fileName.isEmpty() )
+        return;
+
+    QFile xmlFile( fileName );
+    if ( ! xmlFile.open( IO_ReadOnly ) ) {
+        QMessageBox::critical( this, tr("Read file error"),
+                               tr("Can't read file: %1").arg(fileName) );
+        return;
+    }
+
+    try { openWorkspace( xmlFile ); }
+    catch ( WrongXMLFormatException& ) {
+        QMessageBox::critical( this, tr("Error reading workspace file"),
+                               tr("Wrong XML format.") );
+    }
 }
 
 void FermaNextMainFrame::fileSaveWsp ()
@@ -539,16 +660,6 @@ void FermaNextMainFrame::filePrintPreview ()
 }
 
 void FermaNextMainFrame::filePrint ()
-{
-    qWarning("Not implmented yet!");
-}
-
-void FermaNextMainFrame::fileRecentPrjs ()
-{
-    qWarning("Not implmented yet!");
-}
-
-void FermaNextMainFrame::fileRecentWsps ()
 {
     qWarning("Not implmented yet!");
 }
@@ -628,27 +739,10 @@ void FermaNextMainFrame::editCut ()
     qWarning("Not implmented yet!");
 }
 
-void FermaNextMainFrame::editDelete ()
-{
-    FermaNextProject* currentPrj = projectToolBox->currentProject();
-    if ( currentPrj == 0 )
-        return;
-    if ( QMessageBox::question( this,
-                                tr("Project deleting - \"%1\"").
-                                  arg(currentPrj->getName()),
-                                tr("Delete current project?"),
-                                tr("&Yes"), tr("&No"),
-                                QString::null, 0, 1 ) )
-        return;
-    
-    FermaNextWorkspace::workspace().removeProject( *currentPrj );
-}
-
 void FermaNextMainFrame::editSelectAll ()
 {
     qWarning("Not implmented yet!");
 }
-
 
 void FermaNextMainFrame::helpContents ()
 {
