@@ -33,9 +33,11 @@ void XMLSerializableObject::loadFromXML ( const QDomElement& elem )
  * Override this method in parent class to provide saving of the object 
  * to XML format.
  */
-void XMLSerializableObject::saveToXML ( QDomElement& elem )
+QDomElement XMLSerializableObject::saveToXML ( QDomDocument& doc )
 {
+    QDomElement elem = doc.createElement( "XMLSerializableObject" );
     elem.setAttribute( "uuid", getUUID() );
+    return elem;
 }
 
 /*****************************************************************************/
