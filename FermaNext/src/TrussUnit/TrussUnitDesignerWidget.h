@@ -75,6 +75,9 @@ public:
     virtual void sendWindowToBack ( TrussUnitWindow& );
     virtual TrussUnitWindow* getFocusedWindow () const;
 
+    // Returns window stack.
+    virtual WindowList getTrussUnitWindowList () const;
+
 protected:
     virtual void clearTrussUnitWindows ();
     virtual void initToolBar ();    

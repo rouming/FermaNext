@@ -228,9 +228,9 @@ void TrussUnitDesignerWidget::clearTrussUnitWindows ()
 }
 
 void TrussUnitDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow )
-{    
-    X += 15; 
-    Y += 10;
+{   
+    // Window owner
+    trussWindow.setWindowOwner( this );
 
     // We should repaint all area after truss changes its visibility or state
     QObject::connect( &trussWindow, SIGNAL(onVisibleChange(bool)), 
@@ -253,17 +253,22 @@ void TrussUnitDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow 
                                     SLOT( update() ) );
 
     trussWindows.push_back(&trussWindow);
-    trussWindow.setWindowPosition ( QPoint( X, Y ) );
+    // If window position was not set, we set default value
+    if ( ! trussWindow.hasPosition() ) {
+        X += 15; 
+        Y += 10;
+        trussWindow.setWindowPosition ( QPoint( X, Y ) );
+    }
     focusOnWindow(trussWindow);
-    trussWindow.setMaxSize( width(), height() );
 }
 
 bool TrussUnitDesignerWidget::removeTrussUnitWindow ( TrussUnitWindow& window )
 {
-    WindowList::iterator iter = trussWindows.begin();
+    WindowListIter iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter )
         if ( (*iter) == &window ) {
             TrussUnitWindow* trussWindow = *iter;
+            trussWindow->setWindowOwner(0);
             // Do disconnection of all signals
             trussWindow->disconnect( this );
             trussWindows.erase(iter);
@@ -371,11 +376,11 @@ void TrussUnitDesignerWidget::trussWindowDesisted ( StatefulObject& obj )
 
 TrussUnitWindow* TrussUnitDesignerWidget::findWindowByWidgetPos ( int x, int y )
 {
-    WindowList::reverse_iterator rev_iter = trussWindows.rbegin();
-    for ( ; rev_iter != trussWindows.rend(); ++rev_iter ) {
-        TrussUnitWindow* w = *rev_iter;
+    WindowListRevIter revIter = trussWindows.rbegin();
+    for ( ; revIter != trussWindows.rend(); ++revIter ) {
+        TrussUnitWindow* w = *revIter;
         if ( w->isAlive() && w->isVisible() && w->inWindowRect(x, y) )
-            return *rev_iter;
+            return *revIter;
     }
     return 0;
 }
@@ -429,9 +434,9 @@ void TrussUnitDesignerWidget::focusOnPrevWindow ( TrussUnitWindow& window )
 {
     // We start searching from the end of the vector to get the top 
     // of the window stack.
-    WindowList::reverse_iterator windowIt = std::find( trussWindows.rbegin(),
-                                                       trussWindows.rend(), 
-                                                       &window );
+    WindowListRevIter windowIt = std::find( trussWindows.rbegin(),
+                                            trussWindows.rend(), 
+                                            &window );
     if ( windowIt == trussWindows.rend() )
         // Hm. Wrong argument?
         return;
@@ -440,7 +445,7 @@ void TrussUnitDesignerWidget::focusOnPrevWindow ( TrussUnitWindow& window )
         // We should defocus if it has focus and find 
         // prev alive window to bring it to front.
 
-        WindowList::reverse_iterator focusedWindowIt = windowIt;
+        WindowListRevIter focusedWindowIt = windowIt;
 
         // Next window in the stack.
         ++focusedWindowIt;
@@ -462,6 +467,23 @@ void TrussUnitDesignerWidget::focusOnPrevWindow ( TrussUnitWindow& window )
 TrussUnitWindow* TrussUnitDesignerWidget::getFocusedWindow () const
 {
     return focusedWindow;
+}
+
+/** 
+ * Returns window stack.
+ * Note: this method is differ from 
+ *       TrussUnitWindowManager::getTrussUnitWindowList.
+ *       This method returns windows in order they are displayed
+ *       by window owner.
+ */
+WindowList TrussUnitDesignerWidget::getTrussUnitWindowList () const
+{
+    WindowList aliveWindows;
+    WindowListConstIter wIter = trussWindows.begin();
+    for ( ; wIter != trussWindows.end(); ++wIter )
+        if ( (*wIter)->isAlive() )
+            aliveWindows.push_back( *wIter );
+    return aliveWindows;
 }
 
 void TrussUnitDesignerWidget::clearWindowFocus ()
@@ -552,11 +574,11 @@ bool TrussUnitDesignerWidget::nodeCanBeDrawn ( int x, int y )
 {
     bool wrongArea = false;
     uint i = trussWindows.size();
-    WindowList::reverse_iterator rev_iter = trussWindows.rbegin();
-    for ( ; rev_iter != trussWindows.rend(); ++rev_iter )
+    WindowListRevIter revIter = trussWindows.rbegin();
+    for ( ; revIter != trussWindows.rend(); ++revIter )
     {
         i--;
-        TrussUnitWindow* window = *rev_iter;
+        TrussUnitWindow* window = *revIter;
         if ( window->isAlive() && window->inTrussAreaRect ( x, y ) )
         {
             WindowListIter iter = trussWindows.begin() + i;
@@ -698,12 +720,11 @@ void TrussUnitDesignerWidget::aggResizeEvent ( QResizeEvent* )
     for ( ; iter != trussWindows.end(); ++iter ) 
     {
         TrussUnitWindow* w = *iter;
-        w->setMaxSize( width(), height() );
         if ( w->isAlive() && w->isMaximized() )
             w->maximize( false );
     }
     toolBar->changeCenterPosition ( QPoint( width()/2, height() ) );
-    aggHint->renewWidgetSize ( this->size() );
+    aggHint->renewWidgetSize ( size() );
 }
 
 void TrussUnitDesignerWidget::aggKeyPressEvent ( QKeyEvent* ke )

@@ -11,11 +11,17 @@
 
 typedef std::vector<TrussUnitWindow*> WindowList;
 typedef WindowList::iterator WindowListIter;
+typedef WindowList::const_iterator WindowListConstIter;
+typedef WindowList::reverse_iterator WindowListRevIter;
 
 class TrussUnitWindowManager : public QObject
 {
     Q_OBJECT
 public:
+    // File format extensions
+    static const QString NewFormatExtension;
+    static const QString OldFormatExtension;
+
     // TrussUnitWindowManager exceptions
     class ReadFileException  {};
     class WriteFileException {};
@@ -37,7 +43,7 @@ protected:
 
     virtual void loadOldVersion ( TrussUnit&, QFile& ) 
         throw (WrongFormatException);
-    virtual void loadNewVersion ( TrussUnit&, const QFile& ) 
+    virtual void loadNewVersion ( TrussUnit&, QFile& ) 
         throw (WrongFormatException);
 
 public slots:
@@ -67,8 +73,6 @@ signals:
     void onTrussUnitWindowDesist ( TrussUnitWindow& );
 
 private:
-    static const QString NEW_EXTENSION;
-    static const QString OLD_EXTENSION;
     // Every truss has it's own state manager.
     typedef QMap<TrussUnitWindow*, ObjectStateManager*> StateManagerMap;
     typedef StateManagerMap::Iterator StateManagerMapIter;

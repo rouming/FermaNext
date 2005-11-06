@@ -1,7 +1,8 @@
 
 #include "TrussUnitWindow.h"
 #include "TrussUnitActions.h"
-#include "qtimer.h"
+#include <qtimer.h>
+#include <qwidget.h>
 
 /*****************************************************************************
  * Truss Unit Window
@@ -13,6 +14,8 @@
 TrussUnitWindow::TrussUnitWindow ( const QString& name, 
                                    ObjectStateManager* mng ) :
     TrussUnit( name, mng ),
+    windowOwner(0),
+    positionIsSet( false ),
     windowSize( defaultWidth, defaultHeight ),
     coordFieldSize( 49, 12 ),
     cursorCoord( -1.0, -1.0 ),
@@ -75,6 +78,11 @@ TrussUnitWindow::~TrussUnitWindow ()
     delete timer;
 }
 
+void TrussUnitWindow::setWindowOwner ( QWidget* owner )
+{
+    windowOwner = owner;
+}
+
 /** 
  * Loads truss window from XML format
  */
@@ -83,9 +91,11 @@ void TrussUnitWindow::loadFromXML ( const QDomElement& elem )
 {
     TrussUnit::loadFromXML( elem );
 
+    /** 
+     * Set window size
+     *******************/
     if ( ! elem.hasAttribute( "windowWidth" ) )
         throw LoadException();
-
     if ( ! elem.hasAttribute( "windowHeight" ) )
         throw LoadException();
 
@@ -97,13 +107,65 @@ void TrussUnitWindow::loadFromXML ( const QDomElement& elem )
     if ( !ok ) throw LoadException();
 
     setWindowSize( width, height );
+
+    /** 
+     * Set window pisition
+     ***********************/
+    if ( ! elem.hasAttribute( "windowXPosition" ) )
+        throw LoadException();
+    if ( ! elem.hasAttribute( "windowYPosition" ) )
+        throw LoadException();
+
+    int xPos = elem.attribute( "windowXPosition" ).toInt( &ok );
+    if ( !ok ) throw LoadException();
+
+    int yPos = elem.attribute( "windowYPosition" ).toInt( &ok );
+    if ( !ok ) throw LoadException();
+
+    setWindowPosition( QPoint( xPos, yPos ) );
+
+    /**
+     * Set visible
+     *****************/
+    if ( elem.hasAttribute( "windowVisible" ) ) {
+        QString isVisible = elem.attribute( "windowVisible" );
+        if ( isVisible == "Yes" )
+            setVisible( true );
+        else if ( isVisible == "No" )
+            setVisible( false );
+        else
+            throw LoadException();
+    }
 }
 
 /** 
  * Saves truss window to XML format
  */
-void TrussUnitWindow::saveToXML ( QDomElement& )
+QDomElement TrussUnitWindow::saveToXML ( QDomDocument& doc )
 {
+    QDomElement trussElem = TrussUnit::saveToXML( doc );
+    trussElem.setTagName( "TrussUnitWindow" );
+
+    /** 
+     * Save window size
+     *******************/
+    QSize size = getWindowSize();
+    trussElem.setAttribute( "windowWidth", size.width() );
+    trussElem.setAttribute( "windowHeight", size.height() );
+
+    /** 
+     * Save window pisition
+     ***********************/
+    QPoint pos = getWindowLeftTopPos();
+    trussElem.setAttribute( "windowXPosition", pos.x() );
+    trussElem.setAttribute( "windowYPosition", pos.y() );
+
+    /**
+     * Save visible
+     *****************/
+    trussElem.setAttribute( "windowVisible", (isVisible() ? "Yes" : "No") );
+
+    return trussElem;
 }
 
 /* 
@@ -163,12 +225,21 @@ QPoint TrussUnitWindow::getTrussAreaRightBottomPos () const
 */
 void TrussUnitWindow::setWindowPosition ( QPoint pos )
 {
+    positionIsSet = true;
     QPoint oldPos = windowLeftTopPos;
     windowLeftTopPos = pos;
     windowRightBottomPos.setX ( windowLeftTopPos.x() + windowSize.width() );
     windowRightBottomPos.setY ( windowLeftTopPos.y() + windowSize.height() );
     setTrussPosition( getTrussAreaLeftTopPos() );
     emit onMove( oldPos, pos );
+}
+
+/**
+ * Returns true if position was set
+ */
+bool TrussUnitWindow::hasPosition () const
+{
+    return positionIsSet;
 }
 
 /* 
@@ -187,6 +258,18 @@ QPoint TrussUnitWindow::getButtonBufPos () const
 const QSize& TrussUnitWindow::getWindowSize () const
 {
     return windowSize;
+}
+
+/**
+  * If window has its owner, it returns window size to
+  * which it can be maximized. Or 0,0 is returned.
+  */
+QSize TrussUnitWindow::getMaximizedWindowSize () const
+{
+    if ( windowOwner )
+        return QSize( windowOwner->width() - bordWidth,
+                      windowOwner->height() - bordWidth );
+    return QSize(0,0); 
 }
 
 /* 
@@ -234,20 +317,14 @@ bool TrussUnitWindow::isMaximized () const
 }
 
 /*
-    Sets size of the maximized window depending on current
-    Designer Widget geometry size.
-*/
-void TrussUnitWindow::setMaxSize ( int x, int y )
-{
-    maxSize = QSize( x - bordWidth, y - bordWidth );
-}
-
-/*
     Maximizes truss unit window. Saves its current size and
     resizes it to maxSize.
 */
 void TrussUnitWindow::maximize ( bool saveOldSize )
 {
+    if ( windowOwner == 0 )
+        return;
+
     removeButtonsHighlight();
 
     if ( saveOldSize )
@@ -256,8 +333,10 @@ void TrussUnitWindow::maximize ( bool saveOldSize )
         minLeftTopPos = windowLeftTopPos;
         minRightBottomPos = windowRightBottomPos;
     }
+
+    QSize maximizedSize = getMaximizedWindowSize();
     resize ( QPoint( 0, 0 ), 
-             QPoint( maxSize.width(), maxSize.height() ) );
+             QPoint( maximizedSize.width(), maximizedSize.height() ) );
 
     rollUpButton->setHint( "Minimize truss unit" );
     maximized = true;
@@ -269,6 +348,9 @@ void TrussUnitWindow::maximize ( bool saveOldSize )
 */
 void TrussUnitWindow::minimize ()
 {
+    if ( windowOwner == 0 )
+        return;
+
     removeButtonsHighlight();
     resize ( minLeftTopPos, minRightBottomPos );
 

@@ -22,8 +22,10 @@ typedef PivotNodesList::iterator PivotNodesListIter;
  * Truss Unit Window Manager
  *****************************************************************************/
 
-const QString TrussUnitWindowManager::NEW_EXTENSION = ".fnx";
-const QString TrussUnitWindowManager::OLD_EXTENSION = ".frm";
+const QString TrussUnitWindowManager::NewFormatExtension = ".fnx";
+const QString TrussUnitWindowManager::OldFormatExtension = ".frm";
+
+/*****************************************************************************/
 
 TrussUnitWindowManager::TrussUnitWindowManager ()
 {}
@@ -110,8 +112,8 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindowFromFile (
     if ( !file.open( IO_ReadOnly ) )
 	    throw ReadFileException();
 
-    QRegExp re("([^/\\\\]*)((\\" + OLD_EXTENSION + ")|"
-                           "(\\" + NEW_EXTENSION + "))$");
+    QRegExp re("([^/\\\\]*)((\\" + OldFormatExtension + ")|"
+                           "(\\" + NewFormatExtension + "))$");
     re.search(fileName);
     QString trussName = re.cap(1);
     if ( trussName.isEmpty() )        
@@ -121,9 +123,9 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindowFromFile (
     // exception has happened.
     TrussUnitWindow& trussWindow = createTrussUnitWindow( true, trussName );
     try {
-        if( fileName.contains(NEW_EXTENSION) ) 
+        if( fileName.contains(NewFormatExtension) ) 
             loadNewVersion( trussWindow, file );
-        else if ( fileName.contains(OLD_EXTENSION) ) 
+        else if ( fileName.contains(OldFormatExtension) ) 
             loadOldVersion( trussWindow, file );
         else 
             throw WrongFormatException();
@@ -332,11 +334,12 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
 }
 
 void TrussUnitWindowManager::loadNewVersion ( TrussUnit& truss, 
-                                              const QFile& xmlFile )
+                                              QFile& xmlFile )
     throw (WrongFormatException)
 {
     QDomDocument doc;
-    if ( !doc.setContent( (QIODevice*)&xmlFile ) ) {
+    QIODevice* xmlIODev = &xmlFile;
+    if ( !doc.setContent( xmlIODev ) ) {
         throw WrongFormatException();
     }
 
@@ -346,7 +349,7 @@ void TrussUnitWindowManager::loadNewVersion ( TrussUnit& truss,
 
     try { 
         truss.loadFromXML( docElem );
-    } catch ( XMLSerializableObject::LoadException& ) {
+    } catch ( TrussUnit::LoadException& ) {
         throw WrongFormatException();
     }
 }

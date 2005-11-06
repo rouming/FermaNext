@@ -19,21 +19,32 @@ class Node;
 typedef Truss< Node, Pivot<Node> > TrussTopology;
 
 /*****************************************************************************
- * Truss Dimenstion
+ * Truss Dimension
  *****************************************************************************/
 
 class TrussDimension
 {
 public:
+    // Exceptions
+    class WrongArgsException {};
+
     enum LengthMeasure { mm = 0, sm, m };  //millimeter, centimeter, meter
     enum ForceMeasure  { newton = 0, kg };
 
     TrussDimension ();
     TrussDimension ( LengthMeasure, ForceMeasure );
+    // Try to parse arguments
+    TrussDimension ( const QString& lengthMeasure, 
+                     const QString& forceMeasure ) throw (WrongArgsException);
+
     TrussDimension& operator= ( const TrussDimension& );
 
     LengthMeasure getLengthMeasure () const;
     ForceMeasure getForceMeasure () const;
+
+    // String representation of measures
+    QString getLengthMeasureStr () const;
+    QString getForceMeasureStr () const;
 
     void setLengthMeasure ( LengthMeasure );
     void setForceMeasure ( ForceMeasure );
