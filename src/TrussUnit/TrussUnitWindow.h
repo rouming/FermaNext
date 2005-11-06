@@ -5,6 +5,8 @@
 #include "TrussUnit.h"
 #include "TrussUnitWindowButton.h"
 
+class QWidget;
+
 class TrussUnitWindow : public TrussUnit
 {
     Q_OBJECT
@@ -12,27 +14,34 @@ public:
     TrussUnitWindow ( const QString& name, ObjectStateManager* );
     virtual ~TrussUnitWindow ();
 
+    // Set owner of this window. 
+    // e.g. window uses owner for correct maximizing.
+    virtual void setWindowOwner ( QWidget* owner );
+
     // XML serialization
     virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
-    virtual void saveToXML ( QDomElement& );
+    virtual QDomElement saveToXML ( QDomDocument& );
 
+    // Manage window position
+    virtual void setWindowPosition ( QPoint pos );
+    // Returns false if window position was not set, true otherwise
+    virtual bool hasPosition () const;
     virtual QPoint getWindowLeftTopPos () const;
     virtual QPoint getWindowRightBottomPos () const;
     virtual QPoint getTrussAreaLeftTopPos () const;
     virtual QPoint getTrussAreaRightBottomPos () const;
 
-    // Move window
-    virtual void setWindowPosition ( QPoint pos );
-
     // Get/set window size
     virtual void setWindowSize ( int w, int h );
     virtual void setWindowSize ( const QSize& size );
     virtual const QSize& getWindowSize () const;
+    // If window has its owner, it returns window size to
+    // which it can be maximized. Or 0,0 is returned.
+    virtual QSize getMaximizedWindowSize () const;
     // Resize and then move window
     virtual void resize ( QPoint leftTop, QPoint rightBottom );
 
     virtual bool isMaximized () const;
-    virtual void setMaxSize ( int x, int y );
     virtual void maximize ( bool saveOldSize = true );
     virtual void minimize ();
 
@@ -124,6 +133,10 @@ protected slots:
     virtual void setWindowButtonHinted ();
 
 private:
+    // Owner of this window
+    QWidget* windowOwner;
+    // Window has position
+    bool positionIsSet;
     QPoint windowLeftTopPos, windowRightBottomPos;
     QSize windowSize, coordFieldSize;
     DoublePoint cursorCoord;
@@ -142,7 +155,6 @@ private:
     bool hinted;
     // minimize/maximize subsidiaries
     bool maximized;
-    QSize maxSize;
     QPoint minLeftTopPos, minRightBottomPos;
 };
 

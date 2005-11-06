@@ -14,6 +14,32 @@ TrussDimension::TrussDimension ( LengthMeasure lm, ForceMeasure fm ) :
     length(lm), force(fm)
 {}
 
+TrussDimension::TrussDimension ( const QString& lengthMeasure_,
+                                 const QString& forceMeasure_ ) 
+    throw (WrongArgsException)
+{
+    LengthMeasure lengthMeasure = mm;
+    if ( lengthMeasure_ == "mm" )
+        lengthMeasure = mm;
+    else if ( lengthMeasure_ == "sm" )
+        lengthMeasure = sm;
+    else if ( lengthMeasure_ == "m" )
+        lengthMeasure = m;
+    else
+        throw WrongArgsException();
+
+    ForceMeasure forceMeasure = newton;
+    if ( forceMeasure_ == "newton" )
+        forceMeasure = newton;
+    else if ( forceMeasure_ == "kg" )
+        forceMeasure = kg;
+    else
+        throw WrongArgsException();
+
+    length = lengthMeasure;
+    force = forceMeasure;
+}
+
 TrussDimension& TrussDimension::operator= ( const TrussDimension&  dim )
 { length = dim.length; force = dim.force; return *this; }
 
@@ -22,6 +48,24 @@ TrussDimension::LengthMeasure TrussDimension::getLengthMeasure () const
 
 TrussDimension::ForceMeasure TrussDimension::getForceMeasure () const
 { return force; }
+
+QString TrussDimension::getLengthMeasureStr () const
+{
+    if ( length == mm )
+        return "mm";
+    else if ( length == sm )
+        return "sm"; 
+    else
+        return "m";
+}
+
+QString TrussDimension::getForceMeasureStr () const
+{
+    if ( force == newton )
+        return "newton";
+    else
+        return "kg";
+}
 
 void TrussDimension::setLengthMeasure ( LengthMeasure lm )
 { length = lm; }

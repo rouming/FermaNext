@@ -27,14 +27,89 @@ TrussNode::TrussNode ( double x, double y, Fixation fix,
                             SLOT(removeNodeHighlight()) );   
 }
 
+void TrussNode::loadFromXML ( const QDomElement& nodeElem ) 
+    throw (LoadException)
+{
+    XMLSerializableObject::loadFromXML( nodeElem );
+
+    /** 
+     * Set position
+     *****************/
+    if ( ! nodeElem.hasAttribute( "x" ) )
+        throw LoadException();
+    if ( ! nodeElem.hasAttribute( "y" ) )
+        throw LoadException();
+
+    bool ok;
+    double x = nodeElem.attribute( "x" ).toDouble( &ok );
+    if ( !ok ) throw LoadException();
+
+    double y = nodeElem.attribute( "y" ).toDouble( &ok );
+    if ( !ok ) throw LoadException();
+
+    setPoint( x, y );
+
+    /** 
+     * Set fixation
+     *****************/
+    Fixation fixation = Unfixed;
+    if ( nodeElem.hasAttribute( "fixation" ) ) {
+        QString fixStr = nodeElem.attribute( "fixation" );
+        if ( fixStr == "x" )
+            fixation = FixationByX;
+        else if ( fixStr == "y" )
+            fixation = FixationByY;
+        else if ( fixStr == "xy" || fixStr == "yx" )
+            fixation = FixationByXY;
+        else
+            throw LoadException();
+    }
+
+    setFixation( fixation );
+}
+
+QDomElement TrussNode::saveToXML ( QDomDocument& doc )
+{
+    QDomElement nodeElem = XMLSerializableObject::saveToXML( doc );
+    nodeElem.setTagName( "TrussNode" );
+
+    /** 
+     * Save position
+     *****************/
+    const DoublePoint& pos = getPoint();
+    nodeElem.setAttribute( "x", pos.x() );
+    nodeElem.setAttribute( "y", pos.y() );
+
+    /** 
+     * Save fixation
+     *****************/
+    Fixation fix = getFixation();
+    if ( fix != Unfixed ) {
+        QString fixStr = "xy";
+        if ( fix == FixationByX )
+            fixStr = "x";
+        else if ( fix == FixationByY )
+            fixStr = "y";
+        nodeElem.setAttribute( "fixation", fixStr );
+    }
+    else 
+        nodeElem.removeAttribute( "fixation" );
+
+    return nodeElem;
+}
+
+
 void TrussNode::removeNodeHighlight ()
 {
     setHighlighted ( false );
 }
 
-void TrussNode::drawFixation ( scanline_rasterizer& ras, solidRenderer& solidRend, 
-                               agg::scanline_p8& sl, const QPoint& nodePos,
-                               int lineWidth, color_type color ) const
+void TrussNode::drawFixation ( scanline_rasterizer& ras, 
+                               solidRenderer& solidRend, 
+                               agg::scanline_p8& sl, 
+                               const QPoint& nodePos,
+                               int lineWidth, 
+                               color_type color ) const
 {
     QPoint leftPnt, rightPnt;
 

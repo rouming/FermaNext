@@ -20,6 +20,44 @@ TrussPivot::TrussPivot ( TrussNode& first, TrussNode& last,
                             SLOT(removePivotHighlight()) );   
 }
 
+void TrussPivot::loadFromXML ( const QDomElement& pivotElem ) 
+    throw (LoadException)
+{
+    XMLSerializableObject::loadFromXML( pivotElem );
+
+    /** 
+     * Set thickness
+     *****************/
+    if ( ! pivotElem.hasAttribute( "thickness" ) )
+        throw LoadException();
+
+    bool ok;
+    double thickness = pivotElem.attribute( "thickness" ).toDouble( &ok );
+    if ( !ok ) throw LoadException();
+
+    setThickness( thickness );
+
+}
+
+QDomElement TrussPivot::saveToXML ( QDomDocument& doc )
+{
+    QDomElement pivotElem = XMLSerializableObject::saveToXML( doc );
+    pivotElem.setTagName( "TrussPivot" );
+
+    /** 
+     * Save nodes uuids
+     *******************/
+    pivotElem.setAttribute( "firstNodeId", getFirstNode().getUUID() );
+    pivotElem.setAttribute( "lastNodeId", getLastNode().getUUID() );
+
+    /** 
+     * Save thickness
+     *****************/
+    pivotElem.setAttribute( "thickness", getThickness() );
+
+    return pivotElem;
+}
+
 bool TrussPivot::getDrawingStatus () const
 {
     return drawingStatus;

@@ -65,7 +65,7 @@ public:
 
     // XML serialization
     virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
-    virtual void saveToXML ( QDomElement& );
+    virtual QDomElement saveToXML ( QDomDocument& );
 
     const QString& getTrussName () const;
 
@@ -208,6 +208,10 @@ public:
     TrussNode ( double x, double y, ObjectStateManager* );
     TrussNode ( double x, double y, Fixation, ObjectStateManager* );
 
+    // XML serialization
+    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
+    virtual QDomElement saveToXML ( QDomDocument& );
+
     void drawFixation ( scanline_rasterizer& ras, solidRenderer& solidRend, 
                         agg::scanline_p8& sl, const QPoint& nodePos,
                         int lineWidth, color_type color ) const;
@@ -235,6 +239,10 @@ class TrussPivot : public Pivot<TrussNode>,
 public:
     TrussPivot ( ObjectStateManager* );
     TrussPivot ( TrussNode&, TrussNode&, ObjectStateManager* );
+
+    // XML serialization
+    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
+    virtual QDomElement saveToXML ( QDomDocument& );
 
     bool getDrawingStatus () const;
     void setDrawingStatus ( bool status );

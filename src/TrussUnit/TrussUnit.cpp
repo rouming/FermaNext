@@ -104,12 +104,22 @@ void TrussUnit::loadFromXML ( const QDomElement& elem )
 {
     XMLSerializableObject::loadFromXML( elem );
 
+    // Destroy existent truss elements
+    clear();
+
+    /**
+     * Set name
+     *****************/
     if ( ! elem.hasAttribute( "trussName" ) )
         throw LoadException();
+    QString name = elem.attribute( "trussName" );   
+    setTrussName( name );
 
+    /**
+     * Set truss area size
+     ***********************/
     if ( ! elem.hasAttribute( "trussWidth" ) )
         throw LoadException();
-
     if ( ! elem.hasAttribute( "trussHeight" ) )
         throw LoadException();
 
@@ -120,14 +130,242 @@ void TrussUnit::loadFromXML ( const QDomElement& elem )
     double height = elem.attribute( "trussHeight" ).toDouble( &ok );
     if ( !ok ) throw LoadException();
 
-    QString name = elem.attribute( "trussName" );
-
-    setTrussName( name );
     setTrussAreaSize( DoubleSize( width, height ) );
+
+    /** 
+     * Set dimension
+     *****************/
+    QDomNodeList trussDim = elem.elementsByTagName( "TrussDimension" );
+    if ( trussDim.count() != 1 )
+        throw LoadException();
+    if ( ! trussDim.item(0).isElement() )
+        throw LoadException();
+
+    QDomElement trussDimElem = trussDim.item(0).toElement();
+    if ( ! trussDimElem.hasAttribute( "lengthMeasure" ) )
+        throw LoadException();
+    if ( ! trussDimElem.hasAttribute( "forceMeasure" ) )
+        throw LoadException();
+
+    try { 
+        TrussDimension dim( trussDimElem.attribute("lengthMeasure"),
+                            trussDimElem.attribute("forceMeasure") );
+        setDimension( dim );
+    } catch ( TrussDimension::WrongArgsException& ) {
+        throw LoadException();
+    }
+
+    /** 
+     * Set material
+     *****************/
+    QDomNodeList trussMat = elem.elementsByTagName( "TrussMaterial" );
+    if ( trussMat.count() != 1 )
+        throw LoadException();
+    if ( ! trussMat.item(0).isElement() )
+        throw LoadException();
+
+    QDomElement trussMatElem = trussMat.item(0).toElement();
+    if ( ! trussMatElem.hasAttribute( "name" ) )
+        throw LoadException();
+    if ( ! trussMatElem.hasAttribute( "workingStress" ) )
+        throw LoadException();
+    if ( ! trussMatElem.hasAttribute( "elasticityModule" ) )
+        throw LoadException();
+
+    QString matName = trussMatElem.attribute( "name" );
+    double workingStress = 
+        trussMatElem.attribute( "workingStress" ).toDouble( &ok );
+    if ( !ok ) throw LoadException();
+
+    double elasticityModule = 
+        trussMatElem.attribute( "elasticityModule" ).toDouble( &ok );
+    if ( !ok ) throw LoadException();
+
+    setMaterial( TrussMaterial( matName, workingStress, elasticityModule ) );
+
+
+
+    // Tie UUID with truss nodes to link nodes with pivots, nodes with loads
+    typedef QMap<QString, TrussNode*> TrussNodeUUIDMap;
+    TrussNodeUUIDMap nodeUUIDMap;
+
+    /** 
+     * Create nodes
+     *****************/
+    QDomNodeList trussNodes = elem.elementsByTagName( "TrussNode" );
+    for ( uint nodesNum = 0; nodesNum < trussNodes.count(); ++nodesNum ) {
+        QDomNode trussNode = trussNodes.item( nodesNum );
+        if ( ! trussNode.isElement() )
+            throw LoadException();
+        QDomElement nodeElem = trussNode.toElement();
+        // Default position is 0
+        TrussNode& node = createNode( 0, 0 );
+        node.loadFromXML( nodeElem );
+        nodeUUIDMap[node.getUUID()] = &node;
+    }
+
+    /** 
+     * Create load cases
+     *********************/
+    QDomNodeList trussLoadCases = elem.elementsByTagName( "LoadCase" );
+    for ( uint loadCasesNum = 0; 
+          loadCasesNum < trussLoadCases.count(); 
+          ++loadCasesNum ) {
+        QDomNode trussLoadCase = trussLoadCases.item( loadCasesNum );
+        if ( ! trussLoadCase.isElement() )
+            throw LoadException();
+        QDomElement loadCaseElem = trussLoadCase.toElement();
+        LoadCase& loadCase = getLoadCases().createLoadCase();
+
+        // Set current load case
+        // Note: we don't check uniqueness of current attribute
+        //       so last in the set will be applied.
+        if ( loadCaseElem.hasAttribute( "current" ) && 
+             loadCaseElem.attribute( "current" ) == "Yes" )
+             getLoadCases().setCurrentLoadCase( loadCase );
+
+        // Create loads
+        QDomNodeList trussLoads = 
+            loadCaseElem.elementsByTagName( "Load" );
+        for ( uint loadsNum = 0; loadsNum < trussLoads.count(); ++loadsNum ) {
+            QDomNode trussLoad = trussLoads.item( loadsNum );
+            if ( ! trussLoad.isElement() )
+                throw LoadException();            
+            QDomElement loadElem = trussLoad.toElement();
+            if ( ! loadElem.hasAttribute( "nodeId" ) )
+                throw LoadException();
+            if ( ! loadElem.hasAttribute( "xForce" ) )
+                throw LoadException();
+            if ( ! loadElem.hasAttribute( "yForce" ) )
+                throw LoadException();
+
+            QString nodeId = loadElem.attribute( "nodeId" );
+            if ( ! nodeUUIDMap.contains(nodeId) )
+                throw LoadException();
+
+            bool ok;
+            double xForce = loadElem.attribute( "xForce" ).toDouble( &ok );
+            if ( !ok ) throw LoadException();
+
+            double yForce = loadElem.attribute( "yForce" ).toDouble( &ok );
+            if ( !ok ) throw LoadException();
+
+            loadCase.addLoad( *nodeUUIDMap[nodeId], xForce, yForce );
+        }
+    }
+
+    /** 
+     * Create pivots
+     *****************/
+    QDomNodeList trussPivots = elem.elementsByTagName( "TrussPivot" );
+    for ( uint pivotsNum = 0; pivotsNum < trussPivots.count(); ++pivotsNum ) {
+        QDomNode trussPivot = trussPivots.item( pivotsNum );
+        if ( ! trussPivot.isElement() )
+            throw LoadException();
+        QDomElement pivotElem = trussPivot.toElement();
+        if ( ! pivotElem.hasAttribute( "firstNodeId" ) )
+            throw LoadException();
+        if ( ! pivotElem.hasAttribute( "lastNodeId" ) )
+            throw LoadException();
+
+        QString firstNodeId = pivotElem.attribute( "firstNodeId" );
+        QString lastNodeId = pivotElem.attribute( "lastNodeId" );
+        if ( ! nodeUUIDMap.contains(firstNodeId) )
+            throw LoadException();
+        if ( ! nodeUUIDMap.contains(lastNodeId) )
+            throw LoadException();
+
+        TrussPivot& pivot = createPivot( *nodeUUIDMap[firstNodeId],
+                                         *nodeUUIDMap[lastNodeId] );
+        pivot.loadFromXML( pivotElem );
+    }
+
 }
 
-void TrussUnit::saveToXML ( QDomElement& )
+QDomElement TrussUnit::saveToXML ( QDomDocument& doc )
 {
+    QDomElement trussElem = XMLSerializableObject::saveToXML( doc );
+    trussElem.setTagName( "TrussUnit" );
+
+    /**
+     * Save name
+     *****************/
+    trussElem.setAttribute( "trussName", getTrussName() );
+
+    /**
+     * Save truss area size
+     ***********************/
+    const DoubleSize& size = getTrussAreaSize();
+    trussElem.setAttribute( "trussWidth", size.width() );
+    trussElem.setAttribute( "trussHeight", size.height() );
+
+    /** 
+     * Save dimension
+     *****************/
+    TrussDimension& trussDim = getDimension();
+    QDomElement trussDimElem = doc.createElement( "TrussDimension" );
+    trussDimElem.setAttribute( "lengthMeasure", 
+                               trussDim.getLengthMeasureStr() );
+    trussDimElem.setAttribute( "forceMeasure", 
+                               trussDim.getForceMeasureStr() );
+    trussElem.appendChild( trussDimElem );
+
+    /** 
+     * Save material
+     *****************/
+    TrussMaterial& trussMat = getMaterial();
+    QDomElement trussMatElem = doc.createElement( "TrussMaterial" );
+    trussMatElem.setAttribute( "name", trussMat.getMaterialName() );
+    trussMatElem.setAttribute( "workingStress", 
+                               trussMat.getWorkingStress() );
+    trussMatElem.setAttribute( "elasticityModule", 
+                               trussMat.getElasticityModule() );
+    trussElem.appendChild( trussMatElem );
+
+    /** 
+     * Save nodes
+     *****************/
+    NodeList nodes = getNodeList();
+    NodeListIter nIter = nodes.begin();
+    for ( ; nIter != nodes.end(); ++nIter )
+        trussElem.appendChild( (*nIter)->saveToXML( doc ) );
+
+    /** 
+     * Save pivots
+     *****************/
+    PivotList pivots = getPivotList();
+    PivotListIter pIter = pivots.begin();
+    for ( ; pIter != pivots.end(); ++pIter )
+        trussElem.appendChild( (*pIter)->saveToXML( doc ) );
+
+    /** 
+     * Save load cases
+     *********************/
+    LoadCases& loadCases = getLoadCases();    
+    for ( uint indx = 1; indx <= loadCases.countLoadCases(); ++indx ) {
+        LoadCase* loadCase = loadCases.findLoadCase( indx );
+        QDomElement loadCaseElem = doc.createElement( "LoadCase" );
+        // Save current
+        if ( loadCases.getCurrentLoadCase() == loadCase )
+            loadCaseElem.setAttribute( "current", "Yes" );
+        else
+            loadCaseElem.removeAttribute( "current" );
+
+        LoadCase::TrussLoadMap loadMap = loadCase->getTrussLoadMap();
+        LoadCase::TrussLoadMap::Iterator loadsIt = loadMap.begin();
+        for ( ; loadsIt != loadMap.end(); ++loadsIt ) {
+            const TrussNode* node = loadsIt.key();
+            TrussLoad* load = loadsIt.data();
+            QDomElement loadElem = doc.createElement( "Load" );
+            loadElem.setAttribute( "nodeId", node->getUUID() );
+            loadElem.setAttribute( "xForce", load->getXForce() );
+            loadElem.setAttribute( "yForce", load->getYForce() );
+            loadCaseElem.appendChild( loadElem );
+        }
+        trussElem.appendChild( loadCaseElem );        
+    }
+
+    return trussElem;
 }
 
 void TrussUnit::trussUnitStateIsChanged ()
