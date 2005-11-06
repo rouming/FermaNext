@@ -522,7 +522,7 @@ void FermaNextMainFrame::fileOpen ()
     QFile xmlFile( fileName );
     if ( ! xmlFile.open( IO_ReadOnly ) ) {
         QMessageBox::critical( this, tr("Read file error"),
-                               tr("Can't read file: %1").arg(fileName) );
+                               tr("Can't read file: \"%1\"").arg(fileName) );
         return;
     }
 
@@ -557,8 +557,8 @@ void FermaNextMainFrame::fileSaveAs ()
 
     if ( QFile::exists( fileName ) ) {
         if ( QMessageBox::question( this,
-                                    tr("File exists - \"%1\"").arg(fileName),                                      
-                                    tr("Rewrite file?"),
+                                    tr("File exists"),
+                                    tr("Rewrite file \"%1\"?").arg(fileName),
                                     tr("&Yes"), tr("&No"),
                                     QString::null, 0, 1 ) )
             return;
@@ -567,7 +567,7 @@ void FermaNextMainFrame::fileSaveAs ()
     QFile xmlFile( fileName );
     if ( ! xmlFile.open( IO_WriteOnly ) ) {
         QMessageBox::critical( this, tr("Write file error"),
-                               tr("Can't write to file: %1").arg(fileName) );
+                               tr("Can't write to file: \"%1\"").arg(fileName) );
         return;
     }
 
@@ -618,7 +618,7 @@ void FermaNextMainFrame::fileOpenWsp ()
     QFile xmlFile( fileName );
     if ( ! xmlFile.open( IO_ReadOnly ) ) {
         QMessageBox::critical( this, tr("Read file error"),
-                               tr("Can't read file: %1").arg(fileName) );
+                               tr("Can't read file: \"%1\"").arg(fileName) );
         return;
     }
 
