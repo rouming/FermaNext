@@ -33,6 +33,7 @@ public:
 protected slots:
     virtual int addProject ( FermaNextProject& );
     virtual int removeProject ( FermaNextProject& );
+    virtual void projectRename ( const QString& );
  
     void activateSelected ( int index );
 

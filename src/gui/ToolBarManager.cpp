@@ -106,6 +106,12 @@ void TabbedWidget::toolBarDestroyed ()
     toolBarIsDestroyed = true;
 }
 
+void TabbedWidget::setName ( const QString& name_ )
+{
+    name = name_;
+    button->setTextLabel( name );
+}
+
 void TabbedWidget::activate ( bool flag )
 {
     if ( flag )

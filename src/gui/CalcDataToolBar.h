@@ -28,6 +28,7 @@ public slots:
 protected slots:
     virtual void addWidget ( QWidget& );
 
+    virtual void trussUnitWindowRename( const QString& );
     // Actions on some life time signals
     virtual void trussUnitWindowDesist ( StatefulObject& );
     virtual void trussUnitWindowRevive ( StatefulObject& );

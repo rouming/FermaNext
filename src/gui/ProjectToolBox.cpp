@@ -37,7 +37,7 @@ ProjectToolBox::ProjectToolBox ( FermaNextWorkspace& ws, QWidget* parent,
     connect( &workspace, SIGNAL(onReset()), SLOT(clear()) );
     connect( &workspace, SIGNAL(onProjectCreate(FermaNextProject&)), 
                          SLOT(addProject(FermaNextProject&)) );
-    connect( &workspace, SIGNAL(onProjectRemove(FermaNextProject&)), 
+    connect( &workspace, SIGNAL(onBeforeProjectRemove(FermaNextProject&)), 
                          SLOT(removeProject(FermaNextProject&)) );
     connect( this, SIGNAL(currentChanged(int)), 
                    SLOT(activateSelected(int)) );
@@ -48,6 +48,10 @@ int ProjectToolBox::addProject ( FermaNextProject& prj )
     currentPrj = &prj;
     QWidget* page = createSubsidiaryWidget(prj);
     projects[&prj] = page;
+
+    // Catch name changing
+    QObject::connect( &prj, SIGNAL(onNameChange(const QString&)),
+                            SLOT(projectRename(const QString&)) );
 
     QIconSet iconSet( QPixmap::fromMimeSource( imagesPath() + "/project_toolbox.png" ) );
     int result = addItem( page, iconSet, prj.getName() );
@@ -71,6 +75,20 @@ int ProjectToolBox::removeProject ( FermaNextProject& prj )
         setCurrentIndex( result - 1 );        
     delete page;
     return result;
+}
+
+void ProjectToolBox::projectRename ( const QString& newName )
+{
+    try { 
+        QObject* prjSender = const_cast<QObject*>( sender() );
+        FermaNextProject& prj = 
+            dynamic_cast<FermaNextProject&>( *prjSender );
+        if ( projects.contains( &prj ) ) {
+            int indx = indexOf( projects[&prj] );
+            if ( indx != -1 )
+                setItemLabel( indx, newName );
+        }
+    } catch ( ... ) {}
 }
 
 QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
@@ -247,9 +265,11 @@ void ProjectToolBox::importIsPressed ()
     if ( currPrj == 0 )
         return;
 
-    QString fileName = QFileDialog::getOpenFileName( QString::null,        
-                                                     "Ferma (*.fnx );;Ferma old (*.frm)",
-                                                     this );
+    QString fileName = QFileDialog::getOpenFileName( QString::null, 
+        "Ferma (*" + TrussUnitWindowManager::NewFormatExtension  + 
+        " );;Ferma old (*" + TrussUnitWindowManager::OldFormatExtension +")", 
+        this );
+
     if ( fileName.isEmpty() ) 
         return;
 
