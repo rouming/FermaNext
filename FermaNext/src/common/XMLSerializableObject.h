@@ -15,9 +15,10 @@ public:
     // Excetpions
     class LoadException {};
 
+protected:
     // Override this methods in parent class to provide object serialization.
     virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
-    virtual void saveToXML ( QDomElement& );
+    virtual QDomElement saveToXML ( QDomDocument& );
 };
 
 #endif //XMLSERIALIZABLEOBJECT_H
