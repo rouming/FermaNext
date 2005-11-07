@@ -136,6 +136,17 @@ void TrussUnitWindow::loadFromXML ( const QDomElement& elem )
         else
             throw LoadException();
     }
+
+    /**
+     * Set maximized
+     *****************/
+    if ( elem.hasAttribute( "windowMaximized" ) ) {
+        QString isMaximized = elem.attribute( "windowMaximized" );
+        if ( isMaximized == "Yes" )
+            maximize( true );
+        else if ( isMaximized != "No" )
+            throw LoadException();
+    }
 }
 
 /** 
@@ -147,16 +158,20 @@ QDomElement TrussUnitWindow::saveToXML ( QDomDocument& doc )
     trussElem.setTagName( "TrussUnitWindow" );
 
     /** 
-     * Save window size
-     *******************/
-    QSize size = getWindowSize();
+     * Save window size and window position
+     ***************************************/
+    QSize size;
+    QPoint pos;
+    if ( isMaximized() ) {
+        size = QSize( minRightBottomPos.x() - minLeftTopPos.x(), 
+                      minRightBottomPos.y() - minLeftTopPos.y() );
+        pos = minLeftTopPos;
+    } else {
+        size = getWindowSize();
+        pos = getWindowLeftTopPos();
+    }
     trussElem.setAttribute( "windowWidth", size.width() );
     trussElem.setAttribute( "windowHeight", size.height() );
-
-    /** 
-     * Save window pisition
-     ***********************/
-    QPoint pos = getWindowLeftTopPos();
     trussElem.setAttribute( "windowXPosition", pos.x() );
     trussElem.setAttribute( "windowYPosition", pos.y() );
 
@@ -164,6 +179,11 @@ QDomElement TrussUnitWindow::saveToXML ( QDomDocument& doc )
      * Save visible
      *****************/
     trussElem.setAttribute( "windowVisible", (isVisible() ? "Yes" : "No") );
+
+    /**
+     * Save maximized
+     *****************/
+    trussElem.setAttribute( "windowMaximized", (isMaximized() ?"Yes" : "No") );
 
     return trussElem;
 }
@@ -348,9 +368,6 @@ void TrussUnitWindow::maximize ( bool saveOldSize )
 */
 void TrussUnitWindow::minimize ()
 {
-    if ( windowOwner == 0 )
-        return;
-
     removeButtonsHighlight();
     resize ( minLeftTopPos, minRightBottomPos );
 
@@ -1154,7 +1171,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
             QPoint borderRightBottom( windowSize.width(), 
                                    windowSize.height() );
 
-            drawOutlineRoundedRect( baseRend, solidRend, ras, sl,
+            drawOutlineRoundedRect( solidRend, ras, sl,
                                     borderLeftTop, borderRightBottom, 
                                     agg::rgba( 1, 1, 1, 0.6 ), borderColor,
                                     winCornerRadius, 1 );
