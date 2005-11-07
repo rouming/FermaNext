@@ -69,12 +69,36 @@ QDomElement FermaNextProject::saveToXML ( QDomDocument& doc )
     /**
      * Save truss unit windows
      **************************/
-    // Save window stack
+    // Windows in creation order
     WindowList trussWindows = 
+        getTrussUnitWindowManager().getTrussUnitWindowList();
+
+    // Windows in layout order
+    WindowList layoutOrderedWindows = 
         getDesignerWindow().getDesignerWidget().getTrussUnitWindowList();
+    typedef QMap<TrussUnitWindow*, uint> LayoutOrderMap;
+    
+    // Build layout order. i.e. last window in the stack is a first
+    // focused window to the user
+    LayoutOrderMap layoutMap;
+    WindowListIter orderIter = layoutOrderedWindows.begin();
+    for ( uint order = 1; orderIter != layoutOrderedWindows.end(); 
+          ++orderIter, ++order )
+        layoutMap[*orderIter] = order;
+
     WindowListIter wIter = trussWindows.begin();
-    for ( ; wIter != trussWindows.end(); ++wIter )
-        prjElem.appendChild( (*wIter)->saveToXML( doc ) );
+    for ( ; wIter != trussWindows.end(); ++wIter ) {
+        TrussUnitWindow* trussWindow = *wIter;
+        QDomElement trussWindowElem = trussWindow->saveToXML( doc );
+        uint order = 0;
+        if ( layoutMap.contains(trussWindow) )
+            order = layoutMap[trussWindow];
+
+        // Set layout order
+        trussWindowElem.setAttribute( "layoutOrder", order );
+
+        prjElem.appendChild( trussWindowElem );
+    }
 
     return prjElem;
 }
@@ -95,6 +119,10 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
     /**
      * Create truss unit windows
      ****************************/
+    // Layout order
+    typedef QMap<uint, TrussUnitWindow*> LayoutOrderMap;
+    LayoutOrderMap layoutMap;   
+
     TrussUnitWindowManager& mng = getTrussUnitWindowManager();
     QDomNodeList trussWindows = prjElem.elementsByTagName( "TrussUnitWindow" );
     for ( uint windsNum = 0; windsNum < trussWindows.count(); ++windsNum ) {
@@ -104,6 +132,22 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
         QDomElement windowElem = trussWindow.toElement();
         TrussUnitWindow& wnd = mng.createTrussUnitWindow( QString::null );
         wnd.loadFromXML( windowElem );
+
+        if ( windowElem.hasAttribute( "layoutOrder" ) ) {
+            bool ok;
+            uint order = windowElem.attribute( "layoutOrder" ).toUInt( &ok );
+            if ( !ok ) LoadException();
+            layoutMap[order] = &wnd;
+        }
+    }
+    TrussUnitDesignerWidget& designerWidget = 
+        getDesignerWindow().getDesignerWidget();
+
+    // Restore window order
+    LayoutOrderMap::Iterator itOrder = layoutMap.begin();
+    for ( ; itOrder != layoutMap.end(); ++itOrder ) {
+        TrussUnitWindow* trussWindow = *itOrder;
+        designerWidget.focusOnWindow( *trussWindow );
     }
 }
 
