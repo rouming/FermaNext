@@ -168,8 +168,7 @@ void drawOutlineRoundedRect ( ren_dynarow& baseRend,
     agg::render_scanlines ( ras, sl, gradRend );
 }
 
-void drawOutlineRoundedRect ( ren_dynarow& baseRend,
-                              solidRenderer& solidRend, 
+void drawOutlineRoundedRect ( solidRenderer& solidRend, 
                               scanline_rasterizer& ras,
                               agg::scanline_p8& sl,
                               const QPoint& point1, 
