@@ -52,6 +52,9 @@ public:
     virtual const QString& getName () const;
     virtual void setName ( const QString& );
 
+    virtual const QString& getWorkspaceFileName () const;
+    virtual void setWorkspaceFileName ( const QString& );
+
     virtual FermaNextConfig& config ();
     virtual PluginManager& pluginManager ();
 
@@ -79,7 +82,9 @@ signals:
 private:
     static FermaNextWorkspace* instance;
     static QMutex mutex;
-    QString name;
+
+    QString name;    
+    QString workspaceFileName;
     QWidgetStack* widgetStack;    
     ProjectList projects;
     FermaNextConfig fermaConfig;    
