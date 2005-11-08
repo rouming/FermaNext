@@ -4,6 +4,8 @@
 #include "SubsidiaryConstants.h"
 
 #include <qwidgetstack.h>
+#include <qfileinfo.h>
+#include <qdir.h>
 
 /*****************************************************************************
  * FermaNext Workspace
@@ -27,13 +29,41 @@ FermaNextWorkspace::~FermaNextWorkspace ()
     clearProjects();
 }
 
-void FermaNextWorkspace::loadFromXML ( const QDomElement& elem )
+void FermaNextWorkspace::loadFromXML ( const QDomElement& wspElem )
     throw (LoadException)
 {
-    XMLSerializableObject::loadFromXML( elem );
+    XMLSerializableObject::loadFromXML( wspElem );
 
     // Destroy existent projects
     reset();
+
+    QFileInfo wspFileInfo( getWorkspaceFileName() );    
+    QDir workspaceDir( wspFileInfo.dirPath(true) );
+
+    /**
+     * Create projects
+     ****************************/
+    FermaNextProject* selectedProject = 0;
+    
+    QDomNodeList projects = wspElem.elementsByTagName( "FermaNextProjects" );
+    for ( uint prjsNum = 0; prjsNum < projects.count(); ++prjsNum ) {
+        QDomNode project = projects.item( prjsNum );
+        if ( ! project.isElement() )
+            throw LoadException();
+        QDomElement projectElem = project.toElement();
+        if ( ! projectElem.hasAttribute( "projectURL" ) )
+            throw LoadException();
+        QString prjUrl = projectElem.attribute( "projectURL" );
+        QString prjFileName = workspaceDir.filePath( prjUrl, true );
+        QFileInfo prjFileInf( prjFileName );
+        if ( ! prjFileInf.exists() || ! prjFileInf.isReadable() )
+            throw LoadException();
+        
+    }
+
+    // Activate project
+    if ( selectedProject )
+        selectedProject->activate();
 }
 
 QDomElement FermaNextWorkspace::saveToXML ( QDomDocument& doc )
@@ -168,6 +198,16 @@ void FermaNextWorkspace::setName ( const QString& name_ )
 {
     name = name_;
     emit onNameChange(name);
+}
+
+const QString& FermaNextWorkspace::getWorkspaceFileName () const
+{
+    return workspaceFileName;
+}
+
+void FermaNextWorkspace::setWorkspaceFileName ( const QString& fn )
+{
+    workspaceFileName = fn;    
 }
 
 FermaNextConfig& FermaNextWorkspace::config ()
