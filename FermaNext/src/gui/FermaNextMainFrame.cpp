@@ -395,11 +395,12 @@ void FermaNextMainFrame::openWorkspace ( QFile& xmlFile )
         throw WrongXMLFormatException();
 
     FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
-
+/*
     try { wsp.loadFromXML( docElem ); }
     catch ( FermaNextWorkspace::LoadException& ) {
         throw WrongXMLFormatException();
     }
+*/
 }
 
 void FermaNextMainFrame::saveProject ( QFile& xmlFile )
@@ -555,7 +556,9 @@ void FermaNextMainFrame::fileSaveAs ()
     if ( -1 == rx.search( fileName ) )
         fileName += FermaNextProject::FormatExtension;
 
-    if ( QFile::exists( fileName ) ) {
+    QFileInfo prjFileInfo( fileName );
+
+    if ( prjFileInfo.exists() ) {
         if ( QMessageBox::question( this,
                                     tr("File exists"),
                                     tr("Rewrite file \"%1\"?").arg(fileName),
@@ -564,23 +567,11 @@ void FermaNextMainFrame::fileSaveAs ()
             return;
     }
 
-    QFile xmlFile( fileName );
-    if ( ! xmlFile.open( IO_WriteOnly ) ) {
+    try { currentPrj->saveToFile( fileName ); }
+    catch ( FermaNextProject::IOException& ) {
         QMessageBox::critical( this, tr("Write file error"),
                                tr("Can't write to file: \"%1\"").arg(fileName) );
-        return;
     }
-
-    QTextStream stream( &xmlFile );
-
-    QDomDocument doc;
-    QDomNode node = doc.createProcessingInstruction(
-                        "xml", QString("version=\"1.0\" encoding=\"UTF8\"") );
-    doc.insertBefore( node, doc.firstChild() );
-
-    doc.appendChild( currentPrj->saveToXML( doc ) );
-
-    doc.save( stream, 4 );
 }
 
 void FermaNextMainFrame::fileClose ()

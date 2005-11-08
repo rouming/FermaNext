@@ -21,17 +21,27 @@ public:
     // File format extension
     static const QString FormatExtension;
 
-    // Inner exceptions
+    // Exceptions
     class WorkspaceIsNotInitedCorrectly {};
+    class IOException {};
+    class WrongXMLDocException {};
+    class ProjectIsNotSavedException {};
 
+    // Basic typedefs    
     typedef std::vector<FermaNextProject*> ProjectList;
     typedef std::vector<FermaNextProject*>::iterator ProjectListIter;
 
-    // XML serialization
-    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
-    virtual QDomElement saveToXML ( QDomDocument& );
-
+    // Entry point to workspace instance
     static FermaNextWorkspace& workspace ();
+
+    virtual void loadFromFile ( const QString& ) throw (IOException, 
+                                                        WrongXMLDocException,
+                                                        LoadException);
+    virtual void saveToFile ( const QString& ) 
+                         throw (IOException, ProjectIsNotSavedException);
+
+    virtual const QString& getWorkspaceFileName () const;
+    
     virtual void reset ();
     virtual void createWidgetStack ( QMainWindow& );
 
@@ -52,9 +62,6 @@ public:
     virtual const QString& getName () const;
     virtual void setName ( const QString& );
 
-    virtual const QString& getWorkspaceFileName () const;
-    virtual void setWorkspaceFileName ( const QString& );
-
     virtual FermaNextConfig& config ();
     virtual PluginManager& pluginManager ();
 
@@ -67,6 +74,12 @@ private:
     FermaNextWorkspace ( const FermaNextWorkspace& );
 
 protected:
+    // XML serialization
+    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
+    virtual QDomElement saveToXML ( QDomDocument& );
+
+    virtual void setWorkspaceFileName ( const QString& );
+
     virtual bool removeProject ( ProjectListIter& );
 
     FermaNextWorkspace& operator= ( const FermaNextWorkspace& );
@@ -78,6 +91,7 @@ signals:
     void onAfterProjectRemove ();
     void onReset ();
     void onNameChange ( const QString& name );
+    void onWorkspaceFileNameChange ( const QString& name );
     
 private:
     static FermaNextWorkspace* instance;

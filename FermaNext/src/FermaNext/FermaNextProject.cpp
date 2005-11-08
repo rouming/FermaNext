@@ -56,6 +56,59 @@ FermaNextProject::~FermaNextProject ()
     delete projectMainWidget;
 }
 
+void FermaNextProject::loadFromFile ( const QString& fileName )
+    throw (IOException, WrongXMLDocException, LoadException)
+{
+    QFile xmlFile( fileName );
+    if ( ! xmlFile.open( IO_ReadOnly ) )
+        throw IOException();
+
+    QIODevice* xmlIODev = &xmlFile;
+    QDomDocument doc;
+    if ( !doc.setContent( xmlIODev ) )
+        throw WrongXMLDocException();
+
+    QDomElement docElem = doc.documentElement();
+    if ( docElem.isNull() )
+        throw WrongXMLDocException();
+
+    loadFromXML( docElem );
+
+    setProjectFileName( fileName );
+}
+
+void FermaNextProject::saveToFile ( const QString& fileName )
+    throw (IOException)
+{
+    QFile xmlFile( fileName );
+    if ( ! xmlFile.open( IO_WriteOnly ) )
+        throw IOException();
+
+    QTextStream stream( &xmlFile );
+
+    QDomDocument doc;
+    QDomNode xmlInstr = doc.createProcessingInstruction(
+                        "xml", QString("version=\"1.0\" encoding=\"UTF8\"") );
+    doc.insertBefore( xmlInstr, doc.firstChild() );
+
+    QDomElement prjElement = saveToXML( doc );
+
+    doc.appendChild( prjElement );
+    doc.save( stream, 4 );
+    setProjectFileName( fileName );
+}
+    
+const QString& FermaNextProject::getProjectFileName () const
+{
+    return projectFileName;
+}
+
+void FermaNextProject::setProjectFileName ( const QString& fileName )
+{
+    projectFileName = fileName;
+    emit onProjectFileNameChange( projectFileName );
+}
+
 QDomElement FermaNextProject::saveToXML ( QDomDocument& doc )
 {
     QDomElement prjElem = XMLSerializableObject::saveToXML( doc );
