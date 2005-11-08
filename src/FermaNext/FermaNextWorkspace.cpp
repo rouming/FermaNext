@@ -29,6 +29,55 @@ FermaNextWorkspace::~FermaNextWorkspace ()
     clearProjects();
 }
 
+void FermaNextWorkspace::loadFromFile ( const QString& fileName )
+    throw (IOException, WrongXMLDocException, LoadException)
+{
+    QFile xmlFile( fileName );
+    if ( ! xmlFile.open( IO_ReadOnly ) )
+        throw IOException();
+
+    QIODevice* xmlIODev = &xmlFile;
+    QDomDocument doc;
+    if ( !doc.setContent( xmlIODev ) )
+        throw WrongXMLDocException();
+
+    QDomElement docElem = doc.documentElement();
+    if ( docElem.isNull() )
+        throw WrongXMLDocException();
+
+    loadFromXML( docElem );
+
+    setWorkspaceFileName( fileName );
+}
+
+void FermaNextWorkspace::saveToFile ( const QString& fileName )
+    throw (IOException, ProjectIsNotSavedException)
+{
+    ProjectListIter iter = projects.begin();
+    for ( ; iter != projects.end(); ++iter ) {
+        const QString& prjFileName = (*iter)->getProjectFileName();
+        if ( prjFileName.isNull() || prjFileName.isEmpty() )
+            throw ProjectIsNotSavedException();
+    }
+
+    QFile xmlFile( fileName );
+    if ( ! xmlFile.open( IO_WriteOnly ) )
+        throw IOException();
+
+    QTextStream stream( &xmlFile );
+
+    QDomDocument doc;
+    QDomNode xmlInstr = doc.createProcessingInstruction(
+                        "xml", QString("version=\"1.0\" encoding=\"UTF8\"") );
+    doc.insertBefore( xmlInstr, doc.firstChild() );
+
+    QDomElement wspElement = saveToXML( doc );
+
+    doc.appendChild( wspElement );
+    doc.save( stream, 4 );
+    setWorkspaceFileName( fileName );
+}
+
 void FermaNextWorkspace::loadFromXML ( const QDomElement& wspElem )
     throw (LoadException)
 {
@@ -68,7 +117,23 @@ void FermaNextWorkspace::loadFromXML ( const QDomElement& wspElem )
 
 QDomElement FermaNextWorkspace::saveToXML ( QDomDocument& doc )
 {
-    return XMLSerializableObject::saveToXML( doc );
+    QDomElement wspElem = XMLSerializableObject::saveToXML( doc );
+    wspElem.setTagName( "FermaNextWorkspace" );
+
+    QFileInfo wspFileInfo( getWorkspaceFileName() );
+    QDir workspaceDir( wspFileInfo.dirPath(true) );
+
+    /**
+     * Save projects URLs
+     *********************/
+    ProjectListIter iter = projects.begin();
+    for ( ; iter != projects.end(); ++iter ) {
+        const QString& prjFileName = (*iter)->getProjectFileName();
+        QDomElement prjElem = doc.createElement( "FermaNextProject" );        
+        prjElem.setAttribute( "projectURL", prjFileName );
+        wspElem.appendChild( prjElem );
+    }
+    return wspElem;
 }
 
 FermaNextWorkspace& FermaNextWorkspace::workspace ()
@@ -205,9 +270,10 @@ const QString& FermaNextWorkspace::getWorkspaceFileName () const
     return workspaceFileName;
 }
 
-void FermaNextWorkspace::setWorkspaceFileName ( const QString& fn )
+void FermaNextWorkspace::setWorkspaceFileName ( const QString& fileName )
 {
-    workspaceFileName = fn;    
+    workspaceFileName = fileName;
+    emit onWorkspaceFileNameChange( workspaceFileName );
 }
 
 FermaNextConfig& FermaNextWorkspace::config ()
