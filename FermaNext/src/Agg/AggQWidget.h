@@ -52,6 +52,9 @@ public:
     AggQWidget ( QWidget* parent = 0, bool flip_y = false );
     virtual ~AggQWidget ();
 
+    // Just prints widget
+    virtual void print ();
+
 protected:
     virtual rendering_buffer& getAggRenderingBuffer ();
     virtual QImage& getMainImage ();

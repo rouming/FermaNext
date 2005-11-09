@@ -3,6 +3,7 @@
 #include "Benchmark.h"
 
 #include <qpainter.h>
+#include <qprinter.h>
 #include <qsize.h>
 #include <platform/agg_platform_support.h>
 
@@ -140,6 +141,14 @@ QImage& AggQWidget::getMainImage ()
     return *mainQImage;
 }
 
+void AggQWidget::print ()
+{
+    QPrinter printer;
+    if ( printer.setup(this) ) {
+	    QPainter p( &printer );
+	    p.drawImage( mainQImage->rect(), *mainQImage );
+    }
+}
 
 /*****************************************************************************
  * Private QT event handlers. Override AGG handlers instead.

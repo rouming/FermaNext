@@ -97,6 +97,7 @@ private:
     QAction* saveProjectAction;
     QAction* saveAsProjectAction;
     QAction* closeProjectAction;
+    QAction* printAction;
     
     // Plugins menu
     QPopupMenu* pluginsMenu;
