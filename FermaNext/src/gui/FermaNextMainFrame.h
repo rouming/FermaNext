@@ -47,14 +47,14 @@ protected:
 protected slots:
     void fileNew ();
     void fileOpen ();
-    void fileSave ();
-    void fileSaveAs ();
+    bool fileSave ();
+    bool fileSaveAs ();
     void fileClose ();
     void fileOpenWsp ();
-    void fileSaveWsp ();
-    void fileSaveWspAs ();
+    bool fileSaveWsp ();
+    bool fileSaveWspAs ();
     void fileCloseWsp ();
-    void fileSaveAll ();
+    bool fileSaveAll ();
     void filePageSetup ();
     void filePrintPreview ();
     void filePrint ();

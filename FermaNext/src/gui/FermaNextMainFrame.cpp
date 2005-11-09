@@ -234,8 +234,7 @@ void FermaNextMainFrame::setupFileActions ()
 
     // Close
     closeProjectAction = 
-        new QAction( tr( "&Close" ), CTRL + ALT + Key_F4, 
-                     this, "fileClose" );
+        new QAction( tr( "&Close" ), 0, this, "fileClose" );
     connect( closeProjectAction, SIGNAL( activated() ), 
              this, SLOT( fileClose() ) );
     closeProjectAction->addTo( menu );
@@ -268,7 +267,7 @@ void FermaNextMainFrame::setupFileActions ()
     menu->insertSeparator();
 
     // Save All
-    a = new QAction( tr( "Save All" ), CTRL + Key_F3, 
+    a = new QAction( tr( "Save All" ), CTRL + SHIFT + Key_S, 
                      this, "fileSaveAll" );
     connect( a, SIGNAL( activated() ), this, SLOT( fileSaveAll() ) );
     a->addTo( menu );
@@ -481,23 +480,24 @@ void FermaNextMainFrame::fileOpen ()
     }
 }
 
-void FermaNextMainFrame::fileSave ()
+bool FermaNextMainFrame::fileSave ()
 {
     FermaNextProject* currentPrj = projectToolBox->currentProject();
     if ( currentPrj == 0 )
-        return;
+        return false;
 
     try { currentPrj->saveToFile(); }
     catch ( FermaNextProject::FileNameIsNotDefinedException& ) {
-        fileSaveAs();
+        return fileSaveAs();
     }
+    return true;
 }
 
-void FermaNextMainFrame::fileSaveAs ()
+bool FermaNextMainFrame::fileSaveAs ()
 {
     FermaNextProject* currentPrj = projectToolBox->currentProject();
     if ( currentPrj == 0 )
-        return;
+        return false;
 
     QString prjName = currentPrj->getName();
     QString fileName = QFileDialog::getSaveFileName( 
@@ -507,7 +507,7 @@ void FermaNextMainFrame::fileSaveAs ()
           arg(prjName) );
 
     if ( fileName.isEmpty() )
-        return;
+        return false;
 
     QRegExp rx( ".*\\" + FermaNextProject::FormatExtension + "$" );
     if ( -1 == rx.search( fileName ) )
@@ -521,14 +521,16 @@ void FermaNextMainFrame::fileSaveAs ()
                                     tr("Rewrite file \"%1\"?").arg(fileName),
                                     tr("&Yes"), tr("&No"),
                                     QString::null, 0, 1 ) )
-            return;
+            return false;
     }
 
     try { currentPrj->saveToFile( fileName ); }
     catch ( FermaNextProject::IOException& ) {
         QMessageBox::critical( this, tr("Write file error"),
                              tr("Can't write to file: \"%1\"").arg(fileName) );
+        return false;
     }
+    return true;
 }
 
 void FermaNextMainFrame::fileClose ()
@@ -578,7 +580,7 @@ void FermaNextMainFrame::fileOpenWsp ()
     }
 }
 
-void FermaNextMainFrame::fileSaveWsp ()
+bool FermaNextMainFrame::fileSaveWsp ()
 {
     // All projects should have their file names
     FermaNextProject* currentSelected = projectToolBox->currentProject();
@@ -589,7 +591,8 @@ void FermaNextMainFrame::fileSaveWsp ()
         FermaNextProject* prj = *prjIt;
         if ( ! prj->isFileNameDefined() ) {
             prj->activate();
-            fileSaveAs();
+            if ( ! fileSaveAs() )
+                return false;
         }            
     }
 
@@ -599,24 +602,26 @@ void FermaNextMainFrame::fileSaveWsp ()
 
     try { FermaNextWorkspace::workspace().saveToFile(); }
     catch ( FermaNextWorkspace::FileNameIsNotDefinedException& ) {
-        fileSaveWspAs();
+        return fileSaveWspAs();
     }
     catch ( FermaNextWorkspace::ProjectFileNameIsNotDefinedException& ) {
         // Hm. Strange
         QMessageBox::critical( this, tr("FermaNextWorkspace exception"),
                                tr("Some project file name is not defined.\n"
                                   "Please, save all projects." ) );
+        return false;
     }
+    return true;
 }
 
-void FermaNextMainFrame::fileSaveWspAs ()
+bool FermaNextMainFrame::fileSaveWspAs ()
 {
     QString fileName = QFileDialog::getSaveFileName( QString::null, 
         "Ferma workspace (*" + FermaNextWorkspace::FormatExtension + ")", 
         this, "save ferma workspace", tr("Save ferma workspace") );
 
     if ( fileName.isEmpty() )
-        return;
+        return false;
 
     QRegExp rx( ".*\\" + FermaNextWorkspace::FormatExtension + "$" );
     if ( -1 == rx.search( fileName ) )
@@ -630,7 +635,7 @@ void FermaNextMainFrame::fileSaveWspAs ()
                                     tr("Rewrite file \"%1\"?").arg(fileName),
                                     tr("&Yes"), tr("&No"),
                                     QString::null, 0, 1 ) )
-            return;
+            return false;
     }
     
     // All projects should have their file names
@@ -642,7 +647,8 @@ void FermaNextMainFrame::fileSaveWspAs ()
         FermaNextProject* prj = *prjIt;
         if ( ! prj->isFileNameDefined() ) {
             prj->activate();
-            fileSaveAs();
+            if ( ! fileSaveAs() )
+                return false;
         }            
     }
 
@@ -656,12 +662,15 @@ void FermaNextMainFrame::fileSaveWspAs ()
         QMessageBox::critical( this, tr("FermaNextWorkspace exception"),
                                tr("Some project file name is not defined.\n"
                                   "Please, save all projects." ) );
+        return false;        
     }
     catch ( FermaNextWorkspace::IOException& ) {
         // Hm. Strange
         QMessageBox::critical( this, tr("Error writing to workspace file"),
                                tr("Can't open file for writing.") );
+        return false;
     }
+    return true;
 }
 
 void FermaNextMainFrame::fileCloseWsp ()
@@ -669,7 +678,7 @@ void FermaNextMainFrame::fileCloseWsp ()
     FermaNextWorkspace::workspace().reset();
 }
 
-void FermaNextMainFrame::fileSaveAll ()
+bool FermaNextMainFrame::fileSaveAll ()
 {
     // Save projects at first
     FermaNextProject* currentSelected = projectToolBox->currentProject();
@@ -683,10 +692,12 @@ void FermaNextMainFrame::fileSaveAll ()
             const QString& fileName = prj->getProjectFileName();
             QMessageBox::critical( this, tr("Write file error"),
                              tr("Can't write to file: \"%1\"").arg(fileName) );
+            return false;
         }
         catch ( FermaNextProject::FileNameIsNotDefinedException& ) {
             prj->activate();
-            fileSaveAs();
+            if ( !fileSaveAs() )
+                return false;
         }
     }
 
@@ -694,7 +705,7 @@ void FermaNextMainFrame::fileSaveAll ()
     if ( currentSelected )
         currentSelected->activate();
 
-    fileSaveWsp();
+    return fileSaveWsp();
 }
 
 void FermaNextMainFrame::filePageSetup ()
