@@ -287,12 +287,13 @@ void FermaNextMainFrame::setupFileActions ()
     a->setDisabled(true);
 
     // Print
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/fileprint.xpm" ), 
-                     tr( "&Print..." ), CTRL + Key_P, this, "filePrint" );
-    connect( a, SIGNAL( activated() ), this, SLOT( filePrint() ) );        
-    a->addTo( menu );
-    menu->insertSeparator();
-    a->setDisabled(true);
+    printAction = new QAction( 
+                 QPixmap::fromMimeSource( imagesPath() + "/fileprint.xpm" ), 
+                 tr( "&Print..." ), CTRL + Key_P, this, "filePrint" );
+    connect( printAction, SIGNAL( activated() ), this, SLOT( filePrint() ) );        
+    printAction->addTo( menu );
+    printAction->setDisabled(true);
+    menu->insertSeparator();    
 
     // Exit
     a = new QAction( tr( "E&xit" ), CTRL + Key_Q, this, "fileExit" );
@@ -422,6 +423,7 @@ void FermaNextMainFrame::refreshProjectActions ()
     saveProjectAction->setEnabled(enableActions);
     saveAsProjectAction->setEnabled(enableActions);
     closeProjectAction->setEnabled(enableActions);
+    printAction->setEnabled(enableActions);
 }
 
 void FermaNextMainFrame::trussWindowLostFocus ( TrussUnitWindow& window )
@@ -720,7 +722,10 @@ void FermaNextMainFrame::filePrintPreview ()
 
 void FermaNextMainFrame::filePrint ()
 {
-    qWarning("Not implmented yet!");
+    FermaNextProject* prj = projectToolBox->currentProject();
+    if ( prj == 0 )
+        return;
+    prj->getDesignerWindow().getDesignerWidget().print();
 }
 
 void FermaNextMainFrame::fileExit ()
