@@ -60,6 +60,9 @@ void AggPopupHint::show ( const QString& hintText,
 
 void AggPopupHint::hide ( bool smooth )
 {
+    if ( thread_->running() )
+        thread_->wait();
+
     if ( smooth )
     {
         rendered_ = false;
