@@ -25,36 +25,48 @@ public:
     class WorkspaceIsNotInitedCorrectly {};
     class IOException {};
     class WrongXMLDocException {};
-    class ProjectIsNotSavedException {};
+    class FileNameIsNotDefinedException {};
+    class ProjectFileNameIsNotDefinedException {};
 
     // Basic typedefs    
     typedef std::vector<FermaNextProject*> ProjectList;
-    typedef std::vector<FermaNextProject*>::iterator ProjectListIter;
+    typedef ProjectList::iterator ProjectListIter;
+    typedef ProjectList::const_iterator ProjectListConstIter;
 
     // Entry point to workspace instance
     static FermaNextWorkspace& workspace ();
 
+    virtual ProjectList getProjectList () const;
+
     virtual void loadFromFile ( const QString& ) throw (IOException, 
                                                         WrongXMLDocException,
                                                         LoadException);
+    virtual void saveToFile () throw (FileNameIsNotDefinedException,
+                                      IOException,
+                                      ProjectFileNameIsNotDefinedException);
+
     virtual void saveToFile ( const QString& ) 
-                         throw (IOException, ProjectIsNotSavedException);
+                         throw (IOException, 
+                                ProjectFileNameIsNotDefinedException);
 
     virtual const QString& getWorkspaceFileName () const;
+    virtual bool isFileNameDefined () const;
     
     virtual void reset ();
     virtual void createWidgetStack ( QMainWindow& );
 
     virtual FermaNextProject& createProject ( const QString& name ) 
                                     throw (WorkspaceIsNotInitedCorrectly);
-    virtual FermaNextProject& createProject ( QDomElement& ) 
+    virtual FermaNextProject& createProjectFromFile ( const QString& ) 
                                     throw (WorkspaceIsNotInitedCorrectly,
                                            LoadException);
 
     virtual bool removeProject ( FermaNextProject& );
     virtual bool removeProject ( const QString& name );
     virtual void activateProject ( const QString& prjName );
-    virtual FermaNextProject* findProjectByName ( const QString& name );
+    virtual FermaNextProject* currentActivatedProject () const;
+
+    virtual FermaNextProject* findProjectByName ( const QString& name ) const;
 
     virtual int countProjects () const;
     virtual FermaNextProject& getProject ( int index );
@@ -68,6 +80,9 @@ public:
 public slots:
     virtual bool loadPlugins ();
     virtual void clearProjects ();
+
+protected slots:
+    virtual void projectIsActivated ( FermaNextProject& );
 
 private:
     FermaNextWorkspace ();
@@ -86,6 +101,7 @@ protected:
     virtual ~FermaNextWorkspace ();
 
 signals:
+    void onProjectActivated ( FermaNextProject& );
     void onProjectCreate ( FermaNextProject& );
     void onBeforeProjectRemove ( FermaNextProject& );
     void onAfterProjectRemove ();

@@ -50,14 +50,25 @@ void FermaNextWorkspace::loadFromFile ( const QString& fileName )
     setWorkspaceFileName( fileName );
 }
 
+void FermaNextWorkspace::saveToFile ()
+    throw (FileNameIsNotDefinedException,
+           IOException, 
+           ProjectFileNameIsNotDefinedException)
+{
+    const QString& fileName = getWorkspaceFileName();
+    if ( ! isFileNameDefined() )
+        throw FileNameIsNotDefinedException();
+    
+    saveToFile( fileName );
+}
+
 void FermaNextWorkspace::saveToFile ( const QString& fileName )
-    throw (IOException, ProjectIsNotSavedException)
+    throw (IOException, ProjectFileNameIsNotDefinedException)
 {
     ProjectListIter iter = projects.begin();
     for ( ; iter != projects.end(); ++iter ) {
-        const QString& prjFileName = (*iter)->getProjectFileName();
-        if ( prjFileName.isNull() || prjFileName.isEmpty() )
-            throw ProjectIsNotSavedException();
+        if ( ! (*iter)->isFileNameDefined() )
+            throw ProjectFileNameIsNotDefinedException();
     }
 
     QFile xmlFile( fileName );
@@ -94,7 +105,7 @@ void FermaNextWorkspace::loadFromXML ( const QDomElement& wspElem )
      ****************************/
     FermaNextProject* selectedProject = 0;
     
-    QDomNodeList projects = wspElem.elementsByTagName( "FermaNextProjects" );
+    QDomNodeList projects = wspElem.elementsByTagName( "FermaNextProject" );
     for ( uint prjsNum = 0; prjsNum < projects.count(); ++prjsNum ) {
         QDomNode project = projects.item( prjsNum );
         if ( ! project.isElement() )
@@ -107,7 +118,15 @@ void FermaNextWorkspace::loadFromXML ( const QDomElement& wspElem )
         QFileInfo prjFileInf( prjFileName );
         if ( ! prjFileInf.exists() || ! prjFileInf.isReadable() )
             throw LoadException();
-        
+        FermaNextProject& prj = createProject( QString::null );
+        try { prj.loadFromFile( prjFileName ); }
+        catch ( ... ) {
+            throw LoadException();
+        }
+        if ( projectElem.hasAttribute( "selected" ) &&
+             projectElem.attribute( "selected" ) == "Yes" ) {
+            selectedProject = &prj;
+        }
     }
 
     // Activate project
@@ -128,9 +147,14 @@ QDomElement FermaNextWorkspace::saveToXML ( QDomDocument& doc )
      *********************/
     ProjectListIter iter = projects.begin();
     for ( ; iter != projects.end(); ++iter ) {
-        const QString& prjFileName = (*iter)->getProjectFileName();
+        FermaNextProject* prj = *iter;
+        const QString& prjFileName = prj->getProjectFileName();
         QDomElement prjElem = doc.createElement( "FermaNextProject" );        
         prjElem.setAttribute( "projectURL", prjFileName );
+        if ( prj->isActivated() )
+            prjElem.setAttribute( "selected", "Yes" );
+        else
+            prjElem.removeAttribute( "selected" );
         wspElem.appendChild( prjElem );
     }
     return wspElem;
@@ -145,6 +169,11 @@ FermaNextWorkspace& FermaNextWorkspace::workspace ()
         mutex.unlock();
     }
     return *instance;
+}
+
+FermaNextWorkspace::ProjectList FermaNextWorkspace::getProjectList () const
+{
+    return projects;
 }
 
 void FermaNextWorkspace::clearProjects ()
@@ -164,6 +193,11 @@ void FermaNextWorkspace::reset ()
     clearProjects();
 }
 
+void FermaNextWorkspace::projectIsActivated ( FermaNextProject& prj )
+{
+    emit onProjectActivated( prj );
+}
+
 void FermaNextWorkspace::createWidgetStack ( QMainWindow& parent )
 {
     if ( widgetStack )
@@ -179,19 +213,25 @@ FermaNextProject& FermaNextWorkspace::createProject ( const QString& name )
     if ( widgetStack == 0 )
         throw WorkspaceIsNotInitedCorrectly();
     FermaNextProject* project = new FermaNextProject(name, widgetStack);
+
+    // Activation signal catch
+    QObject::connect( project, SIGNAL(onActivate(FermaNextProject&)),
+                      SLOT(projectIsActivated(FermaNextProject&)) );
+
     projects.push_back(project);
     emit onProjectCreate(*project);    
     return *project;
 }
 
-FermaNextProject& FermaNextWorkspace::createProject ( QDomElement& elem ) 
+FermaNextProject& FermaNextWorkspace::createProjectFromFile ( 
+    const QString& fileName ) 
     throw (WorkspaceIsNotInitedCorrectly, LoadException)
 {
     FermaNextProject& prj = createProject( QString::null );
-    try { prj.loadFromXML( elem ); }
-    catch ( LoadException& ) {
+    try { prj.loadFromFile( fileName ); }
+    catch ( ... ) {
         removeProject(prj);
-        throw;
+        throw LoadException();
     }
     return prj;
 }
@@ -234,12 +274,22 @@ void FermaNextWorkspace::activateProject ( const QString& prjName )
         prj->activate();
 }
 
-FermaNextProject* FermaNextWorkspace::findProjectByName ( const QString& name )
+FermaNextProject* FermaNextWorkspace::currentActivatedProject () const
 {
-    ProjectListIter iter = projects.begin();
+    ProjectListConstIter iter = projects.begin();
+    for ( ; iter != projects.end(); ++iter )
+        if ( (*iter)->isActivated() )
+            return *iter;
+    return 0;
+}
+
+FermaNextProject* FermaNextWorkspace::findProjectByName ( 
+    const QString& name ) const
+{
+    ProjectListConstIter iter = projects.begin();
     for ( ; iter != projects.end(); ++iter ) 
         if ( (*iter)->getName() == name )
-            return *iter;    
+            return *iter;
     return 0;
 }
 
@@ -270,10 +320,17 @@ const QString& FermaNextWorkspace::getWorkspaceFileName () const
     return workspaceFileName;
 }
 
+bool FermaNextWorkspace::isFileNameDefined () const
+{
+    return (! workspaceFileName.isNull() && ! workspaceFileName.isEmpty() );
+}
+
 void FermaNextWorkspace::setWorkspaceFileName ( const QString& fileName )
 {
-    workspaceFileName = fileName;
-    emit onWorkspaceFileNameChange( workspaceFileName );
+    if ( workspaceFileName != fileName ) {
+        workspaceFileName = fileName;
+        emit onWorkspaceFileNameChange( workspaceFileName );
+    }
 }
 
 FermaNextConfig& FermaNextWorkspace::config ()

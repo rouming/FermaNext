@@ -77,6 +77,16 @@ void FermaNextProject::loadFromFile ( const QString& fileName )
     setProjectFileName( fileName );
 }
 
+void FermaNextProject::saveToFile () throw (FileNameIsNotDefinedException, 
+                                            IOException)
+{
+    const QString& fileName = getProjectFileName();
+    if ( ! isFileNameDefined() )
+        throw FileNameIsNotDefinedException();
+    
+    saveToFile( fileName );
+}
+
 void FermaNextProject::saveToFile ( const QString& fileName )
     throw (IOException)
 {
@@ -103,10 +113,17 @@ const QString& FermaNextProject::getProjectFileName () const
     return projectFileName;
 }
 
+bool FermaNextProject::isFileNameDefined () const
+{
+    return (! projectFileName.isNull() && ! projectFileName.isEmpty() );
+}
+
 void FermaNextProject::setProjectFileName ( const QString& fileName )
 {
-    projectFileName = fileName;
-    emit onProjectFileNameChange( projectFileName );
+    if ( projectFileName != fileName ) {
+        projectFileName = fileName;
+        emit onProjectFileNameChange( projectFileName );
+    }
 }
 
 QDomElement FermaNextProject::saveToXML ( QDomDocument& doc )
@@ -206,8 +223,15 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
 
 void FermaNextProject::activate ()
 {
-    if ( widgetStack && widgetStack->visibleWidget() != projectMainWidget )
+    if ( widgetStack && widgetStack->visibleWidget() != projectMainWidget ) {
         widgetStack->raiseWidget( projectMainWidget );
+        emit onActivate( *this );
+    }
+}
+
+bool FermaNextProject::isActivated () const
+{
+    return widgetStack && widgetStack->visibleWidget() == projectMainWidget;
 }
 
 const QString& FermaNextProject::getName () const
