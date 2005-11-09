@@ -41,12 +41,6 @@ protected:
     void setupHelpActions ();
     void setupPluginActions ();
 
-    // Manages project/workspace files
-    void openProject ( QFile& ) throw (WrongXMLFormatException);
-    void openWorkspace ( QFile& ) throw (WrongXMLFormatException);
-    void saveProject ( QFile& );
-    void saveWorkspace ( QFile& );
-
     // Close handler. Calls 'clean' for correct close.
     void closeEvent ( QCloseEvent* );
 

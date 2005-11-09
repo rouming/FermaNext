@@ -37,6 +37,8 @@ ProjectToolBox::ProjectToolBox ( FermaNextWorkspace& ws, QWidget* parent,
     connect( &workspace, SIGNAL(onReset()), SLOT(clear()) );
     connect( &workspace, SIGNAL(onProjectCreate(FermaNextProject&)), 
                          SLOT(addProject(FermaNextProject&)) );
+    connect( &workspace, SIGNAL(onProjectActivated(FermaNextProject&)), 
+                         SLOT(projectIsActivated(FermaNextProject&)) );
     connect( &workspace, SIGNAL(onBeforeProjectRemove(FermaNextProject&)), 
                          SLOT(removeProject(FermaNextProject&)) );
     connect( this, SIGNAL(currentChanged(int)), 
@@ -89,6 +91,14 @@ void ProjectToolBox::projectRename ( const QString& newName )
                 setItemLabel( indx, newName );
         }
     } catch ( ... ) {}
+}
+
+void ProjectToolBox::projectIsActivated ( FermaNextProject& prj )
+{
+    // Double activation check
+    if ( currentProject() == &prj )
+        return;
+    setCurrentItem( projects[&prj] );
 }
 
 QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
@@ -240,8 +250,9 @@ void ProjectToolBox::activateSelected ( int index )
     QValueList<FermaNextProject*>::iterator i = keys.begin();
     for ( ; i != keys.end(); ++i )
         if ( page == projects[*i] ) {
-            currentPrj = *i; 
-            currentPrj->activate();
+            currentPrj = *i;
+            if ( ! currentPrj->isActivated() )
+                currentPrj->activate();
             break;
         }
 
