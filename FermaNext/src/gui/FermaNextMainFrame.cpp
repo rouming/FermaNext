@@ -362,55 +362,6 @@ void FermaNextMainFrame::setupPluginActions ()
     reloadPlugins();
 }
 
-void FermaNextMainFrame::openProject ( QFile& xmlFile )
-    throw (WrongXMLFormatException)
-{
-    QIODevice* xmlIODev = &xmlFile;
-    QDomDocument doc;
-    if ( !doc.setContent( xmlIODev ) )
-        throw WrongXMLFormatException();
-
-    QDomElement docElem = doc.documentElement();
-    if ( docElem.isNull() )
-        throw WrongXMLFormatException();
-
-    FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();    
-
-    try { wsp.createProject( docElem ); } 
-    catch ( ... ) {
-        throw WrongXMLFormatException();
-    }
-}
-
-void FermaNextMainFrame::openWorkspace ( QFile& xmlFile )
-    throw (WrongXMLFormatException)
-{
-    QDomDocument doc;
-    QIODevice* xmlIODev = &xmlFile;
-    if ( !doc.setContent( xmlIODev ) )
-        throw WrongXMLFormatException();
-
-    QDomElement docElem = doc.documentElement();
-    if ( docElem.isNull() )
-        throw WrongXMLFormatException();
-
-    FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
-/*
-    try { wsp.loadFromXML( docElem ); }
-    catch ( FermaNextWorkspace::LoadException& ) {
-        throw WrongXMLFormatException();
-    }
-*/
-}
-
-void FermaNextMainFrame::saveProject ( QFile& xmlFile )
-{
-}
-
-void FermaNextMainFrame::saveWorkspace ( QFile& xmlFile )
-{
-}
-
 void FermaNextMainFrame::reloadPlugins ()
 {
     FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
@@ -515,28 +466,31 @@ void FermaNextMainFrame::fileOpen ()
 {
     QString fileName = QFileDialog::getOpenFileName( QString::null, 
         "Ferma project (*" + FermaNextProject::FormatExtension + ")", 
-        this );
+        this, "open ferma project", tr("Open ferma project") );
 
     if ( fileName.isEmpty() )
         return;
 
-    QFile xmlFile( fileName );
-    if ( ! xmlFile.open( IO_ReadOnly ) ) {
-        QMessageBox::critical( this, tr("Read file error"),
-                               tr("Can't read file: \"%1\"").arg(fileName) );
-        return;
-    }
-
-    try { openProject( xmlFile ); }
-    catch ( WrongXMLFormatException& ) {
+    try { FermaNextWorkspace::workspace().createProjectFromFile( fileName ); }
+    catch ( FermaNextWorkspace::WorkspaceIsNotInitedCorrectly& ) {
+        QMessageBox::critical( this, tr("FermaNextWorkspace exception"),
+                               tr("Workspace is not inited correctly.") );
+    } catch ( FermaNextWorkspace::LoadException& ) {
         QMessageBox::critical( this, tr("Error reading project file"),
                                tr("Wrong XML format.") );
-    }    
+    }
 }
 
 void FermaNextMainFrame::fileSave ()
 {
-    qWarning("Not implmented yet!");
+    FermaNextProject* currentPrj = projectToolBox->currentProject();
+    if ( currentPrj == 0 )
+        return;
+
+    try { currentPrj->saveToFile(); }
+    catch ( FermaNextProject::FileNameIsNotDefinedException& ) {
+        fileSaveAs();
+    }
 }
 
 void FermaNextMainFrame::fileSaveAs ()
@@ -545,9 +499,12 @@ void FermaNextMainFrame::fileSaveAs ()
     if ( currentPrj == 0 )
         return;
 
-    QString fileName = QFileDialog::getSaveFileName( QString::null, 
+    QString prjName = currentPrj->getName();
+    QString fileName = QFileDialog::getSaveFileName( 
+        prjName + FermaNextProject::FormatExtension, 
         "Ferma project (*" + FermaNextProject::FormatExtension + ")", 
-        this );
+        this, "save ferma project", tr("Save ferma project (%1)").
+          arg(prjName) );
 
     if ( fileName.isEmpty() )
         return;
@@ -570,7 +527,7 @@ void FermaNextMainFrame::fileSaveAs ()
     try { currentPrj->saveToFile( fileName ); }
     catch ( FermaNextProject::IOException& ) {
         QMessageBox::critical( this, tr("Write file error"),
-                               tr("Can't write to file: \"%1\"").arg(fileName) );
+                             tr("Can't write to file: \"%1\"").arg(fileName) );
     }
 }
 
@@ -594,50 +551,150 @@ void FermaNextMainFrame::fileOpenWsp ()
 {
     if ( QMessageBox::question( this,
                                 tr("Open workspace"),                                  
-                                tr("Open workspace and don't save this one?"),
+                                tr("Open new workspace?"),
                                 tr("&Yes"), tr("&No"),
                                 QString::null, 0, 1 ) )
         return;
 
     QString fileName = QFileDialog::getOpenFileName( QString::null, 
         "Ferma workspace (*" + FermaNextWorkspace::FormatExtension + ")", 
-        this );
+        this, "open ferma workspace", tr("Open ferma workspace") );
 
     if ( fileName.isEmpty() )
         return;
 
-    QFile xmlFile( fileName );
-    if ( ! xmlFile.open( IO_ReadOnly ) ) {
-        QMessageBox::critical( this, tr("Read file error"),
-                               tr("Can't read file: \"%1\"").arg(fileName) );
-        return;
-    }
-
-    try { openWorkspace( xmlFile ); }
-    catch ( WrongXMLFormatException& ) {
+    try { FermaNextWorkspace::workspace().loadFromFile( fileName ); }
+    catch ( FermaNextWorkspace::IOException& ) {
+        QMessageBox::critical( this, tr("Error reading workspace file"),
+                               tr("Can't open file.") );
+    } 
+    catch ( FermaNextWorkspace::WrongXMLDocException& ) {
         QMessageBox::critical( this, tr("Error reading workspace file"),
                                tr("Wrong XML format.") );
+    }
+    catch ( FermaNextWorkspace::LoadException& ) {
+        QMessageBox::critical( this, tr("Error reading workspace file"),
+                               tr("Wrong workspace format.") );
     }
 }
 
 void FermaNextMainFrame::fileSaveWsp ()
 {
-    qWarning("Not implmented yet!");
+    // All projects should have their file names
+    FermaNextProject* currentSelected = projectToolBox->currentProject();
+    FermaNextWorkspace::ProjectList projects = 
+        FermaNextWorkspace::workspace().getProjectList();
+    FermaNextWorkspace::ProjectListIter prjIt = projects.begin();
+    for ( ; prjIt != projects.end(); ++prjIt ) {
+        FermaNextProject* prj = *prjIt;
+        if ( ! prj->isFileNameDefined() ) {
+            prj->activate();
+            fileSaveAs();
+        }            
+    }
+
+    // Restore selected
+    if ( currentSelected )
+        currentSelected->activate();
+
+    try { FermaNextWorkspace::workspace().saveToFile(); }
+    catch ( FermaNextWorkspace::FileNameIsNotDefinedException& ) {
+        fileSaveWspAs();
+    }
+    catch ( FermaNextWorkspace::ProjectFileNameIsNotDefinedException& ) {
+        // Hm. Strange
+        QMessageBox::critical( this, tr("FermaNextWorkspace exception"),
+                               tr("Some project file name is not defined.\n"
+                                  "Please, save all projects." ) );
+    }
 }
 
 void FermaNextMainFrame::fileSaveWspAs ()
 {
-    qWarning("Not implmented yet!");
+    QString fileName = QFileDialog::getSaveFileName( QString::null, 
+        "Ferma workspace (*" + FermaNextWorkspace::FormatExtension + ")", 
+        this, "save ferma workspace", tr("Save ferma workspace") );
+
+    if ( fileName.isEmpty() )
+        return;
+
+    QRegExp rx( ".*\\" + FermaNextWorkspace::FormatExtension + "$" );
+    if ( -1 == rx.search( fileName ) )
+        fileName += FermaNextWorkspace::FormatExtension;
+
+    QFileInfo wspFileInfo( fileName );
+
+    if ( wspFileInfo.exists() ) {
+        if ( QMessageBox::question( this,
+                                    tr("File exists"),
+                                    tr("Rewrite file \"%1\"?").arg(fileName),
+                                    tr("&Yes"), tr("&No"),
+                                    QString::null, 0, 1 ) )
+            return;
+    }
+    
+    // All projects should have their file names
+    FermaNextProject* currentSelected = projectToolBox->currentProject();
+    FermaNextWorkspace::ProjectList projects = 
+        FermaNextWorkspace::workspace().getProjectList();
+    FermaNextWorkspace::ProjectListIter prjIt = projects.begin();
+    for ( ; prjIt != projects.end(); ++prjIt ) {
+        FermaNextProject* prj = *prjIt;
+        if ( ! prj->isFileNameDefined() ) {
+            prj->activate();
+            fileSaveAs();
+        }            
+    }
+
+    // Restore selected
+    if ( currentSelected )
+        currentSelected->activate();
+
+    try { FermaNextWorkspace::workspace().saveToFile( fileName ); }
+    catch ( FermaNextWorkspace::ProjectFileNameIsNotDefinedException& ) {
+        // Hm. Strange
+        QMessageBox::critical( this, tr("FermaNextWorkspace exception"),
+                               tr("Some project file name is not defined.\n"
+                                  "Please, save all projects." ) );
+    }
+    catch ( FermaNextWorkspace::IOException& ) {
+        // Hm. Strange
+        QMessageBox::critical( this, tr("Error writing to workspace file"),
+                               tr("Can't open file for writing.") );
+    }
 }
 
 void FermaNextMainFrame::fileCloseWsp ()
 {
-    qWarning("Not implmented yet!");
+    FermaNextWorkspace::workspace().reset();
 }
 
 void FermaNextMainFrame::fileSaveAll ()
 {
-    qWarning("Not implmented yet!");
+    // Save projects at first
+    FermaNextProject* currentSelected = projectToolBox->currentProject();
+    FermaNextWorkspace::ProjectList projects = 
+        FermaNextWorkspace::workspace().getProjectList();
+    FermaNextWorkspace::ProjectListIter prjIt = projects.begin();
+    for ( ; prjIt != projects.end(); ++prjIt ) {
+        FermaNextProject* prj = *prjIt;
+        try { prj->saveToFile(); }
+        catch ( FermaNextProject::IOException& ) {
+            const QString& fileName = prj->getProjectFileName();
+            QMessageBox::critical( this, tr("Write file error"),
+                             tr("Can't write to file: \"%1\"").arg(fileName) );
+        }
+        catch ( FermaNextProject::FileNameIsNotDefinedException& ) {
+            prj->activate();
+            fileSaveAs();
+        }
+    }
+
+    // Restore selected
+    if ( currentSelected )
+        currentSelected->activate();
+
+    fileSaveWsp();
 }
 
 void FermaNextMainFrame::filePageSetup ()

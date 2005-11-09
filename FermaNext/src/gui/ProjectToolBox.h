@@ -34,6 +34,7 @@ protected slots:
     virtual int addProject ( FermaNextProject& );
     virtual int removeProject ( FermaNextProject& );
     virtual void projectRename ( const QString& );
+    virtual void projectIsActivated ( FermaNextProject& );
  
     void activateSelected ( int index );
 
