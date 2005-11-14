@@ -10,11 +10,11 @@
  *****************************************************************************/
 
 #if defined WINDOWS || defined WIN32
-    const QString DynaLoader::LibExtension = "dll";
-    const QString DynaLoader::LibPrefix    = "";
+    const char* DynaLoader::LibExtension = "dll";
+    const char* DynaLoader::LibPrefix    = "";
 #else
-    const QString DynaLoader::LibExtension = "so";
-    const QString DynaLoader::LibPrefix    = "lib";
+    const char* DynaLoader::LibExtension = "so";
+    const char* DynaLoader::LibPrefix    = "lib";
 #endif
 
 DynaLoader::DynaLoader () :
@@ -36,14 +36,15 @@ DynaLoader::~DynaLoader ()
 void DynaLoader::loadLibrary ( QString fileName ) 
     throw (LibraryLoadException)
 {
-    static QRegExp regExp( "^" + LibPrefix + ".+\\." + LibExtension + "$" );
-    freeLibrary();
+    static QRegExp regExp( QString("^") + LibPrefix + ".+\\." + LibExtension + "$" );
+    freeLibrary();    
     QFileInfo dlInfo( fileName );
     QString dlFileName = dlInfo.fileName();
     if ( -1 == regExp.search( dlFileName ) ) {
         dlFileName = LibPrefix + dlFileName + "." + LibExtension;
         fileName = dlInfo.dirPath() + QDir::separator() + dlFileName;
     }
+    fileName = QDir::convertSeparators( fileName );
 #if defined UNICODE && (defined WINDOWS || defined WIN32)
     handle = dl_open(fileName.ucs2());
 #else

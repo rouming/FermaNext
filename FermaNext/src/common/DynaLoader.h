@@ -20,7 +20,6 @@
 
 #include <qstring.h>
 
-
 class DynaLoader
 {
 public:
@@ -48,8 +47,8 @@ public:
 
 public:
     // OS dependent dynamic lib extension and prefix.
-    static const QString LibExtension;
-    static const QString LibPrefix;
+    static const char* LibExtension;
+    static const char* LibPrefix;
 
 private:
     LibraryHandle handle;

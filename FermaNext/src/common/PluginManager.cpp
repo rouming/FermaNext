@@ -41,7 +41,7 @@ void PluginManager::loadPlugins ( const QString& path )
     // This should be done because some plugins can require 
     // other dynamic libs, which must be loaded first.
     //
-    QDir preloadedLibsDir( path, "*." + DynaLoader::LibExtension,
+    QDir preloadedLibsDir( path, QString("*.") + DynaLoader::LibExtension,
                            QDir::Name | QDir::IgnoreCase, 
                            QDir::Files | QDir::Readable );
     for ( i = 0; i < preloadedLibsDir.count(); ++i ) {
