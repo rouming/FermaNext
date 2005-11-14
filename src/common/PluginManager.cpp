@@ -52,7 +52,8 @@ void PluginManager::loadPlugins ( const QString& path )
                                     DynaLoader::LibExtension + "$" ) ) )
             continue;
         try {
-            DynaLoader* dynaLib = new DynaLoader( path + "/" + dir );
+            DynaLoader* dynaLib = 
+                new DynaLoader( path + QDir::separator() + dir );
             dynaLibs.push_back( dynaLib );
         } catch ( ... ) {}
     }
@@ -64,10 +65,10 @@ void PluginManager::loadPlugins ( const QString& path )
                  QDir::Name | QDir::IgnoreCase, 
                  QDir::Files | QDir::Readable );
     for ( i = 0; i < plgDir.count(); i++ ) {
-        QString dir = plgDir[i];
+        QString plg = plgDir[i];
         PluginLoader* loader = 0;
         try {
-            loader = new PluginLoader( path + "/" + dir );
+            loader = new PluginLoader( path + QDir::separator() + plg );
             Plugin& pluginInstance = loader->pluginInstance();
             PluginHandle handle = pluginInstance.pluginChecksum();
             if ( plugins.contains(handle) )
