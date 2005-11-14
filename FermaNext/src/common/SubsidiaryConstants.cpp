@@ -2,6 +2,7 @@
 #include "SubsidiaryConstants.h"
 #include <qapplication.h>
 #include <qfile.h>
+#include <qdir.h>
 
 /************************************
  * Main Consts 
@@ -60,27 +61,29 @@ const double svgGamma = 1.0,
 
 QString imagesPath () 
 { 
-    return applicationDirPath() + "/" + "images"; 
+    return applicationDirPath() + QDir::separator() + "images"; 
 }
 
 QString imagesSvgPath ()
 {
-    return applicationDirPath() + "/" + "images/svg";
+    return applicationDirPath() + QDir::separator() + "images"  + 
+                                  QDir::separator() + "svg";
 }
 
 QString imagesCursorsPath ()
 {
-    return applicationDirPath() + "/" + "images/cursors";
+    return applicationDirPath() + QDir::separator() + "images" +
+                                  QDir::separator() + "cursors";
 }
 
 QString pluginsPath () 
 { 
-    return applicationDirPath() + "/" + "plugins";
+    return applicationDirPath() + QDir::separator() + "plugins";
 }
 
 QString configFileName ()
 {
-    return applicationDirPath() + "/" + "config.xml";
+    return applicationDirPath() + QDir::separator() + "config.xml";
 }
 
 QString applicationDirPath ()

@@ -21,7 +21,7 @@ PluginLoader::PluginLoader ( const QString& pluginName )
     {
         if ( dynaLoader.isLoaded() )
             dynaLoader.freeLibrary();
-        throw;
+        throw PluginLoadException();
     }
 }
 
