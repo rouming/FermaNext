@@ -179,6 +179,10 @@ SOURCE=.\Geometry.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\Log4CXX.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\ObjectState.h
 
 !IF  "$(CFG)" == "common - Win32 Release"

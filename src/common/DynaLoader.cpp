@@ -9,7 +9,7 @@
  * Dynamic Loader
  *****************************************************************************/
 
-#if defined WINDOWS || defined WIN32
+#if defined _WIN32 || defined WIN32
     const char* DynaLoader::LibExtension = "dll";
     const char* DynaLoader::LibPrefix    = "";
 #else
@@ -45,7 +45,7 @@ void DynaLoader::loadLibrary ( QString fileName )
         fileName = dlInfo.dirPath() + QDir::separator() + dlFileName;
     }
     fileName = QDir::convertSeparators( fileName );
-#if defined UNICODE && (defined WINDOWS || defined WIN32)
+#if defined UNICODE && (defined _WIN32 || defined WIN32)
     handle = dl_open(fileName.ucs2());
 #else
     handle = dl_open(QFile::encodeName(fileName));

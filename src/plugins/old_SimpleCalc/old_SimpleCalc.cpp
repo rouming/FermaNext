@@ -7,7 +7,7 @@
 #include <qfile.h>
 #include <qregexp.h>
 
-#if defined WINDOWS || defined WIN32  
+#if defined _WIN32 || defined WIN32  
   #include "win_SimpleCalc.h"
 #else
   #include "unix_SimpleCalc.h"
