@@ -7,7 +7,7 @@
 #include <string>
 #include <qmutex.h>
 
-#if defined __WIN__ || defined WIN32 || defined _MSC_VER
+#if defined _WIN32 || defined WIN32
  #include <time.h>
 #else
  #include <sys/times.h>

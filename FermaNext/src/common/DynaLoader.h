@@ -2,7 +2,7 @@
 #ifndef DYNALOADER_H
 #define DYNALOADER_H
 
-#if defined WINDOWS || defined WIN32  
+#if defined _WIN32 || defined WIN32  
   #include <windows.h>
   typedef HMODULE LibraryHandle;
   typedef FARPROC ProcAddress;

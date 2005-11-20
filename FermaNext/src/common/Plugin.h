@@ -8,7 +8,7 @@
   #define ExternC extern
 #endif
 
-#if defined WINDOWS || defined WIN32
+#if defined _WIN32 || defined WIN32
   #define PluginExport ExternC __declspec( dllexport )
   #define PluginImport ExternC __declspec( dllimport )
   #define StandardCall __stdcall
@@ -101,7 +101,7 @@ public:
 //   /* some fini code goes here */
 // }
 //
-#if defined WINDOWS || defined WIN32
+#if defined _WIN32 || defined WIN32
   #include <windows.h>
 
   #define FERMA_NEXT_PLUGIN_INIT \
