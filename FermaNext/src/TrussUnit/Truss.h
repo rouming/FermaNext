@@ -311,7 +311,7 @@ public:
     virtual P& createPivot ( uint firstNodeIndex, uint lastNodeIndex ) 
                                           throw (NodeIndexOutOfBoundException) 
     {
-        if ( lastNodeIndex >= nodes.size() || lastNodeIndex >= nodes.size() )
+        if ( firstNodeIndex >= nodes.size() || lastNodeIndex >= nodes.size() )
             throw NodeIndexOutOfBoundException();
         
         N* first = nodes.at(firstNodeIndex);
