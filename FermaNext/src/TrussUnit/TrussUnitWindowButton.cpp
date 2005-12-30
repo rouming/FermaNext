@@ -15,7 +15,7 @@ TrussUnitWindowButton::TrussUnitWindowButton ( const QPoint& pos,
     pressedCol( agg::rgba( 65, 90, 110, 0.7 ) ),
     lineCol( agg::rgba( 10, 10, 10 ) )
 {
-    parseSvg ( pathRend, fname.ascii() );    
+    parseSvg( pathRend, fname.local8Bit() );    
 }
 
 TrussUnitWindowButton::~TrussUnitWindowButton ()
