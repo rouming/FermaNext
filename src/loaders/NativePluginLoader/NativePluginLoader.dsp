@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="old_SimpleCalc" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="NativePluginLoader" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
-CFG=old_SimpleCalc - Win32 Debug
+CFG=NativePluginLoader - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "old_SimpleCalc.mak".
+!MESSAGE NMAKE /f "NativePluginLoader.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "old_SimpleCalc.mak" CFG="old_SimpleCalc - Win32 Debug"
+!MESSAGE NMAKE /f "NativePluginLoader.mak" CFG="NativePluginLoader - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "old_SimpleCalc - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "old_SimpleCalc - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "NativePluginLoader - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "NativePluginLoader - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
@@ -30,7 +30,7 @@ F90=df.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "old_SimpleCalc - Win32 Release"
+!IF  "$(CFG)" == "NativePluginLoader - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -56,14 +56,9 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 qt-mt.lib qtmain_rel.lib common.lib TrussUnit.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /out:"../../../plugins/old_SimpleCalc.plg.dll" /libpath:"../../../build" /libpath:"$(QTDIR)\lib"
-# Begin Special Build Tool
-SOURCE="$(InputPath)"
-PostBuild_Desc=Copy plugin wrappers
-PostBuild_Cmds=xcopy /y Simple_f.dll ..\..\..\plugins	xcopy /y win_Simple_f.dll ..\..\..\plugins
-# End Special Build Tool
+# ADD LINK32 qt-mt.lib qtmain_rel.lib common.lib TrussUnit.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /out:"../../../plugins/loaders/NativePluginLoader.ldr.dll" /libpath:"../../../build" /libpath:"$(QTDIR)\lib"
 
-!ELSEIF  "$(CFG)" == "old_SimpleCalc - Win32 Debug"
+!ELSEIF  "$(CFG)" == "NativePluginLoader - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -79,7 +74,7 @@ PostBuild_Cmds=xcopy /y Simple_f.dll ..\..\..\plugins	xcopy /y win_Simple_f.dll 
 # ADD BASE F90 /check:bounds /compile_only /dbglibs /debug:full /dll /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD F90 /check:bounds /compile_only /dbglibs /debug:full /dll /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "OLD_SIMPLECALC_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /ZI /Od /I "..\..\TrussUnit" /I "..\..\common" /I "..\..\common\plugin" /I "..\..\common\plugin\loader" /I "$(QTDIR)\include" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "OLD_SIMPLECALC_EXPORTS" /D "QT_THREAD_SUPPORT" /YX /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /ZI /Od /I "..\..\common" /I "..\..\common\plugin" /I "..\..\common\plugin\loader" /I "$(QTDIR)\include" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "OLD_SIMPLECALC_EXPORTS" /D "QT_THREAD_SUPPORT" /YX /FD /I /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419 /d "_DEBUG"
@@ -89,33 +84,20 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 qt-mt332.lib qtmain.lib common.lib TrussUnit.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /out:"../../../plugins/old_SimpleCalc.plg.dll" /pdbtype:sept /libpath:"../../../build" /libpath:"$(QTDIR)\lib"
-# Begin Special Build Tool
-SOURCE="$(InputPath)"
-PostBuild_Desc=Copy plugin wrappers
-PostBuild_Cmds=xcopy /y Simple_f.dll ..\..\..\plugins	xcopy /y win_Simple_f.dll ..\..\..\plugins
-# End Special Build Tool
+# ADD LINK32 qt-mt332.lib qtmain.lib common.lib TrussUnit.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /out:"../../../plugins/loaders/NativePluginLoader.ldr.dll" /pdbtype:sept /libpath:"../../../build" /libpath:"$(QTDIR)\lib"
 
 !ENDIF 
 
 # Begin Target
 
-# Name "old_SimpleCalc - Win32 Release"
-# Name "old_SimpleCalc - Win32 Debug"
+# Name "NativePluginLoader - Win32 Release"
+# Name "NativePluginLoader - Win32 Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;f90;for;f;fpp"
 # Begin Source File
 
-SOURCE=.\FRMWriter.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\old_SimpleCalc.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\VYVReader.cpp
+SOURCE=.\NativePluginLoader.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -123,19 +105,7 @@ SOURCE=.\VYVReader.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
 # Begin Source File
 
-SOURCE=.\FRMWriter.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\old_SimpleCalc.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\VYVReader.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\win_SimpleCalc.h
+SOURCE=.\NativePluginLoader.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

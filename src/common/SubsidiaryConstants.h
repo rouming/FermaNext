@@ -63,6 +63,7 @@ QString imagesPath ();
 QString imagesSvgPath ();
 QString imagesCursorsPath ();
 QString pluginsPath ();
+QString pluginLoadersPath ();
 QString configFileName ();
 
 // Sage return of the directory that 

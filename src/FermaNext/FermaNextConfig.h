@@ -17,8 +17,8 @@ public:
     class ConfigWriteException {};
     class ConfigParseException {};        
 
-    FermaNextConfig ( const QString& file ) throw (ConfigReadException, 
-                                                                     ConfigWriteException);
+    FermaNextConfig ( const QString& file ) 
+        throw (ConfigReadException, ConfigWriteException);
 
     QDomNode findConfigNode ( const QString& name ) const;
     QDomNode findConfigNode ( const QDomNode& node, const QString& name ) const;
@@ -29,10 +29,10 @@ protected:
     void parseConfig () throw (ConfigReadException, ConfigParseException);
 
 private:
+    static const QDomNode nullNode;
+
     QString fileName;
     QDomDocument configDoc;
-
-    static const QDomNode nullNode;
 };
 
 

@@ -5,6 +5,7 @@
 #include "TrussUnitActions.h"
 #include "TrussCalcData.h"
 #include "CalcDataWidget.h"
+#include "CalculationInterface.h"
 
 #include <qbuttongroup.h>
 #include <qtoolbutton.h>
@@ -277,8 +278,8 @@ void ProjectToolBox::importIsPressed ()
         return;
 
     QString fileName = QFileDialog::getOpenFileName( QString::null, 
-        "Ferma (*" + TrussUnitWindowManager::NewFormatExtension  + 
-        " );;Ferma old (*" + TrussUnitWindowManager::OldFormatExtension +")", 
+        "Ferma (*" + TrussUnitWindowManager::newFormatExtension()  +
+        " );;Ferma old (*" + TrussUnitWindowManager::oldFormatExtension() +")",
         this );
 
     if ( fileName.isEmpty() ) 
@@ -327,9 +328,8 @@ void ProjectToolBox::calculateAllIsPressed ()
 
     FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
     PluginManager& plgManager = wsp.pluginManager();
-    PluginHandleList pluginHandles = 
-                          plgManager.loadedPluginsOfType( CALCULATION_PLUGIN );
-    if ( pluginHandles.size() == 0 ) {
+    PluginList plugins = plgManager.loadedPluginsOfType( CALCULATION_TYPE );
+    if ( plugins.size() == 0 ) {
         QMessageBox::warning( 0, tr("Plugin manager warning"), 
                                  tr("Calculation plugin was not found "
                                     "in the plugin dir.") );
@@ -341,10 +341,13 @@ void ProjectToolBox::calculateAllIsPressed ()
     WindowList trussWindows = trussMng.getTrussUnitWindowList();
     WindowListIter iter = trussWindows.begin();
 
+    // Find first calculation plugin. 
+    // TODO: plural calculation plugin support
+    Plugin* plugin = plugins[0];
+
     try {
-        // Find first calculation plugin. 
-        // TODO: plural calculation plugin support
-        Plugin& calcPlugin = plgManager.findPlugin( pluginHandles[0] );
+        CalculationInterface& calcPlugin = 
+            dynamic_cast<CalculationInterface&>(*plugin);
 
         for ( ; iter != trussWindows.end(); ++iter ) {
             TrussUnitWindow* trussWindow = *iter;
@@ -369,9 +372,10 @@ void ProjectToolBox::calculateAllIsPressed ()
             }
         }
     }
-    catch ( PluginManager::FindException& ) {
+    catch ( std::exception& ) {
         QMessageBox::critical( 0, tr("Plugin manager error"),
-                               tr("Calculation plugin was not found by.") );
+                               tr("Plugin '"+  plugin->pluginInfo().name + 
+                                  "' has violated type contract.") );
     }
 }
 

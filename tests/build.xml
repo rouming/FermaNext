@@ -1,0 +1,196 @@
+<?xml version="1.0"?> 
+<project name="tests" default="run-tests" basedir="."> 
+
+<taskdef resource="cpptasks.tasks"/>
+<typedef resource="cpptasks.types"/>
+
+<property environment="env"/>
+
+<fail unless="env.QTDIR">'QTDIR=/path/to/qt' environment is required.</fail>
+<fail unless="env.AGGDIR">'AGGDIR=/path/to/agg' environment is required.</fail>
+
+<property name="qt.dir" value="${env.QTDIR}"/>
+<property name="agg.dir" value="${env.AGGDIR}"/>
+<property name="ferma.src" value="../src"/>
+
+<!-- Setup FermaNext includes -->
+<path id="ferma.includes">
+  <dirset dir="${ferma.src}">
+      <include name="**"/>
+      <exclude name="**/obj"/>
+      <exclude name="**/mocs"/>
+      <exclude name="**/ui"/>
+      <exclude name="**/plugins"/>
+      <exclude name="**/loaders"/>
+      <exclude name="**/Debug"/>
+      <exclude name="**/Release"/>
+  </dirset>
+</path>
+
+<!-- Setup AGG includes -->
+<path id="agg.includes">
+  <pathelement path="${agg.dir}/include"/>
+  <pathelement path="${agg.dir}/svg"/>
+</path>
+
+<!-- Setup Qt includes -->
+<path id="qt.includes">
+  <pathelement path="${qt.dir}/include"/>
+  <pathelement path="${qt.dir}/mkspecs/default"/>
+</path>
+
+
+<target name="usage" description="Describes usage of the build script">
+<echo>
+Ant build file for FermaNext tests
+
+Common invocations:
+
+> ant
+
+Builds all tests and run them.  
+
+> ant build-tests
+
+Only builds all tests, doesn't run them.
+
+> ant run-test -Dtest=&lt;directory_name_with_test&gt;
+
+Builds and runs only specified test.
+
+> ant build-test -Dtest=&lt;directory_name_with_test&gt;
+
+Builds only specified test, doesn't run it.
+
+> ant clean-tests
+
+Cleans all garbage from every test directory
+
+> ant clean-test -Dtest=&lt;directory_name_with_test&gt;
+
+Cleans garbage only for specified test.
+
+</echo>
+</target>
+
+<target name="os-detect">
+        <condition property="is-unix" value="true">
+             <or>
+                  <isset property="is-mac"/>
+                  <equals arg1="${os.family}" arg2="cygwin"/>
+                  <and>
+                     <os family="unix"/>
+                     <not><isset property="is-windows"/></not>
+                  </and>
+             </or>
+        </condition>
+
+        <condition property="is-windows" value="true">
+             <and>
+                <os family="windows"/>
+                <not><isset property="is-unix"/></not>
+             </and>
+        </condition>
+
+        <condition property="os.family" value="windows">
+            <isset property="is-windows"/>
+        </condition>
+        <condition property="os.family" value="unix">
+            <isset property="is-unix"/>
+        </condition>
+</target>
+
+
+<target name="win-init" depends="os-detect" if="is-windows">
+    <property name="lib.prefix" value=""/>
+    <property name="lib.extension" value=".lib"/>
+    <property name="lib.suffix" value=""/>
+    <property name="compiler" value="msvc"/>
+</target>
+
+<target name="unix-init" depends="os-detect" if="is-unix">
+
+    <property name="lib.prefix" value="lib"/>
+    <property name="lib.extension" value=".a"/>
+    <property name="lib.suffix" value=""/>
+    <property name="compiler" value="g++"/>
+    <condition property="is-cygwin" value="true">
+        <os family="windows"/>
+    </condition>
+</target>
+
+
+<target name="init" depends="win-init, unix-init">
+        <available classname="net.sf.antcontrib.cpptasks.CCTask" property="cctask-available"/>
+        <fail unless="cctask-available">cpptasks required
+
+Use CVS HEAD or Feb 2005 or later release from
+http://ant-contrib.sourceforge.net
+        </fail>
+
+        <available classname="net.sf.antcontrib.cpptasks.ide.ProjectDef"
+            property="cctask-project-available"/>
+        <fail unless="cctask-project-available">later version of cpptasks required
+
+Required features not present in cpptasks releases prior to Feb 2005
+       </fail>
+</target>
+
+    <target name="build-tests" depends="init">
+        <subant target="build-test" inheritrefs="true">
+            <property name="compiler" value="${compiler}"/>
+            <property name="os.family" value="${os.family}"/>
+            <property name="qt.dir" value="${qt.dir}"/>
+
+            <fileset dir="." includes="*/build.xml"/>
+        </subant>
+    </target>
+
+    <target name="run-tests" depends="build-tests">
+        <subant target="run-test" inheritrefs="true">
+            <property name="compiler" value="${compiler}"/>
+            <property name="os.family" value="${os.family}"/>
+            <property name="qt.dir" value="${qt.dir}"/>
+
+            <fileset dir="." includes="*/build.xml"/>
+        </subant>
+    </target>
+
+    <target name="clean-tests" depends="init">
+        <subant target="clean-test" inheritrefs="true">
+            <property name="os.family" value="${os.family}"/>
+            <fileset dir="." includes="*/build.xml"/>
+        </subant>
+    </target>
+
+    <target name="check-single" depends="init">
+       <fail unless="test">Specify test directory with -Dtest=&lt;directory_name_with_test&gt;</fail>
+    </target>
+
+
+    <target name="run-test" depends="build-test">
+        <subant target="run-test" inheritrefs="true">
+            <property name="compiler" value="${compiler}"/>
+            <property name="os.family" value="${os.family}"/>
+            <property name="qt.dir" value="${qt.dir}"/>
+            <fileset dir="." includes="${test}/build.xml"/>
+        </subant>
+    </target>
+
+    <target name="build-test" depends="check-single">
+        <subant target="build-test" inheritrefs="true">
+            <property name="compiler" value="${compiler}"/>
+            <property name="os.family" value="${os.family}"/>
+            <property name="qt.dir" value="${qt.dir}"/>
+            <fileset dir="." includes="${test}/build.xml"/>
+        </subant>
+    </target>
+
+    <target name="clean-test" depends="check-single">
+        <subant target="clean-test" inheritrefs="true">
+            <property name="os.family" value="${os.family}"/>
+            <fileset dir="." includes="${test}/build.xml"/>
+        </subant>
+    </target>
+
+</project>

@@ -10,7 +10,8 @@ const QString calcProcName = "SimpleFerma";
 class os_dependent_SimpleCalcPlugin : public SimpleCalcPlugin
 {
 public:
-    os_dependent_SimpleCalcPlugin () :
+    os_dependent_SimpleCalcPlugin ( PluginManager& mng, const QString& path ) :
+        SimpleCalcPlugin( mng, path ),
         simpleCalc(0)
     {
         loader.loadLibrary( calcDLLName );

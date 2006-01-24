@@ -8,15 +8,18 @@
 
 const QDomNode FermaNextConfig::nullNode;
 
-FermaNextConfig::FermaNextConfig ( const QString& f )  throw (ConfigReadException, 
-                                                              ConfigWriteException) :
+/*****************************************************************************/
+
+FermaNextConfig::FermaNextConfig ( const QString& f )  
+    throw (ConfigReadException, ConfigWriteException) :
     fileName(f),
     configDoc("FermaNextConfig")
 {
     parseConfig();
 }
 
-void FermaNextConfig::parseConfig () throw (ConfigReadException, ConfigParseException)
+void FermaNextConfig::parseConfig () 
+    throw (ConfigReadException, ConfigParseException)
 {
     QFile file( fileName );
     if ( !file.open( IO_ReadOnly ) )
@@ -37,10 +40,11 @@ QDomNode FermaNextConfig::findConfigNode ( const QString& name ) const
             return n;
         n = n.nextSibling();
     }
-    return nullNode; 
+    return nullNode;
 }
 
-QDomNode FermaNextConfig::findConfigNode ( const QDomNode& node, const QString& name ) const
+QDomNode FermaNextConfig::findConfigNode ( const QDomNode& node, 
+                                           const QString& name ) const
 {
     QDomNode n = node.firstChild();
     while( !n.isNull() ) {
@@ -48,7 +52,7 @@ QDomNode FermaNextConfig::findConfigNode ( const QDomNode& node, const QString& 
             return n;
         n = n.nextSibling();
     }
-    return nullNode; 
+    return nullNode;
 }
 
 ConfigItems FermaNextConfig::getConfigItems ( const QDomNode& node ) const
@@ -83,4 +87,3 @@ ConfigItems FermaNextConfig::getConfigItems ( const QString& name ) const
 }
 
 /****************************************************************************/
-

@@ -9,13 +9,27 @@
  * Dynamic Loader
  *****************************************************************************/
 
+const QString& DynaLoader::libExtension ()
+{
 #if defined _WIN32 || defined WIN32
-    const char* DynaLoader::LibExtension = "dll";
-    const char* DynaLoader::LibPrefix    = "";
+    static QString extension = "dll";
 #else
-    const char* DynaLoader::LibExtension = "so";
-    const char* DynaLoader::LibPrefix    = "lib";
+    static QString extension = "so";
 #endif
+    return extension;
+}
+
+const QString& DynaLoader::libPrefix ()
+{
+#if defined _WIN32 || defined WIN32
+    static QString prefix = "";
+#else
+    static QString prefix = "lib";
+#endif
+    return prefix;
+}
+
+/*****************************************************************************/
 
 DynaLoader::DynaLoader () :
     handle(0)
@@ -33,22 +47,24 @@ DynaLoader::~DynaLoader ()
     freeLibrary();
 }
 
-void DynaLoader::loadLibrary ( QString fileName ) 
+void DynaLoader::loadLibrary ( const QString& fileName ) 
     throw (LibraryLoadException)
 {
-    static QRegExp regExp( QString("^") + LibPrefix + ".+\\." + LibExtension + "$" );
     freeLibrary();    
     QFileInfo dlInfo( fileName );
     QString dlFileName = dlInfo.fileName();
+
+    QString convertedFileName = fileName;
+    QRegExp regExp( "^" + libPrefix() + ".+\\." + libExtension() + "$" );
     if ( -1 == regExp.search( dlFileName ) ) {
-        dlFileName = LibPrefix + dlFileName + "." + LibExtension;
-        fileName = dlInfo.dirPath() + QDir::separator() + dlFileName;
+        dlFileName = libPrefix() + dlFileName + "." + libExtension();
+        convertedFileName = dlInfo.dirPath() + QDir::separator() + dlFileName;
     }
-    fileName = QDir::convertSeparators( fileName );
+    convertedFileName = QDir::convertSeparators( convertedFileName );
 #if defined UNICODE && (defined _WIN32 || defined WIN32)
-    handle = dl_open(fileName.ucs2());
+    handle = dl_open(convertedFileName.ucs2());
 #else
-    handle = dl_open(QFile::encodeName(fileName));
+    handle = dl_open(QFile::encodeName(convertedFileName));
 #endif
     if ( handle == 0 )
         throw LibraryLoadException();

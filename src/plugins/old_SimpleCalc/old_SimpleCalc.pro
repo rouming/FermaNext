@@ -21,7 +21,10 @@ unix {
   system( cp Simple_f.exe ../../../plugins/ )
 }
 
-INCLUDEPATH = ../../TrussUnit ../../common
+INCLUDEPATH = ../../common \
+              ../../common/plugin \
+              ../../common/plugin\loader \
+              ../../TrussUnit               
 
 HEADERS = VYVReader.h \
           FRMWriter.h

@@ -19,9 +19,10 @@ class TrussUnitWindowManager : public QObject
     Q_OBJECT
 public:
     // File format extensions
-    static const QString NewFormatExtension;
-    static const QString OldFormatExtension;
+    static const QString& newFormatExtension ();
+    static const QString& oldFormatExtension ();
 
+public:
     // TrussUnitWindowManager exceptions
     class ReadFileException  {};
     class WriteFileException {};

@@ -85,8 +85,11 @@ INPUT                  = ./src/Agg/ \
                          ./src/FermaNext/ \
                          ./src/TrussUnit/ \
                          ./src/common/ \
+                         ./src/common/plugin \
+                         ./src/common/plugin/loader \
                          ./src/gui/ \
                          ./src/plugins/old_SimpleCalc/ \
+                         ./src/plugins/JavaVM/ \
                          ./tests/
 FILE_PATTERNS          = *.c \
                          *.cc \

@@ -5,6 +5,7 @@
 #include "FermaNextWorkspace.h"
 #include "TrussCalcData.h"
 #include "CalcDataWidget.h"
+#include "CalculationInterface.h"
 
 #include <qstring.h>
 #include <qcursor.h>
@@ -181,22 +182,26 @@ void TrussUnitWindowItem::calculate ()
 { 
     FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();    
     PluginManager& plgManager = wsp.pluginManager();
-    PluginHandleList pluginHandles = 
-                          plgManager.loadedPluginsOfType( CALCULATION_PLUGIN );
-    if ( pluginHandles.size() == 0 ) {
+    PluginList plugins = plgManager.loadedPluginsOfType( CALCULATION_TYPE );
+    if ( plugins.size() == 0 ) {
         QMessageBox::warning( 0, tr("Plugin manager warning"), 
                                  tr("Calculation plugin was not found "
                                     "in the plugin dir.") );
         return;
     }
+
+    // Find first calculation plugin. 
+    // TODO: plural calculation plugin support
+    Plugin* plugin = plugins[0];
+
     try {
+        CalculationInterface& calcPlugin = 
+            dynamic_cast<CalculationInterface&>(*plugin);
+
         // Try to find truss calc data widget
         CalcDataToolBar& calcToolBar = project.getCalcDataToolBar();        
-        CalcDataWidget* calcForm = calcToolBar.findCalcDataWidget( trussWindow );
-
-        // Find first calculation plugin. 
-        // TODO: plural calculation plugin support
-        Plugin& calcPlugin = plgManager.findPlugin( pluginHandles[0] );
+        CalcDataWidget* calcForm = 
+            calcToolBar.findCalcDataWidget( trussWindow );
 
         // Do calculation with new topology and calc data
         TrussCalcData calcData;
@@ -208,9 +213,10 @@ void TrussUnitWindowItem::calculate ()
         // TODO: toplogy manager
         topology.desist();
     }
-    catch ( PluginManager::FindException& ) {
+    catch ( std::exception& ) {
         QMessageBox::critical( 0, tr("Plugin manager error"),
-                                  tr("Calculation plugin was not found by.") );
+                               tr("Plugin '"+  plugin->pluginInfo().name + 
+                                  "' has violated type contract.") );
     }
     catch ( ... ) {
         QMessageBox::critical( 0, tr("Plugin manager error"),

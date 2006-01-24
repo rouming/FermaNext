@@ -14,30 +14,46 @@ win32 {
 unix {
 }
 
+INCLUDEPATH = plugin plugin/loader
+
 SOURCES = \
           Benchmark.cpp \
-          DynaLoader.cpp \
           ObjectState.cpp \
           ObjectStateManager.cpp \
-          PluginLoader.cpp \
-          PluginManager.cpp \
           StatefulObject.cpp \
           SubsidiaryConstants.cpp \
           UUIDGen.cpp \
-          XMLSerializableObject.cpp
+          XMLSerializableObject.cpp \
+          \
+          plugin/Plugin.cpp \
+          plugin/PluginManager.cpp \
+          \
+          plugin/loader/DynaLoader.cpp \
+          plugin/loader/PluginLoader.cpp
 
 HEADERS = \
           AbstractObjectAction.h \
           Benchmark.h \
-          DynaLoader.h \
           Geometry.h \
+          Log4CXX.h \
           ObjectState.h \
           ObjectStateManager.h \
-          Plugin.h \
-          PluginLoader.h \
-          PluginManager.h \
           StatefulObject.h \
           SubsidiaryConstants.h \
           UUIDGen.h \
           UUIDObject.h \
-          XMLSerializableObject.h
+          XMLSerializableObject.h \
+          \
+          plugin/CalculationInterface.h \
+          plugin/CalculationJavaPlugin.h \
+          plugin/CalculationNativePlugin.h \
+          plugin/JavaPlugin.h \
+          plugin/NativePlugin.h \
+          plugin/NativePluginFrontEnd.h \
+          plugin/OptimizationInterface.h \
+          plugin/Plugin.h \
+          plugin/PluginManager.h \
+          \
+          plugin/loader/DynaLoader.h \
+          plugin/loader/PluginLoader.h
+

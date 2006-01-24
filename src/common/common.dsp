@@ -44,7 +44,7 @@ RSC=rc.exe
 # ADD BASE F90 /compile_only /nologo /warn:nofileopt
 # ADD F90 /compile_only /nologo /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /D "NDEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "." /I "plugin" /I "plugin/loader" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /D "NDEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /c
 # ADD BASE RSC /l 0x419 /d "NDEBUG"
 # ADD RSC /l 0x419 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -69,7 +69,7 @@ LIB32=link.exe -lib
 # ADD BASE F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /D "_DEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /GZ /c
+# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /ZI /Od /I "." /I "plugin" /I "plugin/loader" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /D "_DEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x419 /d "_DEBUG"
 # ADD RSC /l 0x419 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -94,7 +94,7 @@ SOURCE=.\Benchmark.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\DynaLoader.cpp
+SOURCE=.\plugin\loader\DynaLoader.cpp
 # End Source File
 # Begin Source File
 
@@ -106,11 +106,15 @@ SOURCE=.\ObjectStateManager.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\PluginLoader.cpp
+SOURCE=.\plugin\Plugin.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\PluginManager.cpp
+SOURCE=.\plugin\loader\PluginLoader.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\plugin\PluginManager.cpp
 # End Source File
 # Begin Source File
 
@@ -171,7 +175,19 @@ SOURCE=.\Benchmark.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\DynaLoader.h
+SOURCE=.\plugin\CalculationInterface.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\plugin\CalculationJavaPlugin.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\plugin\CalculationNativePlugin.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\plugin\loader\DynaLoader.h
 # End Source File
 # Begin Source File
 
@@ -179,7 +195,23 @@ SOURCE=.\Geometry.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\Global.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\plugin\JavaPlugin.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\Log4CXX.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\plugin\NativePlugin.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\plugin\NativePluginFrontEnd.h
 # End Source File
 # Begin Source File
 
@@ -249,15 +281,81 @@ InputName=ObjectStateManager
 # End Source File
 # Begin Source File
 
-SOURCE=.\Plugin.h
+SOURCE=.\plugin\OptimizationInterface.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\PluginLoader.h
+SOURCE=.\plugin\Plugin.h
+
+!IF  "$(CFG)" == "common - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.\plugin
+InputPath=.\plugin\Plugin.h
+InputName=Plugin
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "common - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.\plugin
+InputPath=.\plugin\Plugin.h
+InputName=Plugin
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
-SOURCE=.\PluginManager.h
+SOURCE=.\plugin\loader\PluginLoader.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\plugin\loader\PluginLoaderFrontEnd.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\plugin\PluginManager.h
+
+!IF  "$(CFG)" == "common - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.\plugin
+InputPath=.\plugin\PluginManager.h
+InputName=PluginManager
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "common - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=.\plugin
+InputPath=.\plugin\PluginManager.h
+InputName=PluginManager
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -323,6 +421,14 @@ SOURCE=.\mocs\moc_ObjectState.cpp
 # Begin Source File
 
 SOURCE=.\mocs\moc_ObjectStateManager.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\plugin\mocs\moc_Plugin.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\plugin\mocs\moc_PluginManager.cpp
 # End Source File
 # Begin Source File
 
