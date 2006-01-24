@@ -81,6 +81,11 @@ QString pluginsPath ()
     return applicationDirPath() + QDir::separator() + "plugins";
 }
 
+QString pluginLoadersPath ()
+{
+    return pluginsPath() + QDir::separator() + "loaders";
+}
+
 QString configFileName ()
 {
     return applicationDirPath() + QDir::separator() + "config.xml";

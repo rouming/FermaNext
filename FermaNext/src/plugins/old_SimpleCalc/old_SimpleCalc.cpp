@@ -1,5 +1,6 @@
 
 #include "old_SimpleCalc.h"
+#include "NativePluginFrontEnd.h"
 #include "Truss.h"
 #include "TrussCalcData.h"
 #include "FRMWriter.h"
@@ -21,7 +22,9 @@ FERMA_NEXT_PLUGIN(os_dependent_SimpleCalcPlugin)
 
 /*****************************************************************************/
 
-SimpleCalcPlugin::SimpleCalcPlugin ()
+SimpleCalcPlugin::SimpleCalcPlugin ( PluginManager& mng, 
+                                     const QString& path ) :
+    NativePlugin( mng, path )
 { 
     createTempFile(); 
 }
@@ -31,20 +34,22 @@ SimpleCalcPlugin::~SimpleCalcPlugin ()
     destroyTempFile(); 
 }
 
+Plugin::Status SimpleCalcPlugin::pluginStatusCode () const
+{
+    return OkStatus;
+}
+
+QString SimpleCalcPlugin::pluginStatusMsg () const
+{
+    return QString();
+}
+
 const PluginInfo& SimpleCalcPlugin::pluginInfo () const
 { 
-    static PluginInfo inf = { "SimpleOldCalcPlugin", "Just calculation" };
+    static PluginInfo inf( "SimpleOldCalcPlugin",
+                           "Just calculation",
+                           "calculation.simple.native" );
     return inf; 
-}
-
-PluginType SimpleCalcPlugin::pluginType () const
-{ 
-    return CALCULATION_PLUGIN; 
-}
-
-bool SimpleCalcPlugin::dependsOn ( PluginType ) const
-{ 
-    return false; 
 }
 
 void SimpleCalcPlugin::calculate ( TrussTopology& truss, 

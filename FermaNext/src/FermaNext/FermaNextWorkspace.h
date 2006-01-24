@@ -19,8 +19,9 @@ class FermaNextWorkspace : public QObject, public XMLSerializableObject
     Q_OBJECT
 public:
     // File format extension
-    static const QString FormatExtension;
+    static const QString& formatExtension ();
 
+public:
     // Exceptions
     class WorkspaceIsNotInitedCorrectly {};
     class IOException {};
@@ -84,10 +85,6 @@ public slots:
 protected slots:
     virtual void projectIsActivated ( FermaNextProject& );
 
-private:
-    FermaNextWorkspace ();
-    FermaNextWorkspace ( const FermaNextWorkspace& );
-
 protected:
     // XML serialization
     virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
@@ -97,7 +94,6 @@ protected:
 
     virtual bool removeProject ( ProjectListIter& );
 
-    FermaNextWorkspace& operator= ( const FermaNextWorkspace& );
     virtual ~FermaNextWorkspace ();
 
 signals:
@@ -108,6 +104,14 @@ signals:
     void onReset ();
     void onNameChange ( const QString& name );
     void onWorkspaceFileNameChange ( const QString& name );
+
+public:
+    /** Hidden constructor. Use static workspace() instead. */
+    FermaNextWorkspace ();
+    /** Hidden copy constructor. */
+    FermaNextWorkspace ( const FermaNextWorkspace& );
+    /** Hidden copy operator. */
+    FermaNextWorkspace& operator= ( const FermaNextWorkspace& );
     
 private:
     static FermaNextWorkspace* instance;
@@ -117,8 +121,7 @@ private:
     QString workspaceFileName;
     QWidgetStack* widgetStack;    
     ProjectList projects;
-    FermaNextConfig fermaConfig;    
-    PluginManager plgManager;
+    FermaNextConfig fermaConfig;
 };
 
 #endif //FERMANEXTWORKSPACE_H

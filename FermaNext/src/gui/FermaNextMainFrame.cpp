@@ -56,6 +56,8 @@ void FermaNextMainFrame::cleanBeforeQuit ()
 {
     // Manually destroy all projects.
     FermaNextWorkspace::workspace().clearProjects();
+    // Manually unregister all plugin loaders.
+    PluginManager::instance().unregisterPluginLoaders();
 }
 
 void FermaNextMainFrame::init ()
@@ -369,7 +371,12 @@ void FermaNextMainFrame::reloadPlugins ()
     if ( ! pluginsLoaded )
         return;
     PluginManager& plgManager = wsp.pluginManager();
-    QStringList names = plgManager.loadedPluginsNames();
+
+    QStringList names;
+    PluginList plugins = plgManager.loadedPlugins();
+    PluginListConstIter plgIt = plugins.begin();    
+    for ( ; plgIt != plugins.end(); ++plgIt )
+        names.push_back( (*plgIt)->pluginInfo().name );
 
     if ( pluginsMenu == 0 ) {
         pluginsMenu = new QPopupMenu( this );
@@ -466,7 +473,7 @@ void FermaNextMainFrame::fileNew ()
 void FermaNextMainFrame::fileOpen ()
 {
     QString fileName = QFileDialog::getOpenFileName( QString::null, 
-        "Ferma project (*" + FermaNextProject::FormatExtension + ")", 
+        "Ferma project (*" + FermaNextProject::formatExtension() + ")",
         this, "open ferma project", tr("Open ferma project") );
 
     if ( fileName.isEmpty() )
@@ -503,17 +510,17 @@ bool FermaNextMainFrame::fileSaveAs ()
 
     QString prjName = currentPrj->getName();
     QString fileName = QFileDialog::getSaveFileName( 
-        prjName + FermaNextProject::FormatExtension, 
-        "Ferma project (*" + FermaNextProject::FormatExtension + ")", 
+        prjName + FermaNextProject::formatExtension(),
+        "Ferma project (*" + FermaNextProject::formatExtension() + ")", 
         this, "save ferma project", tr("Save ferma project (%1)").
           arg(prjName) );
 
     if ( fileName.isEmpty() )
         return false;
 
-    QRegExp rx( ".*\\" + FermaNextProject::FormatExtension + "$" );
+    QRegExp rx( ".*\\" + FermaNextProject::formatExtension() + "$" );
     if ( -1 == rx.search( fileName ) )
-        fileName += FermaNextProject::FormatExtension;
+        fileName += FermaNextProject::formatExtension();
 
     QFileInfo prjFileInfo( fileName );
 
@@ -561,7 +568,7 @@ void FermaNextMainFrame::fileOpenWsp ()
         return;
 
     QString fileName = QFileDialog::getOpenFileName( QString::null, 
-        "Ferma workspace (*" + FermaNextWorkspace::FormatExtension + ")", 
+        "Ferma workspace (*" + FermaNextWorkspace::formatExtension() + ")", 
         this, "open ferma workspace", tr("Open ferma workspace") );
 
     if ( fileName.isEmpty() )
@@ -619,15 +626,15 @@ bool FermaNextMainFrame::fileSaveWsp ()
 bool FermaNextMainFrame::fileSaveWspAs ()
 {
     QString fileName = QFileDialog::getSaveFileName( QString::null, 
-        "Ferma workspace (*" + FermaNextWorkspace::FormatExtension + ")", 
+        "Ferma workspace (*" + FermaNextWorkspace::formatExtension() + ")",
         this, "save ferma workspace", tr("Save ferma workspace") );
 
     if ( fileName.isEmpty() )
         return false;
 
-    QRegExp rx( ".*\\" + FermaNextWorkspace::FormatExtension + "$" );
+    QRegExp rx( ".*\\" + FermaNextWorkspace::formatExtension() + "$" );
     if ( -1 == rx.search( fileName ) )
-        fileName += FermaNextWorkspace::FormatExtension;
+        fileName += FermaNextWorkspace::formatExtension();
 
     QFileInfo wspFileInfo( fileName );
 

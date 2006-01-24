@@ -187,8 +187,8 @@ protected:
                                             solidRenderer& solidRend, 
                                             scanline_rasterizer& ras, 
                                             agg::scanline_p8& sl ) const;
+
 private:
-    static const QString UNNAMED;
     mutable bool trussRendered, calculated;
     QPoint leftTopPos;
     QSize pixAreaSize;

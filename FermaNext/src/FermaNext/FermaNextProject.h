@@ -18,13 +18,14 @@ class FermaNextProject : public QObject, public XMLSerializableObject
 {
     Q_OBJECT
 public:
+    // File format extension
+    static const QString& formatExtension ();
+
+public:
     // Exceptions
     class IOException {};
     class WrongXMLDocException {};
     class FileNameIsNotDefinedException {};
-
-    // File format extension
-    static const QString FormatExtension;
 
     virtual ~FermaNextProject ();
 

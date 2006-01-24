@@ -13,7 +13,7 @@
   #include <dlfcn.h>
   typedef void* LibraryHandle;
   typedef void* ProcAddress;
-  #define dl_open(filename) dlopen(filename, RTLD_LAZY)
+  #define dl_open(filename) dlopen(filename, RTLD_NOW | RTLD_GLOBAL)
   #define dl_sym(handler, funcname) dlsym(handler, funcname)
   #define dl_close(handler) dlclose(handler)
 #endif
@@ -23,6 +23,11 @@
 class DynaLoader
 {
 public:
+    // OS dependent dynamic lib extension and prefix.
+    static const QString& libExtension ();
+    static const QString& libPrefix ();
+
+public:
     // Excceptions
     class LibraryLoadException {};
     class AddressException {};
@@ -31,7 +36,7 @@ public:
     DynaLoader ( const QString& fileName ) throw (LibraryLoadException);
     ~DynaLoader ();
 
-    void loadLibrary ( QString fileName ) throw (LibraryLoadException);
+    void loadLibrary ( const QString& fileName ) throw (LibraryLoadException);
 
     ProcAddress getProcAddress ( const QString& funcName ) const
                                                      throw (AddressException);
@@ -44,11 +49,6 @@ public:
 
     bool freeLibrary ();
     bool isLoaded () const;
-
-public:
-    // OS dependent dynamic lib extension and prefix.
-    static const char* LibExtension;
-    static const char* LibPrefix;
 
 private:
     LibraryHandle handle;

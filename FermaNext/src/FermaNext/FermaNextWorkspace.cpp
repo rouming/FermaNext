@@ -11,12 +11,18 @@
  * FermaNext Workspace
  *****************************************************************************/
 
-const QString FermaNextWorkspace::FormatExtension = ".fws";
+FermaNextWorkspace* FermaNextWorkspace::instance = 0;
+QMutex FermaNextWorkspace::mutex;
 
 /*****************************************************************************/
 
-FermaNextWorkspace* FermaNextWorkspace::instance = 0;
-QMutex FermaNextWorkspace::mutex;
+const QString& FermaNextWorkspace::formatExtension ()
+{
+    static QString extension = ".fws";
+    return extension;
+}
+
+/*****************************************************************************/
 
 FermaNextWorkspace::FermaNextWorkspace () :
     name( untitledWorkspaceName ),
@@ -340,13 +346,18 @@ FermaNextConfig& FermaNextWorkspace::config ()
 
 bool FermaNextWorkspace::loadPlugins ()
 {
-    plgManager.loadPlugins( pluginsPath() );
+    static bool registeredPluginLoaders = false;
+    if ( ! registeredPluginLoaders ) {
+        pluginManager().registerPluginLoaders( pluginLoadersPath() );
+        registeredPluginLoaders = true;
+    }
+    pluginManager().loadPlugins( pluginsPath() );
     return true;
 }
 
 PluginManager& FermaNextWorkspace::pluginManager ()
 {
-    return plgManager;
+    return PluginManager::instance();
 }
 
 /*****************************************************************************/

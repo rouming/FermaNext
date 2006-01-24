@@ -22,7 +22,8 @@ private:
     };
 
 public:    
-    os_dependent_SimpleCalcPlugin ()
+    os_dependent_SimpleCalcPlugin ( PluginManager& mng, const QString& path ) :
+        SimpleCalcPlugin( mng, path )
     {
         calcThread.start();
         // Should wait a little to be sure server is started

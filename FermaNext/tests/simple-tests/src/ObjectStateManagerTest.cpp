@@ -542,7 +542,7 @@ int main ()
     stack_top_removing_test();
     step_to_block_test();
 
-    std::cout << "\n" << "Passed: " << PASSED << "\nFailed: " << FAILED << "\n";
-    return 0;    
+    std::cout << "\n" << "Passed: " << PASSED << "\n" << 
+                         "Failed: " << FAILED << "\n";
+    return FAILED;
 }
-

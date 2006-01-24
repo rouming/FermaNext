@@ -22,8 +22,17 @@ typedef PivotNodesList::iterator PivotNodesListIter;
  * Truss Unit Window Manager
  *****************************************************************************/
 
-const QString TrussUnitWindowManager::NewFormatExtension = ".fnx";
-const QString TrussUnitWindowManager::OldFormatExtension = ".frm";
+const QString& TrussUnitWindowManager::newFormatExtension ()
+{
+    static QString extension = ".fnx";
+    return extension;
+}
+
+const QString& TrussUnitWindowManager::oldFormatExtension ()
+{
+    static QString extension = ".frm";
+    return extension;
+}
 
 /*****************************************************************************/
 
@@ -112,8 +121,8 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindowFromFile (
     if ( !file.open( IO_ReadOnly ) )
 	    throw ReadFileException();
 
-    QRegExp re("([^/\\\\]*)((\\" + OldFormatExtension + ")|"
-                           "(\\" + NewFormatExtension + "))$");
+    QRegExp re("([^/\\\\]*)((\\" + oldFormatExtension() + ")|"
+                           "(\\" + newFormatExtension() + "))$");
     re.search(fileName);
     QString trussName = re.cap(1);
     if ( trussName.isEmpty() )        
@@ -123,9 +132,9 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindowFromFile (
     // exception has happened.
     TrussUnitWindow& trussWindow = createTrussUnitWindow( true, trussName );
     try {
-        if( fileName.contains(NewFormatExtension) ) 
+        if( fileName.contains( newFormatExtension() ) ) 
             loadNewVersion( trussWindow, file );
-        else if ( fileName.contains(OldFormatExtension) ) 
+        else if ( fileName.contains( oldFormatExtension() ) ) 
             loadOldVersion( trussWindow, file );
         else 
             throw WrongFormatException();

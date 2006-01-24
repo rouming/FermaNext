@@ -16,6 +16,7 @@ win32 {
          -L$$(EXPATDIR)/Libs
 }
 unix {
+  QMAKE_LFLAGS += -export-dynamic
   LIBS = -L../../build -L../../ \
          -lTrussUnit -lAgg -lcommon -lsvg -lagg
 }
@@ -23,6 +24,8 @@ unix {
 INCLUDEPATH = $$(AGGDIR)/include \
               $$(AGGDIR)/svg \
               ../common \
+              ../common/plugin \
+              ../common/plugin/loader \
               ../Agg \
               ../TrussUnit \
               ../gui

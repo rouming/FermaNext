@@ -9,7 +9,11 @@
  * FermaNext Project
  *****************************************************************************/
 
-const QString FermaNextProject::FormatExtension = ".fpr";
+const QString& FermaNextProject::formatExtension ()
+{
+    static QString extension = ".fpr";
+    return extension;
+}
 
 /*****************************************************************************/
 

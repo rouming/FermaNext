@@ -1,0 +1,125 @@
+<?xml version="1.0"?> 
+<project name="simple-tests" default="run-test" basedir="."> 
+     <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+     <taskdef resource="cpptasks.tasks"/> 
+     <typedef resource="cpptasks.types"/>
+
+     <property name="src.dir" value="src"/> 
+     <property name="objects.dir" value="obj"/>
+     <property name="tests.dir" value="tests"/>
+     <property name="build.dir" value="build"/>
+
+     <condition property="is-windows">
+         <equals arg1="${os.family}" arg2="windows"/>
+     </condition>
+     <condition property="is-unix">
+         <equals arg1="${os.family}" arg2="unix"/>
+     </condition>
+
+     <condition property="os.executable.extension" value=".exe">
+         <isset property="is-windows"/>
+     </condition>
+     <condition property="os.executable.extension" value="">
+         <isset property="is-unix"/>
+     </condition>
+
+
+     <mkdir dir="${objects.dir}"/>
+     <mkdir dir="${tests.dir}"/>
+     <mkdir dir="${build.dir}"/>
+
+     <target name="compile">
+          <basename property="src.file" file="${file}"/>
+          <basename property="out.file" file="${src.file}" suffix=".cpp"/>
+
+          <echo>Compiling ${src.file}</echo>
+
+          <cc name="${compiler}"
+              exceptions="true"
+              rtti="true"
+              subsystem="console"
+              optimize="none"
+              multithreaded="true"
+              relentless="true"
+              debug="true"
+              outfile="${build.dir}/${out.file}"
+              outtype="executable"
+              objdir="${objects.dir}">
+
+              <defineset define="QT_THREAD_SUPPORT"/>
+              <!-- Windows define sets -->
+              <defineset define="UNICODE" if="is-windows"/>
+
+              <includepath refid="qt.includes"/>
+              <includepath refid="agg.includes"/>
+              <includepath refid="ferma.includes"/>
+
+              <!-- UNIX compiler args -->
+              <compilerarg value="-pipe" if="is-unix"/>
+              <compilerarg value="-Wall" if="is-unix"/>
+ 
+              <fileset dir="${src.dir}" includes="${src.file}"/>
+
+              <linker name="${compiler}">
+                 <linkerarg value="-export-dynamic" if="is-unix"/>
+
+                 <libset libs="common" dir="../../build"  />
+                 <libset libs="qt-mt" dir="${qt.dir}/lib"/>
+
+                 <!-- UNIX libsets -->
+                 <libset libs="Xext" dir="/usr/X11R6/lib" if="is-unix"/>
+                 <libset libs="X11" if="is-unix"/>
+                 <libset libs="m" if="is-unix"/>
+                 <libset libs="pthread" if="is-unix"/>
+             </linker>
+         </cc>
+
+         <move file="${build.dir}/${out.file}${os.executable.extension}" todir="${tests.dir}"/>
+     </target>
+
+     <target name="execute">
+         <basename property="exec.file" file="${executable}"/>
+         <echo>Executing ${tests.dir}/${exec.file}</echo>
+
+         <exec resolveexecutable="Yes"
+               dir="tests"
+               failonerror="Yes"
+               executable="${exec.file}">
+         </exec>
+     </target>     
+
+     <target name="build-test" >
+        <foreach target="compile" 
+                 param="file" 
+                 inheritall="true"
+                 inheritrefs="true">
+           <path>
+              <fileset dir="${src.dir}" includes="*.cpp" excludes="FermaNextConfigTest.cpp,DijkstraTest.cpp"/>
+           </path>
+        </foreach>
+     </target>
+
+
+     <target name="run-test" >
+        <foreach target="execute" 
+                 param="executable" 
+                 inheritall="true"
+                 inheritrefs="true">
+           <path>
+              <fileset dir="${tests.dir}"/>
+           </path>
+        </foreach>
+     </target>
+
+     <target name="clean-test" >
+        <delete dir="${objects.dir}"/>
+        <delete dir="${build.dir}"/>
+        <delete dir="${tests.dir}"/>
+        <delete>
+            <fileset dir="." includes="*.pdb"/>
+            <fileset dir="." includes="${outfile}${os.executable.extension}"/>
+            <fileset dir="." includes="*.xml" excludes="build.xml"/>
+        </delete>
+     </target>
+
+</project>
