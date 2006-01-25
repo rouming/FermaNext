@@ -23,7 +23,7 @@ unix {
 
 INCLUDEPATH = ../../common \
               ../../common/plugin \
-              ../../common/plugin\loader \
+              ../../common/plugin/loader \
               ../../TrussUnit               
 
 HEADERS = VYVReader.h \
