@@ -40,6 +40,7 @@ SOURCES = \
           ../gui/CalcDataToolBar.cpp \
           ../gui/FermaNextMainFrame.cpp \
           ../gui/ProjectToolBox.cpp \
+          ../gui/Splash.cpp \
           ../gui/ToolBarManager.cpp \
           ../gui/UndoRedoListBox.cpp \
           ../gui/WindowListBox.cpp
@@ -51,6 +52,7 @@ HEADERS = \
           ../gui/CalcDataToolBar.h \
           ../gui/FermaNextMainFrame.h \
           ../gui/ProjectToolBox.h \
+          ../gui/Splash.h \
           ../gui/ToolBarManager.h \
           ../gui/UndoRedoListBox.h \
           ../gui/WindowListBox.h

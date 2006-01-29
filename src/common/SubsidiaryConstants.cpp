@@ -59,36 +59,39 @@ const double svgGamma = 1.0,
  * Main subs
  ************************************/
 
+char pathSeparator ()
+{ return QDir::separator(); }
+
 QString imagesPath () 
 { 
-    return applicationDirPath() + QDir::separator() + "images"; 
+    return applicationDirPath() + pathSeparator() + "images"; 
 }
 
 QString imagesSvgPath ()
 {
-    return applicationDirPath() + QDir::separator() + "images"  + 
-                                  QDir::separator() + "svg";
+    return applicationDirPath() + pathSeparator() + "images"  + 
+                                  pathSeparator() + "svg";
 }
 
 QString imagesCursorsPath ()
 {
-    return applicationDirPath() + QDir::separator() + "images" +
-                                  QDir::separator() + "cursors";
+    return applicationDirPath() + pathSeparator() + "images" +
+                                  pathSeparator() + "cursors";
 }
 
 QString pluginsPath () 
 { 
-    return applicationDirPath() + QDir::separator() + "plugins";
+    return applicationDirPath() + pathSeparator() + "plugins";
 }
 
 QString pluginLoadersPath ()
 {
-    return pluginsPath() + QDir::separator() + "loaders";
+    return pluginsPath() + pathSeparator() + "loaders";
 }
 
 QString configFileName ()
 {
-    return applicationDirPath() + QDir::separator() + "config.xml";
+    return applicationDirPath() + pathSeparator() + "config.xml";
 }
 
 QString applicationDirPath ()

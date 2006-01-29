@@ -267,6 +267,7 @@ void PluginManager::loadPlugins ( const QString& path )
             PluginLoader* loader = pluginPathMap[ path ];
             Plugin& plg = loader->loadPlugin( path );
             plugins[&plg] = loader;
+            emit onPluginLoad( plg );
         }
         catch ( PluginLoader::PluginIsAlreadyLoadedException& ) {
             //TODO: this exception should be written to log

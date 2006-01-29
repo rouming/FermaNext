@@ -59,6 +59,8 @@ extern const double svgGamma,
  * Main subs
  ************************************/
 
+char pathSeparator ();
+
 QString imagesPath ();
 QString imagesSvgPath ();
 QString imagesCursorsPath ();
