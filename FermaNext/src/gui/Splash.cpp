@@ -10,7 +10,7 @@ Splash::Splash ( const QPixmap& p, WFlags f ) :
 {}
 
 void Splash::message ( PluginLoader& ldr, 
-                       PluginManager::LoadingPriority priority )
+                       PluginManager::LoadingPriority )
 {
     message( "Registering plugin loader for extension \"." + 
              ldr.pluginExtension() + "\"" );
