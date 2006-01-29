@@ -32,7 +32,6 @@ int main ( int argc, char* argv[] )
     FermaNextMainFrame ferma;
     app.setMainWidget(&ferma);
     splash->message( "Loading gui .." );
-    qApp->processEvents();
     ferma.showMaximized();
     splash->finish( &ferma );
     delete splash;
