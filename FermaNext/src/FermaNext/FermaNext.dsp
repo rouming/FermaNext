@@ -122,6 +122,10 @@ SOURCE=.\..\gui\ProjectToolBox.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\gui\Splash.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\..\gui\ToolBarManager.cpp
 # End Source File
 # Begin Source File
@@ -307,6 +311,39 @@ InputName=ProjectToolBox
 # End Source File
 # Begin Source File
 
+SOURCE=..\gui\Splash.h
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\gui
+InputPath=..\gui\Splash.h
+InputName=Splash
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\ferma\Source\FermaNext\src\gui
+InputPath=..\gui\Splash.h
+InputName=Splash
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\..\gui\ToolBarManager.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
@@ -447,6 +484,10 @@ SOURCE=.\..\common\mocs\moc_ObjectStateManager.cpp
 # Begin Source File
 
 SOURCE=.\..\gui\mocs\moc_ProjectToolBox.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\gui\mocs\moc_Splash.cpp
 # End Source File
 # Begin Source File
 

@@ -186,7 +186,7 @@ signals:
      * main event loop.
      */
     void onPluginLoaderRegistration ( PluginLoader& plgLoader,
-                                      LoadingPriority priority );
+        PluginManager::LoadingPriority priority );
 
     /** 
      * Is emited, when #unloadPlugins or #unregisterPluginLoaders has been 

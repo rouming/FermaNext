@@ -79,7 +79,6 @@ public:
     virtual PluginManager& pluginManager ();
 
 public slots:
-    virtual bool loadPlugins ();
     virtual void clearProjects ();
 
 protected slots:

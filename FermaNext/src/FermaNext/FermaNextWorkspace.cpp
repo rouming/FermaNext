@@ -344,17 +344,6 @@ FermaNextConfig& FermaNextWorkspace::config ()
     return fermaConfig;
 }
 
-bool FermaNextWorkspace::loadPlugins ()
-{
-    static bool registeredPluginLoaders = false;
-    if ( ! registeredPluginLoaders ) {
-        pluginManager().registerPluginLoaders( pluginLoadersPath() );
-        registeredPluginLoaders = true;
-    }
-    pluginManager().loadPlugins( pluginsPath() );
-    return true;
-}
-
 PluginManager& FermaNextWorkspace::pluginManager ()
 {
     return PluginManager::instance();

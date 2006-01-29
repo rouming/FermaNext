@@ -367,9 +367,6 @@ void FermaNextMainFrame::setupPluginActions ()
 void FermaNextMainFrame::reloadPlugins ()
 {
     FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
-    bool pluginsLoaded = wsp.loadPlugins();
-    if ( ! pluginsLoaded )
-        return;
     PluginManager& plgManager = wsp.pluginManager();
 
     QStringList names;
