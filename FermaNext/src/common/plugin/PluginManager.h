@@ -135,7 +135,7 @@ public:
 
 signals:    
     /** 
-     * Is emited, when #loadPlugins has been called.
+     * Is emitted, when #loadPlugins has been called.
      * @param plgNum describes how many plugins are going to be loaded.
      * BEWARE: slots should be threadsafe and do not post any GUI events to
      * main event loop.
@@ -143,15 +143,24 @@ signals:
     void onPluginsLoad ( uint plgNum );
 
     /** 
-     * Is emited after successfull plugin load.
+     * Is emitted before plugin load. If loading fails, #onAfterPluginLoad
+     * will not be emitted.
+     * @param path to plugin, which is going to be loaded.
+     * BEWARE: slots should be threadsafe and do not post any GUI events to
+     * main event loop.
+     */
+    void onBeforePluginLoad ( const QString& path );
+
+    /** 
+     * Is emitted after successfull plugin load.
      * @param plg plugin.
      * BEWARE: slots should be threadsafe and do not post any GUI events to
      * main event loop.
      */
-    void onPluginLoad ( Plugin& plg );
+    void onAfterPluginLoad ( Plugin& plg );
 
     /** 
-     * Is emited, when #unloadPlugins has been called.
+     * Is emitted, when #unloadPlugins has been called.
      * @param plgNum describes how many plugins are going to be unloaded.
      * BEWARE: slots should be threadsafe and do not post any GUI events to
      * main event loop.
@@ -159,7 +168,7 @@ signals:
     void onPluginsUnload ( uint plgNum );
 
     /** 
-     * Is emited before plugin unload.
+     * Is emitted before plugin unload.
      * @param plg plugin.
      * BEWARE: slots should be threadsafe and do not post any GUI events to
      * main event loop.
@@ -171,7 +180,7 @@ signals:
     ///////////////////////////////////////////////////////////////////////
 
     /** 
-     * Is emited, when #loadPlugins has been called.
+     * Is emitted, when #loadPlugins has been called.
      * @param num describes how many plugin loaders are going to be registered.
      * BEWARE: slots should be threadsafe and do not post any GUI events to
      * main event loop.
@@ -179,17 +188,27 @@ signals:
     void onPluginLoadersRegistration ( uint num );
 
     /** 
-     * Is emited after successfull plugin loader registration.
+     * Is emitted before loader registration. If registration fails, 
+     * #onAfterPluginLoaderRegistration will not be emitted.
+     * @param path to loader, which is going to be registered.
+     * BEWARE: slots should be threadsafe and do not post any GUI events to
+     * main event loop.
+     */
+    void onBeforePluginLoaderRegistration ( const QString& path );
+
+    /** 
+     * Is emitted after successfull plugin loader registration.
      * @param plgLoader plugin loader.
      * @param priority of loading.
      * BEWARE: slots should be threadsafe and do not post any GUI events to
      * main event loop.
      */
-    void onPluginLoaderRegistration ( PluginLoader& plgLoader,
-        PluginManager::LoadingPriority priority );
+    void onAfterPluginLoaderRegistration ( 
+                                     PluginLoader& plgLoader,
+                                     PluginManager::LoadingPriority priority );
 
     /** 
-     * Is emited, when #unloadPlugins or #unregisterPluginLoaders has been 
+     * Is emitted, when #unloadPlugins or #unregisterPluginLoaders has been 
      * called.
      * @param num describes how many plugin loaders are going to be 
      * unregistered.
@@ -199,7 +218,7 @@ signals:
     void onPluginLoadersUnregistration ( uint num );
 
     /** 
-     * Is emited before plugin loader unregistration.
+     * Is emitted before plugin loader unregistration.
      * @param plgLoader plugin loader..
      * BEWARE: slots should be threadsafe and do not post any GUI events to
      * main event loop.

@@ -58,8 +58,8 @@ void PluginManager::registerPluginLoaders ( const QString& path )
                  QDir::Name | QDir::IgnoreCase, 
                  QDir::Files | QDir::Readable );
 
-    // Notice everyone about amount of loaders
-    onPluginLoadersRegistration( ldrDir.count() );
+    // Notify everyone about amount of loaders
+    emit onPluginLoadersRegistration( ldrDir.count() );
 
     // Try to register loaders from path
     for ( uint i = 0; i < ldrDir.count(); ++i ) {
@@ -76,6 +76,10 @@ void PluginManager::unregisterPluginLoaders ()
     unloadPlugins();
 
     PluginLoaderList loaders = pluginLoaders();
+
+    // Notify everyone about amount of loaders
+    emit onPluginLoadersUnregistration( loaders.size() );
+
     PluginLoaderListConstIter it = loaders.begin();
     for ( ; it != loaders.end(); ++it ) {
         PluginLoader* loader = *it;
@@ -89,6 +93,7 @@ void PluginManager::registerPluginLoader ( const QString& pathToLoaderLib )
     DynaLoader* nativeLib = new DynaLoader;
     PluginLoaderInstanceCall loaderInstanceCall = 0;
     try {
+        emit onBeforePluginLoaderRegistration( pathToLoaderLib );
         nativeLib->loadLibrary( pathToLoaderLib );
         loaderInstanceCall = (PluginLoaderInstanceCall)
                       nativeLib->getProcAddress( PLUGIN_LOADER_INSTANCE_CALL );
@@ -119,7 +124,7 @@ void PluginManager::registerPluginLoader ( const QString& pathToLoaderLib )
     }
     loaders->push_back( loader );
     loadersLibMap[loader] = nativeLib;
-    onPluginLoaderRegistration( *loader, priority );
+    emit onAfterPluginLoaderRegistration( *loader, priority );
 }
 
 void PluginManager::unregisterPluginLoader ( PluginLoader& loader )
@@ -133,8 +138,8 @@ void PluginManager::unregisterPluginLoader ( PluginLoader& loader )
         if ( it == loaders->end() )
             continue;
 
-        // Notice everyone
-        onPluginLoaderUnregistration( loader );
+        // Notify everyone
+        emit onPluginLoaderUnregistration( loader );
 
         // Unload all plugins of plugin loader
         PluginList plugins = loader.loadedPlugins();
@@ -264,10 +269,11 @@ void PluginManager::loadPlugins ( const QString& path )
     for ( ; pathIt != pluginPathList.end(); ++pathIt ) {
         const QString& path = *pathIt;
         try {
+            emit onBeforePluginLoad( path );
             PluginLoader* loader = pluginPathMap[ path ];
             Plugin& plg = loader->loadPlugin( path );
             plugins[&plg] = loader;
-            emit onPluginLoad( plg );
+            emit onAfterPluginLoad( plg );
         }
         catch ( PluginLoader::PluginIsAlreadyLoadedException& ) {
             //TODO: this exception should be written to log

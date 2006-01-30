@@ -30,6 +30,9 @@ protected:
     //Exceptions
     class WrongXMLFormatException {};
 
+    // Reload all plugins
+    void reloadPlugins ( bool reload );
+
     // Provides correct last cleanup before quit.
     void cleanBeforeQuit ();
 

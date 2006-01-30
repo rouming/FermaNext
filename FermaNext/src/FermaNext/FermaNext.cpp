@@ -17,21 +17,20 @@ int main ( int argc, char* argv[] )
 
     PluginManager& plgMng = PluginManager::instance();
     // Catch plugin loaders registration
-    QObject::connect( &plgMng, SIGNAL(onPluginLoaderRegistration(PluginLoader&,
-                                        PluginManager::LoadingPriority)), 
-                      splash, SLOT(message(PluginLoader&, 
-                                        PluginManager::LoadingPriority)) );
+    QObject::connect( &plgMng, 
+                      SIGNAL(onBeforePluginLoaderRegistration(const QString&)),
+                      splash, 
+                      SLOT(pluginLoaderMessage(const QString&)) );
     // Catch plugins loading
-    QObject::connect( &plgMng, SIGNAL(onPluginLoad(Plugin&)), 
-                      splash, SLOT(message(Plugin&)) );
+    QObject::connect( &plgMng, SIGNAL(onBeforePluginLoad(const QString&)), 
+                      splash, SLOT(pluginMessage(const QString&)) );
 
     plgMng.registerPluginLoaders( pluginLoadersPath() );
     plgMng.loadPlugins( pluginsPath() );    
 
-    splash->message( "Building main objects .." );
+    splash->message( "Setting up GUI .." );
     FermaNextMainFrame ferma;
     app.setMainWidget(&ferma);
-    splash->message( "Loading gui .." );
     ferma.showMaximized();
     splash->finish( &ferma );
     delete splash;
