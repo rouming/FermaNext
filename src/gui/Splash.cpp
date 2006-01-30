@@ -1,5 +1,7 @@
 
 #include "Splash.h"
+#include <qfileinfo.h>
+#include <qpainter.h>
 
 /*****************************************************************************
  * Splash
@@ -9,22 +11,27 @@ Splash::Splash ( const QPixmap& p, WFlags f ) :
     QSplashScreen( p, f )
 {}
 
-void Splash::message ( PluginLoader& ldr, 
-                       PluginManager::LoadingPriority )
+void Splash::pluginLoaderMessage ( const QString& path )
 {
-    message( "Registering plugin loader for extension \"." + 
-             ldr.pluginExtension() + "\"" );
+    message( "Registering loader: '" + QFileInfo(path).baseName() + "'" );
 }
 
-void Splash::message ( Plugin& plg )
+void Splash::pluginMessage ( const QString& path )
 {
-    message( "Loading plugin \"" + plg.pluginInfo().name + "\"" );
+    message( "Loading plugin: '" + QFileInfo(path).baseName() + "'" );
 }
 
 void Splash::message ( const QString& msg )
 {
     QSplashScreen::message( msg, Qt::AlignRight | Qt::AlignBottom,
                             QColor("white") );
+}
+
+void Splash::drawContents ( QPainter* painter )
+{
+    QFont f("Helvetica", 10);
+    painter->setFont( f );
+    QSplashScreen::drawContents( painter );
 }
 
 /*****************************************************************************/

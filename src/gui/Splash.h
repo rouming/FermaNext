@@ -12,9 +12,12 @@ public:
     Splash ( const QPixmap& pixmap=QPixmap(), WFlags f=0 );
 
 public slots:
-    void message ( PluginLoader&, PluginManager::LoadingPriority );
-    void message ( Plugin& );
+    void pluginLoaderMessage ( const QString& );
+    void pluginMessage ( const QString& );
     void message ( const QString& );
+
+protected:
+    void drawContents ( QPainter* );
 };
 
 #endif //SPLASH_H

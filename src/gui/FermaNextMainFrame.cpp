@@ -361,17 +361,28 @@ void FermaNextMainFrame::setupHelpActions ()
 
 void FermaNextMainFrame::setupPluginActions ()
 {
-    reloadPlugins();
+    reloadPlugins( false );
 }
 
 void FermaNextMainFrame::reloadPlugins ()
 {
+    reloadPlugins( true );
+}
+
+void FermaNextMainFrame::reloadPlugins ( bool reload )
+{
     FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
     PluginManager& plgManager = wsp.pluginManager();
 
+    if ( reload ) {        
+        plgManager.unloadPlugins();
+        plgManager.loadPlugins( pluginsPath() );
+    }
+
     QStringList names;
     PluginList plugins = plgManager.loadedPlugins();
-    PluginListConstIter plgIt = plugins.begin();    
+    PluginListConstIter plgIt = plugins.begin();
+
     for ( ; plgIt != plugins.end(); ++plgIt )
         names.push_back( (*plgIt)->pluginInfo().name );
 
