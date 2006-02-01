@@ -251,6 +251,7 @@ TabbedWidget& ToolBarManager::createTabbedWidget ( QWidget& w,
     if ( blankLabel )
         delete blankLabel;
     blankLabel = new QLabel(this);
+    blankLabel->show();
     setStretchableWidget( blankLabel );
     widgets.push_back( tb );
     return *tb;

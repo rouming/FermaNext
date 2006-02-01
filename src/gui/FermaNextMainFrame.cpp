@@ -182,8 +182,6 @@ void FermaNextMainFrame::createProject ()
 #endif
 /*********** TEMP TRUSS UNIT **************************/
 
-        prj.activate();
-
     } else {
         // user entered nothing or pressed Cancel
     }
