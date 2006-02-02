@@ -1,0 +1,237 @@
+The Short Story
+---------------
+Four space tabs, braces on their own lines only for function definitions, 
+80 character lines. Code should look something like this:
+
+void TrussUnitWindowManager::suspendedClean () 
+{
+    // Clean desisted truss windows without states
+    WindowListIter iter = trussWindows.begin();
+    for ( ; iter != trussWindows.end(); ) {
+        TrussUnitWindow* truss = *iter;
+        if ( !truss->isAlive() && truss->countEnabledStates() == 0 ) {
+            removeTrussUnitWindow(iter);
+        }
+        else
+            ++iter;
+    }
+}
+
+Full Explanation
+----------------
+You may (will) notice that there are many discrepencies between the current
+code base and this document. All new development should follow the coding style
+as described below and one day the codebase will actually be consistent! Also
+feel free to clean up the code around code you work on. For example, if you
+change a number of lines in a method, reindent the whole method while you
+are in there. However, wholescale reformatting of code is not appropriate.
+This would make `cvs log` and `cvs annotate` far less useful and that 
+information is even more important than re-indenting old code.
+
+NULL vs 0
+---------
+The use of 0 to express a null pointer is preferred over the use of NULL.
+0 is not a magic value, it's the defined value of the null pointer in C++.
+NULL, on the other hand, is a preprocessor directive (#define) and not only is
+it more typing than '0' but I find preprocessor directives less elegant.
+
+    SomeClass* instance = 0;
+
+Naming Conventions
+------------------
+Class names start with a capital letter, member variables, methods and 
+functions start with a lower case letter.
+
+Names should be descriptive. If you can't tell what a variable or a method
+does by its name, the name is wrong. Saving a dozen keystrokes today by
+using cryptic variable names will only lead to maintenance headaches tomorrow.
+Names longer than 20 characters is probably going overboard, however. Just
+use your best judgement.
+
+Singletons will use a static method called instance() to return the instatiated
+object.
+
+Use 'true' and 'false', not 'TRUE' and 'FALSE'
+
+Comments
+--------
+Code should be written with enough clarity that comments are not needed
+above each line. However, if the code does something in a particular way
+for a specific reason that may not be obvious to the next person who has to
+work on it do provide a short comment describing what it does and why.
+
+Comments can also provide notes for future work, including:
+
+    // TODO: this is a todo item
+    //       and should explain the todo in detail
+
+    // BUG: this is documenting a bug. It is preferred that they are fixed.
+    //      but if you don't fix it, at least document it to save the next
+    //      person some time in tracking down the problem.
+
+Indenting
+---------
+Tabstop is 4 spaces. No tabs, only spaces.
+
+Try to keep lines under 80 characters in width. When wrapping a single
+logical line of code across multiple lines, new lines should be indented
+at least once and should preferably line up with parentheses, if any, on
+the line above. e.g.:
+
+    someMethod( parameterOne, parameterTwo,
+                parameterThree, parameterFour );
+
+If a boolean expression is spread out over several lines, the boolean
+operator and the bracket are always the last items on the line, e.g.:
+
+    if ( (condition1 || condition2) &&
+         condition3 &&
+         (condition4 || condition5) ) {
+
+Switch statements should have the case line indented and the case block
+itsel further indented, e.g.:
+
+    switch ( condition )
+    {
+        case 1:
+            ...
+            break;
+        case 2:
+            ...
+            break;
+        default:
+            ...;
+    }
+
+Spaces
+------
+A single space should appear between keywords and parentheses, eg:
+
+    if (
+    while (
+    for (
+
+A single space should appear between opening closing parens and the arguments:
+
+    for ( int i = 0; i < count; ++i ) {
+    if ( condition ) {
+    function( arg, arg );
+
+No spaces appear between function/method names and parentheses:
+
+    function(
+    someObject->method(
+
+Spaces appear between operators, e.g.:
+
+    int i = i + 3;
+    someObject.setValue( someObject.currentValue() + 1 )
+
+
+Braces
+------
+Braces always appear on a line with a keyword:
+
+    if ( foo ) {
+        ...
+    }
+    else {
+        ...
+    }
+
+You can ignore braces for one-liner conditionals:
+
+    if (foo)
+        return 1;
+
+Always use braces if the conditional expression wraps across multiple
+physical lines.
+
+Braces around case blocks in switch statements are optional.
+
+
+Constructors
+------------
+Constructors are written as:
+
+    MyClass::MyClass ( ... ) throw ( ... ) : 
+        SuperClass( ... ),
+        member1( ... ),
+        member2( ... ),
+        ...
+    {
+
+Class Definitions
+-----------------
+Class definitions will follow the following order:
+
+    class <name> : <scope> <superclass>
+    {
+        <macros[1]>
+        <typedefs>
+
+    public:
+            <ctors>
+            <dtors>
+            <operators>
+            <other methods>
+
+            <members>
+
+    protected:
+            <ctors>
+            <dtors>
+            <operators>
+
+            <members>
+
+    private:
+            <ctors>
+            <dtors>
+            <operators>
+
+            <members>
+
+    signals:
+            <methods>
+
+    public slots:
+            <methods>
+
+    protected slots:
+            <methods>
+
+    private slots:
+            <methods>
+    };
+
+Methods implementations may be in the class definition if doing so will
+result in a measurable performance enhancement (e.g. it is called very often
+from tight loops or is in a hot path) or if it is a simple, one-liner
+setter/getter method. Otherwise methods should be implemented outside of
+the class definition.
+
+
+Classes in Public Libraries
+---------------------------
+All classes in shared libraries with publicly installed headers must be 
+implemented as a Pimpl idiom. The definition for them should appear at 
+the end of the private declarations:
+
+        private:
+            <ctors>
+            <dtors>
+            <operators>
+
+            <members>
+
+            class Pimpl;
+            Pimpl* pimpl;
+
+Class with Pimpl declaration should only be defined if necessary, and should 
+appear at the top of the class's source file after #include directives but 
+before the class' ctors.
+
+All public methods, slots and signals must be documented using the standard 
+doxygen style documentation, or javadoc style.
+
