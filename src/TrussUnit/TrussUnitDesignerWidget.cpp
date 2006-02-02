@@ -84,51 +84,57 @@ LoadPopupMenu::LoadPopupMenu ( QWidget* parent, const char* name ) :
     QPopupMenu( parent, name ),
     releaseEvent( QEvent::MouseButtonRelease, QPoint(0,0), 0, 0 ),
     node(0),
-    selectedWindow(0)
+    selectedWindow(0),
+    // boxes
+    vBox( new QVBox(this) ),
+    xHBox( new QHBox(vBox) ),
+    yHBox( new QHBox(vBox) ),
+    buttonHBox( new QHBox(vBox) ),
+    // buttons
+    ok( new QPushButton(tr("OK"), buttonHBox) ),
+    cancel( new QPushButton(tr("Cancel"), buttonHBox) ),
+    // labels
+    loadXLabel( new QLabel(tr("Load by X:"), xHBox) ),
+    loadYLabel( new QLabel(tr("Load by Y:"), yHBox) ),
+    // edits
+    loadXLine( new QLineEdit(xHBox) ),
+    loadYLine( new QLineEdit(yHBox) )
 {
-    VB=new QVBox();
-    XHB=new QHBox(VB);
-    YHB=new QHBox(VB);
-    ButtonHB=new QHBox(VB);
-    VB->setSpacing(4);
-    XHB->setSpacing(4);
-    YHB->setSpacing(4);
-    ButtonHB->setSpacing(4);
-    LoadXLab=new QLabel ("Load by X:",XHB);
-    LoadYLab=new QLabel("Load by Y:",YHB);
-    LoadXLine=new QLineEdit(XHB);
-    LoadXLine->setValidator(new QDoubleValidator(LoadXLine));
-    LoadYLine=new QLineEdit(YHB);
-    LoadYLine->setValidator(new QDoubleValidator(LoadYLine));
-    Ok=new QPushButton("OK",ButtonHB);
-    Cancel=new QPushButton("Cancel",ButtonHB);
-    insertItem(VB);
-    QObject::connect(this, SIGNAL(aboutToHide()), SLOT(hideLoadPopup()));
-    QObject::connect(Cancel,SIGNAL(clicked()),this,SLOT(close()));
-    QObject::connect(Ok,SIGNAL(clicked()),this,SLOT(okClicked()));
+    loadXLine->setValidator( new QDoubleValidator(loadXLine) );
+    loadYLine->setValidator(new QDoubleValidator(loadYLine) );
+
+    vBox->setSpacing(4);
+    xHBox->setSpacing(4);
+    yHBox->setSpacing(4);
+    buttonHBox->setSpacing(4);
+
+    insertItem(vBox);
+
+    QObject::connect( this, SIGNAL(aboutToHide()), SLOT(hideLoadPopup()) );
+    QObject::connect( cancel, SIGNAL(clicked()), SLOT(close()) );
+    QObject::connect( ok, SIGNAL(clicked()), SLOT(okClicked()) );
 }
 
-void LoadPopupMenu::showLoadPopup ( QMouseEvent* e, TrussNode* n, TrussUnitWindow* t)
+void LoadPopupMenu::showLoadPopup ( QMouseEvent* e, 
+                                    TrussNode* n, 
+                                    TrussUnitWindow* t)
 {
-double x;
-double y;
-    x=0;
-    y=0;
+    double x = 0, y = 0;
     selectedWindow = t;
     node = n;
-    if (selectedWindow && node)
-    {
-        TrussUnit::LoadCase* loadCase = selectedWindow->getLoadCases().getCurrentLoadCase();        
+    if ( selectedWindow && node ) {
+        TrussUnit::LoadCase* loadCase = 
+            selectedWindow->getLoadCases().getCurrentLoadCase();        
         if ( loadCase )  {
             TrussLoad* load = loadCase->findLoad( *node );
             if ( load ) {
-                x=load->getXForce();
-                y=load->getYForce();
+                x = load->getXForce();
+                y = load->getYForce();
             }
         }
     }
-    LoadXLine->setText(QString::number(x));
-    LoadYLine->setText(QString::number(y));
+    loadXLine->setText( QString::number(x) );
+    loadYLine->setText( QString::number(y) );
     releaseEvent = QMouseEvent( QEvent::MouseButtonRelease,  e->pos(), 
                                 e->globalPos(), e->button(), e->button() );
     
@@ -137,33 +143,32 @@ double y;
 
 void LoadPopupMenu::okClicked()
 {
-    if (selectedWindow && node)
-    {
-        TrussUnit::LoadCase* loadCase=selectedWindow->
-          getLoadCases().getCurrentLoadCase();        
-        if ( loadCase )  {
-            TrussLoad* load=loadCase->findLoad(*node);
+    if ( selectedWindow && node ) {
+        TrussUnit::LoadCase* loadCase = selectedWindow->
+            getLoadCases().getCurrentLoadCase();        
+        if ( loadCase ) {
+            TrussLoad* load = loadCase->findLoad( *node );
             if ( load ) {
-                if (LoadXLine->text().toDouble()!=0 && 
-                    LoadYLine->text().toDouble()!=0) {
-                    load->setXForce(LoadXLine->text().toDouble());
-                    load->setYForce(LoadYLine->text().toDouble());
+                if ( loadXLine->text().toDouble() != 0 ||
+                     loadYLine->text().toDouble() != 0 ) {
+                    load->setXForce( loadXLine->text().toDouble() );
+                    load->setYForce( loadYLine->text().toDouble() );
                 }
                 else {
-                    loadCase->removeLoad(*node);
+                    loadCase->removeLoad( *node );
                 }
             }
-            else{
-                 loadCase->addLoad (*node, LoadXLine->text().toDouble(),
-                   LoadYLine->text().toDouble());
+            else {
+                loadCase->addLoad( *node, loadXLine->text().toDouble(),
+                                          loadYLine->text().toDouble() );
             }
         }
-        else{
+        else {
             TrussUnit::LoadCase& currentCase = 
-            selectedWindow->getLoadCases().createLoadCase();
-            selectedWindow->getLoadCases().setCurrentLoadCase(currentCase);
-            currentCase.addLoad (*node, LoadXLine->text().toDouble(),
-              LoadYLine->text().toDouble());
+                selectedWindow->getLoadCases().createLoadCase();
+            selectedWindow->getLoadCases().setCurrentLoadCase( currentCase );
+            currentCase.addLoad( *node, loadXLine->text().toDouble(),
+                                        loadYLine->text().toDouble() );
         }
     }
     close();
@@ -184,7 +189,7 @@ void LoadPopupMenu::hideLoadPopup ()
 TrussUnitDesignerWidget::TrussUnitDesignerWidget ( QWidget* p ) :
     AggQWidget(p, flipY),
     fixationPopup( new FixationPopupMenu(this) ),
-    loadPopup(new LoadPopupMenu(this)),
+    loadPopup( new LoadPopupMenu(this) ),
     focusedWindow(0),
     selectedWindow(0),
     selectedNode(0),

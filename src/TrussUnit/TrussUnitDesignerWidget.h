@@ -39,25 +39,28 @@ class LoadPopupMenu : public QPopupMenu
 {
     Q_OBJECT
 public:
-    LoadPopupMenu (QWidget* parent=0, const char* name=0);
-    void showLoadPopup (QMouseEvent* pressEvent, TrussNode*, TrussUnitWindow*);
+    LoadPopupMenu ( QWidget* parent=0, const char* name=0 );
+    void showLoadPopup ( QMouseEvent* pressEvent, TrussNode*, 
+                         TrussUnitWindow* );
+
 protected slots:
     void hideLoadPopup();
     void okClicked();
+
 private:
     QMouseEvent releaseEvent;
     TrussNode* node;
     TrussUnitWindow* selectedWindow;
-    QPushButton* Ok;
-    QPushButton* Cancel;
-    QLabel* LoadXLab;
-    QLabel* LoadYLab;
-    QLineEdit* LoadXLine;
-    QLineEdit* LoadYLine;
-    QHBox* XHB;
-    QHBox* YHB;
-    QHBox* ButtonHB;
-    QVBox* VB;
+    QVBox* vBox;
+    QHBox* xHBox;
+    QHBox* yHBox;
+    QHBox* buttonHBox;
+    QPushButton* ok;
+    QPushButton* cancel;
+    QLabel* loadXLabel;
+    QLabel* loadYLabel;
+    QLineEdit* loadXLine;
+    QLineEdit* loadYLine;
 };
 
 /*****************************************************************************/
@@ -93,7 +96,7 @@ protected:
     virtual void releaseWindowButtons ();
     // clear window cursor position field
     virtual void clearAllCursorCoordFields ();
-    virtual void clearHintsFromNonSelectedWindows ( TrussUnitWindow* selectedWindow );
+    virtual void clearHintsFromNonSelectedWindows ( TrussUnitWindow* );
 
     virtual bool nodeCanBeDrawn ( int x, int y );
 
@@ -154,10 +157,14 @@ private:
     enum TrussWindowBehaviour { windowIdle = 0, onWindowDrag, 
                                 onHorResize, onVerResize, 
                                 onBDiagResize, onFDiagResize };
+
     enum TrussNodeBehaviour { nodeIdle = 0, onNodeSelect, onNodeDrag };
+
     enum TrussPivotBehaviour { pivotIdle = 0, onPivotSelect, onPivotDrag };
-    enum DesignerBehaviour { onSelect = 0, onNodeDraw, onPivotFirstNodeDraw, 
-                            onPivotLastNodeDraw, onFixDraw, onLoadDraw, onErase };
+
+    enum DesignerBehaviour { onSelect = 0, onNodeDraw, 
+                             onPivotFirstNodeDraw, onPivotLastNodeDraw, 
+                             onFixDraw, onLoadDraw, onErase };
 
     // Windows to show
     WindowList trussWindows;
