@@ -8,18 +8,17 @@
 
 void sleep ( clock_t wait )
 {
-   clock_t goal;
-   goal = wait + timer();
-   while( goal > timer() );
+   clock_t goal = wait + timer()/CLOCKS_PER_SEC;
+   while( goal > (timer()/CLOCKS_PER_SEC) );
 }
 
 int main ()
 {
-    const clock_t SLEEP1 = 1000;
-    const clock_t SLEEP2 = 666;
-    const clock_t SLEEP3 = 1234;
-    const clock_t SLEEP4 = 200;
-    const clock_t SLEEP5 = 3000;
+    const clock_t SLEEP1 = 1;
+    const clock_t SLEEP2 = 2;
+    const clock_t SLEEP3 = 1;
+    const clock_t SLEEP4 = 0;
+    const clock_t SLEEP5 = 1;
 
    
     BEGIN_BENCHMARK("WindowRender");

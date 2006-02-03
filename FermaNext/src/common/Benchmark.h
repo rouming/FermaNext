@@ -12,8 +12,6 @@
 #else
  #include <sys/times.h>
  #include <unistd.h>
- #undef CLOCKS_PER_SEC
- #define CLOCKS_PER_SEC (sysconf(_SC_CLK_TCK))
 #endif
 
 clock_t timer ();
