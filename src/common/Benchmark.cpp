@@ -3,12 +3,7 @@
 
 clock_t timer ()
 {
-#if defined _WIN32 || defined WIN32
   return clock();
-#else
-  struct tms tms_tmp;
-  return times(&tms_tmp);
-#endif
 }
 
 /*****************************************************************************
