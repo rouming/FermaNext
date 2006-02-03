@@ -72,4 +72,10 @@ QString configFileName ();
 // contains the application executable.
 QString applicationDirPath ();
 
+// Convert absolute path to absolute
+QString filePathToRelative ( const QString& fname, const QString& dir);
+
+// Convert relative path to absolute
+QString filePathToAbsolute ( const QString& fname, const QString& dir);
+
 #endif //SUBSIDIARYCONSTANTS_H
