@@ -102,4 +102,64 @@ QString applicationDirPath ()
         return ".";
 }
 
+QString filePathToRelative ( const QString& fname, const QString& dir )
+{
+    QString path = fname;
+    QString basePath = dir;
+
+    path.replace('\\', '/');
+    basePath.replace('\\', '/');
+
+    path.remove( 0, 1 );
+    basePath.remove( 0, 1 );
+    if ( basePath.right(1) != "/" ) 
+        basePath.append( "/" );
+    
+    int pos = 0;
+    int pos1 = 0;
+    
+    for ( ;; ) {
+        pos = path.find( "/" );
+        pos1 = basePath.find( "/" );
+        if ( pos < 0 || pos1 < 0 ) 
+            break;
+        if ( path.left( pos+1 ) == basePath.left( pos1+1 ) ) {
+            path.remove( 0, pos+1 );
+            basePath.remove( 0, pos1+1 );
+        }
+        else
+            break;
+    }
+
+    if ( basePath == "/" ) 
+        basePath = "";
+
+    int level = basePath.contains( "/" );
+
+    for ( int i=0; i<level; i++ )
+        path = "../" + path;
+
+    return path;
+}
+
+QString filePathToAbsolute ( const QString& fname, const QString& dir )
+{
+    int pos;
+    QString cutname = fname;
+    QString cutdir = dir;
+
+    cutname.replace('\\', '/');
+    cutdir.replace('\\', '/');
+
+    while ( (pos = cutname.find("../")) >=0 ) {
+        cutname.remove( 0, pos+3 );
+        cutdir.remove( cutdir.length()-1, 1 );
+        cutdir.remove( cutdir.findRev('/')+1 , 1000);
+    }
+    if ( cutdir.right(1) != "/" )
+        cutdir.append('/');
+
+    return cutdir + cutname;
+}
+
 /*****************************************************************************/

@@ -86,7 +86,9 @@ protected slots:
 
 protected:
     // XML serialization
-    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
+    virtual void loadFromXML ( const QDomElement&, const QString& wspFileName )
+        throw (LoadException);
+
     virtual QDomElement saveToXML ( QDomDocument& );
 
     virtual void setWorkspaceFileName ( const QString& );

@@ -51,7 +51,7 @@ void FermaNextWorkspace::loadFromFile ( const QString& fileName )
     if ( docElem.isNull() )
         throw WrongXMLDocException();
 
-    loadFromXML( docElem );
+    loadFromXML( docElem, fileName );
 
     setWorkspaceFileName( fileName );
 }
@@ -95,7 +95,8 @@ void FermaNextWorkspace::saveToFile ( const QString& fileName )
     setWorkspaceFileName( fileName );
 }
 
-void FermaNextWorkspace::loadFromXML ( const QDomElement& wspElem )
+void FermaNextWorkspace::loadFromXML ( const QDomElement& wspElem,
+                                       const QString& wspFileName )
     throw (LoadException)
 {
     XMLSerializableObject::loadFromXML( wspElem );
@@ -103,7 +104,7 @@ void FermaNextWorkspace::loadFromXML ( const QDomElement& wspElem )
     // Destroy existent projects
     reset();
 
-    QFileInfo wspFileInfo( getWorkspaceFileName() );    
+    QFileInfo wspFileInfo( wspFileName );
     QDir workspaceDir( wspFileInfo.dirPath(true) );
 
     /**
@@ -146,7 +147,7 @@ QDomElement FermaNextWorkspace::saveToXML ( QDomDocument& doc )
     wspElem.setTagName( "FermaNextWorkspace" );
 
     QFileInfo wspFileInfo( getWorkspaceFileName() );
-    QDir workspaceDir( wspFileInfo.dirPath(true) );
+    QString wspDirPath = wspFileInfo.dirPath(true);
 
     /**
      * Save projects URLs
@@ -155,8 +156,9 @@ QDomElement FermaNextWorkspace::saveToXML ( QDomDocument& doc )
     for ( ; iter != projects.end(); ++iter ) {
         FermaNextProject* prj = *iter;
         const QString& prjFileName = prj->getProjectFileName();
+        QString relPrjFileName = filePathToRelative( prjFileName, wspDirPath );
         QDomElement prjElem = doc.createElement( "FermaNextProject" );        
-        prjElem.setAttribute( "projectURL", prjFileName );
+        prjElem.setAttribute( "projectURL", relPrjFileName );
         if ( prj->isActivated() )
             prjElem.setAttribute( "selected", "Yes" );
         else
@@ -197,6 +199,7 @@ void FermaNextWorkspace::reset ()
     emit onReset();
     name = untitledWorkspaceName;
     clearProjects();
+    setWorkspaceFileName( "" );
 }
 
 void FermaNextWorkspace::projectIsActivated ( FermaNextProject& prj )
