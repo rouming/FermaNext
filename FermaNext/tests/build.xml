@@ -1,6 +1,7 @@
 <?xml version="1.0"?> 
 <project name="tests" default="run-tests" basedir="."> 
 
+<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 <taskdef resource="cpptasks.tasks"/>
 <typedef resource="cpptasks.types"/>
 
@@ -46,29 +47,30 @@ Ant build file for FermaNext tests
 
 Common invocations:
 
+To build all tests and run them:
 > ant
 
-Builds all tests and run them.  
 
+To build all tests, but don't run them:
 > ant build-tests
 
-Only builds all tests, doesn't run them.
 
-> ant run-test -Dtest=&lt;directory_name_with_test&gt;
+To build and run only specified test.
+Run single testcase if it is defined with param `-Dtestcase=&lt;testcase_name&gt;':
+> ant run-test -Dtest=&lt;directory_with_test&gt; [-Dtestcase=&lt;testcase_name&gt;]
 
-Builds and runs only specified test.
 
-> ant build-test -Dtest=&lt;directory_name_with_test&gt;
+To build only specified test, don't run it.
+Builds single testcase if it is defined with param `-Dtestcase=&lt;testcase_name&gt;':
+> ant build-test -Dtest=&lt;directory_with_test&gt; [-Dtestcase=&lt;testcase_name&gt;]
 
-Builds only specified test, doesn't run it.
 
+To Clean all garbage from every test directory:
 > ant clean-tests
 
-Cleans all garbage from every test directory
 
-> ant clean-test -Dtest=&lt;directory_name_with_test&gt;
-
-Cleans garbage only for specified test.
+To clean garbage only for specified test:
+> ant clean-test -Dtest=&lt;directory_with_test&gt;
 
 </echo>
 </target>
@@ -164,15 +166,26 @@ Required features not present in cpptasks releases prior to Feb 2005
     </target>
 
     <target name="check-single" depends="init">
-       <fail unless="test">Specify test directory with -Dtest=&lt;directory_name_with_test&gt;</fail>
+       <fail unless="test">Specify test directory with -Dtest=&lt;directory_with_test&gt;</fail>
+  
+       <path id="test-path">
+          <fileset dir="." includes="${test}/build.xml"/>
+       </path>
+       <property name="test-path" refid="test-path" />
+       <if>
+         <equals arg1="${test-path}" arg2=""/>
+         <then>
+           <fail>Can't find test: "${test}"</fail>
+         </then>
+       </if>
     </target>
-
 
     <target name="run-test" depends="build-test">
         <subant target="run-test" inheritrefs="true">
             <property name="compiler" value="${compiler}"/>
             <property name="os.family" value="${os.family}"/>
             <property name="qt.dir" value="${qt.dir}"/>
+            <property name="testcase" value="${testcase}"/>
             <fileset dir="." includes="${test}/build.xml"/>
         </subant>
     </target>
@@ -182,6 +195,7 @@ Required features not present in cpptasks releases prior to Feb 2005
             <property name="compiler" value="${compiler}"/>
             <property name="os.family" value="${os.family}"/>
             <property name="qt.dir" value="${qt.dir}"/>
+            <property name="testcase" value="${testcase}"/>
             <fileset dir="." includes="${test}/build.xml"/>
         </subant>
     </target>
@@ -189,6 +203,7 @@ Required features not present in cpptasks releases prior to Feb 2005
     <target name="clean-test" depends="check-single">
         <subant target="clean-test" inheritrefs="true">
             <property name="os.family" value="${os.family}"/>
+            <property name="testcase" value="${testcase}"/>
             <fileset dir="." includes="${test}/build.xml"/>
         </subant>
     </target>
