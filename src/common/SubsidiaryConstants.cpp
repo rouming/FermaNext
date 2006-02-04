@@ -3,6 +3,7 @@
 #include <qapplication.h>
 #include <qfile.h>
 #include <qdir.h>
+#include <qregexp.h>
 
 /************************************
  * Main Consts 
@@ -107,11 +108,26 @@ QString filePathToRelative ( const QString& fname, const QString& dir )
     QString path = fname;
     QString basePath = dir;
 
+    QRegExp windowsDiskExp( "^([A-Za-z]:)(.*)" );
+
     path.replace('\\', '/');
     basePath.replace('\\', '/');
 
-    path.remove( 0, 1 );
-    basePath.remove( 0, 1 );
+    if ( windowsDiskExp.exactMatch( path ) || 
+         windowsDiskExp.exactMatch( basePath ) ) {
+        windowsDiskExp.search( path );
+        QString pathDisk = windowsDiskExp.cap(1);
+
+        windowsDiskExp.search( basePath );
+        QString basePathDisk = windowsDiskExp.cap(1);
+
+        if ( pathDisk != basePathDisk )
+            return path;
+    } else {
+        path.remove( 0, 1 );
+        basePath.remove( 0, 1 );
+    }
+
     if ( basePath.right(1) != "/" ) 
         basePath.append( "/" );
     
@@ -148,8 +164,22 @@ QString filePathToAbsolute ( const QString& fname, const QString& dir )
     QString cutname = fname;
     QString cutdir = dir;
 
+    QRegExp windowsDiskExp( "^([A-Za-z]:)(.*)" );
+
     cutname.replace('\\', '/');
     cutdir.replace('\\', '/');
+
+    if ( windowsDiskExp.exactMatch( cutname ) &&
+         windowsDiskExp.exactMatch( cutdir ) ) {
+        windowsDiskExp.search( cutname );
+        QString cutnameDisk = windowsDiskExp.cap(1);
+
+        windowsDiskExp.search( cutdir );
+        QString cutdirDisk = windowsDiskExp.cap(1);
+
+        if ( cutnameDisk != cutdirDisk )
+            return cutname;
+    }
 
     while ( (pos = cutname.find("../")) >=0 ) {
         cutname.remove( 0, pos+3 );
