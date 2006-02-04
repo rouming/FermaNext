@@ -23,10 +23,98 @@
          <isset property="is-unix"/>
      </condition>
 
+     <condition property="is-def-testcase" value="true">
+         <not><equals arg1="${testcase}" arg2="$${testcase}"/></not>
+     </condition>
 
      <mkdir dir="${objects.dir}"/>
      <mkdir dir="${tests.dir}"/>
      <mkdir dir="${build.dir}"/>
+
+
+<!-- Subsidiary targets -->
+
+     <target name="check-build-path">
+        <property name="build-path" refid="build-path" />
+        <if>
+          <equals arg1="${build-path}" arg2=""/>
+          <then>
+             <fail>Can't find testcase: "${testcase}"</fail>
+          </then>
+        </if>
+     </target>
+
+     <target name="build-all-test" unless="is-def-testcase" >
+        <foreach target="compile" 
+                 param="file" 
+                 inheritall="true"
+                 inheritrefs="true">
+           <path>
+              <fileset dir="${src.dir}" includes="*.cpp" 
+                       excludes="FermaNextConfigTest.cpp,DijkstraTest.cpp"/>
+           </path>
+        </foreach>
+     </target>
+
+     <target name="run-all-test" unless="is-def-testcase" >
+        <foreach target="execute" 
+                 param="executable" 
+                 inheritall="true"
+                 inheritrefs="true">
+           <path>
+              <fileset dir="${tests.dir}"/>
+           </path>
+        </foreach>
+     </target>
+
+     <target name="build-testcase" if="is-def-testcase" >
+        <foreach target="compile" 
+                 param="file" 
+                 inheritall="true"
+                 inheritrefs="true">
+           <path id="build-path">
+              <fileset dir="${src.dir}" includes="${testcase}.cpp" 
+                       excludes="FermaNextConfigTest.cpp,DijkstraTest.cpp"/>
+           </path>
+        </foreach>
+
+        <antcall target="check-build-path" 
+                 inheritall="yes" inheritrefs="yes" />
+     </target>
+
+     <target name="run-testcase" if="is-def-testcase" >
+        <foreach target="execute" 
+                 param="executable" 
+                 inheritall="true"
+                 inheritrefs="true">
+           <path id="build-path">
+              <fileset dir="${tests.dir}" 
+                       includes="${testcase}${os.executable.extension}"/>
+           </path>
+        </foreach>
+
+        <antcall target="check-build-path" 
+                 inheritall="yes" inheritrefs="yes" />
+     </target>
+
+<!-- Main targets -->
+
+     <target name="build-test" depends="build-all-test, build-testcase" >
+     </target>
+
+     <target name="run-test" depends="run-all-test, run-testcase">
+     </target>
+
+     <target name="clean-test" >
+        <delete dir="${objects.dir}"/>
+        <delete dir="${build.dir}"/>
+        <delete dir="${tests.dir}"/>
+        <delete>
+            <fileset dir="." includes="*.pdb"/>
+            <fileset dir="." includes="${outfile}${os.executable.extension}"/>
+            <fileset dir="." includes="*.xml" excludes="build.xml"/>
+        </delete>
+     </target>
 
      <target name="compile">
           <basename property="src.file" file="${file}"/>
@@ -74,7 +162,8 @@
              </linker>
          </cc>
 
-         <move file="${build.dir}/${out.file}${os.executable.extension}" todir="${tests.dir}"/>
+         <move file="${build.dir}/${out.file}${os.executable.extension}" 
+               todir="${tests.dir}"/>
      </target>
 
      <target name="execute">
@@ -86,40 +175,6 @@
                failonerror="Yes"
                executable="${exec.file}">
          </exec>
-     </target>     
-
-     <target name="build-test" >
-        <foreach target="compile" 
-                 param="file" 
-                 inheritall="true"
-                 inheritrefs="true">
-           <path>
-              <fileset dir="${src.dir}" includes="*.cpp" excludes="FermaNextConfigTest.cpp,DijkstraTest.cpp"/>
-           </path>
-        </foreach>
-     </target>
-
-
-     <target name="run-test" >
-        <foreach target="execute" 
-                 param="executable" 
-                 inheritall="true"
-                 inheritrefs="true">
-           <path>
-              <fileset dir="${tests.dir}"/>
-           </path>
-        </foreach>
-     </target>
-
-     <target name="clean-test" >
-        <delete dir="${objects.dir}"/>
-        <delete dir="${build.dir}"/>
-        <delete dir="${tests.dir}"/>
-        <delete>
-            <fileset dir="." includes="*.pdb"/>
-            <fileset dir="." includes="${outfile}${os.executable.extension}"/>
-            <fileset dir="." includes="*.xml" excludes="build.xml"/>
-        </delete>
      </target>
 
 </project>
