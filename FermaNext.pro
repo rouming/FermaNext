@@ -6,6 +6,7 @@ SUBDIRS = src/common \
           src/TrussUnit \
           src/FermaNext \
           \
+          src/loaders/JavaPluginLoader \
           src/loaders/NativePluginLoader \
           \
           src/plugins/old_SimpleCalc

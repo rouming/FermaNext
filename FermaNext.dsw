@@ -36,6 +36,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "JavaPluginLoader"=.\src\loaders\JavaPluginLoader\JavaPluginLoader.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "NativePluginLoader"=.\src\loaders\NativePluginLoader\NativePluginLoader.dsp - Package Owner=<4>
 
 Package=<5>
