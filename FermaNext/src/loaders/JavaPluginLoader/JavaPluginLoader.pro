@@ -6,7 +6,7 @@ CONFIG += plugin warn_on thread debug
 
 OBJECTS_DIR = obj
 
-DEFINES += WIN32 QT_THREAD_SUPPORT
+DEFINES += QT_THREAD_SUPPORT
 
 INCLUDEPATH = ../../common \
               ../../common/plugin \

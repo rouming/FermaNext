@@ -4,6 +4,8 @@
 
 #include "PluginLoader.h"
 
+class JavaVirtualMachine;
+
 class JavaPluginLoader : public PluginLoader
 {
 public:
@@ -55,6 +57,8 @@ protected:
      * @see PluginLoader::specificUnloadPlugins
      */
     virtual void specificUnloadPlugins ();
+private:
+    JavaVirtualMachine* javaVM;
 };
 
 #endif //JAVAPLUGINLOADER_H
