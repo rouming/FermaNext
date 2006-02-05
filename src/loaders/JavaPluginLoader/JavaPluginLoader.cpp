@@ -19,15 +19,18 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
 {
     QStringList options;
     options.push_back("-verbose:jni");
-    JavaVirtualMachine* jvm = new JavaVirtualMachine(
-                                         "e:/java1.4.1/jre/bin/client/jvm.dll",
-                                         JavaVirtualMachine::v1_4,
-                                         options            
-                                                     );
+    javaVM = new JavaVirtualMachine(
+            //  "/home/roman/soft/j2sdk1.4.2_10/jre/lib/i386/client/libjvm.so",
+              "e:/java1.4.1/jre/bin/client/jvm.dll",
+               JavaVirtualMachine::v1_4,
+               options );
 }
 
 JavaPluginLoader::~JavaPluginLoader ()
-{}
+{
+    // BUG: wrong destruction of a dynamic lib
+    //delete javaVM;
+}
 
 const QString& JavaPluginLoader::pluginExtension () const
 { static QString javaExt("jar"); return javaExt; }
