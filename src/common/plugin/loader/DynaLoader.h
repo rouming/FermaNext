@@ -29,8 +29,25 @@ public:
 
 public:
     // Excceptions
-    class LibraryLoadException {};
-    class AddressException {};
+    /** Base class for Dyna exceptions */
+    class DynaLoaderException
+    { 
+    public:
+        DynaLoaderException ( const QString& m ) : msg(m) {}
+        const QString& message () { return msg; }
+    private:
+        QString msg;
+    };
+
+    /** Occurs when loading failed */
+    class LibraryLoadException : public DynaLoaderException
+    { public: LibraryLoadException ( const QString& m ) : 
+          DynaLoaderException(m) {} };
+
+    /** Occurs when can't find specified address */
+    class AddressException : public DynaLoaderException
+    { public: AddressException ( const QString& m ) : 
+          DynaLoaderException(m) {} };
 
     DynaLoader ();
     DynaLoader ( const QString& fileName ) throw (LibraryLoadException);

@@ -5,6 +5,26 @@
 #include <qdir.h>
 #include <qfileinfo.h>
 
+QString dl_error ()
+{
+#if defined _WIN32 || defined WIN32
+    static const uint BUFFER_SIZE = 100;
+    static char buffer[BUFFER_SIZE + 1];
+    FormatMessageA( FORMAT_MESSAGE_FROM_SYSTEM | 
+                    FORMAT_MESSAGE_IGNORE_INSERTS,
+                    0, //source
+                    GetLastError(),
+                    0, //language
+                    buffer,
+                    BUFFER_SIZE,
+                    0 //args 
+                  );
+    return QString( buffer );
+#else
+    return QString( dlerror() );
+#endif
+}
+
 /*****************************************************************************
  * Dynamic Loader
  *****************************************************************************/
@@ -36,7 +56,7 @@ DynaLoader::DynaLoader () :
 {}
 
 DynaLoader::DynaLoader ( const QString& fileName )
-    throw (LibraryLoadException) :
+    throw (DynaLoader::LibraryLoadException) :
     handle(0)
 {
     loadLibrary( fileName );
@@ -48,7 +68,7 @@ DynaLoader::~DynaLoader ()
 }
 
 void DynaLoader::loadLibrary ( const QString& fileName ) 
-    throw (LibraryLoadException)
+    throw (DynaLoader::LibraryLoadException)
 {
     freeLibrary();    
     QFileInfo dlInfo( fileName );
@@ -67,7 +87,7 @@ void DynaLoader::loadLibrary ( const QString& fileName )
     handle = dl_open(QFile::encodeName(convertedFileName));
 #endif
     if ( handle == 0 )
-        throw LibraryLoadException();
+        throw LibraryLoadException( dl_error() );
 }
 
 bool DynaLoader::freeLibrary ()
@@ -81,11 +101,11 @@ bool DynaLoader::freeLibrary ()
 }
 
 ProcAddress DynaLoader::getProcAddress ( const QString& funcName ) const
-    throw (AddressException)
+    throw (DynaLoader::AddressException)
 {
     ProcAddress address = dl_sym(handle, funcName.ascii());
     if ( address == 0 )
-        throw AddressException();
+        throw AddressException( dl_error() );
     return address;
 }
 
