@@ -39,6 +39,22 @@
  * }
  * @endcode
  */
+
+#define FERMA_NEXT_PLUGIN_HOOKS(PluginClass) \
+    static PluginClass* plugin_instance__ = 0; \
+    PluginExport NativePlugin* PLUGIN_INSTANCE_INIT ( PluginManager& mng,   \
+                                                      const QString& path ) \
+    { \
+      plugin_instance__ = new PluginClass( mng, path ); \
+      return plugin_instance__; \
+    } \
+    \
+    PluginExport void PLUGIN_INSTANCE_FINI () \
+    { \
+      delete plugin_instance__; \
+      plugin_instance__ = 0; \
+    }
+
 #if defined _WIN32 || defined WIN32
   #include <windows.h>
 
@@ -57,12 +73,7 @@
     void fini_plugin__ ()
 
   #define FERMA_NEXT_PLUGIN(PluginClass) \
-    PluginExport NativePlugin* PLUGIN_INSTANCE ( PluginManager& mng,   \
-                                                 const QString& path ) \
-    { \
-      static PluginClass plugin_instance__( mng, path ); \
-      return &plugin_instance__; \
-    } \
+    FERMA_NEXT_PLUGIN_HOOKS(PluginClass) \
     \
     typedef void (* InitFiniCall__) (); \
     template <typename Call> \
@@ -98,12 +109,7 @@
     __attribute__((destructor)) void fini_plugin__ ()
 
   #define FERMA_NEXT_PLUGIN(PluginClass) \
-    PluginExport NativePlugin* PLUGIN_INSTANCE ( PluginManager& mng,   \
-                                                 const QString& path ) \
-    { \
-      static PluginClass plugin_instance__( mng, path ); \
-      return &plugin_instance__; \
-    }
+    FERMA_NEXT_PLUGIN_HOOKS(PluginClass)
 #endif
 
 #endif //PLUGINFRONTEND_H

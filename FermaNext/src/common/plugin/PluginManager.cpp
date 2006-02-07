@@ -91,12 +91,12 @@ void PluginManager::registerPluginLoader ( const QString& pathToLoaderLib )
     throw (RegisterPluginLoaderException)
 {
     DynaLoader* nativeLib = new DynaLoader;
-    PluginLoaderInstanceCall loaderInstanceCall = 0;
+    PluginLoaderInstanceInitCall loaderInstanceInitCall = 0;
     try {
         emit onBeforePluginLoaderRegistration( pathToLoaderLib );
         nativeLib->loadLibrary( pathToLoaderLib );
-        loaderInstanceCall = (PluginLoaderInstanceCall)
-                      nativeLib->getProcAddress( PLUGIN_LOADER_INSTANCE_CALL );
+        loaderInstanceInitCall = (PluginLoaderInstanceInitCall)
+                 nativeLib->getProcAddress( PLUGIN_LOADER_INSTANCE_INIT_CALL );
     }
     catch ( DynaLoader::LibraryLoadException& ) {
         delete nativeLib;
@@ -108,9 +108,14 @@ void PluginManager::registerPluginLoader ( const QString& pathToLoaderLib )
         // TODO: log this exception
         throw RegisterPluginLoaderException();
     }
+    catch ( ... ) {
+        // Unknow loader exception
+        // TODO: log this exception
+        throw RegisterPluginLoaderException();
+    }
 
     LoadingPriority priority;
-    PluginLoader* loader = loaderInstanceCall( *this, &priority );
+    PluginLoader* loader = loaderInstanceInitCall( *this, &priority );
     if ( loader == 0 ) {
         delete nativeLib;
         throw RegisterPluginLoaderException();
@@ -160,6 +165,16 @@ void PluginManager::unregisterPluginLoader ( PluginLoader& loader )
         // Free native lib
         DynaLoader* nativeLib = loadersLibMap[&loader];
         loadersLibMap.remove( &loader );
+        try { 
+            PluginLoaderInstanceFiniCall pluginLoaderInstanceFiniCall =
+                (PluginLoaderInstanceFiniCall) nativeLib->getProcAddress(
+                                            PLUGIN_LOADER_INSTANCE_FINI_CALL );
+            pluginLoaderInstanceFiniCall();
+        }
+        catch ( DynaLoader::AddressException& ) {
+            // TODO: log this exception            
+        }
+
         delete nativeLib;
 
         return;
