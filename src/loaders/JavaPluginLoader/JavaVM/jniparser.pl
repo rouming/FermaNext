@@ -280,7 +280,6 @@ JavaVirtualMachine::JavaVirtualMachine ( const QString& sharedLibName,
 JavaVirtualMachine::~JavaVirtualMachine ()
 {
     destroyJavaVM();
-    dynaLoader.freeLibrary();
 }
 
 bool JavaVirtualMachine::isJVMLoaded () const
