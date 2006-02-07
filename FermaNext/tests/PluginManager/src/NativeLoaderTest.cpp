@@ -18,11 +18,11 @@ protected:
         throw (PluginLoadException)
     {
         DynaLoader* dynaLoader = new DynaLoader;
-        PluginInstanceCall pluginInstanceCall = 0;
+        PluginInstanceInitCall pluginInstanceInitCall = 0;
         try {
             dynaLoader->loadLibrary( pathToPlugin );
-            pluginInstanceCall = (PluginInstanceCall)
-                dynaLoader->getProcAddress( PLUGIN_INSTANCE_CALL );
+            pluginInstanceInitCall = (PluginInstanceInitCall)
+                dynaLoader->getProcAddress( PLUGIN_INSTANCE_INIT_CALL );
         }
         catch ( DynaLoader::LibraryLoadException& ) {
             delete dynaLoader;
@@ -36,7 +36,7 @@ protected:
         }
 
         NativePlugin* plugin = 
-            pluginInstanceCall( PluginManager::instance(), pathToPlugin );
+            pluginInstanceInitCall( PluginManager::instance(), pathToPlugin );
         if ( plugin == 0 ) {
             delete dynaLoader;
             std::cout << "is 0\n";
