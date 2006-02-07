@@ -46,11 +46,11 @@ Plugin& NativePluginLoader::specificLoadPlugin ( const QString& pathToPlugin )
     throw (PluginLoadException)
 {
     DynaLoader* dynaLoader = new DynaLoader;
-    PluginInstanceCall pluginInstanceCall = 0;
+    PluginInstanceInitCall pluginInstanceInitCall = 0;
     try {
         dynaLoader->loadLibrary( pathToPlugin );
-        pluginInstanceCall = (PluginInstanceCall)
-            dynaLoader->getProcAddress( PLUGIN_INSTANCE_CALL );
+        pluginInstanceInitCall = (PluginInstanceInitCall)
+            dynaLoader->getProcAddress( PLUGIN_INSTANCE_INIT_CALL );
     }
     catch ( DynaLoader::LibraryLoadException& ) {
         delete dynaLoader;
@@ -62,9 +62,14 @@ Plugin& NativePluginLoader::specificLoadPlugin ( const QString& pathToPlugin )
         // TODO: log this exception
         throw PluginLoadException();
     }
+    catch ( ... ) {
+        // Unknown plugin exception
+        // TODO: log this exception
+        throw PluginLoadException();
+    }
 
     NativePlugin* plugin = 
-        pluginInstanceCall( PluginManager::instance(), pathToPlugin );
+        pluginInstanceInitCall( PluginManager::instance(), pathToPlugin );
     if ( plugin == 0 ) {
         delete dynaLoader;
         throw PluginLoadException();
@@ -79,11 +84,27 @@ void NativePluginLoader::specificUnloadPlugin ( Plugin& plugin )
         NativePlugin& nativePlg = dynamic_cast<NativePlugin&>( plugin );
         if ( ! pluginMap.contains( &nativePlg ) )
             return;
+
         DynaLoader* dynaLoader = pluginMap[&nativePlg];
         pluginMap.remove( &nativePlg );
+        try { 
+            PluginInstanceFiniCall pluginInstanceFiniCall =
+                (PluginInstanceFiniCall) dynaLoader->getProcAddress(
+                                                   PLUGIN_INSTANCE_FINI_CALL );
+            pluginInstanceFiniCall();
+        }
+        catch ( DynaLoader::AddressException& ) {
+            // TODO: log this exception            
+        }
+
         delete dynaLoader;
-    } 
+    }
     catch ( std::exception& ) {
+        // cast exception
+        //TODO: log this exception
+    }
+    catch ( ... ) {
+        // Unknown plugin exception
         //TODO: log this exception
     }
 }
