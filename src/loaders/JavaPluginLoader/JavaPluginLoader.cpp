@@ -15,22 +15,25 @@ FERMA_NEXT_PLUGIN_LOADER(JavaPluginLoader, PluginManager::NormalPriority)
 /*****************************************************************************/
 
 JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
-    PluginLoader( plgMng )
+    PluginLoader( plgMng ),
+    javaVM(0)
 {
-    QStringList options;
-    options.push_back("-verbose:jni");
-    javaVM = new JavaVirtualMachine(
-            //  "/home/roman/soft/j2sdk1.4.2_10/jre/lib/i386/client/libjvm.so",
+    try { 
+        QStringList options;
+        options.push_back("-verbose:jni");
+        javaVM = new JavaVirtualMachine(
+#if defined _WIN32 || defined WIN32  
               "e:/java1.4.1/jre/bin/client/jvm.dll",
-               JavaVirtualMachine::v1_4,
-               options );
+#else
+              "/home/roman/soft/j2sdk1.4.2_06/jre/lib/i386/client/libjvm.so",
+#endif
+              JavaVirtualMachine::v1_4,
+              options );
+    } catch ( ... ) {}
 }
 
 JavaPluginLoader::~JavaPluginLoader ()
-{
-    // BUG: wrong destruction of a dynamic lib
-    //delete javaVM;
-}
+{ delete javaVM; }
 
 const QString& JavaPluginLoader::pluginExtension () const
 { static QString javaExt("jar"); return javaExt; }
