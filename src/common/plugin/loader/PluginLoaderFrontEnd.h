@@ -5,17 +5,26 @@
 #include "PluginManager.h"
 #include "Global.h"
 
-#define PLUGIN_LOADER_INSTANCE ferma_next_plugin_loader_instance
-#define PLUGIN_LOADER_INSTANCE_CALL "ferma_next_plugin_loader_instance"
+#define PLUGIN_LOADER_INSTANCE_INIT ferma_next_plugin_loader_instance_init
+#define PLUGIN_LOADER_INSTANCE_FINI ferma_next_plugin_loader_instance_fini
+#define PLUGIN_LOADER_INSTANCE_INIT_CALL "ferma_next_plugin_loader_instance_init"
+#define PLUGIN_LOADER_INSTANCE_FINI_CALL "ferma_next_plugin_loader_instance_fini"
 
 /** 
- * Plugin loader signature in native DLL. 
+ * Creates plugin loader instance in native DLL.
  * Loading priority is an output of this call, 
  * i.e. every loader should set this param. 
  * @see PluginLoader
  */
-typedef PluginLoader* ( *PluginLoaderInstanceCall ) (
+typedef PluginLoader* ( *PluginLoaderInstanceInitCall ) (
                              PluginManager&, PluginManager::LoadingPriority* );
+
+/** 
+ * Destroyes plugin loader instance in native DLL.
+ * @see PluginLoader
+ */
+typedef void ( *PluginLoaderInstanceFiniCall ) ();
+
 
 /**
  * Define OS independent macros to export plugin loader instance.
@@ -30,12 +39,19 @@ typedef PluginLoader* ( *PluginLoaderInstanceCall ) (
  * @endcode
  */
 #define FERMA_NEXT_PLUGIN_LOADER(LoaderClass, priority) \
-    PluginExport PluginLoader* PLUGIN_LOADER_INSTANCE ( \
+    static LoaderClass* loader_instance__ = 0; \
+    PluginExport PluginLoader* PLUGIN_LOADER_INSTANCE_INIT ( \
            PluginManager& mng, PluginManager::LoadingPriority* priorityOut ) \
     { \
       *priorityOut = priority; \
-      static LoaderClass loader_instance__( mng ); \
-      return &loader_instance__; \
+      loader_instance__ = new LoaderClass( mng ); \
+      return loader_instance__; \
+    } \
+    \
+    PluginExport void PLUGIN_LOADER_INSTANCE_FINI () \
+    { \
+      delete loader_instance__; \
+      loader_instance__ = 0; \
     }
 
 #endif //PLUGINLOADERFRONTEND_H

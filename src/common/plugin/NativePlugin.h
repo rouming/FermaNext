@@ -8,12 +8,16 @@
 class PluginManager;
 class NativePlugin;
 
-#define PLUGIN_INSTANCE ferma_next_plugin_instance
-#define PLUGIN_INSTANCE_CALL "ferma_next_plugin_instance"
+#define PLUGIN_INSTANCE_INIT ferma_next_plugin_instance_init
+#define PLUGIN_INSTANCE_FINI ferma_next_plugin_instance_fini
+#define PLUGIN_INSTANCE_INIT_CALL "ferma_next_plugin_instance_init"
+#define PLUGIN_INSTANCE_FINI_CALL "ferma_next_plugin_instance_fini"
 
-/** Plugin signature in native DLL. */
-typedef NativePlugin* ( *PluginInstanceCall ) ( PluginManager&, 
-                                                const QString& path );
+/** Creates plugin instance in native DLL. */
+typedef NativePlugin* ( *PluginInstanceInitCall ) ( PluginManager&, 
+                                                    const QString& path );
+/** Destroyes plugin instance in native DLL. */
+typedef void ( *PluginInstanceFiniCall ) ();
 
 /** 
  * Basic native plugin class.
