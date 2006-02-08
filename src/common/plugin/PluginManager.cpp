@@ -92,12 +92,15 @@ void PluginManager::registerPluginLoader ( const QString& pathToLoaderLib )
     throw (RegisterPluginLoaderException)
 {
     DynaLoader* nativeLib = new DynaLoader;
-    PluginLoaderInstanceInitCall loaderInstanceInitCall = 0;
+    LoadingPriority priority;
+    PluginLoader* loader = 0;
     try {
         emit onBeforePluginLoaderRegistration( pathToLoaderLib );
         nativeLib->loadLibrary( pathToLoaderLib );
-        loaderInstanceInitCall = (PluginLoaderInstanceInitCall)
-                 nativeLib->getProcAddress( PLUGIN_LOADER_INSTANCE_INIT_CALL );
+        PluginLoaderInstanceInitCall loaderInstanceInitCall = 
+            (PluginLoaderInstanceInitCall)nativeLib->getProcAddress( 
+                                           PLUGIN_LOADER_INSTANCE_INIT_CALL );
+        loader = loaderInstanceInitCall( *this, &priority );
     }
     catch ( DynaLoader::LibraryLoadException& ) {
         delete nativeLib;
@@ -115,8 +118,6 @@ void PluginManager::registerPluginLoader ( const QString& pathToLoaderLib )
         throw RegisterPluginLoaderException();
     }
 
-    LoadingPriority priority;
-    PluginLoader* loader = loaderInstanceInitCall( *this, &priority );
     if ( loader == 0 ) {
         delete nativeLib;
         throw RegisterPluginLoaderException();

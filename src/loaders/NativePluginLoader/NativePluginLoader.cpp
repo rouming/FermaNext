@@ -46,11 +46,14 @@ Plugin& NativePluginLoader::specificLoadPlugin ( const QString& pathToPlugin )
     throw (PluginLoadException)
 {
     DynaLoader* dynaLoader = new DynaLoader;
-    PluginInstanceInitCall pluginInstanceInitCall = 0;
+    NativePlugin* plugin = 0;
     try {
         dynaLoader->loadLibrary( pathToPlugin );
-        pluginInstanceInitCall = (PluginInstanceInitCall)
-            dynaLoader->getProcAddress( PLUGIN_INSTANCE_INIT_CALL );
+        PluginInstanceInitCall pluginInstanceInitCall = 
+            (PluginInstanceInitCall)dynaLoader->getProcAddress( 
+                                                   PLUGIN_INSTANCE_INIT_CALL );
+        plugin = pluginInstanceInitCall( PluginManager::instance(), 
+                                         pathToPlugin );
     }
     catch ( DynaLoader::LibraryLoadException& ) {
         delete dynaLoader;
@@ -68,8 +71,6 @@ Plugin& NativePluginLoader::specificLoadPlugin ( const QString& pathToPlugin )
         throw PluginLoadException();
     }
 
-    NativePlugin* plugin = 
-        pluginInstanceInitCall( PluginManager::instance(), pathToPlugin );
     if ( plugin == 0 ) {
         delete dynaLoader;
         throw PluginLoadException();
