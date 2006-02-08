@@ -110,28 +110,31 @@ public:
 
     /**
      * Returns loaded plugins.
+     * @param onlyOk, if true returns plugins with 
+     * #Plugin::OkStatus, or returns all otherwise.
      * @return loaded plugins
      */
-    PluginList loadedPlugins () const;
+    PluginList loadedPlugins ( bool onlyOk = true ) const;
 
     /**
      * Returns loaded plugins by specified plugin type.
      * @param type of plugins to be returned
+     * @param onlyOk, if true returns plugins with 
+     * #Plugin::OkStatus, or returns all otherwise.
      * @return loaded plugins of specified type.
      */
-    PluginList loadedPluginsOfType ( const QString& type ) const;
+    PluginList loadedPluginsOfType ( const QString& type,
+                                     bool onlyOk = true ) const;
 
+protected:
     /**
      * Returns plugin loaders in priority order.
+     * @param onlyOk, if true returns loaders with 
+     * #PluginLoader::OkStatus, or returns all otherwise.
      * @return plugin loaders
+     * @see PluginLoader::pluginLoaderStatusCode
      */
-    PluginLoaderList pluginLoaders () const;
-
-    /**
-     * Counts plugin loaders.
-     * @return number of plugin loaders have been registered.
-     */    
-    size_t countPluginLoaders () const;
+    PluginLoaderList pluginLoaders ( bool onlyOk = true ) const;
 
 signals:    
     /** 

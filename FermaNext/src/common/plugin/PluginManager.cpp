@@ -75,7 +75,8 @@ void PluginManager::unregisterPluginLoaders ()
     // Firstly unload all plugins.
     unloadPlugins();
 
-    PluginLoaderList loaders = pluginLoaders();
+    // Unregister all plugins loaders regardless of their status.
+    PluginLoaderList loaders = pluginLoaders( false );
 
     // Notify everyone about amount of loaders
     emit onPluginLoadersUnregistration( loaders.size() );
@@ -139,7 +140,7 @@ void PluginManager::unregisterPluginLoader ( PluginLoader& loader )
         PluginLoaderList* loaders = loaderMapIt.data();
         PluginLoaderListIter it = std::find( loaders->begin(), loaders->end(),
                                              &loader );
-        // Continue loop if nothing has benn found
+        // Continue loop if nothing has been found
         if ( it == loaders->end() )
             continue;
 
@@ -259,7 +260,7 @@ void PluginManager::loadPlugins ( const QString& path )
     PluginPathMap pluginPathMap;
 
     // Get all FermaNext plugins paths in priority order..
-    //
+    // Loaders should be with Ok status
     PluginLoaderList loaders = pluginLoaders();
     PluginLoaderListConstIter loaderIt = loaders.begin();
     for ( ; loaderIt != loaders.end(); ++loaderIt ) {
@@ -303,7 +304,8 @@ void PluginManager::loadPlugins ( const QString& path )
 
 void PluginManager::unloadPlugins ()
 {
-    PluginList loadedPlgs = loadedPlugins();
+    // Unload all plugins regardless of their status
+    PluginList loadedPlgs = loadedPlugins( false );
     emit onPluginsUnload( loadedPlgs.size() );
 
     // Firstly unload all FN plugins
@@ -332,18 +334,22 @@ void PluginManager::unloadPlugin ( Plugin& plg )
     //TODO: DO NOT FORGET DEPENDENCIES
 }
 
-PluginList PluginManager::loadedPlugins () const
+PluginList PluginManager::loadedPlugins ( bool onlyOk ) const
 {
     PluginList pluginList;
     PluginsMapConstIter it = plugins.begin();    
-    for ( ; it != plugins.end(); ++it )
-        pluginList.push_back( it.key() );
+    for ( ; it != plugins.end(); ++it ) {
+        Plugin* plg = it.key();
+        if ( !onlyOk || plg->pluginStatusCode() == Plugin::OkStatus )
+            pluginList.push_back( plg );
+    }
     return pluginList;
 }
 
-PluginList PluginManager::loadedPluginsOfType ( const QString& loadType ) const
+PluginList PluginManager::loadedPluginsOfType ( const QString& plgType,
+                                                bool onlyOk ) const
 {
-    QString type = loadType;
+    QString type = plgType;
     // Escape all dots
     type.replace( ".", "\\." );
     // Add dots to asterics
@@ -352,7 +358,7 @@ PluginList PluginManager::loadedPluginsOfType ( const QString& loadType ) const
     regExp.setCaseSensitive( false );
 
     PluginList pluginsOfType;
-    PluginList plugins = loadedPlugins();
+    PluginList plugins = loadedPlugins( onlyOk );
     PluginListConstIter it = plugins.begin();
     for ( ; it != plugins.end(); ++it ) {
         Plugin* plg = *it;
@@ -363,22 +369,22 @@ PluginList PluginManager::loadedPluginsOfType ( const QString& loadType ) const
     return pluginsOfType;
 }
 
-PluginLoaderList PluginManager::pluginLoaders () const
+PluginLoaderList PluginManager::pluginLoaders ( bool onlyOk ) const
 {
     PluginLoaderList loadersRes;
     PluginLoadersMapConstIter it = loadersMap.begin();
     for ( ; it != loadersMap.end(); ++it ) {
         PluginLoaderList* loaders = it.data();
-        size_t size = loadersRes.size();
-        loadersRes.resize( size + loaders->size() );
-        std::copy( loaders->begin(), loaders->end(), loadersRes.begin() +size );
+        PluginLoaderListConstIter loadersIt = loaders->begin();
+        for ( ; loadersIt != loaders->end(); ++loadersIt ) {
+            PluginLoader* loader = *loadersIt;
+            // Check if onlyOk is set to true, status should be Ok
+            if ( !onlyOk || 
+                 loader->pluginLoaderStatusCode() == PluginLoader::OkStatus )
+                loadersRes.push_back(loader);
+        }
     }    
     return loadersRes;
-}
-
-size_t PluginManager::countPluginLoaders () const
-{
-    return pluginLoaders().size();
 }
 
 /*****************************************************************************/
