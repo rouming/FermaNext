@@ -40,7 +40,8 @@ const int defaultWidth = 250,
           coordLineWidth = 1,
           resizeLimit = 200,
           winCornerRadius = 24,
-          resEllRad = 3;
+          resEllRad = 3,
+          snapPixels = 8;
 
 const bool flipY = true;
 

@@ -129,8 +129,8 @@ signals:
     void onHintHides ( bool smooth );
 
 protected slots:
-    virtual void clearButtonBufRenderedFlag ();
-    virtual void setWindowButtonHinted ();
+    void clearButtonBufRenderedFlag ();
+    void setWindowButtonHinted ();
 
 private:
     // Owner of this window

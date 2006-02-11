@@ -39,7 +39,8 @@ extern const int defaultWidth,
                  coordLineWidth,
                  resizeLimit,
                  winCornerRadius,
-                 resEllRad;
+                 resEllRad,
+                 snapPixels;
 
 extern const bool flipY;
 

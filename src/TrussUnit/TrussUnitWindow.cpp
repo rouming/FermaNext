@@ -60,7 +60,7 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name,
                              SLOT( setWindowButtonHinted() ) );
 
     setCanvasColor( 8, 10, 12 );
-    setHighlighted( false );    
+    setHighlighted( false ); 
 }
 
 /* 
@@ -609,7 +609,7 @@ void TrussUnitWindow::setHighlighted ( bool h )
         setHeadlineLastColor( 150, 90, 80 );
     } else {
         setBorderColor( 40,65,60 );
-        setResEllColor( 50, 50, 50 );
+        setResEllColor( 90, 90, 90 );
         setHeadlineFirstColor( 180, 130, 150 );
         setHeadlineMiddleColor( 230, 210, 200 );
         setHeadlineLastColor( 150, 90, 110 );        
@@ -1170,7 +1170,16 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
             QPoint borderLeftTop( 0, -1 );
             QPoint borderRightBottom( windowSize.width(), 
                                    windowSize.height() );
+            QPoint shadowLeftTop( borderLeftTop.x() + 1, borderLeftTop.y() + 1 );
 
+            color_type shadowColor = agg::rgba( 0, 0, 0 );
+            if ( isHighlighted() )
+                shadowColor = agg::rgba( 120, 0, 0 );
+
+            drawOutlineRoundedRect( solidRend, ras, sl,
+                                    shadowLeftTop, borderRightBottom, 
+                                    shadowColor, borderColor,
+                                    winCornerRadius, 1 );
             drawOutlineRoundedRect( solidRend, ras, sl,
                                     borderLeftTop, borderRightBottom, 
                                     agg::rgba( 1, 1, 1, 0.6 ), borderColor,
@@ -1180,10 +1189,29 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         /*------draw window canvas------*/
         QPoint canvasLeftTop( bordWidth, bordWidth + headWidth );
         QPoint canvasRightBottom( windowSize.width() - bordWidth, 
-                                  windowSize.height() - coordBuf->height() - 4 );
+                                  windowSize.height() - coordBuf->height() - 5 );
 
-        agg::rounded_rect canvas ( canvasLeftTop.x(), 
+        color_type shadowColor = agg::rgba( 0, 0, 0, 0.2 );
+        if ( isHighlighted() )
+            shadowColor = agg::rgba( 120, 0, 0, 0.3 );
+        agg::rounded_rect shadow ( canvasLeftTop.x(), 
                                    canvasLeftTop.y(), 
+                                   canvasRightBottom.x(), 
+                                   canvasRightBottom.y(), 
+                                   winCornerRadius / 3 );
+        ras.add_path ( shadow );
+        solidRend.color ( shadowColor );
+        agg::render_scanlines ( ras, sl, solidRend );
+
+        QPoint lineLeftPnt( canvasLeftTop.x() + winCornerRadius / 3, 
+                            canvasRightBottom.y() + 1 ),
+               lineRightPnt( canvasRightBottom.x() - winCornerRadius / 3, 
+                             canvasRightBottom.y() + 1 );
+        drawLine( ras, solidRend, sl, lineLeftPnt, lineRightPnt, 
+                  1, agg::rgba( 1, 1, 1, 0.7 ) );
+
+        agg::rounded_rect canvas ( canvasLeftTop.x() + 1, 
+                                   canvasLeftTop.y() + 1, 
                                    canvasRightBottom.x(), 
                                    canvasRightBottom.y(), 
                                    winCornerRadius / 3 );
