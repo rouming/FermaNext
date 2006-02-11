@@ -15,6 +15,8 @@
 
 class AggPopupHint;
 
+/*****************************************************************************/
+
 class FixationPopupMenu : public QPopupMenu
 {
     Q_OBJECT
@@ -34,6 +36,8 @@ private:
     QMouseEvent releaseEvent;
     TrussNode* node;
 };
+
+/*****************************************************************************/
 
 class LoadPopupMenu : public QPopupMenu
 {
@@ -165,7 +169,6 @@ private:
     enum DesignerBehaviour { onSelect = 0, onNodeDraw, 
                              onPivotFirstNodeDraw, onPivotLastNodeDraw, 
                              onFixDraw, onLoadDraw, onErase };
-
     // Windows to show
     WindowList trussWindows;
     // Node fixation popup menu
@@ -192,8 +195,8 @@ private:
     DesignerBehaviour designerBehaviour;
     // Subsidiary vars
     bool buttonPressed;
-    int clickX, clickY;
-    QPoint firstNodeClickDist, lastNodeClickDist;
+    int xPos, yPos;
+    QPoint firstNodeClickDist, lastNodeClickDist, mouseOffset;
     // Undo/Redo
     DoublePoint beforeDragNodePos;
     DoublePoint beforeDragFirstPos, beforeDragLastPos;

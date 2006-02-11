@@ -23,8 +23,8 @@ public:
     virtual void paint ( base_renderer& baseRenderer ) const;
 
 protected slots:
-    virtual void show ( const QString&, const QPoint, bool );
-    virtual void hide ( bool );
+    void show ( const QString&, const QPoint, bool );
+    void hide ( bool );
 
 protected:
     virtual void renewHintGeometry ();
