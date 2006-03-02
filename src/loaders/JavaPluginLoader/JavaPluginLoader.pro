@@ -1,5 +1,6 @@
 
-TARGET = ../../../plugins/loaders/JavaPluginLoader.ldr
+TARGET = JavaPluginLoader.ldr
+DESTDIR = ../../../plugins/loaders/
 
 TEMPLATE = lib
 CONFIG += plugin warn_on thread debug
