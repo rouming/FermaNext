@@ -1,5 +1,6 @@
 
-TARGET = ../../../plugins/loaders/NativePluginLoader.ldr
+TARGET = NativePluginLoader.ldr
+DESTDIR = ../../../plugins/loaders/
 
 TEMPLATE = lib
 CONFIG += plugin warn_on thread debug
