@@ -39,7 +39,6 @@ void UndoRedoListBox::setStateManager ( ObjectStateManager* newMng )
     setSelected( stateManager->currentPos(), true );
     setBottomItem( stateManager->currentPos() );
 }
-
 void UndoRedoListBox::clickOnItem ( QListBoxItem* item )
 {
     int itemIndx = index( item );

@@ -4,6 +4,7 @@
 #include "ProjectToolBox.h"
 #include "SubsidiaryConstants.h"
 #include "UndoRedoListBox.h"
+#include "TrussGeometryWindow.h"
 
 #include <qapplication.h>
 #include <qpopupmenu.h>
@@ -43,6 +44,7 @@ FermaNextMainFrame::FermaNextMainFrame ( QWidget* p, const char* n,
     // Initial toolbar setup
     setupFileActions();
     setupEditActions();
+    setupViewActions ();
     setupProjectActions();
     setupWindowActions();
     setupPluginActions();
@@ -83,7 +85,12 @@ void FermaNextMainFrame::init ()
     QVBoxLayout* vboxHistoryWidget = new QVBoxLayout( undoRedoHistoryWidget );
     undoRedoListBox = new UndoRedoListBox( undoRedoHistoryWidget );
     vboxHistoryWidget->addWidget( undoRedoListBox );
+    undoRedoHistoryWidget->installEventFilter( this );
 
+    geometryWindow = new TrussGeometryWindow( this, "truss_geometry",
+                                              WStyle_Tool | WType_TopLevel );
+    geometryWindow->move( QApplication::desktop()->width() - 265, 310 );
+    
     projectsDockWindow = new QDockWindow( QDockWindow::InDock, this );
     projectsDockWindow->setResizeEnabled( TRUE );
     projectsDockWindow->setVerticalStretchable( TRUE );
@@ -127,6 +134,7 @@ void FermaNextMainFrame::someProjectCreated ( FermaNextProject& prj )
         0 < FermaNextWorkspace::workspace().countProjects() ) {
         projectsDockWindow->show();
         undoRedoHistoryWidget->show();
+        geometryWindow->show();
     }
 
     TrussUnitDesignerWidget& designerWidget = 
@@ -149,6 +157,9 @@ void FermaNextMainFrame::createProject ()
         FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
         FermaNextProject& prj = wsp.createProject( text );
         TrussUnitWindowManager& mng = prj.getTrussUnitWindowManager();
+
+        connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
+                 geometryWindow, SLOT(trussUnitWindowWasCreated(TrussUnitWindow&)) );
 
 //TODO: remove this in future
 /*********** TEMP TRUSS UNIT **************************/
@@ -329,6 +340,33 @@ void FermaNextMainFrame::setupEditActions ()
     tb->addSeparator();
 }
 
+void FermaNextMainFrame::setupViewActions ()
+{
+    QPopupMenu *menu = new QPopupMenu( this );
+    menuBar()->insertItem( tr( "&View" ), menu );
+
+    // Contents
+    showUndoRedoAction = new QAction( tr( "&Show History Window" ), 0, this );
+    showUndoRedoAction->setToggleAction( true );
+    showUndoRedoAction->setOn( true );
+    showUndoRedoAction->setStatusTip( tr( "Show or hide history window" ) );
+    showUndoRedoAction->addTo( menu );
+    connect( showUndoRedoAction, SIGNAL( toggled( bool ) ), 
+             undoRedoHistoryWidget, SLOT( setShown( bool ) ) );
+
+    showGeometryWindowAction = 
+        new QAction( tr( "&Show Truss Geometry Window" ), 0, this );
+    showGeometryWindowAction->setToggleAction( true );
+    showGeometryWindowAction->setOn( true );
+    showGeometryWindowAction->
+        setStatusTip( tr( "Show or hide truss geometry window" ) );
+    showGeometryWindowAction->addTo( menu );
+    connect( showGeometryWindowAction, SIGNAL( toggled( bool ) ), 
+             geometryWindow, SLOT( setShown( bool ) ) );
+    connect( geometryWindow, SIGNAL(onGeometryWindowClose()), 
+             showGeometryWindowAction, SLOT(toggle()) );
+}
+
 void FermaNextMainFrame::setupProjectActions ()
 {        
 }
@@ -446,6 +484,8 @@ void FermaNextMainFrame::trussWindowLostFocus ( TrussUnitWindow& window )
         mng->disconnect( this );
 
     refreshUndoRedoActions();
+
+    geometryWindow->changeFocusWindow( 0 );
 }
 
 void FermaNextMainFrame::trussWindowReceivedFocus ( TrussUnitWindow& window )
@@ -465,6 +505,22 @@ void FermaNextMainFrame::trussWindowReceivedFocus ( TrussUnitWindow& window )
                   SLOT(refreshUndoRedoActions()) );
     
     refreshUndoRedoActions();
+
+    geometryWindow->changeFocusWindow( &window );
+}
+
+bool FermaNextMainFrame::eventFilter( QObject* obj, QEvent* event )
+{
+    if ( obj == undoRedoHistoryWidget ) {
+        if ( event->type() == QEvent::Close ) {
+            showUndoRedoAction->toggle();
+            return true;
+        }
+        else
+            return false;
+    } else
+        // pass the event on to the parent class
+        return QMainWindow::eventFilter( obj, event );
 }
 
 /*****************************************************************************
