@@ -120,6 +120,8 @@ Node::Node ( double x_, double y_, Fixation fix_, ObjectStateManager* mng ) :
 
 void Node::setFixation ( Node::Fixation fix_ )
 {
+    if ( fix == fix_ )
+        return;
     fix = fix_;
     emit onFixationChange(fix);
 }
@@ -132,7 +134,7 @@ Node::Fixation Node::getFixation () const
 void Node::setPoint ( DoublePoint p )
 {
     pos = p;
-    emit onPositionChange(pos.x(), pos.y());
+    emit onPositionChange( pos.x(), pos.y() );
 }
 
 void Node::setPoint ( double x_, double y_ )

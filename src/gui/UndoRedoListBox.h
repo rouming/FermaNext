@@ -16,7 +16,7 @@ public:
     virtual void setStateManager ( ObjectStateManager* );
 
 protected slots:
-    virtual void clickOnItem ( QListBoxItem* ); 
+    virtual void clickOnItem ( QListBoxItem* );
 
 private:
     ObjectStateManager* stateManager;    

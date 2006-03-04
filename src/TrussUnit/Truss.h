@@ -100,7 +100,7 @@ signals:
 
     // Nodes revive/desist signals
     void beforeNodeRevive ( Node& );
-    void afterNodeRevive ( Node& );
+    void afterNodeRevive ( const Node& );
     void beforeNodeDesist ( Node& );
     void afterNodeDesist ( Node& );
 

@@ -57,6 +57,13 @@ extern const double svgGamma,
                     svgExpand;
 
 /************************************
+ * Geometry Window Consts
+ ************************************/
+
+extern const int tableRowHeight;
+extern const double pivotThickLimit;
+
+/************************************
  * Main subs
  ************************************/
 
