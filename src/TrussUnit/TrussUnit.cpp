@@ -89,10 +89,12 @@ TrussUnit::TrussUnit ( const QString& name, ObjectStateManager* mng ) :
     // We should render again when state has been changed
     QObject::connect( this, SIGNAL(onStateChange()), 
                             SLOT(trussUnitStateIsChanged()) );
-    QObject::connect( this, SIGNAL(afterNodeDesist( Node& )),
-                            SLOT(clearFrontNodePointer( Node& )) );
-    QObject::connect( this, SIGNAL(afterPivotDesist( Node&, Node& )),
-                            SLOT(clearFrontPivotPointer( Node&, Node& )) );
+    QObject::connect( this, SIGNAL(afterNodeDesist( const Node& )),
+                            SLOT(clearFrontNodePointer( const Node& )) );
+    QObject::connect( this, SIGNAL(afterPivotDesist( const Node&, 
+                                                     const Node& )),
+                            SLOT(clearFrontPivotPointer( const Node&, 
+                                                         const Node& )) );
 }
 
 TrussUnit::~TrussUnit ()
@@ -1185,7 +1187,7 @@ void TrussUnit::pivotToFront ( TrussPivot& pivot )
     lastFront = &pivot.getLastNode();
 }
 
-void TrussUnit::clearFrontNodePointer ( Node& node )
+void TrussUnit::clearFrontNodePointer ( const Node& node )
 {
     if ( &node == frontNode )
         frontNode = 0;
@@ -1195,7 +1197,7 @@ void TrussUnit::clearFrontNodePointer ( Node& node )
         lastFront = 0;
 }
 
-void TrussUnit::clearFrontPivotPointer ( Node& first, Node& last )
+void TrussUnit::clearFrontPivotPointer ( const Node& first, const Node& last )
 {
     if ( &first == firstFront &&
          &last == lastFront )

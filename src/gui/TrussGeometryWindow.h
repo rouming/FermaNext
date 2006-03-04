@@ -174,7 +174,7 @@ protected slots:
     virtual void addPivotToTable ( const Node&, const Node& );
     virtual void setNodeTableRowVisible ( bool visible );
     // remove node from the respective table
-    virtual void removeNodeFromTable ( Node& );
+    virtual void removeNodeFromTable ( const Node& );
     // update table fields according to new values of node coordinates
     virtual void updateNodeTableCoords ();
     // update table field according to new value of node fixation
