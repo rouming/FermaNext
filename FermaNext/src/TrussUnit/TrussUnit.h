@@ -132,8 +132,8 @@ public slots:
 
 protected slots:
     void trussUnitStateIsChanged ();
-    void clearFrontNodePointer ( Node& node );
-    void clearFrontPivotPointer ( Node& first, Node& last );
+    void clearFrontNodePointer ( const Node& node );
+    void clearFrontPivotPointer ( const Node& first, const Node& last );
 
 signals:
     void onTrussNameChange ( const QString& );

@@ -99,10 +99,10 @@ signals:
     void afterNodeRemoval ();
 
     // Nodes revive/desist signals
-    void beforeNodeRevive ( Node& );
+    void beforeNodeRevive ( const Node& );
     void afterNodeRevive ( const Node& );
-    void beforeNodeDesist ( Node& );
-    void afterNodeDesist ( Node& );
+    void beforeNodeDesist ( const Node& );
+    void afterNodeDesist ( const Node& );
 
     // Pivots create/remove signals
     void beforePivotCreation ();
@@ -111,10 +111,10 @@ signals:
     void afterPivotRemoval ();
 
     // Pivots revive/desist signals
-    void beforePivotRevive ( Node&, Node& );
-    void afterPivotRevive ( Node&, Node& );
-    void beforePivotDesist ( Node&, Node& );
-    void afterPivotDesist ( Node&, Node& );
+    void beforePivotRevive ( const Node&, const Node& );
+    void afterPivotRevive ( const Node&, const Node& );
+    void beforePivotDesist ( const Node&, const Node& );
+    void afterPivotDesist ( const Node&, const Node& );
 
     // Topologies create/remove signals
     void beforeTopologyCreation ();
@@ -123,10 +123,10 @@ signals:
     void afterTopologyRemoval ();
 
     // Topologies revive/desist signals
-    void beforeTopologyRevive ( TrussTopology& );
-    void afterTopologyRevive ( TrussTopology& );
-    void beforeTopologyDesist ( TrussTopology& );
-    void afterTopologyDesist ( TrussTopology& );
+    void beforeTopologyRevive ( const TrussTopology& );
+    void afterTopologyRevive ( const TrussTopology& );
+    void beforeTopologyDesist ( const TrussTopology& );
+    void afterTopologyDesist ( const TrussTopology& );
 };
 
 /*****************************************************************************

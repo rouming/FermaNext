@@ -180,7 +180,7 @@ Node::Fixation FixationItem::getFixation () const
 
 QWidget* FixationItem::createEditor() const
 {
-    ((FixationItem*)this)->fixCheckBox = 
+    const_cast<FixationItem*>(this)->fixCheckBox = 
         new DoubleCheckBox( "X", "Y", table()->viewport() );
     fixCheckBox->setFirstChecked( xChecked );
     fixCheckBox->setSecondChecked( yChecked );
@@ -376,11 +376,13 @@ ComboItem::ComboItem( QTable* table, int currentNumb ) :
 
 QWidget* ComboItem::createEditor() const
 {
-    ( (ComboItem*)this )->comboBox = new QComboBox( table()->viewport() );
+    const_cast<ComboItem*>(this)->comboBox = 
+        new QComboBox( table()->viewport() );
     QObject::connect( comboBox, SIGNAL( activated( int ) ), 
                       table(), SLOT( doValueChanged() ) );
     try {
-        uint nodesNumb =  dynamic_cast<PivotsTable*>(table())->getNodesNumber();
+        uint nodesNumb = 
+            dynamic_cast<PivotsTable*>(table())->getNodesNumber();
         for ( uint i = 0; i < nodesNumb; ++i )
             comboBox->insertItem( QString::number(i + 1) );
         comboBox->setCurrentItem( currentValue - 1 );
@@ -393,7 +395,7 @@ void ComboItem::setContentFromEditor( QWidget *w )
     // the user changed the value of the combobox, so synchronize the
     // value of the item (its text), with the value of the combobox
     if ( w->inherits( "QComboBox" ) )
-	    setText( ( (QComboBox*)w )->currentText() );
+	    setText( dynamic_cast<QComboBox*>(w)->currentText() );
     else
 	    QTableItem::setContentFromEditor( w );
 }
@@ -442,8 +444,8 @@ void PivotsTable::addPivot ( const TrussPivot& pivot )
     setRowHeight( row, tableRowHeight );
     Node& first = pivot.getFirstNode();
     Node& last = pivot.getLastNode();
-	setItem( row, 0, new ComboItem(this, first.getNumber()) );
-	setItem( row, 1, new ComboItem(this, last.getNumber()) );
+    setItem( row, 0, new ComboItem(this, first.getNumber()) );
+    setItem( row, 1, new ComboItem(this, last.getNumber()) );
     setThickness( row, numCols() - 1, pivot.getThickness() );
 }
 
@@ -662,8 +664,8 @@ void TrussGeometryWindow::trussUnitWindowWasCreated ( TrussUnitWindow& window )
     connect( &window, SIGNAL(afterNodeRevive(const Node&)),
                       SLOT(addNodeToTable(const Node&)) );
                     
-    connect( &window, SIGNAL(beforeNodeDesist(Node&)),
-                      SLOT(removeNodeFromTable(Node&)) );
+    connect( &window, SIGNAL(beforeNodeDesist(const Node&)),
+                      SLOT(removeNodeFromTable(const Node&)) );
 
     connect( &window, SIGNAL(onAreaChange(const DoubleSize&)),
              nodesTable, SLOT(updateTrussAreaSize(const DoubleSize&)) );
@@ -671,11 +673,11 @@ void TrussGeometryWindow::trussUnitWindowWasCreated ( TrussUnitWindow& window )
     connect( &window, SIGNAL(afterPivotCreation(const Node&, const Node&)),
                       SLOT(addPivotToTable(const Node&, const Node&)) );
 /*
-    connect( &window, SIGNAL(afterPivotRevive(Node&, Node&)),
-                      SLOT(addPivotToTable(Node&, Node&)) );
+    connect( &window, SIGNAL(afterPivotRevive(const Node&, const Node&)),
+                      SLOT(addPivotToTable(const Node&, const Node&)) );
                     
-    connect( &window, SIGNAL(beforePivotDesist(Node&, Node&)),
-                      SLOT(removePivotFromTable(Node&, Node&)) ); */
+    connect( &window, SIGNAL(beforePivotDesist(const Node&, const Node&)),
+                      SLOT(removePivotFromTable(const Node&, const Node&)) ); */
 
     changeFocusWindow( &window );
 }
@@ -773,7 +775,7 @@ void TrussGeometryWindow::setNodeTableRowVisible ( bool visible )
     catch ( ... ) { return; }
 }
 
-void TrussGeometryWindow::removeNodeFromTable ( Node& node )
+void TrussGeometryWindow::removeNodeFromTable ( const Node& node )
 {
     if ( sender() != focusWindow )
         return;
