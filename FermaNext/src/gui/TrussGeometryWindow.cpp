@@ -312,7 +312,7 @@ int NodesTable::getFixedNodesNumber () const
 {
     int fixedNumb = 0;
     FixationItem* item = 0;
-    for ( uint i = 0; i < numRows(); ++i ) {
+    for ( int i = 0; i < numRows(); ++i ) {
         item = getFixationItem( i, numCols() - 1 );
         if ( item && item->getFixation() != Node::Unfixed )
             ++fixedNumb;
@@ -650,7 +650,7 @@ void TrussGeometryWindow::fillPivotsTable ()
                               QString::number(pivotList.size()) );
 }
 
-void TrussGeometryWindow::closeEvent ( QCloseEvent *event )
+void TrussGeometryWindow::closeEvent ( QCloseEvent* )
 {
     emit onGeometryWindowClose();
 }
@@ -765,8 +765,9 @@ void TrussGeometryWindow::setNodeTableRowVisible ( bool visible )
             nodesTable->hideRow( row );
             nodesNumbLabel->setText( "Total nodes: " + 
                 QString::number(focusWindow->getNodeList().size() - 1) );
+            /*
             QHeader* horHeader = nodesTable->horizontalHeader();
-            /*nodesTable->setMaximumHeight( ( nodesTable->numRows() - 1 ) * 
+            nodesTable->setMaximumHeight( ( nodesTable->numRows() - 1 ) * 
                                          tableRowHeight + 
                                          horHeader->height() + 
                                          nodesTable->lineWidth() * 2 );*/
