@@ -5,27 +5,27 @@
 #include "SubsidiaryConstants.h"
 #include "UndoRedoListBox.h"
 
-#include <qapplication.h>
-#include <qpopupmenu.h>
-#include <qmenubar.h>
-#include <qaccel.h>
-#include <qtoolbox.h>
-#include <qpainter.h>
-#include <qwidgetstack.h>
-#include <qstylefactory.h>
-#include <qaction.h>
-#include <qsignalmapper.h>
-#include <qdict.h>
-#include <qdir.h>
-#include <qtextcodec.h>
-#include <qbuttongroup.h>
-#include <qtoolbutton.h>
-#include <qstatusbar.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qinputdialog.h> 
-#include <qmessagebox.h>
-#include <qfiledialog.h>
+#include <QApplication>
+#include <QMenu>
+#include <QMenuBar>
+#include <QAccel>
+#include <QToolBox>
+#include <QPainter>
+#include <QWidgetStack>
+#include <QStyleFactory>
+#include <QAction>
+#include <QSignalMapper>
+#include <QDict>
+#include <QDir>
+#include <QTextCodec>
+#include <QButtonGroup>
+#include <QToolButton>
+#include <QStatusBar>
+#include <QLabel>
+#include <QPushButton>
+#include <QInputDialog> 
+#include <QMessageBox>
+#include <QFileDialog>
 
 const QString mainFrameCaption( QObject::tr( "Educational CAD System 'Ferma'" ) );
 

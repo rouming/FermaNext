@@ -1,14 +1,14 @@
 
+#include <stdlib.h>
+#include <QMessagebox>
+#include <QFile>
+
 #include "PluginLoaderFrontEnd.h"
 #include "JavaPluginLoader.h"
 #include "PluginManager.h"
 #include "Plugin.h"
 
 #include "JavaVM/JavaVirtualMachine.h"
-
-#include <qmessagebox.h>
-#include <qfile.h>
-#include <stdlib.h>
 
 /*****************************************************************************
  * Plugin Loader hook

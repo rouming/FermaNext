@@ -1,9 +1,9 @@
 
 #include "SubsidiaryConstants.h"
-#include <qapplication.h>
-#include <qfile.h>
-#include <qdir.h>
-#include <qregexp.h>
+#include <QApplication>
+#include <QFile>
+#include <QDir>
+#include <QRegExp>
 
 /************************************
  * Main Consts 
@@ -61,7 +61,7 @@ const double svgGamma = 1.0,
  * Main subs
  ************************************/
 
-char pathSeparator ()
+QChar pathSeparator ()
 { return QDir::separator(); }
 
 QString imagesPath () 
@@ -116,10 +116,10 @@ QString filePathToRelative ( const QString& fname, const QString& dir )
 
     if ( windowsDiskExp.exactMatch( path ) || 
          windowsDiskExp.exactMatch( basePath ) ) {
-        windowsDiskExp.search( path );
+        windowsDiskExp.indexIn( path );
         QString pathDisk = windowsDiskExp.cap(1);
 
-        windowsDiskExp.search( basePath );
+        windowsDiskExp.indexIn( basePath );
         QString basePathDisk = windowsDiskExp.cap(1);
 
         if ( pathDisk != basePathDisk )
@@ -136,8 +136,8 @@ QString filePathToRelative ( const QString& fname, const QString& dir )
     int pos1 = 0;
     
     for ( ;; ) {
-        pos = path.find( "/" );
-        pos1 = basePath.find( "/" );
+        pos = path.indexOf( "/" );
+        pos1 = basePath.indexOf( "/" );
         if ( pos < 0 || pos1 < 0 ) 
             break;
         if ( path.left( pos+1 ) == basePath.left( pos1+1 ) ) {
@@ -151,7 +151,7 @@ QString filePathToRelative ( const QString& fname, const QString& dir )
     if ( basePath == "/" ) 
         basePath = "";
 
-    int level = basePath.contains( "/" );
+    int level = basePath.count( "/" );
 
     for ( int i=0; i<level; i++ )
         path = "../" + path;
@@ -172,20 +172,20 @@ QString filePathToAbsolute ( const QString& fname, const QString& dir )
 
     if ( windowsDiskExp.exactMatch( cutname ) &&
          windowsDiskExp.exactMatch( cutdir ) ) {
-        windowsDiskExp.search( cutname );
+        windowsDiskExp.indexIn( cutname );
         QString cutnameDisk = windowsDiskExp.cap(1);
 
-        windowsDiskExp.search( cutdir );
+        windowsDiskExp.indexIn( cutdir );
         QString cutdirDisk = windowsDiskExp.cap(1);
 
         if ( cutnameDisk != cutdirDisk )
             return cutname;
     }
 
-    while ( (pos = cutname.find("../")) >=0 ) {
+    while ( (pos = cutname.indexOf("../")) >=0 ) {
         cutname.remove( 0, pos+3 );
         cutdir.remove( cutdir.length()-1, 1 );
-        cutdir.remove( cutdir.findRev('/')+1 , 1000);
+        cutdir.remove( cutdir.lastIndexOf('/')+1 , 1000);
     }
     if ( cutdir.right(1) != "/" )
         cutdir.append('/');

@@ -4,8 +4,11 @@
 
 #include <vector>
 #include <algorithm>
-#include <qobject.h>
-#include <qmap.h>
+
+#include <QObject>
+#include <QMap>
+#include <QPoint>
+#include <QSize>
 
 #include "Geometry.h"
 #include "StatefulObject.h"
@@ -390,8 +393,8 @@ public:
             typename LoadCase::TrussLoadMap::Iterator iter = loads.begin();
             for ( ; iter != loads.end(); ++iter )
                 topologyLoadCase.addLoad( *nodesMap[iter.key()], 
-                                          iter.data()->getXForce(),
-                                          iter.data()->getYForce() );
+                                          iter.value()->getXForce(),
+                                          iter.value()->getYForce() );
         }
 
         topology->setMaterial( getMaterial()  );

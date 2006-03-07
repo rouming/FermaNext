@@ -11,7 +11,7 @@ class TrussPivot;
 
 /*****************************************************************************/
 
-typedef QValueList<DoublePoint> DoublePointArray;
+typedef QList<DoublePoint> DoublePointArray;
 
 /*****************************************************************************/
 

@@ -2,7 +2,7 @@
 #ifndef SUBSIDIARYCONSTANTS_H
 #define SUBSIDIARYCONSTANTS_H
 
-#include <qstring.h>
+#include <QString>
 
 /************************************
  * Main Consts 
@@ -60,7 +60,7 @@ extern const double svgGamma,
  * Main subs
  ************************************/
 
-char pathSeparator ();
+QChar pathSeparator ();
 
 QString imagesPath ();
 QString imagesSvgPath ();

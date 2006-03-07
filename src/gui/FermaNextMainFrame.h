@@ -2,7 +2,7 @@
 #ifndef FERMANEXTFRAME_H
 #define FERMANEXTFRAME_H
 
-#include <qmainwindow.h>
+#include <QMainWindow>
 
 class QAction;
 class ProjectToolBox;

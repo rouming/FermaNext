@@ -2,11 +2,12 @@
 #ifndef AGGPOPUPHINT_H
 #define AGGPOPUPHINT_H
 
+#include <QObject>
+#include <QPoint>
+#include <QSize>
+#include <QString>
+
 #include "AggSubsidiary.h"
-#include "qobject.h"
-#include "qpoint.h"
-#include "qsize.h"
-#include "qstring.h"
 
 class QWidget;
 class AggPaintThread;

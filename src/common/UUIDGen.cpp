@@ -8,7 +8,7 @@
 
 #include "UUIDGen.h"
 #include <time.h>
-#include <qmutex.h>
+#include <QMutex>
 
 /*****************************************************************************
  * UUIDGen
@@ -43,20 +43,20 @@ QString UUIDGen::uuid ()
 
 bool UUIDGen::isValidUUID ( const QString& uuid )
 {
-    return uuidValidator.search(uuid) == 0;
+    return uuidValidator.indexIn(uuid) == 0;
 }
 
 QString UUIDGen::generateUUID () const
 {
     // Generate 128-bit random number
-    QByteArray uuid(16);
+    QByteArray uuid(16, '\0');
     nextRandomBytes(uuid);
         
     // Set various bits such as type
-    uuid[INDEX_TYPE] &= (char) 0x0F;
-    uuid[INDEX_TYPE] |= (char) (TYPE_RANDOM_BASED << 4);
-    uuid[INDEX_VARIATION] &= (char) 0x3F;
-    uuid[INDEX_VARIATION] |= (char) 0x80;
+    uuid[INDEX_TYPE] = uuid[INDEX_TYPE] & (char)0x0F;
+    uuid[INDEX_TYPE] = uuid[INDEX_TYPE] | (char)(TYPE_RANDOM_BASED << 4);
+    uuid[INDEX_VARIATION] = uuid[INDEX_VARIATION] & (char)0x3F;
+    uuid[INDEX_VARIATION] = uuid[INDEX_VARIATION] | (char)0x80;
         
     // Convert byte array into a UUID formated string
     QString b;

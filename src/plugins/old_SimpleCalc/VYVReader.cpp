@@ -1,11 +1,13 @@
 
+#include <cmath>
+#include <QFile>
+#include <QString>
+#include <QStringList>
+#include <QTextCodec>
+#include <QTextStream>
+
 #include "VYVReader.h"
 #include "TrussCalcData.h"
-#include <qfile.h>
-#include <cmath>
-#include <qstring.h>
-#include <qtextstream.h>
-#include <qstringlist.h>
 
 /*****************************************************************************
  * VYV Reader
@@ -22,42 +24,42 @@ bool VYVReader::write ( const QString& fileName ) const
     int i;
     int j;
 
-    if ( ! OutFile.open(IO_WriteOnly) )
+    if ( ! OutFile.open(QIODevice::WriteOnly) )
         return false;
 
     Message = "Чтение из файла : " + fileName + "\n";
-    OutFile.writeBlock(Message, Message.length());
+    OutFile.write(Message.toAscii().data(), Message.length());
     Message = "Ферменная конструкция состоит из : " + 
         QString::number(Data.nodesNum) + " Узлов и " + 
         QString::number(Data.pivotsNum) + " Стержней\n\n";
-    OutFile.writeBlock(Message, Message.length());
+    OutFile.write(Message.toAscii().data(), Message.length());
     Message = "Количество случаев нагружения : " + 
         QString::number(Data.loadsNum) + "\n\n";
-    OutFile.writeBlock(Message, Message.length());
+    OutFile.write(Message.toAscii().data(), Message.length());
     Message = "Допускаемое Напряжение \n" + 
         QString::number(Data.stressLimit,'e',3) + "\n\n";
-    OutFile.writeBlock(Message, Message.length());
+    OutFile.write(Message.toAscii().data(), Message.length());
     Message = "Топология стержней : \n";
-    OutFile.writeBlock(Message, Message.length());
+    OutFile.write(Message.toAscii().data(), Message.length());
     for (i=0;i<Data.pivotsNum;i++) {
         Message = QString::number(i+1) + " Стержень : " + 
             QString::number(Data.pivotsFirstNodes[i]) + " " +
             QString::number(Data.pivotsLastNodes[i]) + "\n";
-        OutFile.writeBlock(Message, Message.length());
+        OutFile.write(Message.toAscii().data(), Message.length());
     }
     Message = "\nКоординаты Узлов : \n";
-    OutFile.writeBlock(Message, Message.length());
+    OutFile.write(Message.toAscii().data(), Message.length());
     for (i = 0; i < Data.nodesNum; i++) {
         Message = QString::number(i+1) + " Узел : [" + 
             QString::number(Data.x[i],'e',3) + "," + 
             QString::number(Data.y[i],'e',3) + "] \n";
-        OutFile.writeBlock(Message, Message.length());
+        OutFile.write(Message.toAscii().data(), Message.length());
     }
     Message = "\nПеремещения узлов :\n";
-    OutFile.writeBlock(Message, Message.length());
+    OutFile.write(Message.toAscii().data(), Message.length());
     for (i = 0; i < Data.loadsNum; i++) {
         Message = "Случай нагружения " + QString::number(i+1) + "\n";
-        OutFile.writeBlock(Message, Message.length());
+        OutFile.write(Message.toAscii().data(), Message.length());
         for (j = 0; j < Data.nodesNum; j++) {
             Message = 
                 QString::number( j+1) + "Узел : [" + 
@@ -65,52 +67,52 @@ bool VYVReader::write ( const QString& fileName ) const
                 " , " +    
                 QString::number(Data.yTrans[Data.nodesNum*i+j],'e',3) + 
                 "] \n";
-            OutFile.writeBlock(Message, Message.length());
+            OutFile.write(Message.toAscii().data(), Message.length());
         }
     }
     Message = "\nНапряжения в стержнях \n";
-    OutFile.writeBlock(Message, Message.length());
+    OutFile.write(Message.toAscii().data(), Message.length());
     for (i = 0; i < Data.loadsNum; i++) {
         Message = "Случай нагружения " + QString::number(i+1) + "\n";
-        OutFile.writeBlock(Message, Message.length());
+        OutFile.write(Message.toAscii().data(), Message.length());
         for (j = 0; j < Data.pivotsNum; j++) {
             Message = 
                 QString::number( j+1) + " Стержень : " + 
                 QString::number(Data.stress[Data.pivotsNum*i+j],'e',3) + 
                 "\n";
-            OutFile.writeBlock(Message, Message.length());
+            OutFile.write(Message.toAscii().data(), Message.length());
         }
     }
     Message = "\nЗапас прочности \n";
-    OutFile.writeBlock(Message, Message.length());
+    OutFile.write(Message.toAscii().data(), Message.length());
     for (i = 0; i < Data.loadsNum; i++) {
         Message = "Случай нагружения " + QString::number(i+1) + "\n";
-        OutFile.writeBlock(Message, Message.length());
+        OutFile.write(Message.toAscii().data(), Message.length());
         for (j = 0; j < Data.pivotsNum; j++) {
             Message = 
                 QString::number( j+1) + " Стержень : " + 
                 QString::number(Data.safetyFactor[Data.pivotsNum*i+j],'e',3) + "\n";
-            OutFile.writeBlock(Message, Message.length());
+            OutFile.write(Message.toAscii().data(), Message.length());
         }
     }
     Message = "\nНачальные площади\n";
-    OutFile.writeBlock(Message, Message.length());
+    OutFile.write(Message.toAscii().data(), Message.length());
     for (i = 0; i < Data.pivotsNum; i++) {
         Message = QString::number(i+1) + "Стержень : " + 
             QString::number(Data.pivotSquare[i],'e',3) + "\n";
-        OutFile.writeBlock(Message, Message.length());
+        OutFile.write(Message.toAscii().data(), Message.length());
     }
     Message = "\nОбъём = " + QString::number(Data.v) + "\n";
-    OutFile.writeBlock(Message, Message.length());
+    OutFile.write(Message.toAscii().data(), Message.length());
     Message = "\nСиловой вес конструкции = " + 
         QString::number(Data.forceWeight) + "\n";
-    OutFile.writeBlock(Message, Message.length());
+    OutFile.write(Message.toAscii().data(), Message.length());
     Message = "\nДлины Стержней : \n\n";
-    OutFile.writeBlock(Message, Message.length());
+    OutFile.write(Message.toAscii().data(), Message.length());
     for (i = 0; i < Data.pivotsNum; i++) {
         Message = QString::number(i+1) + "Стержень : " + 
             QString::number(Data.pivotLength[i],'e',3) + "\n";
-        OutFile.writeBlock(Message, Message.length());
+        OutFile.write(Message.toAscii().data(), Message.length());
     }
     return true;
 }
@@ -127,11 +129,11 @@ bool VYVReader::read ( const QString& fileName )
     double length;
     double MaxStress;
 
-    if ( ! resFile.open(IO_ReadOnly) )
+    if ( ! resFile.open(QIODevice::ReadOnly) )
         return false;
 
     QTextStream stream( &resFile );
-    stream.setEncoding( QTextStream::Latin1 );
+    stream.setCodec( QTextCodec::codecForName("ISO 8859-1") );
 
     stream.readLine();
     str = stream.readLine();

@@ -8,26 +8,27 @@
 #include <vector>
 #include <string>
 #include <math.h>
-#include <qsize.h>
-#include <qwidget.h>
-#include <qcursor.h>
-#include <qpoint.h>
-#include <qapplication.h>
+#include <QSize>
+#include <QWidget>
+#include <QCursor>
+#include <QPoint>
+#include <QApplication>
 
 /*****************************************************************************
  * Fixation Popup Menu
  *****************************************************************************/
 
-FixationPopupMenu::FixationPopupMenu ( QWidget* parent, const char* name ) :
-    QPopupMenu( parent, name ),
-    releaseEvent( QEvent::MouseButtonRelease, QPoint(0,0), 0, 0 ),
+FixationPopupMenu::FixationPopupMenu ( QWidget* parent ) :
+    QMenu( parent ),
+    releaseEvent( QEvent::MouseButtonRelease, QPoint(0,0), Qt::NoButton, 
+                  Qt::NoButton, Qt::NoModifier ),
     node(0)
 {
-    insertItem( "Fixation by X", this, SLOT(fixNodeByX()) );
-    insertItem( "Fixation by Y", this, SLOT(fixNodeByY()) );
-    insertItem("Fixation by XY", this, SLOT(fixNodeByXY()) );
-    insertSeparator();
-    insertItem( "Unfixed", this, SLOT(unfixNode()) );
+    addAction( "Fixation by X", this, SLOT(fixNodeByX()) );
+    addAction( "Fixation by Y", this, SLOT(fixNodeByY()) );
+    addAction("Fixation by XY", this, SLOT(fixNodeByXY()) );
+    addSeparator();
+    addAction( "Unfixed", this, SLOT(unfixNode()) );
 
     QObject::connect( this, SIGNAL(aboutToHide()), SLOT(popupHide()) );
 }
@@ -36,7 +37,8 @@ void FixationPopupMenu::showFixationPopup ( QMouseEvent* e, TrussNode* n)
 {
     node = n;
     releaseEvent = QMouseEvent( QEvent::MouseButtonRelease,  e->pos(), 
-                                e->globalPos(), e->button(), e->button() );
+                                e->globalPos(), e->button(), e->buttons(),
+                                e->modifiers() );
     popup( e->globalPos() );
 }
 
@@ -80,35 +82,56 @@ void FixationPopupMenu::unfixNode ()
  * Load Popup Menu
 ******************************************************************************/
 
-LoadPopupMenu::LoadPopupMenu ( QWidget* parent, const char* name ) :
-    QPopupMenu( parent, name ),
-    releaseEvent( QEvent::MouseButtonRelease, QPoint(0,0), 0, 0 ),
+LoadPopupMenu::LoadPopupMenu ( QWidget* parent ) :
+    QMenu( parent ),
+    releaseEvent( QEvent::MouseButtonRelease, QPoint(0,0), Qt::NoButton, 
+                  Qt::NoButton, Qt::NoModifier ),
     node(0),
     selectedWindow(0),
-    // boxes
-    vBox( new QVBox(this) ),
-    xHBox( new QHBox(vBox) ),
-    yHBox( new QHBox(vBox) ),
-    buttonHBox( new QHBox(vBox) ),
+    // Init X layout and box
+    xBox( new QWidget(this) ),
+    xLayout( new QHBoxLayout(this) ),
+    // Init Y layout and box
+    yBox( new QWidget(this) ),
+    yLayout( new QHBoxLayout(this) ),
+    // Init Button layout and box
+    buttonBox( new QWidget(this) ),
+    buttonLayout( new QHBoxLayout(this) ),
+    // Init Main layout
+    vLayout( new QVBoxLayout(this) ),
     // buttons
-    ok( new QPushButton(tr("OK"), buttonHBox) ),
-    cancel( new QPushButton(tr("Cancel"), buttonHBox) ),
+    ok( new QPushButton(tr("OK"), buttonBox) ),
+    cancel( new QPushButton(tr("Cancel"), buttonBox) ),
     // labels
-    loadXLabel( new QLabel(tr("Load by X:"), xHBox) ),
-    loadYLabel( new QLabel(tr("Load by Y:"), yHBox) ),
+    loadXLabel( new QLabel(tr("Load by X:"), xBox) ),
+    loadYLabel( new QLabel(tr("Load by Y:"), yBox) ),
     // edits
-    loadXLine( new QLineEdit(xHBox) ),
-    loadYLine( new QLineEdit(yHBox) )
+    loadXLine( new QLineEdit(xBox) ),
+    loadYLine( new QLineEdit(yBox) )
 {
+    // Init X layout and box
+    xLayout->addSpacing(4);
+    xLayout->addWidget(loadXLabel);
+    xLayout->addWidget(loadXLine);
+    xBox->setLayout(xLayout);
+    // Init Y layout and box
+    yLayout->addSpacing(4);
+    yLayout->addWidget(loadYLabel);
+    yLayout->addWidget(loadYLine);
+    yBox->setLayout(yLayout);
+    // Init Button layout and box
+    buttonLayout->setSpacing(4);
+    buttonLayout->addWidget(ok);
+    buttonLayout->addWidget(cancel);
+    // Init Main layout
+    vLayout->addSpacing(4);
+    vLayout->addWidget(xBox);
+    vLayout->addWidget(yBox);
+    vLayout->addWidget(buttonBox);
+    setLayout(vLayout);
+
     loadXLine->setValidator( new QDoubleValidator(loadXLine) );
-    loadYLine->setValidator(new QDoubleValidator(loadYLine) );
-
-    vBox->setSpacing(4);
-    xHBox->setSpacing(4);
-    yHBox->setSpacing(4);
-    buttonHBox->setSpacing(4);
-
-    insertItem(vBox);
+    loadYLine->setValidator( new QDoubleValidator(loadYLine) );
 
     QObject::connect( this, SIGNAL(aboutToHide()), SLOT(hideLoadPopup()) );
     QObject::connect( cancel, SIGNAL(clicked()), SLOT(close()) );
@@ -136,7 +159,8 @@ void LoadPopupMenu::showLoadPopup ( QMouseEvent* e,
     loadXLine->setText( QString::number(x) );
     loadYLine->setText( QString::number(y) );
     releaseEvent = QMouseEvent( QEvent::MouseButtonRelease,  e->pos(), 
-                                e->globalPos(), e->button(), e->button() );
+                                e->globalPos(), e->button(), e->buttons(),
+                                e->modifiers() );
     
     popup( e->globalPos() );
 }

@@ -1,4 +1,9 @@
 
+#include <QString>
+#include <QCursor>
+#include <QMenu>
+#include <QMessageBox>
+
 #include "WindowListBox.h"
 #include "SubsidiaryConstants.h"
 #include "TrussUnitActions.h"
@@ -6,11 +11,6 @@
 #include "TrussCalcData.h"
 #include "CalcDataWidget.h"
 #include "CalculationInterface.h"
-
-#include <qstring.h>
-#include <qcursor.h>
-#include <qpopupmenu.h>
-#include <qmessagebox.h>
 
 /*****************************************************************************
  * Truss Unit Window Item

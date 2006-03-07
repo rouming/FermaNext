@@ -2,7 +2,7 @@
 #ifndef FERMANEXTPROJECT_H
 #define FERMANEXTPROJECT_H
 
-#include <qstring.h>
+#include <QString>
 
 #include "XMLSerializableObject.h"
 #include "TrussUnitDesignerWindow.h"

@@ -1,11 +1,12 @@
 
-#include "ToolBarManager.h"
-
 #include <algorithm>
-#include <qtoolbar.h>
-#include <qpainter.h>
-#include <qstyle.h>
-#include <qlabel.h>
+
+#include <QToolBar>
+#include <QPainter>
+#include <QStyle>
+#include <QLabel>
+
+#include "ToolBarManager.h"
 
 /*****************************************************************************
  * Text Tool Button

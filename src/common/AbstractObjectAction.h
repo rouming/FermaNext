@@ -2,7 +2,7 @@
 #ifndef ABSTRACTOBJECTACTION_H
 #define ABSTRACTOBJECTACTION_H
 
-#include <qobject.h>
+#include <QObject>
 
 /* 
    Action class is used to be saved in Undo/Redo stack.

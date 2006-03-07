@@ -2,9 +2,10 @@
 #ifndef TOOLBARMANAGER_H
 #define TOOLBARMANAGER_H
 
-#include <qtoolbar.h>
-#include <qtoolbutton.h>
-#include <qiconset.h>
+#include <QToolBar>
+#include <QToolButton>
+#include <QIconSet>
+
 #include <vector>
 
 class ToolBarManager;

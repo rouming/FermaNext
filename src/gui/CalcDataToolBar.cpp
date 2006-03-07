@@ -1,9 +1,9 @@
 
+#include <QLabel>
+#include <QIconSet>
+
 #include "CalcDataToolBar.h"
 #include "CalcDataWidget.h"
-
-#include <qlabel.h>
-#include <qiconset.h>
 
 /*****************************************************************************
  * Calculation Data Tool Bar

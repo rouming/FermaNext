@@ -1,7 +1,8 @@
 
+#include <QFileInfo>
+#include <QPainter>
+
 #include "Splash.h"
-#include <qfileinfo.h>
-#include <qpainter.h>
 
 /*****************************************************************************
  * Splash

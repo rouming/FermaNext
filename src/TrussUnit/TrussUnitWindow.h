@@ -5,6 +5,8 @@
 #include "TrussUnit.h"
 #include "TrussUnitWindowButton.h"
 
+#include <QTimer>
+
 class QWidget;
 
 class TrussUnitWindow : public TrussUnit

@@ -7,16 +7,16 @@
 #include "CalcDataWidget.h"
 #include "CalculationInterface.h"
 
-#include <qbuttongroup.h>
-#include <qtoolbutton.h>
-#include <qlabel.h>
-#include <qlistview.h>
-#include <qheader.h>
-#include <qmessagebox.h>
-#include <qiconset.h>
-#include <qfiledialog.h>
-#include <qinputdialog.h>
-#include <qaction.h>
+#include <QButtonGroup>
+#include <QToolButton>
+#include <QLabel>
+#include <QListView>
+#include <QHeader>
+#include <QMessageBox>
+#include <QIconSet>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QAction>
 
 /*****************************************************************************
  * Project ToolBox

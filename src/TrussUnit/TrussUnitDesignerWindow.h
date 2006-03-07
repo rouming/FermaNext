@@ -2,17 +2,20 @@
 #ifndef TRUSSUNITDESIGNERWINDOW_H
 #define TRUSSUNITDESIGNERWINDOW_H
 
-#include <qmainwindow.h>
-#include <qlayout.h>
-#include <qscrollview.h>
+#include <QMainWindow>
+#include <QLayout>
+#include <QScrollArea>
+#include <QScrollArea>
+
 #include "TrussUnitDesignerWidget.h"
 
 class TrussUnitDesignerWindow : public QWidget
 {
     Q_OBJECT
 public:
-    TrussUnitDesignerWindow ( const QString& caption, QWidget* p = 0, 
-                              const char* n = 0, WFlags f =WType_TopLevel );
+    TrussUnitDesignerWindow ( const QString& caption, QWidget* p = 0,
+                              //FIXME QT3TO4: WType_TopLevel
+                              Qt::WFlags f = Qt::Window );
 
     virtual TrussUnitDesignerWidget& getDesignerWidget ();
     
@@ -20,7 +23,7 @@ public:
 
 private:
     QVBoxLayout* vbox;
-    QScrollView* scroll;
+    QScrollArea* scroll;
     TrussUnitDesignerWidget* designerWidget;
 };
 

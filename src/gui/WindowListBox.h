@@ -2,9 +2,10 @@
 #ifndef WINDOWLISTBOX_H
 #define WINDOWLISTBOX_H
 
+#include <QListBox>
+#include <QBitArray>
+
 #include "FermaNextProject.h"
-#include <qlistbox.h>
-#include <qbitarray.h>
 
 class WindowListBox;
 

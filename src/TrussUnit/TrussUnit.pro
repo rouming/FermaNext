@@ -1,6 +1,7 @@
 
 TARGET = TrussUnit
 DESTDIR = ../../build
+QT += core xml
 
 TEMPLATE = lib
 CONFIG += staticlib warn_on thread debug

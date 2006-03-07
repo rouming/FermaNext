@@ -1,7 +1,7 @@
 
 #include "AggPopupHint.h"
 #include "AggPaintThread.h"
-#include "qwidget.h"
+#include <QWidget>
 
 /*****************************************************************************
  * Agg Popup Hint
@@ -19,7 +19,7 @@ AggPopupHint::AggPopupHint ( QWidget& widget ) :
 AggPopupHint::~AggPopupHint ()
 {
     delete buf_;
-    if ( thread_->running() )
+    if ( thread_->isRunning() )
         thread_->wait();
     delete thread_;
 }
@@ -60,7 +60,7 @@ void AggPopupHint::show ( const QString& hintText,
 
 void AggPopupHint::hide ( bool smooth )
 {
-    if ( thread_->running() )
+    if ( thread_->isRunning() )
         thread_->wait();
 
     if ( smooth )
@@ -81,7 +81,7 @@ void AggPopupHint::renewHintGeometry ()
 {
     glyph_gen glyph( font_ );
 
-    int width = (int)glyph.width( text_.ascii() ) + 12,
+    int width = (int)glyph.width( text_.toAscii().data() ) + 12,
         height = (int)glyph.height() + 6;
 
     size_ = QSize( width, height );

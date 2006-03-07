@@ -5,7 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#include <qmutex.h>
+#include <QMutex>
 
 #if defined _WIN32 || defined WIN32
  #include <time.h>

@@ -2,8 +2,9 @@
 #ifndef UNDOREDOLISTBOX_H
 #define UNDOREDOLISTBOX_H
 
+#include <QListBox>
+
 #include "ObjectStateManager.h"
-#include <qlistbox.h>
 
 class UndoRedoListBox : public QListBox
 {

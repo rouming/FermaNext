@@ -13,7 +13,7 @@ AggToolBarButton::AggToolBarButton ( const QString& fname, const QString& l,
     highlightFill( agg::rgba( 0, 0, 0, 0.15 ) ),
     highlightLine( agg::rgba( 0, 0, 0, 0.7 ) )
 {
-    parseSvg( pathRend, fname.local8Bit() );
+    parseSvg( pathRend, fname.toLocal8Bit() );
 }
 
 AggToolBarButton::~AggToolBarButton ()

@@ -1,6 +1,6 @@
 
 #include "AggPaintThread.h"
-#include <qdatetime.h>
+#include <QDateTime>
 
 /*****************************************************************************
  * Agg Paint Thread

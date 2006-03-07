@@ -1,6 +1,7 @@
 
+#include <QFile>
+
 #include "FermaNextConfig.h"
-#include <qfile.h>
 
 /*****************************************************************************
  * Ferma Next Config

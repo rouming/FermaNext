@@ -4,6 +4,7 @@ DESTDIR = ../../build
 
 TEMPLATE = lib
 CONFIG += staticlib warn_on thread debug
+QT += core gui
 
 MOC_DIR = mocs
 OBJECTS_DIR = obj

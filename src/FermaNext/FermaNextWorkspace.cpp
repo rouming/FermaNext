@@ -1,11 +1,11 @@
 
+#include <QWidgetStack>
+#include <QFileInfo>
+#include <QDir>
+
 #include "FermaNextWorkspace.h"
 #include "FermaNextMainFrame.h"
 #include "SubsidiaryConstants.h"
-
-#include <qwidgetstack.h>
-#include <qfileinfo.h>
-#include <qdir.h>
 
 /*****************************************************************************
  * FermaNext Workspace

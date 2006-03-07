@@ -25,7 +25,7 @@ public:
 
     void startCalculation ( const QString& fileName ) const
     {
-        simpleCalc( fileName.ascii() );
+        simpleCalc( fileName.toAscii() );
     }
 
 private:

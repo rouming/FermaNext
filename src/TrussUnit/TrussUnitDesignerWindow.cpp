@@ -6,22 +6,22 @@
  *****************************************************************************/
 
 TrussUnitDesignerWindow::TrussUnitDesignerWindow ( const QString& caption, 
-                                                   QWidget* p, const char* n, 
-                                                   WFlags f ) :
-    QWidget(p, n, f),
+                                                   QWidget* p, Qt::WFlags f ) :
+    QWidget(p, f),
     vbox( new QVBoxLayout(this) ),
-    scroll( new QScrollView(this) )    
+    scroll( new QScrollArea(this) )    
 {   
     vbox->addWidget(scroll);    
-    scroll->setVScrollBarMode( QScrollView::AlwaysOff );
-    scroll->setHScrollBarMode( QScrollView::AlwaysOff );
+    scroll->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+    scroll->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 
     designerWidget = new TrussUnitDesignerWidget(scroll->viewport());
-    scroll->addChild(designerWidget);
-    designerWidget->setAcceptDrops(TRUE);    
+    // FIXME QT3TO4: scroll->addChild(designerWidget);
+    scroll->setWidget(designerWidget);
+    designerWidget->setAcceptDrops(true);
 
     setMinimumSize( 640, 480 );
-    setCaption( caption );
+    setWindowTitle( caption );
 }
 
 TrussUnitDesignerWidget& TrussUnitDesignerWindow::getDesignerWidget ()

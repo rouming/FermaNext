@@ -3,7 +3,7 @@
 #define TRUSSUNITTOOLBAR_H
 
 #include "AggToolBar.h"
-#include "qwidget.h"
+#include <QWidget>
 
 class AggToolBarHideButton : public AggButton
 {

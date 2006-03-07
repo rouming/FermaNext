@@ -3,8 +3,10 @@
 #define AGGQWIDGET_H
 
 #include <vector>
-#include <qwidget.h>
-#include <qimage.h>
+
+#include <QWidget>
+#include <QImage>
+
 #include <agg_basics.h>
 #include <agg_rendering_buffer.h>
 #include <util/agg_color_conv_rgb8.h>

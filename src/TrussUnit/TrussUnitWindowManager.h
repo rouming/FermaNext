@@ -3,9 +3,9 @@
 #define TRUSSUNITWINDOWMANAGER_H
 
 #include <vector>
-#include <qobject.h>
-#include <qfile.h>
-#include <qstring.h>
+#include <QObject>
+#include <QFile>
+#include <QString>
 
 #include "TrussUnitWindow.h"
 

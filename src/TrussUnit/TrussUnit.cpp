@@ -355,7 +355,7 @@ QDomElement TrussUnit::saveToXML ( QDomDocument& doc )
         LoadCase::TrussLoadMap::Iterator loadsIt = loadMap.begin();
         for ( ; loadsIt != loadMap.end(); ++loadsIt ) {
             const TrussNode* node = loadsIt.key();
-            TrussLoad* load = loadsIt.data();
+            TrussLoad* load = loadsIt.value();
             QDomElement loadElem = doc.createElement( "Load" );
             loadElem.setAttribute( "nodeId", node->getUUID() );
             loadElem.setAttribute( "xForce", load->getXForce() );

@@ -1,9 +1,9 @@
 
+#include <QTabWidget>
+#include <QWidgetStack>
+
 #include "FermaNextProject.h"
 #include "SubsidiaryConstants.h"
-
-#include <qtabwidget.h>
-#include <qwidgetstack.h>
 
 /*****************************************************************************
  * FermaNext Project

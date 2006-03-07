@@ -1,5 +1,6 @@
 
-#include <qapplication.h>
+#include <QApplication>
+
 #include "Splash.h"
 #include "SubsidiaryConstants.h"
 #include "FermaNextMainFrame.h"

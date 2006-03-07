@@ -3,9 +3,11 @@
 #define FERMANEXTWORKSPACE_H
 
 #include <vector>
-#include <qobject.h>
-#include <qstring.h>
-#include <qmutex.h> 
+
+#include <QObject>
+#include <QString>
+#include <QMutex> 
+
 #include "XMLSerializableObject.h"
 #include "FermaNextProject.h"
 #include "FermaNextConfig.h"

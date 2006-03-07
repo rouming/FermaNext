@@ -3,7 +3,8 @@ TARGET = common
 DESTDIR = ../../build
 
 TEMPLATE = lib
-CONFIG += staticlib warn_on thread debug
+CONFIG += staticlib warn_on debug
+QT += core xml
 
 MOC_DIR = mocs
 OBJECTS_DIR = obj

@@ -1,8 +1,8 @@
 
 #include "TrussUnitWindow.h"
 #include "TrussUnitActions.h"
-#include <qtimer.h>
-#include <qwidget.h>
+#include <QTimer>
+#include <QWidget>
 
 /*****************************************************************************
  * Truss Unit Window
@@ -680,7 +680,7 @@ void TrussUnitWindow::checkMouseMoveEvent ( int x, int y, bool mousePressed )
         {
             currentHintedButton = hideButton;
             hintCurrentPos = QPoint( x, y );
-            timer->start( 1000, false );
+            timer->start( 1000 );
         }
     }
     else if ( inRollUpButtonRect( x, y ) )
@@ -704,7 +704,7 @@ void TrussUnitWindow::checkMouseMoveEvent ( int x, int y, bool mousePressed )
         {
             currentHintedButton = rollUpButton;
             hintCurrentPos = QPoint( x, y );
-            timer->start( 1000, false );
+            timer->start( 1000 );
         }
     }
     else if ( ! inButtonsRect( x, y ) )
@@ -815,7 +815,7 @@ QString TrussUnitWindow::fitTextToWindowSize ( QString str, int lengthLimit,
     uint i, totalChar = str.length();
     for ( i = 0; i < totalChar; i++ )
     {
-        textLength = (int)glyph.width( str.ascii() ); 
+        textLength = (int)glyph.width( str.toAscii().data() ); 
         if ( textLength <= lengthLimit )
             break;
         else
@@ -990,7 +990,7 @@ void TrussUnitWindow::drawCursorCoordinatesField ( ren_dynarow& baseRend,
         str = QString( "%1" ).arg( cursorCoord.x(),0,'f',2 );
         str.append(" : ");
         drawText ( textRend, str, textColor, textPos );
-        int textLength = (int)glyph.width( str.ascii() ); 
+        int textLength = (int)glyph.width( str.toAscii().data() ); 
         str = QString( "%1" ).arg( cursorCoord.y(),0,'f',2 );  
         textPos.setX ( textPos.x() + textLength );
         drawText ( textRend, str, textColor, textPos );
@@ -1233,8 +1233,9 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         /*------draw window title text and background rounded rectangle------*/
         glyph.font ( headFont );
         int lengthLimit = windowSize.width() / 2 - 20;
-        QString title = fitTextToWindowSize ( getTrussName (), lengthLimit, glyph );
-        int titleLength = (int)glyph.width( title.ascii() );
+        QString title = fitTextToWindowSize ( getTrussName (), lengthLimit, 
+                                              glyph );
+        int titleLength = (int)glyph.width( title.toAscii().data() );
         QPoint titlePos( ( windowSize.width() - 2 * bordWidth - 
                            titleLength ) / 2, 14 );
 

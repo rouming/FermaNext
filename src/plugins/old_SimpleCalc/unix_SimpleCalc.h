@@ -3,9 +3,9 @@
 #define UNIX_SIMPLECALC_H
 
 #include <unistd.h>
-#include <qsocketdevice.h>
-#include <qthread.h>
-#include <qdatetime.h>
+#include <QSocketDevice>
+#include <QThread>
+#include <QDateTime>
 
 class os_dependent_SimpleCalcPlugin : public SimpleCalcPlugin
 {

@@ -2,7 +2,8 @@
 #ifndef SPLASH_H
 #define SPLASH_H
 
-#include <qsplashscreen.h>
+#include <QSplashScreen>
+
 #include "PluginManager.h"
 
 class Splash : public QSplashScreen

@@ -1,6 +1,7 @@
 
 TARGET = old_SimpleCalc.plg
 DESTDIR = ../../../plugins/
+QT += core
 
 TEMPLATE = lib
 CONFIG += plugin warn_on thread debug

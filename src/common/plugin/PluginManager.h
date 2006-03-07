@@ -3,9 +3,9 @@
 #define PLUGINMANAGER_H
 
 #include <vector>
-#include <qmap.h>
-#include <qthread.h>
-#include <qobject.h>
+#include <QMap>
+#include <QThread>
+#include <QObject>
 
 #include "PluginLoader.h"
 
