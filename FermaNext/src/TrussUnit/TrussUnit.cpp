@@ -1526,7 +1526,7 @@ void TrussUnit::paint ( ren_dynarow& baseRend ) const
         if ( numbersDrawing )
             drawTrussElementsNumbers ( baseRend, solidRend, ras, sl );
         
-        setTrussRenderedStatus(true);;
+        setTrussRenderedStatus(true);
     }
 }
 

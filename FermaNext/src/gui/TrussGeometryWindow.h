@@ -95,8 +95,8 @@ public:
     virtual void setCoord ( int row, int col, double coord );
     virtual double getCoord ( int row, int col ) const;
     virtual int getFixedNodesNumber () const;
-    virtual void setFixationItem ( int row, int col, Node::Fixation fix );
-    virtual FixationItem* getFixationItem ( int row, int col ) const;
+    virtual void setFixationItem ( int row, Node::Fixation fix );
+    virtual FixationItem* getFixationItem ( int row ) const;
     virtual void addNode ( const Node& );
     virtual void updateMaximumHeight ();
 
@@ -115,14 +115,18 @@ private:
 class ComboItem : public QTableItem
 {
 public:
-    ComboItem( QTable* table, int currentNumb );
+    ComboItem( QTable* table, int currentNumb, int adjNumb );
+    virtual void setAdjoiningNodeNumber ( int );
     virtual QWidget* createEditor() const;
     virtual void setContentFromEditor( QWidget* );
     virtual void setText( const QString& );
 
+protected:
+    virtual QStringList* getComboArgList () const;
+
 private:
     QComboBox *comboBox;
-    int currentValue;
+    int currentValue, adjNodeValue;
 };
 
 /*****************************************************************************/
@@ -131,9 +135,11 @@ class PivotsTable : public QTable
 {
 public:
     PivotsTable ( QWidget* parent = 0, const char* name = 0  );
-    virtual void setThickness ( int row, int col, double thick );
-    virtual double getThickness ( int row, int col ) const;
-    virtual void setNodesNumber ( int );
+    ComboItem* getComboItem ( int row, int col ) const;
+    virtual void setNodeNumber ( int row, int col, int numb, int adjNumb );
+    virtual void setThickness ( int row, double thick );
+    virtual double getThickness ( int row ) const;
+    virtual void setNodesTotalNumber ( int );
     virtual int getNodesNumber () const;
     virtual void addPivot ( const TrussPivot& );
 
@@ -164,6 +170,7 @@ protected:
     // Undo/Redo
     virtual void saveNodeStateAfterMoving ( TrussNode& node,
                                             const DoublePoint& pos );
+    virtual void updatePivotTableNode ( int col, const TrussPivot& pivot );
     virtual void closeEvent( QCloseEvent* );
 
 protected slots:
@@ -171,8 +178,7 @@ protected slots:
     virtual void trussUnitWindowWasCreated ( TrussUnitWindow& );
     // add new node to the respective table
     virtual void addNodeToTable ( const Node& );
-    virtual void addPivotToTable ( const Node&, const Node& );
-    virtual void setNodeTableRowVisible ( bool visible );
+    virtual void setNodeTableRowVisible ( bool );
     // remove node from the respective table
     virtual void removeNodeFromTable ( const Node& );
     // update table fields according to new values of node coordinates
@@ -182,6 +188,13 @@ protected slots:
     // update node state after table field has been chaged
     virtual void updateNodeState ( int, int );
 
+    virtual void addPivotToTable ( const Node&, const Node& );
+    virtual void removePivotFromTable ( const Node&, const Node& );
+    virtual void setPivotTableRowVisible ( bool );
+    virtual void updatePivotTableFirstNode ();
+    virtual void updatePivotTableLastNode ();
+    virtual void updatePivotTableThickness ();
+    virtual void updatePivotState ( int row, int col );
 signals:
     void onGeometryWindowClose();
 
@@ -193,8 +206,6 @@ private:
     QSpacerItem *nodesSpacer, *pivotsSpacer;
     // Undo/Redo
     DoublePoint beforeMovingNodePos;
-    DoublePoint beforeMovingFirstPos, beforeMovingLastPos;
-
 };
 
 #endif //TRUSSGEOMETRYWINDOW_H

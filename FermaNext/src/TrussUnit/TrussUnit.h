@@ -257,6 +257,7 @@ signals:
     void onVisibleChange ( bool );
     void onHighlightChange ( bool );
     void onEnableChange ( bool );
+    void onDrawingStatusChange ( bool );
 
 public slots:
     void removePivotHighlight ();

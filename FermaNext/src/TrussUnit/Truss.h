@@ -342,6 +342,10 @@ public:
         QObject::connect( pivot, SIGNAL(onThicknessChange(double)),
                                  SLOT(stateIsChanged()) );
 
+        QObject::connect( pivot, SIGNAL(onFirstNodeChange()),
+                                 SLOT(stateIsChanged()) );
+        QObject::connect( pivot, SIGNAL(onLastNodeChange()),
+                                 SLOT(stateIsChanged()) );
         pivots.push_back(pivot);
         emit afterPivotCreation(pivot->getFirstNode(), 
                                 pivot->getLastNode());
@@ -879,6 +883,8 @@ public:
 
 signals:
     void onThicknessChange ( double );
+    void onFirstNodeChange ();
+    void onLastNodeChange ();
 };
 
 /*****************************************************************************
@@ -910,9 +916,11 @@ public:
     virtual N& getLastNode () const
     { return *last; }
     virtual void setFirstNode ( N* first_ )
-    { first = first_; }
+    { first = first_; 
+      emit onFirstNodeChange(); }
     virtual void setLastNode ( N* last_ )
-    { last = last_; }
+    { last = last_;
+      emit onLastNodeChange(); }
     virtual double getThickness () const
     { return thickness; }
     virtual void setThickness ( double t_ )
