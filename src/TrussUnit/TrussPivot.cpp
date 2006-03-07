@@ -66,6 +66,7 @@ bool TrussPivot::getDrawingStatus () const
 void TrussPivot::setDrawingStatus ( bool status )
 {
     drawingStatus = status;
+    emit onDrawingStatusChange( status );
 }
 
 void TrussPivot::setHighlighted ( bool h )
