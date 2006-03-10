@@ -1,13 +1,12 @@
 
 TARGET = common
-DESTDIR = ../../build
+
+LEVEL = ../..
+include(../../FermaNext.pri)
 
 TEMPLATE = lib
-CONFIG += staticlib warn_on debug
+CONFIG += staticlib warn_on
 QT += core xml
-
-MOC_DIR = mocs
-OBJECTS_DIR = obj
 
 win32 {
   DEFINES += WIN32

@@ -1,19 +1,22 @@
 
 TARGET = NativePluginLoader.ldr
+
+LEVEL = ../../..
+include(../../../FermaNext.pri)
+
 DESTDIR = ../../../plugins/loaders/
+QT += core
 
 TEMPLATE = lib
-CONFIG += plugin warn_on thread debug
-
-OBJECTS_DIR = obj
+CONFIG += plugin warn_on thread
 
 DEFINES += QT_THREAD_SUPPORT
 
 win32 {
-  LIBS = -L../../../build common.lib
+  LIBS = common.lib
 }
 unix {
-  LIBS = -L../../../build -lcommon
+  LIBS = -lcommon
 }
 
 INCLUDEPATH = ../../common \

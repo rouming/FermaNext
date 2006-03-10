@@ -1,13 +1,13 @@
 
 TARGET = TrussUnit
-DESTDIR = ../../build
+
+LEVEL = ../..
+include(../../FermaNext.pri)
+
 QT += core xml
 
 TEMPLATE = lib
-CONFIG += staticlib warn_on thread debug
-
-MOC_DIR = mocs
-OBJECTS_DIR = obj
+CONFIG += staticlib warn_on thread
 
 win32 {
   DEFINES += WIN32
