@@ -3,7 +3,8 @@
 #define UNIX_SIMPLECALC_H
 
 #include <unistd.h>
-#include <QSocketDevice>
+#include <QTcpSocket>
+#include <QHostAddress>
 #include <QThread>
 #include <QDateTime>
 
@@ -28,13 +29,14 @@ public:
         calcThread.start();
         // Should wait a little to be sure server is started
         sleep(3);        
-        socket.connect( QHostAddress("127.0.0.1"), 1212 );
+        socket.connectToHost( QHostAddress("127.0.0.1"), 1212 );
+        socket.waitForConnected();
     }
 
     ~os_dependent_SimpleCalcPlugin ()
     {
         QString msg("quit\n");
-        socket.writeBlock( msg, msg.length() );
+        socket.write( msg.toAscii() );
         socket.close();
 
         // Workaround of vague segmentation fault after direct call
@@ -57,7 +59,8 @@ public:
     {
         // Send file name to calculation server
         QString fileToCalc( fileName + "\n" );
-        socket.writeBlock( fileToCalc, fileToCalc.length() );
+        socket.write( fileToCalc.toAscii() );
+        socket.flush();
 
         QString vyvFile( tempFileName() + fermaResExt );
         // Wait file appearance. 
@@ -68,7 +71,7 @@ public:
     }
     
 private:
-    mutable QSocketDevice socket;
+    mutable QTcpSocket socket;
     CalcThread calcThread;
 };
 

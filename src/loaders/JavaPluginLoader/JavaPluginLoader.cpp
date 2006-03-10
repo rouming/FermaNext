@@ -1,6 +1,6 @@
 
 #include <stdlib.h>
-#include <QMessagebox>
+#include <QMessageBox>
 #include <QFile>
 
 #include "PluginLoaderFrontEnd.h"
