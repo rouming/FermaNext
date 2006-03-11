@@ -306,9 +306,7 @@ void NodesTable::setFixationItem ( int row, Node::Fixation fix )
 
 FixationItem* NodesTable::getFixationItem ( int row ) const
 {
-    try {
-        return dynamic_cast<FixationItem*>( item(row, numCols() - 1) );
-    } catch ( ... ) { return 0; }
+    return dynamic_cast<FixationItem*>( item(row, numCols() - 1) );
 }
 
 int NodesTable::getFixedNodesNumber () const
@@ -342,6 +340,10 @@ void NodesTable::updateMaximumHeight ()
 
 QWidget* NodesTable::createEditor ( int row, int col, bool initFromCell ) const
 {
+    QTableItem* cell = item( row, col );
+    if ( ! cell )
+        return 0;
+
     if ( col == numCols() - 1 )
         return item(row, col)->createEditor();
 
@@ -389,17 +391,14 @@ QWidget* ComboItem::createEditor() const
         new QComboBox( table()->viewport() );
     QObject::connect( comboBox, SIGNAL( activated( int ) ), 
                       table(), SLOT( doValueChanged() ) );
-    QStringList* argList = 
-        const_cast<ComboItem*>(this)->getComboArgList();
-    if ( argList )
-        comboBox->insertStringList( *argList );
+    comboBox->insertStringList( this->getComboArgList() );
     comboBox->setCurrentText( QString::number(currentValue) );
     return comboBox;
 }
 
-QStringList* ComboItem::getComboArgList () const
+QStringList ComboItem::getComboArgList () const
 {
-    QStringList *badArgList = new QStringList();
+    QStringList badArgList;
     QTableItem *cell = 0, *adjCell = 0;
     
     for ( uint i = 0; i < table()->numRows(); ++i ) {
@@ -408,22 +407,21 @@ QStringList* ComboItem::getComboArgList () const
         if ( cell && adjCell && cell->row() != row() ) {
             QString val = adjCell->text();
             if ( cell->text() == QString::number(adjNodeValue) )
-                badArgList->append( adjCell->text() );
+                badArgList.append( adjCell->text() );
             else if ( adjCell->text() == QString::number(adjNodeValue) )
-                badArgList->append( cell->text() );
+                badArgList.append( cell->text() );
         }
     }
-    badArgList->append( QString::number(adjNodeValue) );
+    badArgList.append( QString::number(adjNodeValue) );
     
-    uint nodesNumb = 0;
-    try {
-        nodesNumb = dynamic_cast<PivotsTable*>(table())->getNodesNumber();
-    } catch ( ... ) { return 0; }
-    QStringList *argList = new QStringList();
+    PivotsTable* pTable = dynamic_cast<PivotsTable*>(table());
+    Q_ASSERT( pTable != 0 );
+    uint nodesNumb = pTable->getNodesNumber();
+    QStringList argList;
     for ( i = 0; i < nodesNumb; ++i ) {
         QString arg = QString::number(i + 1);
-        if ( ! badArgList->contains( arg ) )
-            argList->append( arg );
+        if ( ! badArgList.contains( arg ) )
+            argList.append( arg );
     }
     return argList;
 }
@@ -458,9 +456,7 @@ PivotsTable::PivotsTable ( QWidget* parent, const char* name ) :
 
 ComboItem* PivotsTable::getComboItem ( int row, int col ) const
 {
-    try {
-        return dynamic_cast<ComboItem*>( item(row, col ) );
-    } catch ( ... ) { return 0; }
+    return dynamic_cast<ComboItem*>( item(row, col) );
 }
 
 void PivotsTable::setNodeNumber ( int row, int col, int numb, int adjNumb )
@@ -505,8 +501,12 @@ void PivotsTable::addPivot ( const TrussPivot& pivot )
 
 QWidget* PivotsTable::createEditor ( int row, int col, bool initFromCell ) const
 {
+    QTableItem* cell = item( row, col );
+    if ( ! cell )
+        return 0;
+
     if ( col != numCols() - 1 )
-        return item(row, col)->createEditor();
+        return cell->createEditor();
 
     QLineEdit* editor = new QLineEdit( viewport() );
     editor->setFrame( false );
@@ -917,17 +917,16 @@ void TrussGeometryWindow::addPivotToTable ( const Node& first, const Node& last 
         const TrussNode& node1 = dynamic_cast<const TrussNode&>(first);
         const TrussNode& node2 = dynamic_cast<const TrussNode&>(last);
         TrussPivot* pivot = focusWindow->findPivotByNodes( node1, node2);
-        if ( pivot ) {
-            pivotsTable->addPivot( *pivot );
-            connect( pivot, SIGNAL(onDrawingStatusChange(bool)),
-                            SLOT(setPivotTableRowVisible(bool)) );
-            connect( pivot, SIGNAL(onThicknessChange(double)),
-                            SLOT(updatePivotTableThickness()) );
-            connect( pivot, SIGNAL(onFirstNodeChange()),
-                            SLOT(updatePivotTableFirstNode()) );
-            connect( pivot, SIGNAL(onLastNodeChange()),
-                            SLOT(updatePivotTableLastNode()) );
-        }
+        Q_ASSERT( pivot != 0 );
+        pivotsTable->addPivot( *pivot );
+        connect( pivot, SIGNAL(onDrawingStatusChange(bool)),
+                        SLOT(setPivotTableRowVisible(bool)) );
+        connect( pivot, SIGNAL(onThicknessChange(double)),
+                        SLOT(updatePivotTableThickness()) );
+        connect( pivot, SIGNAL(onFirstNodeChange()),
+                        SLOT(updatePivotTableFirstNode()) );
+        connect( pivot, SIGNAL(onLastNodeChange()),
+                        SLOT(updatePivotTableLastNode()) );
     } catch ( ... ) { return; }
 
     pivotsTable->setNodesTotalNumber( focusWindow->getNodeList().size() );
@@ -945,17 +944,16 @@ void TrussGeometryWindow::removePivotFromTable ( const Node& first,
         const TrussNode& node1 = dynamic_cast<const TrussNode&>(first);
         const TrussNode& node2 = dynamic_cast<const TrussNode&>(last);
         TrussPivot* pivot = focusWindow->findPivotByNodes( node1, node2);
-        if ( pivot ) {
-            pivotsTable->removeRow( pivot->getNumber() - 1 );
-            disconnect( pivot, SIGNAL(onDrawingStatusChange(bool)),
-                         this, SLOT(setPivotTableRowVisible(bool)) );
-            disconnect( pivot, SIGNAL(onThicknessChange(double)),
-                         this, SLOT(updatePivotTableThickness()) );
-            disconnect( pivot, SIGNAL(onFirstNodeChange()),
-                         this, SLOT(updatePivotTableFirstNode()) );
-            disconnect( pivot, SIGNAL(onLastNodeChange()),
-                         this, SLOT(updatePivotTableLastNode()) );
-        }
+        Q_ASSERT( pivot != 0 );
+        pivotsTable->removeRow( pivot->getNumber() - 1 );
+        disconnect( pivot, SIGNAL(onDrawingStatusChange(bool)),
+                     this, SLOT(setPivotTableRowVisible(bool)) );
+        disconnect( pivot, SIGNAL(onThicknessChange(double)),
+                     this, SLOT(updatePivotTableThickness()) );
+        disconnect( pivot, SIGNAL(onFirstNodeChange()),
+                     this, SLOT(updatePivotTableFirstNode()) );
+        disconnect( pivot, SIGNAL(onLastNodeChange()),
+                     this, SLOT(updatePivotTableLastNode()) );
     } catch ( ... ) { return; }
     
     pivotsNumbLabel->setText( "Total pivots: " + 
@@ -1040,6 +1038,7 @@ void TrussGeometryWindow::updatePivotState ( int row, int col )
         return;
 
     QTableItem* item = pivotsTable->item( row, col );
+    Q_ASSERT( item != 0 );
     TrussNode* node = focusWindow->findNodeByNumber( item->text().toInt() );
     if ( ! node )
         return;

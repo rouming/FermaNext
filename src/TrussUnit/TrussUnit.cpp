@@ -423,14 +423,14 @@ void TrussUnit::setFocusOnPivot ( TrussPivot* selectedPivot )
 void TrussUnit::removeNodesHighlight ( const TrussNode* node1,
                                        const TrussNode* node2 )
 {
-    NodeList nodeList = getNodeList ();
+    NodeList nodeList = getNodeList();
     NodeListIter iter = nodeList.begin();
     for ( ; iter != nodeList.end(); ++iter )
     {
         TrussNode* node = *iter;
-        if ( node->isHighlighted () && node != node1 && node != node2 )
+        if ( node->isHighlighted() && node != node1 && node != node2 )
         {
-            node->setHighlighted ( false );
+            node->setHighlighted( false );
             setTrussRenderedStatus(false);
         }
     }
@@ -446,10 +446,13 @@ void TrussUnit::removePivotsHighlight ( const TrussPivot* excPivot )
         if ( pivot->isHighlighted () && pivot != excPivot )
         {
             pivot->setHighlighted ( false );
-            pivot->getFirstNode().setHighlighted ( false );
-            pivot->getLastNode().setHighlighted ( false );
-            setTrussRenderedStatus(false);
+            setTrussRenderedStatus( false );
         }
+    }
+    if ( excPivot ) {
+    // should be sure that nodes of the selected pivot are still highlighted
+        excPivot->getFirstNode().setHighlighted ( true );
+        excPivot->getLastNode().setHighlighted ( true );
     }
 }
 
@@ -834,14 +837,9 @@ void TrussUnit::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
             else
             {
                 // Save action of node changing
-                ObjectState& state = pivot->createState( "node change" );
-                state.addAction( 
-                    new ConcreteObjectAction<TrussPivot, TrussNode*>(
-                                                        *pivot,
-                                                        &TrussPivot::setFirstNode,
-                                                        &TrussPivot::setFirstNode,
-                                                        node,
-                                                        firstNode ) );
+                ObjectState& state = pivot->createState( "change node" );
+                state.addAction( new TrussPivotChangeNodeAction( *pivot, 
+                                 *firstNode, *node, true ) );
                 state.save();
                 pivot->setFirstNode( node );
             }
@@ -860,16 +858,11 @@ void TrussUnit::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
             else
             {
                 // Save action of node changing
-                ObjectState& state = pivot->createState( "node change" );
-                state.addAction( 
-                    new ConcreteObjectAction<TrussPivot, TrussNode*>(
-                                                        *pivot,
-                                                        &TrussPivot::setLastNode,
-                                                        &TrussPivot::setLastNode,
-                                                        node,
-                                                        lastNode ) );
+                ObjectState& state = pivot->createState( "change node" );
+                state.addAction( new TrussPivotChangeNodeAction( *pivot, 
+                                 *lastNode, *node, false ) );
                 state.save();
-                pivot->setLastNode ( node );
+                pivot->setLastNode( node );
             }
         }
     }
@@ -1178,11 +1171,14 @@ void TrussUnit::updateAfterPivotManipulation ( TrussPivot* selectedPivot,
 
 void TrussUnit::nodeToFront ( TrussNode& node )
 {
+    firstFront = 0;
+    lastFront = 0;
     frontNode = &node;
 }
 
 void TrussUnit::pivotToFront ( TrussPivot& pivot )
 {
+    frontNode = 0;
     firstFront = &pivot.getFirstNode();
     lastFront = &pivot.getLastNode();
 }
