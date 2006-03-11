@@ -362,6 +362,49 @@ void ObjectStateManager::redo () throw (UnknownException, RedoException,
     emit afterRedo(*this);
 }
 
+void ObjectStateManager::stepBack () throw (UnknownException, UndoException, 
+                                            StateBlockIsNotEnded) 
+{    
+    // Nothing to undo
+    if ( countStateBlocks() == 0 ) 
+        throw UndoException();
+
+    // Nothing to undo
+    if ( currentBlock == 0 )
+        throw UndoException();
+
+    // Can't undo if block is not ended
+    if ( startedBlocks )
+        throw StateBlockIsNotEnded();
+
+    BlockListIter iter = std::find( stateBlocks.begin(), 
+                                    stateBlocks.end(), 
+                                    currentBlock);
+    // Hm. Strange.
+    if ( iter == stateBlocks.end() )                
+        throw UnknownException();
+
+    // Safe undo
+    emit beforeStepBack(*this);
+    stateCall(true);
+
+    currentBlock->undo();
+    
+    delete *iter;
+    stateBlocks.erase( iter );
+
+    // Should zero current block if we undoed the first block
+    if ( iter == stateBlocks.begin() )
+        currentBlock = 0;
+    else {
+        --iter;
+        currentBlock = *iter;
+    }
+
+    stateCall(false);
+    emit afterStepBack(*this);
+}
+
 void ObjectStateManager::step ( uint indx ) 
     throw (UnknownException, OutOfBoundsException, StepException,
            RedoException, UndoException, StateBlockIsNotEnded)

@@ -46,10 +46,9 @@ protected:
     void setupHelpActions ();
     void setupPluginActions ();
 
+    bool eventFilter( QObject*, QEvent* );
     // Close handler. Calls 'clean' for correct close.
     void closeEvent ( QCloseEvent* );
-
-    bool eventFilter( QObject*, QEvent* );
 
 protected slots:
     void fileNew ();

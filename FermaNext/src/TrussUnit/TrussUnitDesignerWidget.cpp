@@ -735,40 +735,62 @@ void TrussUnitDesignerWidget::aggResizeEvent ( QResizeEvent* )
 
 void TrussUnitDesignerWidget::aggKeyPressEvent ( QKeyEvent* ke )
 {
-    if ( ke->key() == Qt::Key_N && designerBehaviour != onNodeDraw )
+    if ( ke->key() == Qt::Key_N && designerBehaviour != onNodeDraw && 
+         designerBehaviour != onPivotLastNodeDraw )
     {
         designerBehaviour = onNodeDraw;
         emit pressNodeDrawButton();
         removeTrussElemHighlight ();
     }
-    if ( ke->key() == Qt::Key_P && designerBehaviour != onPivotFirstNodeDraw )
+    if ( ke->key() == Qt::Key_P && designerBehaviour != onPivotLastNodeDraw )
     {
         designerBehaviour = onPivotFirstNodeDraw;
         emit pressPivotDrawButton();
         removeTrussElemHighlight ();
     }
-    if ( ke->key() == Qt::Key_R && designerBehaviour != onErase )
+    if ( ke->key() == Qt::Key_R && designerBehaviour != onErase &&
+         designerBehaviour != onPivotLastNodeDraw )
     {
         designerBehaviour = onErase;
         emit pressEraseButton();
         removeTrussElemHighlight ();
     }
-    if ( ke->key() == Qt::Key_F && designerBehaviour != onFixDraw )
+    if ( ke->key() == Qt::Key_F && designerBehaviour != onFixDraw &&
+         designerBehaviour != onPivotLastNodeDraw )
     {
         designerBehaviour = onFixDraw;
         emit pressFixDrawButton();
         removeTrussElemHighlight ();
     }
-    if ( ke->key() == Qt::Key_L && designerBehaviour != onLoadDraw )
+    if ( ke->key() == Qt::Key_L && designerBehaviour != onLoadDraw &&
+         designerBehaviour != onPivotLastNodeDraw )
     {
         designerBehaviour = onLoadDraw;
         emit pressLoadDrawButton();
         removeTrussElemHighlight ();
     }
-    if ( ke->key() == Qt::Key_Escape  && designerBehaviour != onSelect )
+    if ( ke->key() == Qt::Key_Escape  && 
+         designerBehaviour != onSelect &&
+         designerBehaviour != onPivotLastNodeDraw )
     {
         designerBehaviour = onSelect;
         emit pressSelectButton();
+        QWidget::setCursor ( Qt::ArrowCursor );
+    }
+    if ( ke->key() == Qt::Key_Escape  && 
+         designerBehaviour == onPivotLastNodeDraw )
+    {
+        if ( selectedWindow ) {
+            ObjectStateManager* mng = selectedWindow->getStateManager();
+
+            // End state block which was started in press mouse event.
+            if ( mng && mng->stateBlockisNotEnded() ) 
+                mng->endStateBlock();
+            mng->stepBack();
+        }
+        selectedNode = 0;
+        selectedPivot = 0;
+        designerBehaviour = onPivotFirstNodeDraw;
         QWidget::setCursor ( Qt::ArrowCursor );
     }
 }
@@ -951,15 +973,15 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                 clearAllCursorCoordFields ();
 
             removeWindowButtonHighlight ();
-            clearHintsFromNonSelectedWindows ( window );
-            window->releaseButtons ();
+            clearHintsFromNonSelectedWindows( window );
+            window->releaseButtons();
             window->checkMouseMoveEvent( x, y, buttonPressed );
             update();
         }
         else
         {
-            clearHintsFromNonSelectedWindows ( 0 );
-            removeWindowButtonHighlight ();
+            clearHintsFromNonSelectedWindows( 0 );
+            removeWindowButtonHighlight();
         }
 
         if ( designerBehaviour == onNodeDraw || 
@@ -969,7 +991,7 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
             TrussUnitWindow* w = findWindowByWidgetPos( x, y );
             if ( w )
             {
-                removeTrussElemHighlight ();
+                removeTrussElemHighlight();
                 TrussNode* node = w->findNodeByWidgetPos( x, y );
                 TrussPivot* pivot = 
                     w->findPivotByWidgetPos( x, y, 2 * w->getPivotPrecision() );
@@ -982,26 +1004,26 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                 else if ( pivot )
                 {
                     
-                    w->setFocusOnPivot ( pivot );
+                    w->setFocusOnPivot( pivot );
                     update();
                 }
-                if ( nodeCanBeDrawn ( x, y ) || node )
-                    QWidget::setCursor ( Qt::CrossCursor );
+                if ( nodeCanBeDrawn( x, y ) || node )
+                    QWidget::setCursor( Qt::CrossCursor );
                 else
-                    QWidget::setCursor ( Qt::ArrowCursor );
+                    QWidget::setCursor( Qt::ArrowCursor );
             }
         }
 
         if ( nodeBehaviour == onNodeDrag )
         {
-            selectedWindow->moveTrussNode ( x, y, selectedNode );
-            selectedWindow->setCursorCoord ( selectedNode->getPoint() );
+            selectedWindow->moveTrussNode( x, y, selectedNode );
+            selectedWindow->setCursorCoord( selectedNode->getPoint() );
             update();
         }
         else if ( pivotBehaviour == onPivotDrag )
         {
-            clearAllCursorCoordFields ();
-            selectedWindow->setCursorCoord ( QPoint(x, y) );
+            clearAllCursorCoordFields();
+            selectedWindow->setCursorCoord( QPoint(x, y) );
             selectedWindow->moveTrussPivot( x, y, selectedPivot, 
                                             firstNodeClickDist, 
                                             lastNodeClickDist );     
@@ -1009,13 +1031,13 @@ void TrussUnitDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         }
         else if ( designerBehaviour  == onPivotLastNodeDraw )
         {
-            selectedWindow->moveTrussNode ( x, y, selectedNode );
+            selectedWindow->moveTrussNode( x, y, selectedNode );
             selectedWindow->setCursorCoord( selectedNode->getPoint() );
             TrussNode* node = selectedWindow->findNodeByWidgetPos( x, y );
-            if ( nodeCanBeDrawn ( x, y ) || node )
-                QWidget::setCursor ( Qt::CrossCursor );
+            if ( nodeCanBeDrawn( x, y ) || node )
+                QWidget::setCursor( Qt::CrossCursor );
             else
-                QWidget::setCursor ( Qt::ArrowCursor );
+                QWidget::setCursor( Qt::ArrowCursor );
             update();
         }
         else
@@ -1322,10 +1344,10 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                     // Convert widget coordinates into truss (absolute) coordinates
                     DoublePoint trussCoord = selectedWindow->
                                       getTrussCoordFromWidgetPos( xPos, yPos );
-                    const DoublePoint& firstPos = selectedPivot->
-                                                         getFirstNode().getPoint();
-                    const DoublePoint& lastPos  = selectedPivot->
-                                                         getLastNode().getPoint();
+                    const DoublePoint& firstPos = 
+                        selectedPivot->getFirstNode().getPoint();
+                    const DoublePoint& lastPos  = 
+                        selectedPivot->getLastNode().getPoint();
 
                     // Get first and last nodes displacements about a clicked point 
                     firstNodeClickDist.setX( int(firstPos.x() - trussCoord.x()) );
@@ -1344,22 +1366,23 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
             {
                 if ( nodeCanBeDrawn ( xPos, yPos ) )
                 {
-                    TrussNode* node = selectedWindow->findNodeByWidgetPos( xPos, 
-                                                                           yPos );
+                    TrussNode* node = 
+                        selectedWindow->findNodeByWidgetPos( xPos, yPos );
                     if ( node )
                         return;
 
                     DoublePoint nodeCoord = selectedWindow->
                                       getTrussCoordFromWidgetPos( xPos, yPos );
                 
-                    TrussNode& newNode = selectedWindow->createNode ( nodeCoord.x(), 
-                                                                      nodeCoord.y() );
+                    TrussNode& newNode = 
+                        selectedWindow->createNode ( nodeCoord.x(), 
+                                                     nodeCoord.y() );
 
                     ObjectStateManager* mng = selectedWindow->getStateManager();
                     mng->startStateBlock();
 
                     saveNodeStateAfterCreate( newNode );
-                    selectedWindow->updateAfterNodeManipulation ( &newNode, true );
+                    selectedWindow->updateAfterNodeManipulation( &newNode, true );
 
                     mng->endStateBlock();
                     update();
@@ -1378,25 +1401,28 @@ void TrussUnitDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                     bool wasCreated = false;
                     if ( firstNode == 0 ) 
                     {
-                        firstNode = &selectedWindow->createNode( nodeCoord.x(), 
-                                                                 nodeCoord.y() );
+                        firstNode = 
+                            &selectedWindow->createNode( nodeCoord.x(), 
+                                                         nodeCoord.y() );
+                        saveNodeStateAfterCreate( *firstNode );
                         wasCreated = true;
                     }
                     TrussPivot* divPivot = 
-                                    selectedWindow->findDividualPivot( *firstNode );
+                               selectedWindow->findDividualPivot( *firstNode );
                     if ( divPivot )
                         selectedWindow->dividePivot( *divPivot, *firstNode );
 
-                    TrussNode& lastNode = selectedWindow->createNode( nodeCoord.x(), 
-                                                                      nodeCoord.y() );
+                    TrussNode& lastNode = 
+                        selectedWindow->createNode( nodeCoord.x(), 
+                                                    nodeCoord.y() );
                     lastNode.setVisible ( false );
                     selectedPivot = &( selectedWindow->createPivot( *firstNode, 
-                                                                     lastNode ) );
+                                                                    lastNode ) );
                     selectedPivot->setDrawingStatus ( false );
                     selectedNode = &lastNode;
                     designerBehaviour = onPivotLastNodeDraw;
-                    savePivotStateAfterCreate( *firstNode, wasCreated, lastNode, 
-                                               *selectedPivot );
+                    savePivotStateAfterCreate( *firstNode, wasCreated, 
+                                                lastNode, *selectedPivot );
                     update();
                 }
             }

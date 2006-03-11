@@ -85,11 +85,13 @@ void FermaNextMainFrame::init ()
     QVBoxLayout* vboxHistoryWidget = new QVBoxLayout( undoRedoHistoryWidget );
     undoRedoListBox = new UndoRedoListBox( undoRedoHistoryWidget );
     vboxHistoryWidget->addWidget( undoRedoListBox );
+    undoRedoListBox->installEventFilter( this );
     undoRedoHistoryWidget->installEventFilter( this );
 
     geometryWindow = new TrussGeometryWindow( this, "truss_geometry",
                                               WStyle_Tool | WType_TopLevel );
     geometryWindow->move( QApplication::desktop()->width() - 265, 310 );
+    geometryWindow->installEventFilter( this );
     
     projectsDockWindow = new QDockWindow( QDockWindow::InDock, this );
     projectsDockWindow->setResizeEnabled( TRUE );
@@ -112,6 +114,7 @@ void FermaNextMainFrame::init ()
                              SLOT(refreshProjectActions()) );
     projectsDockWindow->setWidget( projectToolBox );
     projectsDockWindow->setFixedExtentWidth( 160 );
+
     projectsDockWindow->hide();
 
     setRightJustification( true );
@@ -509,20 +512,6 @@ void FermaNextMainFrame::trussWindowReceivedFocus ( TrussUnitWindow& window )
     geometryWindow->changeFocusWindow( &window );
 }
 
-bool FermaNextMainFrame::eventFilter( QObject* obj, QEvent* event )
-{
-    if ( obj == undoRedoHistoryWidget ) {
-        if ( event->type() == QEvent::Close ) {
-            showUndoRedoAction->toggle();
-            return true;
-        }
-        else
-            return false;
-    } else
-        // pass the event on to the parent class
-        return QMainWindow::eventFilter( obj, event );
-}
-
 /*****************************************************************************
  * Actions
  *****************************************************************************/
@@ -890,6 +879,39 @@ void FermaNextMainFrame::helpAbout ()
 /*****************************************************************************
  * Events
  *****************************************************************************/
+
+bool FermaNextMainFrame::eventFilter( QObject* targetObj, QEvent* event )
+{
+    if ( event->type() == QEvent::KeyPress ) {
+        QKeyEvent *keyEvent = (QKeyEvent*)event;
+        if ( keyEvent->state() & ControlButton ||
+             keyEvent->state() & ShiftButton ) {
+            setActiveWindow();
+            menuBar()->setFocus();
+            keyPressEvent( keyEvent );
+            return true;
+        }
+        else if ( keyEvent->key() == Key_N || keyEvent->key() == Key_P ||
+                  keyEvent->key() == Key_F || keyEvent->key() == Key_L ||
+                  keyEvent->key() == Key_Escape ) {
+            FermaNextProject* prj = projectToolBox->currentProject();
+            if ( prj ) {
+                setActiveWindow();
+                prj->getDesignerWindow().
+                    getDesignerWidget().aggKeyPressEvent( keyEvent );
+                return true;
+            }
+        }
+        return false;
+    }
+    else if ( event->type() == QEvent::Close &&
+              targetObj == undoRedoHistoryWidget ) {
+            showUndoRedoAction->toggle();
+            return true;
+    } 
+    else
+        return QMainWindow::eventFilter( targetObj, event );
+}
 
 /*
  *  Correct clean.

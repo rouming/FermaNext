@@ -122,7 +122,7 @@ public:
     virtual void setText( const QString& );
 
 protected:
-    virtual QStringList* getComboArgList () const;
+    virtual QStringList getComboArgList () const;
 
 private:
     QComboBox *comboBox;
