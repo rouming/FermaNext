@@ -3,7 +3,7 @@
 #include <QIconSet>
 
 #include "CalcDataToolBar.h"
-#include "CalcDataWidget.h"
+#include "ui_CalcDataWidget.h"
 
 /*****************************************************************************
  * Calculation Data Tool Bar

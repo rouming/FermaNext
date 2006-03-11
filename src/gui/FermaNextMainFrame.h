@@ -16,8 +16,9 @@ class FermaNextMainFrame : public QMainWindow
 {
     Q_OBJECT
 public:
-    FermaNextMainFrame ( QWidget * parent = 0, const char * name = 0, 
-                         WFlags f = WType_TopLevel );
+    FermaNextMainFrame ( QWidget * parent = 0, const char * name = 0,
+                         // FIXME QT3TO4: WFlags f = WType_TopLevel
+                         Qt::WFlags f = Qt::Window );
 
 public slots:
     void someProjectRemoved ( FermaNextProject& );
@@ -84,7 +85,7 @@ protected slots:
 
 private:
     // Dock window on wich all projects are located
-    QDockWindow* projectsDockWindow;
+    QDockWidget* projectsDockWindow;
     // Undo/redo history widget
     QWidget* undoRedoHistoryWidget;
     // Undo/redo list box to control truss states
@@ -103,7 +104,7 @@ private:
     QAction* printAction;
     
     // Plugins menu
-    QPopupMenu* pluginsMenu;
+    QMenu* pluginsMenu;
 };
 
 #endif //FERMANEXTFRAME_H

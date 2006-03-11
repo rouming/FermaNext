@@ -3,7 +3,7 @@
 #define FERMANEXTCONFIG_H
 
 #include <QString>
-#include <QDom>
+#include <QDomNode>
 #include <QMap>
 #include <QVariant>
 

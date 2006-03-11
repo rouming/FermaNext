@@ -4,7 +4,8 @@
 
 #include <QToolBar>
 #include <QToolButton>
-#include <QIconSet>
+#include <QIcon>
+#include <QString>
 
 #include <vector>
 
@@ -19,7 +20,7 @@ class QLabel;
 class TextToolButton : public  QToolButton
 {
 public:
-    TextToolButton ( const QIconSet&, const QString&, const QString&, QObject*,
+    TextToolButton ( const QIcon&, const QString&, const QString&, QObject*,
                      const char*, QToolBar*, const char* name = 0 );
     QSize sizeHint() const;
 protected:
@@ -35,7 +36,7 @@ class TabbedWidget : public QObject
     Q_OBJECT
 public:
     TabbedWidget ( ToolBarManager& parent,  QWidget&, 
-                   const QString& name, const QIconSet& iconSet );
+                   const QString& name, const QIcon& icon );
 
     ~TabbedWidget ();
 
@@ -99,7 +100,7 @@ public slots:
 protected slots:
     virtual TabbedWidget& createTabbedWidget ( QWidget&, 
                                                const QString& name, 
-                                               const QIconSet& iconSet );
+                                               const QIcon& icon );
 
     virtual void addWidget ( QWidget& ) = 0;
     virtual void removeWidget ( QWidget& );

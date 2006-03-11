@@ -1,6 +1,7 @@
 
 #include <QTabWidget>
-#include <QWidgetStack>
+#include <QStackedWidget>
+#include <QTextStream>
 
 #include "FermaNextProject.h"
 #include "SubsidiaryConstants.h"
@@ -17,24 +18,28 @@ const QString& FermaNextProject::formatExtension ()
 
 /*****************************************************************************/
 
-FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack ) :
+FermaNextProject::FermaNextProject ( const QString& name_, 
+                                     QStackedWidget* stack ) :
     name(name_),
     widgetStack(stack),
-    projectMainWidget( new QMainWindow(widgetStack, 0, 0) ),
+    projectMainWidget( new QMainWindow(widgetStack, 0) ),
     calcDataToolBar( new CalcDataToolBar(projectMainWidget) ),
     projectTab( new QTabWidget(projectMainWidget) ),
     justStrengthAnalisysWidget( new QWidget(projectTab) ),
     designerWindow( new TrussUnitDesignerWindow(name_, projectTab) ),
     trussWindowManager( new TrussUnitWindowManager )
 {
+    /*
+      // FIXME QT3TO4:
     projectMainWidget->setRightJustification( true );
     projectMainWidget->setDockEnabled( DockLeft, false );
     projectMainWidget->setDockEnabled( DockRight, false );
+    */
 
     widgetStack->addWidget(projectMainWidget);
     projectMainWidget->setCentralWidget( projectTab );
   
-    projectTab->setTabPosition( QTabWidget::Bottom );
+    projectTab->setTabPosition( QTabWidget::South );
     projectTab->addTab( designerWindow, tr("Designer") );
     projectTab->addTab( justStrengthAnalisysWidget, tr("Strength Analysis") );
       
@@ -64,7 +69,7 @@ void FermaNextProject::loadFromFile ( const QString& fileName )
     throw (IOException, WrongXMLDocException, LoadException)
 {
     QFile xmlFile( fileName );
-    if ( ! xmlFile.open( IO_ReadOnly ) )
+    if ( ! xmlFile.open( QIODevice::ReadOnly ) )
         throw IOException();
 
     QIODevice* xmlIODev = &xmlFile;
@@ -95,7 +100,7 @@ void FermaNextProject::saveToFile ( const QString& fileName )
     throw (IOException)
 {
     QFile xmlFile( fileName );
-    if ( ! xmlFile.open( IO_WriteOnly ) )
+    if ( ! xmlFile.open( QIODevice::WriteOnly ) )
         throw IOException();
 
     QTextStream stream( &xmlFile );
@@ -199,7 +204,7 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
 
     TrussUnitWindowManager& mng = getTrussUnitWindowManager();
     QDomNodeList trussWindows = prjElem.elementsByTagName( "TrussUnitWindow" );
-    for ( uint windsNum = 0; windsNum < trussWindows.count(); ++windsNum ) {
+    for ( int windsNum = 0; windsNum < trussWindows.count(); ++windsNum ) {
         QDomNode trussWindow = trussWindows.item( windsNum );
         if ( ! trussWindow.isElement() )
             throw LoadException();
@@ -227,15 +232,15 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
 
 void FermaNextProject::activate ()
 {
-    if ( widgetStack && widgetStack->visibleWidget() != projectMainWidget ) {
-        widgetStack->raiseWidget( projectMainWidget );
+    if ( widgetStack && widgetStack->currentWidget() != projectMainWidget ) {
+        widgetStack->setCurrentWidget( projectMainWidget );
         emit onActivate( *this );
     }
 }
 
 bool FermaNextProject::isActivated () const
 {
-    return widgetStack && widgetStack->visibleWidget() == projectMainWidget;
+    return widgetStack && widgetStack->currentWidget() == projectMainWidget;
 }
 
 const QString& FermaNextProject::getName () const

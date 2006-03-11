@@ -13,7 +13,7 @@
 #include "FermaNextConfig.h"
 #include "PluginManager.h"
 
-class QWidgetStack;
+class QStackedWidget;
 class FermaNextMainFrame;
 
 class FermaNextWorkspace : public QObject, public XMLSerializableObject
@@ -122,7 +122,7 @@ private:
 
     QString name;    
     QString workspaceFileName;
-    QWidgetStack* widgetStack;    
+    QStackedWidget* widgetStack;    
     ProjectList projects;
     FermaNextConfig fermaConfig;
 };

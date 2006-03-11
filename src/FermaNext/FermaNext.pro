@@ -1,24 +1,20 @@
 
 TARGET = FermaNext
-DESTDIR = ../../
 
-CONFIG += qt warn_on thread debug
+LEVEL = ../..
+include(../../../FermaNext.pri)
 
-MOC_DIR = mocs
-OBJECTS_DIR = obj
-UI_DIR = ../gui/ui
+QT += core gui xml
+CONFIG += qt warn_on thread
+
+LIBPATH += ../.. $$(EXPATDIR)/Libs
 
 win32 {
-  DEFINES += WIN32
-  LIBS = common.lib Agg.lib TrussUnit.lib LibAgg.lib LibSVG.lib libexpat.lib \
-         -L../../build \
-         -L../.. \
-         -L$$(EXPATDIR)/Libs
+  LIBS = common.lib Agg.lib TrussUnit.lib LibAgg.lib LibSVG.lib libexpat.lib
 }
 unix {
   QMAKE_LFLAGS += -export-dynamic
-  LIBS = -L../../build -L../../ \
-         -lTrussUnit -lAgg -lcommon -lsvg -lagg
+  LIBS = -lTrussUnit -lAgg -lcommon -lsvg -lagg
 }
 
 INCLUDEPATH = $$(AGGDIR)/include \

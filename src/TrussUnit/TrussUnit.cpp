@@ -14,7 +14,11 @@ PaintableTrussElement::PaintableTrussElement () :
     renderedFlag(false)
 {}
 
-PaintableTrussElement::PaintableTrussElement ( bool h_, bool v_, bool e_, bool r_ ) :
+PaintableTrussElement::~PaintableTrussElement ()
+{}
+
+PaintableTrussElement::PaintableTrussElement ( bool h_, bool v_, 
+                                               bool e_, bool r_ ) :
     visible(v_), 
     highlighted(h_),
     enabled(e_),

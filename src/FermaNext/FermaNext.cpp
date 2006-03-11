@@ -31,7 +31,6 @@ int main ( int argc, char* argv[] )
 
     splash->message( "Setting up GUI .." );
     FermaNextMainFrame ferma;
-    app.setMainWidget(&ferma);
     ferma.showMaximized();
     splash->finish( &ferma );
     delete splash;

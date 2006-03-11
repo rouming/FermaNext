@@ -20,6 +20,7 @@ class PaintableTrussElement
 public:
     PaintableTrussElement ();
     PaintableTrussElement ( bool h, bool v, bool e, bool r );
+    virtual ~PaintableTrussElement ();
 
     virtual bool isVisible () const;
     virtual bool isHighlighted () const;

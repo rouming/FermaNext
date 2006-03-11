@@ -6,7 +6,6 @@
 #include "TrussUnitWindow.h"
 
 class CalcDataWidget;
-class QIconSet;
 
 class CalcDataToolBar : public ToolBarManager
 {
@@ -39,7 +38,7 @@ private:
     typedef CalcDataMap::iterator CalcDataMapIter;
 
     CalcDataMap calcDataWidgets;
-    QIconSet calcDataIcons;
+    QIcon calcDataIcons;
 };
 
 #endif //CALCDATATOOLBARMANAGER_H

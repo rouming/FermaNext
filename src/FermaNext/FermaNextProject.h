@@ -11,7 +11,7 @@
 #include "CalcDataToolBar.h"
 
 class FermaNextWorkspace;
-class QWidgetStack;
+class QStackedWidget;
 class QTabWidget;
 
 class FermaNextProject : public QObject, public XMLSerializableObject
@@ -64,12 +64,12 @@ signals:
 private:
     friend class FermaNextWorkspace;
     
-    FermaNextProject ( const QString& name, QWidgetStack* parent = 0 );
+    FermaNextProject ( const QString& name, QStackedWidget* parent = 0 );
 
 private:
     QString name;
     QString projectFileName;
-    QWidgetStack* widgetStack;
+    QStackedWidget* widgetStack;
     QMainWindow* projectMainWidget;
     CalcDataToolBar* calcDataToolBar;
     QTabWidget* projectTab;
