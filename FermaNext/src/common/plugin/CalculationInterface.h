@@ -15,6 +15,7 @@ class CalculationInterface
 {
 public:
     virtual void calculate ( TrussTopology&, TrussCalcData& ) const = 0;
+    virtual ~CalculationInterface () {}
 };
 
 #endif //CALCULATIONINTERFACE_H

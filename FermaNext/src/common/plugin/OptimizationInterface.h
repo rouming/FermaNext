@@ -11,7 +11,9 @@ class TrussCalcData;
 
 class OptimizationInterface
 {
+public:
     virtual void optimize ( TrussTopology&, TrussCalcData& ) const = 0;
+    virtual ~OptimizationInterface () {}
 };
 
 #endif //OPTIMIZATIONINTERFACE_H
