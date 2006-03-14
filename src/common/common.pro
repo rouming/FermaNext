@@ -14,7 +14,7 @@ win32 {
 unix {
 }
 
-INCLUDEPATH = plugin plugin/loader
+INCLUDEPATH = . plugin plugin/loader
 
 SOURCES = \
           Benchmark.cpp \
