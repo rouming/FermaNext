@@ -86,16 +86,15 @@ public:
     ToolBarManager ( QMainWindow* parent = 0, const char* name = 0 );
     virtual ~ToolBarManager ();
 
-protected:
-    void clear ();
-    virtual TabbedWidget* findByWidget ( QWidget& ) const;
-
 public slots:
     virtual void activateWidget ( QWidget&, bool activationFlag );
     virtual void activateWidget ( QWidget& );
     virtual void disactivateWidget ( QWidget& );
 
-protected slots:
+protected:
+    void clear ();
+    virtual TabbedWidget* findByWidget ( QWidget& ) const;
+
     virtual TabbedWidget& createTabbedWidget ( QWidget&, 
                                                const QString& name, 
                                                const QIconSet& iconSet );
