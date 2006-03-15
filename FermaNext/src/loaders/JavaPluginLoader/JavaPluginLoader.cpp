@@ -9,6 +9,7 @@
 #include <qmessagebox.h>
 #include <qfile.h>
 #include <stdlib.h>
+#include <qapplication.h>
 
 /*****************************************************************************
  * Plugin Loader hook
@@ -54,9 +55,25 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
         }
     }
 
+    
+    QString appPath(".");
+    if ( qApp) 
+        appPath = qApp->applicationDirPath();
+
+#if defined _WIN32 || defined WIN32
+    QString pathDelim = ";";
+#else
+    QString pathDelim = ":";
+#endif
+
+    QStringList classPaths;
+    classPaths.push_back( appPath );
+    classPaths.push_back( appPath + "/fermanext.jar" );
+    classPaths.push_back( appPath + "/plugins/loaders" );    
+
     QString envJavaHomeStr( envJavaHome );
     QStringList options;
-    options.push_back("-Djava.class.path=.");
+    options.push_back("-Djava.class.path=" + classPaths.join(pathDelim));
     options.push_back("-verbose:jni");
     options.push_back("-Xcheck:jni");
 
@@ -74,17 +91,16 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
             qWarning( "Can't find Prog.<init>" );
             return;
         }
-        
+
         JValue param;
         param.i = 666;
         JObject progObj = javaVM->newObjectA( progCls, progInit, &param );
         if ( progObj == 0 ) {
             qWarning( "Can't construct prog obj" );
             return;
-        }
-
-
-    } 
+        }          
+        
+    }
     catch ( ... ) {        
         QMessageBox::warning( 0, "Can't start JVM", 
                               QString("JVM \"%1\" can't be started!\n").
@@ -101,7 +117,18 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
 }
 
 JavaPluginLoader::~JavaPluginLoader ()
-{ delete javaVM; }
+{
+    // Dispose all frames for clean exit
+    JClass fnCls = javaVM->findClass("fermanext/FermaNext");
+    if ( fnCls ) {
+        JMethodID disposeAllFrames = 
+            javaVM->getStaticMethodID( fnCls, "disposeAllFrames", "()V" );
+
+        if ( disposeAllFrames )
+            javaVM->callStaticVoidMethod( fnCls, disposeAllFrames );
+    }
+    delete javaVM;
+}
 
 const QString& JavaPluginLoader::pluginExtension () const
 { static QString javaExt("jar"); return javaExt; }
