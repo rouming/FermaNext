@@ -56,11 +56,35 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
 
     QString envJavaHomeStr( envJavaHome );
     QStringList options;
+    options.push_back("-Djava.class.path=.");
     options.push_back("-verbose:jni");
+    options.push_back("-Xcheck:jni");
 
     try { javaVM = new JavaVirtualMachine( jvmLibPath,
                                            JavaVirtualMachine::v1_4,
-                                           options ); } 
+                                           options ); 
+        JClass progCls = javaVM->findClass("Prog");
+        if ( progCls == 0 ) {
+            qWarning( "Can't find Prog class" );
+            return;
+        }
+
+        JMethodID progInit = javaVM->getMethodID( progCls, "<init>", "(I)V" );
+        if ( progInit == 0 ) {
+            qWarning( "Can't find Prog.<init>" );
+            return;
+        }
+        
+        JValue param;
+        param.i = 666;
+        JObject progObj = javaVM->newObjectA( progCls, progInit, &param );
+        if ( progObj == 0 ) {
+            qWarning( "Can't construct prog obj" );
+            return;
+        }
+
+
+    } 
     catch ( ... ) {        
         QMessageBox::warning( 0, "Can't start JVM", 
                               QString("JVM \"%1\" can't be started!\n").
