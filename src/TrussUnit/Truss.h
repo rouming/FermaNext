@@ -285,10 +285,9 @@ public:
         emit beforeNodeCreation();
         N* node = new N(getStateManager());
         node->setPoint( x, y );
-        node->setNumber( countNodes() + 1 );
         nodes.push_back(node);
 
-        // Signal connects to catch life time changing
+        // Signal connects to be the first and to catch life time changing
         QObject::connect( node, SIGNAL(onBeforeRevive(StatefulObject&)),
                                  SLOT(nodeBeforeRevive(StatefulObject&)) );
         QObject::connect( node, SIGNAL(onAfterRevive(StatefulObject&)),
@@ -303,6 +302,9 @@ public:
         QObject::connect( node, SIGNAL(onPositionChange(double, double)),
                                 SLOT(stateIsChanged()) );
 
+        // Force reindex of elements numbers
+        reindexNodesPivotsNumbers();
+        
         emit afterNodeCreation(*node);
         emit onStateChange();
         return *node;
@@ -327,9 +329,8 @@ public:
 
         emit beforePivotCreation();
         P* pivot = new P( first, last, getStateManager() );
-        pivot->setNumber( countPivots() + 1 );
 
-        // Signal connects to catch life time changing
+        // Signal connects to be the first and to catch life time changing
         QObject::connect( pivot, SIGNAL(onBeforeRevive(StatefulObject&)),
                                  SLOT(pivotBeforeRevive(StatefulObject&)) );
         QObject::connect( pivot, SIGNAL(onAfterRevive(StatefulObject&)),
@@ -347,6 +348,10 @@ public:
         QObject::connect( pivot, SIGNAL(onLastNodeChange()),
                                  SLOT(stateIsChanged()) );
         pivots.push_back(pivot);
+
+        // Force reindex of elements numbers
+        reindexNodesPivotsNumbers();
+
         emit afterPivotCreation(pivot->getFirstNode(), 
                                 pivot->getLastNode());
         emit onStateChange();
@@ -505,10 +510,9 @@ public:
     {
         NodeList aliveNodes;
         NodeListConstIter iter = nodes.begin();
-        for ( int i = 1; iter != nodes.end(); ++iter ) {
+        for ( ; iter != nodes.end(); ++iter ) {
             N* node = *iter;
             if ( node->isAlive() ) {
-                node->setNumber( i++ );
                 aliveNodes.push_back( node );
             }
         }
@@ -520,10 +524,9 @@ public:
     {
         PivotList alivePivots;
         PivotListConstIter iter = pivots.begin();
-        for ( int i = 1; iter != pivots.end(); ++iter ) {
+        for ( ; iter != pivots.end(); ++iter ) {
             P* pivot = *iter;
             if ( pivot->isAlive() ) {
-                pivot->setNumber( i++ );
                 alivePivots.push_back( pivot );
             }
         }
@@ -614,6 +617,8 @@ protected:
         // Safe conversion
         try { 
             N& node = dynamic_cast<N&>(st);
+            // Force reindex of elements numbers
+            reindexNodesPivotsNumbers();
             emit afterNodeRevive(node);
             emit onStateChange();
         }
@@ -643,6 +648,8 @@ protected:
         // Safe conversion
         try { 
             N& node = dynamic_cast<N&>(st);
+            // Force reindex of elements numbers
+            reindexNodesPivotsNumbers();
             emit afterNodeDesist(node);
             emit onStateChange();
         }
@@ -666,6 +673,8 @@ protected:
         // Safe conversion
         try { 
             P& pivot = dynamic_cast<P&>(st);
+            // Force reindex of elements numbers
+            reindexNodesPivotsNumbers();
             emit afterPivotRevive( pivot.getFirstNode(), pivot.getLastNode());
             emit onStateChange();
         }
@@ -687,6 +696,8 @@ protected:
         // Safe conversion
         try { 
             P& pivot = dynamic_cast<P&>(st);
+            // Force reindex of elements numbers
+            reindexNodesPivotsNumbers();
             emit afterPivotDesist( pivot.getFirstNode(), pivot.getLastNode() );
             emit onStateChange();
         }
@@ -735,6 +746,27 @@ protected:
             emit onStateChange();
         }
         catch ( ... ) { return; }
+    }
+
+/************************** basic operations *********************************/
+
+    // Force reindex all numbers of nodes and pivots
+    virtual void reindexNodesPivotsNumbers ()
+    {
+        NodeListIter nIter = nodes.begin();
+        int i = 1;
+        for ( i = 1; nIter != nodes.end(); ++nIter ) {
+            N* node = *nIter;
+            if ( node->isAlive() )
+                node->setNumber( i++ );
+        }
+
+        PivotListIter pIter = pivots.begin();
+        for ( i = 1; pIter != pivots.end(); ++pIter ) {
+            P* pivot = *pIter;
+            if ( pivot->isAlive() )
+                pivot->setNumber( i++ );
+        }        
     }
 
     // Physically removes nodes and pivots
@@ -789,6 +821,10 @@ protected:
         emit beforeNodeRemoval(*n);
         nodes.erase(iter);
         delete n;
+
+        // Force reindex of elements numbers
+        reindexNodesPivotsNumbers();
+
         emit afterNodeRemoval();
         emit onStateChange();
         return true;
@@ -837,6 +873,10 @@ protected:
         emit beforePivotRemoval(p->getFirstNode(), p->getLastNode());
         pivots.erase(iter);
         delete p;
+
+        // Force reindex of elements numbers
+        reindexNodesPivotsNumbers();
+
         emit afterPivotRemoval();
         emit onStateChange();
         return true;
