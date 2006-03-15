@@ -400,8 +400,10 @@ QStringList ComboItem::getComboArgList () const
 {
     QStringList badArgList;
     QTableItem *cell = 0, *adjCell = 0;
+
+    int i = 0;
     
-    for ( uint i = 0; i < table()->numRows(); ++i ) {
+    for ( i = 0; i < table()->numRows(); ++i ) {
         cell = table()->item( i, col() );
         adjCell = table()->item( i, ! col() );
         if ( cell && adjCell && cell->row() != row() ) {
@@ -416,7 +418,7 @@ QStringList ComboItem::getComboArgList () const
     
     PivotsTable* pTable = dynamic_cast<PivotsTable*>(table());
     Q_ASSERT( pTable != 0 );
-    uint nodesNumb = pTable->getNodesNumber();
+    int nodesNumb = pTable->getNodesNumber();
     QStringList argList;
     for ( i = 0; i < nodesNumb; ++i ) {
         QString arg = QString::number(i + 1);
