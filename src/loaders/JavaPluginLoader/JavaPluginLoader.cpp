@@ -28,10 +28,11 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
     QString jvmLibDir;
     QString jvmLibi386Dir;
     if ( envJavaHome == 0 ) {
-        QMessageBox::warning( 0, "Can't find JAVA_HOME environment", 
-                              "Please, specify JAVA_HOME environment\n"
+        QMessageBox::warning( 
+                  0, QObject::tr("Can't find JAVA_HOME environment"), 
+                  QObject::tr("Please, specify JAVA_HOME environment\n"
                               "if you want to use Java plugins\n\n"
-                              "Java loader has been disabled");
+                              "Java loader has been disabled") );
         return;
     } else {
         const QString envJavaHomeStr( envJavaHome );
@@ -45,12 +46,13 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
         jvmLibPath    = jvmLibDir + "/libjvm.so";
 #endif
         if ( ! QFile::exists( jvmLibPath ) ) {
-            QMessageBox::warning( 0, "Can't find JVM lib",
-                           QString("JAVA_HOME environment is set to \"%1\"\n").
-                                  arg(envJavaHomeStr) + 
-                           QString("but can't find JVM lib there: \"%1\"\n\n").
-                                  arg(jvmLibPath) + 
-                           "Java loader has been disabled!" );
+            QMessageBox::warning( 
+                     0, QObject::tr("Can't find JVM lib"),
+                     QObject::tr("JAVA_HOME environment is set to \"%1\"\n").
+                          arg(envJavaHomeStr) + 
+                     QObject::tr("but can't find JVM lib there: \"%1\"\n\n").
+                          arg(jvmLibPath) + 
+                     QObject::tr("Java loader has been disabled!") );
             return;
         }
     }
@@ -68,8 +70,7 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
 
     QStringList classPaths;
     classPaths.push_back( appPath );
-    classPaths.push_back( appPath + "/fermanext.jar" );
-    classPaths.push_back( appPath + "/plugins/loaders" );    
+    classPaths.push_back( appPath + "/plugins/loaders/fermanext.jar" );
 
     QString envJavaHomeStr( envJavaHome );
     QStringList options;
@@ -79,55 +80,66 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
 
     try { javaVM = new JavaVirtualMachine( jvmLibPath,
                                            JavaVirtualMachine::v1_4,
-                                           options ); 
-        JClass progCls = javaVM->findClass("Prog");
-        if ( progCls == 0 ) {
-            qWarning( "Can't find Prog class" );
-            return;
-        }
-
-        JMethodID progInit = javaVM->getMethodID( progCls, "<init>", "(I)V" );
-        if ( progInit == 0 ) {
-            qWarning( "Can't find Prog.<init>" );
-            return;
-        }
-
-        JValue param;
-        param.i = 666;
-        JObject progObj = javaVM->newObjectA( progCls, progInit, &param );
-        if ( progObj == 0 ) {
-            qWarning( "Can't construct prog obj" );
-            return;
-        }          
-        
-    }
+                                           options ); }
     catch ( ... ) {        
-        QMessageBox::warning( 0, "Can't start JVM", 
-                              QString("JVM \"%1\" can't be started!\n").
-                                  arg(jvmLibPath)
+        QMessageBox::warning( 
+                     0, QObject::tr("Can't start JVM"), 
+                     QObject::tr("JVM \"%1\" can't be started!\n").
+                         arg(jvmLibPath)
 #if !defined _WIN32 && !defined WIN32
-                              + QString("Maybe you have forgot to specify "
-                                        "LD_LIBRARY_PATH?\nIt should be set "
-                                        "to\n  1. %1\n  2. %2\n").
-                                    arg(jvmLibi386Dir).arg(jvmLibDir)
+                     + QObject::tr("Maybe you have forgot to specify "
+                                   "LD_LIBRARY_PATH?\nIt should be set "
+                                   "to\n  1. %1\n  2. %2\n").
+                         arg(jvmLibi386Dir).arg(jvmLibDir)
 #endif
-                              + "\nJava loader has been disabled!"
+                     + QObject::tr("\nJava loader has been disabled!")
                               );        
+    }
+
+
+    // Try to find main 'FermaNext' class
+    JClass fnCls = javaVM->findClass("fermanext/FermaNext");
+    if ( fnCls == 0 ) {
+        QMessageBox::warning( 
+                      0, QObject::tr("Can't start JavaPluginLoader"), 
+                      QObject::tr("JavaPluginLoader can't be started\n"
+                                  "because subsidiary system class\n"
+                                  "'fermanext.FermaNext' doesn't exist")
+                              );
+        delete javaVM;
+        javaVM = 0;
+        return;
+    }
+    
+    JMethodID disposeAllFrames = 
+        javaVM->getStaticMethodID( fnCls, "disposeAllFrames", "()V" );
+    if ( disposeAllFrames == 0 ) {
+        QMessageBox::warning(
+                       0, QObject::tr("Can't start JavaPluginLoader"), 
+                       QObject::tr("Method 'disposeAllFrames' doesn't "
+                                   "exist\nin subsidiary system class "
+                                   "'fermanext.FermaNext'")
+                              );
+        delete javaVM;
+        javaVM = 0;
+        return;
     }
 }
 
 JavaPluginLoader::~JavaPluginLoader ()
 {
-    // Dispose all frames for clean exit
-    JClass fnCls = javaVM->findClass("fermanext/FermaNext");
-    if ( fnCls ) {
-        JMethodID disposeAllFrames = 
-            javaVM->getStaticMethodID( fnCls, "disposeAllFrames", "()V" );
+    if ( javaVM ) {
+        // Dispose all frames for cleanly exit
+        JClass fnCls = javaVM->findClass("fermanext/FermaNext");
+        if ( fnCls ) {
+            JMethodID disposeAllFrames = 
+                javaVM->getStaticMethodID( fnCls, "disposeAllFrames", "()V" );
 
-        if ( disposeAllFrames )
-            javaVM->callStaticVoidMethod( fnCls, disposeAllFrames );
+            if ( disposeAllFrames )
+                javaVM->callStaticVoidMethod( fnCls, disposeAllFrames );
+        }
+        delete javaVM;
     }
-    delete javaVM;
 }
 
 const QString& JavaPluginLoader::pluginExtension () const

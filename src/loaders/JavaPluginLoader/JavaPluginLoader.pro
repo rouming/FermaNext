@@ -32,3 +32,6 @@ HEADERS = JavaPluginLoader.h \
 SOURCES = JavaPluginLoader.cpp \
           \
           JavaVM/JavaVirtualMachine.cpp
+
+# Build java-src
+system(ant)
