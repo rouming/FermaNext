@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<project name="JavaPluginLoader" default="build.all" basedir=".">
+
+    <property name="src.dir" value="java-src"/>
+    <property name="pkg.name" value="fermanext"/>
+    <property name="loaders.dir" value="../../../plugins/loaders"/>
+    <property name="build.dir" value="../../../build"/>
+    <property name="dist.build.dir" value="${build.dir}/JavaPluginLoader"/>
+    <property name="src.build.dir" value="${dist.build.dir}/classes"/>
+    <property name="lib.build.dir" value="${loaders.dir}"/>
+    <property name="src.build.jar" value="${pkg.name}.jar"/>
+    <property environment="env"/>
+
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${dist.build.dir}"/>
+    <mkdir dir="${src.build.dir}"/>
+
+
+
+    <!-- ================================================================== -->
+    <!-- Set up build class path                                            -->
+    <!-- ================================================================== -->
+    <path id="build.classpath">
+      <pathelement path="${src.build.dir}"/>
+    </path>
+
+
+    <!-- ================================================================== -->
+    <!-- Build all                                                          -->
+    <!-- ================================================================== -->
+    <target name="build.all" 
+            depends="build.src">
+    </target>
+
+
+    <!-- ================================================================== -->
+    <!-- Build all src                                                      -->
+    <!-- ================================================================== -->
+    <target name="build.src">
+      <antcall target="compile">
+        <param name="includes" value="${pkg.name}/**/*.java"/>
+      </antcall>
+
+
+      <jar jarfile="${lib.build.dir}/${src.build.jar}" 
+           includes="${pkg.name}/**" 
+           basedir="${src.build.dir}"/>
+
+    </target>
+
+
+    <!-- ================================================================== -->
+    <!-- Useful compile target                                              -->
+    <!-- ================================================================== -->
+    <target name="compile">
+        <property name="includes" value=""/>
+        <property name="excludes" value=""/>
+
+        <javac srcdir="${src.dir}" 
+               destdir="${src.build.dir}" 
+               classpathref="build.classpath" 
+               includes="${includes}" 
+               excludes="${excludes}"/>
+    </target>
+
+
+    <!-- ================================================================== -->
+    <!-- Cleans                                                             -->
+    <!-- ================================================================== -->
+    <target name="clean" depends="clean.build">
+      <echo message="Cleaning all"/>
+    </target>
+
+    <target name="clean.build">
+      <echo message="Cleaning build"/>
+      <delete dir="${dist.build.dir}"/>
+    </target>
+
+</project>
