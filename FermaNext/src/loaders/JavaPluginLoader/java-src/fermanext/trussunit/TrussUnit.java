@@ -33,5 +33,10 @@ public class TrussUnit
     public native LoadCases getLoadCases ();
     public native TrussMaterial getMaterial ();
     public native void setMaterial ( TrussMaterial mat );
+
+    static { 
+        System.loadLibrary("JavaPluginLoader.ldr");
+    }
+
 };
 

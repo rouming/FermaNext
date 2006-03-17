@@ -31,7 +31,9 @@ HEADERS = JavaPluginLoader.h \
 
 SOURCES = JavaPluginLoader.cpp \
           \
-          JavaVM/JavaVirtualMachine.cpp
+          JavaVM/JavaVirtualMachine.cpp \
+          \
+          stubs-src/fermanext_trussunit_TrussUnit.cpp
 
 # Build java-src
 system(ant)
