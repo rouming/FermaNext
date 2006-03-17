@@ -8,14 +8,13 @@
 #include <QApplication>
 #include <QMenu>
 #include <QMenuBar>
-#include <QAccel>
+#include <QShortcut>
 #include <QToolBox>
 #include <QPainter>
-#include <QWidgetStack>
+#include <QStackedWidget>
 #include <QStyleFactory>
 #include <QAction>
 #include <QSignalMapper>
-#include <QDict>
 #include <QDir>
 #include <QTextCodec>
 #include <QButtonGroup>
@@ -26,6 +25,8 @@
 #include <QInputDialog> 
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QDesktopWidget>
+#include <QDockWidget>
 
 const QString mainFrameCaption( QObject::tr( "Educational CAD System 'Ferma'" ) );
 
@@ -33,9 +34,8 @@ const QString mainFrameCaption( QObject::tr( "Educational CAD System 'Ferma'" ) 
  * FermaNext Main Frame
  *****************************************************************************/
 
-FermaNextMainFrame::FermaNextMainFrame ( QWidget* p, const char* n, 
-                                         WFlags f ) :
-    QMainWindow(p, n, f),
+FermaNextMainFrame::FermaNextMainFrame ( QWidget* p, Qt::WFlags f ) :
+    QMainWindow(p, f),
     pluginsMenu(0)
 {      
     init();
@@ -65,12 +65,14 @@ void FermaNextMainFrame::init ()
     // Do not move this line. Should be the first for correct inition.
     FermaNextWorkspace::workspace().createWidgetStack( *this );
 
-    setCaption(mainFrameCaption);
+    setWindowTitle(mainFrameCaption);
     setMinimumSize( 640, 480 );
     statusBar()->addWidget(new QLabel( tr("Ready"), statusBar() ));
 
-    undoRedoHistoryWidget = new QWidget( this, "undo_redo_history",
-                                         WStyle_Tool | WType_TopLevel );
+    undoRedoHistoryWidget = new QWidget( this,
+                                        // FIXME QT3TO4
+                                        // WStyle_Tool | WType_TopLevel 
+                                        Qt::Window | Qt::Tool );
 
     int undoRedoWidth = 140, undoRedoHeight = 110;
     undoRedoHistoryWidget->setFixedSize( undoRedoWidth, undoRedoHeight );
@@ -78,20 +80,25 @@ void FermaNextMainFrame::init ()
     undoRedoHistoryWidget->move( QApplication::desktop()->width() - 
                                  int(undoRedoWidth*1.5), 
                                  0 + int(undoRedoHeight*1.5) );
-    undoRedoHistoryWidget->setCaption( tr("History") );
+    undoRedoHistoryWidget->setWindowTitle( tr("History") );
 
     QVBoxLayout* vboxHistoryWidget = new QVBoxLayout( undoRedoHistoryWidget );
     undoRedoListBox = new UndoRedoListBox( undoRedoHistoryWidget );
     vboxHistoryWidget->addWidget( undoRedoListBox );
 
-    projectsDockWindow = new QDockWindow( QDockWindow::InDock, this );
-    projectsDockWindow->setResizeEnabled( TRUE );
-    projectsDockWindow->setVerticalStretchable( TRUE );
-    projectsDockWindow->setCaption( tr("Truss Unit Projects") );
-    addDockWindow( projectsDockWindow, DockLeft );
-    setDockEnabled( projectsDockWindow, DockTop, FALSE );
-    setDockEnabled( projectsDockWindow, DockBottom, FALSE );
-    projectsDockWindow->setCloseMode( QDockWindow::Always );
+    projectsDockWindow = new QDockWidget( // FIXME QT3TO4 QDockWidget::InDock, 
+                                          this );
+    //FIXME QT3TO4
+    //projectsDockWindow->setResizeEnabled( TRUE );
+    //projectsDockWindow->setVerticalStretchable( TRUE );
+    projectsDockWindow->setWindowTitle( tr("Truss Unit Projects") );
+    //FIXME QT3TO4
+    // addDockWindow
+    setCentralWidget( projectsDockWindow );
+    //FIXME QT3TO4
+    //setDockEnabled( projectsDockWindow, DockTop, FALSE );
+    //setDockEnabled( projectsDockWindow, DockBottom, FALSE );
+    //projectsDockWindow->setCloseMode( QDockWidget::Always );
 
     FermaNextWorkspace& ws = FermaNextWorkspace::workspace();
     projectToolBox = new ProjectToolBox( ws, projectsDockWindow );
@@ -104,10 +111,12 @@ void FermaNextMainFrame::init ()
     connect( projectToolBox, SIGNAL(currentChanged(int)), 
                              SLOT(refreshProjectActions()) );
     projectsDockWindow->setWidget( projectToolBox );
-    projectsDockWindow->setFixedExtentWidth( 160 );
+    //FIXME QT3TO4
+    //projectsDockWindow->setFixedExtentWidth( 160 );
     projectsDockWindow->hide();
 
-    setRightJustification( true );
+    //FIXME QT3TO4
+    //setRightJustification( true );
 }
 
 void FermaNextMainFrame::someProjectRemoved ( FermaNextProject& prj )
@@ -142,9 +151,11 @@ void FermaNextMainFrame::createProject ()
 {
     bool ok;
     QString text = QInputDialog::getText(
+            this,
             tr("Project creation"), 
-            tr("Enter project name:"), QLineEdit::Normal,
-            QString::null, &ok, this );
+            tr("Enter project name:"), 
+            QLineEdit::Normal,
+            QString(), &ok );
     if ( ok && !text.isEmpty() ) {
         FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
         FermaNextProject& prj = wsp.createProject( text );
@@ -193,139 +204,150 @@ void FermaNextMainFrame::createProject ()
 
 void FermaNextMainFrame::setupFileActions ()
 {
-    QToolBar *tb = new QToolBar( this );
-    tb->setLabel( tr("File Actions") );
-    QPopupMenu *menu = new QPopupMenu( this );
-    menuBar()->insertItem( tr( "&File" ), menu );
+    //FIXME QT3TO4 whole change
+    QToolBar* tb = addToolBar( tr("File Actions") );
+    QMenu* menu = menuBar()->addMenu( tr( "&File" ) );
 
     QAction *a;
     // New
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/filenew.xpm" ), 
-                     tr( "&New..." ), CTRL + Key_N, this, "fileNew" );
-    connect( a, SIGNAL( activated() ), this, SLOT( fileNew() ) );
-    a->addTo( tb );
-    a->addTo( menu );
+    a = new QAction( QIcon( imagesPath() + "/filenew.xpm" ), 
+                     tr( "&New..." ), this );
+    a->setShortcut( tr("Ctrl+N") );
+    a->setStatusTip( tr("Create new project") );
+    connect( a, SIGNAL(activated()), SLOT(fileNew()) );
+    tb->addAction( a );
+    menu->addAction( a );
 
     // Open
-    a = new QAction( QPixmap::fromMimeSource( imagesPath() + "/fileopen.xpm" ), 
-                     tr( "&Open..." ), CTRL + Key_O, this, "fileOpen" );
-    connect( a, SIGNAL( activated() ), this, SLOT( fileOpen() ) );
-    a->addTo( tb );
-    a->addTo( menu );    
+    a = new QAction( QIcon( imagesPath() + "/fileopen.xpm" ),
+                     tr( "&Open..." ), this );
+    a->setShortcut( tr("Ctrl+O") );
+    a->setStatusTip( tr("Open project") );
+    connect( a, SIGNAL(activated()), SLOT(fileOpen()) );
+    tb->addAction( a );
+    menu->addAction( a );
 
     // Save
-    saveProjectAction = 
-        new QAction( QPixmap::fromMimeSource( imagesPath() + "/filesave.xpm" ),
-                     tr( "&Save..." ), CTRL + Key_S, this, "fileSave" );
-    connect( saveProjectAction, SIGNAL( activated() ), 
-             this, SLOT( fileSave() ) );
-    saveProjectAction->addTo( tb );
-    saveProjectAction->addTo( menu );
+    saveProjectAction = new QAction( QIcon( imagesPath() + "/filesave.xpm" ),
+                                     tr( "&Save..." ), this );
+    saveProjectAction->setShortcut( tr("Ctrl+S") );
+    saveProjectAction->setStatusTip( tr("Save project") );
+    connect( saveProjectAction, SIGNAL(activated()), SLOT(fileSave()) );
+    tb->addAction( saveProjectAction );
+    menu->addAction( saveProjectAction );
     saveProjectAction->setDisabled(true);
-    menu->insertSeparator();
+    menu->addSeparator();
 
     // Save As
-    saveAsProjectAction = 
-        new QAction( tr( "Save &As..." ), 0, this, "fileSaveAs" );
-    connect( saveAsProjectAction, SIGNAL( activated() ), 
-             this, SLOT( fileSaveAs() ) );
-    saveAsProjectAction->addTo( menu );
+    saveAsProjectAction = new QAction( tr( "Save &As..." ), this );
+    saveAsProjectAction->setStatusTip( tr("Save project as") );
+    connect( saveAsProjectAction, SIGNAL(activated()), SLOT(fileSaveAs()) );
+    menu->addAction( saveAsProjectAction );
     saveAsProjectAction->setDisabled(true);
 
     // Close
-    closeProjectAction = 
-        new QAction( tr( "&Close" ), 0, this, "fileClose" );
-    connect( closeProjectAction, SIGNAL( activated() ), 
-             this, SLOT( fileClose() ) );
-    closeProjectAction->addTo( menu );
+    closeProjectAction = new QAction( tr( "&Close" ), this );
+    closeProjectAction->setStatusTip( tr("Close project") );
+    connect( closeProjectAction, SIGNAL(activated()), SLOT(fileClose()) );
+    menu->addAction( closeProjectAction );
     closeProjectAction->setDisabled(true);
-    menu->insertSeparator();
+    menu->addSeparator();
 
     // Open Wsp
-    a = new QAction( tr( "Open Workspace..." ), SHIFT + Key_F2, 
-                     this, "fileOpenWsp" );
-    connect( a, SIGNAL( activated() ), this, SLOT( fileOpenWsp() ) );
-    a->addTo( menu );
+    a = new QAction( tr( "Open Workspace..." ), this );
+    a->setShortcut( tr("Shift+F2") );
+    a->setStatusTip( tr("Open workspace") );
+    connect( a, SIGNAL(activated()), SLOT(fileOpenWsp()) );
+    menu->addAction( a );
 
     // Save Wsp
-    a = new QAction( tr( "Save Workspace" ), SHIFT + Key_F3, 
-                     this, "fileSaveWsp" );
-    connect( a, SIGNAL( activated() ), this, SLOT( fileSaveWsp() ) );
-    a->addTo( menu );
+    a = new QAction( tr( "Save Workspace" ), this );
+    a->setShortcut( tr("Shift+F3") );
+    a->setStatusTip( tr("Save workspace") );
+    connect( a, SIGNAL(activated()), SLOT(fileSaveWsp()) );
+    menu->addAction( a );
 
     // Save Wsp As
-    a = new QAction( tr( "Save Workspace As..." ), 0, 
-                     this, "fileSaveWspAs" );
-    connect( a, SIGNAL( activated() ), this, SLOT( fileSaveWspAs() ) );
-    a->addTo( menu );
+    a = new QAction( tr( "Save Workspace As..." ), this );
+    a->setStatusTip( tr("Save workspace as") );
+    connect( a, SIGNAL(activated()), SLOT(fileSaveWspAs()) );
+    menu->addAction( a );
 
     // Close Wsp
-    a = new QAction( tr( "Close Workspace" ), SHIFT + Key_F4, 
-                     this, "fileCloseWsp" );
-    connect( a, SIGNAL( activated() ), this, SLOT( fileCloseWsp() ) );
-    a->addTo( menu );
-    menu->insertSeparator();
+    a = new QAction( tr( "Close Workspace" ), this );
+    a->setShortcut( tr("Shift+F4") );
+    a->setStatusTip( tr("Close workspace") );
+    connect( a, SIGNAL(activated()), SLOT(fileCloseWsp()) );
+    menu->addAction( a );
+    menu->addSeparator();
 
     // Save All
-    a = new QAction( tr( "Save All" ), CTRL + SHIFT + Key_S, 
-                     this, "fileSaveAll" );
-    connect( a, SIGNAL( activated() ), this, SLOT( fileSaveAll() ) );
-    a->addTo( menu );
-    menu->insertSeparator();
+    a = new QAction( tr( "Save All" ), this );
+    a->setShortcut( tr("Ctrl+Shift+S") );
+    a->setStatusTip( tr("Save workspace and projects") );
+    connect( a, SIGNAL(activated()), SLOT(fileSaveAll()) );
+    menu->addAction( a );
+    menu->addSeparator();
 
     // Page Setup
-    a = new QAction( tr( "Page setup..." ), 0, this, "filePageSetup" );
-    connect( a, SIGNAL( activated() ), this, SLOT( filePageSetup() ) );
-    a->addTo( menu );
+    a = new QAction( tr( "Page setup..." ), this );
+    a->setStatusTip( tr("Satup page") );
+    connect( a, SIGNAL(activated()), SLOT(filePageSetup()) );
+    menu->addAction( a );
     a->setDisabled(true);
 
     // Print Preview
-    a = new QAction( tr( "Print Preview" ), CTRL + ALT + Key_P, 
-                     this, "fileprintpreview" );
-    connect( a, SIGNAL( activated() ), this, SLOT( filePrintPreview() ) );
-    a->addTo( menu );
+    a = new QAction( tr( "Print Preview" ), this );
+    a->setShortcut( tr("Ctrl+Alt+P") );
+    a->setStatusTip( tr("Print preview") );
+    connect( a, SIGNAL(activated()), SLOT(filePrintPreview()) );
+    menu->addAction( a );
     a->setDisabled(true);
 
     // Print
-    printAction = new QAction( 
-                 QPixmap::fromMimeSource( imagesPath() + "/fileprint.xpm" ), 
-                 tr( "&Print..." ), CTRL + Key_P, this, "filePrint" );
-    connect( printAction, SIGNAL( activated() ), this, SLOT( filePrint() ) );        
-    printAction->addTo( menu );
+    printAction = new QAction( QIcon( imagesPath() + "/fileprint.xpm" ), 
+                               tr( "&Print..." ), this );
+    printAction->setShortcut( tr("Ctrl+P") );
+    printAction->setStatusTip( tr("Print project") );
+    connect( printAction, SIGNAL(activated()), SLOT(filePrint()) );        
+    menu->addAction( printAction );
     printAction->setDisabled(true);
-    menu->insertSeparator();    
+    menu->addSeparator();    
 
     // Exit
-    a = new QAction( tr( "E&xit" ), CTRL + Key_Q, this, "fileExit" );
-    connect( a, SIGNAL( activated() ), this, SLOT( fileExit() ) );
-    a->addTo( menu );
+    a = new QAction( tr( "E&xit" ), this );
+    a->setShortcut( tr("Ctrl+Q") );
+    a->setStatusTip( tr("Exit") );
+    connect( a, SIGNAL(activated()), SLOT(fileExit()) );
+    menu->addAction( a );
 }
 
 void FermaNextMainFrame::setupEditActions ()
 {
-    QToolBar *tb = new QToolBar( this );
-    tb->setLabel( tr("Edit Actions") );
-    QPopupMenu *menu = new QPopupMenu( this );
-    menuBar()->insertItem( tr( "&Edit" ), menu );
+    //FIXME QT3TO4 whole change
+    QToolBar* tb = addToolBar( tr("Edit Actions") );
+    QMenu* menu = menuBar()->addMenu( tr( "&Edit" ) );
 
     // Undo
-    undoAction = new QAction( 
-                      QPixmap::fromMimeSource( imagesPath() + "/editundo.xpm" ), 
-                      tr( "&Undo" ), CTRL + Key_Z, this, "editUndo" );
-    connect( undoAction, SIGNAL( activated() ), this, SLOT( editUndo() ) );
+    undoAction = new QAction( QIcon( imagesPath() + "/editundo.xpm" ), 
+                              tr( "&Undo" ), this );
+    undoAction->setShortcut( tr("Ctrl+Z") );
+    undoAction->setStatusTip( tr("Undo last action") );
+    connect( undoAction, SIGNAL(activated()), SLOT(editUndo()) );
     undoAction->setDisabled(true);
-    undoAction->addTo( tb );
-    undoAction->addTo( menu );
+    tb->addAction( undoAction );
+    menu->addAction( undoAction );
 
     // Redo
-    redoAction = new QAction( 
-                      QPixmap::fromMimeSource( imagesPath() + "/editredo.xpm" ), 
-                      tr( "&Redo" ), CTRL + Key_Y, this, "editRedo" );
-    connect( redoAction, SIGNAL( activated() ), this, SLOT( editRedo() ) );
+    redoAction = new QAction( QIcon( imagesPath() + "/editredo.xpm" ), 
+                              tr( "&Redo" ), this );
+    redoAction->setShortcut( tr("Ctrl+Y") );
+    redoAction->setStatusTip( tr("Redo last action") );
+    connect( redoAction, SIGNAL(activated()), SLOT(editRedo()) );
     redoAction->setDisabled(true);
-    redoAction->addTo( tb );
-    redoAction->addTo( menu );
-    menu->insertSeparator();
+    tb->addAction( redoAction );
+    menu->addAction( redoAction );
+    menu->addSeparator();
     tb->addSeparator();
 }
 
@@ -339,21 +361,24 @@ void FermaNextMainFrame::setupWindowActions ()
 
 void FermaNextMainFrame::setupHelpActions ()
 {
-    QPopupMenu *menu = new QPopupMenu( this );
-    menuBar()->insertItem( tr( "&Help" ), menu );
+    //FIXME QT3TO4 whole change
+    QMenu* menu = menuBar()->addMenu( tr( "&Help" ) );
 
     QAction *a;
     // Contents
-    a = new QAction( tr( "Contents..." ), Key_F1, this, "helpContents" );
-    connect( a, SIGNAL( activated() ), this, SLOT( helpContents() ) );
-    a->addTo( menu );
+    a = new QAction( tr( "Contents..." ), this );
+    a->setShortcut( tr("F1") );
+    a->setStatusTip( tr("Contents") );
+    connect( a, SIGNAL(activated()), SLOT(helpContents()) );
+    menu->addAction( a );
     a->setDisabled(true);
-    menu->insertSeparator();
+    menu->addSeparator();
 
     // About
-    a = new QAction( tr( "About FermaNext" ), 0, this, "helpAbout" );
-    connect( a, SIGNAL( activated() ), this, SLOT( helpAbout() ) );    
-    a->addTo( menu );
+    a = new QAction( tr( "About FermaNext" ), this );
+    a->setStatusTip( tr("Help") );
+    connect( a, SIGNAL(activated()), SLOT(helpAbout()) );    
+    menu->addAction( a );
     a->setDisabled(true);
 }
 
@@ -385,21 +410,20 @@ void FermaNextMainFrame::reloadPlugins ( bool reload )
         names.push_back( (*plgIt)->pluginInfo().name );
 
     if ( pluginsMenu == 0 ) {
-        pluginsMenu = new QPopupMenu( this );
-        menuBar()->insertItem( tr( "&Plugins" ), pluginsMenu );
+        pluginsMenu = menuBar()->addMenu( tr( "&Plugins" ) );
     }
     else 
         pluginsMenu->clear();
 
     QStringList::iterator i = names.begin();
     for ( ; i != names.end(); ++i ) {
-        pluginsMenu->insertItem( *i );
+        pluginsMenu->addAction( *i );
     }
-    pluginsMenu->insertSeparator();
+    pluginsMenu->addSeparator();
 
     // Reload plugins
-    pluginsMenu->insertItem( tr("Reload plugins"), this, 
-                             SLOT(reloadPlugins()) );
+    pluginsMenu->addAction( tr("Reload plugins"), this, 
+                            SLOT(reloadPlugins()) );
 }
 
 void FermaNextMainFrame::refreshUndoRedoActions ()
@@ -478,9 +502,11 @@ void FermaNextMainFrame::fileNew ()
 
 void FermaNextMainFrame::fileOpen ()
 {
-    QString fileName = QFileDialog::getOpenFileName( QString::null, 
-        "Ferma project (*" + FermaNextProject::formatExtension() + ")",
-        this, "open ferma project", tr("Open ferma project") );
+    QString fileName = QFileDialog::getOpenFileName( 
+        this, 
+        tr("Open ferma project"),
+        applicationDirPath(),
+        "Ferma project (*" + FermaNextProject::formatExtension() + ")" );
 
     if ( fileName.isEmpty() )
         return;
@@ -516,16 +542,16 @@ bool FermaNextMainFrame::fileSaveAs ()
 
     QString prjName = currentPrj->getName();
     QString fileName = QFileDialog::getSaveFileName( 
+        this,
+        tr("Save ferma project (%1)").arg(prjName),
         prjName + FermaNextProject::formatExtension(),
-        "Ferma project (*" + FermaNextProject::formatExtension() + ")", 
-        this, "save ferma project", tr("Save ferma project (%1)").
-          arg(prjName) );
+        "Ferma project (*" + FermaNextProject::formatExtension() + ")" );
 
     if ( fileName.isEmpty() )
         return false;
 
     QRegExp rx( ".*\\" + FermaNextProject::formatExtension() + "$" );
-    if ( -1 == rx.search( fileName ) )
+    if ( -1 == rx.indexIn( fileName ) )
         fileName += FermaNextProject::formatExtension();
 
     QFileInfo prjFileInfo( fileName );
@@ -567,15 +593,18 @@ void FermaNextMainFrame::fileClose ()
 void FermaNextMainFrame::fileOpenWsp ()
 {
     if ( QMessageBox::question( this,
-                                tr("Open workspace"),                                  
+                                tr("Open workspace"),
                                 tr("Open new workspace?"),
                                 tr("&Yes"), tr("&No"),
                                 QString::null, 0, 1 ) )
         return;
 
-    QString fileName = QFileDialog::getOpenFileName( QString::null, 
-        "Ferma workspace (*" + FermaNextWorkspace::formatExtension() + ")", 
-        this, "open ferma workspace", tr("Open ferma workspace") );
+
+    QString fileName = QFileDialog::getOpenFileName( 
+       this,
+       tr("Open ferma workspace"),
+       applicationDirPath(),
+        "Ferma workspace (*" + FermaNextWorkspace::formatExtension() + ")" );
 
     if ( fileName.isEmpty() )
         return;
@@ -631,15 +660,17 @@ bool FermaNextMainFrame::fileSaveWsp ()
 
 bool FermaNextMainFrame::fileSaveWspAs ()
 {
-    QString fileName = QFileDialog::getSaveFileName( QString::null, 
-        "Ferma workspace (*" + FermaNextWorkspace::formatExtension() + ")",
-        this, "save ferma workspace", tr("Save ferma workspace") );
+    QString fileName = QFileDialog::getSaveFileName( 
+        this,
+        tr("Save ferma workspace"),
+        applicationDirPath(),
+        "Ferma workspace (*" + FermaNextWorkspace::formatExtension() + ")" );
 
     if ( fileName.isEmpty() )
         return false;
 
     QRegExp rx( ".*\\" + FermaNextWorkspace::formatExtension() + "$" );
-    if ( -1 == rx.search( fileName ) )
+    if ( -1 == rx.indexIn( fileName ) )
         fileName += FermaNextWorkspace::formatExtension();
 
     QFileInfo wspFileInfo( fileName );

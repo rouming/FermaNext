@@ -16,7 +16,7 @@ class FermaNextMainFrame : public QMainWindow
 {
     Q_OBJECT
 public:
-    FermaNextMainFrame ( QWidget * parent = 0, const char * name = 0,
+    FermaNextMainFrame ( QWidget * parent = 0, 
                          // FIXME QT3TO4: WFlags f = WType_TopLevel
                          Qt::WFlags f = Qt::Window );
 

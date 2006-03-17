@@ -26,14 +26,16 @@ INCLUDEPATH = $$(AGGDIR)/include \
               ../TrussUnit \
               ../gui
 
-FORMS = ../gui/CalcDataWidget.ui
+#FIXME QT3TO4
+#FORMS = ../gui/CalcDataWidget.ui
 
 SOURCES = \
           FermaNext.cpp \
           FermaNextConfig.cpp \
           FermaNextProject.cpp \
           FermaNextWorkspace.cpp \
-          ../gui/CalcDataToolBar.cpp \
+#FIXME QT3TO4
+#          ../gui/CalcDataToolBar.cpp \
           ../gui/FermaNextMainFrame.cpp \
           ../gui/ProjectToolBox.cpp \
           ../gui/Splash.cpp \
@@ -45,7 +47,8 @@ HEADERS = \
           FermaNextConfig.h \
           FermaNextProject.h \
           FermaNextWorkspace.h \
-          ../gui/CalcDataToolBar.h \
+#FIXME QT3TO4
+#          ../gui/CalcDataToolBar.h \
           ../gui/FermaNextMainFrame.h \
           ../gui/ProjectToolBox.h \
           ../gui/Splash.h \

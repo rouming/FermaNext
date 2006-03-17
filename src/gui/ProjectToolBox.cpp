@@ -4,27 +4,29 @@
 #include "SubsidiaryConstants.h"
 #include "TrussUnitActions.h"
 #include "TrussCalcData.h"
-#include "CalcDataWidget.h"
+//FIXME QT3TO4
+//#include "CalcDataWidget.h"
 #include "CalculationInterface.h"
 
 #include <QButtonGroup>
 #include <QToolButton>
 #include <QLabel>
 #include <QListView>
-#include <QHeader>
 #include <QMessageBox>
 #include <QIconSet>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QAction>
+#include <QVBoxLayout>
+#include <QGroupBox>
 
 /*****************************************************************************
  * Project ToolBox
  *****************************************************************************/
 
 ProjectToolBox::ProjectToolBox ( FermaNextWorkspace& ws, QWidget* parent, 
-                                 const char* name, WFlags f ) :
-    QToolBox(parent, name, f),
+                                 Qt::WFlags f ) :
+    QToolBox(parent, f),
     currentPrj(0),
     workspace(ws)
 {    
@@ -56,9 +58,9 @@ int ProjectToolBox::addProject ( FermaNextProject& prj )
     QObject::connect( &prj, SIGNAL(onNameChange(const QString&)),
                             SLOT(projectRename(const QString&)) );
 
-    QIconSet iconSet( QPixmap::fromMimeSource( imagesPath() + "/project_toolbox.png" ) );
-    int result = addItem( page, iconSet, prj.getName() );
-    setCurrentItem(page);
+    QIcon icon( imagesPath() + "/project_toolbox.png" );
+    int result = addItem( page, icon, prj.getName() );
+    setCurrentWidget(page);
     prj.activate();
     return result;
 }
@@ -71,13 +73,13 @@ int ProjectToolBox::removeProject ( FermaNextProject& prj )
     ProjectMapIter iter = projects.find(&prj);
     if ( iter == projects.end() ) 
         return -1;
-    QWidget* page = iter.data();
+    QWidget* page = iter.value();
     projects.erase(iter);
-    int result = removeItem(page);
-    if ( result > 0 )
-        setCurrentIndex( result - 1 );        
+    int indexToRemove = indexOf(page);
+    removeItem( indexToRemove );
+    setCurrentIndex( indexToRemove - 1 );        
     delete page;
-    return result;
+    return indexToRemove;
 }
 
 void ProjectToolBox::projectRename ( const QString& newName )
@@ -89,7 +91,7 @@ void ProjectToolBox::projectRename ( const QString& newName )
         if ( projects.contains( &prj ) ) {
             int indx = indexOf( projects[&prj] );
             if ( indx != -1 )
-                setItemLabel( indx, newName );
+                setItemText( indx, newName );
         }
     } catch ( ... ) {}
 }
@@ -99,70 +101,76 @@ void ProjectToolBox::projectIsActivated ( FermaNextProject& prj )
     // Double activation check
     if ( currentProject() == &prj )
         return;
-    setCurrentItem( projects[&prj] );
+    setCurrentWidget( projects[&prj] );
 }
 
 QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
 {
     // Main widget
-    QWidget* page = new QWidget( this, "page" );
-    page->setBackgroundMode( QWidget::PaletteBackground );
-    QVBoxLayout* pageLayout = new QVBoxLayout( page, 0, 0, "pageLayout"); 
+    QWidget* page = new QWidget( this );
+    page->setBackgroundRole( QPalette::Background );
+    QVBoxLayout* pageLayout = new QVBoxLayout( this );
+    page->setLayout( pageLayout );
 
     // Main group box
-    QGroupBox* groupBox = new QGroupBox( page, "groupBox" );
-    groupBox->setBackgroundMode(PaletteBase);
-    groupBox->setLineWidth( 0 );
-    groupBox->setColumnLayout(0, Qt::Vertical );
+    QGroupBox* groupBox = new QGroupBox( page );
+    groupBox->setBackgroundRole( QPalette::Base );
+    //FIXME QT3TO4
+    //groupBox->setLineWidth( 0 );
+    //groupBox->setColumnLayout(0, Qt::Vertical );
     groupBox->layout()->setSpacing( 0 );
     groupBox->layout()->setMargin( 0 );
-    QVBoxLayout* groupBoxLayout = new QVBoxLayout( groupBox->layout() );
+    QVBoxLayout* groupBoxLayout = new QVBoxLayout( groupBox );
+    groupBoxLayout->setLayout( groupBox->layout() );
     groupBoxLayout->setAlignment( Qt::AlignTop );
 
     // Info group box
-    QGroupBox* groupBoxInfo = new QGroupBox( groupBox, "groupBoxInfo" );
-    groupBoxInfo->setBackgroundMode(PaletteBase);
-    groupBoxInfo->setColumnLayout(0, Qt::Vertical );
+    QGroupBox* groupBoxInfo = new QGroupBox( groupBox );
+    groupBoxInfo->setBackgroundRole( QPalette::Base );
+    //FIXME QT3TO4
+    //groupBoxInfo->setColumnLayout(0, Qt::Vertical );
     groupBoxInfo->layout()->setSpacing( 6 );
     groupBoxInfo->layout()->setMargin( 11 );
-    QGridLayout* groupBoxInfoLayout = new QGridLayout( groupBoxInfo->layout() );
+    QGridLayout* groupBoxInfoLayout = 
+        new QGridLayout( groupBoxInfo->layout() );
     groupBoxInfoLayout->setAlignment( Qt::AlignTop );
 
     // Windows group box
-    QGroupBox* groupBoxWindows = new QGroupBox( groupBox, "groupBoxWindows" );
+    QGroupBox* groupBoxWindows = new QGroupBox( groupBox );
     groupBoxWindows->setBackgroundMode(PaletteBase);
     groupBoxWindows->setColumnLayout(0, Qt::Vertical );
     groupBoxWindows->layout()->setSpacing( 6 );
     groupBoxWindows->layout()->setMargin( 11 );
-    QVBoxLayout* groupBoxWindowsLayout = new QVBoxLayout( groupBoxWindows->layout() );
+    QVBoxLayout* groupBoxWindowsLayout = 
+        new QVBoxLayout( groupBoxWindows->layout() );
     groupBoxWindowsLayout->setAlignment( Qt::AlignTop );
 
     // Labels for info group box
-    QLabel* labelTrussNumberVal = new QLabel( groupBoxInfo, "labelTrussNumberVal" );
+    QLabel* labelTrussNumberVal = new QLabel( groupBoxInfo );
     labelTrussNumberVal->setBackgroundMode(PaletteBase);
     groupBoxInfoLayout->addWidget( labelTrussNumberVal, 1, 1 );
 
-    QLabel* labelTOKVal = new QLabel( groupBoxInfo, "labelTOKVal" );
+    QLabel* labelTOKVal = new QLabel( groupBoxInfo );
     labelTOKVal->setBackgroundMode(PaletteBase);
     groupBoxInfoLayout->addWidget( labelTOKVal, 0, 1 );
  
-    QLabel* labelTOK = new QLabel( groupBoxInfo, "labelTOK" );    
+    QLabel* labelTOK = new QLabel( groupBoxInfo );    
     labelTOK->setBackgroundMode(PaletteBase);
     groupBoxInfoLayout->addWidget( labelTOK, 0, 0 );
  
-    QLabel* labelVisibleTrusses = new QLabel( groupBoxInfo, "labelVisibleTrusses" );    
+    QLabel* labelVisibleTrusses = new QLabel( groupBoxInfo );    
     labelVisibleTrusses->setBackgroundMode(PaletteBase); 
     groupBoxInfoLayout->addWidget( labelVisibleTrusses, 2, 0 );
  
-    QLabel* labelTrussNumber = new QLabel( groupBoxInfo, "labelTrussNumber" );    
+    QLabel* labelTrussNumber = new QLabel( groupBoxInfo );    
     labelTrussNumber->setBackgroundMode(PaletteBase); 
     groupBoxInfoLayout->addWidget( labelTrussNumber, 1, 0 );
  
-    QLabel* labelVisibleTrussesVal = new QLabel( groupBoxInfo, "labelVisibleTrussesVal" );
+    QLabel* labelVisibleTrussesVal = new QLabel( groupBoxInfo );
     labelVisibleTrussesVal->setBackgroundMode(PaletteBase); 
     groupBoxInfoLayout->addWidget( labelVisibleTrussesVal, 2, 1 );
 
-    WindowListBox * listBox = new WindowListBox ( prj, groupBoxWindows, "listBox" );
+    WindowListBox * listBox = new WindowListBox ( prj, groupBoxWindows );
     groupBoxWindowsLayout->addWidget( listBox );
 
     // Fonts
@@ -198,7 +206,8 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
     connect( calculateAllButton, SIGNAL(clicked()), SLOT(calculateAllIsPressed()) ); 
 
     // Calculate all action
-    QAction* calculationAllAction = new QAction( "Calculate all", Key_F5, this );
+    QAction* calculationAllAction = 
+        new QAction( "Calculate all", Key_F5, this );
     connect( calculationAllAction, SIGNAL( activated() ) , 
              SLOT( calculateAllIsPressed() ) );
 
@@ -257,11 +266,11 @@ void ProjectToolBox::activateSelected ( int index )
             break;
         }
 
-    QIconSet activeIconSet( QPixmap::fromMimeSource( imagesPath() + "/project_toolbox.png" ) );
-    QIconSet disablesIconSet( QPixmap::fromMimeSource( imagesPath() + "/project_d.png" ) );
+    QIcon activeIcon( imagesPath() + "/project_toolbox.png" );
+    QIcon disablesIcon( imagesPath() + "/project_d.png" );
     for ( int ind = 0; ind < count(); ++ind )
-        setItemIconSet ( ind, disablesIconSet );
-    setItemIconSet ( index, activeIconSet );        
+        setItemIcon( ind, disablesIcon );
+    setItemIcon( index, activeIcon );        
 }
 
 void ProjectToolBox::clear ()
@@ -352,15 +361,19 @@ void ProjectToolBox::calculateAllIsPressed ()
         for ( ; iter != trussWindows.end(); ++iter ) {
             TrussUnitWindow* trussWindow = *iter;
             try {
+                //FIXME QT3TO4
+                /*
                 // Try to find truss calc data widget
                 CalcDataWidget* calcForm = 
                     calcToolBar.findCalcDataWidget( *trussWindow );
+                */
             
                 // Do calculation with new topology and calc data
                 TrussCalcData calcData;
                 TrussTopology& topology = trussWindow->createTopology();
                 calcPlugin.calculate( topology, calcData );
-                calcForm->initCalc( calcData );
+                //FIXME QT3TO4
+                //calcForm->initCalc( calcData );
 
                 // TODO: toplogy manager
                 topology.desist();

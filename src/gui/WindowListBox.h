@@ -2,14 +2,15 @@
 #ifndef WINDOWLISTBOX_H
 #define WINDOWLISTBOX_H
 
-#include <QListBox>
+#include <QListWidget>
 #include <QBitArray>
 
 #include "FermaNextProject.h"
 
 class WindowListBox;
 
-class TrussUnitWindowItem : public QObject, public QListBoxPixmap
+                    //FIXME QT3TO4 QObject, QListBoxPixmap
+class TrussUnitWindowItem : public QListWidget
 {
     Q_OBJECT
 public:
@@ -19,7 +20,7 @@ public:
 
     virtual const QPixmap* pixmap () const;
 
-    virtual void fillPopup ( QPopupMenu* ) const;
+    virtual void fillPopup ( QMenu* ) const;
 
     virtual bool isSelectedInGroup () const;
     virtual bool isShown () const;
@@ -59,12 +60,12 @@ private:
 };
 
 
-class WindowListBox : public QListBox
+class WindowListBox : public QListWidget
 {
     Q_OBJECT
 public:
     WindowListBox( FermaNextProject&, QWidget* parent = 0, 
-                   const char* name = 0, WFlags fl = 0 );
+                   Qt::WFlags fl = 0 );
 
     void contextMenuEvent ( QContextMenuEvent* );
 
@@ -87,7 +88,7 @@ public slots:
     virtual void trussWindowLostFocus ( TrussUnitWindow& );
 
 protected slots:
-    virtual void raiseWindowItem ( QListBoxItem* );
+    virtual void raiseWindowItem ( QListWidgetItem* );
     virtual void showWindowItem ( TrussUnitWindowItem& );
     virtual void hideWindowItem ( TrussUnitWindowItem& );
 

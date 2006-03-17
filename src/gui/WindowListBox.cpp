@@ -21,7 +21,7 @@ TrussUnitWindowItem::TrussUnitWindowItem ( FermaNextProject& prj,
                                            WindowListBox& lb,
                                            const QPixmap& pix,
                                            const QPixmap& disPix ) :
-    QListBoxPixmap( &lb, pix, truss.getTrussName() ),
+    QListWidget( &lb, pix, truss.getTrussName() ),
     listBox(lb),
     project(prj), 
     trussWindow(truss),
@@ -64,7 +64,7 @@ const QPixmap* TrussUnitWindowItem::pixmap () const
         return &disabledPix;        
 }
 
-void TrussUnitWindowItem::fillPopup ( QPopupMenu* popup ) const
+void TrussUnitWindowItem::fillPopup ( QMenu* popup ) const
 {
     if ( isShown() ) {
         if ( isSelectedInGroup() ) {
@@ -243,8 +243,8 @@ void TrussUnitWindowItem::remove ()
  *****************************************************************************/
 
 WindowListBox::WindowListBox ( FermaNextProject& prj, QWidget* parent,
-                               const char* name, WFlags fl ) : 
-    QListBox( parent, name, fl ),
+                               Qt::WFlags fl ) : 
+    QListBox( parent, fl ),
     project(prj)
 {
     // Catch double click on item
