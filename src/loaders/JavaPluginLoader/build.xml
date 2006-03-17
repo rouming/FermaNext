@@ -2,6 +2,8 @@
 <project name="JavaPluginLoader" default="build.all" basedir=".">
 
     <property name="src.dir" value="java-src"/>
+    <property name="stubs.dir" value="stubs-src"/>
+    <property name="stubs.headers" value="${stubs.dir}/include"/>
     <property name="pkg.name" value="fermanext"/>
     <property name="loaders.dir" value="../../../plugins/loaders"/>
     <property name="build.dir" value="../../../build"/>
@@ -14,8 +16,7 @@
     <mkdir dir="${build.dir}"/>
     <mkdir dir="${dist.build.dir}"/>
     <mkdir dir="${src.build.dir}"/>
-
-
+    <mkdir dir="${stubs.headers}"/>
 
     <!-- ================================================================== -->
     <!-- Set up build class path                                            -->
@@ -29,7 +30,7 @@
     <!-- Build all                                                          -->
     <!-- ================================================================== -->
     <target name="build.all" 
-            depends="build.src">
+            depends="build.src, build.headers">
     </target>
 
 
@@ -48,6 +49,16 @@
 
     </target>
 
+
+    <!-- ================================================================== -->
+    <!-- Build headers                                                      -->
+    <!-- ================================================================== -->
+    <target name="build.headers">
+      <javah destdir="${stubs.headers}" 
+             classpath="${src.build.dir}">
+         <class name="fermanext.trussunit.TrussUnit"/>
+      </javah>
+    </target>
 
     <!-- ================================================================== -->
     <!-- Useful compile target                                              -->
@@ -74,6 +85,7 @@
     <target name="clean.build">
       <echo message="Cleaning build"/>
       <delete dir="${dist.build.dir}"/>
+      <delete dir="${stubs.headers}"/>
     </target>
 
 </project>

@@ -75,6 +75,8 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
     QString envJavaHomeStr( envJavaHome );
     QStringList options;
     options.push_back("-Djava.class.path=" + classPaths.join(pathDelim));
+    options.push_back("-Djava.library.path=" + 
+                      QString(appPath + "/plugins/loaders"));
     options.push_back("-verbose:jni");
     options.push_back("-Xcheck:jni");
 
@@ -100,6 +102,9 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
     // Try to find main 'FermaNext' class
     JClass fnCls = javaVM->findClass("fermanext/FermaNext");
     if ( fnCls == 0 ) {
+        // Clears pending exception
+        javaVM->exceptionClear();
+
         QMessageBox::warning( 
                       0, QObject::tr("Can't start JavaPluginLoader"), 
                       QObject::tr("JavaPluginLoader can't be started\n"
@@ -114,6 +119,9 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
     JMethodID disposeAllFrames = 
         javaVM->getStaticMethodID( fnCls, "disposeAllFrames", "()V" );
     if ( disposeAllFrames == 0 ) {
+        // Clears pending exception
+        javaVM->exceptionClear();
+
         QMessageBox::warning(
                        0, QObject::tr("Can't start JavaPluginLoader"), 
                        QObject::tr("Method 'disposeAllFrames' doesn't "
@@ -124,6 +132,52 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
         javaVM = 0;
         return;
     }
+    
+    JClass trussUnitCls = javaVM->findClass("fermanext/trussunit/TrussUnit");
+    if ( trussUnitCls == 0 ) {
+        // Clears pending exception
+        javaVM->exceptionClear();
+        
+        qWarning("no class!");
+        return;
+    }
+
+    JMethodID trussUnitConstructor = 
+        javaVM->getMethodID( trussUnitCls, "<init>", "()V" );
+    if ( trussUnitConstructor == 0 ) {
+        // Clears pending exception
+        javaVM->exceptionClear();
+        
+        qWarning("no constructor!");
+        return;
+    }
+
+    JObject trussUnit = 
+        javaVM->newObject( trussUnitCls, trussUnitConstructor );
+    if ( trussUnit == 0 ) {
+        // Clears pending exception
+        javaVM->exceptionClear();
+        
+        qWarning("can't construct object!");
+        return;
+    }
+
+    JMethodID countNodes = 
+        javaVM->getMethodID( trussUnitCls, "countNodes", 
+                             "()I" );
+    if ( countNodes == 0 ) {
+        javaVM->exceptionDescribe();
+        // Clears pending exception
+        javaVM->exceptionClear();
+        
+        qWarning("can't find method!");
+        return;
+    }
+    
+    JInt nodesNum = javaVM->callIntMethod( trussUnit, countNodes  );
+    QString str = QString("This is return val: %1").arg(nodesNum);
+    qWarning( str );
+
 }
 
 JavaPluginLoader::~JavaPluginLoader ()
@@ -137,7 +191,16 @@ JavaPluginLoader::~JavaPluginLoader ()
 
             if ( disposeAllFrames )
                 javaVM->callStaticVoidMethod( fnCls, disposeAllFrames );
+            else {
+                // Clears pending exception
+                javaVM->exceptionClear();
+            }
         }
+        else {
+            // Clears pending exception
+            javaVM->exceptionClear();
+        }
+        
         delete javaVM;
     }
 }
