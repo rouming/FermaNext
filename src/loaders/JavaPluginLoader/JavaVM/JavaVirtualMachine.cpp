@@ -101,6 +101,7 @@ void JavaVirtualMachine::createJavaVM ( JavaVMVersion version,
     }
 
     JavaVMInitArgs vm_args;
+    memset(&vm_args, 0, sizeof(vm_args));
     vm_args.version = (jint)version;
     vm_args.options = options;
     vm_args.nOptions = optionsList.size();
@@ -128,6 +129,7 @@ void JavaVirtualMachine::destroyJavaVM ()
 {
     if ( pimpl_ == 0 )
         return;
+    pimpl_->jvm->DetachCurrentThread();
     pimpl_->jvm->DestroyJavaVM();
     delete pimpl_;
     pimpl_ = 0;

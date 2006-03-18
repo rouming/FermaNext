@@ -96,6 +96,10 @@ public:
     virtual void redo () throw (UnknownException, RedoException,
                                 StateBlockIsNotEnded);
 
+    // Steps back for one state block and then removes it
+    virtual void stepBack () throw (UnknownException, UndoException, 
+                                    StateBlockIsNotEnded);
+
     // Momentary step to saved state block by index
     // (undo or redo from the current position to defined direction) 
     // if indx is 0 -- try to undo all states
@@ -157,6 +161,8 @@ signals:
     void afterUndo ( ObjectStateManager& );
     void beforeRedo ( ObjectStateManager& );
     void afterRedo ( ObjectStateManager& );
+    void beforeStepBack ( ObjectStateManager& );
+    void afterStepBack( ObjectStateManager& );
     void beforeStep ( ObjectStateManager& );
     void afterStep ( ObjectStateManager& );
     void onSaveState ( ObjectStateManager&, ObjectState& );

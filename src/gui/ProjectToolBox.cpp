@@ -172,6 +172,7 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
 
     WindowListBox * listBox = new WindowListBox ( prj, groupBoxWindows );
     groupBoxWindowsLayout->addWidget( listBox );
+    listBox->installEventFilter( this );
 
     // Fonts
     QFont labelFont( "arial", 9  );
@@ -390,6 +391,21 @@ void ProjectToolBox::calculateAllIsPressed ()
                                tr("Plugin '"+  plugin->pluginInfo().name + 
                                   "' has violated type contract.") );
     }
+}
+
+bool ProjectToolBox::eventFilter( QObject* targetObj, QEvent* event )
+{
+    if ( event->type() == QEvent::KeyPress ) {
+        QKeyEvent *keyEvent = (QKeyEvent*)event;
+        if ( keyEvent->key() == Key_N || keyEvent->key() == Key_P ||
+             keyEvent->key() == Key_F || keyEvent->key() == Key_L ||
+             keyEvent->key() == Key_Escape ) {
+            currentPrj->getDesignerWindow().
+                getDesignerWidget().aggKeyPressEvent( keyEvent );
+            return true;
+        }
+    }
+    return false;
 }
 
 /****************************************************************************/

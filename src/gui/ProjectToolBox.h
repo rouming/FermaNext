@@ -29,6 +29,8 @@ public:
 
     virtual FermaNextProject* currentProject () const;
 
+    virtual bool eventFilter( QObject*, QEvent* );
+
 protected slots:
     virtual int addProject ( FermaNextProject& );
     virtual int removeProject ( FermaNextProject& );

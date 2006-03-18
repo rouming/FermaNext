@@ -21,7 +21,7 @@ TrussNodeCreateAction::TrussNodeCreateAction ( TrussNode& n_ ) :
 {}
 
 void TrussNodeCreateAction::execute ()
-{        
+{   
     getNode().revive();
     emit actionExecuted(*this);
 }
@@ -46,6 +46,7 @@ void TrussNodeRemoveAction::execute ()
 
 void TrussNodeRemoveAction::unexecute ()
 {
+    getNode().setHighlighted( false );
     getNode().revive();
     emit actionUnexecuted(*this);
 }
@@ -95,6 +96,7 @@ void TrussPivotRemoveAction::execute ()
 
 void TrussPivotRemoveAction::unexecute ()
 {
+    getPivot().setHighlighted( false );
     getPivot().revive();
     emit actionUnexecuted(*this);
 }
@@ -126,6 +128,8 @@ void TrussPivotChangeNodeAction::unexecute ()
         pivot.setFirstNode( &oldNode );
     else 
         pivot.setLastNode( &oldNode );
+    newNode.setHighlighted( false );
+    pivot.setHighlighted( false );
     emit actionUnexecuted(*this);
 }
 

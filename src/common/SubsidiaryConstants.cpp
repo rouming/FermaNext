@@ -57,6 +57,13 @@ const int bufferEmptyArea = 30,
 const double svgGamma = 1.0,
              svgExpand = 0.3;
  
+/************************************
+ * Geometry Window Consts
+ ************************************/
+
+const int tableRowHeight = 18;
+const double pivotThickLimit = 999.99;
+
  /************************************
  * Main subs
  ************************************/

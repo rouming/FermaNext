@@ -4,6 +4,7 @@
 #include "ProjectToolBox.h"
 #include "SubsidiaryConstants.h"
 #include "UndoRedoListBox.h"
+#include "TrussGeometryWindow.h"
 
 #include <QApplication>
 #include <QMenu>
@@ -43,6 +44,7 @@ FermaNextMainFrame::FermaNextMainFrame ( QWidget* p, Qt::WFlags f ) :
     // Initial toolbar setup
     setupFileActions();
     setupEditActions();
+    setupViewActions ();
     setupProjectActions();
     setupWindowActions();
     setupPluginActions();
@@ -85,6 +87,12 @@ void FermaNextMainFrame::init ()
     QVBoxLayout* vboxHistoryWidget = new QVBoxLayout( undoRedoHistoryWidget );
     undoRedoListBox = new UndoRedoListBox( undoRedoHistoryWidget );
     vboxHistoryWidget->addWidget( undoRedoListBox );
+    undoRedoListBox->installEventFilter( this );
+    undoRedoHistoryWidget->installEventFilter( this );
+
+    geometryWindow = new TrussGeometryWindow( this, Qt::Window | Qt::Tool );
+    geometryWindow->move( QApplication::desktop()->width() - 265, 310 );
+    geometryWindow->installEventFilter( this );
 
     projectsDockWindow = new QDockWidget( // FIXME QT3TO4 QDockWidget::InDock, 
                                           this );
@@ -113,6 +121,7 @@ void FermaNextMainFrame::init ()
     projectsDockWindow->setWidget( projectToolBox );
     //FIXME QT3TO4
     //projectsDockWindow->setFixedExtentWidth( 160 );
+
     projectsDockWindow->hide();
 
     //FIXME QT3TO4
@@ -136,6 +145,7 @@ void FermaNextMainFrame::someProjectCreated ( FermaNextProject& prj )
         0 < FermaNextWorkspace::workspace().countProjects() ) {
         projectsDockWindow->show();
         undoRedoHistoryWidget->show();
+        geometryWindow->show();
     }
 
     TrussUnitDesignerWidget& designerWidget = 
@@ -160,6 +170,9 @@ void FermaNextMainFrame::createProject ()
         FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
         FermaNextProject& prj = wsp.createProject( text );
         TrussUnitWindowManager& mng = prj.getTrussUnitWindowManager();
+
+        connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
+                 geometryWindow, SLOT(trussUnitWindowWasCreated(TrussUnitWindow&)) );
 
 //TODO: remove this in future
 /*********** TEMP TRUSS UNIT **************************/
@@ -351,6 +364,33 @@ void FermaNextMainFrame::setupEditActions ()
     tb->addSeparator();
 }
 
+void FermaNextMainFrame::setupViewActions ()
+{
+    QPopupMenu *menu = new QPopupMenu( this );
+    menuBar()->insertItem( tr( "&View" ), menu );
+
+    // Contents
+    showUndoRedoAction = new QAction( tr( "&Show History Window" ), 0, this );
+    showUndoRedoAction->setToggleAction( true );
+    showUndoRedoAction->setOn( true );
+    showUndoRedoAction->setStatusTip( tr( "Show or hide history window" ) );
+    showUndoRedoAction->addTo( menu );
+    connect( showUndoRedoAction, SIGNAL( toggled( bool ) ), 
+             undoRedoHistoryWidget, SLOT( setShown( bool ) ) );
+
+    showGeometryWindowAction = 
+        new QAction( tr( "&Show Truss Geometry Window" ), 0, this );
+    showGeometryWindowAction->setToggleAction( true );
+    showGeometryWindowAction->setOn( true );
+    showGeometryWindowAction->
+        setStatusTip( tr( "Show or hide truss geometry window" ) );
+    showGeometryWindowAction->addTo( menu );
+    connect( showGeometryWindowAction, SIGNAL( toggled( bool ) ), 
+             geometryWindow, SLOT( setShown( bool ) ) );
+    connect( geometryWindow, SIGNAL(onGeometryWindowClose()), 
+             showGeometryWindowAction, SLOT(toggle()) );
+}
+
 void FermaNextMainFrame::setupProjectActions ()
 {        
 }
@@ -470,6 +510,8 @@ void FermaNextMainFrame::trussWindowLostFocus ( TrussUnitWindow& window )
         mng->disconnect( this );
 
     refreshUndoRedoActions();
+
+    geometryWindow->changeFocusWindow( 0 );
 }
 
 void FermaNextMainFrame::trussWindowReceivedFocus ( TrussUnitWindow& window )
@@ -489,6 +531,8 @@ void FermaNextMainFrame::trussWindowReceivedFocus ( TrussUnitWindow& window )
                   SLOT(refreshUndoRedoActions()) );
     
     refreshUndoRedoActions();
+
+    geometryWindow->changeFocusWindow( &window );
 }
 
 /*****************************************************************************
@@ -865,6 +909,39 @@ void FermaNextMainFrame::helpAbout ()
 /*****************************************************************************
  * Events
  *****************************************************************************/
+
+bool FermaNextMainFrame::eventFilter( QObject* targetObj, QEvent* event )
+{
+    if ( event->type() == QEvent::KeyPress ) {
+        QKeyEvent *keyEvent = (QKeyEvent*)event;
+        if ( keyEvent->state() & ControlButton ||
+             keyEvent->state() & ShiftButton ) {
+            setActiveWindow();
+            menuBar()->setFocus();
+            keyPressEvent( keyEvent );
+            return true;
+        }
+        else if ( keyEvent->key() == Key_N || keyEvent->key() == Key_P ||
+                  keyEvent->key() == Key_F || keyEvent->key() == Key_L ||
+                  keyEvent->key() == Key_Escape ) {
+            FermaNextProject* prj = projectToolBox->currentProject();
+            if ( prj ) {
+                setActiveWindow();
+                prj->getDesignerWindow().
+                    getDesignerWidget().aggKeyPressEvent( keyEvent );
+                return true;
+            }
+        }
+        return false;
+    }
+    else if ( event->type() == QEvent::Close &&
+              targetObj == undoRedoHistoryWidget ) {
+            showUndoRedoAction->toggle();
+            return true;
+    } 
+    else
+        return QMainWindow::eventFilter( targetObj, event );
+}
 
 /*
  *  Correct clean.

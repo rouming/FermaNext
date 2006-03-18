@@ -26,7 +26,6 @@ CFG=FermaNext - Win32 Debug
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
-F90=df.exe
 RSC=rc.exe
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
@@ -42,6 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "../../Release"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
+F90=df.exe
 # ADD BASE F90 /compile_only /nologo /warn:nofileopt
 # ADD F90 /compile_only /nologo /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
@@ -69,6 +69,7 @@ LINK32=link.exe
 # PROP Intermediate_Dir "../../Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
+F90=df.exe
 # ADD BASE F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
@@ -130,6 +131,10 @@ SOURCE=.\..\gui\ToolBarManager.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\gui\TrussGeometryWindow.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\gui\UndoRedoListBox.cpp
 # End Source File
 # Begin Source File
@@ -147,7 +152,7 @@ SOURCE=.\..\gui\CalcDataToolBar.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=.\..\gui\CalcDataToolBar.h
 InputName=CalcDataToolBar
 
@@ -160,7 +165,7 @@ InputName=CalcDataToolBar
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=.\..\gui\CalcDataToolBar.h
 InputName=CalcDataToolBar
 
@@ -184,7 +189,7 @@ SOURCE=.\..\gui\FermaNextMainFrame.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=.\..\gui\FermaNextMainFrame.h
 InputName=FermaNextMainFrame
 
@@ -197,7 +202,7 @@ InputName=FermaNextMainFrame
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=.\..\gui\FermaNextMainFrame.h
 InputName=FermaNextMainFrame
 
@@ -283,7 +288,7 @@ SOURCE=.\..\gui\ProjectToolBox.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=.\..\gui\ProjectToolBox.h
 InputName=ProjectToolBox
 
@@ -296,7 +301,7 @@ InputName=ProjectToolBox
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=.\..\gui\ProjectToolBox.h
 InputName=ProjectToolBox
 
@@ -316,7 +321,7 @@ SOURCE=..\gui\Splash.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=..\gui\Splash.h
 InputName=Splash
 
@@ -329,7 +334,7 @@ InputName=Splash
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=..\gui\Splash.h
 InputName=Splash
 
@@ -349,7 +354,7 @@ SOURCE=.\..\gui\ToolBarManager.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=.\..\gui\ToolBarManager.h
 InputName=ToolBarManager
 
@@ -362,9 +367,42 @@ InputName=ToolBarManager
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=.\..\gui\ToolBarManager.h
 InputName=ToolBarManager
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\gui\TrussGeometryWindow.h
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+InputPath=..\gui\TrussGeometryWindow.h
+InputName=TrussGeometryWindow
+
+"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
+	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
+	
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# Begin Custom Build - Moc'ing $(InputName).h ...
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+InputPath=..\gui\TrussGeometryWindow.h
+InputName=TrussGeometryWindow
 
 "$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
@@ -382,7 +420,7 @@ SOURCE=..\gui\UndoRedoListBox.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=..\gui\UndoRedoListBox.h
 InputName=UndoRedoListBox
 
@@ -395,7 +433,7 @@ InputName=UndoRedoListBox
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=..\gui\UndoRedoListBox.h
 InputName=UndoRedoListBox
 
@@ -415,7 +453,7 @@ SOURCE=.\..\gui\WindowListBox.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=.\..\gui\WindowListBox.h
 InputName=WindowListBox
 
@@ -428,7 +466,7 @@ InputName=WindowListBox
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=.\..\gui\WindowListBox.h
 InputName=WindowListBox
 
@@ -499,6 +537,10 @@ SOURCE=.\..\gui\mocs\moc_ToolBarManager.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\gui\mocs\moc_TrussGeometryWindow.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\gui\mocs\moc_UndoRedoListBox.cpp
 # End Source File
 # Begin Source File
@@ -516,7 +558,7 @@ SOURCE=..\gui\CalcDataWidget.ui
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Uic'ing $(InputName).ui ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=..\gui\CalcDataWidget.ui
 InputName=CalcDataWidget
 
@@ -536,7 +578,7 @@ BuildCmds= \
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Uic'ing $(InputName).ui ...
-InputDir=\ferma\Source\FermaNext\src\gui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui
 InputPath=..\gui\CalcDataWidget.ui
 InputName=CalcDataWidget
 
@@ -571,7 +613,7 @@ SOURCE=..\gui\ui\CalcDataWidget.h
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui\ui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui\ui
 InputPath=..\gui\ui\CalcDataWidget.h
 InputName=CalcDataWidget
 
@@ -584,7 +626,7 @@ InputName=CalcDataWidget
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\ferma\Source\FermaNext\src\gui\ui
+InputDir=\Development\Visual Studio projects\FermaNext\src\gui\ui
 InputPath=..\gui\ui\CalcDataWidget.h
 InputName=CalcDataWidget
 

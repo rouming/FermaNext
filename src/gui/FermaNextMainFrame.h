@@ -10,6 +10,7 @@ class FermaNextProject;
 class TrussUnitWindow;
 class FermaNextWorkspace;
 class UndoRedoListBox;
+class TrussGeometryWindow;
 class QFile;
 
 class FermaNextMainFrame : public QMainWindow
@@ -40,11 +41,13 @@ protected:
     void init ();
     void setupFileActions ();
     void setupEditActions ();
+    void setupViewActions ();
     void setupProjectActions ();
     void setupWindowActions ();
     void setupHelpActions ();
     void setupPluginActions ();
 
+    bool eventFilter( QObject*, QEvent* );
     // Close handler. Calls 'clean' for correct close.
     void closeEvent ( QCloseEvent* );
 
@@ -94,6 +97,8 @@ private:
     ProjectToolBox* projectToolBox;
     // Current system workspace
     FermaNextWorkspace* wsp;
+    // Truss geometry window
+    TrussGeometryWindow* geometryWindow;
 
     // Some actions
     QAction* undoAction;
@@ -102,6 +107,8 @@ private:
     QAction* saveAsProjectAction;
     QAction* closeProjectAction;
     QAction* printAction;
+    QAction* showUndoRedoAction;
+    QAction* showGeometryWindowAction;
     
     // Plugins menu
     QMenu* pluginsMenu;

@@ -40,6 +40,7 @@ SOURCES = \
           ../gui/ProjectToolBox.cpp \
           ../gui/Splash.cpp \
           ../gui/ToolBarManager.cpp \
+          ../gui/TrussGeometryWindow.cpp \
           ../gui/UndoRedoListBox.cpp \
           ../gui/WindowListBox.cpp
 
@@ -53,5 +54,6 @@ HEADERS = \
           ../gui/ProjectToolBox.h \
           ../gui/Splash.h \
           ../gui/ToolBarManager.h \
+          ../gui/TrussGeometryWindow.h \
           ../gui/UndoRedoListBox.h \
           ../gui/WindowListBox.h
