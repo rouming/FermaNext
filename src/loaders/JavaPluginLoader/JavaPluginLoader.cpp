@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <QMessageBox>
 #include <QFile>
+#include <QApplication>
 
 #include "PluginLoaderFrontEnd.h"
 #include "JavaPluginLoader.h"
@@ -175,7 +176,7 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
     
     JInt nodesNum = javaVM->callIntMethod( trussUnit, countNodes  );
     QString str = QString("This is return val: %1").arg(nodesNum);
-    qWarning( str );
+    qWarning( str.toAscii().data() );
 
 }
 
