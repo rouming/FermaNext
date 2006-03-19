@@ -2,12 +2,13 @@
 #ifndef TRUSSGEOMETRYWINDOW_H
 #define TRUSSGEOMETRYWINDOW_H
 
-#include "TrussUnitWindow.h"
-
 #include <QButton>
+#include <QSpinBox>
 #include <QTable>
 #include <QTabWidget>
 #include <QValidator>
+
+#include "TrussUnitWindow.h"
 
 class QColorGroup;
 class QLabel;
@@ -87,11 +88,11 @@ private:
 
 /*****************************************************************************/
 
-class NodesTable : public QTable
+class NodeTable : public QTable
 {
     Q_OBJECT
 public:
-    NodesTable ( QWidget* parent = 0, const char* name = 0 );
+    NodeTable ( QWidget* parent = 0, const char* name = 0 );
     virtual void setCoord ( int row, int col, double coord );
     virtual double getCoord ( int row, int col ) const;
     virtual int getFixedNodesNumber () const;
@@ -131,17 +132,17 @@ private:
 
 /*****************************************************************************/
 
-class PivotsTable : public QTable
+class PivotTable : public QTable
 {
 public:
-    PivotsTable ( QWidget* parent = 0, const char* name = 0  );
+    PivotTable ( QWidget* parent = 0, const char* name = 0  );
     ComboItem* getComboItem ( int row, int col ) const;
     virtual void setNodeNumber ( int row, int col, int numb, int adjNumb );
     virtual void setThickness ( int row, double thick );
     virtual double getThickness ( int row ) const;
     virtual void setNodesTotalNumber ( int );
     virtual int getNodesNumber () const;
-    virtual void addPivot ( const TrussPivot& );
+    virtual void addPivot ( const TrussPivot&, int row = -1 );
 
 protected:
     virtual QWidget* createEditor ( int row, int col, bool initFromCell ) const;
@@ -164,42 +165,39 @@ protected:
     virtual void init ();
     virtual void initNodesTab ();
     virtual void initPivotsTab ();
-    virtual void fillNodesTable ();
-    virtual void fillPivotsTable ();
-    // Undo/Redo
+    virtual void initAreaTab ();
+    virtual void fillNodeTable ();
+    virtual void fillPivotTable ();
     virtual void saveNodeStateAfterMoving ( TrussNode& node,
                                             const DoublePoint& pos );
-    virtual void updatePivotTableNode ( int col, const TrussPivot& pivot );
     virtual void closeEvent( QCloseEvent* );
 
 protected slots:
-    // connect new truss unit window with geometry widget
     virtual void trussUnitWindowWasCreated ( TrussUnitWindow& );
-    // add new node to the respective table
+
     virtual void addNodeToTable ( const Node& );
-    virtual void setNodeTableRowVisible ( bool );
-    // remove node from the respective table
+    virtual void showNodeTableRow ( bool );
     virtual void removeNodeFromTable ( const Node& );
-    // update table fields according to new values of node coordinates
     virtual void updateNodeTableCoords ();
-    // update table field according to new value of node fixation
     virtual void updateNodeTableFixation ();
-    // update node state after table field has been chaged
     virtual void updateNodeState ( int, int );
 
     virtual void addPivotToTable ( const Node&, const Node& );
     virtual void removePivotFromTable ( const Node&, const Node& );
-    virtual void setPivotTableRowVisible ( bool );
+    virtual void updateNodesNumbers ( const Node& node );
+    virtual void showPivotTableRow ( bool );
     virtual void updatePivotTableFirstNode ();
     virtual void updatePivotTableLastNode ();
     virtual void updatePivotTableThickness ();
     virtual void updatePivotState ( int row, int col );
+
+    virtual void changeTrussAreaSize ( const QString& );
 signals:
     void onGeometryWindowClose();
 
 private:
-    NodesTable *nodesTable;
-    PivotsTable *pivotsTable;
+    NodeTable *nodeTable;
+    PivotTable *pivotTable;
     QLabel *nodesNumbLabel, *fixedNodesLabel, *pivotsNumbLabel;
     TrussUnitWindow *focusWindow;
     QSpacerItem *nodesSpacer, *pivotsSpacer;
