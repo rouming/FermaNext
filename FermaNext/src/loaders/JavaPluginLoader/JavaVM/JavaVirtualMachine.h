@@ -11,8 +11,6 @@
 #include "JNITypes.h"
 #include "DynaLoader.h"
 
-#include <stdio.h>
-#include <stdarg.h>
 #include <qstringlist.h>
 
 class JavaVirtualMachine

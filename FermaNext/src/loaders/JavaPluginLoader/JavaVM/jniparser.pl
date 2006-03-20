@@ -168,8 +168,6 @@ if ( $ARGV[1] eq 'header' ) {
 #include "JNITypes.h"
 #include "DynaLoader.h"
 
-#include <stdio.h>
-#include <stdarg.h>
 #include <qstringlist.h>
 
 class JavaVirtualMachine

@@ -235,3 +235,22 @@ before the class' ctors.
 All public methods, slots and signals must be documented using the standard 
 doxygen style documentation, or javadoc style.
 
+
+Exceptions
+----------
+Never use exception specification (do not be lazy, google a little and find 
+tons of articles on this topic). Inform a client of your header about 
+exception with evident comment, e.g.:
+     instead of using this code in your header:
+         void methodA () throws (MyException);
+     write:
+         /**
+          * @throw MyException occurs when ....
+          */
+         void methodA () /*throw (MyException)*/;
+
+     and duplicate it in your source file:
+         void MyClass::methodA () /*throw (MyException)*/
+         {
+             // code goes here
+         }

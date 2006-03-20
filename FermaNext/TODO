@@ -1,0 +1,16 @@
+
+tasks after 0.1.2
+-----------------------------------------------
+- port to Qt4
+
+- comment dengerous exception specifications 
+  all over the code. to inform a client about 
+  exception which can be occured use evident
+  comment. e.g.:
+     instead of this code:
+         void methodA () throws (MyException);
+     use:
+         /**
+          * @throw MyException occurs when ....
+          */
+         void methodA () /*throw (MyException)*/;
