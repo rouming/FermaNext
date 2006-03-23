@@ -90,21 +90,21 @@ LoadPopupMenu::LoadPopupMenu ( QWidget* parent ) :
     selectedWindow(0),
     // Init X layout and box
     xBox( new QWidget(this) ),
-    xLayout( new QHBoxLayout(this) ),
+    xLayout( new QHBoxLayout ),
     // Init Y layout and box
     yBox( new QWidget(this) ),
-    yLayout( new QHBoxLayout(this) ),
+    yLayout( new QHBoxLayout ),
     // Init Button layout and box
     buttonBox( new QWidget(this) ),
-    buttonLayout( new QHBoxLayout(this) ),
+    buttonLayout( new QHBoxLayout ),
     // Init Main layout
-    vLayout( new QVBoxLayout(this) ),
+    vLayout( new QVBoxLayout ),
     // buttons
-    ok( new QPushButton(tr("OK"), buttonBox) ),
-    cancel( new QPushButton(tr("Cancel"), buttonBox) ),
+    ok( new QPushButton(tr("OK")) ),
+    cancel( new QPushButton(tr("Cancel")) ),
     // labels
-    loadXLabel( new QLabel(tr("Load by X:"), xBox) ),
-    loadYLabel( new QLabel(tr("Load by Y:"), yBox) ),
+    loadXLabel( new QLabel(tr("Load by X:")) ),
+    loadYLabel( new QLabel(tr("Load by Y:")) ),
     // edits
     loadXLine( new QLineEdit(xBox) ),
     loadYLine( new QLineEdit(yBox) )
