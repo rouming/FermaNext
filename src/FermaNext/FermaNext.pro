@@ -2,10 +2,11 @@
 TARGET = FermaNext
 
 LEVEL = ../..
-include(../../../FermaNext.pri)
+include(../../FermaNext.pri)
 
-QT += core gui xml
+QT += core gui xml qt3support
 CONFIG += qt warn_on thread
+DESTDIR = ../..
 
 LIBPATH += ../.. $$(EXPATDIR)/Libs
 
@@ -19,11 +20,12 @@ unix {
 
 INCLUDEPATH = $$(AGGDIR)/include \
               $$(AGGDIR)/svg \
+              ../Agg \
+              ../FermaNext \
+              ../TrussUnit \
               ../common \
               ../common/plugin \
               ../common/plugin/loader \
-              ../Agg \
-              ../TrussUnit \
               ../gui
 
 #FIXME QT3TO4
@@ -40,7 +42,8 @@ SOURCES = \
           ../gui/ProjectToolBox.cpp \
           ../gui/Splash.cpp \
           ../gui/ToolBarManager.cpp \
-          ../gui/TrussGeometryWindow.cpp \
+#FIXME QT3TO4
+#          ../gui/TrussGeometryWindow.cpp \
           ../gui/UndoRedoListBox.cpp \
           ../gui/WindowListBox.cpp
 
@@ -54,6 +57,7 @@ HEADERS = \
           ../gui/ProjectToolBox.h \
           ../gui/Splash.h \
           ../gui/ToolBarManager.h \
-          ../gui/TrussGeometryWindow.h \
+#FIXME QT3TO4
+#          ../gui/TrussGeometryWindow.h \
           ../gui/UndoRedoListBox.h \
           ../gui/WindowListBox.h

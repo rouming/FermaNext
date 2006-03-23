@@ -2,11 +2,12 @@
 #ifndef TOOLBARMANAGER_H
 #define TOOLBARMANAGER_H
 
-#include <QToolBar>
+// Qt3 Support classes
+#include <Q3ToolBar>
+#include <Q3MainWindow>
+
 #include <QToolButton>
 #include <QIcon>
-#include <QString>
-
 #include <vector>
 
 class ToolBarManager;
@@ -21,7 +22,7 @@ class TextToolButton : public  QToolButton
 {
 public:
     TextToolButton ( const QIcon&, const QString&, const QString&, QObject*,
-                     const char*, QToolBar*, const char* name = 0 );
+                     const char*, Q3ToolBar* );
     QSize sizeHint() const;
 protected:
     void drawButtonLabel( QPainter *p );
@@ -36,7 +37,7 @@ class TabbedWidget : public QObject
     Q_OBJECT
 public:
     TabbedWidget ( ToolBarManager& parent,  QWidget&, 
-                   const QString& name, const QIcon& icon );
+                   const QString& name, const QIconSet& iconSet );
 
     ~TabbedWidget ();
 
@@ -73,7 +74,7 @@ private:
     QString name;
     QWidget& widget;
     TextToolButton* button;
-    uint windowState;
+    Qt::WindowStates windowState;
     bool toolBarIsDestroyed;
 };
 
@@ -81,11 +82,11 @@ private:
  * Tool Bar Manager
  *****************************************************************************/
 
-class ToolBarManager : public QToolBar
+class ToolBarManager : public Q3ToolBar
 {
     Q_OBJECT
 public:
-    ToolBarManager ( QMainWindow* parent = 0, const char* name = 0 );
+    ToolBarManager ( Q3MainWindow* parent = 0, const char* name = 0 );
     virtual ~ToolBarManager ();
 
 public slots:
@@ -99,7 +100,7 @@ protected:
 
     virtual TabbedWidget& createTabbedWidget ( QWidget&, 
                                                const QString& name, 
-                                               const QIcon& icon );
+                                               const QIconSet& iconSet );
 
     virtual void addWidget ( QWidget& ) = 0;
     virtual void removeWidget ( QWidget& );

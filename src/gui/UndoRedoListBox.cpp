@@ -1,18 +1,16 @@
 
-#include <QListWidgetItem>
-
 #include "UndoRedoListBox.h"
 
 /*****************************************************************************
  * Undo Redo List Box
  *****************************************************************************/
 
-UndoRedoListBox::UndoRedoListBox ( QWidget* p, const char* n, WFlags f ) :
-    QListBox( p, n, f ),
+UndoRedoListBox::UndoRedoListBox ( QWidget* p, const char* n, Qt::WFlags f ) :
+    Q3ListBox( p, n, f ),
     stateManager(0)
 {
-    QObject::connect( this, SIGNAL(clicked(QListBoxItem*)),
-                            SLOT(clickOnItem(QListBoxItem*)) );
+    QObject::connect( this, SIGNAL(clicked(Q3ListBoxItem*)),
+                            SLOT(clickOnItem(Q3ListBoxItem*)) );
 }
 
 UndoRedoListBox::~UndoRedoListBox ()
@@ -27,7 +25,7 @@ void UndoRedoListBox::setStateManager ( ObjectStateManager* newMng )
 {
     if ( stateManager ) {
         stateManager->disconnect( this );
-        QListBox::clear();
+        Q3ListBox::clear();
     }
 
     stateManager = newMng;
@@ -42,7 +40,7 @@ void UndoRedoListBox::setStateManager ( ObjectStateManager* newMng )
     setBottomItem( stateManager->currentPos() );
 }
 
-void UndoRedoListBox::clickOnItem ( QListBoxItem* item )
+void UndoRedoListBox::clickOnItem ( Q3ListBoxItem* item )
 {
     int itemIndx = index( item );
     if ( itemIndx == -1 || stateManager == 0 || 

@@ -23,7 +23,8 @@ FermaNextProject::FermaNextProject ( const QString& name_,
     name(name_),
     widgetStack(stack),
     projectMainWidget( new QMainWindow(widgetStack, 0) ),
-    calcDataToolBar( new CalcDataToolBar(projectMainWidget) ),
+    // FIXME QT3TO4:
+    //calcDataToolBar( new CalcDataToolBar(projectMainWidget) ),
     projectTab( new QTabWidget(projectMainWidget) ),
     justStrengthAnalisysWidget( new QWidget(projectTab) ),
     designerWindow( new TrussUnitDesignerWindow(name_, projectTab) ),
@@ -51,10 +52,13 @@ FermaNextProject::FermaNextProject ( const QString& name_,
              &designerWidget, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
     connect( trussWindowManager, SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
              &designerWidget, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
+    // FIXME QT3TO4: 
+    /*
     connect( trussWindowManager, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)),     
              calcDataToolBar, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
     connect( trussWindowManager, SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
              calcDataToolBar, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
+     */
 }
 
 FermaNextProject::~FermaNextProject ()

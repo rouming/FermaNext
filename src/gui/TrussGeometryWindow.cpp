@@ -1,18 +1,18 @@
 
-#include <QCheckBox>
-#include <QComboBox>
-#include <QFont>
-#include <QFrame>
-#include <QGroupBox>
-#include <QHBox>
-#include <QLabel>
-#include <QLayout>
-#include <QLineEdit>
-#include <QPainter>
-#include <QPalette> 
-#include <QRect>
-#include <QStringList>
-#include <QStyle>
+#include <qcheckbox.h>
+#include <qcombobox.h>
+#include <qfont.h>
+#include <qframe.h>
+#include <qgroupbox.h>
+#include <qhbox.h>
+#include <qlabel.h>
+#include <qlayout.h>
+#include <qlineedit.h>
+#include <qpainter.h>
+#include <qpalette.h> 
+#include <qrect.h>
+#include <qstringlist.h>
+#include <qstyle.h>
 
 #include "TrussGeometryWindow.h"
 #include "TrussUnitActions.h"
@@ -529,8 +529,8 @@ QWidget* PivotTable::createEditor ( int row, int col, bool initFromCell ) const
  * Truss Geometry Window
  *****************************************************************************/
 
-TrussGeometryWindow::TrussGeometryWindow ( QWidget* p, Qt::WFlags f ) :
-    QTabWidget( p, f ),
+TrussGeometryWindow::TrussGeometryWindow ( QWidget* p, const char* n, WFlags f ) :
+    QTabWidget( p, n, f ),
     nodeTable( 0 ),
     pivotTable( 0 ),
     focusWindow( 0 )

@@ -208,7 +208,7 @@ void FermaNextWorkspace::projectIsActivated ( FermaNextProject& prj )
     emit onProjectActivated( prj );
 }
 
-void FermaNextWorkspace::createWidgetStack ( QMainWindow& parent )
+void FermaNextWorkspace::createWidgetStack ( Q3MainWindow& parent )
 {
     if ( widgetStack )
         return;

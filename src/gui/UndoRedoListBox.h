@@ -2,17 +2,17 @@
 #ifndef UNDOREDOLISTBOX_H
 #define UNDOREDOLISTBOX_H
 
-#include <QListWidget>
+// Qt3 Support classes
+#include <Q3ListBox>
 
 #include "ObjectStateManager.h"
 
-class QListWidgetItem;
-
-class UndoRedoListBox : public QListWidget
+class UndoRedoListBox : public Q3ListBox
 {
     Q_OBJECT
 public:
-    UndoRedoListBox ( QWidget* parent = 0, const char* name = 0,
+    UndoRedoListBox ( QWidget* parent = 0, 
+                      const char* name = 0, 
                       Qt::WFlags f = 0 );
     virtual ~UndoRedoListBox ();
 
@@ -20,7 +20,7 @@ public:
     virtual void setStateManager ( ObjectStateManager* );
 
 protected slots:
-    virtual void clickOnItem ( QListWidgetItem* ); 
+    virtual void clickOnItem ( Q3ListBoxItem* );
 
 private:
     ObjectStateManager* stateManager;    

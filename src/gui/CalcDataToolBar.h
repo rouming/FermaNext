@@ -6,6 +6,7 @@
 #include "TrussUnitWindow.h"
 
 class CalcDataWidget;
+class QIcon;
 
 class CalcDataToolBar : public ToolBarManager
 {

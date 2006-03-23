@@ -2,13 +2,13 @@
 #ifndef TRUSSGEOMETRYWINDOW_H
 #define TRUSSGEOMETRYWINDOW_H
 
-#include <QButton>
-#include <QSpinBox>
-#include <QTable>
-#include <QTabWidget>
-#include <QValidator>
-
 #include "TrussUnitWindow.h"
+
+#include <qbutton.h>
+#include <qspinbox.h>
+#include <qtable.h>
+#include <qtabwidget.h>
+#include <qvalidator.h>
 
 class QColorGroup;
 class QLabel;
@@ -157,7 +157,8 @@ class TrussGeometryWindow : public QTabWidget
 {
     Q_OBJECT
 public:
-    TrussGeometryWindow ( QWidget* parent = 0, Qt::WFlags f = 0 );
+    TrussGeometryWindow ( QWidget* parent = 0, const char* name = 0, 
+                          WFlags f = 0 );
     virtual ~TrussGeometryWindow ();
     virtual void changeFocusWindow ( TrussUnitWindow* focusWindow );
 

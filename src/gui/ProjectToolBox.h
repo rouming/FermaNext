@@ -2,10 +2,10 @@
 #ifndef PROJECTTOOLBOX_H
 #define PROJECTTOOLBOX_H
 
-#include <QToolBox>
-
 #include "FermaNextWorkspace.h"
 #include "FermaNextProject.h"
+
+#include <QToolBox>
 
 // ****************************************************************************
 // BUG: C4786 Warning Is Not Disabled with #pragma Warning
@@ -24,7 +24,7 @@ protected:
 
 public:
     ProjectToolBox ( FermaNextWorkspace&,
-                     QWidget* parent = 0,
+                     QWidget* parent = 0, 
                      Qt::WFlags f = 0 );
 
     virtual FermaNextProject* currentProject () const;

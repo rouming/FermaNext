@@ -6,7 +6,7 @@
 
 #include <QObject>
 #include <QString>
-#include <QMutex> 
+#include <QMutex>
 
 #include "XMLSerializableObject.h"
 #include "FermaNextProject.h"
@@ -56,7 +56,7 @@ public:
     virtual bool isFileNameDefined () const;
     
     virtual void reset ();
-    virtual void createWidgetStack ( QMainWindow& );
+    virtual void createWidgetStack ( Q3MainWindow& );
 
     virtual FermaNextProject& createProject ( const QString& name ) 
                                     throw (WorkspaceIsNotInitedCorrectly);

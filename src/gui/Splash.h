@@ -3,14 +3,13 @@
 #define SPLASH_H
 
 #include <QSplashScreen>
-
 #include "PluginManager.h"
 
 class Splash : public QSplashScreen
 {
     Q_OBJECT
 public:
-    Splash ( const QPixmap& pixmap=QPixmap(), Qt::WFlags f = 0 );
+    Splash ( const QPixmap& pixmap=QPixmap(), Qt::WFlags f=0 );
 
 public slots:
     void pluginLoaderMessage ( const QString& );

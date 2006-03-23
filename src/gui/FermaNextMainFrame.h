@@ -2,22 +2,26 @@
 #ifndef FERMANEXTFRAME_H
 #define FERMANEXTFRAME_H
 
-#include <QMainWindow>
+// Qt3 Support classes
+#include <Q3MainWindow>
 
-class QAction;
+class Q3Action;
+class Q3DockWindow;
+
 class ProjectToolBox;
 class FermaNextProject;
 class TrussUnitWindow;
 class FermaNextWorkspace;
 class UndoRedoListBox;
-class TrussGeometryWindow;
+//FIXME QT3TO4
+//class TrussGeometryWindow;
 class QFile;
 
-class FermaNextMainFrame : public QMainWindow
+class FermaNextMainFrame : public Q3MainWindow
 {
     Q_OBJECT
 public:
-    FermaNextMainFrame ( QWidget * parent = 0, 
+    FermaNextMainFrame ( QWidget * parent = 0, const char * name = 0, 
                          // FIXME QT3TO4: WFlags f = WType_TopLevel
                          Qt::WFlags f = Qt::Window );
 
@@ -88,7 +92,7 @@ protected slots:
 
 private:
     // Dock window on wich all projects are located
-    QDockWidget* projectsDockWindow;
+    Q3DockWindow* projectsDockWindow;
     // Undo/redo history widget
     QWidget* undoRedoHistoryWidget;
     // Undo/redo list box to control truss states
@@ -98,20 +102,21 @@ private:
     // Current system workspace
     FermaNextWorkspace* wsp;
     // Truss geometry window
-    TrussGeometryWindow* geometryWindow;
+    //FIXME QT3TO4
+    //TrussGeometryWindow* geometryWindow;
 
     // Some actions
-    QAction* undoAction;
-    QAction* redoAction;
-    QAction* saveProjectAction;
-    QAction* saveAsProjectAction;
-    QAction* closeProjectAction;
-    QAction* printAction;
-    QAction* showUndoRedoAction;
-    QAction* showGeometryWindowAction;
+    Q3Action* undoAction;
+    Q3Action* redoAction;
+    Q3Action* saveProjectAction;
+    Q3Action* saveAsProjectAction;
+    Q3Action* closeProjectAction;
+    Q3Action* printAction;
+    Q3Action* showUndoRedoAction;
+    Q3Action* showGeometryWindowAction;
     
     // Plugins menu
-    QMenu* pluginsMenu;
+    Q3PopupMenu* pluginsMenu;
 };
 
 #endif //FERMANEXTFRAME_H
