@@ -5,7 +5,6 @@
 #include <QMainWindow>
 #include <QLayout>
 #include <QScrollArea>
-#include <QScrollArea>
 
 #include "TrussUnitDesignerWidget.h"
 
