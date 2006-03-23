@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
-CFG=JavaPluginLoader - Win32 Debug
+CFG=JavaPluginLoader - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,7 +13,7 @@ CFG=JavaPluginLoader - Win32 Debug
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "JavaPluginLoader.mak" CFG="JavaPluginLoader - Win32 Debug"
+!MESSAGE NMAKE /f "JavaPluginLoader.mak" CFG="JavaPluginLoader - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -26,7 +26,6 @@ CFG=JavaPluginLoader - Win32 Debug
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
-F90=df.exe
 MTL=midl.exe
 RSC=rc.exe
 
@@ -34,57 +33,57 @@ RSC=rc.exe
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "Release"
-# PROP BASE Intermediate_Dir "Release"
+# PROP BASE Output_Dir "..\..\..\plugins\loaders"
+# PROP BASE Intermediate_Dir "..\..\..\build\release\obj\JavaPluginLoader.ldr"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "Release"
-# PROP Intermediate_Dir "Release"
-# PROP Ignore_Export_Lib 0
+# PROP Output_Dir "..\..\..\plugins\loaders"
+# PROP Intermediate_Dir "..\..\..\build\release\obj\JavaPluginLoader.ldr"
+# PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
-# ADD BASE F90 /compile_only /dll /nologo /warn:nofileopt
-# ADD F90 /compile_only /dll /nologo /warn:nofileopt
-# ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "OLD_SIMPLECALC_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "..\..\TrussUnit" /I "..\..\common" /I "..\..\common\plugin" /I "..\..\common\plugin\loader" /I "$(QTDIR)\include" /I "$(JAVA_HOME)\include" /I "$(JAVA_HOME)\include\win32" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "OLD_SIMPLECALC_EXPORTS" /D "QT_THREAD_SUPPORT" /YX /FD /c
-# ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
+# ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "stubs-src" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include" /I "..\..\common" /I "..\..\common\plugin" /I "..\..\common\plugin\loader" /I "$(JAVA_HOME)\include" /I "$(JAVA_HOME)\include\win32" /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\release\mocs\JavaPluginLoader.ldr" /I "..\..\..\build\debug\ui\JavaPluginLoader.ldr" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_USRDLL" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_NO_DEBUG" /D "QT_PLUGIN" /D "QT_CORE_LIB" /D "QT_GUI_LIB" /D "WIN32" /FD -Zm200 /c
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
-# ADD BASE RSC /l 0x419 /d "NDEBUG"
-# ADD RSC /l 0x419 /d "NDEBUG"
+# ADD BASE RSC /l 0x419
+# ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 qt-mt.lib qtmain_rel.lib common.lib TrussUnit.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /out:"../../../plugins/loaders/JavaPluginLoader.ldr.dll" /libpath:"../../../build" /libpath:"$(QTDIR)\lib"
+# ADD BASE LINK32 /machine:IX86
+# ADD LINK32 "common.lib" "$(QTDIR)\lib\QtCore4.lib" "$(QTDIR)\lib\QtGui4.lib" /nologo /dll /incremental:yes /machine:IX86 /nodefaultlib:"libc" /out:"..\..\..\plugins\loaders\JavaPluginLoader.ldr.dll" /libpath:"..\..\..\build\debug" /libpath:"$(QTDIR)\lib"
+# Begin Special Build Tool
+SOURCE="$(InputPath)"
+PostBuild_Desc=Build Java sources
+PostBuild_Cmds=ant
+# End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "JavaPluginLoader - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug"
-# PROP BASE Intermediate_Dir "Debug"
+# PROP BASE Output_Dir "..\..\..\plugins\loaders"
+# PROP BASE Intermediate_Dir "..\..\..\build\debug\obj\JavaPluginLoader.ldr"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug"
-# PROP Intermediate_Dir "Debug"
-# PROP Ignore_Export_Lib 0
+# PROP Output_Dir "..\..\..\plugins\loaders"
+# PROP Intermediate_Dir "..\..\..\build\debug\obj\JavaPluginLoader.ldr"
+# PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
-# ADD BASE F90 /check:bounds /compile_only /dbglibs /debug:full /dll /nologo /traceback /warn:argument_checking /warn:nofileopt
-# ADD F90 /check:bounds /compile_only /dbglibs /debug:full /dll /nologo /traceback /warn:argument_checking /warn:nofileopt
-# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "OLD_SIMPLECALC_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /ZI /Od /I "..\..\common" /I "..\..\common\plugin" /I "..\..\common\plugin\loader" /I "$(QTDIR)\include" /I "$(JAVA_HOME)\include" /I "$(JAVA_HOME)\include\win32" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "OLD_SIMPLECALC_EXPORTS" /D "QT_THREAD_SUPPORT" /YX /FD /I /GZ /c
-# ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
+# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /I "stubs-src" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include" /I "..\..\common" /I "..\..\common\plugin" /I "..\..\common\plugin\loader" /I "$(JAVA_HOME)\include" /I "$(JAVA_HOME)\include\win32" /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\debug\mocs\JavaPluginLoader.ldr" /I "..\..\..\build\debug\ui\JavaPluginLoader.ldr" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_USRDLL" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_PLUGIN" /D "QT_CORE_LIB" /D "QT_GUI_LIB" /D "WIN32" /FD -Zm200 /c
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
-# ADD BASE RSC /l 0x419 /d "_DEBUG"
-# ADD RSC /l 0x419 /d "_DEBUG"
+# ADD BASE RSC /l 0x419
+# ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 qt-mt332.lib qtmain.lib common.lib TrussUnit.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /out:"../../../plugins/loaders/JavaPluginLoader.ldr.dll" /pdbtype:sept /libpath:"../../../build" /libpath:"$(QTDIR)\lib"
+# ADD BASE LINK32 /machine:IX86
+# ADD LINK32 "common.lib" "$(QTDIR)\lib\QtCored4.lib" "$(QTDIR)\lib\QtGuid4.lib" /nologo /dll /debug /machine:IX86 /nodefaultlib:"libc" /out:"..\..\..\plugins\loaders\JavaPluginLoader.ldr.dll" /libpath:"..\..\..\build\debug" /libpath:"$(QTDIR)\lib"
+# Begin Special Build Tool
+SOURCE="$(InputPath)"
+PostBuild_Desc=Build Java sources
+PostBuild_Cmds=ant
+# End Special Build Tool
 
 !ENDIF 
 
@@ -94,35 +93,35 @@ LINK32=link.exe
 # Name "JavaPluginLoader - Win32 Debug"
 # Begin Group "Source Files"
 
-# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;f90;for;f;fpp"
+# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\JavaPluginLoader.cpp
+SOURCE="stubs-src\fermanext_trussunit_TrussUnit.cpp"
 # End Source File
 # Begin Source File
 
-SOURCE=.\JavaVM\JavaVirtualMachine.cpp
+SOURCE=JavaPluginLoader.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=JavaVM\JavaVirtualMachine.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
 
-# PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
+# PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\JavaPluginLoader.h
+SOURCE=JavaPluginLoader.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\JavaVM\JavaVirtualMachine.h
+SOURCE=JavaVM\JavaVirtualMachine.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\JavaVM\JNITypes.h
+SOURCE=JavaVM\JNITypes.h
 # End Source File
-# End Group
-# Begin Group "Resource Files"
-
-# PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 # End Group
 # End Target
 # End Project

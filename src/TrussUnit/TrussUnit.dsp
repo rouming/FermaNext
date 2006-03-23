@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Static Library" 0x0104
 
-CFG=TrussUnit - Win32 Debug
+CFG=TrussUnit - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,7 +13,7 @@ CFG=TrussUnit - Win32 Debug
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "TrussUnit.mak" CFG="TrussUnit - Win32 Debug"
+!MESSAGE NMAKE /f "TrussUnit.mak" CFG="TrussUnit - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -25,59 +25,48 @@ CFG=TrussUnit - Win32 Debug
 # PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
-CPP=cl.exe
-F90=df.exe
-RSC=rc.exe
+CPP=cl
+MTL=midl
+RSC=rc
+BSC32=bscmake.exe
 
 !IF  "$(CFG)" == "TrussUnit - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "Release"
-# PROP BASE Intermediate_Dir "Release"
+# PROP BASE Output_Dir "..\..\build\release"
+# PROP BASE Intermediate_Dir "..\..\build\release\obj\TrussUnit"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "../../Release"
-# PROP Intermediate_Dir "../../Release"
+# PROP Output_Dir "..\..\build\release"
+# PROP Intermediate_Dir "..\..\build\release\obj\TrussUnit"
 # PROP Target_Dir ""
-# ADD BASE F90 /compile_only /nologo /warn:nofileopt
-# ADD F90 /compile_only /nologo /warn:nofileopt
-# ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "../common" /I "../Agg" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /c
-# ADD BASE RSC /l 0x419 /d "NDEBUG"
-# ADD RSC /l 0x419 /d "NDEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
+# ADD CPP /I"$(QTDIR)/include/QtXml" /I"$(QTDIR)/include/QtGui" /I"$(QTDIR)/include/QtCore" /I"$(QTDIR)/include" /I"$(AGGDIR)/include" /I"$(AGGDIR)/svg" /I"..\common" /I"..\Agg" /I"$(QTDIR)/include/ActiveQt" /I"..\..\build\release\mocs\TrussUnit" /I"..\..\build\debug\ui\TrussUnit" /I"$(QTDIR)/mkspecs/win32-msvc" /c /FD -nologo -Zm200 -O1 -MD -O1 -MD -W3 -GR -GX  /D "_LIB"  /D UNICODE /D QT_LARGEFILE_SUPPORT /D WIN32 /D QT_THREAD_SUPPORT /D QT_NO_DEBUG /D QT_CORE_LIB /D QT_GUI_LIB /D QT_XML_LIB  /D "WIN32"  
+# ADD MTL /nologo /mktyplib203 /win32 /D "NDEBUG"
+# ADD RSC /l 0x409 /d "NDEBUG"
 # ADD BSC32 /nologo
-LIB32=link.exe -lib
-# ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo /out:"..\..\build\TrussUnit.lib"
+LIB32=lib /NOLOGO
+# ADD LIB32 /out:"..\..\build\release\TrussUnit.lib" 
 
 !ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug"
-# PROP BASE Intermediate_Dir "Debug"
+# PROP BASE Output_Dir "..\..\build\debug"
+# PROP BASE Intermediate_Dir "..\..\build\debug\obj\TrussUnit"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "../../Debug"
-# PROP Intermediate_Dir "../../Debug"
+# PROP Output_Dir "..\..\build\debug"
+# PROP Intermediate_Dir "..\..\build\debug\obj\TrussUnit"
 # PROP Target_Dir ""
-# ADD BASE F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
-# ADD F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
-# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /ZI /Od /I "../common" /I "../Agg" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /GZ /c
-# ADD BASE RSC /l 0x419 /d "_DEBUG"
-# ADD RSC /l 0x419 /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
+# ADD CPP /I"$(QTDIR)/include/QtXml" /I"$(QTDIR)/include/QtGui" /I"$(QTDIR)/include/QtCore" /I"$(QTDIR)/include" /I"$(AGGDIR)/include" /I"$(AGGDIR)/svg" /I"..\common" /I"..\Agg" /I"$(QTDIR)/include/ActiveQt" /I"..\..\build\debug\mocs\TrussUnit" /I"..\..\build\debug\ui\TrussUnit" /I"$(QTDIR)/mkspecs/win32-msvc" /c /FD -nologo -Zm200 -Zi -MDd -Zi -MDd -W3 -GR -GX  /D "_LIB"  /D UNICODE /D QT_LARGEFILE_SUPPORT /D WIN32 /D QT_THREAD_SUPPORT /D QT_CORE_LIB /D QT_GUI_LIB /D QT_XML_LIB  /D "WIN32"  
+# ADD MTL /nologo /mktyplib203 /win32 /D "_DEBUG"
+# ADD RSC /l 0x409 /d "_DEBUG"
 # ADD BSC32 /nologo
-LIB32=link.exe -lib
-# ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo /out:"..\..\build\TrussUnit.lib"
+LIB32=lib /NOLOGO
+# ADD LIB32 /out:"..\..\build\debug\TrussUnit.lib" 
 
 !ENDIF 
 
@@ -85,418 +74,574 @@ LIB32=link.exe -lib
 
 # Name "TrussUnit - Win32 Release"
 # Name "TrussUnit - Win32 Debug"
+
 # Begin Group "Source Files"
-
-# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;f90;for;f;fpp"
+# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
-
-SOURCE=.\Truss.cpp
+SOURCE=Truss.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\TrussLoad.cpp
+SOURCE=TrussLoad.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\TrussMaterial.cpp
+SOURCE=TrussMaterial.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\TrussNode.cpp
+SOURCE=TrussNode.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\TrussPivot.cpp
+SOURCE=TrussPivot.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\TrussUnit.cpp
+SOURCE=TrussUnit.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\TrussUnitActions.cpp
+SOURCE=TrussUnitActions.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\TrussUnitDesignerWidget.cpp
+SOURCE=TrussUnitDesignerWidget.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\TrussUnitDesignerWindow.cpp
+SOURCE=TrussUnitDesignerWindow.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\TrussUnitToolBar.cpp
+SOURCE=TrussUnitToolBar.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\TrussUnitWindow.cpp
+SOURCE=TrussUnitWindow.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\TrussUnitWindowButton.cpp
+SOURCE=TrussUnitWindowButton.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\TrussUnitWindowManager.cpp
+SOURCE=TrussUnitWindowManager.cpp
 # End Source File
+
 # End Group
+
 # Begin Group "Header Files"
-
-# PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
+# PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
+SOURCE=Truss.h
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\Truss.h
+USERDEP_Truss.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on Truss.h
+InputPath=Truss.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\TrussUnit\moc_Truss.cpp
+"..\..\build\release\mocs\TrussUnit\moc_Truss.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-!IF  "$(CFG)" == "TrussUnit - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\Truss.h
-InputName=Truss
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\Truss.h
-InputName=Truss
+USERDEP_Truss.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on Truss.h
+InputPath=Truss.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\TrussUnit\moc_Truss.cpp
+"..\..\build\debug\mocs\TrussUnit\moc_Truss.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ENDIF 
-
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=TrussLoad.h
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\TrussCalcData.h
+USERDEP_TrussLoad.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussLoad.h
+InputPath=TrussLoad.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\TrussUnit\moc_TrussLoad.cpp
+"..\..\build\release\mocs\TrussUnit\moc_TrussLoad.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
+
+# End Custom Build
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+USERDEP_TrussLoad.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussLoad.h
+InputPath=TrussLoad.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\TrussUnit\moc_TrussLoad.cpp
+"..\..\build\debug\mocs\TrussUnit\moc_TrussLoad.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
+
+# End Custom Build
+
+!ENDIF
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\TrussLoad.h
-
-!IF  "$(CFG)" == "TrussUnit - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussLoad.h
-InputName=TrussLoad
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussLoad.h
-InputName=TrussLoad
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ENDIF 
-
+SOURCE=TrussMaterial.h
 # End Source File
+
 # Begin Source File
+SOURCE=TrussUnit.h
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\TrussMaterial.h
+USERDEP_TrussUnit.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussUnit.h
+InputPath=TrussUnit.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\TrussUnit\moc_TrussUnit.cpp
+"..\..\build\release\mocs\TrussUnit\moc_TrussUnit.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
+
+# End Custom Build
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+USERDEP_TrussUnit.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussUnit.h
+InputPath=TrussUnit.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\TrussUnit\moc_TrussUnit.cpp
+"..\..\build\debug\mocs\TrussUnit\moc_TrussUnit.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
+
+# End Custom Build
+
+!ENDIF
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\TrussUnit.h
-
-!IF  "$(CFG)" == "TrussUnit - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussUnit.h
-InputName=TrussUnit
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussUnit.h
-InputName=TrussUnit
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ENDIF 
-
+SOURCE=TrussUnitActions.h
 # End Source File
+
 # Begin Source File
+SOURCE=TrussUnitDesignerWidget.h
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\TrussUnitActions.h
+USERDEP_TrussUnitDesignerWidget.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussUnitDesignerWidget.h
+InputPath=TrussUnitDesignerWidget.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\TrussUnit\moc_TrussUnitDesignerWidget.cpp
+"..\..\build\release\mocs\TrussUnit\moc_TrussUnitDesignerWidget.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
+
+# End Custom Build
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+USERDEP_TrussUnitDesignerWidget.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussUnitDesignerWidget.h
+InputPath=TrussUnitDesignerWidget.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\TrussUnit\moc_TrussUnitDesignerWidget.cpp
+"..\..\build\debug\mocs\TrussUnit\moc_TrussUnitDesignerWidget.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
+
+# End Custom Build
+
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=TrussUnitDesignerWindow.h
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\TrussUnitCalcDataManager.h
+USERDEP_TrussUnitDesignerWindow.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussUnitDesignerWindow.h
+InputPath=TrussUnitDesignerWindow.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\TrussUnit\moc_TrussUnitDesignerWindow.cpp
+"..\..\build\release\mocs\TrussUnit\moc_TrussUnitDesignerWindow.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
+
+# End Custom Build
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+USERDEP_TrussUnitDesignerWindow.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussUnitDesignerWindow.h
+InputPath=TrussUnitDesignerWindow.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\TrussUnit\moc_TrussUnitDesignerWindow.cpp
+"..\..\build\debug\mocs\TrussUnit\moc_TrussUnitDesignerWindow.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
+
+# End Custom Build
+
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=TrussUnitToolBar.h
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\TrussUnitDesignerWidget.h
+USERDEP_TrussUnitToolBar.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussUnitToolBar.h
+InputPath=TrussUnitToolBar.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\TrussUnit\moc_TrussUnitToolBar.cpp
+"..\..\build\release\mocs\TrussUnit\moc_TrussUnitToolBar.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-!IF  "$(CFG)" == "TrussUnit - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussUnitDesignerWidget.h
-InputName=TrussUnitDesignerWidget
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussUnitDesignerWidget.h
-InputName=TrussUnitDesignerWidget
+USERDEP_TrussUnitToolBar.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussUnitToolBar.h
+InputPath=TrussUnitToolBar.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\TrussUnit\moc_TrussUnitToolBar.cpp
+"..\..\build\debug\mocs\TrussUnit\moc_TrussUnitToolBar.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ENDIF 
-
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=TrussUnitWindow.h
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\TrussUnitDesignerWindow.h
+USERDEP_TrussUnitWindow.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussUnitWindow.h
+InputPath=TrussUnitWindow.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\TrussUnit\moc_TrussUnitWindow.cpp
+"..\..\build\release\mocs\TrussUnit\moc_TrussUnitWindow.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-!IF  "$(CFG)" == "TrussUnit - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussUnitDesignerWindow.h
-InputName=TrussUnitDesignerWindow
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussUnitDesignerWindow.h
-InputName=TrussUnitDesignerWindow
+USERDEP_TrussUnitWindow.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussUnitWindow.h
+InputPath=TrussUnitWindow.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\TrussUnit\moc_TrussUnitWindow.cpp
+"..\..\build\debug\mocs\TrussUnit\moc_TrussUnitWindow.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ENDIF 
-
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=TrussUnitWindowButton.h
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\TrussUnitToolBar.h
+USERDEP_TrussUnitWindowButton.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussUnitWindowButton.h
+InputPath=TrussUnitWindowButton.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\TrussUnit\moc_TrussUnitWindowButton.cpp
+"..\..\build\release\mocs\TrussUnit\moc_TrussUnitWindowButton.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-!IF  "$(CFG)" == "TrussUnit - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussUnitToolBar.h
-InputName=TrussUnitToolBar
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussUnitToolBar.h
-InputName=TrussUnitToolBar
+USERDEP_TrussUnitWindowButton.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussUnitWindowButton.h
+InputPath=TrussUnitWindowButton.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\TrussUnit\moc_TrussUnitWindowButton.cpp
+"..\..\build\debug\mocs\TrussUnit\moc_TrussUnitWindowButton.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ENDIF 
-
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=TrussUnitWindowManager.h
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\TrussUnitWindow.h
+USERDEP_TrussUnitWindowManager.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussUnitWindowManager.h
+InputPath=TrussUnitWindowManager.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\TrussUnit\moc_TrussUnitWindowManager.cpp
+"..\..\build\release\mocs\TrussUnit\moc_TrussUnitWindowManager.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-!IF  "$(CFG)" == "TrussUnit - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussUnitWindow.h
-InputName=TrussUnitWindow
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussUnitWindow.h
-InputName=TrussUnitWindow
+USERDEP_TrussUnitWindowManager.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on TrussUnitWindowManager.h
+InputPath=TrussUnitWindowManager.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"..\Agg" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\TrussUnit" -I"..\..\build\debug\ui\TrussUnit" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\TrussUnit\moc_TrussUnitWindowManager.cpp
+"..\..\build\debug\mocs\TrussUnit\moc_TrussUnitWindowManager.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ENDIF 
-
+!ENDIF
 # End Source File
-# Begin Source File
 
-SOURCE=.\TrussUnitWindowButton.h
-
-!IF  "$(CFG)" == "TrussUnit - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussUnitWindowButton.h
-InputName=TrussUnitWindowButton
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussUnitWindowButton.h
-InputName=TrussUnitWindowButton
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\TrussUnitWindowManager.h
-
-!IF  "$(CFG)" == "TrussUnit - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussUnitWindowManager.h
-InputName=TrussUnitWindowManager
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\TrussUnitWindowManager.h
-InputName=TrussUnitWindowManager
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
 # End Group
-# Begin Group "Moc Files"
 
-# PROP Default_Filter "cpp"
+# Begin Group "Generated"
+# PROP Default_Filter ""
 # Begin Source File
+SOURCE=..\..\build\debug\mocs\TrussUnit\moc_Truss.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\mocs\moc_Truss.cpp
+# PROP Exclude_From_Build 1
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=..\..\build\debug\mocs\TrussUnit\moc_TrussLoad.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\mocs\moc_TrussLoad.cpp
+# PROP Exclude_From_Build 1
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=..\..\build\debug\mocs\TrussUnit\moc_TrussUnit.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\mocs\moc_TrussUnit.cpp
+# PROP Exclude_From_Build 1
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=..\..\build\debug\mocs\TrussUnit\moc_TrussUnitDesignerWidget.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\mocs\moc_TrussUnitDesignerWidget.cpp
+# PROP Exclude_From_Build 1
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=..\..\build\debug\mocs\TrussUnit\moc_TrussUnitDesignerWindow.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\mocs\moc_TrussUnitDesignerWindow.cpp
+# PROP Exclude_From_Build 1
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=..\..\build\debug\mocs\TrussUnit\moc_TrussUnitToolBar.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\mocs\moc_TrussUnitToolBar.cpp
+# PROP Exclude_From_Build 1
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=..\..\build\debug\mocs\TrussUnit\moc_TrussUnitWindow.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\mocs\moc_TrussUnitWindow.cpp
+# PROP Exclude_From_Build 1
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=..\..\build\debug\mocs\TrussUnit\moc_TrussUnitWindowButton.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\mocs\moc_TrussUnitWindowButton.cpp
+# PROP Exclude_From_Build 1
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=..\..\build\debug\mocs\TrussUnit\moc_TrussUnitWindowManager.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
 
-SOURCE=.\mocs\moc_TrussUnitWindowManager.cpp
+# PROP Exclude_From_Build 1
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+
+!ENDIF
 # End Source File
+
+# Begin Source File
+SOURCE=..\..\build\release\mocs\TrussUnit\moc_Truss.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
+
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF
+# End Source File
+
+# Begin Source File
+SOURCE=..\..\build\release\mocs\TrussUnit\moc_TrussLoad.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
+
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF
+# End Source File
+
+# Begin Source File
+SOURCE=..\..\build\release\mocs\TrussUnit\moc_TrussUnit.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
+
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF
+# End Source File
+
+# Begin Source File
+SOURCE=..\..\build\release\mocs\TrussUnit\moc_TrussUnitDesignerWidget.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
+
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF
+# End Source File
+
+# Begin Source File
+SOURCE=..\..\build\release\mocs\TrussUnit\moc_TrussUnitDesignerWindow.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
+
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF
+# End Source File
+
+# Begin Source File
+SOURCE=..\..\build\release\mocs\TrussUnit\moc_TrussUnitToolBar.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
+
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF
+# End Source File
+
+# Begin Source File
+SOURCE=..\..\build\release\mocs\TrussUnit\moc_TrussUnitWindow.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
+
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF
+# End Source File
+
+# Begin Source File
+SOURCE=..\..\build\release\mocs\TrussUnit\moc_TrussUnitWindowButton.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
+
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF
+# End Source File
+
+# Begin Source File
+SOURCE=..\..\build\release\mocs\TrussUnit\moc_TrussUnitWindowManager.cpp
+!IF"$(CFG)" == "TrussUnit - Win32 Release"
+
+
+!ELSEIF"$(CFG)" == "TrussUnit - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF
+# End Source File
+
 # End Group
+
+
 # End Target
 # End Project
