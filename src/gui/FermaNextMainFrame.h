@@ -5,7 +5,6 @@
 // Qt3 Support classes
 #include <Q3MainWindow>
 
-class Q3Action;
 class Q3DockWindow;
 
 class ProjectToolBox;
@@ -16,6 +15,7 @@ class UndoRedoListBox;
 //FIXME QT3TO4
 //class TrussGeometryWindow;
 class QFile;
+class QMenu;
 
 class FermaNextMainFrame : public Q3MainWindow
 {
@@ -106,17 +106,17 @@ private:
     //TrussGeometryWindow* geometryWindow;
 
     // Some actions
-    Q3Action* undoAction;
-    Q3Action* redoAction;
-    Q3Action* saveProjectAction;
-    Q3Action* saveAsProjectAction;
-    Q3Action* closeProjectAction;
-    Q3Action* printAction;
-    Q3Action* showUndoRedoAction;
-    Q3Action* showGeometryWindowAction;
+    QAction* undoAction;
+    QAction* redoAction;
+    QAction* saveProjectAction;
+    QAction* saveAsProjectAction;
+    QAction* closeProjectAction;
+    QAction* printAction;
+    QAction* showUndoRedoAction;
+    QAction* showGeometryWindowAction;
     
     // Plugins menu
-    Q3PopupMenu* pluginsMenu;
+    QMenu* pluginsMenu;
 };
 
 #endif //FERMANEXTFRAME_H

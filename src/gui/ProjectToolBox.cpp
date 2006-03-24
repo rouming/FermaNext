@@ -9,7 +9,6 @@
 #include "CalculationInterface.h"
 
 // Qt3 Support classes
-#include <Q3Action>
 #include <Q3ButtonGroup>
 #include <Q3GroupBox>
 
@@ -200,13 +199,14 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
     calculateAllButton->setUsesTextLabel( TRUE );
     calculateAllButton->setFont( simpleFont );
     calculateAllButton->setBackgroundRole( QPalette::Base );
-    connect( calculateAllButton, SIGNAL(clicked()), SLOT(calculateAllIsPressed()) ); 
+    connect( calculateAllButton, SIGNAL(clicked()), 
+             SLOT(calculateAllIsPressed()) ); 
 
     // Calculate all action
-    Q3Action* calculationAllAction = new Q3Action( "Calculate all", Qt::Key_F5,
-                                                   this );
-    connect( calculationAllAction, SIGNAL( activated() ) , 
-             SLOT( calculateAllIsPressed() ) );
+    QAction* calculationAllAction = new QAction( tr("Calculate all"), this );
+    calculationAllAction->setShortcut( tr("F5") );
+    connect( calculationAllAction, SIGNAL(triggered()) , 
+             SLOT(calculateAllIsPressed()) );
 
     Q3ButtonGroup* buttons = new Q3ButtonGroup( 1, Qt::Vertical, groupBox );
     //FIXME QT3TO4
