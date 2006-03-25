@@ -11,6 +11,7 @@
 #include "XMLSerializableObject.h"
 #include "FermaNextProject.h"
 #include "FermaNextConfig.h"
+#include "FermaNextMainWindow.h"
 #include "PluginManager.h"
 
 class QStackedWidget;
@@ -25,7 +26,6 @@ public:
 
 public:
     // Exceptions
-    class WorkspaceIsNotInitedCorrectly {};
     class IOException {};
     class WrongXMLDocException {};
     class FileNameIsNotDefinedException {};
@@ -56,13 +56,15 @@ public:
     virtual bool isFileNameDefined () const;
     
     virtual void reset ();
-    virtual void createWidgetStack ( Q3MainWindow& );
 
-    virtual FermaNextProject& createProject ( const QString& name ) 
-                                    throw (WorkspaceIsNotInitedCorrectly);
+    /**
+     * Clean, shutdown everything and exit.
+     */
+    virtual void quitFermaNextApplication ();
+
+    virtual FermaNextProject& createProject ( const QString& name );
     virtual FermaNextProject& createProjectFromFile ( const QString& ) 
-                                    throw (WorkspaceIsNotInitedCorrectly,
-                                           LoadException);
+                                    throw (LoadException);
 
     virtual bool removeProject ( FermaNextProject& );
     virtual bool removeProject ( const QString& name );
@@ -79,6 +81,7 @@ public:
 
     virtual FermaNextConfig& config ();
     virtual PluginManager& pluginManager ();
+    virtual FermaNextMainWindow& mainWindow ();
 
 public slots:
     virtual void clearProjects ();
@@ -122,9 +125,11 @@ private:
 
     QString name;    
     QString workspaceFileName;
-    QStackedWidget* widgetStack;    
     ProjectList projects;
+    PluginManager pluginMng;
     FermaNextConfig fermaConfig;
+    FermaNextMainWindow* fermaMainWindow;
+    QStackedWidget* stackedWidget;
 };
 
 #endif //FERMANEXTWORKSPACE_H

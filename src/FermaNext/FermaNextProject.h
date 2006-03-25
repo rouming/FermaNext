@@ -48,6 +48,7 @@ public:
     virtual TrussUnitWindowManager& getTrussUnitWindowManager ();    
     virtual TrussUnitDesignerWindow& getDesignerWindow ();
     virtual CalcDataToolBar& getCalcDataToolBar ();
+    virtual FermaNextWorkspace& getWorkspace();
 
 protected:
     // XML serialization
@@ -64,12 +65,15 @@ signals:
 private:
     friend class FermaNextWorkspace;
     
-    FermaNextProject ( const QString& name, QStackedWidget* parent = 0 );
+    FermaNextProject ( FermaNextWorkspace&, 
+                       const QString& name, 
+                       QStackedWidget* parent = 0 );
 
 private:
+    FermaNextWorkspace& currentWorkspace;
     QString name;
     QString projectFileName;
-    QStackedWidget* widgetStack;
+    QStackedWidget* stackedWidget;
     QMainWindow* projectMainWidget;
     CalcDataToolBar* calcDataToolBar;
     QTabWidget* projectTab;

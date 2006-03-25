@@ -1,6 +1,5 @@
 
 // Qt3 Support classes
-#include <Q3WidgetStack>
 #include <Q3DockWindow>
 
 #include <QApplication>
@@ -22,7 +21,7 @@
 #include <QMenu>
 #include <QToolBar>
 
-#include "FermaNextMainFrame.h"
+#include "FermaNextMainWindow.h"
 #include "FermaNextWorkspace.h"
 #include "ProjectToolBox.h"
 #include "SubsidiaryConstants.h"
@@ -30,46 +29,38 @@
 // FIXME QT3TO4
 //#include "TrussGeometryWindow.h"
 
-const QString mainFrameCaption( QObject::tr( "Educational CAD System 'Ferma'" ) );
+const QString fermaTitle( QObject::tr( "Educational CAD System 'Ferma'" ) );
 
 /*****************************************************************************
  * FermaNext Main Frame
  *****************************************************************************/
 
-FermaNextMainFrame::FermaNextMainFrame ( QWidget* p, const char* n, 
-                                         Qt::WFlags f ) :
-    Q3MainWindow(p, n, f),
+FermaNextMainWindow::FermaNextMainWindow ( FermaNextWorkspace& wsp ) :
+    Q3MainWindow(0, 0, Qt::Window),
+    workspace(wsp),
     pluginsMenu(0)
 {     
     init();
 
     // Initial toolbar setup
     setupFileActions();
-	setupEditActions();
+    setupEditActions();
     setupViewActions ();
     setupProjectActions();
     setupWindowActions();
-    setupPluginActions();
     setupHelpActions();
+
+        // Refresh plugins menu
+    PluginManager& plgManager = workspace.pluginManager();
+    QObject::connect( &plgManager, SIGNAL(onAfterPluginsLoad(uint)), 
+                                   SLOT(refreshPluginsActions()) );
+    QObject::connect( &plgManager, SIGNAL(onAfterPluginsUnload(uint)), 
+                                   SLOT(refreshPluginsActions()) );
 }
 
-/*
- *  Last cleanup before quit.
- */
-void FermaNextMainFrame::cleanBeforeQuit ()
+void FermaNextMainWindow::init ()
 {
-    // Manually destroy all projects.
-    FermaNextWorkspace::workspace().clearProjects();
-    // Manually unregister all plugin loaders.
-    PluginManager::instance().unregisterPluginLoaders();
-}
-
-void FermaNextMainFrame::init ()
-{
-    // Do not move this line. Should be the first for correct inition.
-    FermaNextWorkspace::workspace().createWidgetStack( *this );
-
-    setCaption(mainFrameCaption);
+    setCaption( fermaTitle);
     setMinimumSize( 640, 480 );
     statusBar()->addWidget(new QLabel( tr("Ready"), statusBar() ));
 
@@ -109,12 +100,11 @@ void FermaNextMainFrame::init ()
     setDockEnabled( projectsDockWindow, Qt::DockBottom, false );
     projectsDockWindow->setCloseMode( Q3DockWindow::Always );
 
-    FermaNextWorkspace& ws = FermaNextWorkspace::workspace();
-    projectToolBox = new ProjectToolBox( ws, projectsDockWindow );
-    connect( &ws, SIGNAL(onBeforeProjectRemove(FermaNextProject&)), 
-                  SLOT(someProjectRemoved(FermaNextProject&)) );
-    connect( &ws, SIGNAL(onProjectCreate(FermaNextProject&)), 
-                  SLOT(someProjectCreated(FermaNextProject&)) );
+    projectToolBox = new ProjectToolBox( workspace, projectsDockWindow );
+    connect( &workspace, SIGNAL(onBeforeProjectRemove(FermaNextProject&)), 
+             SLOT(someProjectRemoved(FermaNextProject&)) );
+    connect( &workspace, SIGNAL(onProjectCreate(FermaNextProject&)), 
+             SLOT(someProjectCreated(FermaNextProject&)) );
     connect( projectToolBox, SIGNAL(currentChanged(int)), 
                              SLOT(refreshUndoRedoActions()) );
     connect( projectToolBox, SIGNAL(currentChanged(int)), 
@@ -127,9 +117,9 @@ void FermaNextMainFrame::init ()
     setRightJustification( true );
 }
 
-void FermaNextMainFrame::someProjectRemoved ( FermaNextProject& prj )
+void FermaNextMainWindow::someProjectRemoved ( FermaNextProject& prj )
 {
-    if ( 1 == FermaNextWorkspace::workspace().countProjects() ) {
+    if ( 1 == workspace.countProjects() ) {
         projectsDockWindow->hide();
         undoRedoHistoryWidget->hide();
     }
@@ -138,10 +128,9 @@ void FermaNextMainFrame::someProjectRemoved ( FermaNextProject& prj )
     designerWidget.disconnect( this );
 }
 
-void FermaNextMainFrame::someProjectCreated ( FermaNextProject& prj )
+void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
 {
-    if ( !projectsDockWindow->isVisible() && 
-        0 < FermaNextWorkspace::workspace().countProjects() ) {
+    if ( !projectsDockWindow->isVisible() && 0 < workspace.countProjects() ) {
         projectsDockWindow->show();
         undoRedoHistoryWidget->show();
         //FIXME QT3TO4
@@ -157,7 +146,7 @@ void FermaNextMainFrame::someProjectCreated ( FermaNextProject& prj )
                             SLOT(trussWindowReceivedFocus(TrussUnitWindow&)) );
 }
 
-void FermaNextMainFrame::createProject ()
+void FermaNextMainWindow::createProject ()
 {
     bool ok;
     QString text = QInputDialog::getText(
@@ -165,8 +154,7 @@ void FermaNextMainFrame::createProject ()
             tr("Enter project name:"), QLineEdit::Normal,
             QString::null, &ok, this );
     if ( ok && !text.isEmpty() ) {
-        FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
-        FermaNextProject& prj = wsp.createProject( text );
+        FermaNextProject& prj = workspace.createProject( text );
         TrussUnitWindowManager& mng = prj.getTrussUnitWindowManager();
         //FIXME QT3TO4
         /*
@@ -216,7 +204,7 @@ void FermaNextMainFrame::createProject ()
  * Initial ToolBar And Actions Setup
  *****************************************************************************/
 
-void FermaNextMainFrame::setupFileActions ()
+void FermaNextMainWindow::setupFileActions ()
 {
     QToolBar* tb = new QToolBar( tr("File Actions") );
     QMenu* menu = menuBar()->addMenu( tr( "&File" ) );
@@ -321,31 +309,33 @@ void FermaNextMainFrame::setupFileActions ()
     menu->addAction( a );
 }
 
-void FermaNextMainFrame::setupEditActions ()
+void FermaNextMainWindow::setupEditActions ()
 {
     QToolBar* tb = new QToolBar( tr("Edit Actions") );
     QMenu* menu = menuBar()->addMenu( tr( "&Edit" ) );
 
     // Undo
-    undoAction = new QAction( QIcon(imagesPath() + "/editundo.xpm"), tr( "&Undo" ), this );
-	undoAction->setShortcut( tr("CTRL+Z") );                               
+    undoAction = new QAction( QIcon(imagesPath() + "/editundo.xpm"), 
+                              tr( "&Undo" ), this );
+        undoAction->setShortcut( tr("CTRL+Z") );                               
     connect( undoAction, SIGNAL(triggered()), SLOT(editUndo()) );
     undoAction->setDisabled(true);
-	tb->addAction( undoAction );
-	menu->addAction( undoAction );
+        tb->addAction( undoAction );
+        menu->addAction( undoAction );
 
     // Redo
-    redoAction = new QAction( QIcon(imagesPath() + "/editredo.xpm"), tr( "&Redo" ), this );
-	undoAction->setShortcut( tr("CTRL+Y") );
+    redoAction = new QAction( QIcon(imagesPath() + "/editredo.xpm"), 
+                              tr( "&Redo" ), this );
+        undoAction->setShortcut( tr("CTRL+Y") );
     connect( redoAction, SIGNAL(triggered()), SLOT(editRedo()) );
     redoAction->setDisabled(true);
-	tb->addAction( redoAction );
-	menu->addAction( redoAction );
+        tb->addAction( redoAction );
+        menu->addAction( redoAction );
     menu->addSeparator();
     tb->addSeparator();
 }
 
-void FermaNextMainFrame::setupViewActions ()
+void FermaNextMainWindow::setupViewActions ()
 {
     QMenu* menu = menuBar()->addMenu( tr( "&View" ) );
 
@@ -354,7 +344,7 @@ void FermaNextMainFrame::setupViewActions ()
     showUndoRedoAction->setToggleAction( true );
     showUndoRedoAction->setOn( true );
     showUndoRedoAction->setStatusTip( tr( "Show or hide history window" ) );
-	menu->addAction( showUndoRedoAction );
+        menu->addAction( showUndoRedoAction );
     connect( showUndoRedoAction, SIGNAL(toggled(bool)), 
              undoRedoHistoryWidget, SLOT(setShown(bool)) );
 
@@ -374,48 +364,42 @@ void FermaNextMainFrame::setupViewActions ()
     */
 }
 
-void FermaNextMainFrame::setupProjectActions ()
+void FermaNextMainWindow::setupProjectActions ()
 {        
 }
 
-void FermaNextMainFrame::setupWindowActions ()
+void FermaNextMainWindow::setupWindowActions ()
 {
 }
 
-void FermaNextMainFrame::setupHelpActions ()
+void FermaNextMainWindow::setupHelpActions ()
 {
     QMenu* menu = menuBar()->addMenu( tr( "&Help" ) );
 
     QAction *a;
     // Contents
     a = new QAction( tr( "Contents..." ), this );
-	a->setShortcut( tr("F1") );
+        a->setShortcut( tr("F1") );
     connect( a, SIGNAL(triggered()), SLOT(helpContents()) );
-	menu->addAction( a );
+        menu->addAction( a );
     a->setDisabled(true);
     menu->insertSeparator();
 
     // About
     a = new QAction( tr( "About FermaNext" ), this );
     connect( a, SIGNAL(triggered()), SLOT(helpAbout()) );
-	menu->addAction( a );    
+        menu->addAction( a );    
     a->setDisabled(true);
 }
 
-void FermaNextMainFrame::setupPluginActions ()
-{
-    reloadPlugins( false );
-}
-
-void FermaNextMainFrame::reloadPlugins ()
+void FermaNextMainWindow::reloadPlugins ()
 {
     reloadPlugins( true );
 }
 
-void FermaNextMainFrame::reloadPlugins ( bool reload )
+void FermaNextMainWindow::reloadPlugins ( bool reload )
 {
-    FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
-    PluginManager& plgManager = wsp.pluginManager();
+    PluginManager& plgManager = workspace.pluginManager();
 
     if ( reload ) {        
         plgManager.unloadPlugins();
@@ -436,7 +420,7 @@ void FermaNextMainFrame::reloadPlugins ( bool reload )
         pluginsMenu->clear();
 
     QStringList::iterator i = names.begin();
-    for ( ; i != names.end(); ++i ) {		
+    for ( ; i != names.end(); ++i ) {           
         pluginsMenu->addAction( *i );
     }
     pluginsMenu->addSeparator();
@@ -446,7 +430,7 @@ void FermaNextMainFrame::reloadPlugins ( bool reload )
                             SLOT(reloadPlugins()) );
 }
 
-void FermaNextMainFrame::refreshUndoRedoActions ()
+void FermaNextMainWindow::refreshUndoRedoActions ()
 {
     bool enableUndo = false;
     bool enableRedo = false;
@@ -469,7 +453,7 @@ void FermaNextMainFrame::refreshUndoRedoActions ()
     redoAction->setEnabled(enableRedo);
 }
 
-void FermaNextMainFrame::refreshProjectActions ()
+void FermaNextMainWindow::refreshProjectActions ()
 {
     bool enableActions = false;
 
@@ -483,7 +467,13 @@ void FermaNextMainFrame::refreshProjectActions ()
     printAction->setEnabled(enableActions);
 }
 
-void FermaNextMainFrame::trussWindowLostFocus ( TrussUnitWindow& window )
+void FermaNextMainWindow::refreshPluginsActions ()
+{
+    // Just read info about plugins
+    reloadPlugins( false )  ;
+}
+
+void FermaNextMainWindow::trussWindowLostFocus ( TrussUnitWindow& window )
 {
     ObjectStateManager* mng = window.getStateManager();
     if ( mng )
@@ -495,7 +485,7 @@ void FermaNextMainFrame::trussWindowLostFocus ( TrussUnitWindow& window )
     //geometryWindow->changeFocusWindow( 0 );
 }
 
-void FermaNextMainFrame::trussWindowReceivedFocus ( TrussUnitWindow& window )
+void FermaNextMainWindow::trussWindowReceivedFocus ( TrussUnitWindow& window )
 {
     ObjectStateManager* mng = window.getStateManager();
     if ( mng == 0 )
@@ -521,12 +511,12 @@ void FermaNextMainFrame::trussWindowReceivedFocus ( TrussUnitWindow& window )
  * Actions
  *****************************************************************************/
 
-void FermaNextMainFrame::fileNew ()
+void FermaNextMainWindow::fileNew ()
 {
     createProject();
 }
 
-void FermaNextMainFrame::fileOpen ()
+void FermaNextMainWindow::fileOpen ()
 {
     QString fileName = QFileDialog::getOpenFileName( QString::null, 
         "Ferma project (*" + FermaNextProject::formatExtension() + ")",
@@ -535,17 +525,14 @@ void FermaNextMainFrame::fileOpen ()
     if ( fileName.isEmpty() )
         return;
 
-    try { FermaNextWorkspace::workspace().createProjectFromFile( fileName ); }
-    catch ( FermaNextWorkspace::WorkspaceIsNotInitedCorrectly& ) {
-        QMessageBox::critical( this, tr("FermaNextWorkspace exception"),
-                               tr("Workspace is not inited correctly.") );
-    } catch ( FermaNextWorkspace::LoadException& ) {
+    try { workspace.createProjectFromFile( fileName ); }
+    catch ( FermaNextWorkspace::LoadException& ) {
         QMessageBox::critical( this, tr("Error reading project file"),
                                tr("Wrong XML format.") );
     }
 }
 
-bool FermaNextMainFrame::fileSave ()
+bool FermaNextMainWindow::fileSave ()
 {
     FermaNextProject* currentPrj = projectToolBox->currentProject();
     if ( currentPrj == 0 )
@@ -558,7 +545,7 @@ bool FermaNextMainFrame::fileSave ()
     return true;
 }
 
-bool FermaNextMainFrame::fileSaveAs ()
+bool FermaNextMainWindow::fileSaveAs ()
 {
     FermaNextProject* currentPrj = projectToolBox->currentProject();
     if ( currentPrj == 0 )
@@ -598,7 +585,7 @@ bool FermaNextMainFrame::fileSaveAs ()
     return true;
 }
 
-void FermaNextMainFrame::fileClose ()
+void FermaNextMainWindow::fileClose ()
 {
     FermaNextProject* currentPrj = projectToolBox->currentProject();
     if ( currentPrj == 0 )
@@ -611,10 +598,10 @@ void FermaNextMainFrame::fileClose ()
                                 QString::null, 0, 1 ) )
         return;
     
-    FermaNextWorkspace::workspace().removeProject( *currentPrj );
+    workspace.removeProject( *currentPrj );
 }
 
-void FermaNextMainFrame::fileOpenWsp ()
+void FermaNextMainWindow::fileOpenWsp ()
 {
     if ( QMessageBox::question( this,
                                 tr("Open workspace"),                                  
@@ -630,7 +617,7 @@ void FermaNextMainFrame::fileOpenWsp ()
     if ( fileName.isEmpty() )
         return;
 
-    try { FermaNextWorkspace::workspace().loadFromFile( fileName ); }
+    try { workspace.loadFromFile( fileName ); }
     catch ( FermaNextWorkspace::IOException& ) {
         QMessageBox::critical( this, tr("Error reading workspace file"),
                                tr("Can't open file.") );
@@ -645,12 +632,11 @@ void FermaNextMainFrame::fileOpenWsp ()
     }
 }
 
-bool FermaNextMainFrame::fileSaveWsp ()
+bool FermaNextMainWindow::fileSaveWsp ()
 {
     // All projects should have their file names
     FermaNextProject* currentSelected = projectToolBox->currentProject();
-    FermaNextWorkspace::ProjectList projects = 
-        FermaNextWorkspace::workspace().getProjectList();
+    FermaNextWorkspace::ProjectList projects = workspace.getProjectList();
     FermaNextWorkspace::ProjectListIter prjIt = projects.begin();
     for ( ; prjIt != projects.end(); ++prjIt ) {
         FermaNextProject* prj = *prjIt;
@@ -665,7 +651,7 @@ bool FermaNextMainFrame::fileSaveWsp ()
     if ( currentSelected )
         currentSelected->activate();
 
-    try { FermaNextWorkspace::workspace().saveToFile(); }
+    try { workspace.saveToFile(); }
     catch ( FermaNextWorkspace::FileNameIsNotDefinedException& ) {
         return fileSaveWspAs();
     }
@@ -679,7 +665,7 @@ bool FermaNextMainFrame::fileSaveWsp ()
     return true;
 }
 
-bool FermaNextMainFrame::fileSaveWspAs ()
+bool FermaNextMainWindow::fileSaveWspAs ()
 {
     QString fileName = QFileDialog::getSaveFileName( QString::null, 
         "Ferma workspace (*" + FermaNextWorkspace::formatExtension() + ")",
@@ -705,8 +691,7 @@ bool FermaNextMainFrame::fileSaveWspAs ()
     
     // All projects should have their file names
     FermaNextProject* currentSelected = projectToolBox->currentProject();
-    FermaNextWorkspace::ProjectList projects = 
-        FermaNextWorkspace::workspace().getProjectList();
+    FermaNextWorkspace::ProjectList projects = workspace.getProjectList();
     FermaNextWorkspace::ProjectListIter prjIt = projects.begin();
     for ( ; prjIt != projects.end(); ++prjIt ) {
         FermaNextProject* prj = *prjIt;
@@ -721,7 +706,7 @@ bool FermaNextMainFrame::fileSaveWspAs ()
     if ( currentSelected )
         currentSelected->activate();
 
-    try { FermaNextWorkspace::workspace().saveToFile( fileName ); }
+    try { workspace.saveToFile( fileName ); }
     catch ( FermaNextWorkspace::ProjectFileNameIsNotDefinedException& ) {
         // Hm. Strange
         QMessageBox::critical( this, tr("FermaNextWorkspace exception"),
@@ -738,17 +723,16 @@ bool FermaNextMainFrame::fileSaveWspAs ()
     return true;
 }
 
-void FermaNextMainFrame::fileCloseWsp ()
+void FermaNextMainWindow::fileCloseWsp ()
 {
-    FermaNextWorkspace::workspace().reset();
+    workspace.reset();
 }
 
-bool FermaNextMainFrame::fileSaveAll ()
+bool FermaNextMainWindow::fileSaveAll ()
 {
     // Save projects at first
     FermaNextProject* currentSelected = projectToolBox->currentProject();
-    FermaNextWorkspace::ProjectList projects = 
-        FermaNextWorkspace::workspace().getProjectList();
+    FermaNextWorkspace::ProjectList projects = workspace.getProjectList();
     FermaNextWorkspace::ProjectListIter prjIt = projects.begin();
     for ( ; prjIt != projects.end(); ++prjIt ) {
         FermaNextProject* prj = *prjIt;
@@ -773,17 +757,17 @@ bool FermaNextMainFrame::fileSaveAll ()
     return fileSaveWsp();
 }
 
-void FermaNextMainFrame::filePageSetup ()
+void FermaNextMainWindow::filePageSetup ()
 {
     qWarning("Not implmented yet!");
 }
 
-void FermaNextMainFrame::filePrintPreview ()
+void FermaNextMainWindow::filePrintPreview ()
 {
     qWarning("Not implmented yet!");
 }
 
-void FermaNextMainFrame::filePrint ()
+void FermaNextMainWindow::filePrint ()
 {
     FermaNextProject* prj = projectToolBox->currentProject();
     if ( prj == 0 )
@@ -791,13 +775,12 @@ void FermaNextMainFrame::filePrint ()
     prj->getDesignerWindow().getDesignerWidget().print();
 }
 
-void FermaNextMainFrame::fileExit ()
+void FermaNextMainWindow::fileExit ()
 {
-    cleanBeforeQuit();
-    qApp->quit();
+    workspace.quitFermaNextApplication();
 }
 
-void FermaNextMainFrame::editUndo ()
+void FermaNextMainWindow::editUndo ()
 {
     FermaNextProject* prj = projectToolBox->currentProject();
     if ( prj == 0 )
@@ -824,7 +807,7 @@ void FermaNextMainFrame::editUndo ()
     }
 }
 
-void FermaNextMainFrame::editRedo ()
+void FermaNextMainWindow::editRedo ()
 {
     FermaNextProject* prj = projectToolBox->currentProject();
     if ( prj == 0 )
@@ -851,32 +834,32 @@ void FermaNextMainFrame::editRedo ()
     }
 }
 
-void FermaNextMainFrame::editCopy ()
+void FermaNextMainWindow::editCopy ()
 {
     qWarning("Not implmented yet!");
 }
 
-void FermaNextMainFrame::editPaste ()
+void FermaNextMainWindow::editPaste ()
 {
     qWarning("Not implmented yet!");
 }
 
-void FermaNextMainFrame::editCut ()
+void FermaNextMainWindow::editCut ()
 {
     qWarning("Not implmented yet!");
 }
 
-void FermaNextMainFrame::editSelectAll ()
+void FermaNextMainWindow::editSelectAll ()
 {
     qWarning("Not implmented yet!");
 }
 
-void FermaNextMainFrame::helpContents ()
+void FermaNextMainWindow::helpContents ()
 {
     qWarning("Not implmented yet!");
 }
 
-void FermaNextMainFrame::helpAbout ()
+void FermaNextMainWindow::helpAbout ()
 {
     qWarning("Not implmented yet!");
 }
@@ -885,7 +868,7 @@ void FermaNextMainFrame::helpAbout ()
  * Events
  *****************************************************************************/
 
-bool FermaNextMainFrame::eventFilter( QObject* targetObj, QEvent* event )
+bool FermaNextMainWindow::eventFilter( QObject* targetObj, QEvent* event )
 {
     if ( event->type() == QEvent::KeyPress ) {
         QKeyEvent* keyEvent = (QKeyEvent*)event;
@@ -923,10 +906,9 @@ bool FermaNextMainFrame::eventFilter( QObject* targetObj, QEvent* event )
 /*
  *  Correct clean.
  */
-void FermaNextMainFrame::closeEvent ( QCloseEvent* event )
+void FermaNextMainWindow::closeEvent ( QCloseEvent* event )
 {
-    cleanBeforeQuit();
-    event->accept();
+    workspace.quitFermaNextApplication();
 }
 
 /*****************************************************************************/

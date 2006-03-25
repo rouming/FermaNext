@@ -38,7 +38,7 @@ SOURCES = \
           FermaNextWorkspace.cpp \
 #FIXME QT3TO4
 #          ../gui/CalcDataToolBar.cpp \
-          ../gui/FermaNextMainFrame.cpp \
+          ../gui/FermaNextMainWindow.cpp \
           ../gui/ProjectToolBox.cpp \
           ../gui/Splash.cpp \
           ../gui/ToolBarManager.cpp \
@@ -53,7 +53,7 @@ HEADERS = \
           FermaNextWorkspace.h \
 #FIXME QT3TO4
 #          ../gui/CalcDataToolBar.h \
-          ../gui/FermaNextMainFrame.h \
+          ../gui/FermaNextMainWindow.h \
           ../gui/ProjectToolBox.h \
           ../gui/Splash.h \
           ../gui/ToolBarManager.h \

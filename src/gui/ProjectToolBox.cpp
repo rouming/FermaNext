@@ -333,8 +333,7 @@ void ProjectToolBox::calculateAllIsPressed ()
     if ( currPrj == 0 )
         return;
 
-    FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
-    PluginManager& plgManager = wsp.pluginManager();
+    PluginManager& plgManager = workspace.pluginManager();
     PluginList plugins = plgManager.loadedPluginsOfType( CALCULATION_TYPE );
     if ( plugins.size() == 0 ) {
         QMessageBox::warning( 0, tr("Plugin manager warning"), 

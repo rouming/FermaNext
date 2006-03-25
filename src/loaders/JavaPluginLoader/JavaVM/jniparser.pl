@@ -337,7 +337,8 @@ void JavaVirtualMachine::createJavaVM ( JavaVMVersion version,
         QString optStr = *optIt;
         // Safe copy
         options[indx].optionString =
-            qstrcpy( new char[optStr.length() + 1], optStr.ascii() );
+            qstrcpy( new char[optStr.length() + 1],
+                     optStr.toAscii().data() );
         options[indx].extraInfo = 0;
     }
 

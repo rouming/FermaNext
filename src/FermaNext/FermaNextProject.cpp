@@ -18,11 +18,13 @@ const QString& FermaNextProject::formatExtension ()
 
 /*****************************************************************************/
 
-FermaNextProject::FermaNextProject ( const QString& name_, 
+FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
+                                     const QString& name_, 
                                      QStackedWidget* stack ) :
+    currentWorkspace(wsp),
     name(name_),
-    widgetStack(stack),
-    projectMainWidget( new QMainWindow(widgetStack, 0) ),
+    stackedWidget(stack),
+    projectMainWidget( new QMainWindow(stackedWidget, 0) ),
     // FIXME QT3TO4:
     //calcDataToolBar( new CalcDataToolBar(projectMainWidget) ),
     projectTab( new QTabWidget(projectMainWidget) ),
@@ -37,7 +39,7 @@ FermaNextProject::FermaNextProject ( const QString& name_,
     projectMainWidget->setDockEnabled( DockRight, false );
     */
 
-    widgetStack->addWidget(projectMainWidget);
+    stackedWidget->addWidget(projectMainWidget);
     projectMainWidget->setCentralWidget( projectTab );
   
     projectTab->setTabPosition( QTabWidget::South );
@@ -45,26 +47,31 @@ FermaNextProject::FermaNextProject ( const QString& name_,
     projectTab->addTab( justStrengthAnalisysWidget, tr("Strength Analysis") );
       
 
-    TrussUnitDesignerWidget& designerWidget = designerWindow->getDesignerWidget();
+    TrussUnitDesignerWidget& designerWidget = 
+        designerWindow->getDesignerWidget();
 
     // Catch trusses creation or deletion.
-    connect( trussWindowManager, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
+    connect( trussWindowManager, 
+             SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
              &designerWidget, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
-    connect( trussWindowManager, SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
+    connect( trussWindowManager, 
+             SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
              &designerWidget, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
     // FIXME QT3TO4: 
     /*
-    connect( trussWindowManager, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)),     
+    connect( trussWindowManager, 
+             SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)),     
              calcDataToolBar, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
-    connect( trussWindowManager, SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
+    connect( trussWindowManager, 
+             SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
              calcDataToolBar, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
      */
 }
 
 FermaNextProject::~FermaNextProject ()
 {
-    if ( widgetStack )
-        widgetStack->removeWidget( projectMainWidget );
+    if ( stackedWidget )
+        stackedWidget->removeWidget( projectMainWidget );
     delete trussWindowManager;
     delete projectMainWidget;
 }
@@ -236,15 +243,17 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
 
 void FermaNextProject::activate ()
 {
-    if ( widgetStack && widgetStack->currentWidget() != projectMainWidget ) {
-        widgetStack->setCurrentWidget( projectMainWidget );
+    if ( stackedWidget && stackedWidget->currentWidget() != 
+         projectMainWidget ) {
+        stackedWidget->setCurrentWidget( projectMainWidget );
         emit onActivate( *this );
     }
 }
 
 bool FermaNextProject::isActivated () const
 {
-    return widgetStack && widgetStack->currentWidget() == projectMainWidget;
+    return (stackedWidget && stackedWidget->currentWidget() == 
+            projectMainWidget);
 }
 
 const QString& FermaNextProject::getName () const
@@ -271,6 +280,11 @@ TrussUnitDesignerWindow& FermaNextProject::getDesignerWindow ()
 CalcDataToolBar& FermaNextProject::getCalcDataToolBar ()
 {
     return *calcDataToolBar;
+}
+
+FermaNextWorkspace& FermaNextProject::getWorkspace()
+{
+    return currentWorkspace;
 }
 
 /*****************************************************************************/

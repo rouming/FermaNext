@@ -3,7 +3,8 @@
 
 #include "Splash.h"
 #include "SubsidiaryConstants.h"
-#include "FermaNextMainFrame.h"
+#include "FermaNextWorkspace.h"
+#include "FermaNextMainWindow.h"
 
 /*****************************************************************************
  * Main 
@@ -16,7 +17,9 @@ int main ( int argc, char* argv[] )
     Splash* splash = new Splash( pixmap );
     splash->show();
 
-    PluginManager& plgMng = PluginManager::instance();
+    FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
+
+    PluginManager& plgMng = wsp.pluginManager();
     // Catch plugin loaders registration
     QObject::connect( &plgMng, 
                       SIGNAL(onBeforePluginLoaderRegistration(const QString&)),
@@ -30,9 +33,10 @@ int main ( int argc, char* argv[] )
     plgMng.loadPlugins( pluginsPath() );    
 
     splash->message( "Setting up GUI .." );
-    FermaNextMainFrame ferma;
-    ferma.showMaximized();
-    splash->finish( &ferma );
+
+    FermaNextMainWindow& fermaMainWindow = wsp.mainWindow();
+    fermaMainWindow.showMaximized();
+    splash->finish( &fermaMainWindow );
     delete splash;
     return app.exec();
 }

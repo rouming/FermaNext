@@ -53,10 +53,9 @@ public:
     };
 
     /**
-     * Entry point. 
-     * @return plugin manager instance
+     * Plugin manager contructor.
      */
-    static PluginManager& instance ();
+    PluginManager ();
 
     /**
      * Correctly unload all plugins.
@@ -140,24 +139,32 @@ signals:
     /** 
      * Is emitted, when #loadPlugins has been called.
      * @param plgNum describes how many plugins are going to be loaded.
-     * BEWARE: slots should be threadsafe and do not post any GUI events to
+     * BEWARE: slots should be thread safe and do not post any GUI events to
      * main event loop.
      */
-    void onPluginsLoad ( uint plgNum );
+    void onBeforePluginsLoad ( uint plgNum );
+
+    /** 
+     * Is emitted, when #loadPlugins has been called.
+     * @param plgNum describes how many plugins are already loaded.
+     * BEWARE: slots should be thread safe and do not post any GUI events to
+     * main event loop.
+     */
+    void onAfterPluginsLoad ( uint plgNum );
 
     /** 
      * Is emitted before plugin load. If loading fails, #onAfterPluginLoad
      * will not be emitted.
      * @param path to plugin, which is going to be loaded.
-     * BEWARE: slots should be threadsafe and do not post any GUI events to
+     * BEWARE: slots should be thread safe and do not post any GUI events to
      * main event loop.
      */
     void onBeforePluginLoad ( const QString& path );
 
     /** 
-     * Is emitted after successfull plugin load.
+     * Is emitted after successful plugin load.
      * @param plg plugin.
-     * BEWARE: slots should be threadsafe and do not post any GUI events to
+     * BEWARE: slots should be thread safe and do not post any GUI events to
      * main event loop.
      */
     void onAfterPluginLoad ( Plugin& plg );
@@ -165,27 +172,35 @@ signals:
     /** 
      * Is emitted, when #unloadPlugins has been called.
      * @param plgNum describes how many plugins are going to be unloaded.
-     * BEWARE: slots should be threadsafe and do not post any GUI events to
+     * BEWARE: slots should be thread safe and do not post any GUI events to
      * main event loop.
      */
-    void onPluginsUnload ( uint plgNum );
+    void onBeforePluginsUnload ( uint plgNum );
+
+    /** 
+     * Is emitted, when #unloadPlugins has been called.
+     * @param plgNum describes how many plugins are already unloaded.
+     * BEWARE: slots should be thread safe and do not post any GUI events to
+     * main event loop.
+     */
+    void onAfterPluginsUnload ( uint plgNum );
 
     /** 
      * Is emitted before plugin unload.
      * @param plg plugin.
-     * BEWARE: slots should be threadsafe and do not post any GUI events to
+     * BEWARE: slots should be thread safe and do not post any GUI events to
      * main event loop.
      */
     void onPluginUnload ( Plugin& plg );
 
     ///////////////////////////////////////////////////////////////////////
-    // Plugin Loder Signals
+    // Plugin Loader Signals
     ///////////////////////////////////////////////////////////////////////
 
     /** 
      * Is emitted, when #loadPlugins has been called.
      * @param num describes how many plugin loaders are going to be registered.
-     * BEWARE: slots should be threadsafe and do not post any GUI events to
+     * BEWARE: slots should be thread safe and do not post any GUI events to
      * main event loop.
      */
     void onPluginLoadersRegistration ( uint num );
@@ -194,16 +209,16 @@ signals:
      * Is emitted before loader registration. If registration fails, 
      * #onAfterPluginLoaderRegistration will not be emitted.
      * @param path to loader, which is going to be registered.
-     * BEWARE: slots should be threadsafe and do not post any GUI events to
+     * BEWARE: slots should be thread safe and do not post any GUI events to
      * main event loop.
      */
     void onBeforePluginLoaderRegistration ( const QString& path );
 
     /** 
-     * Is emitted after successfull plugin loader registration.
+     * Is emitted after successful plugin loader registration.
      * @param plgLoader plugin loader.
      * @param priority of loading.
-     * BEWARE: slots should be threadsafe and do not post any GUI events to
+     * BEWARE: slots should be thread safe and do not post any GUI events to
      * main event loop.
      */
     void onAfterPluginLoaderRegistration ( 
@@ -215,7 +230,7 @@ signals:
      * called.
      * @param num describes how many plugin loaders are going to be 
      * unregistered.
-     * BEWARE: slots should be threadsafe and do not post any GUI events to
+     * BEWARE: slots should be thread safe and do not post any GUI events to
      * main event loop.
      */
     void onPluginLoadersUnregistration ( uint num );
@@ -223,7 +238,7 @@ signals:
     /** 
      * Is emitted before plugin loader unregistration.
      * @param plgLoader plugin loader..
-     * BEWARE: slots should be threadsafe and do not post any GUI events to
+     * BEWARE: slots should be thread safe and do not post any GUI events to
      * main event loop.
      */
     void onPluginLoaderUnregistration ( PluginLoader& plgLoader );
@@ -243,14 +258,14 @@ private:
         throw (RegisterPluginLoaderException);
 
     /**
-     * Simply unregisteres plugin loader.
+     * Simply unregisters plugin loader.
      * @param loader to be unregistered.
      * @see registerPluginLoader
      */
     void unregisterPluginLoader ( PluginLoader& loader );
 
     /**
-     * Deligates the choice of requried plugin to the user (e.g. creates 
+     * Delegates the choice of required plugin to the user (e.g. creates 
      * GUI dialog window with special combobox).
      * @param plugin for which user should choose required plugin.
      * @param type of required plugin.
@@ -262,9 +277,6 @@ private:
                                    const PluginList& plugins )
         throw (PluginListIsEmptyException);
 
-
-    /** Hidden constructor. Use static instance() instead. */
-    PluginManager ();
     /** Hidden copy constructor. */
     PluginManager ( const PluginManager& );
     /** Hidden copy operator. */
@@ -285,8 +297,6 @@ private:
 
     typedef std::vector<DynaLoader*> PreloadedSystemLibs;
     typedef PreloadedSystemLibs::iterator PreloadedSystemLibsIter;
-
-    static PluginManager* plgMngInstance;
 
     PreloadedSystemLibs systemLibs;    /**< preloaded system libs */
     PluginLoadersMap loadersMap;       /**< loaders in loading order */

@@ -3,7 +3,6 @@
 #include "PluginManager.h"
 #include "DynaLoader.h"
 
-#include <QMutex>
 #include <algorithm>
 #include <QDir>
 #include <QRegExp>
@@ -11,11 +10,6 @@
 /*****************************************************************************
  * Plugin Manager
  *****************************************************************************/
-
-static QMutex mutex;
-PluginManager* PluginManager::plgMngInstance = 0;
-
-/*****************************************************************************/
 
 const QString& PluginManager::systemPluginExtension ()
 {
@@ -27,19 +21,6 @@ const QString& PluginManager::systemPluginLoaderExtension ()
 {
     static QString extension = "ldr";
     return extension;
-}
-
-/*****************************************************************************/
-
-PluginManager& PluginManager::instance ()
-{
-    if ( plgMngInstance == 0 ) {
-        mutex.lock();
-        if ( plgMngInstance == 0 ) 
-            plgMngInstance = new PluginManager;
-        mutex.unlock();
-    }
-    return *plgMngInstance;
 }
 
 /*****************************************************************************/
@@ -280,7 +261,7 @@ void PluginManager::loadPlugins ( const QString& path )
     }
 
     // Emit signal about number of plugins which are going to be loaded.
-    emit onPluginsLoad( pluginPathList.size() );
+    emit onBeforePluginsLoad( pluginPathList.size() );
 
     // Load all plugins by sored plugins paths in priority order..
     PluginPathListConstIter pathIt = pluginPathList.begin();
@@ -301,6 +282,10 @@ void PluginManager::loadPlugins ( const QString& path )
         }
     }
 
+    // Emit signal about number of plugins 
+    // which are sucessfuly loaded.
+    emit onAfterPluginsLoad( plugins.size() );
+
     //TODO: DO NOT FORGET TO RESOLVE DEPENDENCIES
 }
 
@@ -308,7 +293,8 @@ void PluginManager::unloadPlugins ()
 {
     // Unload all plugins regardless of their status
     PluginList loadedPlgs = loadedPlugins( false );
-    emit onPluginsUnload( loadedPlgs.size() );
+    int pluginsSize = loadedPlgs.size();
+    emit onBeforePluginsUnload( pluginsSize );
 
     // Firstly unload all FN plugins
     PluginListIter it = loadedPlgs.begin();
@@ -322,6 +308,8 @@ void PluginManager::unloadPlugins ()
     for ( ; libsIter != systemLibs.end(); ++libsIter )
         delete *libsIter;
     systemLibs.clear();
+
+    emit onAfterPluginsUnload( pluginsSize );
 }
 
 void PluginManager::unloadPlugin ( Plugin& plg )

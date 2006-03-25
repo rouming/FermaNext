@@ -1,6 +1,6 @@
 
-#ifndef FERMANEXTFRAME_H
-#define FERMANEXTFRAME_H
+#ifndef FERMANEXTMAINWINDOW_H
+#define FERMANEXTMAINWINDOW_H
 
 // Qt3 Support classes
 #include <Q3MainWindow>
@@ -17,13 +17,11 @@ class UndoRedoListBox;
 class QFile;
 class QMenu;
 
-class FermaNextMainFrame : public Q3MainWindow
+class FermaNextMainWindow : public Q3MainWindow
 {
     Q_OBJECT
 public:
-    FermaNextMainFrame ( QWidget * parent = 0, const char * name = 0, 
-                         // FIXME QT3TO4: WFlags f = WType_TopLevel
-                         Qt::WFlags f = Qt::Window );
+    FermaNextMainWindow ( FermaNextWorkspace& );
 
 public slots:
     void someProjectRemoved ( FermaNextProject& );
@@ -39,9 +37,6 @@ protected:
     // Reload all plugins
     void reloadPlugins ( bool reload );
 
-    // Provides correct last cleanup before quit.
-    void cleanBeforeQuit ();
-
     void init ();
     void setupFileActions ();
     void setupEditActions ();
@@ -49,7 +44,6 @@ protected:
     void setupProjectActions ();
     void setupWindowActions ();
     void setupHelpActions ();
-    void setupPluginActions ();
 
     bool eventFilter( QObject*, QEvent* );
     // Close handler. Calls 'clean' for correct close.
@@ -85,12 +79,16 @@ protected slots:
     void refreshUndoRedoActions ();
     // Refresh project actions
     void refreshProjectActions ();
+	// Refresh plugins actions
+	void refreshPluginsActions ();
 
     // Catch designer widget focus change
     void trussWindowLostFocus ( TrussUnitWindow& );
     void trussWindowReceivedFocus ( TrussUnitWindow& );
 
 private:
+    // Current system workspace
+    FermaNextWorkspace& workspace;
     // Dock window on wich all projects are located
     Q3DockWindow* projectsDockWindow;
     // Undo/redo history widget
@@ -99,8 +97,6 @@ private:
     UndoRedoListBox* undoRedoListBox;
     // Tool box of all workspace projects
     ProjectToolBox* projectToolBox;
-    // Current system workspace
-    FermaNextWorkspace* wsp;
     // Truss geometry window
     //FIXME QT3TO4
     //TrussGeometryWindow* geometryWindow;
@@ -119,4 +115,4 @@ private:
     QMenu* pluginsMenu;
 };
 
-#endif //FERMANEXTFRAME_H
+#endif //FERMANEXTMAINWINDOW_H

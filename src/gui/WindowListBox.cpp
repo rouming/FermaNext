@@ -171,7 +171,7 @@ void TrussUnitWindowItem::unselectAllFromGroup ()
 
 void TrussUnitWindowItem::calculate ()
 { 
-    FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();    
+    FermaNextWorkspace& wsp = project.getWorkspace();    
     PluginManager& plgManager = wsp.pluginManager();
     PluginList plugins = plgManager.loadedPluginsOfType( CALCULATION_TYPE );
     if ( plugins.size() == 0 ) {

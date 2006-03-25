@@ -52,8 +52,7 @@ Plugin& NativePluginLoader::specificLoadPlugin ( const QString& pathToPlugin )
         PluginInstanceInitCall pluginInstanceInitCall = 
             (PluginInstanceInitCall)dynaLoader->getProcAddress( 
                                                    PLUGIN_INSTANCE_INIT_CALL );
-        plugin = pluginInstanceInitCall( PluginManager::instance(), 
-                                         pathToPlugin );
+        plugin = pluginInstanceInitCall( pluginManager(), pathToPlugin );
     }
     catch ( DynaLoader::LibraryLoadException& ) {
         delete dynaLoader;
