@@ -118,7 +118,7 @@ const agg::ctrl* AggCtrlContainer::arrowKeysPressEvent ( bool left, bool right,
 AggQWidget::AggQWidget ( QWidget* parent,                         
                          bool flip_y ) :
     QWidget( parent ),
-    mainQImage( new QImage ),
+    mainQImage( new QImage(QSize(360, 330), QImage::Format_RGB32) ),
     aggFlipY( flip_y )    
 {
     //FIXME QT3TO4: setBackgroundMode( QWidget::NoBackground );
@@ -189,8 +189,7 @@ void AggQWidget::resizeEvent ( QResizeEvent* event )
 
     // Resize the internal buffer and reattach the main 
     // AGG rendering_buffer to the QImage 
-    //FIXME QT3TO4: mainQImage->create( newSize, 32 );
-    mainQImage->scaled( newSize, Qt::KeepAspectRatio );
+    *mainQImage = mainQImage->scaled( newSize, Qt::KeepAspectRatio );
 
     aggBuffer.attach( mainQImage->bits(), mainQImage->width(), 
                       mainQImage->height(), 

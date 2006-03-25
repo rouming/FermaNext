@@ -395,8 +395,7 @@ bool ProjectToolBox::eventFilter( QObject* targetObj, QEvent* event )
         if ( keyEvent->key() == Qt::Key_N || keyEvent->key() == Qt::Key_P ||
              keyEvent->key() == Qt::Key_F || keyEvent->key() == Qt::Key_L ||
              keyEvent->key() == Qt::Key_Escape ) {
-            currentPrj->getDesignerWindow().
-                getDesignerWidget().aggKeyPressEvent( keyEvent );
+            currentPrj->getDesignerWidget().aggKeyPressEvent( keyEvent );
             return true;
         }
     }

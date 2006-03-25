@@ -123,8 +123,7 @@ void FermaNextMainWindow::someProjectRemoved ( FermaNextProject& prj )
         projectsDockWindow->hide();
         undoRedoHistoryWidget->hide();
     }
-    TrussUnitDesignerWidget& designerWidget = 
-        prj.getDesignerWindow().getDesignerWidget();
+    TrussUnitDesignerWidget& designerWidget = prj.getDesignerWidget();
     designerWidget.disconnect( this );
 }
 
@@ -137,8 +136,7 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
         //geometryWindow->show();
     }
 
-    TrussUnitDesignerWidget& designerWidget = 
-        prj.getDesignerWindow().getDesignerWidget();
+    TrussUnitDesignerWidget& designerWidget = prj.getDesignerWidget();
 
     connect( &designerWidget, SIGNAL(onFocusLose(TrussUnitWindow&)),
                             SLOT(trussWindowLostFocus(TrussUnitWindow&)) );
@@ -439,7 +437,7 @@ void FermaNextMainWindow::refreshUndoRedoActions ()
     FermaNextProject* prj = projectToolBox->currentProject();
     if ( prj != 0 ) {
         TrussUnitWindow* trussWindow = 
-            prj->getDesignerWindow().getDesignerWidget().getFocusedWindow();
+            prj->getDesignerWidget().getFocusedWindow();
         if ( trussWindow ) {
             mng = trussWindow->getStateManager();
             if ( mng ) {    
@@ -772,7 +770,7 @@ void FermaNextMainWindow::filePrint ()
     FermaNextProject* prj = projectToolBox->currentProject();
     if ( prj == 0 )
         return;
-    prj->getDesignerWindow().getDesignerWidget().print();
+    prj->getDesignerWidget().print();
 }
 
 void FermaNextMainWindow::fileExit ()
@@ -787,7 +785,7 @@ void FermaNextMainWindow::editUndo ()
         return;
 
     TrussUnitWindow* trussWindow = 
-        prj->getDesignerWindow().getDesignerWidget().getFocusedWindow();
+        prj->getDesignerWidget().getFocusedWindow();
     if ( trussWindow == 0 )
         return;
 
@@ -797,7 +795,7 @@ void FermaNextMainWindow::editUndo ()
     
     try {
         mng->undo();
-        prj->getDesignerWindow().getDesignerWidget().update();
+        prj->getDesignerWidget().update();
         refreshUndoRedoActions();
     } 
     catch ( ObjectStateManager::UndoException& )
@@ -814,7 +812,7 @@ void FermaNextMainWindow::editRedo ()
         return;
 
     TrussUnitWindow* trussWindow = 
-        prj->getDesignerWindow().getDesignerWidget().getFocusedWindow();
+        prj->getDesignerWidget().getFocusedWindow();
     if ( trussWindow == 0 )
         return;
 
@@ -824,7 +822,7 @@ void FermaNextMainWindow::editRedo ()
     
     try {
         mng->redo();
-        prj->getDesignerWindow().getDesignerWidget().update();
+        prj->getDesignerWidget().update();
         refreshUndoRedoActions();
     } 
     catch ( ObjectStateManager::RedoException& )
@@ -887,8 +885,7 @@ bool FermaNextMainWindow::eventFilter( QObject* targetObj, QEvent* event )
             FermaNextProject* prj = projectToolBox->currentProject();
             if ( prj ) {
                 setActiveWindow();
-                prj->getDesignerWindow().
-                    getDesignerWidget().aggKeyPressEvent( keyEvent );
+                prj->getDesignerWidget().aggKeyPressEvent( keyEvent );
                 return true;
             }
         }

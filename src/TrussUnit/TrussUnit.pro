@@ -29,7 +29,6 @@ SOURCES = \
           TrussUnit.cpp \
           TrussUnitActions.cpp \
           TrussUnitDesignerWidget.cpp \
-          TrussUnitDesignerWindow.cpp \
           TrussUnitToolBar.cpp \
           TrussUnitWindow.cpp \
           TrussUnitWindowButton.cpp \
@@ -42,7 +41,6 @@ HEADERS = \
           TrussUnit.h \
           TrussUnitActions.h \
           TrussUnitDesignerWidget.h \
-          TrussUnitDesignerWindow.h \
           TrussUnitToolBar.h \
           TrussUnitWindow.h \
           TrussUnitWindowButton.h \

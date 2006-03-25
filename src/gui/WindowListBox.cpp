@@ -125,8 +125,7 @@ void TrussUnitWindowItem::raise ()
 {
     if ( ! trussWindow.isVisible() )
         return;
-    TrussUnitDesignerWidget& widget = project.getDesignerWindow().
-        getDesignerWidget();
+    TrussUnitDesignerWidget& widget = project.getDesignerWidget();
     widget.focusOnWindow( trussWindow );
 }
 
@@ -246,7 +245,7 @@ WindowListBox::WindowListBox ( FermaNextProject& prj, QWidget* parent,
                       SLOT(raiseWindowItem(Q3ListBoxItem*)) );
 
     // Catch focus changes
-    TrussUnitDesignerWidget& w = prj.getDesignerWindow().getDesignerWidget();
+    TrussUnitDesignerWidget& w = prj.getDesignerWidget();
     QObject::connect( &w, SIGNAL(onFocusReceive(TrussUnitWindow&)), 
                           SLOT(trussWindowReceivedFocus(TrussUnitWindow&)) );
     QObject::connect( &w, SIGNAL(onFocusLose(TrussUnitWindow&)), 
@@ -345,7 +344,7 @@ void WindowListBox::showWindowItem ( TrussUnitWindowItem& )
 void WindowListBox::hideWindowItem ( TrussUnitWindowItem& item )
 {
     TrussUnitDesignerWidget& w = 
-        project.getDesignerWindow().getDesignerWidget();
+        project.getDesignerWidget();
     TrussUnitWindow* focusedWindow = w.getFocusedWindow();
     if ( focusedWindow == 0 || ! windowItems.contains(focusedWindow) )
         return;
@@ -368,7 +367,7 @@ void WindowListBox::trussWindowDesisted ( const TrussUnitWindow& truss )
         return;
 
     TrussUnitDesignerWidget& w = 
-        project.getDesignerWindow().getDesignerWidget();
+        project.getDesignerWidget();
     TrussUnitWindow* focusedWindow = w.getFocusedWindow();
     if ( focusedWindow == 0 || ! windowItems.contains(focusedWindow) )
         return;

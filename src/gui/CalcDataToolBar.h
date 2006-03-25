@@ -7,6 +7,7 @@
 
 class CalcDataWidget;
 class QIcon;
+class QMainWindow;
 
 class CalcDataToolBar : public ToolBarManager
 {

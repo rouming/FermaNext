@@ -30,7 +30,8 @@ FixationPopupMenu::FixationPopupMenu ( QWidget* parent ) :
     addSeparator();
     addAction( "Unfixed", this, SLOT(unfixNode()) );
 
-    QObject::connect( this, SIGNAL(aboutToHide()), SLOT(popupHide()) );
+    // FIXME: Signal doesn't exist!
+    //QObject::connect( this, SIGNAL(aboutToHide()), SLOT(popupHide()) );
 }
 
 void FixationPopupMenu::showFixationPopup ( QMouseEvent* e, TrussNode* n)
@@ -133,7 +134,8 @@ LoadPopupMenu::LoadPopupMenu ( QWidget* parent ) :
     loadXLine->setValidator( new QDoubleValidator(loadXLine) );
     loadYLine->setValidator( new QDoubleValidator(loadYLine) );
 
-    QObject::connect( this, SIGNAL(aboutToHide()), SLOT(hideLoadPopup()) );
+    // FIXME: Signal doesn't exist!
+    //QObject::connect( this, SIGNAL(aboutToHide()), SLOT(hideLoadPopup()) );
     QObject::connect( cancel, SIGNAL(clicked()), SLOT(close()) );
     QObject::connect( ok, SIGNAL(clicked()), SLOT(okClicked()) );
 }

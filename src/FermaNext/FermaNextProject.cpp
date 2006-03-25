@@ -24,12 +24,11 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
     currentWorkspace(wsp),
     name(name_),
     stackedWidget(stack),
-    projectMainWidget( new QMainWindow(stackedWidget, 0) ),
     // FIXME QT3TO4:
     //calcDataToolBar( new CalcDataToolBar(projectMainWidget) ),
-    projectTab( new QTabWidget(projectMainWidget) ),
-    justStrengthAnalisysWidget( new QWidget(projectTab) ),
-    designerWindow( new TrussUnitDesignerWindow(name_, projectTab) ),
+    projectTab( new QTabWidget(stackedWidget) ),
+    justStrengthAnalisysWidget( new QWidget ),
+    designerWidget( new TrussUnitDesignerWidget ),
     trussWindowManager( new TrussUnitWindowManager )
 {
     /*
@@ -39,24 +38,19 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
     projectMainWidget->setDockEnabled( DockRight, false );
     */
 
-    stackedWidget->addWidget(projectMainWidget);
-    projectMainWidget->setCentralWidget( projectTab );
+    stackedWidget->addWidget(projectTab);
   
     projectTab->setTabPosition( QTabWidget::South );
-    projectTab->addTab( designerWindow, tr("Designer") );
+    projectTab->addTab( designerWidget, tr("Designer") );
     projectTab->addTab( justStrengthAnalisysWidget, tr("Strength Analysis") );
       
-
-    TrussUnitDesignerWidget& designerWidget = 
-        designerWindow->getDesignerWidget();
-
     // Catch trusses creation or deletion.
     connect( trussWindowManager, 
              SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
-             &designerWidget, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
+             designerWidget, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
     connect( trussWindowManager, 
              SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
-             &designerWidget, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
+             designerWidget, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
     // FIXME QT3TO4: 
     /*
     connect( trussWindowManager, 
@@ -71,9 +65,9 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
 FermaNextProject::~FermaNextProject ()
 {
     if ( stackedWidget )
-        stackedWidget->removeWidget( projectMainWidget );
+        stackedWidget->removeWidget( projectTab );
     delete trussWindowManager;
-    delete projectMainWidget;
+    delete projectTab;
 }
 
 void FermaNextProject::loadFromFile ( const QString& fileName )
@@ -164,8 +158,7 @@ QDomElement FermaNextProject::saveToXML ( QDomDocument& doc )
         getTrussUnitWindowManager().getTrussUnitWindowList();
 
     // Windows in layout order
-    WindowList layoutOrderedWindows = 
-        getDesignerWindow().getDesignerWidget().getTrussUnitWindowList();
+    WindowList layoutOrderedWindows = designerWidget->getTrussUnitWindowList();
     typedef QMap<TrussUnitWindow*, uint> LayoutOrderMap;
     
     // Build layout order. i.e. last window in the stack is a first
@@ -230,22 +223,20 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
             layoutMap[order] = &wnd;
         }
     }
-    TrussUnitDesignerWidget& designerWidget = 
-        getDesignerWindow().getDesignerWidget();
 
     // Restore window order
     LayoutOrderMap::Iterator itOrder = layoutMap.begin();
     for ( ; itOrder != layoutMap.end(); ++itOrder ) {
         TrussUnitWindow* trussWindow = *itOrder;
-        designerWidget.focusOnWindow( *trussWindow );
+        designerWidget->focusOnWindow( *trussWindow );
     }
 }
 
 void FermaNextProject::activate ()
 {
     if ( stackedWidget && stackedWidget->currentWidget() != 
-         projectMainWidget ) {
-        stackedWidget->setCurrentWidget( projectMainWidget );
+         projectTab ) {
+        stackedWidget->setCurrentWidget( projectTab );
         emit onActivate( *this );
     }
 }
@@ -253,7 +244,7 @@ void FermaNextProject::activate ()
 bool FermaNextProject::isActivated () const
 {
     return (stackedWidget && stackedWidget->currentWidget() == 
-            projectMainWidget);
+            projectTab);
 }
 
 const QString& FermaNextProject::getName () const
@@ -272,9 +263,9 @@ TrussUnitWindowManager& FermaNextProject::getTrussUnitWindowManager ()
     return *trussWindowManager;
 }
 
-TrussUnitDesignerWindow& FermaNextProject::getDesignerWindow ()
+TrussUnitDesignerWidget& FermaNextProject::getDesignerWidget ()
 {
-    return *designerWindow;
+    return *designerWidget;
 }
 
 CalcDataToolBar& FermaNextProject::getCalcDataToolBar ()
