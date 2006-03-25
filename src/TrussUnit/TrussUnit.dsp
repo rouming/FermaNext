@@ -26,6 +26,7 @@ CFG=TrussUnit - Win32 Release
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
+F90=df.exe
 RSC=rc.exe
 
 !IF  "$(CFG)" == "TrussUnit - Win32 Release"
@@ -469,32 +470,6 @@ SOURCE=..\..\build\debug\mocs\TrussUnit\moc_TrussUnitDesignerWidget.cpp
 # Begin Source File
 
 SOURCE=..\..\build\release\mocs\TrussUnit\moc_TrussUnitDesignerWidget.cpp
-
-!IF  "$(CFG)" == "TrussUnit - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\build\debug\mocs\TrussUnit\moc_TrussUnitDesignerWindow.cpp
-
-!IF  "$(CFG)" == "TrussUnit - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "TrussUnit - Win32 Debug"
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\build\release\mocs\TrussUnit\moc_TrussUnitDesignerWindow.cpp
 
 !IF  "$(CFG)" == "TrussUnit - Win32 Release"
 
