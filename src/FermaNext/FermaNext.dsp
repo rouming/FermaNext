@@ -107,6 +107,10 @@ SOURCE=FermaNextWorkspace.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\gui\GeometryTabWidget.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\gui\ProjectToolBox.cpp
 # End Source File
 # Begin Source File
@@ -214,6 +218,25 @@ InputPath=FermaNextWorkspace.h
 
 "..\..\build\debug\mocs\FermaNext\moc_FermaNextWorkspace.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\FermaNext\moc_FermaNextWorkspace.cpp
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\gui\GeometryTabWidget.h
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# Begin Custom Build - Running MOC on ..\gui\GeometryTabWidget.h
+InputPath=..\gui\GeometryTabWidget.h
+
+"..\..\build\debug\mocs\FermaNext\moc_GeometryTabWidget.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\FermaNext\moc_GeometryTabWidget.cpp
 
 # End Custom Build
 
@@ -446,6 +469,10 @@ SOURCE=..\..\build\release\mocs\FermaNext\moc_FermaNextWorkspace.cpp
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\debug\mocs\FermaNext\moc_GeometryTabWidget.cpp
 # End Source File
 # Begin Source File
 

@@ -12,8 +12,7 @@ class FermaNextProject;
 class TrussUnitWindow;
 class FermaNextWorkspace;
 class UndoRedoListBox;
-//FIXME QT3TO4
-//class TrussGeometryWindow;
+class GeometryTabWidget;
 class QFile;
 class QMenu;
 
@@ -98,8 +97,9 @@ private:
     // Tool box of all workspace projects
     ProjectToolBox* projectToolBox;
     // Truss geometry window
-    //FIXME QT3TO4
-    //TrussGeometryWindow* geometryWindow;
+    QWidget* geometryWindow;
+    // Tab widget for changing truss geometry
+    GeometryTabWidget* geometryTabWidget;
 
     // Some actions
     QAction* undoAction;

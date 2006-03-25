@@ -26,8 +26,7 @@
 #include "ProjectToolBox.h"
 #include "SubsidiaryConstants.h"
 #include "UndoRedoListBox.h"
-// FIXME QT3TO4
-//#include "TrussGeometryWindow.h"
+#include "GeometryTabWidget.h"
 
 const QString fermaTitle( QObject::tr( "Educational CAD System 'Ferma'" ) );
 
@@ -83,13 +82,20 @@ void FermaNextMainWindow::init ()
     undoRedoListBox->installEventFilter( this );
     undoRedoHistoryWidget->installEventFilter( this );
     
-    //FIXME QT3TO4
-    /*
-    geometryWindow = new TrussGeometryWindow( this, "truss_geometry",
-                                              WStyle_Tool | WType_TopLevel );
+    geometryWindow = new QWidget( this, Qt::Window | Qt::Tool );
+    geometryWindow->setFixedSize( 195, 174 );
+    geometryWindow->setCaption( tr("Geometry Window") );
+    geometryTabWidget = new GeometryTabWidget( geometryWindow );
     geometryWindow->move( QApplication::desktop()->width() - 265, 310 );
-    geometryWindow->installEventFilter( this );
-    */
+    geometryTabWidget->installEventFilter( this );
+    QVBoxLayout* tabLayout = new QVBoxLayout;
+    tabLayout->addWidget( geometryTabWidget );
+    QVBoxLayout* parentLayout = new QVBoxLayout( geometryWindow );
+    parentLayout->addLayout( tabLayout );
+    tabLayout->setMargin( 1 );
+    tabLayout->setSpacing( 1 );
+    parentLayout->setMargin( 2 );
+    parentLayout->setSpacing( 2 );
     
     projectsDockWindow = new Q3DockWindow( Q3DockWindow::InDock, this );
     projectsDockWindow->setResizeEnabled( true );
@@ -122,6 +128,7 @@ void FermaNextMainWindow::someProjectRemoved ( FermaNextProject& prj )
     if ( 1 == workspace.countProjects() ) {
         projectsDockWindow->hide();
         undoRedoHistoryWidget->hide();
+        geometryWindow->hide();
     }
     TrussUnitDesignerWidget& designerWidget = prj.getDesignerWidget();
     designerWidget.disconnect( this );
@@ -132,8 +139,7 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
     if ( !projectsDockWindow->isVisible() && 0 < workspace.countProjects() ) {
         projectsDockWindow->show();
         undoRedoHistoryWidget->show();
-        //FIXME QT3TO4
-        //geometryWindow->show();
+        geometryWindow->show();
     }
 
     TrussUnitDesignerWidget& designerWidget = prj.getDesignerWidget();
@@ -154,12 +160,11 @@ void FermaNextMainWindow::createProject ()
     if ( ok && !text.isEmpty() ) {
         FermaNextProject& prj = workspace.createProject( text );
         TrussUnitWindowManager& mng = prj.getTrussUnitWindowManager();
-        //FIXME QT3TO4
-        /*
+
         connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
-                 geometryWindow, 
-                 SLOT(trussUnitWindowWasCreated(TrussUnitWindow&)) );
-        */
+                 geometryTabWidget, 
+                        SLOT(trussUnitWindowWasCreated(TrussUnitWindow&)) );
+
 
 //TODO: remove this in future
 /*********** TEMP TRUSS UNIT **************************/
@@ -342,24 +347,21 @@ void FermaNextMainWindow::setupViewActions ()
     showUndoRedoAction->setToggleAction( true );
     showUndoRedoAction->setOn( true );
     showUndoRedoAction->setStatusTip( tr( "Show or hide history window" ) );
-        menu->addAction( showUndoRedoAction );
+    menu->addAction( showUndoRedoAction );
     connect( showUndoRedoAction, SIGNAL(toggled(bool)), 
              undoRedoHistoryWidget, SLOT(setShown(bool)) );
 
-    //FIXME QT3TO4
-    /*
     showGeometryWindowAction = 
         new QAction( tr( "&Show Truss Geometry Window" ), this );
     showGeometryWindowAction->setToggleAction( true );
     showGeometryWindowAction->setOn( true );
     showGeometryWindowAction->
         setStatusTip( tr( "Show or hide truss geometry window" ) );
-    showGeometryWindowAction->addTo( menu );
-    connect( showGeometryWindowAction, SIGNAL(toggled(bool)), 
-             geometryWindow, SLOT(setShown(bool)) );
+    menu->addAction( showGeometryWindowAction );
+    connect( showGeometryWindowAction, SIGNAL( toggled( bool ) ), 
+             geometryWindow, SLOT( setShown( bool ) ) );
     connect( geometryWindow, SIGNAL(onGeometryWindowClose()), 
              showGeometryWindowAction, SLOT(toggle()) );
-    */
 }
 
 void FermaNextMainWindow::setupProjectActions ()
@@ -479,8 +481,7 @@ void FermaNextMainWindow::trussWindowLostFocus ( TrussUnitWindow& window )
 
     refreshUndoRedoActions();
 
-    //FIXME QT3TO4    
-    //geometryWindow->changeFocusWindow( 0 );
+    geometryTabWidget->changeFocusWindow( 0 );
 }
 
 void FermaNextMainWindow::trussWindowReceivedFocus ( TrussUnitWindow& window )
@@ -501,8 +502,7 @@ void FermaNextMainWindow::trussWindowReceivedFocus ( TrussUnitWindow& window )
     
     refreshUndoRedoActions();
     
-    //FIXME QT3TO4
-    //geometryWindow->changeFocusWindow( &window );
+    geometryTabWidget->changeFocusWindow( &window );
 }
 
 /*****************************************************************************
