@@ -39,11 +39,10 @@ SOURCES = \
 #FIXME QT3TO4
 #          ../gui/CalcDataToolBar.cpp \
           ../gui/FermaNextMainWindow.cpp \
+          ../gui/GeometryTabWidget.cpp \
           ../gui/ProjectToolBox.cpp \
           ../gui/Splash.cpp \
           ../gui/ToolBarManager.cpp \
-#FIXME QT3TO4
-#          ../gui/TrussGeometryWindow.cpp \
           ../gui/UndoRedoListBox.cpp \
           ../gui/WindowListBox.cpp
 
@@ -54,10 +53,9 @@ HEADERS = \
 #FIXME QT3TO4
 #          ../gui/CalcDataToolBar.h \
           ../gui/FermaNextMainWindow.h \
+          ../gui/GeometryTabWidget.h \
           ../gui/ProjectToolBox.h \
           ../gui/Splash.h \
           ../gui/ToolBarManager.h \
-#FIXME QT3TO4
-#          ../gui/TrussGeometryWindow.h \
           ../gui/UndoRedoListBox.h \
           ../gui/WindowListBox.h
