@@ -61,7 +61,14 @@ const double svgGamma = 1.0,
  * Geometry Window Consts
  ************************************/
 
-const int tableRowHeight = 18;
+const int tableRowHeight = 17;
+
+// fixation check box side length 
+const int checkBoxLen = 12;
+
+// fixation check box indent from the cell border
+const int checkBoxIndent = 1;
+
 const double pivotThickLimit = 999.99;
 
  /************************************

@@ -84,10 +84,11 @@ void FermaNextMainWindow::init ()
     
     geometryWindow = new QWidget( this, Qt::Window | Qt::Tool );
     geometryWindow->setFixedSize( 195, 174 );
-    geometryWindow->setCaption( tr("Geometry Window") );
+    geometryWindow->setCaption( tr("Truss Geometry") );
     geometryTabWidget = new GeometryTabWidget( geometryWindow );
     geometryWindow->move( QApplication::desktop()->width() - 265, 310 );
-    geometryTabWidget->installEventFilter( this );
+    geometryWindow->installEventFilter( this );
+
     QVBoxLayout* tabLayout = new QVBoxLayout;
     tabLayout->addWidget( geometryTabWidget );
     QVBoxLayout* parentLayout = new QVBoxLayout( geometryWindow );
@@ -360,8 +361,6 @@ void FermaNextMainWindow::setupViewActions ()
     menu->addAction( showGeometryWindowAction );
     connect( showGeometryWindowAction, SIGNAL( toggled( bool ) ), 
              geometryWindow, SLOT( setShown( bool ) ) );
-    connect( geometryWindow, SIGNAL(onGeometryWindowClose()), 
-             showGeometryWindowAction, SLOT(toggle()) );
 }
 
 void FermaNextMainWindow::setupProjectActions ()
@@ -891,10 +890,12 @@ bool FermaNextMainWindow::eventFilter( QObject* targetObj, QEvent* event )
         }
         return false;
     }
-    else if ( event->type() == QEvent::Close &&
-              targetObj == undoRedoHistoryWidget ) {
+    else if ( event->type() == QEvent::Close ) {
+        if ( targetObj == geometryWindow )
+            showGeometryWindowAction->toggle();
+        else if ( targetObj == undoRedoHistoryWidget )
             showUndoRedoAction->toggle();
-            return true;
+        return true;
     } 
     else
         return Q3MainWindow::eventFilter( targetObj, event );

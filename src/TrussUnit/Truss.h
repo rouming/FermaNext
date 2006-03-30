@@ -1021,4 +1021,8 @@ private:
     int number;
 };
 
+/************************* Declare meta types ********************************/
+
+Q_DECLARE_METATYPE (Node::Fixation);
+
 #endif //TRUSS_H

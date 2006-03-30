@@ -133,6 +133,8 @@ Node::Fixation Node::getFixation () const
 
 void Node::setPoint ( DoublePoint p )
 {
+    if ( pos == p )
+        return;
     pos = p;
     emit onPositionChange( pos.x(), pos.y() );
 }

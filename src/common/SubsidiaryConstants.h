@@ -60,7 +60,9 @@ extern const double svgGamma,
  * Geometry Window Consts
  ************************************/
 
-extern const int tableRowHeight;
+extern const int tableRowHeight,
+                 checkBoxLen,
+                 checkBoxIndent;
 extern const double pivotThickLimit;
 
 /************************************

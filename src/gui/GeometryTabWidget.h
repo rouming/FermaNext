@@ -32,59 +32,50 @@ public:
 
 /*****************************************************************************/
 
-class DoubleCheckBox : public QWidget
+class NodeTableDelegate : public QItemDelegate
 {
     Q_OBJECT
 public:
-    DoubleCheckBox ( const QString& label1, const QString& label2,
-                     QWidget* parent = 0 );
-    DoubleCheckBox ( QWidget* parent = 0 );
-    virtual void init ();
-    virtual bool isFirstChecked () const;
-    virtual bool isSecondChecked () const;
-    virtual void setFirstLabel ( QString& label );
-    virtual void setSecondLabel ( QString& label );
-
-protected:
-    virtual void mousePressEvent ( QMouseEvent* );
-
-public slots:
-    void setFirstChecked ( bool check );
-    void setSecondChecked ( bool check );
-
-signals:
-    void onValueChange ();
-
-private:
-    QCheckBox *checkBox1, *checkBox2;
-    QString firstLabel, secondLabel;
-};
-
-/*****************************************************************************/
-
-class NodeTableDelegate : public QItemDelegate
-{
-public:
     NodeTableDelegate ( QObject* parent = 0 );
+
+    QRect getCheckBoxDrawArea ( const QStyleOptionViewItem &option,
+                                bool forFirstCheckBox = true ) const;
+
+    void getCheckStates ( bool& checkState1, bool& checkState2, 
+                          const QModelIndex& index ) const;
+
+    Node::Fixation getFixationByCheckStates ( bool, bool ) const;
 
     QWidget* createEditor ( QWidget *parent, const QStyleOptionViewItem&,
                             const QModelIndex& ) const;
-/*
+
     void paint ( QPainter* painter, const QStyleOptionViewItem& option,
                  const QModelIndex& index ) const;
-*/
+
     void setEditorData ( QWidget* editor, const QModelIndex& index ) const;
 
     void setModelData ( QWidget* editor, QAbstractItemModel* model, 
                         const QModelIndex& index ) const;
-/*
+
+    QSize sizeHint( const QStyleOptionViewItem &option,
+                    const QModelIndex &index ) const;
+
     bool editorEvent ( QEvent* event, QAbstractItemModel* model,
                        const QStyleOptionViewItem& option,
                        const QModelIndex& index );
-*/
+
     void updateEditorGeometry ( QWidget *editor,
                                 const QStyleOptionViewItem& option, 
                                 const QModelIndex& ) const;
+
+private:
+    DoubleSize areaSize;
+
+signals:
+    void cellWasChanged ( int, int );
+
+protected slots:
+    void updateTrussAreaSize ( const DoubleSize& );
 };
 
 /*****************************************************************************/
@@ -95,11 +86,7 @@ public:
     FixationItem ( Node::Fixation, int type = Type );
     FixationItem ( int type = Type );
     virtual void setFixation ( Node::Fixation );
-    virtual void setFixation ( bool, bool );
     virtual Node::Fixation getFixation () const;
-
-private:
-    Node::Fixation fixType;
 };
 
 /*****************************************************************************/
@@ -116,12 +103,6 @@ public:
     virtual FixationItem* getFixationItem ( int row ) const;
     virtual void addNode ( const Node& );
     virtual void updateMaximumHeight ();
-
-protected slots:
-    void updateTrussAreaSize ( const DoubleSize& );
-
-private:
-    DoubleSize areaSize;
 };
 
 /*****************************************************************************
@@ -183,7 +164,6 @@ protected:
 //    virtual void fillPivotTable ();
     virtual void saveNodeStateAfterMoving ( TrussNode& node,
                                             const DoublePoint& pos );
-    virtual void closeEvent( QCloseEvent* );
 
 protected slots:
     virtual void trussUnitWindowWasCreated ( TrussUnitWindow& );
@@ -205,8 +185,6 @@ protected slots:
     virtual void updatePivotState ( int row, int col );
 */
     virtual void changeTrussAreaSize ( const QString& );
-signals:
-    void onGeometryWindowClose();
 
 private:
     NodeTable *nodeTable;
