@@ -11,6 +11,8 @@ TEMPLATE = lib
 CONFIG += plugin warn_on thread
 
 win32 {
+  HEADERS += win_SimpleCalc.h
+
   DEFINES += WIN32 QT_THREAD_SUPPORT
   LIBS = TrussUnit.lib common.lib
 
@@ -18,6 +20,8 @@ win32 {
   system( xcopy /y win_Simple_f.dll ..\..\..\plugins )
 }
 unix {
+  HEADERS += unix_SimpleCalc.h
+
   DEFINES += QT_THREAD_SUPPORT
   LIBS = -lTrussUnit -lcommon
 
@@ -30,7 +34,8 @@ INCLUDEPATH = ../../common \
               ../../common/plugin/loader \
               ../../TrussUnit               
 
-HEADERS = VYVReader.h \
+HEADERS = old_SimpleCalc.h \
+          VYVReader.h \
           FRMWriter.h
 
 SOURCES = old_SimpleCalc.cpp \

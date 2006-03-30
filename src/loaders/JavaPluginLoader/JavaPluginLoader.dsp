@@ -26,6 +26,7 @@ CFG=JavaPluginLoader - Win32 Release
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
+F90=df.exe
 MTL=midl.exe
 RSC=rc.exe
 
@@ -51,11 +52,14 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 /machine:IX86
 # ADD LINK32 "common.lib" "$(QTDIR)\lib\QtCore4.lib" "$(QTDIR)\lib\QtGui4.lib" /nologo /dll /incremental:yes /machine:IX86 /nodefaultlib:"libc" /out:"..\..\..\plugins\loaders\JavaPluginLoader.ldr.dll" /libpath:"..\..\..\build\debug" /libpath:"$(QTDIR)\lib"
-# Begin Special Build Tool
+# Begin Custom Build - Building Java sources ...
+InputPath=\ferma\Source\FermaNext-qt4-fullport\plugins\loaders\JavaPluginLoader.ldr.dll
 SOURCE="$(InputPath)"
-PostBuild_Desc=Build Java sources
-PostBuild_Cmds=ant
-# End Special Build Tool
+
+"nothing" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	ant
+
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "JavaPluginLoader - Win32 Debug"
 
@@ -79,11 +83,14 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 /machine:IX86
 # ADD LINK32 "common.lib" "$(QTDIR)\lib\QtCored4.lib" "$(QTDIR)\lib\QtGuid4.lib" /nologo /dll /debug /machine:IX86 /nodefaultlib:"libc" /out:"..\..\..\plugins\loaders\JavaPluginLoader.ldr.dll" /libpath:"..\..\..\build\debug" /libpath:"$(QTDIR)\lib"
-# Begin Special Build Tool
+# Begin Custom Build - Building Java sources ...
+InputPath=\ferma\Source\FermaNext-qt4-fullport\plugins\loaders\JavaPluginLoader.ldr.dll
 SOURCE="$(InputPath)"
-PostBuild_Desc=Build Java sources
-PostBuild_Cmds=ant
-# End Special Build Tool
+
+"nothing" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(ANT_HOME)/bin/ant
+
+# End Custom Build
 
 !ENDIF 
 

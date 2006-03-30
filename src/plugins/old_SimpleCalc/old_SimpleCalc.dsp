@@ -26,6 +26,7 @@ CFG=old_SimpleCalc - Win32 Release
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
+F90=df.exe
 MTL=midl.exe
 RSC=rc.exe
 
@@ -111,7 +112,15 @@ SOURCE=FRMWriter.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\old_SimpleCalc.h
+# End Source File
+# Begin Source File
+
 SOURCE=VYVReader.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\win_SimpleCalc.h
 # End Source File
 # End Group
 # End Target
