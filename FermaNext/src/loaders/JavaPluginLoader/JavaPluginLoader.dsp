@@ -52,14 +52,6 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 /machine:IX86
 # ADD LINK32 "common.lib" "$(QTDIR)\lib\QtCore4.lib" "$(QTDIR)\lib\QtGui4.lib" /nologo /dll /incremental:yes /machine:IX86 /nodefaultlib:"libc" /out:"..\..\..\plugins\loaders\JavaPluginLoader.ldr.dll" /libpath:"..\..\..\build\debug" /libpath:"$(QTDIR)\lib"
-# Begin Custom Build - Building Java sources ...
-InputPath=\ferma\Source\FermaNext-qt4-fullport\plugins\loaders\JavaPluginLoader.ldr.dll
-SOURCE="$(InputPath)"
-
-"nothing" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	ant
-
-# End Custom Build
 
 !ELSEIF  "$(CFG)" == "JavaPluginLoader - Win32 Debug"
 
@@ -83,14 +75,6 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 /machine:IX86
 # ADD LINK32 "common.lib" "$(QTDIR)\lib\QtCored4.lib" "$(QTDIR)\lib\QtGuid4.lib" /nologo /dll /debug /machine:IX86 /nodefaultlib:"libc" /out:"..\..\..\plugins\loaders\JavaPluginLoader.ldr.dll" /libpath:"..\..\..\build\debug" /libpath:"$(QTDIR)\lib"
-# Begin Custom Build - Building Java sources ...
-InputPath=\ferma\Source\FermaNext-qt4-fullport\plugins\loaders\JavaPluginLoader.ldr.dll
-SOURCE="$(InputPath)"
-
-"nothing" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(ANT_HOME)/bin/ant
-
-# End Custom Build
 
 !ENDIF 
 
@@ -120,6 +104,31 @@ SOURCE=JavaVM\JavaVirtualMachine.cpp
 # Begin Source File
 
 SOURCE=JavaPluginLoader.h
+
+!IF  "$(CFG)" == "JavaPluginLoader - Win32 Release"
+
+# Begin Custom Build - Building Java sources ...
+TargetDir=\ferma\Source\FermaNext\plugins\loaders
+InputPath=JavaPluginLoader.h
+
+"$(TargetDir)" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(ANT_HOME)/bin/ant
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "JavaPluginLoader - Win32 Debug"
+
+# Begin Custom Build - Building Java sources ...
+TargetDir=\ferma\Source\FermaNext\plugins\loaders
+InputPath=JavaPluginLoader.h
+
+"$(TargetDir)" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(ANT_HOME)/bin/ant
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
