@@ -2,9 +2,6 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include <qglobal.h>
-#include <qmetaobject.h>
-
 #define ExternC extern "C"
 
 #if defined _WIN32 || defined WIN32

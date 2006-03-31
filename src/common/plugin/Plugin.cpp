@@ -26,7 +26,7 @@ Plugin::ResolvingMode Plugin::resolvingMode () const
 { return Immediately; }
 
 bool Plugin::dependsOnPluginType ( const QString& type ) const
-{ return (requiredPluginTypes().contains( type ) > 0); }
+{ return requiredPluginTypes().contains( type ); }
 
 void Plugin::resolveDependence () throw (RequiredPluginIsNotResolvedException)
 {  

@@ -3,9 +3,9 @@
 #define TRUSSUNITWINDOWMANAGER_H
 
 #include <vector>
-#include <qobject.h>
-#include <qfile.h>
-#include <qstring.h>
+#include <QObject>
+#include <QFile>
+#include <QString>
 
 #include "TrussUnitWindow.h"
 
@@ -43,7 +43,9 @@ public:
 protected:
     virtual void clearTrussUnitWindows ();
     virtual void suspendedClean ();
-    virtual bool removeTrussUnitWindow ( WindowListIter& );
+
+    // Returns iter after erase
+    virtual WindowListIter removeTrussUnitWindow ( WindowListIter );
 
     virtual void loadOldVersion ( TrussUnit&, QFile& ) 
         throw (WrongFormatException);

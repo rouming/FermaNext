@@ -2,10 +2,10 @@
 #ifndef FERMANEXTCONFIG_H
 #define FERMANEXTCONFIG_H
 
-#include <qstring.h>
-#include <qdom.h>
-#include <qmap.h>
-#include <qvariant.h>
+#include <QString>
+#include <QDomNode>
+#include <QMap>
+#include <QVariant>
 
 typedef QMap<QString, QVariant> ConfigItems;
 

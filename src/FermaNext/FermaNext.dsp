@@ -2,9 +2,9 @@
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
-# TARGTYPE "Win32 (x86) Console Application" 0x0103
+# TARGTYPE "Win32 (x86) Application" 0x0101
 
-CFG=FermaNext - Win32 Debug
+CFG=FermaNext - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,12 +13,12 @@ CFG=FermaNext - Win32 Debug
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "FermaNext.mak" CFG="FermaNext - Win32 Debug"
+!MESSAGE NMAKE /f "FermaNext.mak" CFG="FermaNext - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "FermaNext - Win32 Release" (based on "Win32 (x86) Console Application")
-!MESSAGE "FermaNext - Win32 Debug" (based on "Win32 (x86) Console Application")
+!MESSAGE "FermaNext - Win32 Release" (based on "Win32 (x86) Application")
+!MESSAGE "FermaNext - Win32 Debug" (based on "Win32 (x86) Application")
 !MESSAGE 
 
 # Begin Project
@@ -26,62 +26,55 @@ CFG=FermaNext - Win32 Debug
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
+F90=df.exe
+MTL=midl.exe
 RSC=rc.exe
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "Release"
-# PROP BASE Intermediate_Dir "Release"
+# PROP BASE Output_Dir "..\.."
+# PROP BASE Intermediate_Dir "..\..\build\release\obj\FermaNext"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "../../Release"
-# PROP Intermediate_Dir "../../Release"
+# PROP Output_Dir "..\.."
+# PROP Intermediate_Dir "..\..\build\release\obj\FermaNext"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-F90=df.exe
-# ADD BASE F90 /compile_only /nologo /warn:nofileopt
-# ADD F90 /compile_only /nologo /warn:nofileopt
-# ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "." /I "..\common" /I "..\common\plugin" /I "..\common\plugin\loader" /I "..\Agg" /I "..\TrussUnit" /I "..\gui" /I "..\gui\ui" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /c
-# ADD BASE RSC /l 0x419 /d "NDEBUG"
-# ADD RSC /l 0x419 /d "NDEBUG"
+# ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "$(QTDIR)/include/Qt3Support" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include" /I "$(AGGDIR)/include" /I "$(AGGDIR)/svg" /I "..\Agg" /I "..\FermaNext" /I "..\TrussUnit" /I "..\common" /I "..\common\plugin" /I "..\common\plugin\loader" /I "..\gui" /I "$(QTDIR)/include/ActiveQt" /I "..\..\build\release\mocs\FermaNext" /I "..\..\build\debug\ui\FermaNext" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_WINDOWS" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_NO_DEBUG" /D "QT_CORE_LIB" /D "QT_GUI_LIB" /D "QT_XML_LIB" /D "QT_QT3SUPPORT_LIB" /D "QT3_SUPPORT" /D "WIN32" /FD -Zm200 /c
+# ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
+# ADD BASE RSC /l 0x419
+# ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 qt-mt.lib qtmain_rel.lib ole32.lib odbc32.lib odbccp32.lib LibAGG.lib LibSVG.lib libexpat.lib common.lib TrussUnit.lib Agg.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib oleaut32.lib uuid.lib winspool.lib /nologo /subsystem:windows /machine:I386 /out:"../../FermaNext.exe" /libpath:"..\..\\" /libpath:"..\..\build" /libpath:"$(QTDIR)\lib" /libpath:"$(EXPATDIR)\Libs"
-# SUBTRACT LINK32 /pdb:none
+# ADD BASE LINK32 /machine:IX86
+# ADD LINK32 "$(QTDIR)\lib\qtmain.lib" "common.lib" "Agg.lib" "TrussUnit.lib" "LibAgg.lib" "LibSVG.lib" "libexpat.lib" "$(QTDIR)\lib\QtCore4.lib" "$(QTDIR)\lib\QtGui4.lib" "$(QTDIR)\lib\QtXml4.lib" "$(QTDIR)\lib\Qt3Support4.lib" /nologo /subsystem:windows /incremental:yes /machine:IX86 /nodefaultlib:"libc" /libpath:"..\..\build\debug" /libpath:"..\.." /libpath:"$(EXPATDIR)\Libs" /libpath:"$(QTDIR)\lib"
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug"
-# PROP BASE Intermediate_Dir "Debug"
+# PROP BASE Output_Dir "..\.."
+# PROP BASE Intermediate_Dir "..\..\build\debug\obj\FermaNext"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "../../Debug"
-# PROP Intermediate_Dir "../../Debug"
+# PROP Output_Dir "..\.."
+# PROP Intermediate_Dir "..\..\build\debug\obj\FermaNext"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-F90=df.exe
-# ADD BASE F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
-# ADD F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
-# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /Od /I "." /I "..\common" /I "..\common\plugin" /I "..\common\plugin\loader" /I "..\Agg" /I "..\TrussUnit" /I "..\gui" /I "..\gui\ui" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /GZ -Zm200 /c
-# ADD BASE RSC /l 0x419 /d "_DEBUG"
-# ADD RSC /l 0x419 /d "_DEBUG"
+# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /I "$(QTDIR)/include/Qt3Support" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include" /I "$(AGGDIR)/include" /I "$(AGGDIR)/svg" /I "..\Agg" /I "..\FermaNext" /I "..\TrussUnit" /I "..\common" /I "..\common\plugin" /I "..\common\plugin\loader" /I "..\gui" /I "$(QTDIR)/include/ActiveQt" /I "..\..\build\debug\mocs\FermaNext" /I "..\..\build\debug\ui\FermaNext" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_WINDOWS" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_CORE_LIB" /D "QT_GUI_LIB" /D "QT_XML_LIB" /D "QT_QT3SUPPORT_LIB" /D "QT3_SUPPORT" /D "WIN32" /FD -Zm200 /c
+# ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
+# ADD BASE RSC /l 0x419
+# ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 qt-mt332.lib qtmain.lib imm32.lib winmm.lib wsock32.lib LibAGG.lib LibSVG.lib libexpat.lib common.lib TrussUnit.lib Agg.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib advapi32.lib shell32.lib oleaut32.lib uuid.lib winspool.lib /nologo /subsystem:console /debug /machine:I386 /out:"../../FermaNext.exe" /pdbtype:sept /libpath:"..\..\\" /libpath:"..\..\build" /libpath:"$(QTDIR)\lib" /libpath:"$(EXPATDIR)\Libs"
+# ADD BASE LINK32 /machine:IX86
+# ADD LINK32 "$(QTDIR)\lib\qtmaind.lib" "common.lib" "Agg.lib" "TrussUnit.lib" "LibAgg.lib" "LibSVG.lib" "libexpat.lib" "$(QTDIR)\lib\QtCored4.lib" "$(QTDIR)\lib\QtGuid4.lib" "$(QTDIR)\lib\QtXmld4.lib" "$(QTDIR)\lib\Qt3Supportd4.lib" /nologo /subsystem:console /debug /machine:IX86 /nodefaultlib:"libc" /libpath:"..\..\build\debug" /libpath:"..\.." /libpath:"$(EXPATDIR)\Libs" /libpath:"$(QTDIR)\lib"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
@@ -92,34 +85,34 @@ LINK32=link.exe
 # Name "FermaNext - Win32 Debug"
 # Begin Group "Source Files"
 
-# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;f90;for;f;fpp"
+# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\..\gui\CalcDataToolBar.cpp
+SOURCE=FermaNext.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\FermaNext\FermaNext.cpp
+SOURCE=FermaNextConfig.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\FermaNext\FermaNextConfig.cpp
+SOURCE=..\gui\FermaNextMainWindow.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\gui\FermaNextMainFrame.cpp
+SOURCE=FermaNextProject.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\FermaNext\FermaNextProject.cpp
+SOURCE=FermaNextWorkspace.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\FermaNext\FermaNextWorkspace.cpp
+SOURCE=..\gui\GeometryTabWidget.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\gui\ProjectToolBox.cpp
+SOURCE=..\gui\ProjectToolBox.cpp
 # End Source File
 # Begin Source File
 
@@ -127,11 +120,7 @@ SOURCE=..\gui\Splash.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\gui\ToolBarManager.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\gui\TrussGeometryWindow.cpp
+SOURCE=..\gui\ToolBarManager.cpp
 # End Source File
 # Begin Source File
 
@@ -139,40 +128,40 @@ SOURCE=..\gui\UndoRedoListBox.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\gui\WindowListBox.cpp
+SOURCE=..\gui\WindowListBox.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
 
-# PROP Default_Filter "h;hpp;hxx;hm;inl;fi;fd"
+# PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\..\gui\CalcDataToolBar.h
+SOURCE=FermaNextConfig.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\gui\FermaNextMainWindow.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
-InputPath=.\..\gui\CalcDataToolBar.h
-InputName=CalcDataToolBar
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on ..\gui\FermaNextMainWindow.h
+InputPath=..\gui\FermaNextMainWindow.h
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\release\mocs\FermaNext\moc_FermaNextMainWindow.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\FermaNext\moc_FermaNextMainWindow.cpp
+
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
-InputPath=.\..\gui\CalcDataToolBar.h
-InputName=CalcDataToolBar
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on ..\gui\FermaNextMainWindow.h
+InputPath=..\gui\FermaNextMainWindow.h
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\debug\mocs\FermaNext\moc_FermaNextMainWindow.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\FermaNext\moc_FermaNextMainWindow.cpp
+
 # End Custom Build
 
 !ENDIF 
@@ -180,36 +169,28 @@ InputName=CalcDataToolBar
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\FermaNext\FermaNextConfig.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\gui\FermaNextMainFrame.h
+SOURCE=FermaNextProject.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
-InputPath=.\..\gui\FermaNextMainFrame.h
-InputName=FermaNextMainFrame
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on FermaNextProject.h
+InputPath=FermaNextProject.h
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\release\mocs\FermaNext\moc_FermaNextProject.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\FermaNext\moc_FermaNextProject.cpp
+
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
-InputPath=.\..\gui\FermaNextMainFrame.h
-InputName=FermaNextMainFrame
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on FermaNextProject.h
+InputPath=FermaNextProject.h
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\debug\mocs\FermaNext\moc_FermaNextProject.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\FermaNext\moc_FermaNextProject.cpp
+
 # End Custom Build
 
 !ENDIF 
@@ -217,32 +198,28 @@ InputName=FermaNextMainFrame
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\FermaNext\FermaNextProject.h
+SOURCE=FermaNextWorkspace.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\..\FermaNext\FermaNextProject.h
-InputName=FermaNextProject
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on FermaNextWorkspace.h
+InputPath=FermaNextWorkspace.h
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\release\mocs\FermaNext\moc_FermaNextWorkspace.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\FermaNext\moc_FermaNextWorkspace.cpp
+
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\..\FermaNext\FermaNextProject.h
-InputName=FermaNextProject
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on FermaNextWorkspace.h
+InputPath=FermaNextWorkspace.h
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\debug\mocs\FermaNext\moc_FermaNextWorkspace.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\FermaNext\moc_FermaNextWorkspace.cpp
+
 # End Custom Build
 
 !ENDIF 
@@ -250,32 +227,26 @@ InputName=FermaNextProject
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\FermaNext\FermaNextWorkspace.h
+SOURCE=..\gui\GeometryTabWidget.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\..\FermaNext\FermaNextWorkspace.h
-InputName=FermaNextWorkspace
+# Begin Custom Build - Running MOC on ..\gui\GeometryTabWidget.h
+InputPath=..\gui\GeometryTabWidget.h
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\release\mocs\FermaNext\moc_GeometryTabWidget.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\FermaNext" -I"..\..\build\release\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\FermaNext\moc_GeometryTabWidget.cpp
+
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\..\FermaNext\FermaNextWorkspace.h
-InputName=FermaNextWorkspace
+# Begin Custom Build - Running MOC on ..\gui\GeometryTabWidget.h
+InputPath=..\gui\GeometryTabWidget.h
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\debug\mocs\FermaNext\moc_GeometryTabWidget.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\FermaNext\moc_GeometryTabWidget.cpp
+
 # End Custom Build
 
 !ENDIF 
@@ -283,32 +254,28 @@ InputName=FermaNextWorkspace
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\gui\ProjectToolBox.h
+SOURCE=..\gui\ProjectToolBox.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
-InputPath=.\..\gui\ProjectToolBox.h
-InputName=ProjectToolBox
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on ..\gui\ProjectToolBox.h
+InputPath=..\gui\ProjectToolBox.h
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\release\mocs\FermaNext\moc_ProjectToolBox.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\FermaNext\moc_ProjectToolBox.cpp
+
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
-InputPath=.\..\gui\ProjectToolBox.h
-InputName=ProjectToolBox
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on ..\gui\ProjectToolBox.h
+InputPath=..\gui\ProjectToolBox.h
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\debug\mocs\FermaNext\moc_ProjectToolBox.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\FermaNext\moc_ProjectToolBox.cpp
+
 # End Custom Build
 
 !ENDIF 
@@ -320,28 +287,24 @@ SOURCE=..\gui\Splash.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on ..\gui\Splash.h
 InputPath=..\gui\Splash.h
-InputName=Splash
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\release\mocs\FermaNext\moc_Splash.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\FermaNext\moc_Splash.cpp
+
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on ..\gui\Splash.h
 InputPath=..\gui\Splash.h
-InputName=Splash
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\debug\mocs\FermaNext\moc_Splash.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\FermaNext\moc_Splash.cpp
+
 # End Custom Build
 
 !ENDIF 
@@ -349,65 +312,28 @@ InputName=Splash
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\gui\ToolBarManager.h
+SOURCE=..\gui\ToolBarManager.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
-InputPath=.\..\gui\ToolBarManager.h
-InputName=ToolBarManager
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on ..\gui\ToolBarManager.h
+InputPath=..\gui\ToolBarManager.h
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\release\mocs\FermaNext\moc_ToolBarManager.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\FermaNext\moc_ToolBarManager.cpp
+
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
-InputPath=.\..\gui\ToolBarManager.h
-InputName=ToolBarManager
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on ..\gui\ToolBarManager.h
+InputPath=..\gui\ToolBarManager.h
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
+"..\..\build\debug\mocs\FermaNext\moc_ToolBarManager.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\FermaNext\moc_ToolBarManager.cpp
 
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\gui\TrussGeometryWindow.h
-
-!IF  "$(CFG)" == "FermaNext - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
-InputPath=..\gui\TrussGeometryWindow.h
-InputName=TrussGeometryWindow
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
-InputPath=..\gui\TrussGeometryWindow.h
-InputName=TrussGeometryWindow
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
 !ENDIF 
@@ -419,28 +345,24 @@ SOURCE=..\gui\UndoRedoListBox.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on ..\gui\UndoRedoListBox.h
 InputPath=..\gui\UndoRedoListBox.h
-InputName=UndoRedoListBox
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\release\mocs\FermaNext\moc_UndoRedoListBox.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\FermaNext\moc_UndoRedoListBox.cpp
+
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on ..\gui\UndoRedoListBox.h
 InputPath=..\gui\UndoRedoListBox.h
-InputName=UndoRedoListBox
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\debug\mocs\FermaNext\moc_UndoRedoListBox.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\FermaNext\moc_UndoRedoListBox.cpp
+
 # End Custom Build
 
 !ENDIF 
@@ -448,193 +370,245 @@ InputName=UndoRedoListBox
 # End Source File
 # Begin Source File
 
-SOURCE=.\..\gui\WindowListBox.h
+SOURCE=..\gui\WindowListBox.h
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
-InputPath=.\..\gui\WindowListBox.h
-InputName=WindowListBox
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on ..\gui\WindowListBox.h
+InputPath=..\gui\WindowListBox.h
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\release\mocs\FermaNext\moc_WindowListBox.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\FermaNext\moc_WindowListBox.cpp
+
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
-InputPath=.\..\gui\WindowListBox.h
-InputName=WindowListBox
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on ..\gui\WindowListBox.h
+InputPath=..\gui\WindowListBox.h
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
+"..\..\build\debug\mocs\FermaNext\moc_WindowListBox.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\Agg" -I"..\FermaNext" -I"..\TrussUnit" -I"..\common" -I"..\common\plugin" -I"..\common\plugin\loader" -I"..\gui" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\FermaNext" -I"..\..\build\debug\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\FermaNext\moc_WindowListBox.cpp
+
 # End Custom Build
 
 !ENDIF 
 
 # End Source File
 # End Group
-# Begin Group "Resource Files"
+# Begin Group "Generated"
 
-# PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
-# End Group
-# Begin Group "Moc Files"
-
-# PROP Default_Filter "cpp"
+# PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\..\common\mocs\moc_AbstractObjectAction.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\gui\mocs\moc_CalcDataToolBar.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\gui\ui\mocs\moc_CalcDataWidget.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\gui\mocs\moc_FermaNextMainFrame.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\FermaNext\mocs\moc_FermaNextProject.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\FermaNext\mocs\moc_FermaNextWorkspace.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\common\mocs\moc_ObjectState.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\common\mocs\moc_ObjectStateManager.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\gui\mocs\moc_ProjectToolBox.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\gui\mocs\moc_Splash.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\common\mocs\moc_StatefulObject.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\gui\mocs\moc_ToolBarManager.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\gui\mocs\moc_TrussGeometryWindow.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\gui\mocs\moc_UndoRedoListBox.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\..\gui\mocs\moc_WindowListBox.cpp
-# End Source File
-# End Group
-# Begin Group "Ui Files"
-
-# PROP Default_Filter "ui"
-# Begin Source File
-
-SOURCE=..\gui\CalcDataWidget.ui
+SOURCE=..\..\build\debug\mocs\FermaNext\moc_FermaNextMainWindow.cpp
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
-# Begin Custom Build - Uic'ing $(InputName).ui ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
-InputPath=..\gui\CalcDataWidget.ui
-InputName=CalcDataWidget
-
-BuildCmds= \
-	IF NOT EXIST "$(InputDir)\ui" mkdir "$(InputDir)\ui" \
-	"%qtdir%\bin\uic.exe" "$(InputDir)\$(InputName).ui" -o "$(InputDir)\ui\$(InputName).h" \
-	"%qtdir%\bin\uic.exe" "$(InputDir)\$(InputName).ui" -i "$(InputDir)\ui\$(InputName).h" -o "$(InputDir)\ui\$(InputName).cpp" \
-	
-
-"$(InputDir)\ui\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-
-"$(InputDir)\ui\$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-# End Custom Build
+# PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
-
-# Begin Custom Build - Uic'ing $(InputName).ui ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui
-InputPath=..\gui\CalcDataWidget.ui
-InputName=CalcDataWidget
-
-BuildCmds= \
-	IF NOT EXIST "$(InputDir)\ui" mkdir "$(InputDir)\ui" \
-	"%qtdir%\bin\uic.exe" "$(InputDir)\$(InputName).ui" -o "$(InputDir)\ui\$(InputName).h" \
-	"%qtdir%\bin\uic.exe" "$(InputDir)\$(InputName).ui" -i "$(InputDir)\ui\$(InputName).h" -o "$(InputDir)\ui\$(InputName).cpp" \
-	
-
-"$(InputDir)\ui\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-
-"$(InputDir)\ui\$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-# End Custom Build
 
 !ENDIF 
 
 # End Source File
-# End Group
-# Begin Group "Ui Source Files"
-
-# PROP Default_Filter "*.cpp;*.h"
 # Begin Source File
 
-SOURCE=..\gui\ui\CalcDataWidget.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\gui\ui\CalcDataWidget.h
+SOURCE=..\..\build\release\mocs\FermaNext\moc_FermaNextMainWindow.cpp
 
 !IF  "$(CFG)" == "FermaNext - Win32 Release"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui\ui
-InputPath=..\gui\ui\CalcDataWidget.h
-InputName=CalcDataWidget
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\debug\mocs\FermaNext\moc_FermaNextProject.cpp
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=\Development\Visual Studio projects\FermaNext\src\gui\ui
-InputPath=..\gui\ui\CalcDataWidget.h
-InputName=CalcDataWidget
+!ENDIF 
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
-# End Custom Build
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\release\mocs\FermaNext\moc_FermaNextProject.cpp
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\debug\mocs\FermaNext\moc_FermaNextWorkspace.cpp
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\release\mocs\FermaNext\moc_FermaNextWorkspace.cpp
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\debug\mocs\FermaNext\moc_GeometryTabWidget.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\debug\mocs\FermaNext\moc_ProjectToolBox.cpp
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\release\mocs\FermaNext\moc_ProjectToolBox.cpp
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\debug\mocs\FermaNext\moc_Splash.cpp
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\release\mocs\FermaNext\moc_Splash.cpp
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\debug\mocs\FermaNext\moc_ToolBarManager.cpp
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\release\mocs\FermaNext\moc_ToolBarManager.cpp
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\debug\mocs\FermaNext\moc_UndoRedoListBox.cpp
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\release\mocs\FermaNext\moc_UndoRedoListBox.cpp
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\debug\mocs\FermaNext\moc_WindowListBox.cpp
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\build\release\mocs\FermaNext\moc_WindowListBox.cpp
+
+!IF  "$(CFG)" == "FermaNext - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "FermaNext - Win32 Debug"
+
+# PROP Exclude_From_Build 1
 
 !ENDIF 
 

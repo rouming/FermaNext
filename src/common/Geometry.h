@@ -2,7 +2,7 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include "math.h"
+#include <math.h>
 
 class DoublePoint;
 class DoubleSize;

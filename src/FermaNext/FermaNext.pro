@@ -1,48 +1,48 @@
 
 TARGET = FermaNext
-DESTDIR = ../../
 
-CONFIG += qt warn_on thread debug
+LEVEL = ../..
+include(../../FermaNext.pri)
 
-MOC_DIR = mocs
-OBJECTS_DIR = obj
-UI_DIR = ../gui/ui
+QT += core gui xml qt3support
+CONFIG += qt warn_on thread
+DESTDIR = ../..
+
+LIBPATH += ../.. $$(EXPATDIR)/Libs
 
 win32 {
-  DEFINES += WIN32
-  LIBS = common.lib Agg.lib TrussUnit.lib LibAgg.lib LibSVG.lib libexpat.lib \
-         -L../../build \
-         -L../.. \
-         -L$$(EXPATDIR)/Libs
+  LIBS = common.lib Agg.lib TrussUnit.lib LibAgg.lib LibSVG.lib libexpat.lib
 }
 unix {
   QMAKE_LFLAGS += -export-dynamic
-  LIBS = -L../../build -L../../ \
-         -lTrussUnit -lAgg -lcommon -lsvg -lagg
+  LIBS = -lTrussUnit -lAgg -lcommon -lsvg -lagg
 }
 
 INCLUDEPATH = $$(AGGDIR)/include \
               $$(AGGDIR)/svg \
+              ../Agg \
+              ../FermaNext \
+              ../TrussUnit \
               ../common \
               ../common/plugin \
               ../common/plugin/loader \
-              ../Agg \
-              ../TrussUnit \
               ../gui
 
-FORMS = ../gui/CalcDataWidget.ui
+#FIXME QT3TO4
+#FORMS = ../gui/CalcDataWidget.ui
 
 SOURCES = \
           FermaNext.cpp \
           FermaNextConfig.cpp \
           FermaNextProject.cpp \
           FermaNextWorkspace.cpp \
-          ../gui/CalcDataToolBar.cpp \
-          ../gui/FermaNextMainFrame.cpp \
+#FIXME QT3TO4
+#          ../gui/CalcDataToolBar.cpp \
+          ../gui/FermaNextMainWindow.cpp \
+          ../gui/GeometryTabWidget.cpp \
           ../gui/ProjectToolBox.cpp \
           ../gui/Splash.cpp \
           ../gui/ToolBarManager.cpp \
-          ../gui/TrussGeometryWindow.cpp \
           ../gui/UndoRedoListBox.cpp \
           ../gui/WindowListBox.cpp
 
@@ -50,11 +50,12 @@ HEADERS = \
           FermaNextConfig.h \
           FermaNextProject.h \
           FermaNextWorkspace.h \
-          ../gui/CalcDataToolBar.h \
-          ../gui/FermaNextMainFrame.h \
+#FIXME QT3TO4
+#          ../gui/CalcDataToolBar.h \
+          ../gui/FermaNextMainWindow.h \
+          ../gui/GeometryTabWidget.h \
           ../gui/ProjectToolBox.h \
           ../gui/Splash.h \
           ../gui/ToolBarManager.h \
-          ../gui/TrussGeometryWindow.h \
           ../gui/UndoRedoListBox.h \
           ../gui/WindowListBox.h

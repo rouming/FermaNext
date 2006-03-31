@@ -1,6 +1,7 @@
 
+#include <QFile>
+
 #include "FermaNextConfig.h"
-#include <qfile.h>
 
 /*****************************************************************************
  * Ferma Next Config
@@ -22,7 +23,7 @@ void FermaNextConfig::parseConfig ()
     throw (ConfigReadException, ConfigParseException)
 {
     QFile file( fileName );
-    if ( !file.open( IO_ReadOnly ) )
+    if ( !file.open( QIODevice::ReadOnly ) )
         throw ConfigReadException();
     if ( !configDoc.setContent( &file ) ) {
         file.close();

@@ -3,7 +3,7 @@
 #define XMLSERIALIZABLEOBJECT_H
 
 #include "UUIDObject.h"
-#include <qdom.h>
+#include <QDomElement>
 
 class XMLSerializableObject : public UUIDObject
 {

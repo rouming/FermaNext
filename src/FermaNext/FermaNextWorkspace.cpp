@@ -1,11 +1,12 @@
 
-#include "FermaNextWorkspace.h"
-#include "FermaNextMainFrame.h"
-#include "SubsidiaryConstants.h"
+#include <QStackedWidget>
+#include <QFileInfo>
+#include <QDir>
+#include <QTextStream>
+#include <QApplication>
 
-#include <qwidgetstack.h>
-#include <qfileinfo.h>
-#include <qdir.h>
+#include "FermaNextWorkspace.h"
+#include "SubsidiaryConstants.h"
 
 /*****************************************************************************
  * FermaNext Workspace
@@ -26,20 +27,25 @@ const QString& FermaNextWorkspace::formatExtension ()
 
 FermaNextWorkspace::FermaNextWorkspace () :
     name( untitledWorkspaceName ),
-    widgetStack(0),
-    fermaConfig( configFileName() )
-{}
+    fermaConfig( configFileName() ),
+    fermaMainWindow(0),
+    stackedWidget(0)
+{
+    fermaMainWindow = new FermaNextMainWindow( *this );
+    stackedWidget = new QStackedWidget( fermaMainWindow );
+    fermaMainWindow->setCentralWidget( stackedWidget );
+}
 
 FermaNextWorkspace::~FermaNextWorkspace ()
 {
-    clearProjects();
+    quitFermaNextApplication();
 }
 
 void FermaNextWorkspace::loadFromFile ( const QString& fileName )
     throw (IOException, WrongXMLDocException, LoadException)
 {
     QFile xmlFile( fileName );
-    if ( ! xmlFile.open( IO_ReadOnly ) )
+    if ( ! xmlFile.open( QIODevice::ReadOnly ) )
         throw IOException();
 
     QIODevice* xmlIODev = &xmlFile;
@@ -78,7 +84,7 @@ void FermaNextWorkspace::saveToFile ( const QString& fileName )
     }
 
     QFile xmlFile( fileName );
-    if ( ! xmlFile.open( IO_WriteOnly ) )
+    if ( ! xmlFile.open( QIODevice::WriteOnly ) )
         throw IOException();
 
     QTextStream stream( &xmlFile );
@@ -105,7 +111,7 @@ void FermaNextWorkspace::loadFromXML ( const QDomElement& wspElem,
     reset();
 
     QFileInfo wspFileInfo( wspFileName );
-    QDir workspaceDir( wspFileInfo.dirPath(true) );
+    QDir workspaceDir( wspFileInfo.absoluteDir() );
 
     /**
      * Create projects
@@ -113,7 +119,7 @@ void FermaNextWorkspace::loadFromXML ( const QDomElement& wspElem,
     FermaNextProject* selectedProject = 0;
     
     QDomNodeList projects = wspElem.elementsByTagName( "FermaNextProject" );
-    for ( uint prjsNum = 0; prjsNum < projects.count(); ++prjsNum ) {
+    for ( int prjsNum = 0; prjsNum < projects.count(); ++prjsNum ) {
         QDomNode project = projects.item( prjsNum );
         if ( ! project.isElement() )
             throw LoadException();
@@ -121,11 +127,11 @@ void FermaNextWorkspace::loadFromXML ( const QDomElement& wspElem,
         if ( ! projectElem.hasAttribute( "projectURL" ) )
             throw LoadException();
         QString prjUrl = projectElem.attribute( "projectURL" );
-        QString prjFileName = workspaceDir.filePath( prjUrl, true );
+        QString prjFileName = workspaceDir.absoluteFilePath( prjUrl );
         QFileInfo prjFileInf( prjFileName );
         if ( ! prjFileInf.exists() || ! prjFileInf.isReadable() )
             throw LoadException();
-        FermaNextProject& prj = createProject( QString::null );
+        FermaNextProject& prj = createProject( QString() );
         try { prj.loadFromFile( prjFileName ); }
         catch ( ... ) {
             throw LoadException();
@@ -147,7 +153,7 @@ QDomElement FermaNextWorkspace::saveToXML ( QDomDocument& doc )
     wspElem.setTagName( "FermaNextWorkspace" );
 
     QFileInfo wspFileInfo( getWorkspaceFileName() );
-    QString wspDirPath = wspFileInfo.dirPath(true);
+    QString wspDirPath = wspFileInfo.absolutePath();
 
     /**
      * Save projects URLs
@@ -202,26 +208,25 @@ void FermaNextWorkspace::reset ()
     setWorkspaceFileName( "" );
 }
 
+void FermaNextWorkspace::quitFermaNextApplication ()
+{
+    // Manually destroy all projects.
+    clearProjects();
+    // Manually unregister all plugin loaders.
+    pluginManager().unregisterPluginLoaders();
+
+    qApp->exit();
+}
+
 void FermaNextWorkspace::projectIsActivated ( FermaNextProject& prj )
 {
     emit onProjectActivated( prj );
 }
 
-void FermaNextWorkspace::createWidgetStack ( QMainWindow& parent )
-{
-    if ( widgetStack )
-        return;
-    widgetStack = new QWidgetStack(&parent);
-    parent.setCentralWidget(widgetStack);
-}
-
 FermaNextProject& FermaNextWorkspace::createProject ( const QString& name )
-    throw (WorkspaceIsNotInitedCorrectly)
 {
-    // Assuming widget stack was created.
-    if ( widgetStack == 0 )
-        throw WorkspaceIsNotInitedCorrectly();
-    FermaNextProject* project = new FermaNextProject(name, widgetStack);
+    FermaNextProject* project = new FermaNextProject( *this, name, 
+                                                      stackedWidget );
 
     // Activation signal catch
     QObject::connect( project, SIGNAL(onActivate(FermaNextProject&)),
@@ -234,9 +239,9 @@ FermaNextProject& FermaNextWorkspace::createProject ( const QString& name )
 
 FermaNextProject& FermaNextWorkspace::createProjectFromFile ( 
     const QString& fileName ) 
-    throw (WorkspaceIsNotInitedCorrectly, LoadException)
+    throw (LoadException)
 {
-    FermaNextProject& prj = createProject( QString::null );
+    FermaNextProject& prj = createProject( QString() );
     try { prj.loadFromFile( fileName ); }
     catch ( ... ) {
         removeProject(prj);
@@ -349,7 +354,12 @@ FermaNextConfig& FermaNextWorkspace::config ()
 
 PluginManager& FermaNextWorkspace::pluginManager ()
 {
-    return PluginManager::instance();
+    return pluginMng;
+}
+
+FermaNextMainWindow& FermaNextWorkspace::mainWindow ()
+{
+    return *fermaMainWindow;
 }
 
 /*****************************************************************************/

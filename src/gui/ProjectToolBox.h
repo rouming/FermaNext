@@ -5,7 +5,7 @@
 #include "FermaNextWorkspace.h"
 #include "FermaNextProject.h"
 
-#include <qtoolbox.h>
+#include <QToolBox>
 
 // ****************************************************************************
 // BUG: C4786 Warning Is Not Disabled with #pragma Warning
@@ -13,7 +13,7 @@
 // This warning can be ignored. This occured only in the <map> container.
 // ****************************************************************************
 // QMap is used instead of std::map for avoiding this undisabling warning
-#include <qmap.h>
+#include <QMap>
 
 // Container for smart FermaNext projects navigation
 class ProjectToolBox : public QToolBox
@@ -25,8 +25,7 @@ protected:
 public:
     ProjectToolBox ( FermaNextWorkspace&,
                      QWidget* parent = 0, 
-                     const char * name = 0, 
-                     WFlags f = 0 );
+                     Qt::WFlags f = 0 );
 
     virtual FermaNextProject* currentProject () const;
 

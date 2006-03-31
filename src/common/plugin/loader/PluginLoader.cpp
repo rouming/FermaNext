@@ -35,7 +35,7 @@ void PluginLoader::unloadPlugin ( Plugin& plugin )
 {
     PluginMapIter it = pluginMap.begin();
     for ( ; it != pluginMap.end(); ++it ) {
-        if ( it.data() == &plugin ) {                
+        if ( it.value() == &plugin ) {                
             specificUnloadPlugin( plugin );
             pluginMap.remove( it.key() );
             return;
@@ -47,7 +47,7 @@ void PluginLoader::unloadPlugins ()
 {
     PluginMapIter it = pluginMap.begin();
     for ( ; it != pluginMap.end(); ++it )
-        specificUnloadPlugin( *it.data() );
+        specificUnloadPlugin( *it.value() );
     pluginMap.clear();
 }
 
@@ -56,7 +56,7 @@ PluginList PluginLoader::loadedPlugins () const
     PluginList plugins;
     PluginMapConstIter it = pluginMap.begin();
     for ( ; it != pluginMap.end(); ++it )
-        plugins.push_back( it.data() );
+        plugins.push_back( it.value() );
     return plugins;
 }
 
@@ -64,7 +64,7 @@ bool PluginLoader::pluginIsLoaded ( const Plugin& plugin ) const
 {
     PluginMapConstIter it = pluginMap.begin();
     for ( ; it != pluginMap.end(); ++it ) {
-        if ( it.data() == &plugin )
+        if ( it.value() == &plugin )
             return true;
     }
     return false;
@@ -79,7 +79,7 @@ QString PluginLoader::pathToPlugin ( const Plugin& plugin ) const
 {
     PluginMapConstIter it = pluginMap.begin();
     for ( ; it != pluginMap.end(); ++it ) {
-        if ( it.data() == &plugin )
+        if ( it.value() == &plugin )
             return it.key();
     }
     return QString();

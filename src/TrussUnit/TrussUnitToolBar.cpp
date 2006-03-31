@@ -1,6 +1,6 @@
 
 #include "TrussUnitToolBar.h"
-#include "qtimer.h"
+#include <QTimer>
 
 /*****************************************************************************
  * Agg Tool Bar Hide Button
@@ -85,7 +85,7 @@ TrussUnitToolBar::TrussUnitToolBar  ( QPoint pos, int bordLeft, int bordRight,
 
 TrussUnitToolBar::~TrussUnitToolBar ()
 {
-    if ( thread->running() )
+    if ( thread->isRunning() )
         thread->wait();
     delete thread;
     delete timer;
@@ -277,7 +277,7 @@ void TrussUnitToolBar::checkMouseMoveEvent ( int x, int y )
         {
             currentHintedButton = button;
             hintCurrentPos = QPoint( x, y );
-            timer->start( 1000, false );
+            timer->start( 1000 );
         }
     }
     else

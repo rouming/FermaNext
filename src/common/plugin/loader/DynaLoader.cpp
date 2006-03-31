@@ -1,9 +1,10 @@
 
 #include "DynaLoader.h"
-#include <qfile.h>
-#include <qregexp.h>
-#include <qdir.h>
-#include <qfileinfo.h>
+
+#include <QFile>
+#include <QRegExp>
+#include <QDir>
+#include <QFileInfo>
 
 QString dl_error ()
 {
@@ -76,13 +77,14 @@ void DynaLoader::loadLibrary ( const QString& fileName )
 
     QString convertedFileName = fileName;
     QRegExp regExp( "^" + libPrefix() + ".+\\." + libExtension() + "$" );
-    if ( -1 == regExp.search( dlFileName ) ) {
+    if ( -1 == regExp.indexIn( dlFileName ) ) {
         dlFileName = libPrefix() + dlFileName + "." + libExtension();
-        convertedFileName = dlInfo.dirPath() + QDir::separator() + dlFileName;
+        convertedFileName = dlInfo.absolutePath() + QDir::separator() + 
+                            dlFileName;
     }
     convertedFileName = QDir::convertSeparators( convertedFileName );
 #if defined UNICODE && (defined _WIN32 || defined WIN32)
-    handle = dl_open(convertedFileName.ucs2());
+    handle = dl_open(convertedFileName.toStdWString().data());
 #else
     handle = dl_open(QFile::encodeName(convertedFileName));
 #endif
@@ -103,7 +105,7 @@ bool DynaLoader::freeLibrary ()
 ProcAddress DynaLoader::getProcAddress ( const QString& funcName ) const
     throw (DynaLoader::AddressException)
 {
-    ProcAddress address = dl_sym(handle, funcName.ascii());
+    ProcAddress address = dl_sym(handle, funcName.toAscii().data());
     if ( address == 0 )
         throw AddressException( dl_error() );
     return address;

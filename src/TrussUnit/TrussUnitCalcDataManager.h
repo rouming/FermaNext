@@ -4,8 +4,8 @@
 
 #include "TrussCalcData.h"
 #include <vector>
-#include <qmap.h>
-#include <qdatetime.h>
+#include <QMap>
+#include <QDateTime>
 
 class TrussUnit;
 class TrussTopology;

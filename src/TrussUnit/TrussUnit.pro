@@ -1,12 +1,13 @@
 
 TARGET = TrussUnit
-DESTDIR = ../../build
+
+LEVEL = ../..
+include(../../FermaNext.pri)
+
+QT += core xml
 
 TEMPLATE = lib
-CONFIG += staticlib warn_on thread debug
-
-MOC_DIR = mocs
-OBJECTS_DIR = obj
+CONFIG += staticlib warn_on thread
 
 win32 {
   DEFINES += WIN32
@@ -28,7 +29,6 @@ SOURCES = \
           TrussUnit.cpp \
           TrussUnitActions.cpp \
           TrussUnitDesignerWidget.cpp \
-          TrussUnitDesignerWindow.cpp \
           TrussUnitToolBar.cpp \
           TrussUnitWindow.cpp \
           TrussUnitWindowButton.cpp \
@@ -41,7 +41,6 @@ HEADERS = \
           TrussUnit.h \
           TrussUnitActions.h \
           TrussUnitDesignerWidget.h \
-          TrussUnitDesignerWindow.h \
           TrussUnitToolBar.h \
           TrussUnitWindow.h \
           TrussUnitWindowButton.h \

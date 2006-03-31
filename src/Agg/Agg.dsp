@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Static Library" 0x0104
 
-CFG=Agg - Win32 Debug
+CFG=Agg - Win32 Release
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,7 +13,7 @@ CFG=Agg - Win32 Debug
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "Agg.mak" CFG="Agg - Win32 Debug"
+!MESSAGE NMAKE /f "Agg.mak" CFG="Agg - Win32 Release"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -25,59 +25,48 @@ CFG=Agg - Win32 Debug
 # PROP AllowPerConfigDependencies 0
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
-CPP=cl.exe
-F90=df.exe
-RSC=rc.exe
+CPP=cl
+MTL=midl
+RSC=rc
+BSC32=bscmake.exe
 
 !IF  "$(CFG)" == "Agg - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "Release"
-# PROP BASE Intermediate_Dir "Release"
+# PROP BASE Output_Dir "..\..\build\release"
+# PROP BASE Intermediate_Dir "..\..\build\release\obj\Agg"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "../../Release"
-# PROP Intermediate_Dir "../../Release"
+# PROP Output_Dir "..\..\build\release"
+# PROP Intermediate_Dir "..\..\build\release\obj\Agg"
 # PROP Target_Dir ""
-# ADD BASE F90 /compile_only /nologo /warn:nofileopt
-# ADD F90 /compile_only /nologo /warn:nofileopt
-# ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GR /GX /O2 /I "../common" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "NDEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /YX /FD /c
-# ADD BASE RSC /l 0x419 /d "NDEBUG"
-# ADD RSC /l 0x419 /d "NDEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
+# ADD CPP /I"$(QTDIR)/include/QtGui" /I"$(QTDIR)/include/QtCore" /I"$(QTDIR)/include" /I"$(AGGDIR)/include" /I"$(AGGDIR)/svg" /I"..\common" /I"$(QTDIR)/include/ActiveQt" /I"..\..\build\release\mocs\Agg" /I"..\..\build\debug\ui\Agg" /I"$(QTDIR)/mkspecs/win32-msvc" /c /FD -nologo -Zm200 -O1 -MD -O1 -MD -W3 -GR -GX  /D "_LIB"  /D UNICODE /D QT_LARGEFILE_SUPPORT /D WIN32 /D QT_THREAD_SUPPORT /D QT_NO_DEBUG /D QT_CORE_LIB /D QT_GUI_LIB  /D "WIN32"  
+# ADD MTL /nologo /mktyplib203 /win32 /D "NDEBUG"
+# ADD RSC /l 0x409 /d "NDEBUG"
 # ADD BSC32 /nologo
-LIB32=link.exe -lib
-# ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo /out:"..\..\build\Agg.lib"
+LIB32=lib /NOLOGO
+# ADD LIB32 /out:"..\..\build\release\Agg.lib" 
 
 !ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug"
-# PROP BASE Intermediate_Dir "Debug"
+# PROP BASE Output_Dir "..\..\build\debug"
+# PROP BASE Intermediate_Dir "..\..\build\debug\obj\Agg"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "../../Debug"
-# PROP Intermediate_Dir "../../Debug"
+# PROP Output_Dir "..\..\build\debug"
+# PROP Intermediate_Dir "..\..\build\debug\obj\Agg"
 # PROP Target_Dir ""
-# ADD BASE F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
-# ADD F90 /check:bounds /compile_only /dbglibs /debug:full /nologo /traceback /warn:argument_checking /warn:nofileopt
-# ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GR /GX /ZI /Od /I "../common" /I "$(QTDIR)\include" /I "$(QTDIR)\mkspecs\win32-msvc" /I "$(AGGDIR)\include" /I "$(AGGDIR)\font_freetype" /I "$(AGGDIR)\font_win32_tt" /I "$(AGGDIR)\svg" /D "_DEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "UNICODE" /D "QT_DLL" /D "QT_THREAD_SUPPORT" /D "QT_ACCESSIBILITY_SUPPORT" /D "BENCHMARK_ON" /YX /FD /GZ /c
-# ADD BASE RSC /l 0x419 /d "_DEBUG"
-# ADD RSC /l 0x419 /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
+# ADD CPP /I"$(QTDIR)/include/QtGui" /I"$(QTDIR)/include/QtCore" /I"$(QTDIR)/include" /I"$(AGGDIR)/include" /I"$(AGGDIR)/svg" /I"..\common" /I"$(QTDIR)/include/ActiveQt" /I"..\..\build\debug\mocs\Agg" /I"..\..\build\debug\ui\Agg" /I"$(QTDIR)/mkspecs/win32-msvc" /c /FD -nologo -Zm200 -Zi -MDd -Zi -MDd -W3 -GR -GX  /D "_LIB"  /D UNICODE /D QT_LARGEFILE_SUPPORT /D WIN32 /D QT_THREAD_SUPPORT /D QT_CORE_LIB /D QT_GUI_LIB  /D "WIN32"  
+# ADD MTL /nologo /mktyplib203 /win32 /D "_DEBUG"
+# ADD RSC /l 0x409 /d "_DEBUG"
 # ADD BSC32 /nologo
-LIB32=link.exe -lib
-# ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo /out:"..\..\build\Agg.lib"
+LIB32=lib /NOLOGO
+# ADD LIB32 /out:"..\..\build\debug\Agg.lib" 
 
 !ENDIF 
 
@@ -85,251 +74,271 @@ LIB32=link.exe -lib
 
 # Name "Agg - Win32 Release"
 # Name "Agg - Win32 Debug"
-# Begin Group "Source Files"
 
+# Begin Group "Source Files"
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
-
-SOURCE=.\AggButton.cpp
-
-!IF  "$(CFG)" == "Agg - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
-
-# SUBTRACT CPP /D "BENCHMARK_ON"
-
-!ENDIF 
-
+SOURCE=AggButton.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\AggPaintThread.cpp
-
-!IF  "$(CFG)" == "Agg - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
-
-# SUBTRACT CPP /D "BENCHMARK_ON"
-
-!ENDIF 
-
+SOURCE=AggPaintThread.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\AggPopupHint.cpp
-
-!IF  "$(CFG)" == "Agg - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
-
-# SUBTRACT CPP /D "BENCHMARK_ON"
-
-!ENDIF 
-
+SOURCE=AggPopupHint.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\AggQWidget.cpp
-
-!IF  "$(CFG)" == "Agg - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
-
-# SUBTRACT CPP /D "BENCHMARK_ON"
-
-!ENDIF 
-
+SOURCE=AggQWidget.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\AggSubsidiary.cpp
-
-!IF  "$(CFG)" == "Agg - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
-
-# SUBTRACT CPP /D "BENCHMARK_ON"
-
-!ENDIF 
-
+SOURCE=AggSubsidiary.cpp
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\AggToolBar.cpp
-
-!IF  "$(CFG)" == "Agg - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
-
-# SUBTRACT CPP /D "BENCHMARK_ON"
-
-!ENDIF 
-
+SOURCE=AggToolBar.cpp
 # End Source File
+
 # End Group
-# Begin Group "Header Files"
 
+# Begin Group "Header Files"
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
+SOURCE=AggButton.h
+!IF"$(CFG)" == "Agg - Win32 Release"
 
-SOURCE=.\AggButton.h
+USERDEP_AggButton.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on AggButton.h
+InputPath=AggButton.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\Agg" -I"..\..\build\debug\ui\Agg" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\Agg\moc_AggButton.cpp
+"..\..\build\release\mocs\Agg\moc_AggButton.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-!IF  "$(CFG)" == "Agg - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\AggButton.h
-InputName=AggButton
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
+!ELSEIF"$(CFG)" == "Agg - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\AggButton.h
-InputName=AggButton
+USERDEP_AggButton.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on AggButton.h
+InputPath=AggButton.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\Agg" -I"..\..\build\debug\ui\Agg" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\Agg\moc_AggButton.cpp
+"..\..\build\debug\mocs\Agg\moc_AggButton.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ENDIF 
-
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=AggPaintThread.h
+!IF"$(CFG)" == "Agg - Win32 Release"
 
-SOURCE=.\AggPaintThread.h
+USERDEP_AggPaintThread.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on AggPaintThread.h
+InputPath=AggPaintThread.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\Agg" -I"..\..\build\debug\ui\Agg" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\Agg\moc_AggPaintThread.cpp
+"..\..\build\release\mocs\Agg\moc_AggPaintThread.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-!IF  "$(CFG)" == "Agg - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\AggPaintThread.h
-InputName=AggPaintThread
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
+!ELSEIF"$(CFG)" == "Agg - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\AggPaintThread.h
-InputName=AggPaintThread
+USERDEP_AggPaintThread.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on AggPaintThread.h
+InputPath=AggPaintThread.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\Agg" -I"..\..\build\debug\ui\Agg" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\Agg\moc_AggPaintThread.cpp
+"..\..\build\debug\mocs\Agg\moc_AggPaintThread.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ENDIF 
-
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=AggPopupHint.h
+!IF"$(CFG)" == "Agg - Win32 Release"
 
-SOURCE=.\AggPopupHint.h
+USERDEP_AggPopupHint.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on AggPopupHint.h
+InputPath=AggPopupHint.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\Agg" -I"..\..\build\debug\ui\Agg" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\Agg\moc_AggPopupHint.cpp
+"..\..\build\release\mocs\Agg\moc_AggPopupHint.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-!IF  "$(CFG)" == "Agg - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\AggPopupHint.h
-InputName=AggPopupHint
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
+!ELSEIF"$(CFG)" == "Agg - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\AggPopupHint.h
-InputName=AggPopupHint
+USERDEP_AggPopupHint.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on AggPopupHint.h
+InputPath=AggPopupHint.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\Agg" -I"..\..\build\debug\ui\Agg" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\Agg\moc_AggPopupHint.cpp
+"..\..\build\debug\mocs\Agg\moc_AggPopupHint.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ENDIF 
-
+!ENDIF
 # End Source File
+
 # Begin Source File
-
-SOURCE=.\AggQWidget.h
+SOURCE=AggQWidget.h
 # End Source File
-# Begin Source File
 
-SOURCE=.\AggSubsidiary.h
+# Begin Source File
+SOURCE=AggSubsidiary.h
 # End Source File
+
 # Begin Source File
+SOURCE=AggToolBar.h
+!IF"$(CFG)" == "Agg - Win32 Release"
 
-SOURCE=.\AggToolBar.h
+USERDEP_AggToolBar.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on AggToolBar.h
+InputPath=AggToolBar.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_CORE_LIB -DQT_GUI_LIB -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\Agg" -I"..\..\build\debug\ui\Agg" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\Agg\moc_AggToolBar.cpp
+"..\..\build\release\mocs\Agg\moc_AggToolBar.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-!IF  "$(CFG)" == "Agg - Win32 Release"
-
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\AggToolBar.h
-InputName=AggToolBar
-
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "Agg - Win32 Debug"
+!ELSEIF"$(CFG)" == "Agg - Win32 Debug"
 
-# Begin Custom Build - Moc'ing $(InputName).h ...
-InputDir=.
-InputPath=.\AggToolBar.h
-InputName=AggToolBar
+USERDEP_AggToolBar.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on AggToolBar.h
+InputPath=AggToolBar.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"..\common" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\Agg" -I"..\..\build\debug\ui\Agg" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\Agg\moc_AggToolBar.cpp
+"..\..\build\debug\mocs\Agg\moc_AggToolBar.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
 
-"$(InputDir)\mocs\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	IF NOT EXIST "$(InputDir)\mocs" mkdir "$(InputDir)\mocs" 
-	"%qtdir%\bin\moc.exe" -o "$(InputDir)\mocs\moc_$(InputName).cpp" "$(InputDir)\$(InputName).h" 
-	
 # End Custom Build
 
-!ENDIF 
-
+!ENDIF
 # End Source File
+
 # End Group
-# Begin Group "Moc Files"
 
-# PROP Default_Filter "cpp"
+# Begin Group "Generated"
+# PROP Default_Filter ""
 # Begin Source File
+SOURCE=..\..\build\debug\mocs\Agg\moc_AggButton.cpp
+!IF"$(CFG)" == "Agg - Win32 Release"
 
-SOURCE=.\mocs\moc_AggButton.cpp
+# PROP Exclude_From_Build 1
+
+!ELSEIF"$(CFG)" == "Agg - Win32 Debug"
+
+
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=..\..\build\debug\mocs\Agg\moc_AggPaintThread.cpp
+!IF"$(CFG)" == "Agg - Win32 Release"
 
-SOURCE=.\mocs\moc_AggPaintThread.cpp
+# PROP Exclude_From_Build 1
+
+!ELSEIF"$(CFG)" == "Agg - Win32 Debug"
+
+
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=..\..\build\debug\mocs\Agg\moc_AggPopupHint.cpp
+!IF"$(CFG)" == "Agg - Win32 Release"
 
-SOURCE=.\mocs\moc_AggPopupHint.cpp
+# PROP Exclude_From_Build 1
+
+!ELSEIF"$(CFG)" == "Agg - Win32 Debug"
+
+
+!ENDIF
 # End Source File
+
 # Begin Source File
+SOURCE=..\..\build\debug\mocs\Agg\moc_AggToolBar.cpp
+!IF"$(CFG)" == "Agg - Win32 Release"
 
-SOURCE=.\mocs\moc_AggToolBar.cpp
+# PROP Exclude_From_Build 1
+
+!ELSEIF"$(CFG)" == "Agg - Win32 Debug"
+
+
+!ENDIF
 # End Source File
+
+# Begin Source File
+SOURCE=..\..\build\release\mocs\Agg\moc_AggButton.cpp
+!IF"$(CFG)" == "Agg - Win32 Release"
+
+
+!ELSEIF"$(CFG)" == "Agg - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF
+# End Source File
+
+# Begin Source File
+SOURCE=..\..\build\release\mocs\Agg\moc_AggPaintThread.cpp
+!IF"$(CFG)" == "Agg - Win32 Release"
+
+
+!ELSEIF"$(CFG)" == "Agg - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF
+# End Source File
+
+# Begin Source File
+SOURCE=..\..\build\release\mocs\Agg\moc_AggPopupHint.cpp
+!IF"$(CFG)" == "Agg - Win32 Release"
+
+
+!ELSEIF"$(CFG)" == "Agg - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF
+# End Source File
+
+# Begin Source File
+SOURCE=..\..\build\release\mocs\Agg\moc_AggToolBar.cpp
+!IF"$(CFG)" == "Agg - Win32 Release"
+
+
+!ELSEIF"$(CFG)" == "Agg - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF
+# End Source File
+
 # End Group
+
+
 # End Target
 # End Project

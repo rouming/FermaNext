@@ -8,10 +8,12 @@
 #ifndef JAVAVIRTUALMACHINE_H
 #define JAVAVIRTUALMACHINE_H
 
+#include <stdio.h>
+#include <stdarg.h>
+#include <QStringList>
+
 #include "JNITypes.h"
 #include "DynaLoader.h"
-
-#include <qstringlist.h>
 
 class JavaVirtualMachine
 {

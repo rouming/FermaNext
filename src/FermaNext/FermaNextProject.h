@@ -2,16 +2,16 @@
 #ifndef FERMANEXTPROJECT_H
 #define FERMANEXTPROJECT_H
 
-#include <qstring.h>
+#include <QString>
 
 #include "XMLSerializableObject.h"
-#include "TrussUnitDesignerWindow.h"
+#include "TrussUnitDesignerWidget.h"
 #include "TrussUnitWindowManager.h"
 #include "ObjectStateManager.h"
 #include "CalcDataToolBar.h"
 
 class FermaNextWorkspace;
-class QWidgetStack;
+class QStackedWidget;
 class QTabWidget;
 
 class FermaNextProject : public QObject, public XMLSerializableObject
@@ -46,8 +46,9 @@ public:
     virtual bool isActivated () const;
 
     virtual TrussUnitWindowManager& getTrussUnitWindowManager ();    
-    virtual TrussUnitDesignerWindow& getDesignerWindow ();
+    virtual TrussUnitDesignerWidget& getDesignerWidget ();
     virtual CalcDataToolBar& getCalcDataToolBar ();
+    virtual FermaNextWorkspace& getWorkspace();
 
 protected:
     // XML serialization
@@ -64,17 +65,19 @@ signals:
 private:
     friend class FermaNextWorkspace;
     
-    FermaNextProject ( const QString& name, QWidgetStack* parent = 0 );
+    FermaNextProject ( FermaNextWorkspace&, 
+                       const QString& name, 
+                       QStackedWidget* parent = 0 );
 
 private:
+    FermaNextWorkspace& currentWorkspace;
     QString name;
     QString projectFileName;
-    QWidgetStack* widgetStack;
-    QMainWindow* projectMainWidget;
+    QStackedWidget* stackedWidget;
     CalcDataToolBar* calcDataToolBar;
     QTabWidget* projectTab;
     QWidget* justStrengthAnalisysWidget;
-    TrussUnitDesignerWindow* designerWindow;
+    TrussUnitDesignerWidget* designerWidget;
     TrussUnitWindowManager* trussWindowManager;
 };
 

@@ -1,24 +1,26 @@
 
-#ifndef FERMANEXTFRAME_H
-#define FERMANEXTFRAME_H
+#ifndef FERMANEXTMAINWINDOW_H
+#define FERMANEXTMAINWINDOW_H
 
-#include <qmainwindow.h>
+// Qt3 Support classes
+#include <Q3MainWindow>
 
-class QAction;
+class Q3DockWindow;
+
 class ProjectToolBox;
 class FermaNextProject;
 class TrussUnitWindow;
 class FermaNextWorkspace;
 class UndoRedoListBox;
-class TrussGeometryWindow;
+class GeometryTabWidget;
 class QFile;
+class QMenu;
 
-class FermaNextMainFrame : public QMainWindow
+class FermaNextMainWindow : public Q3MainWindow
 {
     Q_OBJECT
 public:
-    FermaNextMainFrame ( QWidget * parent = 0, const char * name = 0, 
-                         WFlags f = WType_TopLevel );
+    FermaNextMainWindow ( FermaNextWorkspace& );
 
 public slots:
     void someProjectRemoved ( FermaNextProject& );
@@ -34,9 +36,6 @@ protected:
     // Reload all plugins
     void reloadPlugins ( bool reload );
 
-    // Provides correct last cleanup before quit.
-    void cleanBeforeQuit ();
-
     void init ();
     void setupFileActions ();
     void setupEditActions ();
@@ -44,7 +43,6 @@ protected:
     void setupProjectActions ();
     void setupWindowActions ();
     void setupHelpActions ();
-    void setupPluginActions ();
 
     bool eventFilter( QObject*, QEvent* );
     // Close handler. Calls 'clean' for correct close.
@@ -80,24 +78,28 @@ protected slots:
     void refreshUndoRedoActions ();
     // Refresh project actions
     void refreshProjectActions ();
+	// Refresh plugins actions
+	void refreshPluginsActions ();
 
     // Catch designer widget focus change
     void trussWindowLostFocus ( TrussUnitWindow& );
     void trussWindowReceivedFocus ( TrussUnitWindow& );
 
 private:
+    // Current system workspace
+    FermaNextWorkspace& workspace;
     // Dock window on wich all projects are located
-    QDockWindow* projectsDockWindow;
+    Q3DockWindow* projectsDockWindow;
     // Undo/redo history widget
     QWidget* undoRedoHistoryWidget;
     // Undo/redo list box to control truss states
     UndoRedoListBox* undoRedoListBox;
     // Tool box of all workspace projects
     ProjectToolBox* projectToolBox;
-    // Current system workspace
-    FermaNextWorkspace* wsp;
     // Truss geometry window
-    TrussGeometryWindow* geometryWindow;
+    QWidget* geometryWindow;
+    // Tab widget for changing truss geometry
+    GeometryTabWidget* geometryTabWidget;
 
     // Some actions
     QAction* undoAction;
@@ -110,7 +112,7 @@ private:
     QAction* showGeometryWindowAction;
     
     // Plugins menu
-    QPopupMenu* pluginsMenu;
+    QMenu* pluginsMenu;
 };
 
-#endif //FERMANEXTFRAME_H
+#endif //FERMANEXTMAINWINDOW_H

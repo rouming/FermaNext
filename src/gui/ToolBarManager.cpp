@@ -1,21 +1,20 @@
 
 #include "ToolBarManager.h"
 
+#include <QPainter>
+#include <QStyle>
+#include <QLabel>
+
 #include <algorithm>
-#include <qtoolbar.h>
-#include <qpainter.h>
-#include <qstyle.h>
-#include <qlabel.h>
 
 /*****************************************************************************
  * Text Tool Button
  *****************************************************************************/
 
-TextToolButton::TextToolButton ( const QIconSet & i, const QString & l, 
-                                 const QString & gt, QObject* r, 
-                                 const char* slot, QToolBar* p, 
-                                 const char * n ) :
-    QToolButton( i, l, gt, r, slot, p, n )
+TextToolButton::TextToolButton ( const QIcon& i, const QString& l, 
+                                 const QString& gt, QObject* r, 
+                                 const char* slot, Q3ToolBar* p ) :
+    QToolButton( i, l, gt, r, slot, p )
 {}
 
 QSize TextToolButton::sizeHint() const
@@ -25,7 +24,7 @@ QSize TextToolButton::sizeHint() const
 
     QString s( textLabel() );
     QFontMetrics fm = fontMetrics();
-    QSize sz = fm.size( ShowPrefix, s );
+    QSize sz = fm.size( Qt::ShowPrefix, s );
     w = sz.width() + 5;
     h = sz.height() + sz.height()/8 + 10;
     w += h;	
@@ -59,16 +58,16 @@ void TextToolButton::drawButtonLabel( QPainter *p )
     int w2 = pm.width() + 8;
         
     p->setFont( font() );
-    QStyle::SFlags flags = QStyle::Style_Default;
-    QColor btext = colorGroup().buttonText();
+    QStyle::State flags = QStyle::State_None;
+    // FIXME QT3TO4
+    //QColor btext = colorGroup().buttonText();
 
     QRect pr( x, y, w2, h );
     QRect tr( x+pm.width() - 9, y, w, h);
     
-    style().drawItem( p, pr, AlignCenter|ShowPrefix, colorGroup(), 
-                      TRUE, &pm, QString::null );
-    style().drawItem( p, tr, AlignCenter|ShowPrefix, colorGroup(), flags, 0, 
-                      textLabel(), textLabel().length(), &btext );
+    style()->drawItemPixmap( p, pr, Qt::AlignCenter| Qt::ShowPrefix, pm );
+    style()->drawItemText( p, tr, Qt::AlignCenter | Qt::ShowPrefix, 
+                           palette(), true, textLabel() );
 }
 
 /*****************************************************************************
@@ -198,8 +197,8 @@ QWidget& TabbedWidget::getWidget ()
  * Tool Bar Manager
  *****************************************************************************/
 
-ToolBarManager::ToolBarManager ( QMainWindow* parent, const char* name ) :
-    QToolBar(parent, name),
+ToolBarManager::ToolBarManager ( Q3MainWindow* parent, const char* name ) :
+    Q3ToolBar(parent, name),
     blankLabel(0)
 {}
 

@@ -2,7 +2,7 @@
 #ifndef TRUSSMATERIAL_H
 #define TRUSSMATERIAL_H
 
-#include <qstring.h>
+#include <QString>
 
 class TrussMaterial 
 {

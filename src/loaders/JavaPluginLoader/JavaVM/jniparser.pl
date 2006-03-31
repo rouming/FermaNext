@@ -165,10 +165,12 @@ if ( $ARGV[1] eq 'header' ) {
 #ifndef JAVAVIRTUALMACHINE_H
 #define JAVAVIRTUALMACHINE_H
 
+#include <stdio.h>
+#include <stdarg.h>
+#include <QStringList>
+
 #include "JNITypes.h"
 #include "DynaLoader.h"
-
-#include <qstringlist.h>
 
 class JavaVirtualMachine
 {
@@ -335,7 +337,8 @@ void JavaVirtualMachine::createJavaVM ( JavaVMVersion version,
         QString optStr = *optIt;
         // Safe copy
         options[indx].optionString =
-            qstrcpy( new char[optStr.length() + 1], optStr.ascii() );
+            qstrcpy( new char[optStr.length() + 1],
+                     optStr.toAscii().data() );
         options[indx].extraInfo = 0;
     }
 

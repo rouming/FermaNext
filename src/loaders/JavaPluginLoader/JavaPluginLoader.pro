@@ -1,11 +1,14 @@
 
 TARGET = JavaPluginLoader.ldr
+
+LEVEL = ../../..
+include(../../../FermaNext.pri)
+
 DESTDIR = ../../../plugins/loaders/
+QT += core gui
 
 TEMPLATE = lib
-CONFIG += plugin warn_on thread debug
-
-OBJECTS_DIR = obj
+CONFIG += plugin warn_on thread
 
 DEFINES += QT_THREAD_SUPPORT
 
@@ -16,11 +19,11 @@ INCLUDEPATH = ../../common \
 
 
 win32 {
-  LIBS = -L../../../build common.lib
+  LIBS = common.lib
   INCLUDEPATH += $$(JAVA_HOME)/include/win32
 }
 unix {
-  LIBS = -L../../../build -lcommon
+  LIBS = -lcommon
   INCLUDEPATH += $$(JAVA_HOME)/include/linux
 }
 

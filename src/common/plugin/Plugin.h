@@ -3,9 +3,9 @@
 #define PLUGIN_H
 
 #include <vector>
-#include <qmap.h>
-#include <qstringlist.h>
-#include <qobject.h>
+#include <QMap>
+#include <QStringList>
+#include <QObject>
 
 class Plugin;
 class PluginManager;

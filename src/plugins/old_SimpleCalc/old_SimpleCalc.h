@@ -2,9 +2,10 @@
 #ifndef OLD_SIMPLECALC_H
 #define OLD_SIMPLECALC_H
 
+#include <QString>
+
 #include "NativePlugin.h"
 #include "CalculationInterface.h"
-#include <qstring.h>
 
 const QString fermaResExt = ".vyv";
 

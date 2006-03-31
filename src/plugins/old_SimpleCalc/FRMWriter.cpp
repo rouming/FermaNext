@@ -1,7 +1,9 @@
 
-#include "FRMWriter.h"
+#include <QFile>
+#include <QTextStream>
+#include <QTextCodec>
 
-#include <qfile.h>
+#include "FRMWriter.h"
 
 /*****************************************************************************
  * FRM Writer
@@ -14,12 +16,12 @@ FRMWriter::FRMWriter ( const TrussTopology& truss_ ) :
 void FRMWriter::write ( const QString& name )
 {
     QFile file( name );    
-    if ( ! file.open( IO_WriteOnly ) ) {
+    if ( ! file.open(QIODevice::WriteOnly) ) {
         return;
     } 
 
     QTextStream out( &file );
-    out.setEncoding( QTextStream::Latin1 );
+    out.setCodec( QTextCodec::codecForName("ISO 8859-1") );
 
     TrussTopology::NodeList nodes = truss.getNodeList();
     TrussTopology::PivotList pivots = truss.getPivotList();

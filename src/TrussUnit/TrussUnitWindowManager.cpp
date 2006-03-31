@@ -2,7 +2,7 @@
 #include "TrussUnitWindowManager.h"
 #include "StatefulObject.h"
 
-#include <qregexp.h>
+#include <QRegExp>
 
 // Indeces of povot nodes
 struct PivotNodes
@@ -64,7 +64,7 @@ void TrussUnitWindowManager::suspendedClean ()
     for ( ; iter != trussWindows.end(); ) {
         TrussUnitWindow* truss = *iter;
         if ( !truss->isAlive() && truss->countEnabledStates() == 0 ) {
-            removeTrussUnitWindow(iter);
+            iter = removeTrussUnitWindow(iter);
         }
         else
             ++iter;
@@ -118,12 +118,12 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindowFromFile (
                                      WrongFormatException)
 {
     QFile file( fileName );
-    if ( !file.open( IO_ReadOnly ) )
+    if ( !file.open(QIODevice::ReadOnly) )
 	    throw ReadFileException();
 
     QRegExp re("([^/\\\\]*)((\\" + oldFormatExtension() + ")|"
                            "(\\" + newFormatExtension() + "))$");
-    re.search(fileName);
+    re.indexIn(fileName);
     QString trussName = re.cap(1);
     if ( trussName.isEmpty() )        
         throw ReadFileException();
@@ -161,23 +161,26 @@ bool TrussUnitWindowManager::removeTrussUnitWindow (
 
     // Desist first
     (*iter)->desist();
-    return removeTrussUnitWindow( iter );
-}
-
-bool TrussUnitWindowManager::removeTrussUnitWindow ( WindowListIter& iter )
-{
+    iter = removeTrussUnitWindow( iter );
     if ( iter == trussWindows.end() )
         return false;
+    return true;
+}
+
+WindowListIter TrussUnitWindowManager::removeTrussUnitWindow ( WindowListIter iter )
+{
+    if ( iter == trussWindows.end() )
+        return trussWindows.end();
     TrussUnitWindow* w = *iter;
     if ( w->isAlive() )
-        return false;
+        return trussWindows.end();
     emit onTrussUnitWindowRemove( *w );
-    trussWindows.erase(iter);
+    iter = trussWindows.erase(iter);
     ObjectStateManager* stateMng = stateManagerMap[w];
-    stateManagerMap.erase(w);
+    stateManagerMap.remove(w);
     delete w;
     delete stateMng;
-    return true;
+    return iter;
 }
 
 WindowList TrussUnitWindowManager::getTrussUnitWindowList ()
@@ -319,16 +322,16 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
    
     file.readLine( line, 256 );
     dimensionStr = line;
-    if ( dimensionStr.contains("μμ", 0) )
+    if ( dimensionStr.contains("μμ", Qt::CaseInsensitive) )
         dim.setLengthMeasure( TrussDimension::mm );
-    else if ( dimensionStr.contains("ρμ", 0) )
+    else if ( dimensionStr.contains("ρμ", Qt::CaseInsensitive) )
         dim.setLengthMeasure( TrussDimension::sm );
     else
         dim.setLengthMeasure( TrussDimension::m );        
 
     file.readLine( line, 256 );
     dimensionStr = line;
-    if ( dimensionStr.contains("Ν", 0) )
+    if ( dimensionStr.contains("Ν", Qt::CaseInsensitive) )
         dim.setForceMeasure( TrussDimension::newton );
     else
         dim.setForceMeasure( TrussDimension::kg );

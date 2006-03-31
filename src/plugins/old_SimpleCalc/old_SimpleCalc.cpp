@@ -1,12 +1,13 @@
 
+#include <QFile>
+#include <QRegExp>
+
 #include "old_SimpleCalc.h"
 #include "NativePluginFrontEnd.h"
 #include "Truss.h"
 #include "TrussCalcData.h"
 #include "FRMWriter.h"
 #include "VYVReader.h"
-#include <qfile.h>
-#include <qregexp.h>
 
 #if defined _WIN32 || defined WIN32  
   #include "win_SimpleCalc.h"

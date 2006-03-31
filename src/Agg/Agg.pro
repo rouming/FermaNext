@@ -1,12 +1,12 @@
 
 TARGET = Agg
-DESTDIR = ../../build
+
+LEVEL = ../..
+include(../../FermaNext.pri)
 
 TEMPLATE = lib
-CONFIG += staticlib warn_on thread debug
-
-MOC_DIR = mocs
-OBJECTS_DIR = obj
+CONFIG += staticlib warn_on thread
+QT += core gui
 
 win32 {
   DEFINES += WIN32
