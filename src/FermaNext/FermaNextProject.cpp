@@ -31,18 +31,22 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
     designerWidget( new TrussUnitDesignerWidget ),
     trussWindowManager( new TrussUnitWindowManager )
 {
+    // Should be hidden while creating other widgets
+    // Only for aesthetic purposes 
+    projectTab->setVisible(false);
+    designerWidget->setVisible(false);
+
     /*
       // FIXME QT3TO4:
     projectMainWidget->setRightJustification( true );
     projectMainWidget->setDockEnabled( DockLeft, false );
     projectMainWidget->setDockEnabled( DockRight, false );
     */
-
-    stackedWidget->addWidget(projectTab);
-  
+    
     projectTab->setTabPosition( QTabWidget::South );
     projectTab->addTab( designerWidget, tr("Designer") );
     projectTab->addTab( justStrengthAnalisysWidget, tr("Strength Analysis") );
+    stackedWidget->addWidget(projectTab);
       
     // Catch trusses creation or deletion.
     connect( trussWindowManager, 

@@ -63,10 +63,7 @@ void FermaNextMainWindow::init ()
     setMinimumSize( 640, 480 );
     statusBar()->addWidget(new QLabel( tr("Ready"), statusBar() ));
 
-    undoRedoHistoryWidget = new QWidget( this, "undo_redo_history",
-                                         // FIXME QT3TO4
-                                         // WStyle_Tool | WType_TopLevel 
-                                         Qt::Window | Qt::Tool );
+    undoRedoHistoryWidget = new QWidget( this, Qt::Window | Qt::Tool );
 
     int undoRedoWidth = 140, undoRedoHeight = 110;
     undoRedoHistoryWidget->setFixedSize( undoRedoWidth, undoRedoHeight );

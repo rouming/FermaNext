@@ -1,18 +1,19 @@
 
-#include "TrussUnitDesignerWidget.h"
-#include "SubsidiaryConstants.h"
-#include "TrussUnitActions.h"
-#include "AggPopupHint.h"
-
 #include <algorithm>
 #include <vector>
 #include <string>
 #include <math.h>
+
 #include <QSize>
 #include <QWidget>
 #include <QCursor>
 #include <QPoint>
 #include <QApplication>
+
+#include "TrussUnitDesignerWidget.h"
+#include "SubsidiaryConstants.h"
+#include "TrussUnitActions.h"
+#include "AggPopupHint.h"
 
 /*****************************************************************************
  * Fixation Popup Menu
@@ -20,8 +21,6 @@
 
 FixationPopupMenu::FixationPopupMenu ( QWidget* parent ) :
     QMenu( parent ),
-    releaseEvent( QEvent::MouseButtonRelease, QPoint(0,0), Qt::NoButton, 
-                  Qt::NoButton, Qt::NoModifier ),
     node(0)
 {
     addAction( "Fixation by X", this, SLOT(fixNodeByX()) );
@@ -29,26 +28,12 @@ FixationPopupMenu::FixationPopupMenu ( QWidget* parent ) :
     addAction("Fixation by XY", this, SLOT(fixNodeByXY()) );
     addSeparator();
     addAction( "Unfixed", this, SLOT(unfixNode()) );
-
-    // FIXME: Signal doesn't exist!
-    //QObject::connect( this, SIGNAL(aboutToHide()), SLOT(popupHide()) );
 }
 
 void FixationPopupMenu::showFixationPopup ( QMouseEvent* e, TrussNode* n)
 {
     node = n;
-    releaseEvent = QMouseEvent( QEvent::MouseButtonRelease,  e->pos(), 
-                                e->globalPos(), e->button(), e->buttons(),
-                                e->modifiers() );
     popup( e->globalPos() );
-}
-
-void FixationPopupMenu::popupHide ()
-{
-    // Deligate stolen releaseEvent to parent
-    if ( parent() ) {
-        QApplication::sendEvent( parent(), &releaseEvent );
-    }
 }
 
 void FixationPopupMenu::fixNodeByX ()
@@ -85,8 +70,6 @@ void FixationPopupMenu::unfixNode ()
 
 LoadPopupMenu::LoadPopupMenu ( QWidget* parent ) :
     QMenu( parent ),
-    releaseEvent( QEvent::MouseButtonRelease, QPoint(0,0), Qt::NoButton, 
-                  Qt::NoButton, Qt::NoModifier ),
     node(0),
     selectedWindow(0),
     // Init X layout and box
@@ -110,32 +93,35 @@ LoadPopupMenu::LoadPopupMenu ( QWidget* parent ) :
     loadXLine( new QLineEdit(xBox) ),
     loadYLine( new QLineEdit(yBox) )
 {
-    // Init X layout and box
-    xLayout->addSpacing(4);
+    // Init X layout and box    
     xLayout->addWidget(loadXLabel);
     xLayout->addWidget(loadXLine);
+    xLayout->setMargin(0);
+    xLayout->setSpacing(0);
     xBox->setLayout(xLayout);
-    // Init Y layout and box
-    yLayout->addSpacing(4);
+    // Init Y layout and box    
     yLayout->addWidget(loadYLabel);
     yLayout->addWidget(loadYLine);
+    yLayout->setMargin(0);
+    yLayout->setSpacing(0);
     yBox->setLayout(yLayout);
-    // Init Button layout and box
-    buttonLayout->setSpacing(4);
+    // Init Button layout and box    
     buttonLayout->addWidget(ok);
     buttonLayout->addWidget(cancel);
+    buttonLayout->setMargin(0);
+    buttonLayout->setSpacing(0);
+    buttonBox->setLayout(buttonLayout);
     // Init Main layout
-    vLayout->addSpacing(4);
     vLayout->addWidget(xBox);
     vLayout->addWidget(yBox);
+    vLayout->setMargin(3);
+    vLayout->setSpacing(3);
     vLayout->addWidget(buttonBox);
     setLayout(vLayout);
 
     loadXLine->setValidator( new QDoubleValidator(loadXLine) );
     loadYLine->setValidator( new QDoubleValidator(loadYLine) );
 
-    // FIXME: Signal doesn't exist!
-    //QObject::connect( this, SIGNAL(aboutToHide()), SLOT(hideLoadPopup()) );
     QObject::connect( cancel, SIGNAL(clicked()), SLOT(close()) );
     QObject::connect( ok, SIGNAL(clicked()), SLOT(okClicked()) );
 }
@@ -160,9 +146,6 @@ void LoadPopupMenu::showLoadPopup ( QMouseEvent* e,
     }
     loadXLine->setText( QString::number(x) );
     loadYLine->setText( QString::number(y) );
-    releaseEvent = QMouseEvent( QEvent::MouseButtonRelease,  e->pos(), 
-                                e->globalPos(), e->button(), e->buttons(),
-                                e->modifiers() );
     
     popup( e->globalPos() );
 }
@@ -198,14 +181,6 @@ void LoadPopupMenu::okClicked()
         }
     }
     close();
-}
-
-void LoadPopupMenu::hideLoadPopup ()
-{
-    // Deligate stolen releaseEvent to parent
-    if ( parent() ) {
-        QApplication::sendEvent( parent(), &releaseEvent );
-    }
 }
 
 /*****************************************************************************

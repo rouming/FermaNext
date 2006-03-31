@@ -92,7 +92,8 @@ const agg::ctrl* AggCtrlContainer::mouseReleaseEvent ( double x, double y )
     return releasedCtrl;
 }
 
-const agg::ctrl* AggCtrlContainer::mouseMoveEvent ( double x, double y, bool buttonFlag )
+const agg::ctrl* AggCtrlContainer::mouseMoveEvent ( double x, double y, 
+                                                     bool buttonFlag )
 {
     CtrlList::iterator iter = ctrls.begin();
     for ( ; iter != ctrls.end(); ++iter )
@@ -101,7 +102,7 @@ const agg::ctrl* AggCtrlContainer::mouseMoveEvent ( double x, double y, bool but
     return 0;
 }
 
-const agg::ctrl* AggCtrlContainer::arrowKeysPressEvent ( bool left, bool right, 
+const agg::ctrl* AggCtrlContainer::arrowKeysPressEvent ( bool left, bool right,
                                                          bool down, bool up )
 {
     if ( current != 0 && 
@@ -118,29 +119,19 @@ const agg::ctrl* AggCtrlContainer::arrowKeysPressEvent ( bool left, bool right,
 AggQWidget::AggQWidget ( QWidget* parent,                         
                          bool flip_y ) :
     QWidget( parent ),
-    mainQImage( new QImage(QSize(360, 330), QImage::Format_RGB32) ),
+    mainQImage( QSize(360, 330), QImage::Format_RGB32 ),
     aggFlipY( flip_y )    
 {
-    //FIXME QT3TO4: setBackgroundMode( QWidget::NoBackground );
     setMinimumSize( QSize(100, 100) );
     resize( QSize(360, 330) );
-    initialWidth  = width();
-    initialHeight = height();
 }
 
 AggQWidget::~AggQWidget ()
-{
-    delete mainQImage;
-}
+{}
 
 agg::rendering_buffer& AggQWidget::getAggRenderingBuffer ()
 {
     return aggBuffer;
-}
-
-QImage& AggQWidget::getMainImage ()
-{
-    return *mainQImage;
 }
 
 void AggQWidget::print ()
@@ -166,17 +157,17 @@ void AggQWidget::paintEvent ( QPaintEvent* event )
 
 
     // This conversion was taken from the original agg_plarform_support.cpp
-    QImage tmpImg( mainQImage->width(), mainQImage->height(), QImage::Format_RGB32 );
+    QImage tmpImg( mainQImage.width(), mainQImage.height(), 
+                   QImage::Format_RGB32 );
 					
     agg::rendering_buffer rbufTmp;
     rbufTmp.attach( tmpImg.bits(), tmpImg.width(), tmpImg.height(), 
-                    aggFlipY ? tmpImg.bytesPerLine() : -tmpImg.bytesPerLine() );
+                    aggFlipY ? tmpImg.bytesPerLine() : 
+                                -tmpImg.bytesPerLine() );
     
         
     agg::color_conv(&rbufTmp, &aggBuffer, agg::color_conv_rgb24_to_rgba32());
 
-    //FIXME QT3TO4: 
-    //bitBlt( this, 0,0, &tmpImg );
     QPainter painter( this );
     painter.drawImage( QPoint(0,0), tmpImg );
     
@@ -189,12 +180,12 @@ void AggQWidget::resizeEvent ( QResizeEvent* event )
 
     // Resize the internal buffer and reattach the main 
     // AGG rendering_buffer to the QImage 
-    *mainQImage = mainQImage->scaled( newSize, Qt::KeepAspectRatio );
+    mainQImage = mainQImage.scaled( newSize, Qt::IgnoreAspectRatio );
 
-    aggBuffer.attach( mainQImage->bits(), mainQImage->width(), 
-                      mainQImage->height(), 
-                      aggFlipY ?  mainQImage->bytesPerLine() : 
-                                 -mainQImage->bytesPerLine() );
+    aggBuffer.attach( mainQImage.bits(), mainQImage.width(), 
+                      mainQImage.height(), 
+                      aggFlipY ?  mainQImage.bytesPerLine() : 
+                                 -mainQImage.bytesPerLine() );
 
     // Notice other agg paintable elements 
     aggResizeEvent( event ); 
@@ -216,7 +207,8 @@ void AggQWidget::keyPressEvent ( QKeyEvent* ke )
         default:    break;
     }
 				
-    const agg::ctrl* ctrl = ctrlContainer.arrowKeysPressEvent( left, right, down, up );
+    const agg::ctrl* ctrl = 
+        ctrlContainer.arrowKeysPressEvent( left, right, down, up );
     if( ctrl != 0 )
     {
         aggCtrlChangedEvent( ctrl );
@@ -247,8 +239,9 @@ void AggQWidget::mouseMoveEvent ( QMouseEvent* me )
     int curY = aggFlipY ? height() - me->pos().y() : me->pos().y();
 		
 
-    const agg::ctrl* ctrl = ctrlContainer.mouseMoveEvent( curX, curY,
-                                                          (flags & agg::mouse_left) != 0 );
+    const agg::ctrl* ctrl = 
+        ctrlContainer.mouseMoveEvent( curX, curY, 
+                                      (flags & agg::mouse_left) != 0 );
     if ( ctrl != 0 )
     {
         aggCtrlChangedEvent( ctrl );
@@ -262,9 +255,8 @@ void AggQWidget::mouseMoveEvent ( QMouseEvent* me )
         if ( ctrl == 0 )
         {            
             QPoint  newPos( curX, curY );
-            //FIXME QT3TO4:
-            QMouseEvent newEvent( me->type(), newPos, me->button(), me->buttons(),
-                                  me->modifiers() );
+            QMouseEvent newEvent( me->type(), newPos, me->button(), 
+                                  me->buttons(), me->modifiers() );
             aggMouseMoveEvent( &newEvent );
         }
     } 
@@ -295,9 +287,8 @@ void AggQWidget::mouseReleaseEvent ( QMouseEvent* me )
     if ( flags & (agg::mouse_left | agg::mouse_right) )
     {
         QPoint  newPos( curX, curY );
-        //FIXME QT3TO4:
-        QMouseEvent newEvent( me->type(), newPos, me->button(), me->buttons(),
-                              me->modifiers() );
+        QMouseEvent newEvent( me->type(), newPos, me->button(), 
+                              me->buttons(), me->modifiers() );
         aggMouseReleaseEvent( &newEvent );
     }
 }
@@ -338,9 +329,8 @@ void AggQWidget::mousePressEvent ( QMouseEvent* me )
             else
             {
                 QPoint  newPos( curX, curY );
-                //FIXME QT3TO4:
-                QMouseEvent newEvent( me->type(), newPos, me->button(), me->buttons(), 
-                                      me->modifiers() );
+                QMouseEvent newEvent( me->type(), newPos, me->button(), 
+                                      me->buttons(), me->modifiers() );
                 aggMousePressEvent( &newEvent );                
             }    
         }

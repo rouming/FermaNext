@@ -5,8 +5,8 @@
  * Undo Redo List Box
  *****************************************************************************/
 
-UndoRedoListBox::UndoRedoListBox ( QWidget* p, const char* n, Qt::WFlags f ) :
-    Q3ListBox( p, n, f ),
+UndoRedoListBox::UndoRedoListBox ( QWidget* p, Qt::WFlags f ) :
+    Q3ListBox( p, "UndoRedoListBox", f ),
     stateManager(0)
 {
     QObject::connect( this, SIGNAL(clicked(Q3ListBoxItem*)),

@@ -2,9 +2,6 @@
 #ifndef TRUSSUNITDESIGNERWIDGET_H
 #define TRUSSUNITDESIGNERWIDGET_H
 
-#include "AggQWidget.h"
-#include "TrussUnitWindowManager.h"
-#include "TrussUnitToolBar.h"
 #include <QMenu>
 #include <QLabel>
 #include <QLineEdit>
@@ -13,6 +10,10 @@
 #include <QVBoxLayout>
 #include <QValidator>
 #include <QMouseEvent>
+
+#include "AggQWidget.h"
+#include "TrussUnitWindowManager.h"
+#include "TrussUnitToolBar.h"
 
 class AggPopupHint;
 
@@ -26,15 +27,12 @@ public:
     void showFixationPopup ( QMouseEvent* pressEvent, TrussNode* );
 
 protected slots:
-    void popupHide ();
-
     void fixNodeByX ();
     void fixNodeByY ();
     void fixNodeByXY ();
     void unfixNode ();
 
 private:
-    QMouseEvent releaseEvent;
     TrussNode* node;
 };
 
@@ -49,11 +47,9 @@ public:
                          TrussUnitWindow* );
 
 protected slots:
-    void hideLoadPopup();
     void okClicked();
 
 private:
-    QMouseEvent releaseEvent;
     TrussNode* node;
     TrussUnitWindow* selectedWindow;
     // x box and layout

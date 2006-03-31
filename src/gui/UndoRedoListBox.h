@@ -11,9 +11,7 @@ class UndoRedoListBox : public Q3ListBox
 {
     Q_OBJECT
 public:
-    UndoRedoListBox ( QWidget* parent = 0, 
-                      const char* name = 0, 
-                      Qt::WFlags f = 0 );
+    UndoRedoListBox ( QWidget* parent = 0, Qt::WFlags f = 0 );
     virtual ~UndoRedoListBox ();
 
     virtual ObjectStateManager* getStateManager () const;
