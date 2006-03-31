@@ -4,7 +4,7 @@
 
 #include "PluginLoader.h"
 
-class JavaVirtualMachine;
+#include "JavaVM/JavaVirtualMachine.h"
 
 class JavaPluginLoader : public PluginLoader
 {
@@ -57,8 +57,26 @@ protected:
      * @see PluginLoader::specificUnloadPlugins
      */
     virtual void specificUnloadPlugins ();
+
 private:
+    /** Hidden copy constructor. */
+    JavaPluginLoader ( const JavaPluginLoader& );
+    /** Hidden copy operator. */
+    JavaPluginLoader& operator= ( const JavaPluginLoader& );
+
+    /** 
+     * Tries to find 'fermanext.jar' and to 
+     * create an object of main 'FermaNext' class.
+     */
+    void findMainAppJavaPackage ();
+
+private:
+    /** JVM */
     JavaVirtualMachine* javaVM;
+    /** Loaded java 'FermaNext' class */
+    JClass fnClass;
+    /** Instance of java 'FermaNext' class */
+    JObject fnObject;
 };
 
 #endif //JAVAPLUGINLOADER_H

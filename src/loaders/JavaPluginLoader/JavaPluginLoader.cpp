@@ -9,8 +9,6 @@
 #include "PluginManager.h"
 #include "Plugin.h"
 
-#include "JavaVM/JavaVirtualMachine.h"
-
 /*****************************************************************************
  * Plugin Loader hook
  *****************************************************************************/
@@ -21,7 +19,9 @@ FERMA_NEXT_PLUGIN_LOADER(JavaPluginLoader, PluginManager::NormalPriority)
 
 JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
     PluginLoader( plgMng ),
-    javaVM(0)
+    javaVM(0),
+    fnClass(0),
+    fnObject(0)
 {
     const char* envJavaHome = getenv("JAVA_HOME");
     QString jvmLibPath;
@@ -98,10 +98,9 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
                               );        
     }
 
-
-    // Try to find main 'FermaNext' class
-    JClass fnCls = javaVM->findClass("fermanext/FermaNext");
-    if ( fnCls == 0 ) {
+    // Try to load main 'FermaNext' java class
+    fnClass = javaVM->findClass("fermanext/system/FermaNext");
+    if ( fnClass == 0 ) {
         // Clears pending exception
         javaVM->exceptionClear();
 
@@ -115,24 +114,47 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
         javaVM = 0;
         return;
     }
-    
-    JMethodID disposeAllFrames = 
-        javaVM->getStaticMethodID( fnCls, "disposeAllFrames", "()V" );
-    if ( disposeAllFrames == 0 ) {
+
+    JMethodID fnInstance =
+        javaVM->getStaticMethodID( fnClass, "instance", 
+                                   "()Lfermanext/system/FermaNext;" );
+
+    if ( fnInstance == 0 ) {
         // Clears pending exception
         javaVM->exceptionClear();
 
-        QMessageBox::warning(
-                       0, QObject::tr("Can't start JavaPluginLoader"), 
-                       QObject::tr("Method 'disposeAllFrames' doesn't "
-                                   "exist\nin subsidiary system class "
-                                   "'fermanext.FermaNext'")
+        QMessageBox::warning( 0, QObject::tr("Can't start JavaPluginLoader"), 
+                              QObject::tr("Method 'instance' doesn't "
+                                          "exist\nin system class "
+                                          "'fermanext.system.FermaNext'")
                               );
+        fnClass = 0;
         delete javaVM;
         javaVM = 0;
         return;
     }
     
+    fnObject = javaVM->callStaticObjectMethod( fnClass, fnInstance );
+    if ( fnObject == 0 ) {
+        // Clears pending exception
+        javaVM->exceptionClear();
+
+        QMessageBox::warning( 0, QObject::tr("Can't start JavaPluginLoader"), 
+                              QObject::tr("Error has occured while calling\n"
+                                          "'instance' method of 'fermanext."
+                                          "system.FermaNext'")
+                              );
+
+        fnClass = 0;
+        delete javaVM;
+        javaVM = 0;
+        return;
+    }
+
+//===========================================================================
+// Remove in the future! Only for debug purposes!
+//===========================================================================
+
     JClass trussUnitCls = javaVM->findClass("fermanext/trussunit/TrussUnit");
     if ( trussUnitCls == 0 ) {
         // Clears pending exception
@@ -182,37 +204,43 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
 
 JavaPluginLoader::~JavaPluginLoader ()
 {
-    if ( javaVM ) {
-        // Dispose all frames for cleanly exit
-        JClass fnCls = javaVM->findClass("fermanext/FermaNext");
-        if ( fnCls ) {
-            JMethodID disposeAllFrames = 
-                javaVM->getStaticMethodID( fnCls, "disposeAllFrames", "()V" );
+    // Calls unload method of base class
+    unloadPlugins();
 
-            if ( disposeAllFrames )
-                javaVM->callStaticVoidMethod( fnCls, disposeAllFrames );
-            else {
-                // Clears pending exception
-                javaVM->exceptionClear();
-            }
-        }
+    // Try to unload JVM
+    if ( javaVM ) {
+        Q_ASSERT(fnClass);
+        Q_ASSERT(fnObject);
+
+        // Find dispose method for cleanly exit
+        JMethodID disposeAllFrames = 
+            javaVM->getMethodID( fnClass, "disposeAllFrames", "()V" );
+
+        if ( disposeAllFrames )
+            javaVM->callVoidMethod( fnObject, disposeAllFrames );
         else {
             // Clears pending exception
             javaVM->exceptionClear();
+            qWarning( "Can't find 'disposeAllFrames' while destructing!\n"
+                      "Seems 'fermanext.system.FermaNext' is not a correct"
+                      "class" );
         }
-        
         delete javaVM;
     }
+}
+
+void JavaPluginLoader::findMainAppJavaPackage ()
+{
 }
 
 const QString& JavaPluginLoader::pluginExtension () const
 { static QString javaExt("jar"); return javaExt; }
 
 JavaPluginLoader::Status JavaPluginLoader::pluginLoaderStatusCode () const
-{ return OkStatus; }
+{ return javaVM ? OkStatus : InternalErrStatus; }
 
 QString JavaPluginLoader::pluginLoaderStatusMsg () const
-{ return QString(); }
+{ return javaVM ? QString() : "Can't load JVM!";  }
 
 Plugin& JavaPluginLoader::specificLoadPlugin ( const QString& )
     throw (PluginLoadException)

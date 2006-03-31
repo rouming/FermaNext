@@ -525,17 +525,19 @@ bool TrussUnitWindow::inBDiagResizeRect ( int x, int y )
     if ( maximized )
         return false;
 
-    if ( sqrt( (x - (windowRightBottomPos.x() - bordWidth)) * 
-        (x - (windowRightBottomPos.x() - bordWidth)) +
-        (y - (windowLeftTopPos.y() + bordWidth)) * 
-        (y - (windowLeftTopPos.y() + bordWidth)) ) <= resEllRad )
+    if ( sqrt( double((x - (windowRightBottomPos.x() - bordWidth)) * 
+                      (x - (windowRightBottomPos.x() - bordWidth)) +
+                      (y - (windowLeftTopPos.y() + bordWidth)) * 
+                      (y - (windowLeftTopPos.y() + bordWidth)) )) 
+         <= resEllRad )
     {
         return true;
     }
-    else if ( sqrt( (x - (windowLeftTopPos.x() + bordWidth)) * 
-            (x - (windowLeftTopPos.x() + bordWidth)) + 
-            (y - (windowRightBottomPos.y() - bordWidth)) * 
-            (y - (windowRightBottomPos.y() - bordWidth)) ) <= resEllRad )
+    else if ( sqrt( double((x - (windowLeftTopPos.x() + bordWidth)) * 
+                           (x - (windowLeftTopPos.x() + bordWidth)) + 
+                           (y - (windowRightBottomPos.y() - bordWidth)) * 
+                           (y - (windowRightBottomPos.y() - bordWidth))) ) 
+              <= resEllRad )
     {
         return true;
     }
@@ -547,17 +549,19 @@ bool TrussUnitWindow::inFDiagResizeRect ( int x, int y )
     if ( maximized )
         return false;
 
-    if ( sqrt( (x - (windowLeftTopPos.x() + bordWidth)) * 
-        (x - (windowLeftTopPos.x() + bordWidth)) +
-        (y - (windowLeftTopPos.y() + bordWidth)) * 
-        (y - (windowLeftTopPos.y() + bordWidth)) ) <= resEllRad )
+    if ( sqrt( double((x - (windowLeftTopPos.x() + bordWidth)) * 
+                      (x - (windowLeftTopPos.x() + bordWidth)) +
+                      (y - (windowLeftTopPos.y() + bordWidth)) * 
+                      (y - (windowLeftTopPos.y() + bordWidth))) ) 
+         <= resEllRad )
     {
         return true;
     }
-    else if ( sqrt( (x - (windowRightBottomPos.x() - bordWidth)) * 
-            (x - (windowRightBottomPos.x() - bordWidth)) +
-            (y - (windowRightBottomPos.y() - bordWidth)) * 
-            (y - (windowRightBottomPos.y() - bordWidth)) ) <= resEllRad )
+    else if ( sqrt( double((x - (windowRightBottomPos.x() - bordWidth)) * 
+                           (x - (windowRightBottomPos.x() - bordWidth)) +
+                           (y - (windowRightBottomPos.y() - bordWidth)) * 
+                           (y - (windowRightBottomPos.y() - bordWidth))) ) 
+              <= resEllRad )
     {
         return true;
     }
