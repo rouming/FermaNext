@@ -575,8 +575,10 @@ size_t ObjectStateManager::countStatesToUndo () const
         return 0;    
 
     size_t statesNum = 0;
-    while ( iter-- != stateBlocks.begin() )
+    while ( iter != stateBlocks.begin() ) {
+        --iter;
         statesNum += (*iter)->countStates();
+    }
     // We should count states of first state block
     statesNum += stateBlocks.front()->countStates();
     return statesNum;

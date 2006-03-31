@@ -64,7 +64,7 @@ void TrussUnitWindowManager::suspendedClean ()
     for ( ; iter != trussWindows.end(); ) {
         TrussUnitWindow* truss = *iter;
         if ( !truss->isAlive() && truss->countEnabledStates() == 0 ) {
-            removeTrussUnitWindow(iter);
+            iter = removeTrussUnitWindow(iter);
         }
         else
             ++iter;
@@ -161,23 +161,26 @@ bool TrussUnitWindowManager::removeTrussUnitWindow (
 
     // Desist first
     (*iter)->desist();
-    return removeTrussUnitWindow( iter );
-}
-
-bool TrussUnitWindowManager::removeTrussUnitWindow ( WindowListIter& iter )
-{
+    iter = removeTrussUnitWindow( iter );
     if ( iter == trussWindows.end() )
         return false;
+    return true;
+}
+
+WindowListIter TrussUnitWindowManager::removeTrussUnitWindow ( WindowListIter iter )
+{
+    if ( iter == trussWindows.end() )
+        return trussWindows.end();
     TrussUnitWindow* w = *iter;
     if ( w->isAlive() )
-        return false;
+        return trussWindows.end();
     emit onTrussUnitWindowRemove( *w );
-    trussWindows.erase(iter);
+    iter = trussWindows.erase(iter);
     ObjectStateManager* stateMng = stateManagerMap[w];
     stateManagerMap.remove(w);
     delete w;
     delete stateMng;
-    return true;
+    return iter;
 }
 
 WindowList TrussUnitWindowManager::getTrussUnitWindowList ()

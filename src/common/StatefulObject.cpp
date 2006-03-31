@@ -28,7 +28,7 @@ void StatefulObject::removeDisabledStates ()
         ObjectState* state = *iter;
         if ( state->isDisabled() ) {
             delete state;
-            states.erase(iter);
+            iter = states.erase(iter);
         }
         else 
             ++iter;

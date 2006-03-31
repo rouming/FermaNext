@@ -43,7 +43,9 @@ public:
 protected:
     virtual void clearTrussUnitWindows ();
     virtual void suspendedClean ();
-    virtual bool removeTrussUnitWindow ( WindowListIter& );
+
+    // Returns iter after erase
+    virtual WindowListIter removeTrussUnitWindow ( WindowListIter );
 
     virtual void loadOldVersion ( TrussUnit&, QFile& ) 
         throw (WrongFormatException);

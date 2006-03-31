@@ -147,15 +147,15 @@ void AggToolBar::removeButton ( const QString& label )
 
     int delWidth;
     ButtonListIter iter = buttons.begin();
-    for ( ; iter != buttons.end(); ++iter )
-    {
+    while ( iter != buttons.end() ) {
         AggToolBarButton* button = *iter;
-        if ( button->getLabel() == label )
-        {
+        if ( button->getLabel() == label ) {
             delWidth = button->getWidth();            
-            buttons.erase( iter );
+            iter = buttons.erase( iter );
             delete button;
         }
+        else
+            ++iter;
     }
     toolBarHeight = findMaxButtonHeight ();
     toolBarWidth = toolBarWidth - delWidth - separation;
