@@ -9,8 +9,8 @@
 #ifndef UUIDGEN_H
 #define UUIDGEN_H
 
-#include <qstring.h>
-#include <qregexp.h>
+#include <QString>
+#include <QRegExp>
 
 class UUIDGen
 {

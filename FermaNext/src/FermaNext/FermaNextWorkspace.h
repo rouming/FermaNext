@@ -3,15 +3,18 @@
 #define FERMANEXTWORKSPACE_H
 
 #include <vector>
-#include <qobject.h>
-#include <qstring.h>
-#include <qmutex.h> 
+
+#include <QObject>
+#include <QString>
+#include <QMutex>
+
 #include "XMLSerializableObject.h"
 #include "FermaNextProject.h"
 #include "FermaNextConfig.h"
+#include "FermaNextMainWindow.h"
 #include "PluginManager.h"
 
-class QWidgetStack;
+class QStackedWidget;
 class FermaNextMainFrame;
 
 class FermaNextWorkspace : public QObject, public XMLSerializableObject
@@ -23,7 +26,6 @@ public:
 
 public:
     // Exceptions
-    class WorkspaceIsNotInitedCorrectly {};
     class IOException {};
     class WrongXMLDocException {};
     class FileNameIsNotDefinedException {};
@@ -54,13 +56,15 @@ public:
     virtual bool isFileNameDefined () const;
     
     virtual void reset ();
-    virtual void createWidgetStack ( QMainWindow& );
 
-    virtual FermaNextProject& createProject ( const QString& name ) 
-                                    throw (WorkspaceIsNotInitedCorrectly);
+    /**
+     * Clean, shutdown everything and exit.
+     */
+    virtual void quitFermaNextApplication ();
+
+    virtual FermaNextProject& createProject ( const QString& name );
     virtual FermaNextProject& createProjectFromFile ( const QString& ) 
-                                    throw (WorkspaceIsNotInitedCorrectly,
-                                           LoadException);
+                                    throw (LoadException);
 
     virtual bool removeProject ( FermaNextProject& );
     virtual bool removeProject ( const QString& name );
@@ -77,6 +81,7 @@ public:
 
     virtual FermaNextConfig& config ();
     virtual PluginManager& pluginManager ();
+    virtual FermaNextMainWindow& mainWindow ();
 
 public slots:
     virtual void clearProjects ();
@@ -120,9 +125,11 @@ private:
 
     QString name;    
     QString workspaceFileName;
-    QWidgetStack* widgetStack;    
     ProjectList projects;
+    PluginManager pluginMng;
     FermaNextConfig fermaConfig;
+    FermaNextMainWindow* fermaMainWindow;
+    QStackedWidget* stackedWidget;
 };
 
 #endif //FERMANEXTWORKSPACE_H

@@ -1,15 +1,18 @@
 
-#ifndef TRUSSGEOMETRYWINDOW_H
-#define TRUSSGEOMETRYWINDOW_H
+#ifndef GEOMETRYTABWIDGET_H
+#define GEOMETRYTABWIDGET_H
+
+#include <QAbstractButton>
+#include <QItemDelegate>
+#include <QSpinBox>
+#include <QTabWidget>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QValidator>
 
 #include "TrussUnitWindow.h"
 
-#include <qbutton.h>
-#include <qspinbox.h>
-#include <qtable.h>
-#include <qtabwidget.h>
-#include <qvalidator.h>
-
+class QCheckBox;
 class QColorGroup;
 class QLabel;
 class QLineEdit;
@@ -21,78 +24,78 @@ class QSpacerItem;
 class RangeValidator : public QDoubleValidator
 {
 public:
-    RangeValidator ( QObject* parent, const char* name = 0 );
+    RangeValidator ( QObject* parent );
     RangeValidator ( double bottom, double top, int decimals, 
-                      QObject* parent, const char* name = 0 );
+                     QObject* parent );
     virtual QValidator::State validate ( QString& input, int& ) const;
 };
 
 /*****************************************************************************/
 
-class DoubleCheckBox : public QButton
+class NodeTableDelegate : public QItemDelegate
 {
     Q_OBJECT
 public:
-    DoubleCheckBox ( const QString& label1, const QString& label2,
-                     QWidget* parent = 0, const char* name = 0, WFlags f = 0 );
-    DoubleCheckBox ( QWidget * parent = 0, const char * name = 0, WFlags f = 0 );
-    virtual void init ();
-    virtual bool isFirstChecked () const;
-    virtual bool isSecondChecked () const;
-    virtual void setFirstLabel ( QString& label );
-    virtual void setSecondLabel ( QString& label );
+    NodeTableDelegate ( QObject* parent = 0 );
 
-protected:
-    virtual void mousePressEvent ( QMouseEvent* me );
+    QRect getCheckBoxDrawArea ( const QStyleOptionViewItem &option,
+                                bool forFirstCheckBox = true ) const;
 
-public slots:
-    void setFirstChecked ( bool check );
-    void setSecondChecked ( bool check );
+    void getCheckStates ( bool& checkState1, bool& checkState2, 
+                          const QModelIndex& index ) const;
 
-signals:
-    void onValueChange ();
+    Node::Fixation getFixationByCheckStates ( bool, bool ) const;
+
+    QWidget* createEditor ( QWidget *parent, const QStyleOptionViewItem&,
+                            const QModelIndex& ) const;
+
+    void paint ( QPainter* painter, const QStyleOptionViewItem& option,
+                 const QModelIndex& index ) const;
+
+    void setEditorData ( QWidget* editor, const QModelIndex& index ) const;
+
+    void setModelData ( QWidget* editor, QAbstractItemModel* model, 
+                        const QModelIndex& index ) const;
+
+    QSize sizeHint( const QStyleOptionViewItem &option,
+                    const QModelIndex &index ) const;
+
+    bool editorEvent ( QEvent* event, QAbstractItemModel* model,
+                       const QStyleOptionViewItem& option,
+                       const QModelIndex& index );
+
+    void updateEditorGeometry ( QWidget *editor,
+                                const QStyleOptionViewItem& option, 
+                                const QModelIndex& ) const;
 
 private:
-    QCheckBox *checkBox1, *checkBox2;
-    QString firstLabel, secondLabel;
-};
+    DoubleSize areaSize;
 
-/*****************************************************************************/
+signals:
+    void cellWasChanged ( int, int );
 
-class FixationItem : public QObject, public QTableItem
-{
-    Q_OBJECT
-public:
-    FixationItem ( QTable*, Node::Fixation );
-    FixationItem ( QTable* );
-    virtual void setFixation ( Node::Fixation );
-    virtual void setFixation ( bool, bool );
-    virtual Node::Fixation getFixation () const;
-
-protected:
-    virtual QWidget* createEditor () const;
-    virtual void setContentFromEditor( QWidget *widget );
-    virtual void paint ( QPainter* p, const QColorGroup& cg,
-				         const QRect& cr, bool selected );
 protected slots:
-    void setValueChanged ();
-
-signals:
-    void onTableFixValueChange ( int, int );
-
-private:
-    DoubleCheckBox* fixCheckBox;
-    Node::Fixation fixType;
-    bool xChecked, yChecked;
+    void updateTrussAreaSize ( const DoubleSize& );
 };
 
 /*****************************************************************************/
 
-class NodeTable : public QTable
+class FixationItem : public QTableWidgetItem
+{
+public:
+    FixationItem ( Node::Fixation, int type = Type );
+    FixationItem ( int type = Type );
+    virtual void setFixation ( Node::Fixation );
+    virtual Node::Fixation getFixation () const;
+};
+
+/*****************************************************************************/
+
+class NodeTable : public QTableWidget
 {
     Q_OBJECT
 public:
-    NodeTable ( QWidget* parent = 0, const char* name = 0 );
+    NodeTable ( QWidget* parent = 0 );
     virtual void setCoord ( int row, int col, double coord );
     virtual double getCoord ( int row, int col ) const;
     virtual int getFixedNodesNumber () const;
@@ -100,20 +103,11 @@ public:
     virtual FixationItem* getFixationItem ( int row ) const;
     virtual void addNode ( const Node& );
     virtual void updateMaximumHeight ();
-
-protected slots:
-    void updateTrussAreaSize ( const DoubleSize& );
-
-protected:
-    virtual QWidget* createEditor ( int row, int col, bool initFromCell ) const;
-
-private:
-    DoubleSize areaSize;
 };
 
-/*****************************************************************************/
+/*****************************************************************************
 
-class ComboItem : public QTableItem
+class ComboItem : public QTableWidgetItem
 {
 public:
     ComboItem( QTable* table, int currentNumb, int adjNumb );
@@ -130,9 +124,9 @@ private:
     int currentValue, adjNodeValue;
 };
 
-/*****************************************************************************/
+/*****************************************************************************
 
-class PivotTable : public QTable
+class PivotTable : public QTableWidget
 {
 public:
     PivotTable ( QWidget* parent = 0, const char* name = 0  );
@@ -153,13 +147,12 @@ private:
 
 /*****************************************************************************/
 
-class TrussGeometryWindow : public QTabWidget
+class GeometryTabWidget : public QTabWidget
 {
     Q_OBJECT
 public:
-    TrussGeometryWindow ( QWidget* parent = 0, const char* name = 0, 
-                          WFlags f = 0 );
-    virtual ~TrussGeometryWindow ();
+    GeometryTabWidget ( QWidget* parent = 0 );
+    virtual ~GeometryTabWidget ();
     virtual void changeFocusWindow ( TrussUnitWindow* focusWindow );
 
 protected:
@@ -168,10 +161,9 @@ protected:
     virtual void initPivotsTab ();
     virtual void initAreaTab ();
     virtual void fillNodeTable ();
-    virtual void fillPivotTable ();
+//    virtual void fillPivotTable ();
     virtual void saveNodeStateAfterMoving ( TrussNode& node,
                                             const DoublePoint& pos );
-    virtual void closeEvent( QCloseEvent* );
 
 protected slots:
     virtual void trussUnitWindowWasCreated ( TrussUnitWindow& );
@@ -182,7 +174,7 @@ protected slots:
     virtual void updateNodeTableCoords ();
     virtual void updateNodeTableFixation ();
     virtual void updateNodeState ( int, int );
-
+/*
     virtual void addPivotToTable ( const Node&, const Node& );
     virtual void removePivotFromTable ( const Node&, const Node& );
     virtual void updateNodesNumbers ( const Node& node );
@@ -191,14 +183,12 @@ protected slots:
     virtual void updatePivotTableLastNode ();
     virtual void updatePivotTableThickness ();
     virtual void updatePivotState ( int row, int col );
-
+*/
     virtual void changeTrussAreaSize ( const QString& );
-signals:
-    void onGeometryWindowClose();
 
 private:
     NodeTable *nodeTable;
-    PivotTable *pivotTable;
+//    PivotTable *pivotTable;
     QLabel *nodesNumbLabel, *fixedNodesLabel, *pivotsNumbLabel;
     TrussUnitWindow *focusWindow;
     QSpacerItem *nodesSpacer, *pivotsSpacer;
@@ -206,4 +196,4 @@ private:
     DoublePoint beforeMovingNodePos;
 };
 
-#endif //TRUSSGEOMETRYWINDOW_H
+#endif //GEOMETRYTABWIDGET_H

@@ -5,7 +5,7 @@
 #include "ObjectState.h"
 #include "ObjectStateManager.h"
 
-#include <qobject.h>
+#include <QObject>
 
 
 // Basic class in stateful hierarchy.

@@ -2,11 +2,11 @@
 #ifndef AGGPAINTTHREAD_H
 #define AGGPAINTTHREAD_H
 
-#include <qthread.h>
-#include <qobject.h>
-#include <qwidget.h>
+#include <QThread>
+#include <QObject>
+#include <QWidget>
 
-class AggPaintThread : public QObject, public QThread
+class AggPaintThread : public QThread
 {
     Q_OBJECT
 public:

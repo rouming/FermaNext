@@ -1,9 +1,10 @@
 
+#include <QString>
+#include <QPoint>
+#include <QSize>
+
 #include "AggSubsidiary.h"
 #include "Geometry.h"
-#include <qstring.h>
-#include <qpoint.h>
-#include <qsize.h>
 
 /*****************************************************************************
  * line
@@ -67,7 +68,7 @@ void drawText ( textRenderer& textRend, const QString& str, color_type col,
                 const QPoint& point )
 {
     textRend.color( col );    
-    textRend.render_text( point.x(), point.y(), str.ascii(), flipY );
+    textRend.render_text( point.x(), point.y(), str.toAscii().data(), flipY );
 }
 
 void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,

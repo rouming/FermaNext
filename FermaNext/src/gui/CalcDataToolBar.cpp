@@ -2,8 +2,8 @@
 #include "CalcDataToolBar.h"
 #include "CalcDataWidget.h"
 
-#include <qlabel.h>
-#include <qiconset.h>
+#include <QLabel>
+#include <QIcon>
 
 /*****************************************************************************
  * Calculation Data Tool Bar
@@ -40,7 +40,7 @@ void CalcDataToolBar::initCalcDataIcons ()
 {
     // Active icons
     calcDataIcons.setPixmap( QPixmap::fromMimeSource( imagesPath() + "/calcdata.png"),
-                             QIconSet::Automatic, QIconSet::Active );
+                             QIcon::Automatic, QIcon::Active );
 }
 
 void CalcDataToolBar::addWidget ( QWidget& w )

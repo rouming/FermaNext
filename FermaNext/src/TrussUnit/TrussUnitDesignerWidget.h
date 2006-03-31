@@ -2,65 +2,71 @@
 #ifndef TRUSSUNITDESIGNERWIDGET_H
 #define TRUSSUNITDESIGNERWIDGET_H
 
+#include <QMenu>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QValidator>
+#include <QMouseEvent>
+
 #include "AggQWidget.h"
 #include "TrussUnitWindowManager.h"
 #include "TrussUnitToolBar.h"
-#include <qpopupmenu.h>
-#include <qlabel.h>
-#include <qlineedit.h>
-#include <qpushbutton.h>
-#include <qhbox.h>
-#include <qvbox.h>
-#include <qvalidator.h>
 
 class AggPopupHint;
 
 /*****************************************************************************/
 
-class FixationPopupMenu : public QPopupMenu
+class FixationPopupMenu : public QMenu
 {
     Q_OBJECT
 public:
-    FixationPopupMenu ( QWidget* parent = 0, const char*  name = 0 );
+    FixationPopupMenu ( QWidget* parent = 0 );
     void showFixationPopup ( QMouseEvent* pressEvent, TrussNode* );
 
 protected slots:
-    void popupHide ();
-
     void fixNodeByX ();
     void fixNodeByY ();
     void fixNodeByXY ();
     void unfixNode ();
 
 private:
-    QMouseEvent releaseEvent;
     TrussNode* node;
 };
 
 /*****************************************************************************/
 
-class LoadPopupMenu : public QPopupMenu
+class LoadPopupMenu : public QMenu
 {
     Q_OBJECT
 public:
-    LoadPopupMenu ( QWidget* parent=0, const char* name=0 );
+    LoadPopupMenu ( QWidget* parent=0 );
     void showLoadPopup ( QMouseEvent* pressEvent, TrussNode*, 
                          TrussUnitWindow* );
 
 protected slots:
-    void hideLoadPopup();
     void okClicked();
 
 private:
-    QMouseEvent releaseEvent;
     TrussNode* node;
     TrussUnitWindow* selectedWindow;
-    QVBox* vBox;
-    QHBox* xHBox;
-    QHBox* yHBox;
-    QHBox* buttonHBox;
+    // x box and layout
+    QWidget* xBox;
+    QHBoxLayout* xLayout;
+    // y box and layout
+    QWidget* yBox;
+    QHBoxLayout* yLayout;
+    // buttons box and layout
+    QWidget* buttonBox;
+    QHBoxLayout* buttonLayout;
+    // main layout
+    QVBoxLayout* vLayout;
+    // buttons
     QPushButton* ok;
     QPushButton* cancel;
+    // edits and labels
     QLabel* loadXLabel;
     QLabel* loadYLabel;
     QLineEdit* loadXLine;

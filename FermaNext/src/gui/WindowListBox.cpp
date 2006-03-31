@@ -1,16 +1,16 @@
 
+#include <QString>
+#include <QCursor>
+#include <QMessageBox>
+
 #include "WindowListBox.h"
 #include "SubsidiaryConstants.h"
 #include "TrussUnitActions.h"
 #include "FermaNextWorkspace.h"
 #include "TrussCalcData.h"
-#include "CalcDataWidget.h"
+//FIXME QT3TO4
+//#include "CalcDataWidget.h"
 #include "CalculationInterface.h"
-
-#include <qstring.h>
-#include <qcursor.h>
-#include <qpopupmenu.h>
-#include <qmessagebox.h>
 
 /*****************************************************************************
  * Truss Unit Window Item
@@ -21,7 +21,7 @@ TrussUnitWindowItem::TrussUnitWindowItem ( FermaNextProject& prj,
                                            WindowListBox& lb,
                                            const QPixmap& pix,
                                            const QPixmap& disPix ) :
-    QListBoxPixmap( &lb, pix, truss.getTrussName() ),
+    Q3ListBoxPixmap( &lb, pix, truss.getTrussName() ),
     listBox(lb),
     project(prj), 
     trussWindow(truss),
@@ -59,53 +59,44 @@ void TrussUnitWindowItem::update ()
 const QPixmap* TrussUnitWindowItem::pixmap () const
 {
     if ( isShown() )
-        return QListBoxPixmap::pixmap();
+        return Q3ListBoxPixmap::pixmap();
     else
         return &disabledPix;        
 }
 
-void TrussUnitWindowItem::fillPopup ( QPopupMenu* popup ) const
+void TrussUnitWindowItem::fillPopup ( Q3PopupMenu* popup ) const
 {
     if ( isShown() ) {
         if ( isSelectedInGroup() ) {
-            popup->insertItem(
-                    QPixmap::fromMimeSource(imagesPath() + "/unselect.png"),
-                    "Unselect", this, SLOT(unselectFromGroup()) );
+            popup->insertItem( QIcon(imagesPath() + "/unselect.png"),
+                               "Unselect", this, SLOT(unselectFromGroup()) );
         } else {
-            popup->insertItem( 
-                    QPixmap::fromMimeSource(imagesPath() + "/select.png"),
-                    "Select", this, SLOT(selectInGroup()) );
+            popup->insertItem( QIcon(imagesPath() + "/select.png"),
+                               "Select", this, SLOT(selectInGroup()) );
         }
         popup->insertSeparator();
-        popup->insertItem(
-                        QPixmap::fromMimeSource(imagesPath() + "/select.png"),
-                        "Select All", this, SLOT(selectAllInGroup()) );
-        popup->insertItem(
-                        QPixmap::fromMimeSource(imagesPath() + "/unselect.png"),
-                        "Unselect All", this, SLOT(unselectAllFromGroup()) );
+        popup->insertItem( QIcon(imagesPath() + "/select.png"),
+                           "Select All", this, SLOT(selectAllInGroup()) );
+        popup->insertItem( QIcon(imagesPath() + "/unselect.png"),
+                           "Unselect All", this, SLOT(unselectAllFromGroup()));
         popup->insertSeparator();
-        popup->insertItem(
-                        QPixmap::fromMimeSource(imagesPath() + "/calculate.png"),
-                        "Calculate", this, SLOT(calculate()) );
+        popup->insertItem( QIcon(imagesPath() + "/calculate.png"),
+                           "Calculate", this, SLOT(calculate()) );
         popup->insertSeparator();
-        popup->insertItem(
-                        QPixmap::fromMimeSource(imagesPath() + "/delete.png"),
-                        "Remove", this, SLOT(remove()) );
+        popup->insertItem( QIcon(imagesPath() + "/delete.png"),
+                           "Remove", this, SLOT(remove()) );
         popup->insertSeparator();
 
-        popup->insertItem( 
-                      QPixmap::fromMimeSource( imagesPath() + "/hide.png"),
-                      "Hide", this, SLOT(hide()) );
+        popup->insertItem( QIcon(imagesPath() + "/hide.png"),
+                           "Hide", this, SLOT(hide()) );
 
     } else {
-        popup->insertItem(
-                        QPixmap::fromMimeSource(imagesPath() + "/delete.png"),
-                        "Remove", this, SLOT(remove()) );
+        popup->insertItem( QIcon(imagesPath() + "/delete.png"),
+                           "Remove", this, SLOT(remove()) );
         popup->insertSeparator();
 
-        popup->insertItem(
-                      QPixmap::fromMimeSource(imagesPath() + "/show.png"),
-                      "Show", this, SLOT(show()) );
+        popup->insertItem( QIcon(imagesPath() + "/show.png"),
+                           "Show", this, SLOT(show()) );
     }
     popup->exec( QCursor::pos() );
 }
@@ -127,15 +118,14 @@ bool TrussUnitWindowItem::isAlive () const
 
 void TrussUnitWindowItem::setText ( const QString& text )
 {
-    QListBoxPixmap::setText( text );
+    Q3ListBoxPixmap::setText( text );
 }
 
 void TrussUnitWindowItem::raise ()
 {
     if ( ! trussWindow.isVisible() )
         return;
-    TrussUnitDesignerWidget& widget = project.getDesignerWindow().
-        getDesignerWidget();
+    TrussUnitDesignerWidget& widget = project.getDesignerWidget();
     widget.focusOnWindow( trussWindow );
 }
 
@@ -180,7 +170,7 @@ void TrussUnitWindowItem::unselectAllFromGroup ()
 
 void TrussUnitWindowItem::calculate ()
 { 
-    FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();    
+    FermaNextWorkspace& wsp = project.getWorkspace();    
     PluginManager& plgManager = wsp.pluginManager();
     PluginList plugins = plgManager.loadedPluginsOfType( CALCULATION_TYPE );
     if ( plugins.size() == 0 ) {
@@ -195,6 +185,8 @@ void TrussUnitWindowItem::calculate ()
     Plugin* plugin = plugins[0];
 
     try {
+        // FIXME QT3TO4
+        /*
         CalculationInterface& calcPlugin = 
             dynamic_cast<CalculationInterface&>(*plugin);
 
@@ -212,6 +204,7 @@ void TrussUnitWindowItem::calculate ()
 
         // TODO: toplogy manager
         topology.desist();
+        */
     }
     catch ( std::exception& ) {
         QMessageBox::critical( 0, tr("Plugin manager error"),
@@ -243,16 +236,16 @@ void TrussUnitWindowItem::remove ()
  *****************************************************************************/
 
 WindowListBox::WindowListBox ( FermaNextProject& prj, QWidget* parent,
-                               const char* name, WFlags fl ) : 
-    QListBox( parent, name, fl ),
+                               const char* name, Qt::WFlags fl ) : 
+    Q3ListBox( parent, name, fl ),
     project(prj)
 {
     // Catch double click on item
-    QObject::connect( this, SIGNAL(doubleClicked(QListBoxItem*)),
-                      SLOT(raiseWindowItem(QListBoxItem*)) );
+    QObject::connect( this, SIGNAL(doubleClicked(Q3ListBoxItem*)),
+                      SLOT(raiseWindowItem(Q3ListBoxItem*)) );
 
     // Catch focus changes
-    TrussUnitDesignerWidget& w = prj.getDesignerWindow().getDesignerWidget();
+    TrussUnitDesignerWidget& w = prj.getDesignerWidget();
     QObject::connect( &w, SIGNAL(onFocusReceive(TrussUnitWindow&)), 
                           SLOT(trussWindowReceivedFocus(TrussUnitWindow&)) );
     QObject::connect( &w, SIGNAL(onFocusLose(TrussUnitWindow&)), 
@@ -268,13 +261,13 @@ WindowListBox::WindowListBox ( FermaNextProject& prj, QWidget* parent,
 
 void WindowListBox::contextMenuEvent ( QContextMenuEvent* )
 {
-    QListBoxItem* selected = selectedItem();
+    Q3ListBoxItem* selected = selectedItem();
     if ( selected == 0 )
         return;
     try { 
         TrussUnitWindowItem& item = 
             dynamic_cast<TrussUnitWindowItem&>( *selected ); 
-        QPopupMenu* popup = new QPopupMenu( this );
+        Q3PopupMenu* popup = new Q3PopupMenu( this );
         Q_CHECK_PTR( popup );
         item.fillPopup( popup );
         delete popup;
@@ -294,8 +287,8 @@ void WindowListBox::addTrussUnitWindow ( TrussUnitWindow& truss )
 {
     TrussUnitWindowItem* item = new TrussUnitWindowItem( 
                   project, truss, *this, 
-                  QPixmap::fromMimeSource(imagesPath() + "/project.png"),
-                  QPixmap::fromMimeSource(imagesPath() + "/project_d.png"));
+                  QPixmap(imagesPath() + "/project.png"),
+                  QPixmap(imagesPath() + "/project_d.png"));
 
     // Catches item visibility changes 
     QObject::connect( item, SIGNAL(onWindowItemShow(TrussUnitWindowItem&)), 
@@ -333,7 +326,7 @@ void WindowListBox::unselectAllFromGroup ()
         iter.data().item->unselectFromGroup();
 }
 
-void WindowListBox::raiseWindowItem ( QListBoxItem* it )
+void WindowListBox::raiseWindowItem ( Q3ListBoxItem* it )
 {    
     if ( it == 0 )
         return;
@@ -351,7 +344,7 @@ void WindowListBox::showWindowItem ( TrussUnitWindowItem& )
 void WindowListBox::hideWindowItem ( TrussUnitWindowItem& item )
 {
     TrussUnitDesignerWidget& w = 
-        project.getDesignerWindow().getDesignerWidget();
+        project.getDesignerWidget();
     TrussUnitWindow* focusedWindow = w.getFocusedWindow();
     if ( focusedWindow == 0 || ! windowItems.contains(focusedWindow) )
         return;
@@ -374,7 +367,7 @@ void WindowListBox::trussWindowDesisted ( const TrussUnitWindow& truss )
         return;
 
     TrussUnitDesignerWidget& w = 
-        project.getDesignerWindow().getDesignerWidget();
+        project.getDesignerWidget();
     TrussUnitWindow* focusedWindow = w.getFocusedWindow();
     if ( focusedWindow == 0 || ! windowItems.contains(focusedWindow) )
         return;

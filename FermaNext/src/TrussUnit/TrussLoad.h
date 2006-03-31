@@ -3,8 +3,8 @@
 #define TRUSSLOAD_H
 
 #include <vector>
-#include <qobject.h>
-#include <qmap.h>
+#include <QObject>
+#include <QMap>
 
 /*****************************************************************************
  * Truss Load
@@ -59,7 +59,7 @@ public:
     { 
         TrussLoadMapIter iter = loads.begin();
         for ( ; iter != loads.end(); ++iter )
-            delete iter.data();
+            delete iter.value();
         loads.clear();
     }
 
@@ -126,7 +126,7 @@ public:
         size_t loadsNum = 0;
         TrussLoadMapConstIter iter = loads.begin();
         for ( ; iter != loads.end(); ++iter ) {
-            if ( iter.data()->isEnabled() ) 
+            if ( iter.value()->isEnabled() ) 
                 ++loadsNum;
         }
         return loadsNum;
@@ -137,10 +137,10 @@ protected:
     {
         TrussLoadMapIter iter = loads.begin();
         for ( ; iter != loads.end(); ++iter ) {
-            TrussLoad* load = iter.data();
+            TrussLoad* load = iter.value();
             if ( load->isRemoved() ) {
-                delete iter.data();
-                loads.remove(iter);
+                delete iter.value();
+                iter = loads.erase(iter);
             }
         }
     }

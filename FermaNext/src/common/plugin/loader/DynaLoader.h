@@ -18,7 +18,7 @@
   #define dl_close(handler) dlclose(handler)
 #endif
 
-#include <qstring.h>
+#include <QString>
 
 class DynaLoader
 {

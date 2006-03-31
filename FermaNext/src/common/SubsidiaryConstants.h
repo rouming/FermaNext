@@ -2,7 +2,7 @@
 #ifndef SUBSIDIARYCONSTANTS_H
 #define SUBSIDIARYCONSTANTS_H
 
-#include <qstring.h>
+#include <QString>
 
 /************************************
  * Main Consts 
@@ -60,14 +60,16 @@ extern const double svgGamma,
  * Geometry Window Consts
  ************************************/
 
-extern const int tableRowHeight;
+extern const int tableRowHeight,
+                 checkBoxLen,
+                 checkBoxIndent;
 extern const double pivotThickLimit;
 
 /************************************
  * Main subs
  ************************************/
 
-char pathSeparator ();
+QChar pathSeparator ();
 
 QString imagesPath ();
 QString imagesSvgPath ();

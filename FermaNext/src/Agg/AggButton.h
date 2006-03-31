@@ -2,10 +2,10 @@
 #ifndef AGGBUTTON_H
 #define AGGBUTTON_H
 
-#include "qstring.h"
-#include "qpoint.h"
-#include "qsize.h"
-#include <qobject.h>
+#include <QString>
+#include <QPoint>
+#include <QSize>
+#include <QObject>
 
 class AggButton : public QObject
 {

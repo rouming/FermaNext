@@ -14,7 +14,11 @@ PaintableTrussElement::PaintableTrussElement () :
     renderedFlag(false)
 {}
 
-PaintableTrussElement::PaintableTrussElement ( bool h_, bool v_, bool e_, bool r_ ) :
+PaintableTrussElement::~PaintableTrussElement ()
+{}
+
+PaintableTrussElement::PaintableTrussElement ( bool h_, bool v_, 
+                                               bool e_, bool r_ ) :
     visible(v_), 
     highlighted(h_),
     enabled(e_),
@@ -357,7 +361,7 @@ QDomElement TrussUnit::saveToXML ( QDomDocument& doc )
         LoadCase::TrussLoadMap::Iterator loadsIt = loadMap.begin();
         for ( ; loadsIt != loadMap.end(); ++loadsIt ) {
             const TrussNode* node = loadsIt.key();
-            TrussLoad* load = loadsIt.data();
+            TrussLoad* load = loadsIt.value();
             QDomElement loadElem = doc.createElement( "Load" );
             loadElem.setAttribute( "nodeId", node->getUUID() );
             loadElem.setAttribute( "xForce", load->getXForce() );

@@ -4,8 +4,12 @@
 
 #include <vector>
 #include <algorithm>
-#include <qobject.h>
-#include <qmap.h>
+
+#include <QObject>
+#include <QMap>
+#include <QPoint>
+#include <QSize>
+#include <QMetaType>
 
 #include "Geometry.h"
 #include "StatefulObject.h"
@@ -399,8 +403,8 @@ public:
             typename LoadCase::TrussLoadMap::Iterator iter = loads.begin();
             for ( ; iter != loads.end(); ++iter )
                 topologyLoadCase.addLoad( *nodesMap[iter.key()], 
-                                          iter.data()->getXForce(),
-                                          iter.data()->getYForce() );
+                                          iter.value()->getXForce(),
+                                          iter.value()->getYForce() );
         }
 
         topology->setMaterial( getMaterial()  );
@@ -433,7 +437,10 @@ public:
             if ( (*iter) == &pivot ) {
                 // Desist first
                 (*iter)->desist();
-                return removePivot(iter);
+                iter = removePivot(iter);
+                if ( iter == pivots.end() )
+                    return false;
+                return true;
             }
         return false;    
     }
@@ -448,7 +455,10 @@ public:
             if ( (*iter) == &node ) {                
                 // Desist first
                 (*iter)->desist();
-                return removeNode(iter);
+                iter = removeNode(iter);
+                if ( iter == nodes.end() )
+                    return false;
+                return true; 
             }            
         return false;    
     }
@@ -463,8 +473,10 @@ public:
             if ( (*iter) == &topology ) {
                 // Desist first
                 (*iter)->desist();
-                return removeTopology(iter);
-
+                iter = removeTopology(iter);
+                if ( iter == topologies.end() )
+                    return false;
+                return true;
             }
         return false;
     }
@@ -777,7 +789,7 @@ protected:
         for ( ; pIter != pivots.end(); ) {
             P* pivot = *pIter;
             if ( !pivot->isAlive() && pivot->countEnabledStates() == 0 ) {
-                removePivot(pIter);
+                pIter = removePivot(pIter);
             }
             else
                 ++pIter;
@@ -788,7 +800,7 @@ protected:
         for ( ; nIter != nodes.end(); ) {
             N* node = *nIter;
             if ( !node->isAlive() && node->countEnabledStates() == 0 ) {
-                removeNode(nIter);
+                nIter = removeNode(nIter);
             }
             else
                 ++nIter;
@@ -800,7 +812,7 @@ protected:
             TrussTopology* topology = *tIter;
             if ( !topology->isAlive() && 
                  topology->countEnabledStates() == 0 ) {
-                removeTopology(tIter);
+                tIter = removeTopology(tIter);
             }
             else
                 ++tIter;
@@ -809,17 +821,18 @@ protected:
 
     // Momentary removing of desisted object. Nothing can revive it.
     // Of course, adjoining pivots should be removed too.
-    virtual bool removeNode ( NodeListIter& iter )
+    // Returns next iter after erase.
+    virtual NodeListIter removeNode ( NodeListIter iter )
     {
         if ( iter == nodes.end() )
-            return false;
+            return nodes.end();
         N* n = *iter;
         if ( n->isAlive() )
-            return false;
+            return nodes.end();
         // We should remove adjoining pivots first
         removeAdjoiningPivots(*n);
         emit beforeNodeRemoval(*n);
-        nodes.erase(iter);
+        iter = nodes.erase(iter);
         delete n;
 
         // Force reindex of elements numbers
@@ -827,7 +840,7 @@ protected:
 
         emit afterNodeRemoval();
         emit onStateChange();
-        return true;
+        return iter;
     }
 
     // If flag is true returns only alive pivots
@@ -857,21 +870,28 @@ protected:
         PivotListIter iter = pivotsToRemove.begin();
         for ( ; iter != pivotsToRemove.end(); ++iter ) {
             // Desist first
-            (*iter)->desist();            
-            removePivot(iter);
+            (*iter)->desist();
+            // Find not temp iter. 
+            // (As you know, we create temp vector for adjoining elements)
+            PivotListIter realIter = std::find( pivots.begin(), pivots.end(), 
+                                                *iter );
+            // We can omit saving of the returning iter, bacause we are
+            // working with temp vector
+            removePivot(realIter);
         }
     }
 
     // Momentary removing of desisted object. Nothing can revive it.
-    virtual bool removePivot ( PivotListIter& iter )
+    // Returns next iter after erase.
+    virtual PivotListIter removePivot ( PivotListIter iter )
     {
         if ( iter == pivots.end() )
-            return false;
+            return pivots.end();
         P* p = *iter;
         if ( p->isAlive() )
-            return false;
+            return pivots.end();
         emit beforePivotRemoval(p->getFirstNode(), p->getLastNode());
-        pivots.erase(iter);
+        iter = pivots.erase(iter);
         delete p;
 
         // Force reindex of elements numbers
@@ -879,23 +899,24 @@ protected:
 
         emit afterPivotRemoval();
         emit onStateChange();
-        return true;
+        return iter;
     }
 
     // Momentary removing of desisted object. Nothing can revive it.
-    virtual bool removeTopology ( TopologyListIter& iter )
+    // Returns next iter after erase.
+    virtual TopologyListIter removeTopology ( TopologyListIter iter )
     {
         if ( iter == topologies.end() )
-            return false;
+            return topologies.end();
         TrussTopology* t = *iter;
         if ( t->isAlive() )
-            return false;
+            return topologies.end();
         emit beforeTopologyRemoval(*t);
-        topologies.erase(iter);
+        iter = topologies.erase(iter);
         delete t;
         emit afterTopologyRemoval();
         emit onStateChange();
-        return true;
+        return iter;
     }
 
 private:
@@ -1017,5 +1038,9 @@ private:
     Fixation fix;
     int number;
 };
+
+/************************* Declare meta types ********************************/
+
+Q_DECLARE_METATYPE (Node::Fixation);
 
 #endif //TRUSS_H

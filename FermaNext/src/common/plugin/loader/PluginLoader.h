@@ -5,8 +5,8 @@
 #include "Plugin.h"
 #include "Global.h"
 
-#include <qstring.h>
-#include <qmap.h>
+#include <QString>
+#include <QMap>
 
 class PluginLoader;
 class PluginManager;

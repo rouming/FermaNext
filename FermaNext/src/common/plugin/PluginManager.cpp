@@ -2,19 +2,14 @@
 #include "PluginLoaderFrontEnd.h"
 #include "PluginManager.h"
 #include "DynaLoader.h"
-#include <qmutex.h>
+
 #include <algorithm>
-#include <qdir.h>
-#include <qregexp.h>
+#include <QDir>
+#include <QRegExp>
 
 /*****************************************************************************
  * Plugin Manager
  *****************************************************************************/
-
-static QMutex mutex;
-PluginManager* PluginManager::plgMngInstance = 0;
-
-/*****************************************************************************/
 
 const QString& PluginManager::systemPluginExtension ()
 {
@@ -26,19 +21,6 @@ const QString& PluginManager::systemPluginLoaderExtension ()
 {
     static QString extension = "ldr";
     return extension;
-}
-
-/*****************************************************************************/
-
-PluginManager& PluginManager::instance ()
-{
-    if ( plgMngInstance == 0 ) {
-        mutex.lock();
-        if ( plgMngInstance == 0 ) 
-            plgMngInstance = new PluginManager;
-        mutex.unlock();
-    }
-    return *plgMngInstance;
 }
 
 /*****************************************************************************/
@@ -138,7 +120,7 @@ void PluginManager::unregisterPluginLoader ( PluginLoader& loader )
 {
     PluginLoadersMapIter loaderMapIt = loadersMap.begin();
     for ( ; loaderMapIt != loadersMap.end(); ++loaderMapIt ) {
-        PluginLoaderList* loaders = loaderMapIt.data();
+        PluginLoaderList* loaders = loaderMapIt.value();
         PluginLoaderListIter it = std::find( loaders->begin(), loaders->end(),
                                              &loader );
         // Continue loop if nothing has been found
@@ -161,7 +143,7 @@ void PluginManager::unregisterPluginLoader ( PluginLoader& loader )
         // Free loaders list if it is empty
         if ( loaders->size() == 0 ) {
             delete loaders;
-            loadersMap.remove( loaderMapIt );
+            loadersMap.erase( loaderMapIt );
         }
 
         // Free native lib
@@ -279,7 +261,7 @@ void PluginManager::loadPlugins ( const QString& path )
     }
 
     // Emit signal about number of plugins which are going to be loaded.
-    emit onPluginsLoad( pluginPathList.size() );
+    emit onBeforePluginsLoad( pluginPathList.size() );
 
     // Load all plugins by sored plugins paths in priority order..
     PluginPathListConstIter pathIt = pluginPathList.begin();
@@ -300,6 +282,10 @@ void PluginManager::loadPlugins ( const QString& path )
         }
     }
 
+    // Emit signal about number of plugins 
+    // which are sucessfuly loaded.
+    emit onAfterPluginsLoad( plugins.size() );
+
     //TODO: DO NOT FORGET TO RESOLVE DEPENDENCIES
 }
 
@@ -307,7 +293,8 @@ void PluginManager::unloadPlugins ()
 {
     // Unload all plugins regardless of their status
     PluginList loadedPlgs = loadedPlugins( false );
-    emit onPluginsUnload( loadedPlgs.size() );
+    int pluginsSize = loadedPlgs.size();
+    emit onBeforePluginsUnload( pluginsSize );
 
     // Firstly unload all FN plugins
     PluginListIter it = loadedPlgs.begin();
@@ -321,6 +308,8 @@ void PluginManager::unloadPlugins ()
     for ( ; libsIter != systemLibs.end(); ++libsIter )
         delete *libsIter;
     systemLibs.clear();
+
+    emit onAfterPluginsUnload( pluginsSize );
 }
 
 void PluginManager::unloadPlugin ( Plugin& plg )
@@ -355,8 +344,7 @@ PluginList PluginManager::loadedPluginsOfType ( const QString& plgType,
     type.replace( ".", "\\." );
     // Add dots to asterics
     type.replace( "*", ".*" );
-    QRegExp regExp( "^" + type + "$" ); 
-    regExp.setCaseSensitive( false );
+    QRegExp regExp( "^" + type + "$", Qt::CaseInsensitive ); 
 
     PluginList pluginsOfType;
     PluginList plugins = loadedPlugins( onlyOk );
@@ -364,7 +352,7 @@ PluginList PluginManager::loadedPluginsOfType ( const QString& plgType,
     for ( ; it != plugins.end(); ++it ) {
         Plugin* plg = *it;
         const PluginInfo& plgInfo = plg->pluginInfo();
-        if ( regExp.search( plgInfo.type ) != -1 )
+        if ( regExp.indexIn( plgInfo.type ) != -1 )
             pluginsOfType.push_back( plg );
     }
     return pluginsOfType;
@@ -375,7 +363,7 @@ PluginLoaderList PluginManager::pluginLoaders ( bool onlyOk ) const
     PluginLoaderList loadersRes;
     PluginLoadersMapConstIter it = loadersMap.begin();
     for ( ; it != loadersMap.end(); ++it ) {
-        PluginLoaderList* loaders = it.data();
+        PluginLoaderList* loaders = it.value();
         PluginLoaderListConstIter loadersIt = loaders->begin();
         for ( ; loadersIt != loaders->end(); ++loadersIt ) {
             PluginLoader* loader = *loadersIt;

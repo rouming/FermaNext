@@ -2,9 +2,12 @@
 #ifndef TOOLBARMANAGER_H
 #define TOOLBARMANAGER_H
 
-#include <qtoolbar.h>
-#include <qtoolbutton.h>
-#include <qiconset.h>
+// Qt3 Support classes
+#include <Q3ToolBar>
+#include <Q3MainWindow>
+
+#include <QToolButton>
+#include <QIcon>
 #include <vector>
 
 class ToolBarManager;
@@ -18,8 +21,8 @@ class QLabel;
 class TextToolButton : public  QToolButton
 {
 public:
-    TextToolButton ( const QIconSet&, const QString&, const QString&, QObject*,
-                     const char*, QToolBar*, const char* name = 0 );
+    TextToolButton ( const QIcon&, const QString&, const QString&, QObject*,
+                     const char*, Q3ToolBar* );
     QSize sizeHint() const;
 protected:
     void drawButtonLabel( QPainter *p );
@@ -71,7 +74,7 @@ private:
     QString name;
     QWidget& widget;
     TextToolButton* button;
-    uint windowState;
+    Qt::WindowStates windowState;
     bool toolBarIsDestroyed;
 };
 
@@ -79,11 +82,11 @@ private:
  * Tool Bar Manager
  *****************************************************************************/
 
-class ToolBarManager : public QToolBar
+class ToolBarManager : public Q3ToolBar
 {
     Q_OBJECT
 public:
-    ToolBarManager ( QMainWindow* parent = 0, const char* name = 0 );
+    ToolBarManager ( Q3MainWindow* parent = 0, const char* name = 0 );
     virtual ~ToolBarManager ();
 
 public slots:

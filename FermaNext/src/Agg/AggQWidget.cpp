@@ -1,11 +1,13 @@
 
+#include <QPainter>
+#include <QPrinter>
+#include <QSize>
+#include <QResizeEvent>
+
+#include <platform/agg_platform_support.h>
+
 #include "AggQWidget.h"
 #include "Benchmark.h"
-
-#include <qpainter.h>
-#include <qprinter.h>
-#include <qsize.h>
-#include <platform/agg_platform_support.h>
 
 /*****************************************************************************
  * Agg Ctrls Container
@@ -90,7 +92,8 @@ const agg::ctrl* AggCtrlContainer::mouseReleaseEvent ( double x, double y )
     return releasedCtrl;
 }
 
-const agg::ctrl* AggCtrlContainer::mouseMoveEvent ( double x, double y, bool buttonFlag )
+const agg::ctrl* AggCtrlContainer::mouseMoveEvent ( double x, double y, 
+                                                     bool buttonFlag )
 {
     CtrlList::iterator iter = ctrls.begin();
     for ( ; iter != ctrls.end(); ++iter )
@@ -99,7 +102,7 @@ const agg::ctrl* AggCtrlContainer::mouseMoveEvent ( double x, double y, bool but
     return 0;
 }
 
-const agg::ctrl* AggCtrlContainer::arrowKeysPressEvent ( bool left, bool right, 
+const agg::ctrl* AggCtrlContainer::arrowKeysPressEvent ( bool left, bool right,
                                                          bool down, bool up )
 {
     if ( current != 0 && 
@@ -116,38 +119,30 @@ const agg::ctrl* AggCtrlContainer::arrowKeysPressEvent ( bool left, bool right,
 AggQWidget::AggQWidget ( QWidget* parent,                         
                          bool flip_y ) :
     QWidget( parent ),
-    mainQImage( new QImage ),
+    mainQImage( QSize(360, 330), QImage::Format_RGB32 ),
     aggFlipY( flip_y )    
 {
-    setBackgroundMode( QWidget::NoBackground );
     setMinimumSize( QSize(100, 100) );
     resize( QSize(360, 330) );
-    initialWidth  = width();
-    initialHeight = height();
 }
 
 AggQWidget::~AggQWidget ()
-{
-    delete mainQImage;
-}
+{}
 
 agg::rendering_buffer& AggQWidget::getAggRenderingBuffer ()
 {
     return aggBuffer;
 }
 
-QImage& AggQWidget::getMainImage ()
-{
-    return *mainQImage;
-}
-
 void AggQWidget::print ()
 {
+    /*FIXME QT3TO4
     QPrinter printer;
     if ( printer.setup(this) ) {
 	    QPainter p( &printer );
 	    p.drawImage( mainQImage->rect(), *mainQImage );
     }
+    */
 }
 
 /*****************************************************************************
@@ -162,15 +157,20 @@ void AggQWidget::paintEvent ( QPaintEvent* event )
 
 
     // This conversion was taken from the original agg_plarform_support.cpp
-    QImage tmpImg( mainQImage->width(), mainQImage->height(), 32 );
+    QImage tmpImg( mainQImage.width(), mainQImage.height(), 
+                   QImage::Format_RGB32 );
 					
     agg::rendering_buffer rbufTmp;
     rbufTmp.attach( tmpImg.bits(), tmpImg.width(), tmpImg.height(), 
-                    aggFlipY ? tmpImg.bytesPerLine() : -tmpImg.bytesPerLine() );
+                    aggFlipY ? tmpImg.bytesPerLine() : 
+                                -tmpImg.bytesPerLine() );
     
         
     agg::color_conv(&rbufTmp, &aggBuffer, agg::color_conv_rgb24_to_rgba32());
-    bitBlt( this, 0,0, &tmpImg );
+
+    QPainter painter( this );
+    painter.drawImage( QPoint(0,0), tmpImg );
+    
     CLOSE_BENCHMARK;
 }
 
@@ -180,11 +180,12 @@ void AggQWidget::resizeEvent ( QResizeEvent* event )
 
     // Resize the internal buffer and reattach the main 
     // AGG rendering_buffer to the QImage 
-    mainQImage->create( newSize, 32 );
-    aggBuffer.attach( mainQImage->bits(), mainQImage->width(), 
-                      mainQImage->height(), 
-                      aggFlipY ?  mainQImage->bytesPerLine() : 
-                                 -mainQImage->bytesPerLine() );
+    mainQImage = mainQImage.scaled( newSize, Qt::IgnoreAspectRatio );
+
+    aggBuffer.attach( mainQImage.bits(), mainQImage.width(), 
+                      mainQImage.height(), 
+                      aggFlipY ?  mainQImage.bytesPerLine() : 
+                                 -mainQImage.bytesPerLine() );
 
     // Notice other agg paintable elements 
     aggResizeEvent( event ); 
@@ -199,14 +200,15 @@ void AggQWidget::keyPressEvent ( QKeyEvent* ke )
 
     switch( ke->key() )
     {
-        case Key_Up:    up    = true; break;
-        case Key_Down:  down  = true; break;
-        case Key_Left:  left  = true; break;
-        case Key_Right: right = true; break;
+        case Qt::Key_Up:    up    = true; break;
+        case Qt::Key_Down:  down  = true; break;
+        case Qt::Key_Left:  left  = true; break;
+        case Qt::Key_Right: right = true; break;
         default:    break;
     }
 				
-    const agg::ctrl* ctrl = ctrlContainer.arrowKeysPressEvent( left, right, down, up );
+    const agg::ctrl* ctrl = 
+        ctrlContainer.arrowKeysPressEvent( left, right, down, up );
     if( ctrl != 0 )
     {
         aggCtrlChangedEvent( ctrl );
@@ -222,8 +224,8 @@ void AggQWidget::keyPressEvent ( QKeyEvent* ke )
 void AggQWidget::mouseMoveEvent ( QMouseEvent* me )
 {			
     uint flags = 0;
-    if ( me->button() & Qt::ShiftButton)   flags |= agg::kbd_shift;
-    if ( me->button() & Qt::ControlButton) flags |= agg::kbd_ctrl;
+    if ( me->button() & Qt::ShiftModifier)   flags |= agg::kbd_shift;
+    if ( me->button() & Qt::ControlModifier) flags |= agg::kbd_ctrl;
     if ( me->button() == Qt::LeftButton)   flags |= agg::mouse_left;
     if ( me->button() == Qt::RightButton)  flags |= agg::mouse_right;
     // for some reason, Qt doesnt set the button on mouse move
@@ -237,8 +239,9 @@ void AggQWidget::mouseMoveEvent ( QMouseEvent* me )
     int curY = aggFlipY ? height() - me->pos().y() : me->pos().y();
 		
 
-    const agg::ctrl* ctrl = ctrlContainer.mouseMoveEvent( curX, curY,
-                                                          (flags & agg::mouse_left) != 0 );
+    const agg::ctrl* ctrl = 
+        ctrlContainer.mouseMoveEvent( curX, curY, 
+                                      (flags & agg::mouse_left) != 0 );
     if ( ctrl != 0 )
     {
         aggCtrlChangedEvent( ctrl );
@@ -252,7 +255,8 @@ void AggQWidget::mouseMoveEvent ( QMouseEvent* me )
         if ( ctrl == 0 )
         {            
             QPoint  newPos( curX, curY );
-            QMouseEvent newEvent( me->type(), newPos, me->button(), me->state() );
+            QMouseEvent newEvent( me->type(), newPos, me->button(), 
+                                  me->buttons(), me->modifiers() );
             aggMouseMoveEvent( &newEvent );
         }
     } 
@@ -261,8 +265,8 @@ void AggQWidget::mouseMoveEvent ( QMouseEvent* me )
 void AggQWidget::mouseReleaseEvent ( QMouseEvent* me )
 {
     uint flags = 0;
-    if ( me->button() & Qt::ShiftButton)   flags |= agg::kbd_shift;
-    if ( me->button() & Qt::ControlButton) flags |= agg::kbd_ctrl;
+    if ( me->button() & Qt::ShiftModifier)   flags |= agg::kbd_shift;
+    if ( me->button() & Qt::ControlModifier) flags |= agg::kbd_ctrl;
     if ( me->button() == Qt::LeftButton)   flags |= agg::mouse_left;
     if ( me->button() == Qt::RightButton)  flags |= agg::mouse_right;
 				
@@ -283,7 +287,8 @@ void AggQWidget::mouseReleaseEvent ( QMouseEvent* me )
     if ( flags & (agg::mouse_left | agg::mouse_right) )
     {
         QPoint  newPos( curX, curY );
-        QMouseEvent newEvent( me->type(), newPos, me->button(), me->state() );
+        QMouseEvent newEvent( me->type(), newPos, me->button(), 
+                              me->buttons(), me->modifiers() );
         aggMouseReleaseEvent( &newEvent );
     }
 }
@@ -291,8 +296,8 @@ void AggQWidget::mouseReleaseEvent ( QMouseEvent* me )
 void AggQWidget::mousePressEvent ( QMouseEvent* me )
 {
     uint flags = 0;
-    if ( me->button() & Qt::ShiftButton)   flags |= agg::kbd_shift;
-    if ( me->button() & Qt::ControlButton) flags |= agg::kbd_ctrl;
+    if ( me->button() & Qt::ShiftModifier)   flags |= agg::kbd_shift;
+    if ( me->button() & Qt::ControlModifier) flags |= agg::kbd_ctrl;
     if ( me->button() == Qt::LeftButton)   flags |= agg::mouse_left;
     if ( me->button() == Qt::RightButton)  flags |= agg::mouse_right;
 				
@@ -324,7 +329,8 @@ void AggQWidget::mousePressEvent ( QMouseEvent* me )
             else
             {
                 QPoint  newPos( curX, curY );
-                QMouseEvent newEvent( me->type(), newPos, me->button(), me->state() );
+                QMouseEvent newEvent( me->type(), newPos, me->button(), 
+                                      me->buttons(), me->modifiers() );
                 aggMousePressEvent( &newEvent );                
             }    
         }
@@ -332,7 +338,8 @@ void AggQWidget::mousePressEvent ( QMouseEvent* me )
     if ( flags & agg::mouse_right )
     {
         QPoint  newPos( curX, curY );
-        QMouseEvent newEvent( me->type(), newPos, me->button(), me->state() );
+        QMouseEvent newEvent( me->type(), newPos, me->button(), me->buttons(),
+                              me->modifiers() );
         aggMousePressEvent( &newEvent );
     }
 }

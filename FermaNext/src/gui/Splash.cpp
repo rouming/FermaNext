@@ -1,13 +1,14 @@
 
+#include <QFileInfo>
+#include <QPainter>
+
 #include "Splash.h"
-#include <qfileinfo.h>
-#include <qpainter.h>
 
 /*****************************************************************************
  * Splash
  *****************************************************************************/
 
-Splash::Splash ( const QPixmap& p, WFlags f ) :
+Splash::Splash ( const QPixmap& p, Qt::WFlags f ) :
     QSplashScreen( p, f )
 {}
 
@@ -23,8 +24,8 @@ void Splash::pluginMessage ( const QString& path )
 
 void Splash::message ( const QString& msg )
 {
-    QSplashScreen::message( msg, Qt::AlignRight | Qt::AlignBottom,
-                            QColor("white") );
+    QSplashScreen::showMessage( msg, Qt::AlignRight | Qt::AlignBottom,
+                                QColor("white") );
 }
 
 void Splash::drawContents ( QPainter* painter )
@@ -35,4 +36,3 @@ void Splash::drawContents ( QPainter* painter )
 }
 
 /*****************************************************************************/
-

@@ -1,9 +1,10 @@
 
+#include <QTabWidget>
+#include <QStackedWidget>
+#include <QTextStream>
+
 #include "FermaNextProject.h"
 #include "SubsidiaryConstants.h"
-
-#include <qtabwidget.h>
-#include <qwidgetstack.h>
 
 /*****************************************************************************
  * FermaNext Project
@@ -17,54 +18,67 @@ const QString& FermaNextProject::formatExtension ()
 
 /*****************************************************************************/
 
-FermaNextProject::FermaNextProject ( const QString& name_, QWidgetStack* stack ) :
+FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
+                                     const QString& name_, 
+                                     QStackedWidget* stack ) :
+    currentWorkspace(wsp),
     name(name_),
-    widgetStack(stack),
-    projectMainWidget( new QMainWindow(widgetStack, 0, 0) ),
-    calcDataToolBar( new CalcDataToolBar(projectMainWidget) ),
-    projectTab( new QTabWidget(projectMainWidget) ),
-    justStrengthAnalisysWidget( new QWidget(projectTab) ),
-    designerWindow( new TrussUnitDesignerWindow(name_, projectTab) ),
+    stackedWidget(stack),
+    // FIXME QT3TO4:
+    //calcDataToolBar( new CalcDataToolBar(projectMainWidget) ),
+    projectTab( new QTabWidget(stackedWidget) ),
+    justStrengthAnalisysWidget( new QWidget ),
+    designerWidget( new TrussUnitDesignerWidget ),
     trussWindowManager( new TrussUnitWindowManager )
 {
+    // Should be hidden while creating other widgets
+    // Only for aesthetic purposes 
+    projectTab->setVisible(false);
+    designerWidget->setVisible(false);
+
+    /*
+      // FIXME QT3TO4:
     projectMainWidget->setRightJustification( true );
     projectMainWidget->setDockEnabled( DockLeft, false );
     projectMainWidget->setDockEnabled( DockRight, false );
-
-    widgetStack->addWidget(projectMainWidget);
-    projectMainWidget->setCentralWidget( projectTab );
-  
-    projectTab->setTabPosition( QTabWidget::Bottom );
-    projectTab->addTab( designerWindow, tr("Designer") );
+    */
+    
+    projectTab->setTabPosition( QTabWidget::South );
+    projectTab->addTab( designerWidget, tr("Designer") );
     projectTab->addTab( justStrengthAnalisysWidget, tr("Strength Analysis") );
+    stackedWidget->addWidget(projectTab);
       
-
-    TrussUnitDesignerWidget& designerWidget = designerWindow->getDesignerWidget();
-
     // Catch trusses creation or deletion.
-    connect( trussWindowManager, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
-             &designerWidget, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
-    connect( trussWindowManager, SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
-             &designerWidget, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
-    connect( trussWindowManager, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)),     
+    connect( trussWindowManager, 
+             SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
+             designerWidget, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
+    connect( trussWindowManager, 
+             SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
+             designerWidget, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
+    // FIXME QT3TO4: 
+    /*
+    connect( trussWindowManager, 
+             SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)),     
              calcDataToolBar, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
-    connect( trussWindowManager, SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
+    connect( trussWindowManager, 
+             SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
              calcDataToolBar, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
+     */
 }
 
 FermaNextProject::~FermaNextProject ()
 {
-    if ( widgetStack )
-        widgetStack->removeWidget( projectMainWidget );
+    if ( stackedWidget )
+        stackedWidget->removeWidget( projectTab );
     delete trussWindowManager;
-    delete projectMainWidget;
+    delete projectTab;
 }
 
 void FermaNextProject::loadFromFile ( const QString& fileName )
     throw (IOException, WrongXMLDocException, LoadException)
 {
     QFile xmlFile( fileName );
-    if ( ! xmlFile.open( IO_ReadOnly ) )
+    if ( ! xmlFile.open( QIODevice::ReadOnly ) )
         throw IOException();
 
     QIODevice* xmlIODev = &xmlFile;
@@ -95,7 +109,7 @@ void FermaNextProject::saveToFile ( const QString& fileName )
     throw (IOException)
 {
     QFile xmlFile( fileName );
-    if ( ! xmlFile.open( IO_WriteOnly ) )
+    if ( ! xmlFile.open( QIODevice::WriteOnly ) )
         throw IOException();
 
     QTextStream stream( &xmlFile );
@@ -148,8 +162,7 @@ QDomElement FermaNextProject::saveToXML ( QDomDocument& doc )
         getTrussUnitWindowManager().getTrussUnitWindowList();
 
     // Windows in layout order
-    WindowList layoutOrderedWindows = 
-        getDesignerWindow().getDesignerWidget().getTrussUnitWindowList();
+    WindowList layoutOrderedWindows = designerWidget->getTrussUnitWindowList();
     typedef QMap<TrussUnitWindow*, uint> LayoutOrderMap;
     
     // Build layout order. i.e. last window in the stack is a first
@@ -199,7 +212,7 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
 
     TrussUnitWindowManager& mng = getTrussUnitWindowManager();
     QDomNodeList trussWindows = prjElem.elementsByTagName( "TrussUnitWindow" );
-    for ( uint windsNum = 0; windsNum < trussWindows.count(); ++windsNum ) {
+    for ( int windsNum = 0; windsNum < trussWindows.count(); ++windsNum ) {
         QDomNode trussWindow = trussWindows.item( windsNum );
         if ( ! trussWindow.isElement() )
             throw LoadException();
@@ -214,28 +227,28 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
             layoutMap[order] = &wnd;
         }
     }
-    TrussUnitDesignerWidget& designerWidget = 
-        getDesignerWindow().getDesignerWidget();
 
     // Restore window order
     LayoutOrderMap::Iterator itOrder = layoutMap.begin();
     for ( ; itOrder != layoutMap.end(); ++itOrder ) {
         TrussUnitWindow* trussWindow = *itOrder;
-        designerWidget.focusOnWindow( *trussWindow );
+        designerWidget->focusOnWindow( *trussWindow );
     }
 }
 
 void FermaNextProject::activate ()
 {
-    if ( widgetStack && widgetStack->visibleWidget() != projectMainWidget ) {
-        widgetStack->raiseWidget( projectMainWidget );
+    if ( stackedWidget && stackedWidget->currentWidget() != 
+         projectTab ) {
+        stackedWidget->setCurrentWidget( projectTab );
         emit onActivate( *this );
     }
 }
 
 bool FermaNextProject::isActivated () const
 {
-    return widgetStack && widgetStack->visibleWidget() == projectMainWidget;
+    return (stackedWidget && stackedWidget->currentWidget() == 
+            projectTab);
 }
 
 const QString& FermaNextProject::getName () const
@@ -254,14 +267,19 @@ TrussUnitWindowManager& FermaNextProject::getTrussUnitWindowManager ()
     return *trussWindowManager;
 }
 
-TrussUnitDesignerWindow& FermaNextProject::getDesignerWindow ()
+TrussUnitDesignerWidget& FermaNextProject::getDesignerWidget ()
 {
-    return *designerWindow;
+    return *designerWidget;
 }
 
 CalcDataToolBar& FermaNextProject::getCalcDataToolBar ()
 {
     return *calcDataToolBar;
+}
+
+FermaNextWorkspace& FermaNextProject::getWorkspace()
+{
+    return currentWorkspace;
 }
 
 /*****************************************************************************/

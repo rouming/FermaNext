@@ -1,12 +1,12 @@
 
 TARGET = common
-DESTDIR = ../../build
+
+LEVEL = ../..
+include(../../FermaNext.pri)
 
 TEMPLATE = lib
-CONFIG += staticlib warn_on thread debug
-
-MOC_DIR = mocs
-OBJECTS_DIR = obj
+CONFIG += staticlib warn_on
+QT += core xml
 
 win32 {
   DEFINES += WIN32
@@ -14,7 +14,7 @@ win32 {
 unix {
 }
 
-INCLUDEPATH = plugin plugin/loader
+INCLUDEPATH = . plugin plugin/loader
 
 SOURCES = \
           Benchmark.cpp \
