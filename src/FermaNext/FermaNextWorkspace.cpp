@@ -6,7 +6,7 @@
 #include <QApplication>
 
 #include "FermaNextWorkspace.h"
-#include "SubsidiaryConstants.h"
+#include "Global.h"
 
 /*****************************************************************************
  * FermaNext Workspace

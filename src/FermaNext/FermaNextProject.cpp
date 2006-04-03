@@ -4,7 +4,7 @@
 #include <QTextStream>
 
 #include "FermaNextProject.h"
-#include "SubsidiaryConstants.h"
+#include "Global.h"
 
 /*****************************************************************************
  * FermaNext Project
@@ -28,7 +28,7 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
     //calcDataToolBar( new CalcDataToolBar(projectMainWidget) ),
     projectTab( new QTabWidget(stackedWidget) ),
     justStrengthAnalisysWidget( new QWidget ),
-    designerWidget( new TrussUnitDesignerWidget ),
+    designerWidget( new TrussDesignerWidget ),
     trussWindowManager( new TrussUnitWindowManager )
 {
     // Should be hidden while creating other widgets
@@ -267,7 +267,7 @@ TrussUnitWindowManager& FermaNextProject::getTrussUnitWindowManager ()
     return *trussWindowManager;
 }
 
-TrussUnitDesignerWidget& FermaNextProject::getDesignerWidget ()
+TrussDesignerWidget& FermaNextProject::getDesignerWidget ()
 {
     return *designerWidget;
 }
