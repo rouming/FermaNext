@@ -5,7 +5,7 @@
 #include <QString>
 
 #include "XMLSerializableObject.h"
-#include "TrussUnitDesignerWidget.h"
+#include "TrussDesignerWidget.h"
 #include "TrussUnitWindowManager.h"
 #include "ObjectStateManager.h"
 #include "CalcDataToolBar.h"
@@ -46,7 +46,7 @@ public:
     virtual bool isActivated () const;
 
     virtual TrussUnitWindowManager& getTrussUnitWindowManager ();    
-    virtual TrussUnitDesignerWidget& getDesignerWidget ();
+    virtual TrussDesignerWidget& getDesignerWidget ();
     virtual CalcDataToolBar& getCalcDataToolBar ();
     virtual FermaNextWorkspace& getWorkspace();
 
@@ -77,7 +77,7 @@ private:
     CalcDataToolBar* calcDataToolBar;
     QTabWidget* projectTab;
     QWidget* justStrengthAnalisysWidget;
-    TrussUnitDesignerWidget* designerWidget;
+    TrussDesignerWidget* designerWidget;
     TrussUnitWindowManager* trussWindowManager;
 };
 

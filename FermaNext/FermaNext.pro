@@ -1,13 +1,13 @@
 
 TEMPLATE = subdirs
 
-SUBDIRS = src/common \
-          src/Agg \
-          src/TrussUnit \
+SUBDIRS = src/Common \
+          src/FermaNext/Gui \
+          src/FermaNext/TrussUnit \
           src/FermaNext \
           \
-          src/loaders/JavaPluginLoader \
-          src/loaders/NativePluginLoader \
+          src/Loaders/JavaPluginLoader \
+          src/Loaders/NativePluginLoader \
           \
-          src/plugins/old_SimpleCalc
+          src/Plugins/old_SimpleCalc
 

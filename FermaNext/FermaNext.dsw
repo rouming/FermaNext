@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "Agg"=.\src\Agg\Agg.dsp - Package Owner=<4>
+Project: "Common"=.\src\Common\Common.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -27,11 +27,23 @@ Package=<4>
     Project_Dep_Name TrussUnit
     End Project Dependency
     Begin Project Dependency
-    Project_Dep_Name Agg
-    End Project Dependency
-    Begin Project Dependency
     Project_Dep_Name common
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name Gui
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "Gui"=.\src\FermaNext\Gui\Gui.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
 }}}
 
 ###############################################################################
@@ -44,11 +56,29 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name Common
+    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "NativePluginLoader"=.\src\loaders\NativePluginLoader\NativePluginLoader.dsp - Package Owner=<4>
+Project: "NativePluginLoader"=.\src\Loaders\NativePluginLoader\NativePluginLoader.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name Common
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "TrussUnit"=.\src\FermaNext\TrussUnit\TrussUnit.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -60,31 +90,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "TrussUnit"=.\src\TrussUnit\TrussUnit.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "common"=.\SRC\common\common.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "old_SimpleCalc"=.\SRC\PLUGINS\old_SimpleCalc\old_SimpleCalc.dsp - Package Owner=<4>
+Project: "old_SimpleCalc"=.\src\Plugins\old_SimpleCalc\old_SimpleCalc.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
