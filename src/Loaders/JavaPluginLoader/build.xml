@@ -7,7 +7,7 @@
     <property name="pkg.name" value="fermanext"/>
     <property name="loaders.dir" value="../../../plugins/loaders"/>
     <property name="build.dir" value="../../../build"/>
-    <property name="dist.build.dir" value="${build.dir}/JavaPluginLoader"/>
+    <property name="dist.build.dir" value="${build.dir}/JavaPluginLoader.ldr"/>
     <property name="src.build.dir" value="${dist.build.dir}/classes"/>
     <property name="lib.build.dir" value="${loaders.dir}"/>
     <property name="src.build.jar" value="${pkg.name}.jar"/>

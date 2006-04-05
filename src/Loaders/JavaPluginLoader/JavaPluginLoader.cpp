@@ -157,6 +157,7 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
 
     JClass trussUnitCls = javaVM->findClass("fermanext/trussunit/TrussUnit");
     if ( trussUnitCls == 0 ) {
+        javaVM->exceptionDescribe();
         // Clears pending exception
         javaVM->exceptionClear();
         
@@ -167,6 +168,7 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
     JMethodID trussUnitConstructor = 
         javaVM->getMethodID( trussUnitCls, "<init>", "()V" );
     if ( trussUnitConstructor == 0 ) {
+        javaVM->exceptionDescribe();
         // Clears pending exception
         javaVM->exceptionClear();
         
@@ -177,6 +179,7 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
     JObject trussUnit = 
         javaVM->newObject( trussUnitCls, trussUnitConstructor );
     if ( trussUnit == 0 ) {
+        javaVM->exceptionDescribe();
         // Clears pending exception
         javaVM->exceptionClear();
         
