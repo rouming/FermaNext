@@ -38,5 +38,7 @@ SOURCES = JavaPluginLoader.cpp \
           \
           stubs-src/fermanext_trussunit_TrussUnit.cpp
 
-# Build java-src
-system(ant)
+# Build Java sources
+PRE_TARGETDEPS = JavaBuild
+QMAKE_EXTRA_TARGETS += JavaBuild
+JavaBuild.commands = $$(ANT_HOME)/bin/ant

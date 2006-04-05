@@ -15,18 +15,12 @@ win32 {
 
   DEFINES += WIN32 QT_THREAD_SUPPORT
   LIBS = TrussUnit.lib Common.lib
-
-  system( xcopy /y Simple_f.dll ..\..\..\plugins )
-  system( xcopy /y win_Simple_f.dll ..\..\..\plugins )
 }
 unix {
   HEADERS += unix_SimpleCalc.h
 
   DEFINES += QT_THREAD_SUPPORT
   LIBS = -lTrussUnit -lCommon
-
-  system( cp Simple_f.dll ../../../plugins/ )
-  system( cp Simple_f.exe ../../../plugins/ )
 }
 
 INCLUDEPATH = ../../Common \
@@ -41,3 +35,9 @@ HEADERS = old_SimpleCalc.h \
 SOURCES = old_SimpleCalc.cpp \
           VYVReader.cpp \
           FRMWriter.cpp
+
+
+# Copy dlls
+win32:QMAKE_POST_LINK = xcopy /y Simple_f.dll win_Simple_f.dll ..\..\..\plugins
+unix:QMAKE_POST_LINK = cp Simple_f.dll Simple_f.exe ../../../plugins
+
