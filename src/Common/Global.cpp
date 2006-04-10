@@ -22,6 +22,9 @@ const int nodesRadius = 4,
           defaultBufWidth = 204 + trussBufIndent,
           defaultBufHeight = 188 + trussBufIndent;
 
+const double areaMaxDimension = 999.99,
+             pivotThickLimit = 999.99;
+
 /************************************
  * Truss Unit Window Consts
  ************************************/
@@ -62,15 +65,15 @@ const double svgGamma = 1.0,
  * Geometry Window Consts
  ************************************/
 
-const int tableRowHeight = 17;
+const int tableRowHeight = 17,
+          nodeColumnWidth = 40,
+          thicknessColumnWidth = 62;
 
 // fixation check box side length 
 const int checkBoxLen = 12;
 
 // fixation check box indent from the cell border
 const int checkBoxIndent = 1;
-
-const double pivotThickLimit = 999.99;
 
  /************************************
  * Main subs

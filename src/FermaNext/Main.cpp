@@ -16,7 +16,7 @@ int main ( int argc, char* argv[] )
     QApplication app(argc, argv);
 
     // Set default style
-    QApplication::setStyle( QStyleFactory::create ("plastique") );
+    //QApplication::setStyle( QStyleFactory::create ("plastique") );
 
     QPixmap pixmap( imagesPath() + pathSeparator() + "splash.png" );
     Splash* splash = new Splash( pixmap );

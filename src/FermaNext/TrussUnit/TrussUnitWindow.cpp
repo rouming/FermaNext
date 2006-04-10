@@ -44,6 +44,9 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name,
 
     hideButton->setHint( "Hide truss unit" );
     rollUpButton->setHint( "Maximize truss unit" );
+    
+    QObject::connect( this, SIGNAL( onAreaChange(const DoubleSize&) ),
+                            SLOT( clearWindowRenderedFlag() ) );
 
     QObject::connect( hideButton, SIGNAL( onChangeButtonState() ),
                                   SLOT( clearButtonBufRenderedFlag() ) );
@@ -187,6 +190,15 @@ QDomElement TrussUnitWindow::saveToXML ( QDomDocument& doc )
     trussElem.setAttribute( "windowMaximized", (isMaximized() ?"Yes" : "No") );
 
     return trussElem;
+}
+
+/* 
+   Sets rendered flag of the window buffer to FALSE, so it 
+   will be repainted, when the paint method will be called.
+*/
+void TrussUnitWindow::clearWindowRenderedFlag ()
+{
+    rendered( false );
 }
 
 /* 

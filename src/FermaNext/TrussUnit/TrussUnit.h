@@ -84,6 +84,8 @@ public:
     virtual QPoint getWidgetPosFromTrussCoord ( double x, double y ) const;
     virtual QPoint getWidgetPosFromTrussCoord ( const DoublePoint& ) const;
 
+    virtual DoubleSize getTrussSize () const;
+
     virtual double getNodePrecision ( bool inPix = true ) const;
     virtual double getPivotPrecision () const;
 
