@@ -36,6 +36,9 @@ extern const int nodesRadius,
                  defaultBufHeight,
                  trussBufIndent;
 
+extern const double areaMaxDimension,
+                    pivotThickLimit;
+
 /************************************
  * Truss Unit Window Consts
  ************************************/
@@ -77,9 +80,10 @@ extern const double svgGamma,
  ************************************/
 
 extern const int tableRowHeight,
+                 nodeColumnWidth,
+                 thicknessColumnWidth,
                  checkBoxLen,
                  checkBoxIndent;
-extern const double pivotThickLimit;
 
 /************************************
  * Main subs

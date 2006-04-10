@@ -510,6 +510,26 @@ QPoint TrussUnit::getWidgetPosFromTrussCoord ( const DoublePoint& coord ) const
 }
 
 /*
+    Returns size of the truss unit. Truss unit size are 
+    equal to maximum x and y coords of its nodes.
+*/
+DoubleSize TrussUnit::getTrussSize () const
+{
+    DoubleSize trussSize( 0, 0 );
+    NodeList nodeList = getNodeList ();
+    NodeListIter iter = nodeList.begin();
+    for ( ; iter != nodeList.end(); ++iter )
+    {   
+        TrussNode* node = *iter;
+        if ( node->getX() > trussSize.width() )
+            trussSize.setWidth( node->getX() );
+        if ( node->getY() > trussSize.height() )
+            trussSize.setHeight( node->getY() );
+    }
+    return trussSize;
+}
+
+/*
     Returns node finding precision. If inPix is TRUE, 
     returns it in pixels, otherwise returns it in truss 
     coordinates relative to the current truss area size.

@@ -131,6 +131,7 @@ signals:
     void onHintHides ( bool smooth );
 
 protected slots:
+    void clearWindowRenderedFlag ();
     void clearButtonBufRenderedFlag ();
     void setWindowButtonHinted ();
 

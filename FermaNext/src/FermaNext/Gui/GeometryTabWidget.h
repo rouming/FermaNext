@@ -14,6 +14,7 @@
 
 class QCheckBox;
 class QColorGroup;
+class QGroupBox;
 class QLabel;
 class QLineEdit;
 class QPainter;
@@ -106,46 +107,50 @@ public:
 };
 
 /*****************************************************************************/
-/*
-class ComboItem : public QTableWidgetItem
+
+class PivotTableDelegate : public QItemDelegate
 {
+    Q_OBJECT
 public:
-    ComboItem( QTable* table, int currentNumb, int adjNumb );
-    virtual void setAdjoiningNodeNumber ( int );
-    virtual QWidget* createEditor() const;
-    virtual void setContentFromEditor( QWidget* );
-    virtual void setText( const QString& );
+    PivotTableDelegate( QWidget* parent = 0 );
+
+    void setNodesTotalNumber ( int );
+    
+    QWidget* createEditor ( QWidget *parent, const QStyleOptionViewItem&,
+                            const QModelIndex& ) const;
+
+    void setEditorData ( QWidget* editor, const QModelIndex& index ) const;
+
+    void setModelData ( QWidget* editor, QAbstractItemModel* model, 
+                        const QModelIndex& index ) const;
+
+    void updateEditorGeometry ( QWidget *editor,
+                                const QStyleOptionViewItem& option, 
+                                const QModelIndex& index ) const;
 
 protected:
-    virtual QStringList getComboArgList () const;
-
-private:
-    QComboBox *comboBox;
-    int currentValue, adjNodeValue;
-};
-*/
-/*****************************************************************************/
-/*
-class PivotTable : public QTableWidget
-{
-public:
-    PivotTable ( QWidget* parent = 0, const char* name = 0  );
-    ComboItem* getComboItem ( int row, int col ) const;
-    virtual void setNodeNumber ( int row, int col, int numb, int adjNumb );
-    virtual void setThickness ( int row, double thick );
-    virtual double getThickness ( int row ) const;
-    virtual void setNodesTotalNumber ( int );
-    virtual int getNodesNumber () const;
-    virtual void addPivot ( const TrussPivot&, int row = -1 );
-
-protected:
-    virtual QWidget* createEditor ( int row, int col, 
-                                    bool initFromCell ) const;
+    QStringList getComboArgList ( const QModelIndex& index ) const;
 
 private:
     int nodesNumb;
+
+signals:
+    void cellWasChanged ( int, int );
 };
-*/
+
+/*****************************************************************************/
+
+class PivotTable : public QTableWidget
+{
+public:
+    PivotTable ( QWidget* parent = 0 );
+    virtual void setNodeNumber ( int row, int col, int numb );
+    virtual void setThickness ( int row, double thick );
+    virtual double getThickness ( int row ) const;
+    virtual void addPivot ( const TrussPivot&, int row = -1 );
+    virtual void setNodesTotalNumber ( int );
+};
+
 /*****************************************************************************/
 
 class GeometryTabWidget : public QTabWidget
@@ -162,7 +167,8 @@ protected:
     virtual void initPivotsTab ();
     virtual void initAreaTab ();
     virtual void fillNodeTable ();
-//    virtual void fillPivotTable ();
+    virtual void fillPivotTable ();
+    virtual void fillAreaSizeTab ();
     virtual void saveNodeStateAfterMoving ( TrussNode& node,
                                             const DoublePoint& pos );
 
@@ -175,7 +181,7 @@ protected slots:
     virtual void updateNodeTableCoords ();
     virtual void updateNodeTableFixation ();
     virtual void updateNodeState ( int, int );
-/*
+
     virtual void addPivotToTable ( const Node&, const Node& );
     virtual void removePivotFromTable ( const Node&, const Node& );
     virtual void updateNodesNumbers ( const Node& node );
@@ -184,14 +190,18 @@ protected slots:
     virtual void updatePivotTableLastNode ();
     virtual void updatePivotTableThickness ();
     virtual void updatePivotState ( int row, int col );
-*/
-    virtual void changeTrussAreaSize ( const QString& );
 
+    virtual void updateTrussAreaSize ( double );
+    virtual void updateTableTrussAreaSize ( const DoubleSize& );
+    virtual void updateAreaSizeSpinBoxes ();
+    
 private:
-    NodeTable *nodeTable;
-//    PivotTable *pivotTable;
-    QLabel *nodesNumbLabel, *fixedNodesLabel, *pivotsNumbLabel;
     TrussUnitWindow *focusWindow;
+    NodeTable *nodeTable;
+    PivotTable *pivotTable;
+    QLabel *nodesNumbLabel, *fixedNodesLabel, *pivotsNumbLabel;
+    QGroupBox *sizeGroupBox;
+    QDoubleSpinBox *xSizeEdit, *ySizeEdit;
     QSpacerItem *nodesSpacer, *pivotsSpacer;
     // Undo/Redo
     DoublePoint beforeMovingNodePos;
