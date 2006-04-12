@@ -11,8 +11,10 @@
      <!-- Loaders properties -->
      <property name="loaders.dir" value="loaders"/>
      <property name="loader.extension" value="ldr"/>
-     <property name="loader.name" value="NativeLoaderTest"/>
-     <property name="loader.outfile" value="${loaders.dir}/${loader.name}.${loader.extension}"/>
+     <property name="loader.name" 
+               value="NativeLoaderTest"/>
+     <property name="loader.outfile" 
+               value="${loaders.dir}/${loader.name}.${loader.extension}"/>
      <property name="loader.srcfile" value="${loader.name}.cpp"/>
 
      <!-- Plugins properties -->
@@ -20,7 +22,8 @@
      <property name="plugin.extension" value="plg"/>
 
      <property name="plugin.name" value="NativePluginTest"/>
-     <property name="plugin.outfile" value="${plugins.dir}/${plugin.name}.${plugin.extension}"/>
+     <property name="plugin.outfile" 
+               value="${plugins.dir}/${plugin.name}.${plugin.extension}"/>
      <property name="plugin.srcfile" value="${plugin.name}.cpp"/>
 
 
@@ -53,18 +56,19 @@
               optimize="none"
               multithreaded="true"
               relentless="true"
-              debug="true"
+              debug="false"
               outfile="${loader.outfile}"
               outtype="shared"
               objdir="${objects.dir}">
 
-              <defineset define="_REENTRANT"/>
+              <defineset define="QT_THREAD_SUPPORT"/>
               <defineset define="QT_XML_LIB"/>
               <defineset define="QT_CORE_LIB"/>
               <defineset define="QT_NETWORK_LIB"/>
 
               <!-- Windows define sets -->
               <defineset define="UNICODE" if="is-windows"/>
+              <defineset define="WIN32" if="is-windows"/>
 
               <includepath refid="qt.includes"/>
               <includepath refid="ferma.includes"/>
@@ -77,9 +81,13 @@
 
               <linker name="${compiler}">
                  <libset libs="Common" dir="../../build/Release"  />
-                 <libset libs="QtCore"/>
-                 <libset libs="QtXml"/>
-                 <libset libs="QtNetwork"/>
+
+                 <!-- Windows Qt libsets -->
+                 <libset libs="QtCore4, QtXml4, QtNetwork4" 
+                         dir="${qt.dir}/lib" if="is-windows" />
+
+                 <!-- UNIX Qt libsets -->
+                 <libset libs="QtCore, QtXml, QtNetwork" if="is-unix" />
 
                  <!-- UNIX libsets -->
                  <libset libs="Xext" dir="/usr/X11R6/lib" if="is-unix"/>
@@ -107,13 +115,15 @@
               outtype="shared"
               objdir="${objects.dir}">
 
-              <defineset define="_REENTRANT"/>
+              <defineset define="QT_THREAD_SUPPORT"/>
+
               <defineset define="QT_XML_LIB"/>
               <defineset define="QT_CORE_LIB"/>
               <defineset define="QT_NETWORK_LIB"/>
 
               <!-- Windows define sets -->
               <defineset define="UNICODE" if="is-windows"/>
+              <defineset define="WIN32" if="is-windows"/>
 
               <includepath refid="qt.includes"/>
               <includepath refid="ferma.includes"/>
@@ -126,9 +136,13 @@
 
               <linker name="${compiler}">
                  <libset libs="Common" dir="../../build/Release"  />
-                 <libset libs="QtCore"/>
-                 <libset libs="QtXml"/>
-                 <libset libs="QtNetwork"/>
+
+                 <!-- Windows Qt libsets -->
+                 <libset libs="QtCore4, QtXml4, QtNetwork4" 
+                         dir="${qt.dir}/lib" if="is-windows" />
+
+                 <!-- UNIX Qt libsets -->
+                 <libset libs="QtCore, QtXml, QtNetwork" if="is-unix" />
 
                  <!-- UNIX libsets -->
                  <libset libs="Xext" dir="/usr/X11R6/lib" if="is-unix"/>
@@ -152,18 +166,19 @@
               optimize="none"
               multithreaded="true"
               relentless="true"
-              debug="true"
+              debug="false"
               outfile="${outfile}"
               outtype="executable"
               objdir="${objects.dir}">
 
-              <defineset define="_REENTRANT"/>
+              <defineset define="QT_THREAD_SUPPORT"/>
               <defineset define="QT_XML_LIB"/>
               <defineset define="QT_CORE_LIB"/>
               <defineset define="QT_NETWORK_LIB"/>
 
               <!-- Windows define sets -->
               <defineset define="UNICODE" if="is-windows"/>
+              <defineset define="WIN32" if="is-windows"/>
 
               <includepath refid="qt.includes"/>
               <includepath refid="ferma.includes"/>
@@ -174,14 +189,17 @@
  
               <fileset dir="${src.dir}" includes="PluginManagerTest.cpp"/>
 
-
               <linker name="${compiler}">
                  <linkerarg value="-export-dynamic" if="is-unix"/>
 
                  <libset libs="Common" dir="../../build/Release"  />
-                 <libset libs="QtCore"/>
-                 <libset libs="QtXml"/>
-                 <libset libs="QtNetwork"/>
+
+                 <!-- Windows Qt libsets -->
+                 <libset libs="QtCore4, QtXml4, QtNetwork4" 
+                         dir="${qt.dir}/lib" if="is-windows" />
+
+                 <!-- UNIX Qt libsets -->
+                 <libset libs="QtCore, QtXml, QtNetwork" if="is-unix" />
 
                  <!-- UNIX libsets -->
                  <libset libs="Xext" dir="/usr/X11R6/lib" if="is-unix"/>
