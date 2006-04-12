@@ -1,5 +1,6 @@
 
 #include "Common.h"
+#include "PrivateCommon.h"
 
 class NativeLoaderTest : public CommonNativeLoaderTest
 {
@@ -36,7 +37,7 @@ protected:
         }
 
         NativePlugin* plugin = 
-            pluginInstanceInitCall( PluginManager::instance(), pathToPlugin );
+            pluginInstanceInitCall( pluginManager(), pathToPlugin );
         if ( plugin == 0 ) {
             delete dynaLoader;
             std::cout << "is 0\n";
@@ -53,6 +54,63 @@ protected:
     }
 
     virtual void specificUnloadPlugins () {}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//  inherited from CommonNativeLoaderTest
+///////////////////////////////////////////////////////////////////////////////
+
+    bool dynamicCastTest ( Plugin& plg ) const
+    {
+        bool cast_is_ok = true;
+        try { dynamic_cast<NativePlugin&>(plg); }
+        // we can't catch `std::bad_cast` for Windows. 
+        // On Windows `bad_cast` is thrown which is not similar to `std::bad_cast`
+        catch ( std::exception& ) { cast_is_ok = false; }
+        return cast_is_ok;
+    }
+
+    bool exceptionCatchTest ( Plugin& plg ) const
+    {
+        bool expected_exception = false;
+        try { 
+            CommonNativePluginTest& nativePlg = 
+                dynamic_cast<CommonNativePluginTest&>(plg);
+            // This method should throw exception
+            nativePlg.throwStatusAsException();
+        }
+        catch ( Plugin::Status& ) 
+            { expected_exception = true; }
+        catch ( ... ) { /* unexpected exception */ } 
+        return expected_exception;
+    }
+
+    bool singletonInstanceTest ()
+    {
+        PluginList plugins = loadedPlugins();
+        if ( plugins.size() == 0 ) {
+            qWarning( "plugins.size() == 0" );
+            return false;
+        }
+
+        // Get first plugin
+        Plugin& plg = *plugins.at(0);
+
+        try { 
+            CommonNativePluginTest& nativePlg = 
+                dynamic_cast<CommonNativePluginTest&>(plg);
+        
+            return &PrivateSingleInstance::instance() == 
+                   &nativePlg.getPrivateSingleInstance();
+        }
+        catch ( ... ) {
+            qWarning( "Bad cast from 'Plugin' to 'CommonNativePluginTest'" );
+            return false;            
+        } 
+
+        qWarning( "Unreachable line" );
+        return false;
+    }
 
 private:
     NativeLoaderTest ( const NativeLoaderTest& );

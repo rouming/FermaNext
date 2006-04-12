@@ -3,11 +3,11 @@
 #include <vector>
 #include <algorithm>
 #include <math.h>
-
-#include <qregion.h> 
-#include <qpointarray.h>
-#include <qmap.h>
 #include <time.h>
+
+#include <QRegion> 
+#include <QPointArray>
+#include <QMap>
 
 #define MIN(v1, v2)( (v1) < (v2) ? (v1) : (v2)  )
 

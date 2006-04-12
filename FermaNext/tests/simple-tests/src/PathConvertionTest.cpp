@@ -1,7 +1,9 @@
 
-#include "SubsidiaryConstants.h"
-#include <qstringlist.h>
 #include <iostream>
+#include <QStringList>
+
+#include "Global.h"
+
 
 int PASSED = 0, FAILED = 0;
 
@@ -10,7 +12,7 @@ void my_assert( bool val, const QString& str )
     if ( val ) ++PASSED;
     else ++FAILED;
     
-    std::cout << (val ? "    OK: " : "NOT OK: ") << str.ascii() << "\n";
+    std::cout << (val ? "    OK: " : "NOT OK: ") << qPrintable( str ) << "\n";
 }
 
 int main ()

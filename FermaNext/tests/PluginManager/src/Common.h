@@ -8,17 +8,22 @@
 
 #include <iostream>
 
+class PrivateSingleInstance;
+
 //////////////////////////////////////////////////////
 // Common Native plugin 
 //////////////////////////////////////////////////////
 class CommonNativePluginTest : public NativePlugin
 {
 public:
-    CommonNativePluginTest ( PluginManager& mng, const QString& path );
+    CommonNativePluginTest ( PluginManager& mng, const QString& path ) :
+        NativePlugin( mng, path )
+    {}
 
-    virtual ~CommonNativePluginTest ();
+    virtual ~CommonNativePluginTest () {}
 
-    virtual void throwStatusAsException ();
+    virtual PrivateSingleInstance& getPrivateSingleInstance () const = 0;
+    virtual void throwStatusAsException () = 0;
         //throw(Plugin::Status)
 };
 
@@ -28,12 +33,14 @@ public:
 class CommonNativeLoaderTest : public PluginLoader
 {
 public:
-    CommonNativeLoaderTest ( PluginManager& mng );
-    virtual ~CommonNativeLoaderTest ();
+    CommonNativeLoaderTest ( PluginManager& mng ) :
+        PluginLoader(mng) 
+    {}
+    virtual ~CommonNativeLoaderTest () {}
 
-    virtual bool dynamicCastTest ( Plugin& plg ) const;
-    virtual bool exceptionCatchTest ( Plugin& plg ) const;
-    virtual bool singletonInstanceTest ();
+    virtual bool dynamicCastTest ( Plugin& plg ) const = 0;
+    virtual bool exceptionCatchTest ( Plugin& plg ) const = 0;
+    virtual bool singletonInstanceTest () = 0;
 
 private:
     CommonNativeLoaderTest ( const CommonNativeLoaderTest& );
