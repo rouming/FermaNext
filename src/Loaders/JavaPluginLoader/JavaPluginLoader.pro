@@ -41,4 +41,6 @@ SOURCES = JavaPluginLoader.cpp \
 # Build Java sources
 PRE_TARGETDEPS = JavaBuild
 QMAKE_EXTRA_TARGETS += JavaBuild
-JavaBuild.commands = $$(ANT_HOME)/bin/ant
+
+win32::JavaBuild.commands = $$(ANT_HOME)\bin\ant
+unix::JavaBuild.commands = $$(ANT_HOME)/bin/ant
