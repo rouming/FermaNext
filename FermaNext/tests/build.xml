@@ -17,7 +17,7 @@
 <!-- Setup FermaNext includes -->
 <path id="ferma.includes">
   <dirset dir="${ferma.src}">
-      <include name="**"/>
+      <include name="Common/**"/>
       <exclude name="**/obj"/>
       <exclude name="**/mocs"/>
       <exclude name="**/ui"/>

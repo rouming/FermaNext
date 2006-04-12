@@ -135,8 +135,13 @@
               objdir="${objects.dir}">
 
               <defineset define="QT_THREAD_SUPPORT"/>
+              <defineset define="QT_XML_LIB"/>
+              <defineset define="QT_CORE_LIB"/>
+              <defineset define="QT_NETWORK_LIB"/>
+
               <!-- Windows define sets -->
               <defineset define="UNICODE" if="is-windows"/>
+              <defineset define="WIN32" if="is-windows"/>
 
               <includepath refid="qt.includes"/>
               <includepath refid="agg.includes"/>
@@ -152,9 +157,13 @@
                  <linkerarg value="-export-dynamic" if="is-unix"/>
 
                  <libset libs="Common" dir="../../build/Release"  />
-                 <libset libs="QtCore"/>
-                 <libset libs="QtXml"/>
-                 <libset libs="QtNetwork"/>
+
+                 <!-- Windows Qt libsets -->
+                 <libset libs="QtCore4, QtXml4, QtNetwork4" 
+                         dir="${qt.dir}/lib" if="is-windows" />
+
+                 <!-- UNIX Qt libsets -->
+                 <libset libs="QtCore, QtXml, QtNetwork" if="is-unix" />
 
                  <!-- UNIX libsets -->
                  <libset libs="Xext" dir="/usr/X11R6/lib" if="is-unix"/>
