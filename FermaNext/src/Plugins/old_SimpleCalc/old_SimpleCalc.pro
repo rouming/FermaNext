@@ -38,6 +38,6 @@ SOURCES = old_SimpleCalc.cpp \
 
 
 # Copy dlls
-win32:QMAKE_POST_LINK = xcopy /y Simple_f.dll win_Simple_f.dll ..\..\..\plugins
+win32:QMAKE_POST_LINK = xcopy /y *.dll ..\..\..\plugins
 unix:QMAKE_POST_LINK = cp Simple_f.dll Simple_f.exe ../../../plugins
 
