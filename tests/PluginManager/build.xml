@@ -58,7 +58,11 @@
               outtype="shared"
               objdir="${objects.dir}">
 
-              <defineset define="QT_THREAD_SUPPORT"/>
+              <defineset define="_REENTRANT"/>
+              <defineset define="QT_XML_LIB"/>
+              <defineset define="QT_CORE_LIB"/>
+              <defineset define="QT_NETWORK_LIB"/>
+
               <!-- Windows define sets -->
               <defineset define="UNICODE" if="is-windows"/>
 
@@ -70,11 +74,12 @@
               <compilerarg value="-Wall" if="is-unix"/>
  
               <fileset dir="${src.dir}" includes="${loader.srcfile}"/>
-              <fileset dir="${src.dir}" includes="Common.cpp"/>
 
               <linker name="${compiler}">
-                 <libset libs="common" dir="../../build"  />
-                 <libset libs="qt-mt" dir="${qt.dir}/lib"/>
+                 <libset libs="Common" dir="../../build/Release"  />
+                 <libset libs="QtCore"/>
+                 <libset libs="QtXml"/>
+                 <libset libs="QtNetwork"/>
 
                  <!-- UNIX libsets -->
                  <libset libs="Xext" dir="/usr/X11R6/lib" if="is-unix"/>
@@ -97,12 +102,16 @@
               optimize="none"
               multithreaded="true"
               relentless="true"
-              debug="true"
+              debug="false"
               outfile="${plugin.outfile}"
               outtype="shared"
               objdir="${objects.dir}">
 
-              <defineset define="QT_THREAD_SUPPORT"/>
+              <defineset define="_REENTRANT"/>
+              <defineset define="QT_XML_LIB"/>
+              <defineset define="QT_CORE_LIB"/>
+              <defineset define="QT_NETWORK_LIB"/>
+
               <!-- Windows define sets -->
               <defineset define="UNICODE" if="is-windows"/>
 
@@ -114,11 +123,12 @@
               <compilerarg value="-Wall" if="is-unix"/>
  
               <fileset dir="${src.dir}" includes="${plugin.srcfile}"/>
-              <fileset dir="${src.dir}" includes="Common.cpp"/>
 
               <linker name="${compiler}">
-                 <libset libs="common" dir="../../build"  />
-                 <libset libs="qt-mt" dir="${qt.dir}/lib"/>
+                 <libset libs="Common" dir="../../build/Release"  />
+                 <libset libs="QtCore"/>
+                 <libset libs="QtXml"/>
+                 <libset libs="QtNetwork"/>
 
                  <!-- UNIX libsets -->
                  <libset libs="Xext" dir="/usr/X11R6/lib" if="is-unix"/>
@@ -147,7 +157,11 @@
               outtype="executable"
               objdir="${objects.dir}">
 
-              <defineset define="QT_THREAD_SUPPORT"/>
+              <defineset define="_REENTRANT"/>
+              <defineset define="QT_XML_LIB"/>
+              <defineset define="QT_CORE_LIB"/>
+              <defineset define="QT_NETWORK_LIB"/>
+
               <!-- Windows define sets -->
               <defineset define="UNICODE" if="is-windows"/>
 
@@ -159,13 +173,15 @@
               <compilerarg value="-Wall" if="is-unix"/>
  
               <fileset dir="${src.dir}" includes="PluginManagerTest.cpp"/>
-              <fileset dir="${src.dir}" includes="Common.cpp"/>
+
 
               <linker name="${compiler}">
                  <linkerarg value="-export-dynamic" if="is-unix"/>
 
-                 <libset libs="common" dir="../../build"  />
-                 <libset libs="qt-mt" dir="${qt.dir}/lib"/>
+                 <libset libs="Common" dir="../../build/Release"  />
+                 <libset libs="QtCore"/>
+                 <libset libs="QtXml"/>
+                 <libset libs="QtNetwork"/>
 
                  <!-- UNIX libsets -->
                  <libset libs="Xext" dir="/usr/X11R6/lib" if="is-unix"/>

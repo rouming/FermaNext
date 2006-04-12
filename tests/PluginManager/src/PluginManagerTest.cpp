@@ -1,21 +1,20 @@
 
-#include <iostream>
-#include <qstring.h>
+#include <QString>
 
 #include "Common.h"
 
-class PluginManagerTest
+class PluginManagerTest : public PluginManager
 {
 public:
     PluginManagerTest () :
         passed(0), failed(0)
     {}
 
-    void assert ( bool val, const QString& str )
+    void my_assert ( bool val, const QString& str )
     {
         if ( val ) ++passed;
         else ++failed;    
-        std::cout << (val ? "    OK: " : "NOT OK: ") << str.ascii() << "\n"; 
+        std::cout << (val ? "    OK: " : "NOT OK: ") << qPrintable(str) << "\n"; 
     }
 
     void lastReport ()
@@ -27,7 +26,7 @@ public:
 
     void testCaseBegin ( const QString& testCaseName ) 
     {
-        std::cout <<  "=========== " << testCaseName.ascii() << 
+        std::cout <<  "=========== " << qPrintable(testCaseName) << 
                       " ==========\n";
     }
 
@@ -48,8 +47,7 @@ public:
     {
         testCaseBegin("rttiBehaviourAcrossDynamicLibraries");
 
-        PluginManager& plgMng = PluginManager::instance();
-        PluginLoaderList loaders = plgMng.pluginLoaders();
+        PluginLoaderList loaders = pluginLoaders();
         PluginLoader& loader = *loaders.at(0);
         PluginList plugins = loader.loadedPlugins();
         Plugin& plugin = *plugins.at(0);
@@ -83,14 +81,14 @@ public:
                                    "should be loaded with "
                                    "'RTLD_GLOBAL' param)" );
 #endif
-             assert( dynCastRes, dynCastMsg );
-             assert( excpCatchRes, excpCatchMsg );
-             assert( singletonRes, singletonMsg );
+             my_assert( dynCastRes, dynCastMsg );
+             my_assert( excpCatchRes, excpCatchMsg );
+             my_assert( singletonRes, singletonMsg );
         } 
         // we can't catch `std::bad_cast` for Windows. 
         // On Windows `bad_cast` is thrown which is not 
         // similar to `std::bad_cast`
-        catch ( std::exception& ) { assert( 0, "Bad cast!" ); }
+        catch ( std::exception& ) { my_assert( 0, "Bad cast!" ); }
         
         testCaseEnd();
     }
@@ -99,9 +97,8 @@ public:
     {
         testCaseBegin("registerLoadersTest");
 
-        PluginManager& plgMng = PluginManager::instance();
-        plgMng.registerPluginLoaders( "loaders" );
-        assert( plgMng.countPluginLoaders() == 1, 
+        registerPluginLoaders( "loaders" );
+        my_assert( pluginLoaders().size() == 1, 
                 "One native plugin loader" );
 
         testCaseEnd();
@@ -111,11 +108,10 @@ public:
     {
         testCaseBegin("unregisterLoadersTest");
 
-        PluginManager& plgMng = PluginManager::instance();
-        plgMng.unregisterPluginLoaders();
-        assert( plgMng.countPluginLoaders() == 0, 
+        unregisterPluginLoaders();
+        my_assert( pluginLoaders().size() == 0, 
                 "Zero plugin loaders after unregister" );
-        assert( plgMng.loadedPlugins().size() == 0, 
+        my_assert( loadedPlugins().size() == 0, 
                 "Zero plugins after unload" );
 
         testCaseEnd();
@@ -125,9 +121,8 @@ public:
     {
         testCaseBegin("loadPluginsTest");
 
-        PluginManager& plgMng = PluginManager::instance();
-        plgMng.loadPlugins( "plugins" );
-        assert( plgMng.loadedPlugins().size() == 1, "One native plugin" );
+        loadPlugins( "plugins" );
+        my_assert( loadedPlugins().size() == 1, "One native plugin" );
 
         testCaseEnd();
     }
@@ -136,11 +131,10 @@ public:
     {
         testCaseBegin("unloadPluginsTest");
 
-        PluginManager& plgMng = PluginManager::instance();
-        plgMng.unloadPlugins();
-        assert( plgMng.countPluginLoaders() == 1, 
+        unloadPlugins();
+        my_assert( pluginLoaders().size() == 1, 
                 "One native plugin loader" );
-        assert( plgMng.loadedPlugins().size() == 0, 
+        my_assert( loadedPlugins().size() == 0, 
                "Zero plugins after unload" );
 
         testCaseEnd();
@@ -150,21 +144,21 @@ public:
     void resolvingDependenciesTest ()
     {
         testCaseBegin("resolvingDependenciesTest");
-        assert( false, "Not implemented!" );
+        my_assert( false, "Not implemented!" );
         testCaseEnd();
     }
 
     void loadingUnloadingPluginsTest ()
     {
         testCaseBegin("loadingUnloadingPluginsTest");
-        assert( false, "Not implemented!" );
+        my_assert( false, "Not implemented!" );
         testCaseEnd();
     }
     
     void loadedPluginsByTypeTest ()
     {
         testCaseBegin("loadedPluginsByTypeTest");
-        assert( false, "Not implemented!" );
+        my_assert( false, "Not implemented!" );
         testCaseEnd();
     }
 

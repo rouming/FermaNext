@@ -129,7 +129,7 @@
               optimize="none"
               multithreaded="true"
               relentless="true"
-              debug="true"
+              debug="false"
               outfile="${build.dir}/${out.file}"
               outtype="executable"
               objdir="${objects.dir}">
@@ -151,8 +151,10 @@
               <linker name="${compiler}">
                  <linkerarg value="-export-dynamic" if="is-unix"/>
 
-                 <libset libs="common" dir="../../build"  />
-                 <libset libs="qt-mt" dir="${qt.dir}/lib"/>
+                 <libset libs="Common" dir="../../build/Release"  />
+                 <libset libs="QtCore"/>
+                 <libset libs="QtXml"/>
+                 <libset libs="QtNetwork"/>
 
                  <!-- UNIX libsets -->
                  <libset libs="Xext" dir="/usr/X11R6/lib" if="is-unix"/>

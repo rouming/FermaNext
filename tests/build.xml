@@ -37,6 +37,9 @@
 <!-- Setup Qt includes -->
 <path id="qt.includes">
   <pathelement path="${qt.dir}/include"/>
+  <pathelement path="${qt.dir}/include/QtCore"/>
+  <pathelement path="${qt.dir}/include/QtXml"/>
+  <pathelement path="${qt.dir}/include/QtNetwork"/>
   <pathelement path="${qt.dir}/mkspecs/default"/>
 </path>
 
@@ -66,7 +69,7 @@ Builds single testcase if it is defined with param `-Dtestcase=&lt;testcase_name
 
 
 To Clean all garbage from every test directory:
-> ant clean-tests
+> ant clean
 
 
 To clean garbage only for specified test:
@@ -158,7 +161,7 @@ Required features not present in cpptasks releases prior to Feb 2005
         </subant>
     </target>
 
-    <target name="clean-tests" depends="init">
+    <target name="clean" depends="init">
         <subant target="clean-test" inheritrefs="true">
             <property name="os.family" value="${os.family}"/>
             <fileset dir="." includes="*/build.xml"/>

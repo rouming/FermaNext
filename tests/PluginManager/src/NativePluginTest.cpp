@@ -1,5 +1,6 @@
 
 #include "Common.h"
+#include "PrivateCommon.h"
 
 class NativePluginTest : public CommonNativePluginTest
 {
@@ -24,6 +25,19 @@ public:
 
     virtual QString pluginStatusMsg () const 
     { return "";  }
+
+///////////////////////////////////////////////////////////////////////////////
+//  inherited from CommonNativePluginTest
+///////////////////////////////////////////////////////////////////////////////
+
+    PrivateSingleInstance& getPrivateSingleInstance () const
+    {
+        return PrivateSingleInstance::instance();
+    }
+
+    void throwStatusAsException () 
+        //throw (Plugin::Status)
+    { throw OkStatus; }
 };
 
 // plugin export
