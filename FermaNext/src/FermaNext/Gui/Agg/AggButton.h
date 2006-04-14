@@ -34,6 +34,9 @@ public:
     virtual void setPressed ( bool );
     virtual bool isPressed () const;
 
+    virtual void setEnabled ( bool );
+    virtual bool isEnabled () const;
+
     virtual bool isHighlighted () const;
     virtual void setHighlighted ( bool );
 
@@ -50,7 +53,7 @@ protected slots:
 
 private:
     int width, height;
-    bool pressed, highlighted;
+    bool pressed, enabled, highlighted;
     // leftTopPos - button position in inner dynarow buffer coords
     QPoint leftTopPos;
     QString label, hint;

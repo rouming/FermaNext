@@ -46,18 +46,27 @@ double TrussLoad::getYForce () const
 
 void TrussLoad::setXForce ( double x_ )
 {
+    if ( x == x_ )
+        return;
     x = x_;
+    emit forceWasChanged();
 }
 
 void TrussLoad::setYForce ( double y_ )
 {
+    if ( y == y_ )
+        return;
     y = y_;
+    emit forceWasChanged();
 }
 
 void TrussLoad::setForces ( double x_, double y_ )
 {
+    if ( x == x_ && y == y_ )
+        return;
     x = x_;
     y = y_;
+    emit forceWasChanged();
 }
 
 bool TrussLoad::isEnabled () const

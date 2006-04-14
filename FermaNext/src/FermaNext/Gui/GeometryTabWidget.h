@@ -8,7 +8,6 @@
 #include <QTabWidget>
 #include <QTableWidget>
 #include <QTableWidgetItem>
-#include <QValidator>
 
 #include "TrussUnitWindow.h"
 
@@ -19,17 +18,6 @@ class QLabel;
 class QLineEdit;
 class QPainter;
 class QSpacerItem;
-
-/*****************************************************************************/
-
-class RangeValidator : public QDoubleValidator
-{
-public:
-    RangeValidator ( QObject* parent );
-    RangeValidator ( double bottom, double top, int decimals, 
-                     QObject* parent );
-    virtual QValidator::State validate ( QString& input, int& ) const;
-};
 
 /*****************************************************************************/
 

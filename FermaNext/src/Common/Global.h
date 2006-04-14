@@ -76,11 +76,12 @@ extern const double svgGamma,
                     svgExpand;
 
 /************************************
- * Geometry Window Consts
+ * Geometry/Property Window Consts
  ************************************/
 
 extern const int tableRowHeight,
                  nodeColumnWidth,
+                 loadColumnWidth,
                  thicknessColumnWidth,
                  checkBoxLen,
                  checkBoxIndent;

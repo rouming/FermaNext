@@ -9,6 +9,7 @@
 AggButton::AggButton ( const QString& l, const QPoint& p, int w, int h ) :
     width(w), height(h),
     pressed(false),
+    enabled(true),
     highlighted(false),
     leftTopPos(p),
     label(l)
@@ -17,6 +18,7 @@ AggButton::AggButton ( const QString& l, const QPoint& p, int w, int h ) :
 AggButton::AggButton ( QPoint p, int w, int h ) :
     width(w), height(h),
     pressed(false),
+    enabled(true),
     highlighted(false),
     leftTopPos(p)
 {}
@@ -91,6 +93,19 @@ void AggButton::setPressed ( bool status )
 
     pressed = status;
     emit onChangeButtonState();
+}
+
+bool AggButton::isEnabled () const
+{
+    return enabled;
+}
+
+void AggButton::setEnabled ( bool e_ )
+{
+    if ( enabled == e_ )
+        return;
+    enabled = e_;
+    emit onChangeButtonState ();
 }
 
 bool AggButton::isHighlighted () const

@@ -260,7 +260,7 @@ void AggTrussToolBar::checkMouseMoveEvent ( int x, int y )
     removeButtonHighlight();
 
     AggButton* button = getSelectedButton( x, y );
-    if ( button )
+    if ( button && button->isEnabled() )
     {
         button->setHighlighted( true );
 
@@ -305,8 +305,10 @@ void AggTrussToolBar::checkMousePressEvent ( int x, int y )
     if ( ! button )
         return;
 
-    if ( button != hideButton )
-        button->setPressed( true );
+    if ( button != hideButton ) {
+        if ( button->isEnabled() )
+            button->setPressed( true );
+    }
     else if ( ! hideButton->isPressed() )
         button->setPressed( true );
     else

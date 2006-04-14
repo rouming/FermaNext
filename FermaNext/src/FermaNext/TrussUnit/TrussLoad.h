@@ -6,6 +6,10 @@
 #include <QObject>
 #include <QMap>
 
+#include "StatefulObject.h"
+
+class Node;
+
 /*****************************************************************************
  * Truss Load
  *****************************************************************************/
@@ -34,6 +38,9 @@ public slots:
     void enable ();
     void remove ();
 
+signals:
+    void forceWasChanged ();
+
 private:
     bool enabled;
     bool removed;
@@ -42,11 +49,30 @@ private:
 };
 
 /*****************************************************************************
+ * Truss Load Case Emitter
+ *****************************************************************************/
+
+class TrussLoadCaseEmitter : public QObject
+{
+    Q_OBJECT
+public:
+    TrussLoadCaseEmitter () {}
+
+protected slots:
+    virtual void loadIsChanged () = 0;
+
+signals:
+    void onAfterLoadCreation ( const Node& );
+    void onAfterLoadRemoval ( const Node& );
+    void onLoadChange ( const Node& );
+};
+
+/*****************************************************************************
  * Truss Load Case
  *****************************************************************************/
 
 template <class N>
-class TrussLoadCase
+class TrussLoadCase : public TrussLoadCaseEmitter
 {
 public:
     // Basic typedefs
@@ -77,14 +103,18 @@ public:
         else {
             load = new TrussLoad( x, y );
             // Catch life time changes
-            QObject::connect( &node, SIGNAL(onBeforeDesist(StatefulObject&)),
-                              load, SLOT(disable()) );
-            QObject::connect( &node, SIGNAL(onAfterRevive(StatefulObject&)),
-                              load, SLOT(enable()) );
-            QObject::connect( &node, SIGNAL(destroyed()),
-                              load, SLOT(remove()) );
+            connect( &node, SIGNAL(onBeforeDesist(StatefulObject&)),
+                      load, SLOT(disable()) );
+            connect( &node, SIGNAL(onAfterRevive(StatefulObject&)),
+                      load, SLOT(enable()) );
+            connect( &node, SIGNAL(destroyed()),
+                      load, SLOT(remove()) );
+            connect( load, SIGNAL(forceWasChanged()),
+                           SLOT(loadIsChanged()) );
 
             loads[&node] = load;
+
+            emit onAfterLoadCreation( node );
         }
     }
 
@@ -99,6 +129,7 @@ public:
             QObject::disconnect( &node, 0, load, 0 );
             delete load;
             loads.remove(&node);
+            emit onAfterLoadRemoval( node );
             return true;
         }
         return false;
@@ -143,6 +174,18 @@ protected:
                 iter = loads.erase(iter);
             }
         }
+    }
+
+    void loadIsChanged ()
+    {
+        TrussLoad* load = dynamic_cast<TrussLoad*>(sender());
+        if ( ! load )
+            return;
+
+        const Node* node = loads.key( load );
+        if ( ! node )
+            return;    
+        emit onLoadChange( *node );
     }
 
 private:
@@ -199,12 +242,12 @@ public:
     }
 
     // Remove load case by index
-    virtual bool removeLoadCase ( uint indx )
+    virtual bool removeLoadCase ( int indx )
     {
         // Load cases index starts with 1, not 0
         if ( indx == 0 || indx > loadCases.size() )
             return false;
-        uint index = indx - 1;
+        int index = indx - 1;
         
         try {
             return removeLoadCase( *loadCases.at(index) );
@@ -215,12 +258,12 @@ public:
     }
 
     // Set current load case by index
-    virtual bool setCurrentLoadCase ( uint indx )
+    virtual bool setCurrentLoadCase ( int indx )
     {
         // Load cases index starts with 1, not 0
         if ( indx == 0 || indx > loadCases.size() )
             return false;
-        uint index = indx - 1;
+        int index = indx - 1;
         return setCurrentLoadCase( *loadCases.at(index) );
     }
 
@@ -243,14 +286,27 @@ public:
         return currentLoadCase;
     }
 
+    virtual int getLoadCaseIndex ( TrussLoadCase<N>& loadCase ) const
+    {
+        // Load cases index starts with 1, not 0
+        int indx = 1;
+        TrussLoadCaseListConstIter iter = loadCases.begin();
+        for ( ; iter != loadCases.end(); ++iter ) {
+            if ( *iter == &loadCase )
+                return indx;
+            ++indx;
+        }
+        return 0;
+    }
+
     // Try to find load case by index. 
-    virtual TrussLoadCase<N>* findLoadCase ( uint indx ) const
+    virtual TrussLoadCase<N>* findLoadCase ( int indx ) const
     {
         // Load cases index starts with 1, not 0
         if ( indx == 0 || indx > loadCases.size() )
             return 0;
 
-        uint index = indx - 1;
+        int index = indx - 1;
         try {
             return loadCases.at(index);
         }
@@ -280,6 +336,7 @@ private:
 private:
     typedef std::vector<TrussLoadCase<N>*> TrussLoadCaseList;
     typedef typename TrussLoadCaseList::iterator TrussLoadCaseListIter;
+    typedef typename TrussLoadCaseList::const_iterator TrussLoadCaseListConstIter;
 
     TrussLoadCaseList loadCases;        
     TrussLoadCase<N>* currentLoadCase;
