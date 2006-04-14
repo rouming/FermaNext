@@ -756,9 +756,12 @@ void TrussPropertyTabWidget::setLoadTableNonEditable ( bool noLoadCases )
     if ( noLoadCases ) {
         loadTable->setEditTriggers( QAbstractItemView::NoEditTriggers );
         fillLoadTable( 0 );
+        removeLoadCaseBtn->setEnabled( false );
     }
-    else
+    else {
         loadTable->setEditTriggers( QAbstractItemView::DoubleClicked );
+        removeLoadCaseBtn->setEnabled( true );
+    }
 }
 
 /****************************** pivots ***************************************

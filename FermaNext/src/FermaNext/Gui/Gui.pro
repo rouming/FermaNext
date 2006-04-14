@@ -32,6 +32,7 @@ SOURCES = \
 #          CalcDataToolBar.cpp \
           FermaNextMainWindow.cpp \
           GeometryTabWidget.cpp \
+	  GuiSubsidiary.cpp \
           ProjectToolBox.cpp \
           Splash.cpp \
           ToolBarManager.cpp \
@@ -58,6 +59,7 @@ HEADERS = \
           UndoRedoListBox.h \
           CalcDataWidget.ui.h \
           GeometryTabWidget.h \
+	  GuiSubsidiary.h \
           Splash.h \
           TrussDesignerWidget.h \
           WindowListBox.h \
