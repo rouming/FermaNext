@@ -37,6 +37,7 @@ SOURCES = \
           Splash.cpp \
           ToolBarManager.cpp \
           TrussDesignerWidget.cpp \
+          TrussPropertyTabWidget.cpp \
           UndoRedoListBox.cpp \
           WindowListBox.cpp \
           \
@@ -62,6 +63,7 @@ HEADERS = \
 	  GuiSubsidiary.h \
           Splash.h \
           TrussDesignerWidget.h \
+          TrussPropertyTabWidget.h \
           WindowListBox.h \
           \
           Agg/AggButton.h \

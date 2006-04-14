@@ -516,12 +516,12 @@ void TrussPropertyTabWidget::changeFocusWindow ( TrussUnitWindow* newFocusWindow
 
 void TrussPropertyTabWidget::fillLoadTab ()
 {
+    createLoadCaseBtn->setEnabled( true );
+    removeLoadCaseBtn->setEnabled( true );
+
     TrussUnit::LoadCases& loadCases = focusWindow->getLoadCases();
     if ( ! loadCases.countLoadCases() )
         setLoadTableNonEditable( true );
-
-    createLoadCaseBtn->setEnabled( true );
-    removeLoadCaseBtn->setEnabled( true );
 
     // clear table
     loadTable->setRowCount( 0 );
