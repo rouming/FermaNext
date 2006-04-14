@@ -13,6 +13,7 @@ class TrussUnitWindow;
 class FermaNextWorkspace;
 class UndoRedoListBox;
 class GeometryTabWidget;
+class TrussPropertyTabWidget;
 class QFile;
 class QMenu;
 
@@ -37,6 +38,9 @@ protected:
     void reloadPlugins ( bool reload );
 
     void init ();
+    void initUndoRedoWindow ();
+    void initGeometryWindow ();
+    void initTrussPropertyWindow ();
     void setupFileActions ();
     void setupEditActions ();
     void setupViewActions ();
@@ -100,6 +104,11 @@ private:
     QWidget* geometryWindow;
     // Tab widget for changing truss geometry
     GeometryTabWidget* geometryTabWidget;
+    // Truss property window
+    QWidget* trussPropertyWindow;
+    // Tab widget for changing truss properties
+    TrussPropertyTabWidget* trussPropTabWidget;
+
 
     // Some actions
     QAction* undoAction;
@@ -110,6 +119,7 @@ private:
     QAction* printAction;
     QAction* showUndoRedoAction;
     QAction* showGeometryWindowAction;
+    QAction* showTrussPropWindowAction;
     
     // Plugins menu
     QMenu* pluginsMenu;

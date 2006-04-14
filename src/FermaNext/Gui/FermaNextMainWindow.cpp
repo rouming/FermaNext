@@ -27,6 +27,7 @@
 #include "Global.h"
 #include "UndoRedoListBox.h"
 #include "GeometryTabWidget.h"
+#include "TrussPropertyTabWidget.h"
 
 const QString fermaTitle( QObject::tr( "Educational CAD System 'Ferma'" ) );
 
@@ -63,37 +64,9 @@ void FermaNextMainWindow::init ()
     setMinimumSize( 640, 480 );
     statusBar()->addWidget(new QLabel( tr("Ready"), statusBar() ));
 
-    undoRedoHistoryWidget = new QWidget( this, Qt::Window | Qt::Tool );
-
-    int undoRedoWidth = 140, undoRedoHeight = 110;
-    undoRedoHistoryWidget->setFixedSize( undoRedoWidth, undoRedoHeight );
-    // Pretty history widget offset from the end point of the screen
-    undoRedoHistoryWidget->move( QApplication::desktop()->width() - 
-                                 int(undoRedoWidth*1.5), 
-                                 0 + int(undoRedoHeight*1.5) );
-    undoRedoHistoryWidget->setCaption( tr("History") );
-
-    QVBoxLayout* vboxHistoryWidget = new QVBoxLayout( undoRedoHistoryWidget );
-    undoRedoListBox = new UndoRedoListBox( undoRedoHistoryWidget );
-    vboxHistoryWidget->addWidget( undoRedoListBox );
-    undoRedoListBox->installEventFilter( this );
-    undoRedoHistoryWidget->installEventFilter( this );
-    
-    geometryWindow = new QWidget( this, Qt::Window | Qt::Tool );
-    geometryWindow->setFixedSize( 195, 174 );
-    geometryWindow->setCaption( tr("Truss Geometry") );
-    geometryTabWidget = new GeometryTabWidget( geometryWindow );
-    geometryWindow->move( QApplication::desktop()->width() - 265, 310 );
-    geometryWindow->installEventFilter( this );
-
-    QVBoxLayout* tabLayout = new QVBoxLayout;
-    tabLayout->addWidget( geometryTabWidget );
-    QVBoxLayout* parentLayout = new QVBoxLayout( geometryWindow );
-    parentLayout->addLayout( tabLayout );
-    tabLayout->setMargin( 1 );
-    tabLayout->setSpacing( 1 );
-    parentLayout->setMargin( 2 );
-    parentLayout->setSpacing( 2 );
+    initUndoRedoWindow();
+    initGeometryWindow();
+    initTrussPropertyWindow();
     
     projectsDockWindow = new Q3DockWindow( Q3DockWindow::InDock, this );
     projectsDockWindow->setResizeEnabled( true );
@@ -121,12 +94,69 @@ void FermaNextMainWindow::init ()
     setRightJustification( true );
 }
 
+void FermaNextMainWindow::initUndoRedoWindow ()
+{
+    undoRedoHistoryWidget = new QWidget( this, Qt::Window | Qt::Tool );
+
+    undoRedoHistoryWidget->setFixedSize( 140, 110 );
+    // Pretty history widget offset from the end point of the screen
+    undoRedoHistoryWidget->move( QApplication::desktop()->width() - 170, 70 );
+    undoRedoHistoryWidget->setCaption( tr("History") );
+    undoRedoListBox = new UndoRedoListBox( undoRedoHistoryWidget );
+    undoRedoHistoryWidget->installEventFilter( this );
+    
+    QVBoxLayout* listBoxLayout = new QVBoxLayout;
+    listBoxLayout->addWidget( undoRedoListBox );
+    QVBoxLayout* widgetLayout = new QVBoxLayout( undoRedoHistoryWidget );
+    widgetLayout->addLayout( listBoxLayout );
+    widgetLayout->setMargin( 2 );
+}
+
+void FermaNextMainWindow::initGeometryWindow ()
+{
+    geometryWindow = new QWidget( this, Qt::Window | Qt::Tool );
+    geometryWindow->setFixedSize( 195, 174 );
+    geometryWindow->setCaption( tr("Truss Geometry") );
+    geometryTabWidget = new GeometryTabWidget( geometryWindow );
+    geometryWindow->move( QApplication::desktop()->width() - 225, 210 );
+    geometryWindow->installEventFilter( this );
+
+    QVBoxLayout* tabLayout = new QVBoxLayout;
+    tabLayout->addWidget( geometryTabWidget );
+    QVBoxLayout* parentLayout = new QVBoxLayout( geometryWindow );
+    parentLayout->addLayout( tabLayout );
+    tabLayout->setMargin( 1 );
+    tabLayout->setSpacing( 1 );
+    parentLayout->setMargin( 2 );
+    parentLayout->setSpacing( 2 );
+}
+
+void FermaNextMainWindow::initTrussPropertyWindow ()
+{
+    trussPropertyWindow = new QWidget( this, Qt::Window | Qt::Tool );
+    trussPropertyWindow->setFixedSize( 195, 230 );
+    trussPropertyWindow->setCaption( tr("Truss Properties") );
+    trussPropTabWidget = new TrussPropertyTabWidget( trussPropertyWindow );
+    trussPropertyWindow->move( QApplication::desktop()->width() - 225, 415 );
+    trussPropertyWindow->installEventFilter( this );
+
+    QVBoxLayout* tabLayout = new QVBoxLayout;
+    tabLayout->addWidget( trussPropTabWidget );
+    QVBoxLayout* parentLayout = new QVBoxLayout( trussPropertyWindow );
+    parentLayout->addLayout( tabLayout );
+    tabLayout->setMargin( 1 );
+    tabLayout->setSpacing( 1 );
+    parentLayout->setMargin( 2 );
+    parentLayout->setSpacing( 2 );
+}
+
 void FermaNextMainWindow::someProjectRemoved ( FermaNextProject& prj )
 {
     if ( 1 == workspace.countProjects() ) {
         projectsDockWindow->hide();
         undoRedoHistoryWidget->hide();
         geometryWindow->hide();
+        trussPropertyWindow->hide();
     }
     TrussDesignerWidget& designerWidget = prj.getDesignerWidget();
     designerWidget.disconnect( this );
@@ -138,6 +168,7 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
         projectsDockWindow->show();
         undoRedoHistoryWidget->show();
         geometryWindow->show();
+        trussPropertyWindow->show();
     }
 
     TrussDesignerWidget& designerWidget = prj.getDesignerWidget();
@@ -162,7 +193,9 @@ void FermaNextMainWindow::createProject ()
         connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
                  geometryTabWidget, 
                         SLOT(trussUnitWindowWasCreated(TrussUnitWindow&)) );
-
+        connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
+                 trussPropTabWidget, 
+                        SLOT(trussUnitWindowWasCreated(TrussUnitWindow&)) );
 
 //TODO: remove this in future
 /*********** TEMP TRUSS UNIT **************************/
@@ -189,9 +222,7 @@ void FermaNextMainWindow::createProject ()
         node2.setFixation( Node::FixationByY );
         node3.setFixation( Node::FixationByXY );
 
-        TrussUnit::LoadCase& currentCase = 
-            trussWindow.getLoadCases().createLoadCase();
-        trussWindow.getLoadCases().setCurrentLoadCase ( currentCase );
+        TrussUnit::LoadCase& currentCase = trussWindow.createLoadCase();
         currentCase.addLoad ( node4, 300, 100 );
 #endif
 /*********** TEMP TRUSS UNIT **************************/
@@ -358,6 +389,16 @@ void FermaNextMainWindow::setupViewActions ()
     menu->addAction( showGeometryWindowAction );
     connect( showGeometryWindowAction, SIGNAL( toggled( bool ) ), 
              geometryWindow, SLOT( setShown( bool ) ) );
+
+    showTrussPropWindowAction = 
+        new QAction( tr( "&Show Truss Property Window" ), this );
+    showTrussPropWindowAction->setToggleAction( true );
+    showTrussPropWindowAction->setOn( true );
+    showTrussPropWindowAction->
+        setStatusTip( tr( "Show or hide truss property window" ) );
+    menu->addAction( showTrussPropWindowAction );
+    connect( showTrussPropWindowAction, SIGNAL( toggled( bool ) ), 
+             trussPropertyWindow, SLOT( setShown( bool ) ) );
 }
 
 void FermaNextMainWindow::setupProjectActions ()
@@ -478,6 +519,7 @@ void FermaNextMainWindow::trussWindowLostFocus ( TrussUnitWindow& window )
     refreshUndoRedoActions();
 
     geometryTabWidget->changeFocusWindow( 0 );
+    trussPropTabWidget->changeFocusWindow( 0 );
 }
 
 void FermaNextMainWindow::trussWindowReceivedFocus ( TrussUnitWindow& window )
@@ -499,6 +541,7 @@ void FermaNextMainWindow::trussWindowReceivedFocus ( TrussUnitWindow& window )
     refreshUndoRedoActions();
     
     geometryTabWidget->changeFocusWindow( &window );
+    trussPropTabWidget->changeFocusWindow( &window );
 }
 
 /*****************************************************************************
@@ -888,10 +931,12 @@ bool FermaNextMainWindow::eventFilter( QObject* targetObj, QEvent* event )
         return false;
     }
     else if ( event->type() == QEvent::Close ) {
-        if ( targetObj == geometryWindow )
-            showGeometryWindowAction->toggle();
-        else if ( targetObj == undoRedoHistoryWidget )
+        if ( targetObj == undoRedoHistoryWidget )
             showUndoRedoAction->toggle();
+        else if ( targetObj == geometryWindow )
+            showGeometryWindowAction->toggle();            
+        else if ( targetObj == trussPropertyWindow )
+            showTrussPropWindowAction->toggle();
         return true;
     } 
     else

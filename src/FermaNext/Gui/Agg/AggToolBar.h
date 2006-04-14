@@ -2,10 +2,11 @@
 #ifndef AGGTOOLBAR_H
 #define AGGTOOLBAR_H
 
+#include <vector>
+
 #include "AggButton.h"
 #include "AggSubsidiary.h"
 #include "AggPaintThread.h"
-#include <vector>
 
 /*****************************************************************************/
 
@@ -45,7 +46,10 @@ public:
                                           QWidget* widget, 
                                           const char* signal, 
                                           const char* slot );
-    virtual void removeButton ( const QString& label );
+    virtual void removeButton ( AggToolBarButton& );
+    virtual void removeButton ( int indx );
+    virtual AggToolBarButton* getButton ( int indx ) const;
+    virtual AggToolBarButton* getButton ( const QString& label ) const;
     virtual void clearToolBar ();
 
     void changeCenterPosition ( QPoint );

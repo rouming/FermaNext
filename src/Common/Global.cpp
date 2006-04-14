@@ -62,11 +62,12 @@ const double svgGamma = 1.0,
              svgExpand = 0.3;
  
 /************************************
- * Geometry Window Consts
+ * Geometry/Property Window Consts
  ************************************/
 
 const int tableRowHeight = 17,
           nodeColumnWidth = 40,
+          loadColumnWidth = 71,
           thicknessColumnWidth = 62;
 
 // fixation check box side length 

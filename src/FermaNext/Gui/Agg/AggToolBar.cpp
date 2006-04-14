@@ -1,4 +1,6 @@
 
+#include <algorithm>
+
 #include "AggToolBar.h"
 
 /*****************************************************************************
@@ -140,23 +142,22 @@ AggToolBarButton& AggToolBar::addButton ( const QString& fname,
     return *button;
 }
 
-void AggToolBar::removeButton ( const QString& label )
+void AggToolBar::removeButton ( AggToolBarButton& btn )
 {
     if ( buttons.empty() )
         return;
 
     int delWidth = 0;
-    ButtonListIter iter = buttons.begin();
-    while ( iter != buttons.end() ) {
-        AggToolBarButton* button = *iter;
-        if ( button->getLabel() == label ) {
-            delWidth = button->getWidth();            
-            iter = buttons.erase( iter );
-            delete button;
-        }
-        else
-            ++iter;
-    }
+
+    ButtonListIter iter = std::find( buttons.begin(),
+                                     buttons.end(),
+                                     &btn );
+    if ( iter == buttons.end() )
+        return;
+
+    buttons.erase( iter );
+    delete *iter;
+
     toolBarHeight = findMaxButtonHeight ();
     toolBarWidth = toolBarWidth - delWidth - separation;
 
@@ -170,6 +171,41 @@ void AggToolBar::removeButton ( const QString& label )
     toolBarLeftTopPos.setY( centerPos.y() - toolBarHeight );
 
     setRendered( false );
+}
+
+void AggToolBar::removeButton ( int indx )
+{
+    if ( indx > buttons.size() )
+        return;
+
+    removeButton( *buttons.at( indx ) );
+}
+
+AggToolBarButton* AggToolBar::getButton ( int indx ) const
+{
+    if ( indx > buttons.size() )
+        return 0;
+
+    ButtonListConstIter iter = std::find( buttons.begin(),
+                                          buttons.end(),
+                                          buttons.at( indx ) );
+    if ( iter == buttons.end() )
+        return 0;
+
+    return *iter;
+}
+
+AggToolBarButton* AggToolBar::getButton ( const QString& label ) const
+{
+    ButtonListConstIter iter = buttons.begin();
+    while ( iter != buttons.end() ) {
+        AggToolBarButton* button = *iter;
+        if ( button->getLabel() == label )
+            return *iter;
+        else
+            ++iter;
+    }
+    return 0;
 }
 
 int AggToolBar::findMaxButtonHeight () const

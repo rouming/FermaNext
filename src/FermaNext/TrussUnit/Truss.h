@@ -131,6 +131,15 @@ signals:
     void afterTopologyRevive ( const TrussTopology& );
     void beforeTopologyDesist ( const TrussTopology& );
     void afterTopologyDesist ( const TrussTopology& );
+
+    // Truss loads/load cases signals
+    void thereAreNoLoadCases ( bool );
+    void afterLoadCaseCreation ( int );
+    void afterLoadCaseRemoval ();
+    void currentLoadCaseChanged ( int );
+    void onTrussLoadChange ( const Node& );
+    void onTrussLoadCreate ( const Node& );
+    void onTrussLoadRemove ( const Node& );
 };
 
 /*****************************************************************************
@@ -579,6 +588,65 @@ public:
     virtual LoadCases& getLoadCases ()
     {
         return loadCases;
+    }
+
+    virtual LoadCase& createLoadCase ()
+    {
+        LoadCase& loadCase = loadCases.createLoadCase();
+
+        connect( &loadCase, SIGNAL( onLoadChange(const Node&) ),
+                            SIGNAL( onTrussLoadChange(const Node&) ) );
+        connect( &loadCase, SIGNAL( onLoadChange(const Node&) ),
+                            SIGNAL( onStateChange() ) );
+        connect( &loadCase, SIGNAL( onAfterLoadCreation(const Node&) ),
+                            SIGNAL( onTrussLoadCreate(const Node&) ) );
+        connect( &loadCase, SIGNAL( onAfterLoadCreation(const Node&) ),
+                            SIGNAL( onStateChange() ) );
+        connect( &loadCase, SIGNAL( onAfterLoadRemoval(const Node&) ),
+                            SIGNAL( onTrussLoadRemove(const Node&) ) );
+        connect( &loadCase, SIGNAL( onAfterLoadRemoval(const Node&) ),
+                            SIGNAL( onStateChange() ) );
+
+        emit afterLoadCaseCreation( loadCases.countLoadCases() );
+
+        setCurrentLoadCase( loadCase );
+
+        if ( loadCases.countLoadCases() == 1 )
+            emit thereAreNoLoadCases( false );
+
+        return loadCase;
+    }
+
+    virtual void removeLoadCase ( LoadCase& loadCase )
+    {
+        int indx = loadCases.getLoadCaseIndex( loadCase );
+        if ( &loadCase == loadCases.getCurrentLoadCase() ) {
+            if ( loadCases.countLoadCases() > indx ) {
+                LoadCase* current = loadCases.findLoadCase( indx + 1 );
+                if ( current )
+                    setCurrentLoadCase( *current );
+            }
+            else if ( loadCases.countLoadCases() ) {
+                LoadCase* current = loadCases.findLoadCase( indx - 1 );
+                if ( current )
+                    setCurrentLoadCase( *current );                
+            }
+        }
+        loadCases.removeLoadCase( loadCase );
+        emit afterLoadCaseRemoval();
+        emit onStateChange();
+        if ( ! loadCases.countLoadCases() )
+            emit thereAreNoLoadCases( true );
+    }
+
+    virtual void setCurrentLoadCase ( LoadCase& loadCase )
+    {
+        loadCases.setCurrentLoadCase( loadCase );
+        int indx = loadCases.getLoadCaseIndex( loadCase );
+        if ( indx ) {
+            emit currentLoadCaseChanged( indx );
+            emit onStateChange();
+        }
     }
 
     virtual const TrussMaterial& getMaterial () const

@@ -163,6 +163,8 @@ protected slots:
     virtual void trussWindowChangedVisibility ( bool );
     virtual void trussWindowDesisted ( StatefulObject& );
 
+    virtual void disableLoadDrawBehaviour ( bool );
+
 private:
     enum TrussWindowBehaviour { windowIdle = 0, onWindowDrag, 
                                 onHorResize, onVerResize, 
@@ -200,7 +202,7 @@ private:
     TrussPivotBehaviour pivotBehaviour;
     DesignerBehaviour designerBehaviour;
     // Subsidiary vars
-    bool buttonPressed;
+    bool buttonPressed, noLoadBehaviour;
     int xPos, yPos;
     QPoint firstNodeClickDist, lastNodeClickDist, mouseOffset;
     // Undo/Redo
