@@ -51,7 +51,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /machine:IX86
-# ADD LINK32 "$(QTDIR)\lib\qtmaind.lib" "Common.lib" "Gui.lib" "TrussUnit.lib" "LibAgg.lib" "LibSVG.lib" "libexpat.lib" "$(QTDIR)\lib\Qt3Supportd4.lib" "$(QTDIR)\lib\QtXmld4.lib" "$(QTDIR)\lib\QtGuid4.lib" "$(QTDIR)\lib\QtCored4.lib" /nologo /subsystem:windows /debug /machine:IX86 /nodefaultlib:"libc" /libpath:"..\..\build\debug" /libpath:"..\.." /libpath:"$(EXPATDIR)\Libs" /libpath:"$(QTDIR)\lib"
+# ADD LINK32 "$(QTDIR)\lib\qtmaind.lib" "Common.lib" "Gui.lib" "TrussUnit.lib" "LibAgg.lib" "LibSVG.lib" "libexpat.lib" "$(QTDIR)\lib\Qt3Supportd4.lib" "$(QTDIR)\lib\QtXmld4.lib" "$(QTDIR)\lib\QtGuid4.lib" "$(QTDIR)\lib\QtCored4.lib" /nologo /subsystem:console /debug /machine:IX86 /nodefaultlib:"libc" /libpath:"..\..\build\debug" /libpath:"..\.." /libpath:"$(EXPATDIR)\Libs" /libpath:"$(QTDIR)\lib"
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Release"
 
