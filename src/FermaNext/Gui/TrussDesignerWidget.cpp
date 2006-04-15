@@ -200,7 +200,6 @@ TrussDesignerWidget::TrussDesignerWidget ( QWidget* p ) :
     nodeBehaviour(nodeIdle),
     pivotBehaviour(pivotIdle),
     buttonPressed(false),
-    noLoadBehaviour(true),
     xPos(0), yPos(0), 
     firstNodeClickDist(0,0), 
     lastNodeClickDist(0,0),
@@ -260,9 +259,6 @@ void TrussDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow )
                            aggHint, SLOT( hide(bool) ) );
     QObject::connect( &trussWindow, SIGNAL( onHintHides(bool) ),
                                     SLOT( update() ) );
-
-    QObject::connect( &trussWindow, SIGNAL( thereAreNoLoadCases(bool) ),
-                                    SLOT( disableLoadDrawBehaviour(bool) ) );
 
     trussWindows.push_back(&trussWindow);
     // If window position was not set, we set default value
@@ -384,22 +380,6 @@ void TrussDesignerWidget::trussWindowDesisted ( StatefulObject& obj )
         focusOnPrevWindow( window );
     }
     catch ( ... ) { return; }
-}
-
-void TrussDesignerWidget::disableLoadDrawBehaviour ( bool disable )
-{
-    AggToolBarButton* btn = toolBar->getButton( "Load" );
-    if ( ! btn)
-        return;
-    
-    btn->setEnabled( ! disable );
-    noLoadBehaviour = disable;
-
-    if ( disable && designerBehaviour == onLoadDraw ) {
-        designerBehaviour = onSelect;
-        emit pressSelectButton();
-        QWidget::setCursor ( Qt::ArrowCursor );
-    }
 }
 
 TrussUnitWindow* TrussDesignerWidget::findWindowByWidgetPos ( int x, int y )
@@ -786,7 +766,7 @@ void TrussDesignerWidget::aggKeyPressEvent ( QKeyEvent* ke )
         removeTrussElemHighlight ();
     }
     if ( ke->key() == Qt::Key_L && designerBehaviour != onLoadDraw &&
-         designerBehaviour != onPivotLastNodeDraw && ! noLoadBehaviour )
+         designerBehaviour != onPivotLastNodeDraw )
     {
         designerBehaviour = onLoadDraw;
         emit pressLoadDrawButton();

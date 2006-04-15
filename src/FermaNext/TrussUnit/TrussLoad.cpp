@@ -49,7 +49,7 @@ void TrussLoad::setXForce ( double x_ )
     if ( x == x_ )
         return;
     x = x_;
-    emit forceWasChanged();
+    emit onForceChange();
 }
 
 void TrussLoad::setYForce ( double y_ )
@@ -57,7 +57,7 @@ void TrussLoad::setYForce ( double y_ )
     if ( y == y_ )
         return;
     y = y_;
-    emit forceWasChanged();
+    emit onForceChange();
 }
 
 void TrussLoad::setForces ( double x_, double y_ )
@@ -66,7 +66,7 @@ void TrussLoad::setForces ( double x_, double y_ )
         return;
     x = x_;
     y = y_;
-    emit forceWasChanged();
+    emit onForceChange();
 }
 
 bool TrussLoad::isEnabled () const
@@ -81,12 +81,18 @@ bool TrussLoad::isRemoved () const
 
 void TrussLoad::disable ()
 {
+    if ( ! enabled )
+        return;
     enabled = false;
+    emit onEnableChange( enabled );
 }
 
 void TrussLoad::enable ()
 {
+    if ( enabled )
+        return;
     enabled = true;
+    emit onEnableChange( enabled );
 }
 
 void TrussLoad::remove ()

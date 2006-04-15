@@ -222,8 +222,10 @@ void FermaNextMainWindow::createProject ()
         node2.setFixation( Node::FixationByY );
         node3.setFixation( Node::FixationByXY );
 
-        TrussUnit::LoadCase& currentCase = trussWindow.createLoadCase();
-        currentCase.addLoad ( node4, 300, 100 );
+        TrussUnit::LoadCase* currentCase = 
+            trussWindow.getLoadCases().getCurrentLoadCase();
+        if ( currentCase )
+            currentCase->addLoad( node4, 300, 100 );
 #endif
 /*********** TEMP TRUSS UNIT **************************/
 
