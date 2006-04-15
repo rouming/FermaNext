@@ -133,10 +133,10 @@ signals:
     void afterTopologyDesist ( const TrussTopology& );
 
     // Truss loads/load cases signals
-    void thereAreNoLoadCases ( bool );
     void afterLoadCaseCreation ( int );
     void afterLoadCaseRemoval ();
     void currentLoadCaseChanged ( int );
+    void loadCaseCanBeRemoved ( bool );
     void onTrussLoadChange ( const Node& );
     void onTrussLoadCreate ( const Node& );
     void onTrussLoadRemove ( const Node& );
@@ -178,6 +178,7 @@ public:
                                  SLOT(stateIsChanged()) );
         QObject::connect( this, SIGNAL(onAfterDesist(StatefulObject&)),
                                  SLOT(stateIsChanged()) );
+        createLoadCase();
     }
 
     virtual void clear () 
@@ -611,8 +612,10 @@ public:
 
         setCurrentLoadCase( loadCase );
 
-        if ( loadCases.countLoadCases() == 1 )
-            emit thereAreNoLoadCases( false );
+        if ( loadCases.countLoadCases() == 2 )
+            emit loadCaseCanBeRemoved( true );
+        else if ( loadCases.countLoadCases() == 1 )
+            emit loadCaseCanBeRemoved( false );
 
         return loadCase;
     }
@@ -635,8 +638,9 @@ public:
         loadCases.removeLoadCase( loadCase );
         emit afterLoadCaseRemoval();
         emit onStateChange();
-        if ( ! loadCases.countLoadCases() )
-            emit thereAreNoLoadCases( true );
+        
+        if ( loadCases.countLoadCases() == 1 )
+            emit loadCaseCanBeRemoved( false );
     }
 
     virtual void setCurrentLoadCase ( LoadCase& loadCase )

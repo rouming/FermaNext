@@ -133,8 +133,6 @@ protected slots:
     virtual void updateTableLoad ( const Node& );
     virtual void updateTrussLoad ( int, int );
 
-    virtual void setLoadTableNonEditable ( bool );
-
 /*
     virtual void addPivotToTable ( const Node&, const Node& );
     virtual void removePivotFromTable ( const Node&, const Node& );

@@ -39,7 +39,8 @@ public slots:
     void remove ();
 
 signals:
-    void forceWasChanged ();
+    void onForceChange ();
+    void onEnableChange ( bool );
 
 private:
     bool enabled;
@@ -109,9 +110,12 @@ public:
                       load, SLOT(enable()) );
             connect( &node, SIGNAL(destroyed()),
                       load, SLOT(remove()) );
-            connect( load, SIGNAL(forceWasChanged()),
-                           SLOT(loadIsChanged()) );
 
+            connect( load, SIGNAL(onForceChange()),
+                           SLOT(loadIsChanged()) );
+            connect( load, SIGNAL(onEnableChange(bool)),
+                           SLOT(loadIsChanged()) );
+            
             loads[&node] = load;
 
             emit onAfterLoadCreation( node );

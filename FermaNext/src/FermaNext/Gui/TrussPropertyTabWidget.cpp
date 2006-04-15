@@ -80,27 +80,29 @@ LoadTable::LoadTable ( QWidget* parent ) :
 
 void LoadTable::setLoad ( int row, const TrussLoad& load )
 {
-    if ( rowCount() <= row ) {
-        insertRow( row );
+    if ( row >= rowCount() )
+        return;
+    
+    QTableWidgetItem* cellX = item( row, 0 );
+    if ( cellX )
+        cellX->setText( QString("%1").arg( load.getXForce(),0,'f',2 ) );
+    else {
         QTableWidgetItem* cellX = new QTableWidgetItem( 
                         QString("%1").arg( load.getXForce(),0,'f',2 ) );
         cellX->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter );
         setItem( row, 0, cellX );
+    }
 
+    QTableWidgetItem* cellY = item( row, 1 );
+    if ( cellY )
+        cellY->setText( QString("%1").arg( load.getYForce(),0,'f',2 ) );
+    else {
         QTableWidgetItem* cellY = new QTableWidgetItem( 
                         QString("%1").arg( load.getYForce(),0,'f',2 ) );
         cellY->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter );
         setItem( row, 1, cellY );
     }
-    else {
-        QTableWidgetItem* cellX = item( row, 0 );
-        if ( cellX )
-            cellX->setText( QString("%1").arg( load.getXForce(),0,'f',2 ) );
-
-        QTableWidgetItem* cellY = item( row, 1 );
-        if ( cellY )
-            cellY->setText( QString("%1").arg( load.getYForce(),0,'f',2 ) );
-    }
+    
     horizontalHeader()->resizeSection( 0, loadColumnWidth );
     horizontalHeader()->resizeSection( 1, loadColumnWidth );
 }
@@ -337,13 +339,11 @@ void TrussPropertyTabWidget::initLoadTab ()
     QVBoxLayout* parentLayout = new QVBoxLayout( parentFrame );
     QHBoxLayout* topLayout = new QHBoxLayout;
     QVBoxLayout* tableLayout = new QVBoxLayout;
-    QVBoxLayout *bottomLayout = new QVBoxLayout;
-    QHBoxLayout *loadCaseLayout = new QHBoxLayout( loadCaseGroupBox );
+    QHBoxLayout* loadCaseLayout = new QHBoxLayout( loadCaseGroupBox );
     parentLayout->addLayout( topLayout );
     parentLayout->addLayout( tableLayout );
     loadSpacer = new QSpacerItem( 0, 0 );
     parentLayout->addItem( loadSpacer );
-    parentLayout->addLayout( bottomLayout );
     topLayout->addWidget( nodesNumbLabel );
     topLayout->addWidget( loadedNodesLabel );
     tableLayout->addWidget( loadTable );
@@ -352,13 +352,10 @@ void TrussPropertyTabWidget::initLoadTab ()
     loadCaseLayout->addWidget( loadCaseComboBox );
     loadCaseLayout->addWidget( createLoadCaseBtn);
     loadCaseLayout->addWidget( removeLoadCaseBtn );
-
     topLayout->setMargin( 5 );
     topLayout->setSpacing( 5 );
     tableLayout->setMargin( 1 );
     tableLayout->setSpacing( 1 );
-    bottomLayout->setMargin( 1 );
-    bottomLayout->setSpacing( 2 );
     loadCaseLayout->setMargin( 6 );
     loadCaseLayout->setSpacing( 5 );
     parentLayout->setMargin( 1 );
@@ -468,8 +465,8 @@ void TrussPropertyTabWidget::trussUnitWindowWasCreated ( TrussUnitWindow& window
     connect( &window, SIGNAL(onTrussLoadRemove(const Node&) ),
                       SLOT(updateTableLoad(const Node&)) );
 
-    connect( &window, SIGNAL(thereAreNoLoadCases(bool)),
-                      SLOT(setLoadTableNonEditable(bool)) );
+    connect( &window, SIGNAL(loadCaseCanBeRemoved(bool)),
+             removeLoadCaseBtn, SLOT(setEnabled(bool)) );
 
     connect( loadCaseComboBox, SIGNAL(currentIndexChanged(int)),
                                SLOT(setCurrentLoadCase(int)) );
@@ -516,12 +513,14 @@ void TrussPropertyTabWidget::changeFocusWindow ( TrussUnitWindow* newFocusWindow
 
 void TrussPropertyTabWidget::fillLoadTab ()
 {
-    createLoadCaseBtn->setEnabled( true );
-    removeLoadCaseBtn->setEnabled( true );
-
     TrussUnit::LoadCases& loadCases = focusWindow->getLoadCases();
-    if ( ! loadCases.countLoadCases() )
-        setLoadTableNonEditable( true );
+    if ( loadCases.countLoadCases() == 1 )
+        removeLoadCaseBtn->setEnabled( false );
+    else
+        removeLoadCaseBtn->setEnabled( true );
+    createLoadCaseBtn->setEnabled( true );
+
+    fillLoadCaseComboBox();
 
     // clear table
     loadTable->setRowCount( 0 );
@@ -539,30 +538,22 @@ void TrussPropertyTabWidget::fillLoadTab ()
 
     fillLoadTable( loadCases.getCurrentLoadCase() );
 
-    fillLoadCaseComboBox();
-
     nodesNumbLabel->setText( "Total nodes: " + 
                              QString::number(nodeList.size()) );
 }
 
 void TrussPropertyTabWidget::fillLoadTable ( const TrussUnit::LoadCase* loadCase )
 {
-    if ( ! focusWindow )
+    if ( ! focusWindow || ! loadCase )
         return;
     
     TrussUnit::NodeList nodeList = focusWindow->getNodeList();
-    if ( ! loadCase ) {
-        int i;
-        for ( i = 0; i < nodeList.size(); i++ )
-            loadTable->setLoad( i, TrussLoad( 0, 0 ) );
-        loadedNodesLabel->setText( "Loaded nodes: 0" );
-        return;
-    }
-
     TrussUnit::NodeListIter iter = nodeList.begin();
     for ( ; iter != nodeList.end(); ++iter ) {
         TrussNode& node = **iter;
         int row = node.getNumber() - 1;
+        if ( row >= loadTable->rowCount() )
+            loadTable->insertRow( row );
         TrussLoad* load = loadCase->findLoad( node );
         if ( load )
             loadTable->setLoad( row, *load );
@@ -602,19 +593,27 @@ void TrussPropertyTabWidget::addLoadTableRow ( const Node& node )
     if ( sender() != focusWindow )
         return;
 
-    try { 
-        const TrussNode& n = dynamic_cast<const TrussNode&>(node);
-        connect( &n, SIGNAL(onVisibleChange(bool)),
-                     SLOT(showLoadTableRow(bool)) );
-    }
-    catch ( ... ) { return; }
+    const TrussNode* trussNode = dynamic_cast<const TrussNode*>(&node);
+    Q_ASSERT( trussNode );
+    connect( trussNode, SIGNAL(onVisibleChange(bool)),
+                 SLOT(showLoadTableRow(bool)) );
 
     if ( loadTable->isHidden() ) {
         loadTable->show();
         loadSpacer->changeSize( 0, 0 );
     }
 
-    loadTable->setLoad( node.getNumber() - 1, TrussLoad( 0, 0 ) );
+    TrussUnit::LoadCase* currentCase = 
+        focusWindow->getLoadCases().getCurrentLoadCase();
+    if ( ! currentCase )
+        return;
+    int row = trussNode->getNumber() - 1;
+    loadTable->insertRow( row );
+    TrussLoad* load = currentCase->findLoad( *trussNode );
+    if ( load )
+        loadTable->setLoad( row, *load );
+    else
+        loadTable->setLoad( row, TrussLoad( 0, 0 ) );
 
     nodesNumbLabel->setText( "Total nodes: " + 
                           QString::number(focusWindow->getNodeList().size()) );
@@ -748,19 +747,6 @@ void TrussPropertyTabWidget::updateTrussLoad ( int row, int col )
             load->setXForce( newLoad.getXForce() );
         else
             load->setYForce( newLoad.getYForce() );
-    }
-}
-
-void TrussPropertyTabWidget::setLoadTableNonEditable ( bool noLoadCases )
-{
-    if ( noLoadCases ) {
-        loadTable->setEditTriggers( QAbstractItemView::NoEditTriggers );
-        fillLoadTable( 0 );
-        removeLoadCaseBtn->setEnabled( false );
-    }
-    else {
-        loadTable->setEditTriggers( QAbstractItemView::DoubleClicked );
-        removeLoadCaseBtn->setEnabled( true );
     }
 }
 
