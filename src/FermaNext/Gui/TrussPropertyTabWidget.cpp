@@ -27,7 +27,7 @@ LoadTableDelegate::LoadTableDelegate ( QObject* parent ) :
 
 QWidget* LoadTableDelegate::createEditor ( QWidget *parent,
                                            const QStyleOptionViewItem&,
-                                           const QModelIndex& index ) const
+                                           const QModelIndex& ) const
 {
     QLineEdit* editor = new QLineEdit( parent );
     editor->setFrame( false );
@@ -135,8 +135,8 @@ int LoadTable::getLoadedNodesNumber () const
 
 /*****************************************************************************
  * Pivot Table Delegate
- *****************************************************************************
-
+ *****************************************************************************/
+/*
 PivotTableDelegate::PivotTableDelegate ( QWidget* parent ) : 
     QItemDelegate( parent ),
     nodesNumb( 0 )
@@ -219,11 +219,11 @@ void PivotTableDelegate::updateEditorGeometry ( QWidget* editor,
 {
     editor->setGeometry( option.rect );
 }
-
+*/
 /*****************************************************************************
  * Pivot Table
- *****************************************************************************
-
+ *****************************************************************************/
+/*
 PivotTable::PivotTable ( QWidget* parent ) :
     QTableWidget( parent )
 {}
@@ -279,7 +279,7 @@ void PivotTable::setNodesTotalNumber ( int newNodesNumb )
     Q_ASSERT( delegate != 0 );
     delegate->setNodesTotalNumber( newNodesNumb );
 }
-
+*/
 /*****************************************************************************
  * Truss Property Tab Widget
  *****************************************************************************/
@@ -575,7 +575,7 @@ void TrussPropertyTabWidget::fillLoadCaseComboBox ()
 
     TrussUnit::LoadCases& loadCases = focusWindow->getLoadCases();
     QStringList argList;
-    int i;
+    uint i;
     for ( i = 0; i < loadCases.countLoadCases(); ++i )
         argList.push_back( QString::number( i + 1 ) );
     loadCaseComboBox->addItems( argList );
@@ -738,7 +738,7 @@ void TrussPropertyTabWidget::updateTrussLoad ( int row, int col )
         if ( ! node )
             return;
 
-        TrussLoad& newLoad = loadTable->getLoad( row );
+        TrussLoad newLoad = loadTable->getLoad( row );
         TrussLoad* load = loadCase->findLoad( *node );
         if ( ! load )
             loadCase->addLoad( *node, newLoad.getXForce(),
@@ -750,8 +750,8 @@ void TrussPropertyTabWidget::updateTrussLoad ( int row, int col )
     }
 }
 
-/****************************** pivots ***************************************
-
+/****************************** pivots ***************************************/
+/*
 void GeometryTabWidget::fillPivotTable ()
 {
     // clear table
@@ -965,5 +965,5 @@ void GeometryTabWidget::updatePivotState ( int row, int col )
 
     mng->endStateBlock();
 }
-
+*/
 /***************************************************************************/

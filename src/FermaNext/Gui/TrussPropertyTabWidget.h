@@ -60,8 +60,8 @@ public:
     virtual int getLoadedNodesNumber () const;
 };
 
-/*****************************************************************************
-
+/*****************************************************************************/
+/*
 class PivotPropertyTableDelegate : public QItemDelegate
 {
     Q_OBJECT
@@ -83,9 +83,9 @@ public:
 signals:
     void cellWasChanged ( int, int );
 };
-
-/*****************************************************************************
-
+*/
+/*****************************************************************************/
+/*
 class PivotPropertyTable : public QTableWidget
 {
 public:
@@ -96,7 +96,7 @@ public:
     virtual double getThickness ( int row ) const;
     virtual void addPivot ( const TrussPivot&, int row = -1 );
 };
-
+*/
 /*****************************************************************************/
 
 class TrussPropertyTabWidget : public QTabWidget
