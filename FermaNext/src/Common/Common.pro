@@ -2,7 +2,7 @@
 TARGET = Common
 
 LEVEL = ../..
-include(../../FermaNext.pri)
+include($$LEVEL/FermaNext.pri)
 
 TEMPLATE = lib
 CONFIG += staticlib warn_on
@@ -18,6 +18,7 @@ INCLUDEPATH = . Plugin Loader
 
 SOURCES = \
           Benchmark.cpp \
+          Config.cpp \
           Global.cpp \
           ObjectState.cpp \
           ObjectStateManager.cpp \
@@ -34,6 +35,7 @@ SOURCES = \
 HEADERS = \
           AbstractObjectAction.h \
           Benchmark.h \
+          Config.h \
           Geometry.h \
           Global.h \
           Log4CXX.h \
