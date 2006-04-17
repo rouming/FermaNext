@@ -2,6 +2,7 @@
 #include <QDomNamedNodeMap>
 #include <QStringList>
 #include <QFileInfo>
+#include <QTextStream>
 
 #include "Config.h"
 
@@ -9,19 +10,19 @@
  * Config::Node
  *****************************************************************************/
 
-Config::Node::Node ( Config& config_, const QString& tagName ) :
+Config::Node::Node ( Config& config_, const QDomElement& xmlData_ ) :
     cfg(config_),
     parent(0),
-    removedFlag(false)
-{
-    // There is no any need to lock data, this is a root node
-    xmlData = cfg.configDoc.createElement( tagName );
-}
+    xmlData(xmlData_),
+    removedFlag(false),
+    fullyParsed(false)
+{}
 
 Config::Node::Node ( Node& parent_, const QString& tagName ) :
     cfg(parent_.cfg),
     parent(&parent_),
-    removedFlag(false)
+    removedFlag(false),
+    fullyParsed(false)
 {
     cfg.lockBeforeChange();
     xmlData = cfg.configDoc.createElement( tagName );
@@ -135,20 +136,54 @@ void Config::Node::clearAttributes ()
 
 Config::Node Config::Node::createChildNode ( const QString& tagName )
 {
-    return Node( *this, tagName );
+    Config::Node node( *this, tagName );
+    childs.append( node );
+    return node;
 }
 
-/*
-bool Config::Node::removeAllChildNodes ( const QString& tagName )
+bool Config::Node::removeChildNode ( const QString& tagName )
 {
+    QList<Config::Node>::Iterator iter = childs.begin();
+    for ( ; iter != childs.end(); ++iter ) {
+        Config::Node& node = *iter;
+        if ( node.getTagName() == tagName ) {
+            node.remove();
+            iter = childs.erase(iter);
+            return true;
+        }
+    }
+    return false;
 }
 
+void Config::Node::removeAllChildNodes ( const QString& tagName )
+{
+    QList<Config::Node>::Iterator iter = childs.begin();
+    while (  iter != childs.end() ) {
+        Config::Node& node = *iter;
+        if ( node.getTagName() == tagName ) {
+            node.remove();
+            iter = childs.erase(iter);
+        } else
+            ++iter;
+    }            
+}
 
-        QList<Config::Node> Config::Node::findChildNodes ( const QString& tagName ) const;
+QList<Config::Node> Config::Node::findChildNodes ( 
+    const QString& tagName ) const
+{
+    QList<Config::Node> result;
+    QList<Config::Node>::ConstIterator iter = childs.begin();
+    for ( ; iter < childs.end(); ++iter ) {
+        const Config::Node& node = *iter;
+        if ( node.getTagName() == tagName )
+            result.append( node );            
+    }    
+    return result;
+}
 
-        QList<Config::Node> Config::Node::childNodes () const;
+QList<Config::Node> Config::Node::childNodes () const
+{ return childs; }
 
-*/
 /*****************************************************************************
  * Config
  *****************************************************************************/
@@ -160,7 +195,7 @@ QMutex Config::notificationMutex;
 /*****************************************************************************/
 
 Config& Config::instance ( const QString& fileName )
-    /*throw (OpenFileException)*/
+    /*throw (OpenConfigException)*/
 {
     instanceMutex.lock();
     QFileInfo fileInfo( fileName );
@@ -171,7 +206,7 @@ Config& Config::instance ( const QString& fileName )
             cfgInstance = new Config( absFilePath );
             configInstances[ absFilePath ] = cfgInstance;
         }
-        catch ( OpenFileException& ) {
+        catch ( ... ) {
             instanceMutex.unlock();
             throw;
         }
@@ -184,69 +219,76 @@ Config& Config::instance ( const QString& fileName )
 }
 
 Config::Config ( const QString& fileName )
-    /*throw (OpenFileException)*/ :
+    /*throw (OpenConfigException)*/ :
     configFile( fileName ),
     rootConfigNode(0)
 {
     if ( !configFile.open( QIODevice::ReadWrite ) )
-        throw OpenFileException();
+        throw OpenConfigException();
 
-    rootConfigNode = new Config::Node( *this, "Configuration" );
+    QDomElement rootElement;
+
+    if ( !configDoc.setContent( &configFile ) ) {
+        // Clear all doc
+        configDoc.clear();
+        // Create default header
+        QDomNode xmlInstr = configDoc.createProcessingInstruction(
+                        "xml", QString("version=\"1.0\" encoding=\"UTF8\"") );
+        // First line as XML header
+        configDoc.insertBefore( xmlInstr, QDomNode() );
+        // Create root element
+        rootElement = configDoc.createElement( "Configuration" );
+        configDoc.appendChild(rootElement);
+    } else {
+        // Parsed successfully. Take root element.
+        rootElement = configDoc.documentElement();
+    }    
+    rootConfigNode = new Config::Node( *this, rootElement );
 }
 
 Config::~Config ()
-{
-    delete rootConfigNode;
-}
+{ delete rootConfigNode; }
 
 Config::Node Config::rootNode () const
 { return *rootConfigNode; }
 
 void Config::lockBeforeChange ()
+{ notificationMutex.lock(); }
+
+void Config::flush ()
 {
-    notificationMutex.lock();
+    QTextStream stream( &configFile );
+    configDoc.save( stream, 4 );
 }
 
 void Config::nodeHasBeenChanged ( const Config::Node& node )
 {
-
-    ///
-    /// Some code
-    /// 
-
     // Everything should be flushed
     flush();
     // Notify everyone
     emit onNodeChanged( *this, node );
+    // We should unlock previously locked mutex
     notificationMutex.unlock();
 }
 
 
 void Config::nodeHasBeenCreated ( const Config::Node& node )
 {
-
-    ///
-    /// Some code
-    /// 
-
     // Everything should be flushed
     flush();
     // Notify everyone
     emit onNodeCreated( *this, node );
+    // We should unlock previously locked mutex
     notificationMutex.unlock();
 }
     
 void Config::nodeHasBeenRemoved ( const Config::Node& node )
 {
-
-    ///
-    /// Some code
-    /// 
-
     // Everything should be flushed
     flush();
     // Notify everyone
     emit onNodeRemoved( *this, node );
+    // We should unlock previously locked mutex
     notificationMutex.unlock();
 }
 
