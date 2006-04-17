@@ -29,7 +29,7 @@ public:
     {
     public:
         /** Constructs root configuration xml node  */
-        Node ( Config&, const QString& tagName );
+        Node ( Config&, const QDomElement& rootNode );
         /** Constructs configuration xml node with parent */
         Node ( Node& parent, const QString& tagName );
         
@@ -71,12 +71,26 @@ public:
 
         /** Creates child node with specified tag name */
         Node createChildNode ( const QString& tagName );
+        /** Tries to remove child node with specified tag name */
+        bool removeChildNode ( const QString& tagName );
+        /** Removes all child nodes */
+        void removeAllChildNodes ( const QString& tagName );
+
+        /** Finds child nodes with specified tag name */
+        QList<Node> findChildNodes ( const QString& tagName ) const;
+        /** Returns all child nodes */
+        QList<Node> childNodes () const;
+
+    private:
+        void suspendedParse ();
         
     private:
         Config& cfg;
         Node* parent;
         QDomElement xmlData;
+        QList<Node> childs;
         bool removedFlag;
+        bool fullyParsed;
     };
 
     // Inner Node class should be a friend of Config to have possibility 
@@ -85,15 +99,16 @@ public:
 
     //Exceptions
     /** Can't open file for read/write */
-    class OpenFileException {};
+    class OpenConfigException {};
+
 
     /**
      * Create an instance of config.
      * @param fileName of configuration.
-     * @throw OpenFileException occurs when can't open file for read/write
+     * @throw OpenConfigException occurs when can't open file for read/write
      */
     static Config& instance ( const QString& fileName )
-        /*throw (OpenFileException)*/;
+        /*throw (OpenConfigException)*/;
 
     /** Returns root node of this config */
     Config::Node rootNode () const;
@@ -131,9 +146,9 @@ private:
 
     /** 
      * Private constructor. Use #instance instead.
-     * @throw OpenFileException occurs when can't open file for read/write
+     * @throw OpenConfigException occurs when can't open file for read/write
      */
-    Config ( const QString& fileName ) /*throw (OpenFileException)*/;
+    Config ( const QString& fileName ) /*throw (OpenConfigException)*/;
     ~Config ();
     Config ( const Config& );
     Config& operator= ( const Config& );
