@@ -27,7 +27,6 @@ const QString& FermaNextWorkspace::formatExtension ()
 
 FermaNextWorkspace::FermaNextWorkspace () :
     name( untitledWorkspaceName ),
-    fermaConfig( configFileName() ),
     fermaMainWindow(0),
     stackedWidget(0)
 {
@@ -347,9 +346,9 @@ void FermaNextWorkspace::setWorkspaceFileName ( const QString& fileName )
     }
 }
 
-FermaNextConfig& FermaNextWorkspace::config ()
+Config& FermaNextWorkspace::config ()
 {
-    return fermaConfig;
+    return Config::instance( ::configFileName() );
 }
 
 PluginManager& FermaNextWorkspace::pluginManager ()

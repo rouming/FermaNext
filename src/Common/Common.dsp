@@ -82,6 +82,10 @@ SOURCE=Benchmark.cpp
 # End Source File
 
 # Begin Source File
+SOURCE=Config.cpp
+# End Source File
+
+# Begin Source File
 SOURCE=Global.cpp
 # End Source File
 
@@ -158,6 +162,37 @@ BuildCmds=  \
 
 # Begin Source File
 SOURCE=Benchmark.h
+# End Source File
+
+# Begin Source File
+SOURCE=Config.h
+!IF"$(CFG)" == "Common - Win32 Debug"
+
+USERDEP_Config.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on Config.h
+InputPath=Config.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_THREAD_SUPPORT -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"." -I"Plugin" -I"Loader" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\Common" -I"..\..\build\release\ui\Common" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\Common\moc_Config.cpp
+"..\..\build\debug\mocs\Common\moc_Config.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
+
+# End Custom Build
+
+!ELSEIF"$(CFG)" == "Common - Win32 Release"
+
+USERDEP_Config.h=
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Running MOC on Config.h
+InputPath=Config.h
+BuildCmds=  \
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_THREAD_SUPPORT -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"." -I"Plugin" -I"Loader" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\Common" -I"..\..\build\release\ui\Common" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\Common\moc_Config.cpp
+"..\..\build\release\mocs\Common\moc_Config.cpp": $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(BuildCmds)
+
+# End Custom Build
+
+!ENDIF
 # End Source File
 
 # Begin Source File
@@ -381,6 +416,18 @@ SOURCE=XMLSerializableObject.h
 # PROP Default_Filter ""
 # Begin Source File
 SOURCE=..\..\build\debug\mocs\Common\moc_AbstractObjectAction.cpp
+!IF"$(CFG)" == "Common - Win32 Debug"
+
+
+!ELSEIF"$(CFG)" == "Common - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF
+# End Source File
+
+# Begin Source File
+SOURCE=..\..\build\debug\mocs\Common\moc_Config.cpp
 !IF"$(CFG)" == "Common - Win32 Debug"
 
 

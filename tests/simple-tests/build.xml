@@ -51,7 +51,7 @@
                  inheritrefs="true">
            <path>
               <fileset dir="${src.dir}" includes="*.cpp" 
-                       excludes="FermaNextConfigTest.cpp,DijkstraTest.cpp"/>
+                       excludes="DijkstraTest.cpp"/>
            </path>
         </foreach>
      </target>
@@ -62,7 +62,8 @@
                  inheritall="true"
                  inheritrefs="true">
            <path>
-              <fileset dir="${tests.dir}"/>
+              <fileset dir="${tests.dir}"
+                       excludes="*${os.executable.extension}.manifest"/>
            </path>
         </foreach>
      </target>
@@ -74,7 +75,7 @@
                  inheritrefs="true">
            <path id="build-path">
               <fileset dir="${src.dir}" includes="${testcase}.cpp" 
-                       excludes="FermaNextConfigTest.cpp,DijkstraTest.cpp"/>
+                       excludes="DijkstraTest.cpp"/>
            </path>
         </foreach>
 
@@ -89,7 +90,9 @@
                  inheritrefs="true">
            <path id="build-path">
               <fileset dir="${tests.dir}" 
-                       includes="${testcase}${os.executable.extension}"/>
+                       includes="${testcase}${os.executable.extension}"
+                       excludes="${testcase}${os.executable.extension}.manifest" />
+
            </path>
         </foreach>
 
@@ -174,6 +177,10 @@
          </cc>
 
          <move file="${build.dir}/${out.file}${os.executable.extension}" 
+               todir="${tests.dir}"/>
+
+         <!-- For MSVS2005 -->
+         <move file="${build.dir}/${out.file}${os.executable.extension}.manifest" 
                todir="${tests.dir}"/>
      </target>
 

@@ -28,10 +28,14 @@ public:
     class Node
     {
     public:
-        /** Constructs root configuration xml node  */
+        /** Constructs null node */
+        Node ();
+        /** Prases root configuration xml node  */
         Node ( Config&, const QDomElement& rootNode );
         /** Constructs configuration xml node with parent */
         Node ( Node& parent, const QString& tagName );
+        /** Prases xml node  */
+        Node ( Node& parent, const QDomElement& );
         
         /** Just a copy constructor */
         Node ( const Node& );
@@ -39,9 +43,7 @@ public:
         Node& operator= ( const Node& );        
 
         /** Returns config, from which this node was created */
-        const Config& config () const;
-        /** Returns config, from which this node was created */
-        Config& config ();
+        Config* config () const;
 
         /** Returns parent node */
         Node* parentNode () const;
@@ -54,6 +56,12 @@ public:
          * @return true if it is removed, false otherwise
          */
         bool isRemoved () const;
+
+        /** 
+         * Node can be null, if it was constructed only 
+         * with config parameter
+         */
+        bool isNull () const;
 
         /** Return tag name of this node */
         QString getTagName () const;
@@ -82,15 +90,20 @@ public:
         QList<Node> childNodes () const;
 
     private:
-        void suspendedParse ();
+        /**
+         * Parse childs for node
+         * Sure, this method is not a const one, but it can be called
+         * from some const, so const_cast is made inside.
+         */
+        void parse () const;
         
     private:
-        Config& cfg;
+        Config* cfg;
         Node* parent;
         QDomElement xmlData;
-        QList<Node> childs;
+        mutable QList<Node> childs;
         bool removedFlag;
-        bool fullyParsed;
+        mutable bool fullyParsed;
     };
 
     // Inner Node class should be a friend of Config to have possibility 
@@ -175,7 +188,7 @@ private:
 
     QDomDocument configDoc;
     QFile configFile;
-    Config::Node* rootConfigNode;
+    Config::Node rootConfigNode;
 };
 
 typedef Config::Node ConfigNode;
