@@ -30,11 +30,9 @@ INCLUDEPATH = $$(AGGDIR)/include \
 
 SOURCES = \
           Main.cpp \
-          FermaNextConfig.cpp \
           FermaNextProject.cpp \
           FermaNextWorkspace.cpp
 
 HEADERS = \
-          FermaNextConfig.h \
           FermaNextProject.h \
           FermaNextWorkspace.h

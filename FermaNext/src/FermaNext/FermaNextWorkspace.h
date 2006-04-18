@@ -9,8 +9,8 @@
 #include <QMutex>
 
 #include "XMLSerializableObject.h"
+#include "Config.h"
 #include "FermaNextProject.h"
-#include "FermaNextConfig.h"
 #include "FermaNextMainWindow.h"
 #include "PluginManager.h"
 
@@ -79,7 +79,7 @@ public:
     virtual const QString& getName () const;
     virtual void setName ( const QString& );
 
-    virtual FermaNextConfig& config ();
+    virtual Config& config ();
     virtual PluginManager& pluginManager ();
     virtual FermaNextMainWindow& mainWindow ();
 
@@ -127,7 +127,6 @@ private:
     QString workspaceFileName;
     ProjectList projects;
     PluginManager pluginMng;
-    FermaNextConfig fermaConfig;
     FermaNextMainWindow* fermaMainWindow;
     QStackedWidget* stackedWidget;
 };
