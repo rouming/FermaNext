@@ -180,8 +180,11 @@
                todir="${tests.dir}"/>
 
          <!-- For MSVS2005 -->
-         <move file="${build.dir}/${out.file}${os.executable.extension}.manifest" 
-               todir="${tests.dir}"/>
+         <move todir="${tests.dir}">
+           <fileset dir="${build.dir}" 
+                    includes="${out.file}${os.executable.extension}.manifest"/>
+
+         </move>
      </target>
 
      <target name="execute">
