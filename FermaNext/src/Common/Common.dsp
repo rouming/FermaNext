@@ -511,6 +511,18 @@ SOURCE=..\..\build\release\mocs\Common\moc_AbstractObjectAction.cpp
 # End Source File
 
 # Begin Source File
+SOURCE=..\..\build\release\mocs\Common\moc_Config.cpp
+!IF"$(CFG)" == "Common - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF"$(CFG)" == "Common - Win32 Release"
+
+
+!ENDIF
+# End Source File
+
+# Begin Source File
 SOURCE=..\..\build\release\mocs\Common\moc_ObjectState.cpp
 !IF"$(CFG)" == "Common - Win32 Debug"
 

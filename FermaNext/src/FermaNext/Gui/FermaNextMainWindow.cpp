@@ -1,7 +1,5 @@
 
-// Qt3 Support classes
-#include <Q3DockWindow>
-
+#include <QDockWidget>
 #include <QApplication>
 #include <QDir>
 #include <QFileDialog>
@@ -28,6 +26,7 @@
 #include "UndoRedoListBox.h"
 #include "GeometryTabWidget.h"
 #include "TrussPropertyTabWidget.h"
+#include "PreferencesWidget.h"
 
 const QString fermaTitle( QObject::tr( "Educational CAD System 'Ferma'" ) );
 
@@ -36,7 +35,6 @@ const QString fermaTitle( QObject::tr( "Educational CAD System 'Ferma'" ) );
  *****************************************************************************/
 
 FermaNextMainWindow::FermaNextMainWindow ( FermaNextWorkspace& wsp ) :
-    Q3MainWindow(0, 0, Qt::Window),
     workspace(wsp),
     pluginsMenu(0)
 {     
@@ -60,7 +58,7 @@ FermaNextMainWindow::FermaNextMainWindow ( FermaNextWorkspace& wsp ) :
 
 void FermaNextMainWindow::init ()
 {
-    setCaption( fermaTitle);
+    setWindowTitle( fermaTitle);
     setMinimumSize( 640, 480 );
     statusBar()->addWidget(new QLabel( tr("Ready"), statusBar() ));
 
@@ -68,16 +66,13 @@ void FermaNextMainWindow::init ()
     initGeometryWindow();
     initTrussPropertyWindow();
     
-    projectsDockWindow = new Q3DockWindow( Q3DockWindow::InDock, this );
-    projectsDockWindow->setResizeEnabled( true );
-    projectsDockWindow->setVerticalStretchable( true );
-    projectsDockWindow->setCaption( tr("Truss Unit Projects") );
-    addDockWindow( projectsDockWindow, Qt::DockLeft );
-    setDockEnabled( projectsDockWindow, Qt::DockTop, false );
-    setDockEnabled( projectsDockWindow, Qt::DockBottom, false );
-    projectsDockWindow->setCloseMode( Q3DockWindow::Always );
+    projectsDockWidget = new QDockWidget( tr("Projects"), this );
+    projectsDockWidget->setVisible(false);
+    projectsDockWidget->setAllowedAreas( Qt::LeftDockWidgetArea );
+    projectsDockWidget->setFixedWidth( 150 );
+    projectsDockWidget->setWindowTitle( tr("Projects") );
 
-    projectToolBox = new ProjectToolBox( workspace, projectsDockWindow );
+    projectToolBox = new ProjectToolBox( workspace, projectsDockWidget );
     connect( &workspace, SIGNAL(onBeforeProjectRemove(FermaNextProject&)), 
              SLOT(someProjectRemoved(FermaNextProject&)) );
     connect( &workspace, SIGNAL(onProjectCreate(FermaNextProject&)), 
@@ -86,12 +81,11 @@ void FermaNextMainWindow::init ()
                              SLOT(refreshUndoRedoActions()) );
     connect( projectToolBox, SIGNAL(currentChanged(int)), 
                              SLOT(refreshProjectActions()) );
-    projectsDockWindow->setWidget( projectToolBox );
-    projectsDockWindow->setFixedExtentWidth( 160 );
+    projectsDockWidget->setWidget( projectToolBox );    
 
-    projectsDockWindow->hide();
+    preferencesWidget = new PreferencesWidget( this );
 
-    setRightJustification( true );
+    addDockWidget( Qt::LeftDockWidgetArea, projectsDockWidget );
 }
 
 void FermaNextMainWindow::initUndoRedoWindow ()
@@ -101,7 +95,7 @@ void FermaNextMainWindow::initUndoRedoWindow ()
     undoRedoHistoryWidget->setFixedSize( 140, 110 );
     // Pretty history widget offset from the end point of the screen
     undoRedoHistoryWidget->move( QApplication::desktop()->width() - 170, 70 );
-    undoRedoHistoryWidget->setCaption( tr("History") );
+    undoRedoHistoryWidget->setWindowTitle( tr("History") );
     undoRedoListBox = new UndoRedoListBox( undoRedoHistoryWidget );
     undoRedoHistoryWidget->installEventFilter( this );
     
@@ -116,7 +110,7 @@ void FermaNextMainWindow::initGeometryWindow ()
 {
     geometryWindow = new QWidget( this, Qt::Window | Qt::Tool );
     geometryWindow->setFixedSize( 195, 174 );
-    geometryWindow->setCaption( tr("Truss Geometry") );
+    geometryWindow->setWindowTitle( tr("Truss Geometry") );
     geometryTabWidget = new GeometryTabWidget( geometryWindow );
     geometryWindow->move( QApplication::desktop()->width() - 225, 210 );
     geometryWindow->installEventFilter( this );
@@ -135,7 +129,7 @@ void FermaNextMainWindow::initTrussPropertyWindow ()
 {
     trussPropertyWindow = new QWidget( this, Qt::Window | Qt::Tool );
     trussPropertyWindow->setFixedSize( 195, 230 );
-    trussPropertyWindow->setCaption( tr("Truss Properties") );
+    trussPropertyWindow->setWindowTitle( tr("Truss Properties") );
     trussPropTabWidget = new TrussPropertyTabWidget( trussPropertyWindow );
     trussPropertyWindow->move( QApplication::desktop()->width() - 225, 415 );
     trussPropertyWindow->installEventFilter( this );
@@ -153,7 +147,7 @@ void FermaNextMainWindow::initTrussPropertyWindow ()
 void FermaNextMainWindow::someProjectRemoved ( FermaNextProject& prj )
 {
     if ( 1 == workspace.countProjects() ) {
-        projectsDockWindow->hide();
+        projectsDockWidget->hide();
         undoRedoHistoryWidget->hide();
         geometryWindow->hide();
         trussPropertyWindow->hide();
@@ -164,8 +158,8 @@ void FermaNextMainWindow::someProjectRemoved ( FermaNextProject& prj )
 
 void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
 {
-    if ( !projectsDockWindow->isVisible() && 0 < workspace.countProjects() ) {
-        projectsDockWindow->show();
+    if ( !projectsDockWidget->isVisible() && 0 < workspace.countProjects() ) {
+        projectsDockWidget->show();
         undoRedoHistoryWidget->show();
         geometryWindow->show();
         trussPropertyWindow->show();
@@ -181,12 +175,11 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
 
 void FermaNextMainWindow::createProject ()
 {
-    bool ok;
     QString text = QInputDialog::getText(
+            this,
             tr("Project creation"), 
-            tr("Enter project name:"), QLineEdit::Normal,
-            QString::null, &ok, this );
-    if ( ok && !text.isEmpty() ) {
+            tr("Enter project name:") );
+    if ( !text.isEmpty() ) {
         FermaNextProject& prj = workspace.createProject( text );
         TrussUnitWindowManager& mng = prj.getTrussUnitWindowManager();
 
@@ -240,7 +233,7 @@ void FermaNextMainWindow::createProject ()
 
 void FermaNextMainWindow::setupFileActions ()
 {
-    QToolBar* tb = new QToolBar( tr("File Actions") );
+    QToolBar* tb = addToolBar( tr("File Actions") );
     QMenu* menu = menuBar()->addMenu( tr( "&File" ) );
 
     QAction *a;
@@ -345,28 +338,34 @@ void FermaNextMainWindow::setupFileActions ()
 
 void FermaNextMainWindow::setupEditActions ()
 {
-    QToolBar* tb = new QToolBar( tr("Edit Actions") );
+    QToolBar* tb = addToolBar( tr("Edit Actions") );
     QMenu* menu = menuBar()->addMenu( tr( "&Edit" ) );
 
     // Undo
     undoAction = new QAction( QIcon(imagesPath() + "/editundo.xpm"), 
                               tr( "&Undo" ), this );
-        undoAction->setShortcut( tr("CTRL+Z") );                               
+    undoAction->setShortcut( tr("CTRL+Z") );                               
     connect( undoAction, SIGNAL(triggered()), SLOT(editUndo()) );
     undoAction->setDisabled(true);
-        tb->addAction( undoAction );
-        menu->addAction( undoAction );
+    tb->addAction( undoAction );
+    menu->addAction( undoAction );
 
     // Redo
     redoAction = new QAction( QIcon(imagesPath() + "/editredo.xpm"), 
                               tr( "&Redo" ), this );
-        undoAction->setShortcut( tr("CTRL+Y") );
+    redoAction->setShortcut( tr("CTRL+Y") );
     connect( redoAction, SIGNAL(triggered()), SLOT(editRedo()) );
     redoAction->setDisabled(true);
-        tb->addAction( redoAction );
-        menu->addAction( redoAction );
+    tb->addAction( redoAction );
+    menu->addAction( redoAction );
     menu->addSeparator();
     tb->addSeparator();
+
+    // Preferences
+    QAction* prefAction = new QAction( tr( "&Preferences..." ), this );
+    prefAction->setShortcut( tr("CTRL+K") );
+    connect( prefAction, SIGNAL(triggered()), SLOT(editPreferences()) );
+    menu->addAction( prefAction );
 }
 
 void FermaNextMainWindow::setupViewActions ()
@@ -375,32 +374,26 @@ void FermaNextMainWindow::setupViewActions ()
 
     // Contents
     showUndoRedoAction = new QAction( tr( "&Show History Window" ), this );
-    showUndoRedoAction->setToggleAction( true );
-    showUndoRedoAction->setOn( true );
     showUndoRedoAction->setStatusTip( tr( "Show or hide history window" ) );
     menu->addAction( showUndoRedoAction );
     connect( showUndoRedoAction, SIGNAL(toggled(bool)), 
-             undoRedoHistoryWidget, SLOT(setShown(bool)) );
+             undoRedoHistoryWidget, SLOT(setVisible(bool)) );
 
     showGeometryWindowAction = 
         new QAction( tr( "&Show Truss Geometry Window" ), this );
-    showGeometryWindowAction->setToggleAction( true );
-    showGeometryWindowAction->setOn( true );
     showGeometryWindowAction->
         setStatusTip( tr( "Show or hide truss geometry window" ) );
     menu->addAction( showGeometryWindowAction );
-    connect( showGeometryWindowAction, SIGNAL( toggled( bool ) ), 
-             geometryWindow, SLOT( setShown( bool ) ) );
+    connect( showGeometryWindowAction, SIGNAL(toggled(bool)),
+             geometryWindow, SLOT(setVisible(bool) ) );
 
     showTrussPropWindowAction = 
         new QAction( tr( "&Show Truss Property Window" ), this );
-    showTrussPropWindowAction->setToggleAction( true );
-    showTrussPropWindowAction->setOn( true );
     showTrussPropWindowAction->
         setStatusTip( tr( "Show or hide truss property window" ) );
     menu->addAction( showTrussPropWindowAction );
-    connect( showTrussPropWindowAction, SIGNAL( toggled( bool ) ), 
-             trussPropertyWindow, SLOT( setShown( bool ) ) );
+    connect( showTrussPropWindowAction, SIGNAL(toggled(bool)), 
+             trussPropertyWindow, SLOT(setVisible(bool)) );
 }
 
 void FermaNextMainWindow::setupProjectActions ()
@@ -422,7 +415,7 @@ void FermaNextMainWindow::setupHelpActions ()
     connect( a, SIGNAL(triggered()), SLOT(helpContents()) );
         menu->addAction( a );
     a->setDisabled(true);
-    menu->insertSeparator();
+    menu->addSeparator();
 
     // About
     a = new QAction( tr( "About FermaNext" ), this );
@@ -557,9 +550,11 @@ void FermaNextMainWindow::fileNew ()
 
 void FermaNextMainWindow::fileOpen ()
 {
-    QString fileName = QFileDialog::getOpenFileName( QString::null, 
-        "Ferma project (*" + FermaNextProject::formatExtension() + ")",
-        this, "open ferma project", tr("Open ferma project") );
+    QString fileName = QFileDialog::getOpenFileName( 
+        this,
+        tr("Open ferma project"),
+        QString(),
+        "Ferma project (*" + FermaNextProject::formatExtension() + ")" );
 
     if ( fileName.isEmpty() )
         return;
@@ -591,17 +586,18 @@ bool FermaNextMainWindow::fileSaveAs ()
         return false;
 
     QString prjName = currentPrj->getName();
-    QString fileName = QFileDialog::getSaveFileName( 
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this,
+        tr("Save ferma project (%1)").arg(prjName),
         prjName + FermaNextProject::formatExtension(),
-        "Ferma project (*" + FermaNextProject::formatExtension() + ")", 
-        this, "save ferma project", tr("Save ferma project (%1)").
-          arg(prjName) );
+        "Ferma project (*" + FermaNextProject::formatExtension() + ")" );
 
     if ( fileName.isEmpty() )
         return false;
 
     QRegExp rx( ".*\\" + FermaNextProject::formatExtension() + "$" );
-    if ( -1 == rx.search( fileName ) )
+    if ( -1 == rx.indexIn( fileName ) )
         fileName += FermaNextProject::formatExtension();
 
     QFileInfo prjFileInfo( fileName );
@@ -649,9 +645,11 @@ void FermaNextMainWindow::fileOpenWsp ()
                                 QString::null, 0, 1 ) )
         return;
 
-    QString fileName = QFileDialog::getOpenFileName( QString::null, 
-        "Ferma workspace (*" + FermaNextWorkspace::formatExtension() + ")", 
-        this, "open ferma workspace", tr("Open ferma workspace") );
+    QString fileName = QFileDialog::getOpenFileName(
+        this,
+        tr("Open ferma workspace"),
+        QString(),
+        "Ferma workspace (*" + FermaNextWorkspace::formatExtension() + ")" );
 
     if ( fileName.isEmpty() )
         return;
@@ -706,15 +704,17 @@ bool FermaNextMainWindow::fileSaveWsp ()
 
 bool FermaNextMainWindow::fileSaveWspAs ()
 {
-    QString fileName = QFileDialog::getSaveFileName( QString::null, 
-        "Ferma workspace (*" + FermaNextWorkspace::formatExtension() + ")",
-        this, "save ferma workspace", tr("Save ferma workspace") );
+    QString fileName = QFileDialog::getSaveFileName( 
+        this,
+        tr("Save ferma workspace"),
+        QString(),
+        "Ferma workspace (*" + FermaNextWorkspace::formatExtension() + ")" );
 
     if ( fileName.isEmpty() )
         return false;
 
     QRegExp rx( ".*\\" + FermaNextWorkspace::formatExtension() + "$" );
-    if ( -1 == rx.search( fileName ) )
+    if ( -1 == rx.indexIn( fileName ) )
         fileName += FermaNextWorkspace::formatExtension();
 
     QFileInfo wspFileInfo( fileName );
@@ -893,6 +893,14 @@ void FermaNextMainWindow::editSelectAll ()
     qWarning("Not implmented yet!");
 }
 
+void FermaNextMainWindow::editPreferences ()
+{   
+    preferencesWidget->resize( 300, 300 );
+    preferencesWidget->setVisible(true);
+    preferencesWidget->setWindowTitle( "F" );
+    preferencesWidget->show();    
+}
+
 void FermaNextMainWindow::helpContents ()
 {
     qWarning("Not implmented yet!");
@@ -913,7 +921,6 @@ bool FermaNextMainWindow::eventFilter( QObject* targetObj, QEvent* event )
         QKeyEvent* keyEvent = (QKeyEvent*)event;
         if ( keyEvent->modifiers() & Qt::ControlModifier ||
              keyEvent->modifiers() & Qt::ShiftModifier ) {
-            setActiveWindow();
             menuBar()->setFocus();
             keyPressEvent( keyEvent );
             return true;
@@ -925,7 +932,6 @@ bool FermaNextMainWindow::eventFilter( QObject* targetObj, QEvent* event )
                   keyEvent->key() == Qt::Key_Escape ) {
             FermaNextProject* prj = projectToolBox->currentProject();
             if ( prj ) {
-                setActiveWindow();
                 prj->getDesignerWidget().aggKeyPressEvent( keyEvent );
                 return true;
             }
@@ -942,7 +948,7 @@ bool FermaNextMainWindow::eventFilter( QObject* targetObj, QEvent* event )
         return true;
     } 
     else
-        return Q3MainWindow::eventFilter( targetObj, event );
+        return QMainWindow::eventFilter( targetObj, event );
 }
 
 /*

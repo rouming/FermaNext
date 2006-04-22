@@ -47,13 +47,11 @@ TrussUnitWindowManager::~TrussUnitWindowManager ()
 void TrussUnitWindowManager::clearTrussUnitWindows ()
 {
     WindowListIter iter = trussWindows.begin();
-    for ( ; iter != trussWindows.end(); ++iter ) {
+    for ( ; iter != trussWindows.end(); ) {
         TrussUnitWindow* trussWindow = *iter;
         ObjectStateManager* stateMng = stateManagerMap[trussWindow];
-        delete trussWindow;
-        delete stateMng;
+        iter = removeTrussUnitWindow( iter );
     }
-    trussWindows.clear();
     stateManagerMap.clear();
 }
 

@@ -2,27 +2,25 @@
 #ifndef WINDOWLISTBOX_H
 #define WINDOWLISTBOX_H
 
-// Qt3 Support classes
-#include <Q3ListBox>
-#include <Q3PopupMenu>
-
+#include <QListWidget>
+#include <QMenu>
 #include <QBitArray>
 
 #include "FermaNextProject.h"
 
 class WindowListBox;
 
-class TrussUnitWindowItem : public QObject, public Q3ListBoxPixmap
+class TrussUnitWindowItem : public QObject, public QListWidgetItem
 {
     Q_OBJECT
 public:
     TrussUnitWindowItem ( FermaNextProject&, TrussUnitWindow&, 
-                          WindowListBox&, const QPixmap&,
-                          const QPixmap& disPix );
+                          WindowListBox&, const QIcon&,
+                          const QIcon& disPix );
 
-    virtual const QPixmap* pixmap () const;
+    virtual QVariant data ( int role ) const;
 
-    virtual void fillPopup ( Q3PopupMenu* ) const;
+    virtual void fillPopup ( QMenu* ) const;
 
     virtual bool isSelectedInGroup () const;
     virtual bool isShown () const;
@@ -46,8 +44,6 @@ protected slots:
     virtual void trussWindowDesisted ();
     virtual void trussWindowRevived ();
 
-    virtual void update ();
-
 signals:
     // Emits when item changes its visibility status
     void onWindowItemShow ( TrussUnitWindowItem& );
@@ -57,17 +53,16 @@ private:
     WindowListBox& listBox;
     FermaNextProject& project;
     TrussUnitWindow& trussWindow;
-    QPixmap disabledPix;
+    QIcon disabledIcon;
     bool selected;    
 };
 
 
-class WindowListBox : public Q3ListBox
+class WindowListBox : public QListWidget
 {
     Q_OBJECT
 public:
-    WindowListBox( FermaNextProject&, QWidget* parent = 0, 
-                   const char* name = 0, Qt::WFlags fl = 0 );
+    WindowListBox( FermaNextProject&, QWidget* parent = 0 );
 
     void contextMenuEvent ( QContextMenuEvent* );
 
@@ -90,9 +85,7 @@ public slots:
     virtual void trussWindowLostFocus ( TrussUnitWindow& );
 
 protected slots:
-    virtual void raiseWindowItem ( Q3ListBoxItem* );
-    virtual void showWindowItem ( TrussUnitWindowItem& );
-    virtual void hideWindowItem ( TrussUnitWindowItem& );
+    virtual void raiseWindowItem ( QListWidgetItem* );
 
 private:
     struct IndexedItem 

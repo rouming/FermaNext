@@ -2,18 +2,11 @@
 #ifndef PROJECTTOOLBOX_H
 #define PROJECTTOOLBOX_H
 
+#include <QToolBox>
+#include <QMap>
+
 #include "FermaNextWorkspace.h"
 #include "FermaNextProject.h"
-
-#include <QToolBox>
-
-// ****************************************************************************
-// BUG: C4786 Warning Is Not Disabled with #pragma Warning
-// STATUS: Microsoft has confirmed this to be a bug in the Microsoft product. 
-// This warning can be ignored. This occured only in the <map> container.
-// ****************************************************************************
-// QMap is used instead of std::map for avoiding this undisabling warning
-#include <QMap>
 
 // Container for smart FermaNext projects navigation
 class ProjectToolBox : public QToolBox

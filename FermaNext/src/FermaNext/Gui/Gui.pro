@@ -6,7 +6,7 @@ include(../../../FermaNext.pri)
 
 TEMPLATE = lib
 CONFIG += staticlib warn_on thread
-QT += core gui xml qt3support
+QT += core gui xml
 
 win32 {
   DEFINES += WIN32
@@ -30,12 +30,14 @@ INCLUDEPATH = $$(AGGDIR)/include \
 SOURCES = \
 #FIXME QT3TO4
 #          CalcDataToolBar.cpp \
+	  GuiSubsidiary.cpp \
           FermaNextMainWindow.cpp \
           GeometryTabWidget.cpp \
-	  GuiSubsidiary.cpp \
+          PreferencesWidget.cpp \
           ProjectToolBox.cpp \
           Splash.cpp \
-          ToolBarManager.cpp \
+#FIXME QT3TO4 
+#          ToolBarManager.cpp \
           TrussDesignerWidget.cpp \
           TrussPropertyTabWidget.cpp \
           UndoRedoListBox.cpp \
@@ -54,16 +56,18 @@ SOURCES = \
 HEADERS = \
 #FIXME QT3TO4 
 #          CalcDataToolBar.h \
-          FermaNextMainWindow.h \
-          ProjectToolBox.h \
-          ToolBarManager.h \
-          UndoRedoListBox.h \
-          CalcDataWidget.ui.h \
-          GeometryTabWidget.h \
 	  GuiSubsidiary.h \
+          CalcDataWidget.ui.h \
+          FermaNextMainWindow.h \
+          GeometryTabWidget.h \
+          PreferencesWidget.h \
+          ProjectToolBox.h \
           Splash.h \
+#FIXME QT3TO4 
+#          ToolBarManager.h \
           TrussDesignerWidget.h \
           TrussPropertyTabWidget.h \
+          UndoRedoListBox.h \
           WindowListBox.h \
           \
           Agg/AggButton.h \

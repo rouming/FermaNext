@@ -4,7 +4,7 @@ TARGET = FermaNext
 LEVEL = ../..
 include(../../FermaNext.pri)
 
-QT += core gui xml qt3support
+QT += core gui xml
 CONFIG += qt warn_on thread
 DESTDIR = ../..
 

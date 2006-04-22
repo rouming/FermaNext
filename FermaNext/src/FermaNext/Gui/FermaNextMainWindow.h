@@ -2,11 +2,9 @@
 #ifndef FERMANEXTMAINWINDOW_H
 #define FERMANEXTMAINWINDOW_H
 
-// Qt3 Support classes
-#include <Q3MainWindow>
+#include <QMainWindow>
 
-class Q3DockWindow;
-
+class QDockWidget;
 class ProjectToolBox;
 class FermaNextProject;
 class TrussUnitWindow;
@@ -14,10 +12,11 @@ class FermaNextWorkspace;
 class UndoRedoListBox;
 class GeometryTabWidget;
 class TrussPropertyTabWidget;
+class PreferencesWidget;
 class QFile;
 class QMenu;
 
-class FermaNextMainWindow : public Q3MainWindow
+class FermaNextMainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
@@ -74,6 +73,7 @@ protected slots:
     void editPaste ();
     void editCut ();    
     void editSelectAll ();
+    void editPreferences ();
 
     void helpContents ();
     void helpAbout ();
@@ -92,8 +92,8 @@ protected slots:
 private:
     // Current system workspace
     FermaNextWorkspace& workspace;
-    // Dock window on wich all projects are located
-    Q3DockWindow* projectsDockWindow;
+    // Dock widgget on wich all projects are located
+    QDockWidget* projectsDockWidget;
     // Undo/redo history widget
     QWidget* undoRedoHistoryWidget;
     // Undo/redo list box to control truss states
@@ -108,6 +108,8 @@ private:
     QWidget* trussPropertyWindow;
     // Tab widget for changing truss properties
     TrussPropertyTabWidget* trussPropTabWidget;
+    // Preferences widget
+    PreferencesWidget* preferencesWidget;
 
 
     // Some actions

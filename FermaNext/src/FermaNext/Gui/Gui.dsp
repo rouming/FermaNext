@@ -26,6 +26,7 @@ CFG=Gui - Win32 Debug
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
+F90=df.exe
 RSC=rc.exe
 
 !IF  "$(CFG)" == "Gui - Win32 Debug"
@@ -42,7 +43,7 @@ RSC=rc.exe
 # PROP Target_Dir ""
 MTL=midl
 # ADD MTL /nologo /mktyplib203 /win32 /D "_DEBUG"
-# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include/Qt3Support" /I "$(QTDIR)/include" /I "$(AGGDIR)/include" /I "$(AGGDIR)/svg" /I "." /I "Agg" /I "..\..\Common" /I "..\..\Common\Plugin" /I "..\..\Common\Loader" /I "..\TrussUnit" /I ".." /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\debug\mocs\Gui" /I "..\..\..\build\release\ui\Gui" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_LIB" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_THREAD_SUPPORT" /D "QT_QT3SUPPORT_LIB" /D "QT3_SUPPORT" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /FD -Zm200 /c
+# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include" /I "$(AGGDIR)/include" /I "$(AGGDIR)/svg" /I "." /I "Agg" /I "..\..\Common" /I "..\..\Common\Plugin" /I "..\..\Common\Loader" /I "..\TrussUnit" /I ".." /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\debug\mocs\Gui" /I "..\..\..\build\release\ui\Gui" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_LIB" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_THREAD_SUPPORT" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /FD -Zm200 /c
 # ADD BASE RSC /l 0x419
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -63,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Target_Dir ""
 MTL=midl
 # ADD MTL /nologo /mktyplib203 /win32 /D "NDEBUG"
-# ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include/Qt3Support" /I "$(QTDIR)/include" /I "$(AGGDIR)/include" /I "$(AGGDIR)/svg" /I "." /I "Agg" /I "..\..\Common" /I "..\..\Common\Plugin" /I "..\..\Common\Loader" /I "..\TrussUnit" /I ".." /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\release\mocs\Gui" /I "..\..\..\build\release\ui\Gui" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_LIB" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_THREAD_SUPPORT" /D "QT_NO_DEBUG" /D "QT_QT3SUPPORT_LIB" /D "QT3_SUPPORT" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /FD -Zm200 /c
+# ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include" /I "$(AGGDIR)/include" /I "$(AGGDIR)/svg" /I "." /I "Agg" /I "..\..\Common" /I "..\..\Common\Plugin" /I "..\..\Common\Loader" /I "..\TrussUnit" /I ".." /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\release\mocs\Gui" /I "..\..\..\build\release\ui\Gui" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_LIB" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_THREAD_SUPPORT" /D "QT_NO_DEBUG" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /FD -Zm200 /c
 # ADD BASE RSC /l 0x419
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -125,15 +126,15 @@ SOURCE=.\GuiSubsidiary.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\PreferencesWidget.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=ProjectToolBox.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=Splash.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=ToolBarManager.cpp
 # End Source File
 # Begin Source File
 
@@ -166,7 +167,7 @@ SOURCE=Agg\AggButton.h
 InputPath=Agg\AggButton.h
 
 "..\..\..\build\debug\mocs\Gui\moc_AggButton.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_AggButton.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_AggButton.cpp
 
 # End Custom Build
 
@@ -177,7 +178,7 @@ InputPath=Agg\AggButton.h
 InputPath=Agg\AggButton.h
 
 "..\..\..\build\release\mocs\Gui\moc_AggButton.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_AggButton.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_AggButton.cpp
 
 # End Custom Build
 
@@ -195,7 +196,7 @@ SOURCE=Agg\AggPaintThread.h
 InputPath=Agg\AggPaintThread.h
 
 "..\..\..\build\debug\mocs\Gui\moc_AggPaintThread.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_AggPaintThread.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_AggPaintThread.cpp
 
 # End Custom Build
 
@@ -206,7 +207,7 @@ InputPath=Agg\AggPaintThread.h
 InputPath=Agg\AggPaintThread.h
 
 "..\..\..\build\release\mocs\Gui\moc_AggPaintThread.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_AggPaintThread.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_AggPaintThread.cpp
 
 # End Custom Build
 
@@ -224,7 +225,7 @@ SOURCE=Agg\AggPopupHint.h
 InputPath=Agg\AggPopupHint.h
 
 "..\..\..\build\debug\mocs\Gui\moc_AggPopupHint.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_AggPopupHint.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_AggPopupHint.cpp
 
 # End Custom Build
 
@@ -235,7 +236,7 @@ InputPath=Agg\AggPopupHint.h
 InputPath=Agg\AggPopupHint.h
 
 "..\..\..\build\release\mocs\Gui\moc_AggPopupHint.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_AggPopupHint.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_AggPopupHint.cpp
 
 # End Custom Build
 
@@ -257,7 +258,7 @@ SOURCE=Agg\AggToolBar.h
 InputPath=Agg\AggToolBar.h
 
 "..\..\..\build\debug\mocs\Gui\moc_AggToolBar.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_AggToolBar.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_AggToolBar.cpp
 
 # End Custom Build
 
@@ -268,7 +269,7 @@ InputPath=Agg\AggToolBar.h
 InputPath=Agg\AggToolBar.h
 
 "..\..\..\build\release\mocs\Gui\moc_AggToolBar.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_AggToolBar.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_AggToolBar.cpp
 
 # End Custom Build
 
@@ -286,7 +287,7 @@ SOURCE=Agg\AggTrussToolBar.h
 InputPath=Agg\AggTrussToolBar.h
 
 "..\..\..\build\debug\mocs\Gui\moc_AggTrussToolBar.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_AggTrussToolBar.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_AggTrussToolBar.cpp
 
 # End Custom Build
 
@@ -297,7 +298,7 @@ InputPath=Agg\AggTrussToolBar.h
 InputPath=Agg\AggTrussToolBar.h
 
 "..\..\..\build\release\mocs\Gui\moc_AggTrussToolBar.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_AggTrussToolBar.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_AggTrussToolBar.cpp
 
 # End Custom Build
 
@@ -315,7 +316,7 @@ SOURCE=Agg\AggTrussWindowButton.h
 InputPath=Agg\AggTrussWindowButton.h
 
 "..\..\..\build\debug\mocs\Gui\moc_AggTrussWindowButton.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_AggTrussWindowButton.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_AggTrussWindowButton.cpp
 
 # End Custom Build
 
@@ -326,7 +327,7 @@ InputPath=Agg\AggTrussWindowButton.h
 InputPath=Agg\AggTrussWindowButton.h
 
 "..\..\..\build\release\mocs\Gui\moc_AggTrussWindowButton.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_AggTrussWindowButton.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_AggTrussWindowButton.cpp
 
 # End Custom Build
 
@@ -339,10 +340,6 @@ SOURCE=Agg\AggWidget.h
 # End Source File
 # Begin Source File
 
-SOURCE=CalcDataWidget.ui.h
-# End Source File
-# Begin Source File
-
 SOURCE=FermaNextMainWindow.h
 
 !IF  "$(CFG)" == "Gui - Win32 Debug"
@@ -352,7 +349,7 @@ SOURCE=FermaNextMainWindow.h
 InputPath=FermaNextMainWindow.h
 
 "..\..\..\build\debug\mocs\Gui\moc_FermaNextMainWindow.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_FermaNextMainWindow.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_FermaNextMainWindow.cpp
 
 # End Custom Build
 
@@ -363,7 +360,7 @@ InputPath=FermaNextMainWindow.h
 InputPath=FermaNextMainWindow.h
 
 "..\..\..\build\release\mocs\Gui\moc_FermaNextMainWindow.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_FermaNextMainWindow.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_FermaNextMainWindow.cpp
 
 # End Custom Build
 
@@ -381,7 +378,7 @@ SOURCE=GeometryTabWidget.h
 InputPath=GeometryTabWidget.h
 
 "..\..\..\build\debug\mocs\Gui\moc_GeometryTabWidget.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_GeometryTabWidget.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_GeometryTabWidget.cpp
 
 # End Custom Build
 
@@ -392,7 +389,7 @@ InputPath=GeometryTabWidget.h
 InputPath=GeometryTabWidget.h
 
 "..\..\..\build\release\mocs\Gui\moc_GeometryTabWidget.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_GeometryTabWidget.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_GeometryTabWidget.cpp
 
 # End Custom Build
 
@@ -405,6 +402,33 @@ SOURCE=.\GuiSubsidiary.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\PreferencesWidget.h
+
+!IF  "$(CFG)" == "Gui - Win32 Debug"
+
+# Begin Custom Build - Running MOC on PreferencesWidget.h
+InputPath=.\PreferencesWidget.h
+
+"..\..\..\build\debug\mocs\Gui\moc_PreferencesWidget.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\debug\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_PreferencesWidget.cpp
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "Gui - Win32 Release"
+
+# Begin Custom Build - Running MOC on PreferencesWidget.h
+InputPath=.\PreferencesWidget.h
+
+"..\..\..\build\release\mocs\Gui\moc_PreferencesWidget.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_PreferencesWidget.cpp
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=ProjectToolBox.h
 
 !IF  "$(CFG)" == "Gui - Win32 Debug"
@@ -414,7 +438,7 @@ SOURCE=ProjectToolBox.h
 InputPath=ProjectToolBox.h
 
 "..\..\..\build\debug\mocs\Gui\moc_ProjectToolBox.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_ProjectToolBox.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_ProjectToolBox.cpp
 
 # End Custom Build
 
@@ -425,7 +449,7 @@ InputPath=ProjectToolBox.h
 InputPath=ProjectToolBox.h
 
 "..\..\..\build\release\mocs\Gui\moc_ProjectToolBox.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_ProjectToolBox.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_ProjectToolBox.cpp
 
 # End Custom Build
 
@@ -443,7 +467,7 @@ SOURCE=Splash.h
 InputPath=Splash.h
 
 "..\..\..\build\debug\mocs\Gui\moc_Splash.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_Splash.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_Splash.cpp
 
 # End Custom Build
 
@@ -454,36 +478,7 @@ InputPath=Splash.h
 InputPath=Splash.h
 
 "..\..\..\build\release\mocs\Gui\moc_Splash.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_Splash.cpp
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=ToolBarManager.h
-
-!IF  "$(CFG)" == "Gui - Win32 Debug"
-
-# PROP Ignore_Default_Tool 1
-# Begin Custom Build - Running MOC on ToolBarManager.h
-InputPath=ToolBarManager.h
-
-"..\..\..\build\debug\mocs\Gui\moc_ToolBarManager.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_ToolBarManager.cpp
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "Gui - Win32 Release"
-
-# PROP Ignore_Default_Tool 1
-# Begin Custom Build - Running MOC on ToolBarManager.h
-InputPath=ToolBarManager.h
-
-"..\..\..\build\release\mocs\Gui\moc_ToolBarManager.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_ToolBarManager.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_Splash.cpp
 
 # End Custom Build
 
@@ -501,7 +496,7 @@ SOURCE=TrussDesignerWidget.h
 InputPath=TrussDesignerWidget.h
 
 "..\..\..\build\debug\mocs\Gui\moc_TrussDesignerWidget.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_TrussDesignerWidget.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_TrussDesignerWidget.cpp
 
 # End Custom Build
 
@@ -512,7 +507,7 @@ InputPath=TrussDesignerWidget.h
 InputPath=TrussDesignerWidget.h
 
 "..\..\..\build\release\mocs\Gui\moc_TrussDesignerWidget.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_TrussDesignerWidget.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_TrussDesignerWidget.cpp
 
 # End Custom Build
 
@@ -529,7 +524,7 @@ SOURCE=.\TrussPropertyTabWidget.h
 InputPath=.\TrussPropertyTabWidget.h
 
 "..\..\..\build\debug\mocs\Gui\moc_TrussPropertyTabWidget.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_TrussPropertyTabWidget.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_TrussPropertyTabWidget.cpp
 
 # End Custom Build
 
@@ -539,7 +534,7 @@ InputPath=.\TrussPropertyTabWidget.h
 InputPath=.\TrussPropertyTabWidget.h
 
 "..\..\..\build\release\mocs\Gui\moc_TrussPropertyTabWidget.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_TrussPropertyTabWidget.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_TrussPropertyTabWidget.cpp
 
 # End Custom Build
 
@@ -557,7 +552,7 @@ SOURCE=UndoRedoListBox.h
 InputPath=UndoRedoListBox.h
 
 "..\..\..\build\debug\mocs\Gui\moc_UndoRedoListBox.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_UndoRedoListBox.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_UndoRedoListBox.cpp
 
 # End Custom Build
 
@@ -568,7 +563,7 @@ InputPath=UndoRedoListBox.h
 InputPath=UndoRedoListBox.h
 
 "..\..\..\build\release\mocs\Gui\moc_UndoRedoListBox.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_UndoRedoListBox.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_UndoRedoListBox.cpp
 
 # End Custom Build
 
@@ -586,7 +581,7 @@ SOURCE=WindowListBox.h
 InputPath=WindowListBox.h
 
 "..\..\..\build\debug\mocs\Gui\moc_WindowListBox.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_WindowListBox.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_WindowListBox.cpp
 
 # End Custom Build
 
@@ -597,7 +592,7 @@ InputPath=WindowListBox.h
 InputPath=WindowListBox.h
 
 "..\..\..\build\release\mocs\Gui\moc_WindowListBox.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_WindowListBox.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_WindowListBox.cpp
 
 # End Custom Build
 
@@ -818,6 +813,32 @@ SOURCE=..\..\..\build\release\mocs\Gui\moc_GeometryTabWidget.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\build\debug\mocs\Gui\moc_PreferencesWidget.cpp
+
+!IF  "$(CFG)" == "Gui - Win32 Debug"
+
+!ELSEIF  "$(CFG)" == "Gui - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\build\release\mocs\Gui\moc_PreferencesWidget.cpp
+
+!IF  "$(CFG)" == "Gui - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "Gui - Win32 Release"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\build\debug\mocs\Gui\moc_ProjectToolBox.cpp
 
 !IF  "$(CFG)" == "Gui - Win32 Debug"
@@ -870,32 +891,6 @@ SOURCE=..\..\..\build\release\mocs\Gui\moc_Splash.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\build\debug\mocs\Gui\moc_ToolBarManager.cpp
-
-!IF  "$(CFG)" == "Gui - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "Gui - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\build\release\mocs\Gui\moc_ToolBarManager.cpp
-
-!IF  "$(CFG)" == "Gui - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "Gui - Win32 Release"
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\build\debug\mocs\Gui\moc_TrussDesignerWidget.cpp
 
 !IF  "$(CFG)" == "Gui - Win32 Debug"
@@ -923,6 +918,28 @@ SOURCE=..\..\..\build\release\mocs\Gui\moc_TrussDesignerWidget.cpp
 # Begin Source File
 
 SOURCE=..\..\..\build\debug\mocs\Gui\moc_TrussPropertyTabWidget.cpp
+
+!IF  "$(CFG)" == "Gui - Win32 Debug"
+
+!ELSEIF  "$(CFG)" == "Gui - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\build\release\mocs\Gui\moc_TrussPropertyTabWidget.cpp
+
+!IF  "$(CFG)" == "Gui - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "Gui - Win32 Release"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 

@@ -192,11 +192,9 @@ FermaNextWorkspace::ProjectList FermaNextWorkspace::getProjectList () const
 void FermaNextWorkspace::clearProjects ()
 {
     ProjectListIter iter = projects.begin();
-    for ( ; iter != projects.end(); ) {
-        bool res = removeProject(iter);
-        if ( ! res )
-            ++iter;
-    }
+    for ( ; iter != projects.end(); )
+        iter = removeProject( iter );
+
 }
 
 void FermaNextWorkspace::reset ()
@@ -249,34 +247,44 @@ FermaNextProject& FermaNextWorkspace::createProjectFromFile (
     return prj;
 }
 
-bool FermaNextWorkspace::removeProject ( ProjectListIter& iter )
+FermaNextWorkspace::ProjectListIter FermaNextWorkspace::removeProject ( 
+    ProjectListIter iter )
 {
     if ( iter == projects.end() )
-        return false;
+        return projects.end();
     FermaNextProject* prj = *iter;
     emit onBeforeProjectRemove(*prj);
-    projects.erase(iter);
+    iter = projects.erase(iter);
     delete prj;
     emit onAfterProjectRemove();
-    return true;        
+    return iter;        
 }
 
 bool FermaNextWorkspace::removeProject ( FermaNextProject& project )
 {    
     ProjectListIter iter = projects.begin();
     for ( ; iter != projects.end(); ++iter ) 
-        if ( (*iter) == &project )
-            return removeProject(iter);    
+        if ( (*iter) == &project ) {
+            ProjectListIter removedIt = removeProject(iter);
+            if ( removedIt == projects.end() )
+                return false;
+            else
+                return true;
+        }
     return false; 
 }
 
 bool FermaNextWorkspace::removeProject ( const QString& name )
 { 
     ProjectListIter iter = projects.begin();
-    for ( ; iter != projects.end(); ++iter ) 
+    for ( ; iter != projects.end(); ++iter )
         if ( (*iter)->getName() == name ) {
-            return removeProject( iter );
-    }
+            ProjectListIter removedIt = removeProject(iter);
+            if ( removedIt == projects.end() )
+                return false;
+            else
+                return true;
+        }
     return false; 
 }
 
