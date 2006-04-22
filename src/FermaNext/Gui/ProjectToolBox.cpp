@@ -1,4 +1,10 @@
 
+#include <QFileDialog>
+#include <QIcon>
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QPushButton>
+
 #include "ProjectToolBox.h"
 #include "WindowListBox.h"
 #include "Global.h"
@@ -7,18 +13,6 @@
 //FIXME QT3TO4
 //#include "CalcDataWidget.h"
 #include "CalculationInterface.h"
-
-// Qt3 Support classes
-#include <Q3ButtonGroup>
-#include <Q3GroupBox>
-
-#include <QFileDialog>
-#include <QIcon>
-#include <QInputDialog>
-#include <QLabel>
-#include <QListView>
-#include <QMessageBox>
-#include <QToolButton>
 
 /*****************************************************************************
  * Project ToolBox
@@ -59,8 +53,8 @@ int ProjectToolBox::addProject ( FermaNextProject& prj )
                             SLOT(projectRename(const QString&)) );
 
     QIcon iconSet( imagesPath() + "/project_toolbox.png"  );
-    int result = addItem( page, iconSet, prj.getName() );
-    setCurrentItem(page);
+    int result = addItem( page, iconSet, prj.getName() );    
+    setCurrentWidget(page);
     prj.activate();
     return result;
 }
@@ -73,13 +67,14 @@ int ProjectToolBox::removeProject ( FermaNextProject& prj )
     ProjectMapIter iter = projects.find(&prj);
     if ( iter == projects.end() ) 
         return -1;
-    QWidget* page = iter.data();
+    QWidget* page = iter.value();
+    int pageIndex = indexOf(page);
     projects.erase(iter);
-    int result = removeItem(page);
-    if ( result > 0 )
-        setCurrentIndex( result - 1 );        
+    removeItem( pageIndex );
+    if ( pageIndex > 0 )
+        setCurrentIndex( pageIndex - 1 );        
     delete page;
-    return result;
+    return pageIndex;
 }
 
 void ProjectToolBox::projectRename ( const QString& newName )
@@ -91,7 +86,7 @@ void ProjectToolBox::projectRename ( const QString& newName )
         if ( projects.contains( &prj ) ) {
             int indx = indexOf( projects[&prj] );
             if ( indx != -1 )
-                setItemLabel( indx, newName );
+                setItemText( indx, newName );
         }
     } catch ( ... ) {}
 }
@@ -101,104 +96,36 @@ void ProjectToolBox::projectIsActivated ( FermaNextProject& prj )
     // Double activation check
     if ( currentProject() == &prj )
         return;
-    setCurrentItem( projects[&prj] );
+    setCurrentWidget( projects[&prj] );
 }
 
 QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
 {
     // Main widget
-    QWidget* page = new QWidget( this, "page" );
-    page->setBackgroundRole( QPalette::Background );
-    QVBoxLayout* pageLayout = new QVBoxLayout( page, 0, 0, "pageLayout"); 
+    QWidget* page = new QWidget;
+    QVBoxLayout* pageLayout = new QVBoxLayout;
+    pageLayout->setMargin(0);
+    pageLayout->setSpacing(0);
+    page->setLayout( pageLayout );
 
-    // Main group box
-    Q3GroupBox* groupBox = new Q3GroupBox( page, "groupBox" );
-    groupBox->setBackgroundRole( QPalette::Base );
-    //FIXME QT3TO4
-    //groupBox->setLineWidth( 0 );
-    groupBox->setColumnLayout(0, Qt::Vertical );
-    groupBox->layout()->setSpacing( 0 );
-    groupBox->layout()->setMargin( 0 );
-    QVBoxLayout* groupBoxLayout = new QVBoxLayout( groupBox->layout() );
-    groupBoxLayout->setAlignment( Qt::AlignTop );
+    // Truss units group box
+    QWidget* groupBoxTrussUnits = new QWidget;
+    QVBoxLayout* trussUnitsLayout = new QVBoxLayout;
+    trussUnitsLayout->setMargin(0);
+    trussUnitsLayout->setSpacing(0);
+    groupBoxTrussUnits->setLayout( trussUnitsLayout );
+    pageLayout->addWidget( groupBoxTrussUnits );
 
-    // Info group box
-    Q3GroupBox* groupBoxInfo = new Q3GroupBox( groupBox, "groupBoxInfo" );
-    groupBoxInfo->setBackgroundRole( QPalette::Base );
-    groupBoxInfo->setColumnLayout(0, Qt::Vertical );
-    groupBoxInfo->layout()->setSpacing( 6 );
-    groupBoxInfo->layout()->setMargin( 11 );
-    QGridLayout* groupBoxInfoLayout = new QGridLayout( groupBoxInfo->layout() );
-    groupBoxInfoLayout->setAlignment( Qt::AlignTop );
+    WindowListBox * listBox = new WindowListBox( prj );
+    trussUnitsLayout->addWidget( listBox );
 
-    // Windows group box
-    Q3GroupBox* groupBoxWindows = new Q3GroupBox( groupBox, "groupBoxWindows" );
-    groupBoxWindows->setBackgroundRole( QPalette::Base );
-    groupBoxWindows->setColumnLayout(0, Qt::Vertical );
-    groupBoxWindows->layout()->setSpacing( 6 );
-    groupBoxWindows->layout()->setMargin( 11 );
-    QVBoxLayout* groupBoxWindowsLayout = new QVBoxLayout( groupBoxWindows->layout() );
-    groupBoxWindowsLayout->setAlignment( Qt::AlignTop );
-
-    // Labels for info group box
-    QLabel* labelTrussNumberVal = new QLabel( groupBoxInfo, "labelTrussNumberVal" );
-    labelTrussNumberVal->setBackgroundRole( QPalette::Base );
-    groupBoxInfoLayout->addWidget( labelTrussNumberVal, 1, 1 );
-
-    QLabel* labelTOKVal = new QLabel( groupBoxInfo, "labelTOKVal" );
-    labelTOKVal->setBackgroundRole( QPalette::Base );
-    groupBoxInfoLayout->addWidget( labelTOKVal, 0, 1 );
- 
-    QLabel* labelTOK = new QLabel( groupBoxInfo, "labelTOK" );    
-    labelTOK->setBackgroundRole( QPalette::Base );
-    groupBoxInfoLayout->addWidget( labelTOK, 0, 0 );
- 
-    QLabel* labelVisibleTrusses = new QLabel( groupBoxInfo, "labelVisibleTrusses" );    
-    labelVisibleTrusses->setBackgroundRole( QPalette::Base ); 
-    groupBoxInfoLayout->addWidget( labelVisibleTrusses, 2, 0 );
- 
-    QLabel* labelTrussNumber = new QLabel( groupBoxInfo, "labelTrussNumber" );    
-    labelTrussNumber->setBackgroundRole( QPalette::Base ); 
-    groupBoxInfoLayout->addWidget( labelTrussNumber, 1, 0 );
- 
-    QLabel* labelVisibleTrussesVal = new QLabel( groupBoxInfo, "labelVisibleTrussesVal" );
-    labelVisibleTrussesVal->setBackgroundRole( QPalette::Base ); 
-    groupBoxInfoLayout->addWidget( labelVisibleTrussesVal, 2, 1 );
-
-    WindowListBox * listBox = new WindowListBox ( prj, groupBoxWindows, "listBox" );
-    groupBoxWindowsLayout->addWidget( listBox );
-    listBox->installEventFilter( this );
-
-    // Fonts
-    QFont labelFont( "arial", 9  );
-    labelFont.setUnderline(true);
-    QFont simpleFont( "arial", 9  );
-
-    // Legends     
-    groupBoxInfo->setTitle( tr( "Project info" ) );
-    groupBoxInfo->setFont(simpleFont);
-    groupBoxWindows->setTitle( tr( "Trusses " ) );
-    groupBoxWindows->setFont(simpleFont);
-    labelTrussNumberVal->setText( tr( "6" ) );
-    labelTOKVal->setText( tr( "1,23" ) );     
-    labelTOK->setText( tr( "TOK" ) );     
-    labelTOK->setFont(labelFont);     
-    labelVisibleTrusses->setText( tr( "Visible trusses" ) );
-    labelVisibleTrusses->setFont(labelFont);     
-    labelTrussNumber->setText( tr( "Truss number" ) );
-    labelTrussNumber->setFont(labelFont);
-    labelVisibleTrussesVal->setText( tr( "5" ) );
-
-    // Some buttons at the bottom
-    QToolButton* calculateAllButton = new QToolButton( groupBoxWindows );
-    calculateAllButton->setText( tr("FFFFFFF") );
-    groupBoxWindowsLayout->addWidget( calculateAllButton );
-    calculateAllButton->setTextLabel( tr("Calculate all") );
-    calculateAllButton->setAutoRaise( TRUE );
-    calculateAllButton->setTextPosition( QToolButton::Right );
-    calculateAllButton->setUsesTextLabel( TRUE );
-    calculateAllButton->setFont( simpleFont );
-    calculateAllButton->setBackgroundRole( QPalette::Base );
+    // Buttons
+    QPushButton* calculateAllButton = new QPushButton;    
+    trussUnitsLayout->addSpacing(10);
+    trussUnitsLayout->addWidget( calculateAllButton );
+    calculateAllButton->setFlat( true );
+    calculateAllButton->setText( tr("Calculate all") );    
+    calculateAllButton->setIcon( QIcon(imagesPath() + "/calculate.png") );        
     connect( calculateAllButton, SIGNAL(clicked()), 
              SLOT(calculateAllIsPressed()) ); 
 
@@ -208,38 +135,25 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
     connect( calculationAllAction, SIGNAL(triggered()) , 
              SLOT(calculateAllIsPressed()) );
 
-    Q3ButtonGroup* buttons = new Q3ButtonGroup( 1, Qt::Vertical, groupBox );
-    //FIXME QT3TO4
-    //buttons->setFrameStyle( QFrame::NoFrame );
-    buttons->setEraseColor( Qt::green );
-    buttons->setBackgroundRole( QPalette::Base );
-        
-    QToolButton* buttonImport = new QToolButton(buttons);
-    buttonImport->setBackgroundRole( QPalette::Base );
-    buttonImport->setTextLabel( tr("Import") );
-    buttonImport->setAutoRaise( true );
-    buttonImport->setTextPosition( QToolButton::Right );
-    buttonImport->setUsesTextLabel( true );
-    buttonImport->setFont( simpleFont );
+    QWidget* buttonsGroupBox = new QWidget;
+    QHBoxLayout* buttonsLayout = new QHBoxLayout;
+    buttonsLayout->setSpacing(0);
+    buttonsLayout->setMargin(0);
+    buttonsGroupBox->setLayout( buttonsLayout );
+    pageLayout->addWidget( buttonsGroupBox );
+
+
+    QPushButton* buttonImport = new QPushButton;    
+    buttonsLayout->addWidget( buttonImport );
+    buttonImport->setFlat( true );
+    buttonImport->setText( tr("Import truss") );
     connect( buttonImport, SIGNAL(clicked()), SLOT(importIsPressed()) ); 
 
-    QToolButton* buttonNewTruss = new QToolButton(buttons);
-    buttonNewTruss->setBackgroundRole( QPalette::Base );
-    buttonNewTruss->setTextLabel( tr("New") );
-    buttonNewTruss->setAutoRaise( true );
-    buttonNewTruss->setTextPosition( QToolButton::Right );
-    buttonNewTruss->setUsesTextLabel( true );
-    buttonNewTruss->setFont( simpleFont );
+    QPushButton* buttonNewTruss = new QPushButton;
+    buttonsLayout->addWidget( buttonNewTruss );
+    buttonNewTruss->setFlat( true );
+    buttonNewTruss->setText( tr("Create truss") );
     connect( buttonNewTruss, SIGNAL(clicked()), SLOT(newTrussIsPressed()) ); 
-
-    buttons->insert( buttonImport, 0 );
-    buttons->insert( buttonNewTruss, 0 );
-
-    // Assembling
-    pageLayout->addWidget( groupBox );
-    groupBoxLayout->addWidget( groupBoxInfo );
-    groupBoxLayout->addWidget( groupBoxWindows ); 
-    groupBoxLayout->addWidget( buttons );
 
     return page;
 }
@@ -253,7 +167,7 @@ void ProjectToolBox::activateSelected ( int index )
 {   
     if ( index == -1 ) 
         return;
-    QWidget* page = currentItem();
+    QWidget* page = currentWidget();
     QList<FermaNextProject*> keys = projects.keys();
     QList<FermaNextProject*>::iterator i = keys.begin();
     for ( ; i != keys.end(); ++i )
@@ -267,8 +181,8 @@ void ProjectToolBox::activateSelected ( int index )
     QIcon activeIconSet( imagesPath() + "/project_toolbox.png" );
     QIcon disablesIconSet( imagesPath() + "/project_d.png" );
     for ( int ind = 0; ind < count(); ++ind )
-        setItemIconSet ( ind, disablesIconSet );
-    setItemIconSet ( index, activeIconSet );        
+        setItemIcon( ind, disablesIconSet );
+    setItemIcon( index, activeIconSet );        
 }
 
 void ProjectToolBox::clear ()
@@ -284,10 +198,13 @@ void ProjectToolBox::importIsPressed ()
     if ( currPrj == 0 )
         return;
 
-    QString fileName = QFileDialog::getOpenFileName( QString::null, 
+    QString fileName = QFileDialog::getOpenFileName( 
+        this,
+        tr( "Import trusses" ),
+        QString(),
         "Ferma (*" + TrussUnitWindowManager::newFormatExtension()  +
-        " );;Ferma old (*" + TrussUnitWindowManager::oldFormatExtension() +")",
-        this );
+        " );;Ferma old (*" + TrussUnitWindowManager::oldFormatExtension() +")"
+         );
 
     if ( fileName.isEmpty() ) 
         return;
@@ -313,12 +230,11 @@ void ProjectToolBox::newTrussIsPressed ()
     if ( currPrj == 0 )
         return;
 
-    bool ok;
     QString trussName = QInputDialog::getText(
+            this,
             tr("Truss unit creation"), 
-            tr("Enter truss unit name:"), QLineEdit::Normal,
-            QString::null, &ok, this );
-    if ( ok && !trussName.isEmpty() ) {
+            tr("Enter truss unit name:") );
+    if ( !trussName.isEmpty() ) {
         TrussUnitWindowManager& trussMng = currPrj->getTrussUnitWindowManager();
         TrussUnitWindow& truss = trussMng.createTrussUnitWindow(trussName);
         truss.setTrussAreaSize( DoubleSize( 300, 300 ) );

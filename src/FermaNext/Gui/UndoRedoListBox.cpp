@@ -5,12 +5,12 @@
  * Undo Redo List Box
  *****************************************************************************/
 
-UndoRedoListBox::UndoRedoListBox ( QWidget* p, Qt::WFlags f ) :
-    Q3ListBox( p, "UndoRedoListBox", f ),
+UndoRedoListBox::UndoRedoListBox ( QWidget* p ) :
+    QListWidget( p ),
     stateManager(0)
 {
-    QObject::connect( this, SIGNAL(clicked(Q3ListBoxItem*)),
-                            SLOT(clickOnItem(Q3ListBoxItem*)) );
+    QObject::connect( this, SIGNAL(itemPressed(QListWidgetItem*)),
+                            SLOT(clickOnItem(QListWidgetItem*)) );
 }
 
 UndoRedoListBox::~UndoRedoListBox ()
@@ -25,7 +25,7 @@ void UndoRedoListBox::setStateManager ( ObjectStateManager* newMng )
 {
     if ( stateManager ) {
         stateManager->disconnect( this );
-        Q3ListBox::clear();
+        QListWidget::clear();
     }
 
     stateManager = newMng;
@@ -33,16 +33,15 @@ void UndoRedoListBox::setStateManager ( ObjectStateManager* newMng )
         return;
 
     // Init item
-    insertItem( "New" );
+    addItem( "New" );
     // State manager states
-    insertStringList( stateManager->stateBlockNames() );
-    setSelected( stateManager->currentPos(), true );
-    setBottomItem( stateManager->currentPos() );
+    insertItems( 1, stateManager->stateBlockNames() );
+    setCurrentRow( stateManager->currentPos() );
 }
 
-void UndoRedoListBox::clickOnItem ( Q3ListBoxItem* item )
+void UndoRedoListBox::clickOnItem ( QListWidgetItem* item )
 {
-    int itemIndx = index( item );
+    int itemIndx = row( item );
     if ( itemIndx == -1 || stateManager == 0 || 
          stateManager->countStateBlocks() == 0 )
         return;

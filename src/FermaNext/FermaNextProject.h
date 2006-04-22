@@ -8,7 +8,8 @@
 #include "TrussDesignerWidget.h"
 #include "TrussUnitWindowManager.h"
 #include "ObjectStateManager.h"
-#include "CalcDataToolBar.h"
+// FIXME QT3TO4:
+//#include "CalcDataToolBar.h"
 
 class FermaNextWorkspace;
 class QStackedWidget;
@@ -47,7 +48,8 @@ public:
 
     virtual TrussUnitWindowManager& getTrussUnitWindowManager ();    
     virtual TrussDesignerWidget& getDesignerWidget ();
-    virtual CalcDataToolBar& getCalcDataToolBar ();
+// FIXME QT3TO4:
+//    virtual CalcDataToolBar& getCalcDataToolBar ();
     virtual FermaNextWorkspace& getWorkspace();
 
 protected:
@@ -74,7 +76,8 @@ private:
     QString name;
     QString projectFileName;
     QStackedWidget* stackedWidget;
-    CalcDataToolBar* calcDataToolBar;
+// FIXME QT3TO4:
+//    CalcDataToolBar* calcDataToolBar;
     QTabWidget* projectTab;
     QWidget* justStrengthAnalisysWidget;
     TrussDesignerWidget* designerWidget;

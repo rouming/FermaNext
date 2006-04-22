@@ -98,7 +98,8 @@ protected:
 
     virtual void setWorkspaceFileName ( const QString& );
 
-    virtual bool removeProject ( ProjectListIter& );
+    /** Removed project and returns next iterator. */
+    ProjectListIter removeProject ( ProjectListIter );
 
     virtual ~FermaNextWorkspace ();
 

@@ -238,8 +238,8 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
 
 void FermaNextProject::activate ()
 {
-    if ( stackedWidget && stackedWidget->currentWidget() != 
-         projectTab ) {
+    if ( stackedWidget && 
+         stackedWidget->currentWidget() != projectTab ) {
         stackedWidget->setCurrentWidget( projectTab );
         emit onActivate( *this );
     }
@@ -271,12 +271,13 @@ TrussDesignerWidget& FermaNextProject::getDesignerWidget ()
 {
     return *designerWidget;
 }
-
+//FIXME QT3TO4
+/*
 CalcDataToolBar& FermaNextProject::getCalcDataToolBar ()
 {
     return *calcDataToolBar;
 }
-
+*/
 FermaNextWorkspace& FermaNextProject::getWorkspace()
 {
     return currentWorkspace;

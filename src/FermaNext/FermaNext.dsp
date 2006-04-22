@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "..\..\build\debug\obj\FermaNext"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include/Qt3Support" /I "$(QTDIR)/include" /I "$(AGGDIR)/include" /I "$(AGGDIR)/svg" /I "." /I "Gui" /I "Gui\Agg" /I "TrussUnit" /I "..\Common" /I "..\Common\Plugin" /I "..\Common\Loader" /I "$(QTDIR)/include/ActiveQt" /I "..\..\build\debug\mocs\FermaNext" /I "..\..\build\release\ui\FermaNext" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_WINDOWS" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_QT3SUPPORT_LIB" /D "QT3_SUPPORT" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /D "WIN32" /FD -Zm200 /c
+# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include" /I "$(AGGDIR)/include" /I "$(AGGDIR)/svg" /I "." /I "Gui" /I "Gui\Agg" /I "TrussUnit" /I "..\Common" /I "..\Common\Plugin" /I "..\Common\Loader" /I "$(QTDIR)/include/ActiveQt" /I "..\..\build\debug\mocs\FermaNext" /I "..\..\build\release\ui\FermaNext" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_WINDOWS" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /D "WIN32" /FD -Zm200 /c
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419
 # ADD RSC /l 0x409 /d "_DEBUG"
@@ -51,7 +51,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /machine:IX86
-# ADD LINK32 "$(QTDIR)\lib\qtmaind.lib" "Common.lib" "Gui.lib" "TrussUnit.lib" "LibAgg.lib" "LibSVG.lib" "libexpat.lib" "$(QTDIR)\lib\Qt3Supportd4.lib" "$(QTDIR)\lib\QtXmld4.lib" "$(QTDIR)\lib\QtGuid4.lib" "$(QTDIR)\lib\QtCored4.lib" /nologo /subsystem:console /debug /machine:IX86 /nodefaultlib:"libc" /libpath:"..\..\build\debug" /libpath:"..\.." /libpath:"$(EXPATDIR)\Libs" /libpath:"$(QTDIR)\lib"
+# ADD LINK32 "$(QTDIR)\lib\qtmaind.lib" "Common.lib" "Gui.lib" "TrussUnit.lib" "LibAgg.lib" "LibSVG.lib" "libexpat.lib" "$(QTDIR)\lib\QtXmld4.lib" "$(QTDIR)\lib\QtGuid4.lib" "$(QTDIR)\lib\QtCored4.lib" /nologo /subsystem:console /debug /machine:IX86 /nodefaultlib:"libc" /libpath:"..\..\build\debug" /libpath:"..\.." /libpath:"$(EXPATDIR)\Libs" /libpath:"$(QTDIR)\lib"
 
 !ELSEIF  "$(CFG)" == "FermaNext - Win32 Release"
 
@@ -65,7 +65,7 @@ LINK32=link.exe
 # PROP Output_Dir "..\.."
 # PROP Intermediate_Dir "..\..\build\release\obj\FermaNext"
 # PROP Target_Dir ""
-# ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include/Qt3Support" /I "$(QTDIR)/include" /I "$(AGGDIR)/include" /I "$(AGGDIR)/svg" /I "." /I "Gui" /I "Gui\Agg" /I "TrussUnit" /I "..\Common" /I "..\Common\Plugin" /I "..\Common\Loader" /I "$(QTDIR)/include/ActiveQt" /I "..\..\build\release\mocs\FermaNext" /I "..\..\build\release\ui\FermaNext" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_WINDOWS" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_NO_DEBUG" /D "QT_QT3SUPPORT_LIB" /D "QT3_SUPPORT" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /D "WIN32" /FD -Zm200 /c
+# ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include" /I "$(AGGDIR)/include" /I "$(AGGDIR)/svg" /I "." /I "Gui" /I "Gui\Agg" /I "TrussUnit" /I "..\Common" /I "..\Common\Plugin" /I "..\Common\Loader" /I "$(QTDIR)/include/ActiveQt" /I "..\..\build\release\mocs\FermaNext" /I "..\..\build\release\ui\FermaNext" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_WINDOWS" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_NO_DEBUG" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /D "WIN32" /FD -Zm200 /c
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419
 # ADD RSC /l 0x409 /d "NDEBUG"
@@ -73,7 +73,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /machine:IX86
-# ADD LINK32 "$(QTDIR)\lib\qtmain.lib" "Common.lib" "Gui.lib" "TrussUnit.lib" "LibAgg.lib" "LibSVG.lib" "libexpat.lib" "$(QTDIR)\lib\Qt3Support4.lib" "$(QTDIR)\lib\QtXml4.lib" "$(QTDIR)\lib\QtGui4.lib" "$(QTDIR)\lib\QtCore4.lib" /nologo /subsystem:windows /incremental:yes /machine:IX86 /nodefaultlib:"libc" /libpath:"..\..\build\release" /libpath:"..\.." /libpath:"$(EXPATDIR)\Libs" /libpath:"$(QTDIR)\lib"
+# ADD LINK32 "$(QTDIR)\lib\qtmain.lib" "Common.lib" "Gui.lib" "TrussUnit.lib" "LibAgg.lib" "LibSVG.lib" "libexpat.lib" "$(QTDIR)\lib\QtXml4.lib" "$(QTDIR)\lib\QtGui4.lib" "$(QTDIR)\lib\QtCore4.lib" /nologo /subsystem:windows /incremental:yes /machine:IX86 /nodefaultlib:"libc" /libpath:"..\..\build\release" /libpath:"..\.." /libpath:"$(EXPATDIR)\Libs" /libpath:"$(QTDIR)\lib"
 
 !ENDIF 
 
@@ -111,7 +111,7 @@ SOURCE=FermaNextProject.h
 InputPath=FermaNextProject.h
 
 "..\..\build\debug\mocs\FermaNext\moc_FermaNextProject.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Gui" -I"Gui\Agg" -I"TrussUnit" -I"..\Common" -I"..\Common\Plugin" -I"..\Common\Loader" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\FermaNext" -I"..\..\build\release\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\FermaNext\moc_FermaNextProject.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml"  -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Gui" -I"Gui\Agg" -I"TrussUnit" -I"..\Common" -I"..\Common\Plugin" -I"..\Common\Loader" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\FermaNext" -I"..\..\build\release\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\FermaNext\moc_FermaNextProject.cpp
 
 # End Custom Build
 
@@ -122,7 +122,7 @@ InputPath=FermaNextProject.h
 InputPath=FermaNextProject.h
 
 "..\..\build\release\mocs\FermaNext\moc_FermaNextProject.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Gui" -I"Gui\Agg" -I"TrussUnit" -I"..\Common" -I"..\Common\Plugin" -I"..\Common\Loader" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\FermaNext" -I"..\..\build\release\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\FermaNext\moc_FermaNextProject.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml"  -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Gui" -I"Gui\Agg" -I"TrussUnit" -I"..\Common" -I"..\Common\Plugin" -I"..\Common\Loader" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\FermaNext" -I"..\..\build\release\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\FermaNext\moc_FermaNextProject.cpp
 
 # End Custom Build
 
@@ -140,7 +140,7 @@ SOURCE=FermaNextWorkspace.h
 InputPath=FermaNextWorkspace.h
 
 "..\..\build\debug\mocs\FermaNext\moc_FermaNextWorkspace.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Gui" -I"Gui\Agg" -I"TrussUnit" -I"..\Common" -I"..\Common\Plugin" -I"..\Common\Loader" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\FermaNext" -I"..\..\build\release\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\FermaNext\moc_FermaNextWorkspace.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml"  -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Gui" -I"Gui\Agg" -I"TrussUnit" -I"..\Common" -I"..\Common\Plugin" -I"..\Common\Loader" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\debug\mocs\FermaNext" -I"..\..\build\release\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\debug\mocs\FermaNext\moc_FermaNextWorkspace.cpp
 
 # End Custom Build
 
@@ -151,7 +151,7 @@ InputPath=FermaNextWorkspace.h
 InputPath=FermaNextWorkspace.h
 
 "..\..\build\release\mocs\FermaNext\moc_FermaNextWorkspace.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DQT_QT3SUPPORT_LIB -DQT3_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include/Qt3Support" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Gui" -I"Gui\Agg" -I"TrussUnit" -I"..\Common" -I"..\Common\Plugin" -I"..\Common\Loader" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\FermaNext" -I"..\..\build\release\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\FermaNext\moc_FermaNextWorkspace.cpp
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DQT_THREAD_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml"  -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Gui" -I"Gui\Agg" -I"TrussUnit" -I"..\Common" -I"..\Common\Plugin" -I"..\Common\Loader" -I"$(QTDIR)/include/ActiveQt" -I"..\..\build\release\mocs\FermaNext" -I"..\..\build\release\ui\FermaNext" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\build\release\mocs\FermaNext\moc_FermaNextWorkspace.cpp
 
 # End Custom Build
 

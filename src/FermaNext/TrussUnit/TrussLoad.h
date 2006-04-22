@@ -78,6 +78,8 @@ class TrussLoadCase : public TrussLoadCaseEmitter
 public:
     // Basic typedefs
     typedef QMap<const N*, TrussLoad*> TrussLoadMap;
+    typedef typename TrussLoadMap::Iterator TrussLoadMapIter;
+    typedef typename TrussLoadMap::ConstIterator TrussLoadMapConstIter;
 
     TrussLoadCase ()
     {}
@@ -85,9 +87,8 @@ public:
     virtual ~TrussLoadCase ()
     { 
         TrussLoadMapIter iter = loads.begin();
-        for ( ; iter != loads.end(); ++iter )
-            delete iter.value();
-        loads.clear();
+        for ( ; iter != loads.end(); )
+            iter = removeLoad( iter );
     }
 
     // Add new node load
@@ -123,20 +124,30 @@ public:
     }
 
     // Remove node load
-    virtual bool removeLoad ( const N& node )
+    virtual TrussLoadMapIter removeLoad ( TrussLoadMapIter iter )
+    {
+        if ( iter == loads.end() )
+            return loads.end();
+
+        TrussLoad* load = iter.value();
+        const N* node = iter.key();
+        QObject::disconnect( node, 0, load, 0 );
+        delete load;
+        iter = loads.erase( iter );
+        emit onAfterLoadRemoval( *node );
+        return iter;
+    }
+
+    virtual bool removeLoad ( const N& node ) 
     {
         // Do suspended clean
         suspendedClean();
 
-        if ( loads.contains(&node) ) {
-            TrussLoad* load = loads[&node];
-            QObject::disconnect( &node, 0, load, 0 );
-            delete load;
-            loads.remove(&node);
-            emit onAfterLoadRemoval( node );
-            return true;
-        }
-        return false;
+        TrussLoadMapIter iter = removeLoad( loads.find(&node) );
+        if ( iter == loads.end() )
+            return false;
+        else
+            return true;       
     }
 
     // Returns load, 0 if fails
@@ -171,12 +182,10 @@ protected:
     void suspendedClean ()
     {
         TrussLoadMapIter iter = loads.begin();
-        for ( ; iter != loads.end(); ++iter ) {
+        for ( ; iter != loads.end(); ) {
             TrussLoad* load = iter.value();
-            if ( load->isRemoved() ) {
-                delete iter.value();
-                iter = loads.erase(iter);
-            }
+            if ( load->isRemoved() )
+                iter = removeLoad( iter );
         }
     }
 
@@ -197,9 +206,6 @@ private:
     TrussLoadCase& operator= ( const TrussLoadCase& );
 
 private:
-    typedef typename TrussLoadMap::iterator TrussLoadMapIter;
-    typedef typename TrussLoadMap::const_iterator TrussLoadMapConstIter;
-
     TrussLoadMap loads;
 };
 

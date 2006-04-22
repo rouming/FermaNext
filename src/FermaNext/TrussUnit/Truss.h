@@ -187,20 +187,14 @@ public:
         PivotListIter itPivot;
         TopologyListIter itTopology;
         for ( itNode = nodes.begin(); 
-              itNode != nodes.end(); 
-              ++itNode )
-            delete *itNode;
+              itNode != nodes.end(); )
+            itNode = removeNode( itNode );
         for ( itPivot = pivots.begin(); 
-              itPivot != pivots.end();  
-              ++itPivot )
-            delete *itPivot;
+              itPivot != pivots.end(); )
+            itPivot = removePivot( itPivot );
         for ( itTopology = topologies.begin(); 
-              itTopology != topologies.end();  
-              ++itTopology )
-            delete *itTopology;
-        nodes.clear();
-        pivots.clear();
-        topologies.clear();
+              itTopology != topologies.end(); )
+            itTopology = removeTopology( itTopology );
     }
 
     virtual ~Truss ()
