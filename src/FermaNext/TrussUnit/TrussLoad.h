@@ -186,6 +186,8 @@ protected:
             TrussLoad* load = iter.value();
             if ( load->isRemoved() )
                 iter = removeLoad( iter );
+            else
+                ++iter;
         }
     }
 
