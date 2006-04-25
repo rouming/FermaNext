@@ -10,6 +10,7 @@
 #include <QVBoxLayout>
 #include <QValidator>
 #include <QMouseEvent>
+#include <QApplication>
 
 #include "AggWidget.h"
 #include "TrussUnitWindowManager.h"
@@ -19,12 +20,60 @@ class AggTrussToolBar;
 
 /*****************************************************************************/
 
-class FixationPopupMenu : public QMenu
+/** Event to notify handler to raise popup */
+class PopupEvent : public QEvent
+{
+public:
+    PopupEvent ( const QPoint& p, TrussUnitWindow* w, TrussNode* n ) : 
+        QEvent(QEvent::MouseButtonPress), pos(p),
+        trussWindow(w), trussNode(n) {}
+    const QPoint pos;
+    TrussUnitWindow* trussWindow;
+    TrussNode* trussNode;
+};
+
+/*****************************************************************************/
+
+class PopupMenu : public QMenu
+{
+public:    
+    PopupMenu ( QWidget* p = 0 ) : QMenu(p) {}
+    virtual ~PopupMenu () {}
+
+    /** Raise popup in main event loop */
+    void showPopup ( QMouseEvent* e, TrussUnitWindow* w, TrussNode* n )
+    {
+        PopupEvent* pe = new PopupEvent( e->globalPos(), w, n );
+        QApplication::postEvent( this, pe );
+    }
+    
+protected:
+    /** Handles #PopupEvent and forwards it to #beforePopup */
+    bool event ( QEvent* e )
+    {
+        PopupEvent* event = dynamic_cast<PopupEvent *>(e);
+        if ( event ) {
+            beforePopup( event->trussWindow, event->trussNode );
+            exec( event->pos );
+            return true;
+        }
+        return false;
+    }
+
+    /** Override method in base class */
+    virtual void beforePopup ( TrussUnitWindow*, TrussNode* ) {}
+};
+
+/*****************************************************************************/
+
+class FixationPopupMenu : public PopupMenu
 {
     Q_OBJECT
 public:
     FixationPopupMenu ( QWidget* parent = 0 );
-    void showFixationPopup ( QMouseEvent* pressEvent, TrussNode* );
+
+protected:
+    void beforePopup ( TrussUnitWindow*, TrussNode* );
 
 protected slots:
     void fixNodeByX ();
@@ -38,13 +87,14 @@ private:
 
 /*****************************************************************************/
 
-class LoadPopupMenu : public QMenu
+class LoadPopupMenu : public PopupMenu
 {
     Q_OBJECT
 public:
     LoadPopupMenu ( QWidget* parent=0 );
-    void showLoadPopup ( QMouseEvent* pressEvent, TrussNode*, 
-                         TrussUnitWindow* );
+
+protected:
+    void beforePopup ( TrussUnitWindow*, TrussNode* );
 
 protected slots:
     void okClicked();
