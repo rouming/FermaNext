@@ -21,28 +21,19 @@
  *****************************************************************************/
 
 FixationPopupMenu::FixationPopupMenu ( QWidget* parent ) :
-    QMenu( parent ),
+    PopupMenu( parent ),
     node(0)
 {
-    addAction( "Fixation by X", this, SLOT(fixNodeByX()) );
-    addAction( "Fixation by Y", this, SLOT(fixNodeByY()) );
-    addAction("Fixation by XY", this, SLOT(fixNodeByXY()) );
+    addAction( tr("Fixation by X"),  this, SLOT(fixNodeByX()) );
+    addAction( tr("Fixation by Y"),  this, SLOT(fixNodeByY()) );
+    addAction( tr("Fixation by XY"), this, SLOT(fixNodeByXY()) );
     addSeparator();
-    addAction( "Unfixed", this, SLOT(unfixNode()) );
+    addAction( tr("Unfixed"), this, SLOT(unfixNode()) );
 }
 
-void FixationPopupMenu::showFixationPopup ( QMouseEvent* e, TrussNode* n)
+void FixationPopupMenu::beforePopup ( TrussUnitWindow*, TrussNode* n)
 {
     node = n;
-    popup( e->globalPos() );
-
-    // Restore stolen release event
-    if ( parent() ) {
-        QMouseEvent* releaseEvent = new QMouseEvent( 
-                         QEvent::MouseButtonRelease,  e->pos(), e->globalPos(),
-                         e->button(), e->buttons(), e->modifiers() );
-        QApplication::postEvent( parent(), releaseEvent );        
-    }
 }
 
 void FixationPopupMenu::fixNodeByX ()
@@ -78,7 +69,7 @@ void FixationPopupMenu::unfixNode ()
 ******************************************************************************/
 
 LoadPopupMenu::LoadPopupMenu ( QWidget* parent ) :
-    QMenu( parent ),
+    PopupMenu( parent ),
     node(0),
     selectedWindow(0),
     // Init X layout and box
@@ -135,12 +126,10 @@ LoadPopupMenu::LoadPopupMenu ( QWidget* parent ) :
     QObject::connect( ok, SIGNAL(clicked()), SLOT(okClicked()) );
 }
 
-void LoadPopupMenu::showLoadPopup ( QMouseEvent* e, 
-                                    TrussNode* n, 
-                                    TrussUnitWindow* t)
+void LoadPopupMenu::beforePopup ( TrussUnitWindow* w, TrussNode* n )
 {
     double x = 0, y = 0;
-    selectedWindow = t;
+    selectedWindow = w;
     node = n;
     if ( selectedWindow && node ) {
         TrussUnit::LoadCase* loadCase = 
@@ -154,17 +143,7 @@ void LoadPopupMenu::showLoadPopup ( QMouseEvent* e,
         }
     }
     loadXLine->setText( QString::number(x) );
-    loadYLine->setText( QString::number(y) );
-    
-    popup( e->globalPos() );
-
-    // Restore stolen release event
-    if ( parent() ) {
-        QMouseEvent* releaseEvent = new QMouseEvent( 
-                         QEvent::MouseButtonRelease,  e->pos(), e->globalPos(),
-                         e->button(), e->buttons(), e->modifiers() );
-        QApplication::postEvent( parent(), releaseEvent );        
-    }
+    loadYLine->setText( QString::number(y) );    
 }
 
 void LoadPopupMenu::okClicked()
@@ -243,7 +222,6 @@ TrussDesignerWidget::~TrussDesignerWidget ()
     clearTrussUnitWindows();
     delete toolBar;
     delete aggHint;
-    delete fixationPopup;
 }
 
 void TrussDesignerWidget::clearTrussUnitWindows ()
@@ -1329,12 +1307,13 @@ void TrussDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                 {
                     selectedWindow->nodeToFront ( *selectedNode );
 
-                    if ( designerBehaviour == onFixDraw ) {
-                        fixationPopup->showFixationPopup( me, selectedNode );
+                    if ( designerBehaviour == onFixDraw ) {                        
+                        fixationPopup->showPopup( me, 0, selectedNode );
                         emit onFixationSet( *selectedNode );
                     }
                     else if ( designerBehaviour == onLoadDraw ) {
-                        loadPopup->showLoadPopup(me, selectedNode, selectedWindow);
+                        loadPopup->showPopup( me, selectedWindow, 
+                                              selectedNode );
                         emit onLoadSet( *selectedNode ); 
                     }               
                     else
