@@ -35,6 +35,14 @@ void FixationPopupMenu::showFixationPopup ( QMouseEvent* e, TrussNode* n)
 {
     node = n;
     popup( e->globalPos() );
+
+    // Restore stolen release event
+    if ( parent() ) {
+        QMouseEvent* releaseEvent = new QMouseEvent( 
+                         QEvent::MouseButtonRelease,  e->pos(), e->globalPos(),
+                         e->button(), e->buttons(), e->modifiers() );
+        QApplication::postEvent( parent(), releaseEvent );        
+    }
 }
 
 void FixationPopupMenu::fixNodeByX ()
@@ -149,6 +157,14 @@ void LoadPopupMenu::showLoadPopup ( QMouseEvent* e,
     loadYLine->setText( QString::number(y) );
     
     popup( e->globalPos() );
+
+    // Restore stolen release event
+    if ( parent() ) {
+        QMouseEvent* releaseEvent = new QMouseEvent( 
+                         QEvent::MouseButtonRelease,  e->pos(), e->globalPos(),
+                         e->button(), e->buttons(), e->modifiers() );
+        QApplication::postEvent( parent(), releaseEvent );        
+    }
 }
 
 void LoadPopupMenu::okClicked()
