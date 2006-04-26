@@ -21,19 +21,33 @@
  *****************************************************************************/
 
 FixationPopupMenu::FixationPopupMenu ( QWidget* parent ) :
-    PopupMenu( parent ),
+    QMenu( parent ),
     node(0)
 {
-    addAction( tr("Fixation by X"),  this, SLOT(fixNodeByX()) );
-    addAction( tr("Fixation by Y"),  this, SLOT(fixNodeByY()) );
-    addAction( tr("Fixation by XY"), this, SLOT(fixNodeByXY()) );
+    addAction( "Fixation by X", this, SLOT(fixNodeByX()) );
+    addAction( "Fixation by Y", this, SLOT(fixNodeByY()) );
+    addAction("Fixation by XY", this, SLOT(fixNodeByXY()) );
     addSeparator();
-    addAction( tr("Unfixed"), this, SLOT(unfixNode()) );
+    addAction( "Unfixed", this, SLOT(unfixNode()) );
 }
 
-void FixationPopupMenu::beforePopup ( TrussUnitWindow*, TrussNode* n)
+void FixationPopupMenu::showFixationPopup ( QMouseEvent* e, TrussNode* n)
 {
     node = n;
+    popup( e->globalPos() );
+
+// According to Qt documentation popup menu _must_ steal 
+// release mouse event, but this doesn't happen on Windows. 
+// So only on other OS we should post it manually.
+#ifndef QT_OS_WIN32
+    // Restore stolen release event
+    if ( parent() ) {
+        QMouseEvent* releaseEvent = new QMouseEvent( 
+                         QEvent::MouseButtonRelease,  e->pos(), e->globalPos(),
+                         e->button(), e->buttons(), e->modifiers() );
+        QApplication::postEvent( parent(), releaseEvent );        
+    }
+#endif
 }
 
 void FixationPopupMenu::fixNodeByX ()
@@ -69,7 +83,7 @@ void FixationPopupMenu::unfixNode ()
 ******************************************************************************/
 
 LoadPopupMenu::LoadPopupMenu ( QWidget* parent ) :
-    PopupMenu( parent ),
+    QMenu( parent ),
     node(0),
     selectedWindow(0),
     // Init X layout and box
@@ -126,10 +140,12 @@ LoadPopupMenu::LoadPopupMenu ( QWidget* parent ) :
     QObject::connect( ok, SIGNAL(clicked()), SLOT(okClicked()) );
 }
 
-void LoadPopupMenu::beforePopup ( TrussUnitWindow* w, TrussNode* n )
+void LoadPopupMenu::showLoadPopup ( QMouseEvent* e, 
+                                    TrussNode* n, 
+                                    TrussUnitWindow* t)
 {
     double x = 0, y = 0;
-    selectedWindow = w;
+    selectedWindow = t;
     node = n;
     if ( selectedWindow && node ) {
         TrussUnit::LoadCase* loadCase = 
@@ -143,7 +159,22 @@ void LoadPopupMenu::beforePopup ( TrussUnitWindow* w, TrussNode* n )
         }
     }
     loadXLine->setText( QString::number(x) );
-    loadYLine->setText( QString::number(y) );    
+    loadYLine->setText( QString::number(y) );
+    
+    popup( e->globalPos() );
+
+// According to Qt documentation popup menu _must_ steal 
+// release mouse event, but this doesn't happen on Windows. 
+// So only on other OS we should post it manually.
+#ifndef QT_OS_WIN32
+    // Restore stolen release event
+    if ( parent() ) {
+        QMouseEvent* releaseEvent = new QMouseEvent( 
+                         QEvent::MouseButtonRelease,  e->pos(), e->globalPos(),
+                         e->button(), e->buttons(), e->modifiers() );
+        QApplication::postEvent( parent(), releaseEvent );        
+    }
+#endif
 }
 
 void LoadPopupMenu::okClicked()
@@ -222,6 +253,7 @@ TrussDesignerWidget::~TrussDesignerWidget ()
     clearTrussUnitWindows();
     delete toolBar;
     delete aggHint;
+    delete fixationPopup;
 }
 
 void TrussDesignerWidget::clearTrussUnitWindows ()
@@ -1307,13 +1339,12 @@ void TrussDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                 {
                     selectedWindow->nodeToFront ( *selectedNode );
 
-                    if ( designerBehaviour == onFixDraw ) {                        
-                        fixationPopup->showPopup( me, 0, selectedNode );
+                    if ( designerBehaviour == onFixDraw ) {
+                        fixationPopup->showFixationPopup( me, selectedNode );
                         emit onFixationSet( *selectedNode );
                     }
                     else if ( designerBehaviour == onLoadDraw ) {
-                        loadPopup->showPopup( me, selectedWindow, 
-                                              selectedNode );
+                        loadPopup->showLoadPopup(me, selectedNode, selectedWindow);
                         emit onLoadSet( *selectedNode ); 
                     }               
                     else
