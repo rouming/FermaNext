@@ -98,11 +98,9 @@ void FermaNextProject::loadFromFile ( const QString& fileName )
 void FermaNextProject::saveToFile () throw (FileNameIsNotDefinedException, 
                                             IOException)
 {
-    const QString& fileName = getProjectFileName();
     if ( ! isFileNameDefined() )
         throw FileNameIsNotDefinedException();
-    
-    saveToFile( fileName );
+    saveToFile( getProjectFileName() );
 }
 
 void FermaNextProject::saveToFile ( const QString& fileName )
@@ -112,18 +110,18 @@ void FermaNextProject::saveToFile ( const QString& fileName )
     if ( ! xmlFile.open( QIODevice::WriteOnly ) )
         throw IOException();
 
+    setProjectFileName( fileName );
+
     QTextStream stream( &xmlFile );
 
     QDomDocument doc;
     QDomNode xmlInstr = doc.createProcessingInstruction(
                         "xml", QString("version=\"1.0\" encoding=\"UTF8\"") );
     doc.insertBefore( xmlInstr, doc.firstChild() );
-
+    
     QDomElement prjElement = saveToXML( doc );
-
     doc.appendChild( prjElement );
     doc.save( stream, 4 );
-    setProjectFileName( fileName );
 }
     
 const QString& FermaNextProject::getProjectFileName () const
