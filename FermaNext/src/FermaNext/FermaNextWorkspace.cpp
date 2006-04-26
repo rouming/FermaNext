@@ -86,6 +86,8 @@ void FermaNextWorkspace::saveToFile ( const QString& fileName )
     if ( ! xmlFile.open( QIODevice::WriteOnly ) )
         throw IOException();
 
+    setWorkspaceFileName( fileName );
+
     QTextStream stream( &xmlFile );
 
     QDomDocument doc;
@@ -97,7 +99,6 @@ void FermaNextWorkspace::saveToFile ( const QString& fileName )
 
     doc.appendChild( wspElement );
     doc.save( stream, 4 );
-    setWorkspaceFileName( fileName );
 }
 
 void FermaNextWorkspace::loadFromXML ( const QDomElement& wspElem,
