@@ -284,6 +284,7 @@ void Config::Node::parse () const
             hasValueParsed = true;
             self->setValue( n.toText().data() );
         }
+        n = n.nextSibling();
     }
 
     // There is no any child if this node has value

@@ -27,8 +27,8 @@ const QString& FermaNextWorkspace::formatExtension ()
 
 FermaNextWorkspace::FermaNextWorkspace () :
     name( untitledWorkspaceName ),
-    fermaConfig( Config::instance(::configFileName()) ),
-    pluginMng( fermaConfig ),    
+    fermaConfig( ::config() ),
+    pluginMng( fermaConfig ),
     fermaMainWindow(0),
     stackedWidget(0)
 {
