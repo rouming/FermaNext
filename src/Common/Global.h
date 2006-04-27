@@ -20,6 +20,8 @@
 
 #include <QString>
 
+class Config;
+
 /************************************
  * Main Consts 
  ************************************/
@@ -98,6 +100,7 @@ QString imagesCursorsPath ();
 QString pluginsPath ();
 QString pluginLoadersPath ();
 QString configFileName ();
+Config& config ();
 
 // Sage return of the directory that 
 // contains the application executable.

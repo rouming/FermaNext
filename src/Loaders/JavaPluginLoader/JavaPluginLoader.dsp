@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "..\..\..\build\release\obj\JavaPluginLoader.ldr"
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
-# ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "stubs-src" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include" /I "..\..\Common" /I "..\..\Common\Plugin" /I "..\..\Common\Loader" /I "$(JAVA_HOME)\include" /I "$(JAVA_HOME)\include\win32" /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\release\mocs\JavaPluginLoader.ldr" /I "..\..\..\build\debug\ui\JavaPluginLoader.ldr" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_USRDLL" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_NO_DEBUG" /D "QT_PLUGIN" /D "QT_CORE_LIB" /D "QT_GUI_LIB" /D "WIN32" /FD -Zm200 /c
+# ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "stubs-src" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include" /I "..\..\Common" /I "..\..\Common\Plugin" /I "..\..\Common\Loader" /I "$(JAVA_HOME)\include" /I "$(JAVA_HOME)\include\win32" /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\release\mocs\JavaPluginLoader.ldr" /I "..\..\..\build\debug\ui\JavaPluginLoader.ldr" /I "$(QTDIR)/mkspecs/win32-msvc" /D "QT_NO_DEBUG" /D "_USRDLL" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_PLUGIN" /D "QT_CORE_LIB" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "WIN32" /FD -Zm200 /c
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419
 # ADD RSC /l 0x409 /d "NDEBUG"
@@ -51,7 +51,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /machine:IX86
-# ADD LINK32 "Common.lib" "$(QTDIR)\lib\QtCore4.lib" "$(QTDIR)\lib\QtGui4.lib" /nologo /dll /incremental:yes /machine:IX86 /nodefaultlib:"libc" /out:"..\..\..\plugins\loaders\JavaPluginLoader.ldr.dll" /libpath:"..\..\..\build\release" /libpath:"$(QTDIR)\lib"
+# ADD LINK32 "Common.lib" "$(QTDIR)\lib\QtCore4.lib"  "$(QTDIR)\lib\QtXmld.lib"  "$(QTDIR)\lib\QtGui4.lib" /nologo /dll /incremental:yes /machine:IX86 /nodefaultlib:"libc" /out:"..\..\..\plugins\loaders\JavaPluginLoader.ldr.dll" /libpath:"..\..\..\build\release" /libpath:"$(QTDIR)\lib"
 
 !ELSEIF  "$(CFG)" == "JavaPluginLoader - Win32 Debug"
 
@@ -66,7 +66,7 @@ LINK32=link.exe
 # PROP Intermediate_Dir "..\..\..\build\debug\obj\JavaPluginLoader.ldr"
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
-# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /I "stubs-src" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include" /I "..\..\Common" /I "..\..\Common\Plugin" /I "..\..\Common\Loader" /I "$(JAVA_HOME)\include" /I "$(JAVA_HOME)\include\win32" /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\debug\mocs\JavaPluginLoader.ldr" /I "..\..\..\build\debug\ui\JavaPluginLoader.ldr" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_USRDLL" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_PLUGIN" /D "QT_CORE_LIB" /D "QT_GUI_LIB" /D "WIN32" /FD -Zm200 /c
+# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /I "stubs-src" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include" /I "..\..\Common" /I "..\..\Common\Plugin" /I "..\..\Common\Loader" /I "$(JAVA_HOME)\include" /I "$(JAVA_HOME)\include\win32" /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\debug\mocs\JavaPluginLoader.ldr" /I "..\..\..\build\debug\ui\JavaPluginLoader.ldr" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_USRDLL" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_PLUGIN" /D "QT_CORE_LIB" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "WIN32" /FD -Zm200 /c
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419
 # ADD RSC /l 0x409 /d "_DEBUG"
@@ -74,7 +74,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /machine:IX86
-# ADD LINK32 "Common.lib" "$(QTDIR)\lib\QtCored4.lib" "$(QTDIR)\lib\QtGuid4.lib" /nologo /dll /debug /machine:IX86 /nodefaultlib:"libc" /out:"..\..\..\plugins\loaders\JavaPluginLoader.ldr.dll" /libpath:"..\..\..\build\debug" /libpath:"$(QTDIR)\lib"
+# ADD LINK32 "Common.lib" "$(QTDIR)\lib\QtCored4.lib"  "$(QTDIR)\lib\QtXmld4.lib"  "$(QTDIR)\lib\QtGuid4.lib" /nologo /dll /debug /machine:IX86 /nodefaultlib:"libc" /out:"..\..\..\plugins\loaders\JavaPluginLoader.ldr.dll" /libpath:"..\..\..\build\debug" /libpath:"$(QTDIR)\lib"
 
 !ENDIF 
 
@@ -108,7 +108,7 @@ SOURCE=JavaPluginLoader.h
 !IF  "$(CFG)" == "JavaPluginLoader - Win32 Release"
 
 # Begin Custom Build - Building Java sources ...
-TargetDir=\ferma\Source\FermaNext\new_src_arch\FermaNext\plugins\loaders
+TargetDir=\ferma\Source\FermaNext\plugins\loaders
 InputPath=JavaPluginLoader.h
 
 "$(TargetDir)" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
@@ -119,7 +119,7 @@ InputPath=JavaPluginLoader.h
 !ELSEIF  "$(CFG)" == "JavaPluginLoader - Win32 Debug"
 
 # Begin Custom Build - Building Java sources ...
-TargetDir=\ferma\Source\FermaNext\new_src_arch\FermaNext\plugins\loaders
+TargetDir=\ferma\Source\FermaNext\plugins\loaders
 InputPath=JavaPluginLoader.h
 
 "$(TargetDir)" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"

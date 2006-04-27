@@ -5,6 +5,7 @@
 #include <QRegExp>
 
 #include "Global.h"
+#include "Config.h"
 
 /************************************
  * Main Consts 
@@ -113,6 +114,11 @@ QString pluginLoadersPath ()
 QString configFileName ()
 {
     return applicationDirPath() + pathSeparator() + "config.xml";
+}
+
+Config& config ()
+{
+    return Config::instance( configFileName() );
 }
 
 QString applicationDirPath ()
