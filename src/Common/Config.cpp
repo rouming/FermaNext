@@ -99,6 +99,51 @@ void Config::Node::setTagName ( const QString& tagName )
     cfg->nodeHasBeenChanged( *this );
 }
 
+bool Config::Node::hasValue () const
+{ return !textData.isNull(); }
+
+QString Config::Node::getValue () const
+{
+    if ( !xmlData.hasChildNodes() )
+        return QString();
+    QDomNode n = xmlData.firstChild();
+    if ( n.isText() )
+        return n.toText().data();
+    return QString();
+}
+
+void Config::Node::setValue ( const QString& value )
+{
+    cfg->lockBeforeChange();
+
+    if ( hasValue() ) {
+        QDomText newTextData = cfg->configDoc.createTextNode( value );
+        xmlData.replaceChild( newTextData, textData );
+    } else {
+        // This is not a text node, so clear all childs
+        removeAllChildNodes();
+        textData = cfg->configDoc.createTextNode( value );
+        xmlData.appendChild( textData );
+    }
+
+    // Notify about changes
+    cfg->nodeHasBeenChanged( *this );
+}
+
+void Config::Node::resetValue ()
+{
+    if ( !hasValue() )
+        return;
+
+    cfg->lockBeforeChange();
+
+    xmlData.removeChild( textData );
+    textData.clear();
+
+    // Notify about changes
+    cfg->nodeHasBeenChanged( *this );
+}
+
 NodeAttributeList Config::Node::getAttributes () const
 {
     NodeAttributeList resultList;
@@ -159,6 +204,10 @@ Config::Node Config::Node::createChildNode ( const QString& tagName )
     // Suspended parse
     if ( !fullyParsed )
         parse();
+    else
+        // We should reset value if this node has it before
+        if ( hasValue() )
+            resetValue();
 
     Config::Node node( *this, tagName );
     childs.append( node );
@@ -182,7 +231,7 @@ bool Config::Node::removeChildNode ( const QString& tagName )
     return false;
 }
 
-void Config::Node::removeAllChildNodes ( const QString& tagName )
+void Config::Node::removeAllChildNodes ()
 {
     // Suspended parse
     if ( !fullyParsed )
@@ -190,12 +239,9 @@ void Config::Node::removeAllChildNodes ( const QString& tagName )
     QList<Config::Node>::Iterator iter = childs.begin();
     while (  iter != childs.end() ) {
         Config::Node& node = *iter;
-        if ( node.getTagName() == tagName ) {
-            node.remove();
-            iter = childs.erase(iter);
-        } else
-            ++iter;
-    }            
+        node.remove();
+        iter = childs.erase(iter);
+    }
 }
 
 QList<Config::Node> Config::Node::findChildNodes ( 
@@ -224,17 +270,34 @@ QList<Config::Node> Config::Node::childNodes () const
 
 void Config::Node::parse () const
 {
+    // We are using const cast to make this method constant,
+    // as it is called from other constant methods
     Config::Node* self = const_cast<Config::Node*>(this);
-    childs.clear();
+
+    self->fullyParsed = true;
+    self->childs.clear();
+
+    bool hasValueParsed = false;
     QDomNode n = xmlData.firstChild();
+    while( !n.isNull() ) {
+        if ( n.isText() ) { 
+            hasValueParsed = true;
+            self->setValue( n.toText().data() );
+        }
+    }
+
+    // There is no any child if this node has value
+    if ( hasValueParsed )
+        return;
+
+    n = xmlData.firstChild();
     while( !n.isNull() ) {
         if ( n.isElement() ) {
             QDomElement element = n.toElement();
-            childs.append( Config::Node( *self, element ) );
+            self->childs.append( Config::Node( *self, element ) );
         }
         n = n.nextSibling();
     }
-    fullyParsed = true;
 }
 
 /*****************************************************************************
@@ -242,15 +305,15 @@ void Config::Node::parse () const
  *****************************************************************************/
 
 Config::HashInstances Config::configInstances;
-QMutex Config::instanceMutex;
-QMutex Config::notificationMutex;
+QMutex* Config::instanceMutex = new QMutex;
+QMutex* Config::notificationMutex = new QMutex( QMutex::Recursive );
 
 /*****************************************************************************/
 
 Config& Config::instance ( const QString& fileName )
     /*throw (OpenConfigException)*/
 {
-    instanceMutex.lock();
+    instanceMutex->lock();
     QFileInfo fileInfo( fileName );
     QString absFilePath = fileInfo.absoluteFilePath();
     Config* cfgInstance = 0;
@@ -260,14 +323,14 @@ Config& Config::instance ( const QString& fileName )
             configInstances[ absFilePath ] = cfgInstance;
         }
         catch ( ... ) {
-            instanceMutex.unlock();
+            instanceMutex->unlock();
             throw;
         }
 
     } else {
         cfgInstance = configInstances[ absFilePath ];
     }
-    instanceMutex.unlock();
+    instanceMutex->unlock();
     return *cfgInstance;
 }
 
@@ -305,7 +368,7 @@ Config::Node Config::rootNode () const
 { return rootConfigNode; }
 
 void Config::lockBeforeChange ()
-{ notificationMutex.lock(); }
+{ notificationMutex->lock(); }
 
 void Config::flush ()
 {
@@ -321,7 +384,7 @@ void Config::nodeHasBeenChanged ( const Config::Node& node )
     // Notify everyone
     emit onNodeChanged( *this, node );
     // We should unlock previously locked mutex
-    notificationMutex.unlock();
+    notificationMutex->unlock();
 }
 
 
@@ -332,7 +395,7 @@ void Config::nodeHasBeenCreated ( const Config::Node& node )
     // Notify everyone
     emit onNodeCreated( *this, node );
     // We should unlock previously locked mutex
-    notificationMutex.unlock();
+    notificationMutex->unlock();
 }
     
 void Config::nodeHasBeenRemoved ( const Config::Node& node )
@@ -342,7 +405,7 @@ void Config::nodeHasBeenRemoved ( const Config::Node& node )
     // Notify everyone
     emit onNodeRemoved( *this, node );
     // We should unlock previously locked mutex
-    notificationMutex.unlock();
+    notificationMutex->unlock();
 }
 
 /*****************************************************************************/

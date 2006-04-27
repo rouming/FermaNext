@@ -2,6 +2,7 @@
 #include "PluginLoaderFrontEnd.h"
 #include "PluginManager.h"
 #include "DynaLoader.h"
+#include "Config.h"
 
 #include <algorithm>
 #include <QDir>
@@ -25,13 +26,17 @@ const QString& PluginManager::systemPluginLoaderExtension ()
 
 /*****************************************************************************/
 
-PluginManager::PluginManager ()
+PluginManager::PluginManager ( Config& config ) :
+    cfg(config)
 {}
 
 PluginManager::~PluginManager ()
 {
     unregisterPluginLoaders();
 }
+
+Config& PluginManager::config ()
+{ return cfg; }
 
 void PluginManager::registerPluginLoaders ( const QString& path )
 {

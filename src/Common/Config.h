@@ -68,6 +68,34 @@ public:
         /** Sets tag name */
         void setTagName ( const QString& );
 
+        /** 
+         * Config nodes can store child config nodes or text value.
+         * So if this node has value, it doesn't have childs.
+         * @see getValue
+         * @see setValue
+         */
+        bool hasValue () const;
+
+        /** 
+         * Returns value of this node. If this node 
+         * has other config nodes or value has not been
+         * set before, returned string is empty 
+         * @see setValue
+         * @see hasValue
+         */
+        QString getValue () const;
+
+        /**
+         * Sets value to node. If node has child config nodes
+         * they will be removed and value will be set.
+         * @see getValue
+         * @see hasValue
+         */
+        void setValue ( const QString& );
+
+        /** Resets value. #hasValue should return false after call */
+        void resetValue ();
+
         /** Returns attributes of this node */
         NodeAttributeList getAttributes () const;
         /** Adds new node attribute */
@@ -82,7 +110,7 @@ public:
         /** Tries to remove child node with specified tag name */
         bool removeChildNode ( const QString& tagName );
         /** Removes all child nodes */
-        void removeAllChildNodes ( const QString& tagName );
+        void removeAllChildNodes ();
 
         /** Finds child nodes with specified tag name */
         QList<Node> findChildNodes ( const QString& tagName ) const;
@@ -101,9 +129,10 @@ public:
         Config* cfg;
         Node* parent;
         QDomElement xmlData;
-        mutable QList<Node> childs;
+        QDomText textData;
+        QList<Node> childs;
         bool removedFlag;
-        mutable bool fullyParsed;
+        bool fullyParsed;
     };
 
     // Inner Node class should be a friend of Config to have possibility 
@@ -183,8 +212,8 @@ private:
     typedef QHash<QString, Config*> HashInstances;
 
     static HashInstances configInstances;
-    static QMutex instanceMutex;
-    static QMutex notificationMutex;
+    static QMutex* instanceMutex;
+    static QMutex* notificationMutex;
 
     QDomDocument configDoc;
     QFile configFile;

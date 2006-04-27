@@ -8,6 +8,7 @@
 #include "JavaPluginLoader.h"
 #include "PluginManager.h"
 #include "Plugin.h"
+#include "Config.h"
 
 /*****************************************************************************
  * Plugin Loader hook
@@ -68,17 +69,72 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
     QString pathDelim = ":";
 #endif
 
-    QStringList classPaths;
-    classPaths.push_back( appPath );
-    classPaths.push_back( appPath + "/plugins/loaders/fermanext.jar" );
-
-    QString envJavaHomeStr( envJavaHome );
+    // Varibles for options
     QStringList options;
+    QStringList classPaths;
+    QStringList libPaths;
+
+    // Read config
+    Config& cfg = pluginManager().config();
+    ConfigNode rootNode = cfg.rootNode();
+    ConfigNodeList nodes = rootNode.findChildNodes( "JavaPluginLoader" );
+    if ( nodes.size() != 0 ) {
+        ConfigNode javaLoaderNode = nodes.at(0);
+
+        // Options setting
+        ConfigNodeList jvmOptions = 
+            javaLoaderNode.findChildNodes( "JVMOption" );
+
+        foreach ( ConfigNode jvmOption, jvmOptions ) {
+            NodeAttributeList attrs = jvmOption.getAttributes();
+            if ( attrs.size() == 0 )
+                continue;
+            NodeAttribute attr = attrs.at(0);
+            if ( attr.first != "option" )
+                continue;
+            options.push_back( attr.second );
+        }
+
+        // Class path setting
+        ConfigNodeList jvmClassPaths = 
+            javaLoaderNode.findChildNodes( "JVMClassPath" );
+
+        foreach ( ConfigNode jvmClassPath, jvmClassPaths ) {
+            NodeAttributeList attrs = jvmClassPath.getAttributes();
+            if ( attrs.size() == 0 )
+                continue;
+            NodeAttribute attr = attrs.at(0);
+            if ( attr.first != "path" )
+                continue;
+            QString path = attr.second;
+            // Replace special word '%APPDIR%'
+            path.replace("%APPDIR%", appPath);
+            // Append to paths
+            classPaths.push_back( path );
+        }
+
+        // Class path setting
+        ConfigNodeList jvmLibPaths = 
+            javaLoaderNode.findChildNodes( "JVMLibraryPath" );
+
+        foreach ( ConfigNode jvmLibPath, jvmLibPaths ) {
+            NodeAttributeList attrs = jvmLibPath.getAttributes();
+            if ( attrs.size() == 0 )
+                continue;
+            NodeAttribute attr = attrs.at(0);
+            if ( attr.first != "path" )
+                continue;
+            QString path = attr.second;
+            // Replace special word '%APPDIR%'
+            path.replace("%APPDIR%", appPath);
+            // Append to paths
+            libPaths.push_back( path );
+        }
+    }
+
+    // Set options
     options.push_back("-Djava.class.path=" + classPaths.join(pathDelim));
-    options.push_back("-Djava.library.path=" + 
-                      QString(appPath + "/plugins/loaders"));
-    options.push_back("-verbose:jni");
-    options.push_back("-Xcheck:jni");
+    options.push_back("-Djava.library.path=" + libPaths.join(pathDelim));
 
     try { javaVM = new JavaVirtualMachine( jvmLibPath,
                                            JavaVirtualMachine::v1_4,
