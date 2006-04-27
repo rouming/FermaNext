@@ -51,7 +51,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /machine:IX86
-# ADD LINK32 "Common.lib" "$(QTDIR)\lib\QtCore4.lib"  "$(QTDIR)\lib\QtXmld.lib"  "$(QTDIR)\lib\QtGui4.lib" /nologo /dll /incremental:yes /machine:IX86 /nodefaultlib:"libc" /out:"..\..\..\plugins\loaders\JavaPluginLoader.ldr.dll" /libpath:"..\..\..\build\release" /libpath:"$(QTDIR)\lib"
+# ADD LINK32 "Common.lib" "$(QTDIR)\lib\QtCore4.lib" "$(QTDIR)\lib\QtXml4.lib" "$(QTDIR)\lib\QtGui4.lib" /nologo /dll /incremental:yes /machine:IX86 /nodefaultlib:"libc" /out:"..\..\..\plugins\loaders\JavaPluginLoader.ldr.dll" /libpath:"..\..\..\build\release" /libpath:"$(QTDIR)\lib"
 
 !ELSEIF  "$(CFG)" == "JavaPluginLoader - Win32 Debug"
 
@@ -74,7 +74,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 /machine:IX86
-# ADD LINK32 "Common.lib" "$(QTDIR)\lib\QtCored4.lib"  "$(QTDIR)\lib\QtXmld4.lib"  "$(QTDIR)\lib\QtGuid4.lib" /nologo /dll /debug /machine:IX86 /nodefaultlib:"libc" /out:"..\..\..\plugins\loaders\JavaPluginLoader.ldr.dll" /libpath:"..\..\..\build\debug" /libpath:"$(QTDIR)\lib"
+# ADD LINK32 "Common.lib" "$(QTDIR)\lib\QtCored4.lib" "$(QTDIR)\lib\QtXmld4.lib" "$(QTDIR)\lib\QtGuid4.lib" /nologo /dll /debug /machine:IX86 /nodefaultlib:"libc" /out:"..\..\..\plugins\loaders\JavaPluginLoader.ldr.dll" /libpath:"..\..\..\build\debug" /libpath:"$(QTDIR)\lib"
 
 !ENDIF 
 
