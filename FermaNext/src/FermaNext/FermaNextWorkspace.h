@@ -127,6 +127,7 @@ private:
     QString name;    
     QString workspaceFileName;
     ProjectList projects;
+    Config& fermaConfig;
     PluginManager pluginMng;
     FermaNextMainWindow* fermaMainWindow;
     QStackedWidget* stackedWidget;

@@ -5,7 +5,7 @@ LEVEL = ../../..
 include(../../../FermaNext.pri)
 
 DESTDIR = ../../../plugins/loaders/
-QT += core gui
+QT += core gui xml
 
 TEMPLATE = lib
 CONFIG += plugin warn_on thread

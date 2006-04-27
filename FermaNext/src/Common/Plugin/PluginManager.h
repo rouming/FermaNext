@@ -10,6 +10,7 @@
 #include "PluginLoader.h"
 
 class DynaLoader;
+class Config;
 
 /** Thread for load and unload plugins */
 class PluginLoaderThread : public QThread
@@ -54,13 +55,18 @@ public:
 
     /**
      * Plugin manager contructor.
+     * @param config, manager will share it 
+     * with plugins and loaders.
      */
-    PluginManager ();
+    PluginManager ( Config& config );
 
     /**
      * Correctly unload all plugins.
      */
     ~PluginManager ();
+
+    /** Returns config */
+    Config& config ();
 
     /**
      * Resolves dependencies.
@@ -302,6 +308,7 @@ private:
     PluginLoadersMap loadersMap;       /**< loaders in loading order */
     PluginLoadersLibMap loadersLibMap; /**< loaders and their libs */
     PluginsMap plugins;                /**< plugins and their loaders */
+    Config& cfg;
     
 };
 

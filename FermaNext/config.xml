@@ -1,13 +1,12 @@
-<?xml version="1.0"?>
+<?xml version='1.0'?>
 <FermaNextConfig>
-   <TrussUnitWindow>
-       <BorderColor>#142328</BorderColor>
-       <CanvasColor>#080A0C</CanvasColor>
-       <HeadlineColor>#080A0C</HeadlineColor>
-       <Color>
-          <ArrowColor>#000000</ArrowColor>
-          <GridColor>#ffffff</GridColor>
-       </Color>
-      
-   </TrussUnitWindow>
+    <JavaPluginLoader>
+       <!-- <JVMOption option="-verbose:jni" /> -->
+       <JVMOption option="-Xcheck:jni" />
+       
+       <JVMClassPath path="%APPDIR%" />
+       <JVMClassPath path="%APPDIR%/plugins/loaders/fermanext.jar" />
+
+       <JVMLibraryPath path="%APPDIR%/plugins/loaders" />
+    </JavaPluginLoader>
 </FermaNextConfig>
