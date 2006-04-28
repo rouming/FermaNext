@@ -3,6 +3,7 @@
 #include <QStringList>
 #include <QFileInfo>
 #include <QTextStream>
+#include <QMetaType>
 
 #include "Config.h"
 
@@ -31,7 +32,7 @@ Config::Node::Node ( Node& parent_, const QString& tagName ) :
     removedFlag(false),
     fullyParsed(false)
 {
-    cfg->lockBeforeChange();
+    QMutexLocker locker( cfg->notificationMutex );
     xmlData = cfg->configDoc.createElement( tagName );
     parent->xmlData.appendChild( xmlData );
     cfg->nodeHasBeenCreated( *this );
@@ -74,12 +75,12 @@ Config::Node* Config::Node::parentNode () const
 void Config::Node::remove ()
 { 
     if ( parent == 0 )
-        return;    
-    cfg->lockBeforeChange();
+        return;
+    QMutexLocker locker( cfg->notificationMutex );
     parent->xmlData.removeChild( xmlData );
-    // Notify about changes
-    cfg->nodeHasBeenRemoved( *this );    
     removedFlag = true;
+    // Notify about changes
+    cfg->nodeHasBeenRemoved( *this );
 }
 
 bool Config::Node::isRemoved () const
@@ -93,7 +94,7 @@ QString Config::Node::getTagName () const
 
 void Config::Node::setTagName ( const QString& tagName )
 {
-    cfg->lockBeforeChange();
+    QMutexLocker locker( cfg->notificationMutex );
     xmlData.setTagName( tagName );
     // Notify about changes
     cfg->nodeHasBeenChanged( *this );
@@ -114,7 +115,7 @@ QString Config::Node::getValue () const
 
 void Config::Node::setValue ( const QString& value )
 {
-    cfg->lockBeforeChange();
+    QMutexLocker locker( cfg->notificationMutex );
 
     if ( hasValue() ) {
         QDomText newTextData = cfg->configDoc.createTextNode( value );
@@ -135,7 +136,7 @@ void Config::Node::resetValue ()
     if ( !hasValue() )
         return;
 
-    cfg->lockBeforeChange();
+    QMutexLocker locker( cfg->notificationMutex );
 
     xmlData.removeChild( textData );
     textData.clear();
@@ -163,7 +164,7 @@ bool Config::Node::addAttribute ( const NodeAttribute& attr )
 {
     if ( xmlData.hasAttribute( attr.first ) )
         return false;
-    cfg->lockBeforeChange();
+    QMutexLocker locker( cfg->notificationMutex );
     xmlData.setAttribute( attr.first, attr.second );
     // Notify about changes
     cfg->nodeHasBeenChanged( *this );
@@ -174,7 +175,7 @@ bool Config::Node::removeAttribute ( const QString& attrName )
 {
     if ( ! xmlData.hasAttribute( attrName ) )
         return false;
-    cfg->lockBeforeChange();
+    QMutexLocker locker( cfg->notificationMutex );
     xmlData.removeAttribute( attrName );
     // Notify about changes
     cfg->nodeHasBeenChanged( *this );
@@ -190,7 +191,7 @@ void Config::Node::clearAttributes ()
     for ( i = 0; i < size; ++i )
         attrNames.append( attributes.item(i).toAttr().name() );
 
-    cfg->lockBeforeChange();
+    QMutexLocker locker( cfg->notificationMutex );
 
     for ( i = 0; i < size; ++i )        
         xmlData.removeAttribute( attrNames.at(i) );
@@ -308,32 +309,48 @@ void Config::Node::parse () const
 Config::HashInstances Config::configInstances;
 QMutex* Config::instanceMutex = new QMutex;
 QMutex* Config::notificationMutex = new QMutex( QMutex::Recursive );
+ConfigNodeTypeRegistrator<Config::Node> Config::registrator;
 
 /*****************************************************************************/
 
 Config& Config::instance ( const QString& fileName )
     /*throw (OpenConfigException)*/
 {
-    instanceMutex->lock();
+    QMutexLocker locker( instanceMutex );
     QFileInfo fileInfo( fileName );
     QString absFilePath = fileInfo.absoluteFilePath();
     Config* cfgInstance = 0;
     if ( ! configInstances.contains( absFilePath ) ) {
-        try { 
-            cfgInstance = new Config( absFilePath );
-            configInstances[ absFilePath ] = cfgInstance;
-        }
-        catch ( ... ) {
-            instanceMutex->unlock();
-            throw;
-        }
-
+        cfgInstance = new Config( absFilePath );
+        configInstances[ absFilePath ] = cfgInstance;
     } else {
         cfgInstance = configInstances[ absFilePath ];
     }
-    instanceMutex->unlock();
     return *cfgInstance;
 }
+
+bool Config::destroyInstance ( const QString& fileName, bool removeConfigFile )
+{
+    QMutexLocker locker( instanceMutex );
+    QFileInfo fileInfo( fileName );
+    QString absFilePath = fileInfo.absoluteFilePath();
+
+    if ( ! configInstances.contains(absFilePath) )
+        return false;
+
+    Config* cfgInstance = configInstances[ absFilePath ];
+    configInstances.remove( absFilePath );
+    delete cfgInstance;
+
+    // Remove config file on request
+    if ( removeConfigFile )
+        QFile::remove( absFilePath );
+
+    return true;
+}
+
+bool Config::destroyInstance ( Config& cfg,  bool removeConfigFile )
+{ return destroyInstance( cfg.configFileName(), removeConfigFile ); }
 
 Config::Config ( const QString& fileName )
     /*throw (OpenConfigException)*/ :
@@ -342,28 +359,38 @@ Config::Config ( const QString& fileName )
     if ( !configFile.open( QIODevice::ReadWrite ) )
         throw OpenConfigException();
 
+    qint64 fileSize = configFile.size();
+
     QDomElement rootElement;
 
-    if ( !configDoc.setContent( &configFile ) ) {
-        // Clear all doc
-        configDoc.clear();
+    if ( fileSize == 0 ) {
         // Create default header
         QDomNode xmlInstr = configDoc.createProcessingInstruction(
-                        "xml", QString("version=\"1.0\" encoding=\"UTF8\"") );
+                        "xml", QString("version=\"1.0\" encoding=\"UTF-8\"") );
         // First line as XML header
         configDoc.insertBefore( xmlInstr, QDomNode() );
         // Create root element
         rootElement = configDoc.createElement( "Configuration" );
         configDoc.appendChild(rootElement);
-    } else {
+        // Flushes newly created header
+        flush();
+    } else if ( configDoc.setContent( &configFile ) ) {
         // Parsed successfully. Take root element.
         rootElement = configDoc.documentElement();
-    }    
+    }
+    else
+        // Can't parse
+        throw OpenConfigException();
+
     rootConfigNode = Config::Node( *this, rootElement );
 }
 
 Config::~Config ()
-{}
+{ configFile.close(); }
+
+
+QString Config::configFileName () const
+{ return configFile.fileName(); }
 
 Config::Node Config::rootNode () const
 { return rootConfigNode; }
@@ -383,9 +410,7 @@ void Config::nodeHasBeenChanged ( const Config::Node& node )
     // Everything should be flushed
     flush();
     // Notify everyone
-    emit onNodeChanged( *this, node );
-    // We should unlock previously locked mutex
-    notificationMutex->unlock();
+    emit onNodeChanged( node );
 }
 
 
@@ -394,9 +419,7 @@ void Config::nodeHasBeenCreated ( const Config::Node& node )
     // Everything should be flushed
     flush();
     // Notify everyone
-    emit onNodeCreated( *this, node );
-    // We should unlock previously locked mutex
-    notificationMutex->unlock();
+    emit onNodeCreated( node );
 }
     
 void Config::nodeHasBeenRemoved ( const Config::Node& node )
@@ -404,9 +427,7 @@ void Config::nodeHasBeenRemoved ( const Config::Node& node )
     // Everything should be flushed
     flush();
     // Notify everyone
-    emit onNodeRemoved( *this, node );
-    // We should unlock previously locked mutex
-    notificationMutex->unlock();
+    emit onNodeRemoved( node );
 }
 
 /*****************************************************************************/

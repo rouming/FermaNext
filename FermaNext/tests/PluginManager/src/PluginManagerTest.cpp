@@ -2,11 +2,13 @@
 #include <QString>
 
 #include "Common.h"
+#include "Config.h"
 
 class PluginManagerTest : public PluginManager
 {
 public:
-    PluginManagerTest () :
+    PluginManagerTest ( Config& cfg ) :
+        PluginManager(cfg),
         passed(0), failed(0)
     {}
 
@@ -169,7 +171,10 @@ private:
 
 int main ()
 {
-    PluginManagerTest test;
+    QString configFileName( "plgmng.cfg" );
+    Config& cfg = Config::instance( configFileName );
+
+    PluginManagerTest test( Config::instance(configFileName) );
     test.registerLoadersTest();
     test.loadPluginsTest();
 
@@ -185,7 +190,9 @@ int main ()
     */
 
     test.lastReport();
-   
+
+    // Remove config instance and temp config file
+    Config::destroyInstance( cfg, true );    
 
     return test.status();
 }
