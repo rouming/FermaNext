@@ -29,7 +29,8 @@ void FRMWriter::write ( const QString& name )
     TrussTopology::NodeListIter nIter;
     TrussTopology::PivotListIter pIter;
 
-    const TrussMaterial& mat = truss.getMaterial();
+    // FIXME: use material lib instead
+    /*const TrussMaterial& mat = truss.getMaterial();*/
     const TrussTopology::LoadCases& loadCases = truss.getLoadCases();
 
     uint fixNum = 0;
@@ -40,9 +41,11 @@ void FRMWriter::write ( const QString& name )
     out << pivots.size() << "\n";
     out << nodes.size() << "\n";
     out << fixNum  << "\n";
-    out << QString::number(mat.getElasticityModule(), 'E', 14) << "\n";
+
+    // FIXME: use material lib instead
+    out << QString::number( 0/*mat.getElasticityModule()*/, 'E', 14) << "\n";
     out << loadCases.countLoadCases() << "\n";
-    out << QString::number(mat.getWorkingStress(), 'E', 14)  << "\n";
+    out << QString::number( 0/*mat.getWorkingStress()*/, 'E', 14)  << "\n";
 
     for ( pIter = pivots.begin(); pIter != pivots.end(); ++pIter ) {
         uint firstInd = 1, lastInd = 1;
