@@ -15,6 +15,15 @@
 typedef QPair<QString, QString> NodeAttribute;
 typedef QList<NodeAttribute> NodeAttributeList;
 
+/** Subsidiary class, which registers Config::Node */
+template < class Type >
+class ConfigNodeTypeRegistrator
+{ 
+public:
+    ConfigNodeTypeRegistrator () 
+    {  qRegisterMetaType< Type >( "Config::Node" ); }
+};
+
 /**
  * Configuration class, which manages xml configuration.
  */
@@ -152,6 +161,25 @@ public:
     static Config& instance ( const QString& fileName )
         /*throw (OpenConfigException)*/;
 
+    /** 
+     * Destroys config instance by specified file name.
+     * @param fileName config file name
+     * @param removeConfigFile if true, file will be removed
+     * @return returns true if success, false otherwise
+     */
+    static bool destroyInstance ( const QString& fileName, 
+                                  bool removeConfigFile = false );
+
+    /** 
+     * Destroys config instance. 
+     * This is an overloaded member function, provided for convenience.
+     */
+    static bool destroyInstance ( Config& cfg,
+                                  bool removeConfigFile = false );
+
+    /** Return config file name */
+    QString configFileName () const;
+
     /** Returns root node of this config */
     Config::Node rootNode () const;
 
@@ -191,29 +219,34 @@ private:
      * @throw OpenConfigException occurs when can't open file for read/write
      */
     Config ( const QString& fileName ) /*throw (OpenConfigException)*/;
+
+    /** Destructor */
     ~Config ();
+    /** Just a copy constructor */
     Config ( const Config& );
+    /** Just an assignmen operator */
     Config& operator= ( const Config& );
-
-
 
 signals:
     /** Emits, when some node has been changed */
-    void onNodeChanged ( const Config&, const Config::Node& );
+    void onNodeChanged ( Config::Node );
 
     /** Emits, when some node has been created */
-    void onNodeCreated ( const Config&, const Config::Node& );
+    void onNodeCreated ( Config::Node );
 
     /** Emits, when some node has been removed */
-    void onNodeRemoved ( const Config&, const Config::Node& );
+    void onNodeRemoved ( Config::Node );
 
 
 private:
     typedef QHash<QString, Config*> HashInstances;
+    typedef ConfigNodeTypeRegistrator<Config::Node> NodeRegistrator;
 
     static HashInstances configInstances;
     static QMutex* instanceMutex;
     static QMutex* notificationMutex;
+    static NodeRegistrator registrator;/**< Registrator should be static to 
+                                            register #Config::Node only once */
 
     QDomDocument configDoc;
     QFile configFile;
@@ -222,6 +255,5 @@ private:
 
 typedef Config::Node ConfigNode;
 typedef QList<ConfigNode> ConfigNodeList;
-
 
 #endif //CONFIG_H
