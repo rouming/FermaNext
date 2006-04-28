@@ -527,11 +527,9 @@ void FermaNextMainWindow::refreshGeometryAndPropertyWindows ()
         return;
     
     TrussUnitWindow* window = prj->getDesignerWidget().getFocusedWindow();
-    if ( window ) {
-        geometryTabWidget->changeFocusWindow( window );
-        trussPropTabWidget->changeFocusWindow( window );
-        trussPropTabWidget->changeMaterialLibrary( prj->getMaterialLibrary() );
-    }
+    geometryTabWidget->changeFocusWindow( window );
+    trussPropTabWidget->changeFocusWindow( window );
+    trussPropTabWidget->changeMaterialLibrary( prj->getMaterialLibrary() );
 }
 
 void FermaNextMainWindow::trussWindowLostFocus ( TrussUnitWindow& window )
