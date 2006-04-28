@@ -34,6 +34,7 @@ extern const QString untitledWorkspaceName;
 
 extern const int nodesRadius,
                  pivotsWidth,
+                 defaultThickness,
                  defaultBufWidth,
                  defaultBufHeight,
                  trussBufIndent;
@@ -85,6 +86,7 @@ extern const int tableRowHeight,
                  nodeColumnWidth,
                  loadColumnWidth,
                  thicknessColumnWidth,
+                 materialColumnWidth,
                  checkBoxLen,
                  checkBoxIndent;
 

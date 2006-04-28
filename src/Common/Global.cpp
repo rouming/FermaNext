@@ -19,6 +19,7 @@ const QString untitledWorkspaceName = QObject::tr("Unnamed workspace");
 
 const int nodesRadius = 4,
           pivotsWidth = 2,
+          defaultThickness = 0.1,
           trussBufIndent = 24,
           defaultBufWidth = 204 + trussBufIndent,
           defaultBufHeight = 188 + trussBufIndent;
@@ -69,7 +70,8 @@ const double svgGamma = 1.0,
 const int tableRowHeight = 17,
           nodeColumnWidth = 40,
           loadColumnWidth = 71,
-          thicknessColumnWidth = 62;
+          thicknessColumnWidth = 62,
+          materialColumnWidth = 80;
 
 // fixation check box side length 
 const int checkBoxLen = 12;

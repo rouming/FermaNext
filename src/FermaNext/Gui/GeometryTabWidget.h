@@ -133,10 +133,12 @@ class PivotTable : public QTableWidget
 public:
     PivotTable ( QWidget* parent = 0 );
     virtual void setNodeNumber ( int row, int col, int numb );
-    virtual void setThickness ( int row, double thick );
-    virtual double getThickness ( int row ) const;
     virtual void addPivot ( const TrussPivot&, int row = -1 );
     virtual void setNodesTotalNumber ( int );
+    virtual void recalcPivotLength ( const TrussPivot& );
+
+protected:
+    virtual void setPivotLength ( int, double );
 };
 
 /*****************************************************************************/
@@ -176,7 +178,7 @@ protected slots:
     virtual void showPivotTableRow ( bool );
     virtual void updatePivotTableFirstNode ();
     virtual void updatePivotTableLastNode ();
-    virtual void updatePivotTableThickness ();
+    virtual void updatePivotLength ();
     virtual void updatePivotState ( int row, int col );
 
     virtual void updateTrussAreaSize ( double );

@@ -72,6 +72,7 @@ public:
 
 public slots:
     virtual void setTrussAreaSize ( const DoubleSize& ) = 0;
+    virtual void setDefaultMaterial ( const TrussMaterial& ) = 0;
 
 protected slots:
     void stateIsChanged ();
@@ -95,6 +96,7 @@ signals:
     // Truss signals
     void onStateChange ();
     void onAreaChange ( const DoubleSize& );
+    void onDefaultMaterialChange ( const TrussMaterial& );
 
     // Nodes create/remove signals
     void beforeNodeCreation ();
@@ -131,15 +133,6 @@ signals:
     void afterTopologyRevive ( const TrussTopology& );
     void beforeTopologyDesist ( const TrussTopology& );
     void afterTopologyDesist ( const TrussTopology& );
-
-    // Truss loads/load cases signals
-    void afterLoadCaseCreation ( int );
-    void afterLoadCaseRemoval ();
-    void currentLoadCaseChanged ( int );
-    void loadCaseCanBeRemoved ( bool );
-    void onTrussLoadChange ( const Node& );
-    void onTrussLoadCreate ( const Node& );
-    void onTrussLoadRemove ( const Node& );
 };
 
 /*****************************************************************************
@@ -178,7 +171,22 @@ public:
                                  SLOT(stateIsChanged()) );
         QObject::connect( this, SIGNAL(onAfterDesist(StatefulObject&)),
                                  SLOT(stateIsChanged()) );
-        createLoadCase();
+
+        QObject::connect( &loadCases, SIGNAL(afterLoadCaseCreation(int)),
+                                      SIGNAL(onStateChange()) );
+        QObject::connect( &loadCases, SIGNAL(afterLoadCaseRemoval()),
+                                      SIGNAL(onStateChange()) );
+        QObject::connect( &loadCases, SIGNAL(currentLoadCaseChanged(int)),
+                                      SIGNAL(onStateChange()) );
+
+        QObject::connect( &loadCases, SIGNAL(onTrussLoadCreate(const Node&)),
+                                      SIGNAL(onStateChange()) );
+        QObject::connect( &loadCases, SIGNAL(onTrussLoadRemove(const Node&)),
+                                      SIGNAL(onStateChange()) );
+        QObject::connect( &loadCases, SIGNAL(onTrussLoadChange(const Node&)),
+                                      SIGNAL(onStateChange()) );
+
+        loadCases.createLoadCase();
     }
 
     virtual void clear () 
@@ -355,14 +363,17 @@ public:
                                  SLOT(stateIsChanged()) );
         QObject::connect( pivot, SIGNAL(onLastNodeChange()),
                                  SLOT(stateIsChanged()) );
+        
+        pivot->setMaterial( *defaultMaterial );
         pivots.push_back(pivot);
 
         // Force reindex of elements numbers
         reindexNodesPivotsNumbers();
-
+        
         emit afterPivotCreation(pivot->getFirstNode(), 
                                 pivot->getLastNode());
         emit onStateChange();
+
         return *pivot;    
     }
 
@@ -411,7 +422,6 @@ public:
                                           iter.value()->getYForce() );
         }
 
-        topology->setMaterial( getMaterial()  );
         topology->setDimension( getDimension() );
         topology->setTrussAreaSize( getTrussAreaSize() );
 
@@ -574,7 +584,7 @@ public:
         emit onAreaChange( trussAreaSize );
         emit onStateChange();
     }
-
+    
     virtual const LoadCases& getLoadCases () const
     {
         return loadCases;
@@ -585,81 +595,9 @@ public:
         return loadCases;
     }
 
-    virtual LoadCase& createLoadCase ()
+    virtual void setDefaultMaterial ( const TrussMaterial& mat )
     {
-        LoadCase& loadCase = loadCases.createLoadCase();
-
-        connect( &loadCase, SIGNAL( onLoadChange(const Node&) ),
-                            SIGNAL( onTrussLoadChange(const Node&) ) );
-        connect( &loadCase, SIGNAL( onLoadChange(const Node&) ),
-                            SIGNAL( onStateChange() ) );
-        connect( &loadCase, SIGNAL( onAfterLoadCreation(const Node&) ),
-                            SIGNAL( onTrussLoadCreate(const Node&) ) );
-        connect( &loadCase, SIGNAL( onAfterLoadCreation(const Node&) ),
-                            SIGNAL( onStateChange() ) );
-        connect( &loadCase, SIGNAL( onAfterLoadRemoval(const Node&) ),
-                            SIGNAL( onTrussLoadRemove(const Node&) ) );
-        connect( &loadCase, SIGNAL( onAfterLoadRemoval(const Node&) ),
-                            SIGNAL( onStateChange() ) );
-
-        emit afterLoadCaseCreation( loadCases.countLoadCases() );
-
-        setCurrentLoadCase( loadCase );
-
-        if ( loadCases.countLoadCases() == 2 )
-            emit loadCaseCanBeRemoved( true );
-        else if ( loadCases.countLoadCases() == 1 )
-            emit loadCaseCanBeRemoved( false );
-
-        return loadCase;
-    }
-
-    virtual void removeLoadCase ( LoadCase& loadCase )
-    {
-        int indx = loadCases.getLoadCaseIndex( loadCase );
-        if ( &loadCase == loadCases.getCurrentLoadCase() ) {
-            if ( loadCases.countLoadCases() > indx ) {
-                LoadCase* current = loadCases.findLoadCase( indx + 1 );
-                if ( current )
-                    setCurrentLoadCase( *current );
-            }
-            else if ( loadCases.countLoadCases() ) {
-                LoadCase* current = loadCases.findLoadCase( indx - 1 );
-                if ( current )
-                    setCurrentLoadCase( *current );                
-            }
-        }
-        loadCases.removeLoadCase( loadCase );
-        emit afterLoadCaseRemoval();
-        emit onStateChange();
-        
-        if ( loadCases.countLoadCases() == 1 )
-            emit loadCaseCanBeRemoved( false );
-    }
-
-    virtual void setCurrentLoadCase ( LoadCase& loadCase )
-    {
-        loadCases.setCurrentLoadCase( loadCase );
-        int indx = loadCases.getLoadCaseIndex( loadCase );
-        if ( indx ) {
-            emit currentLoadCaseChanged( indx );
-            emit onStateChange();
-        }
-    }
-
-    virtual const TrussMaterial& getMaterial () const
-    {
-        return material;
-    }
-
-    virtual TrussMaterial& getMaterial ()
-    {
-        return material;
-    }
-
-    virtual void setMaterial ( const TrussMaterial& mat )
-    {
-        material = mat;
+        defaultMaterial = &mat;
     }
 
     virtual const TrussDimension& getDimension () const
@@ -991,7 +929,7 @@ private:
     TopologyList topologies;
     DoubleSize trussAreaSize;
     LoadCases loadCases;
-    TrussMaterial material;
+    const TrussMaterial* defaultMaterial;
     TrussDimension dimension;
 };
 
@@ -1012,6 +950,7 @@ signals:
     void onThicknessChange ( double );
     void onFirstNodeChange ();
     void onLastNodeChange ();
+    void onMaterialChange ();
 };
 
 /*****************************************************************************
@@ -1025,14 +964,16 @@ public:
     Pivot ( ObjectStateManager* mng ) : 
         PivotEmitter(mng),
         first(0), last(0),
-        thickness(0),
+        material(0),
+        thickness(0.1),
         number(0)
     {}
     Pivot ( N& first_, N& last_, ObjectStateManager* mng ) :
         PivotEmitter(mng),
         first(&first_),
         last(&last_),
-        thickness(0),
+        material(0),
+        thickness(0.1),
         number(0)
     {}
     virtual ~Pivot ()
@@ -1045,14 +986,27 @@ public:
     virtual void setFirstNode ( N* first_ )
     { first = first_; 
       emit onFirstNodeChange(); }
+
     virtual void setLastNode ( N* last_ )
     { last = last_;
       emit onLastNodeChange(); }
+    
+    virtual const TrussMaterial& getMaterial () const
+    { return *material; }
+    virtual void setMaterial ( const TrussMaterial& mat )
+    { 
+        if ( material == &mat )
+            return;
+        material = &mat; 
+        emit onMaterialChange();
+    }
+
     virtual double getThickness () const
     { return thickness; }
     virtual void setThickness ( double t_ )
     { thickness = t_; 
       emit onThicknessChange(thickness); }
+
     virtual int getNumber () const
     { return number; }
     virtual void setNumber ( int num )
@@ -1060,6 +1014,7 @@ public:
 
 private:    
     N *first, *last;
+    const TrussMaterial* material;
     double thickness;
     int number;
 };

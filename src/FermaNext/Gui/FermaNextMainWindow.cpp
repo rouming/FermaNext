@@ -81,6 +81,8 @@ void FermaNextMainWindow::init ()
                              SLOT(refreshUndoRedoActions()) );
     connect( projectToolBox, SIGNAL(currentChanged(int)), 
                              SLOT(refreshProjectActions()) );
+    connect( projectToolBox, SIGNAL(currentChanged(int)), 
+                             SLOT(refreshGeometryAndPropertyWindows()) );
     projectsDockWidget->setWidget( projectToolBox );    
 
     preferencesWidget = new PreferencesWidget( this );
@@ -163,6 +165,7 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
         undoRedoHistoryWidget->show();
         geometryWindow->show();
         trussPropertyWindow->show();
+        trussPropTabWidget->changeMaterialLibrary( prj.getMaterialLibrary() );
     }
 
     TrussDesignerWidget& designerWidget = prj.getDesignerWidget();
@@ -171,6 +174,14 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
                             SLOT(trussWindowLostFocus(TrussUnitWindow&)) );
     connect( &designerWidget, SIGNAL(onFocusReceive(TrussUnitWindow&)),
                             SLOT(trussWindowReceivedFocus(TrussUnitWindow&)) );
+
+    TrussUnitWindowManager& mng = prj.getTrussUnitWindowManager();
+    connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
+             geometryTabWidget, 
+                    SLOT(trussUnitWindowWasCreated(TrussUnitWindow&)) );
+    connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
+             trussPropTabWidget, 
+                    SLOT(trussUnitWindowWasCreated(TrussUnitWindow&)) );
 }
 
 void FermaNextMainWindow::createProject ()
@@ -182,13 +193,6 @@ void FermaNextMainWindow::createProject ()
     if ( !text.isEmpty() ) {
         FermaNextProject& prj = workspace.createProject( text );
         TrussUnitWindowManager& mng = prj.getTrussUnitWindowManager();
-
-        connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
-                 geometryTabWidget, 
-                        SLOT(trussUnitWindowWasCreated(TrussUnitWindow&)) );
-        connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
-                 trussPropTabWidget, 
-                        SLOT(trussUnitWindowWasCreated(TrussUnitWindow&)) );
 
 //TODO: remove this in future
 /*********** TEMP TRUSS UNIT **************************/
@@ -238,7 +242,7 @@ void FermaNextMainWindow::setupFileActions ()
 
     QAction *a;
     // New
-    a = new QAction( QIcon(imagesPath() + "/filenew.xpm"), 
+    a = new QAction( QIcon(imagesPath() + "/filenew.png"), 
                      tr( "&New..." ), this );
     a->setShortcut( tr("CTRL+N") );
     connect( a, SIGNAL(triggered()), SLOT(fileNew()) );
@@ -246,7 +250,7 @@ void FermaNextMainWindow::setupFileActions ()
     menu->addAction( a );
 
     // Open
-    a = new QAction( QIcon(imagesPath() + "/fileopen.xpm"), 
+    a = new QAction( QIcon(imagesPath() + "/fileopen.png"), 
                       tr( "&Open..." ), this );
     a->setShortcut( tr("CTRL+O") );
     connect( a, SIGNAL(triggered()), SLOT(fileOpen()) );
@@ -254,7 +258,7 @@ void FermaNextMainWindow::setupFileActions ()
     menu->addAction( a );   
 
     // Save
-    saveProjectAction = new QAction( QIcon(imagesPath() + "/filesave.xpm"),
+    saveProjectAction = new QAction( QIcon(imagesPath() + "/filesave.png"),
                                      tr( "&Save..." ), this );
     saveProjectAction->setShortcut( tr("CTRL+S") );
     connect( saveProjectAction, SIGNAL(triggered()), SLOT(fileSave()) );
@@ -262,7 +266,17 @@ void FermaNextMainWindow::setupFileActions ()
     menu->addAction( saveProjectAction );
     saveProjectAction->setDisabled(true);
     menu->addSeparator();
-  
+
+    // Save All
+    saveAllAction = new QAction( QIcon(imagesPath() + "/filesaveall.png"),
+                                 tr( "&Save All..." ), this );
+    saveAllAction->setShortcut( tr("CTRL+SHIFT+S") );
+    connect( saveAllAction, SIGNAL(triggered()), SLOT(fileSaveAll()) );
+    tb->addAction( saveAllAction );
+    menu->addAction( saveAllAction );
+    saveAllAction->setDisabled(true);
+    menu->addSeparator();
+
     // Save As
     saveAsProjectAction = new QAction( tr( "Save &As..." ), this );
     connect( saveAsProjectAction, SIGNAL(triggered()), SLOT(fileSaveAs()) );
@@ -300,12 +314,12 @@ void FermaNextMainWindow::setupFileActions ()
     menu->addAction( a );
     menu->addSeparator();
 
-    // Save All
+    /* Save All
     a = new QAction( tr( "Save All" ), this );
     a->setShortcut( tr("CTRL+SHIFT+S") );
     connect( a, SIGNAL(triggered()), SLOT(fileSaveAll()) );
     menu->addAction( a );
-    menu->addSeparator();
+    menu->addSeparator();*/
     
     // Page Setup
     a = new QAction( tr( "Page setup..." ), this );
@@ -342,7 +356,7 @@ void FermaNextMainWindow::setupEditActions ()
     QMenu* menu = menuBar()->addMenu( tr( "&Edit" ) );
 
     // Undo
-    undoAction = new QAction( QIcon(imagesPath() + "/editundo.xpm"), 
+    undoAction = new QAction( QIcon(imagesPath() + "/undo.png"), 
                               tr( "&Undo" ), this );
     undoAction->setShortcut( tr("CTRL+Z") );                               
     connect( undoAction, SIGNAL(triggered()), SLOT(editUndo()) );
@@ -351,7 +365,7 @@ void FermaNextMainWindow::setupEditActions ()
     menu->addAction( undoAction );
 
     // Redo
-    redoAction = new QAction( QIcon(imagesPath() + "/editredo.xpm"), 
+    redoAction = new QAction( QIcon(imagesPath() + "/redo.png"), 
                               tr( "&Redo" ), this );
     redoAction->setShortcut( tr("CTRL+Y") );
     connect( redoAction, SIGNAL(triggered()), SLOT(editRedo()) );
@@ -494,6 +508,7 @@ void FermaNextMainWindow::refreshProjectActions ()
         enableActions = true;
 
     saveProjectAction->setEnabled(enableActions);
+    saveAllAction->setEnabled(enableActions);
     saveAsProjectAction->setEnabled(enableActions);
     closeProjectAction->setEnabled(enableActions);
     printAction->setEnabled(enableActions);
@@ -503,6 +518,20 @@ void FermaNextMainWindow::refreshPluginsActions ()
 {
     // Just read info about plugins
     reloadPlugins( false )  ;
+}
+
+void FermaNextMainWindow::refreshGeometryAndPropertyWindows ()
+{
+    FermaNextProject* prj = projectToolBox->currentProject();
+    if ( ! prj )
+        return;
+    
+    TrussUnitWindow* window = prj->getDesignerWidget().getFocusedWindow();
+    if ( window ) {
+        geometryTabWidget->changeFocusWindow( window );
+        trussPropTabWidget->changeFocusWindow( window );
+        trussPropTabWidget->changeMaterialLibrary( prj->getMaterialLibrary() );
+    }
 }
 
 void FermaNextMainWindow::trussWindowLostFocus ( TrussUnitWindow& window )

@@ -85,6 +85,8 @@ protected slots:
 	// Refresh plugins actions
 	void refreshPluginsActions ();
 
+    void refreshGeometryAndPropertyWindows ();
+
     // Catch designer widget focus change
     void trussWindowLostFocus ( TrussUnitWindow& );
     void trussWindowReceivedFocus ( TrussUnitWindow& );
@@ -117,6 +119,7 @@ private:
     QAction* redoAction;
     QAction* saveProjectAction;
     QAction* saveAsProjectAction;
+    QAction* saveAllAction;
     QAction* closeProjectAction;
     QAction* printAction;
     QAction* showUndoRedoAction;

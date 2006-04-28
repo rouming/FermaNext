@@ -12,7 +12,7 @@ protected:
     virtual ~XMLSerializableObject ();
 
 public:
-    // Excetpions
+    // Exceptions
     class LoadException {};
 
 protected:

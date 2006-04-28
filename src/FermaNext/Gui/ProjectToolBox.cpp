@@ -125,7 +125,7 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
     trussUnitsLayout->addWidget( calculateAllButton );
     calculateAllButton->setFlat( true );
     calculateAllButton->setText( tr("Calculate all") );    
-    calculateAllButton->setIcon( QIcon(imagesPath() + "/calculate.png") );        
+    calculateAllButton->setIcon( QIcon(imagesPath() + "/calculate_all.png") );        
     connect( calculateAllButton, SIGNAL(clicked()), 
              SLOT(calculateAllIsPressed()) ); 
 

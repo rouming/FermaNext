@@ -6,7 +6,9 @@
  *****************************************************************************/
 
 TrussPivot::TrussPivot ( ObjectStateManager* mng ) :
-    Pivot<TrussNode>(mng), drawingStatus(true)
+    Pivot<TrussNode>(mng), 
+    materialUUIDMap(0), 
+    drawingStatus(true)
 {
     QObject::connect( this, SIGNAL(onAfterDesist( StatefulObject& )),
                             SLOT(removePivotHighlight()) );   
@@ -14,7 +16,9 @@ TrussPivot::TrussPivot ( ObjectStateManager* mng ) :
 
 TrussPivot::TrussPivot ( TrussNode& first, TrussNode& last,
                          ObjectStateManager* mng) :
-    Pivot<TrussNode>(first, last, mng), drawingStatus(true)
+    Pivot<TrussNode>(first, last, mng), 
+    materialUUIDMap(0), 
+    drawingStatus(true)
 {
     QObject::connect( this, SIGNAL(onAfterDesist( StatefulObject& )),
                             SLOT(removePivotHighlight()) );   
@@ -37,6 +41,14 @@ void TrussPivot::loadFromXML ( const QDomElement& pivotElem )
 
     setThickness( thickness );
 
+     /** 
+     * Set material
+     *****************/
+    QString materialID = pivotElem.attribute( "materialID" );
+    if ( ! materialUUIDMap || ! materialUUIDMap->contains(materialID) )
+        throw LoadException();
+    
+    setMaterial( *materialUUIDMap->value(materialID) );
 }
 
 QDomElement TrussPivot::saveToXML ( QDomDocument& doc )
@@ -55,7 +67,17 @@ QDomElement TrussPivot::saveToXML ( QDomDocument& doc )
      *****************/
     pivotElem.setAttribute( "thickness", getThickness() );
 
+    /** 
+     * Save material
+     *****************/
+    pivotElem.setAttribute( "materialID", getMaterial().getUUID() );
+
     return pivotElem;
+}
+
+void TrussPivot::setMaterialUUIDMap ( const QMap<QString, TrussMaterial*>& m )
+{
+    materialUUIDMap = &m;
 }
 
 bool TrussPivot::getDrawingStatus () const
