@@ -240,7 +240,7 @@ signals:
 
 private:
     typedef QHash<QString, Config*> HashInstances;
-    typedef ConfigNodeTypeRegistrator<Config::Node> NodeRegistrator;
+    typedef ConfigNodeTypeRegistrator<Node> NodeRegistrator;
 
     static HashInstances configInstances;
     static QMutex* instanceMutex;
