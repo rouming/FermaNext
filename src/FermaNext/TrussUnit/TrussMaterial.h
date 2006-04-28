@@ -6,6 +6,7 @@
 #include <QList>
 #include <QMap>
 #include <QObject>
+#include <QMetaType>
 
 #include "XMLSerializableObject.h"
 
