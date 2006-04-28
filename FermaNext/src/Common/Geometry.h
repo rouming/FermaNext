@@ -16,6 +16,8 @@ typedef DoublePoint Vector;
 inline bool comparePoints ( const DoublePoint&, const DoublePoint&,
                             double precision );
 
+inline double getPointDistance ( const DoublePoint&, const DoublePoint& );
+
 inline DoublePoint getLineSegmentsCrossPoint ( const DoublePoint&, 
                                                const DoublePoint&,
                                                const DoublePoint&, 
@@ -320,6 +322,13 @@ inline bool comparePoints ( const DoublePoint& p1, const DoublePoint& p2,
          fabs( p1.y() - p2.y() ) < precision )
          return true;
     return false;
+}
+
+inline double getPointDistance ( const DoublePoint& p1, const DoublePoint& p2 )
+{
+    double dx = p2.x() - p1.x(),
+           dy = p2.y() - p1.y();
+    return sqrt( dx * dx + dy * dy );
 }
 
 inline DoublePoint getLineSegmentsCrossPoint ( const DoublePoint& p11, 

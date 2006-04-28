@@ -28,7 +28,7 @@ public:
     class WriteFileException {};
     class WrongFormatException {};
 
-    TrussUnitWindowManager ();
+    TrussUnitWindowManager ( const TrussMaterialLibrary& );
     virtual ~TrussUnitWindowManager ();
 
     virtual TrussUnitWindow& createTrussUnitWindowFromFile ( 
@@ -60,18 +60,19 @@ protected:
     // failed creation attempt.
     virtual TrussUnitWindow& createTrussUnitWindow ( bool silence,
                                                      const QString& name );
-
 protected slots:
     // Just wrappers to cast stateful object to truss window
     // and to emit the signal further
     virtual void trussWindowAfterRevive ( StatefulObject& );
     virtual void trussWindowAfterDesist ( StatefulObject& );
+    virtual void changeDefaultMaterial ( const TrussMaterial& );
 
 signals:
     void onTrussUnitWindowCreate ( TrussUnitWindow& );
     void onTrussUnitWindowRemove ( TrussUnitWindow& );
     void onTrussUnitWindowRevive ( TrussUnitWindow& );
     void onTrussUnitWindowDesist ( TrussUnitWindow& );
+    void onDefaultMaterialChange ( const TrussMaterial& );
 
 private:
     // Every truss has it's own state manager.
@@ -80,6 +81,9 @@ private:
 
     WindowList trussWindows;
     StateManagerMap stateManagerMap;
+   
+    const TrussMaterialLibrary& materialLib;
+    const TrussMaterial* defaultMaterial;
 };
 
 #endif //TRUSSUNITWINDOWMANAGER_H

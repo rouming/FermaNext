@@ -67,6 +67,7 @@ public:
     // XML serialization
     virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
     virtual QDomElement saveToXML ( QDomDocument& );
+    virtual void setMaterialUUIDMap ( const QMap<QString, TrussMaterial*>& );
 
     const QString& getTrussName () const;
 
@@ -197,6 +198,7 @@ private:
     QSize pixAreaSize;
     QString trussName;
     TrussNode *frontNode, *firstFront, *lastFront;
+    const QMap<QString, TrussMaterial*> *materialUUIDMap;
 };
 
 /*****************************************************************************/
@@ -246,6 +248,7 @@ public:
     // XML serialization
     virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
     virtual QDomElement saveToXML ( QDomDocument& );
+    virtual void setMaterialUUIDMap ( const QMap<QString, TrussMaterial*>& );
 
     bool getDrawingStatus () const;
     void setDrawingStatus ( bool status );
@@ -266,6 +269,7 @@ public slots:
     void removePivotHighlight ();
 
 private:
+    const QMap<QString, TrussMaterial*> *materialUUIDMap;
     bool drawingStatus;
 };
 

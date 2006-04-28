@@ -2,7 +2,7 @@
 #ifndef TRUSSLOAD_H
 #define TRUSSLOAD_H
 
-#include <vector>
+#include <QList>
 #include <QObject>
 #include <QMap>
 
@@ -212,11 +212,32 @@ private:
 };
 
 /*****************************************************************************
+ * Truss Load Case Array Emitter
+ *****************************************************************************/
+
+class TrussLoadCaseArrayEmitter : public QObject
+{
+    Q_OBJECT
+public:
+    TrussLoadCaseArrayEmitter () {}
+
+signals:
+    void afterLoadCaseCreation ( int );
+    void afterLoadCaseRemoval ();
+    void currentLoadCaseChanged ( int );
+    void loadCaseCanBeRemoved ( bool );
+    void onTrussLoadChange ( const Node& );
+    void onTrussLoadCreate ( const Node& );
+    void onTrussLoadRemove ( const Node& );
+};
+
+
+/*****************************************************************************
  * Truss Load Case Array
  *****************************************************************************/
 
 template <class N>
-class TrussLoadCaseArray
+class TrussLoadCaseArray : public TrussLoadCaseArrayEmitter
 {
 public:
     TrussLoadCaseArray () :
@@ -233,12 +254,43 @@ public:
     {
         TrussLoadCase<N>* loadCase = new TrussLoadCase<N>;
         loadCases.push_back( loadCase );
+        
+        connect( loadCase, SIGNAL( onLoadChange(const Node&) ),
+                           SIGNAL( onTrussLoadChange(const Node&) ) );
+        connect( loadCase, SIGNAL( onAfterLoadCreation(const Node&) ),
+                           SIGNAL( onTrussLoadCreate(const Node&) ) );
+        connect( loadCase, SIGNAL( onAfterLoadRemoval(const Node&) ),
+                           SIGNAL( onTrussLoadRemove(const Node&) ) );
+
+        emit afterLoadCaseCreation( countLoadCases() );
+
+        setCurrentLoadCase( *loadCase );
+
+        if ( countLoadCases() == 2 )
+            emit loadCaseCanBeRemoved( true );
+        else if ( countLoadCases() == 1 )
+            emit loadCaseCanBeRemoved( false );
+
         return *loadCase;
     }
 
     // Remove specified load case
     virtual bool removeLoadCase ( TrussLoadCase<N>& loadCase )
     {
+        int indx = getLoadCaseIndex( loadCase );
+        if ( &loadCase == getCurrentLoadCase() ) {
+            if ( countLoadCases() > indx ) {
+                TrussLoadCase<N>* current = findLoadCase( indx + 1 );
+                if ( current )
+                    setCurrentLoadCase( *current );
+            }
+            else if ( countLoadCases() ) {
+                TrussLoadCase<N>* current = findLoadCase( indx - 1 );
+                if ( current )
+                    setCurrentLoadCase( *current );                
+            }
+        }
+
         TrussLoadCaseListIter iter = std::find( loadCases.begin(),
                                                 loadCases.end(),
                                                 &loadCase );
@@ -250,6 +302,12 @@ public:
             currentLoadCase = 0;
         delete *iter;
         loadCases.erase(iter);
+
+        emit afterLoadCaseRemoval();
+        
+        if ( countLoadCases() == 1 )
+            emit loadCaseCanBeRemoved( false );
+        
         return true;
     }
 
@@ -290,6 +348,11 @@ public:
             return false;
 
         currentLoadCase = &loadCase;
+
+        int indx = getLoadCaseIndex( loadCase );
+        if ( indx )
+            emit currentLoadCaseChanged( indx );
+
         return true;
     }
 
@@ -327,7 +390,7 @@ public:
         }
     }
 
-    virtual size_t countLoadCases () const
+    virtual int countLoadCases () const
     {
         return loadCases.size();
     }
@@ -346,7 +409,7 @@ private:
     TrussLoadCaseArray& operator= ( const TrussLoadCaseArray& );
     
 private:
-    typedef std::vector<TrussLoadCase<N>*> TrussLoadCaseList;
+    typedef QList<TrussLoadCase<N>*> TrussLoadCaseList;
     typedef typename TrussLoadCaseList::iterator TrussLoadCaseListIter;
     typedef typename TrussLoadCaseList::const_iterator TrussLoadCaseListConstIter;
 

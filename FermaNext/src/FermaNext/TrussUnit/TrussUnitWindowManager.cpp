@@ -36,7 +36,9 @@ const QString& TrussUnitWindowManager::oldFormatExtension ()
 
 /*****************************************************************************/
 
-TrussUnitWindowManager::TrussUnitWindowManager ()
+TrussUnitWindowManager::TrussUnitWindowManager ( const TrussMaterialLibrary& lib) :
+    materialLib(lib),
+    defaultMaterial(0)
 {}
 
 TrussUnitWindowManager::~TrussUnitWindowManager ()
@@ -83,6 +85,12 @@ void TrussUnitWindowManager::trussWindowAfterDesist ( StatefulObject& st )
     } catch ( ... ) {}
 }
 
+void TrussUnitWindowManager::changeDefaultMaterial( const TrussMaterial& m )
+{
+    defaultMaterial = &m;
+    emit onDefaultMaterialChange(m);
+}
+
 TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow (
     const QString& name )
 {
@@ -98,16 +106,20 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow (
 
     ObjectStateManager* stateManager = new ObjectStateManager;
     TrussUnitWindow* trussWindow = new TrussUnitWindow(name, stateManager);
+    trussWindow->setDefaultMaterial( *defaultMaterial );
     stateManagerMap[trussWindow] = stateManager;
 
     QObject::connect( trussWindow, SIGNAL(onAfterRevive(StatefulObject&)), 
                       SLOT(trussWindowAfterRevive(StatefulObject&)) );
     QObject::connect( trussWindow, SIGNAL(onAfterDesist(StatefulObject&)), 
                       SLOT(trussWindowAfterDesist(StatefulObject&)) );
+    QObject::connect( this, SIGNAL(onDefaultMaterialChange(const TrussMaterial&)), 
+                      trussWindow, SLOT(setDefaultMaterial(const TrussMaterial&)) );
     trussWindows.push_back(trussWindow);
 
     if ( ! silence )
         emit onTrussUnitWindowCreate(*trussWindow);
+
     return *trussWindow;
 }
 
@@ -214,9 +226,9 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
     file.readLine( line, 256 );
     double workingStress = strtod( line,  NULL ); //sd1
 
-    TrussMaterial& material = truss.getMaterial();
-    material.setElasticityModule( elasticityModule );
-    material.setWorkingStress( workingStress );
+    //TrussMaterial& material = truss.getMaterial();
+    //material.setElasticityModule( elasticityModule );
+    //material.setWorkingStress( workingStress );
 
     uint i;
     PivotNodesList pivots;
@@ -294,9 +306,14 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
     TrussUnit::LoadCases& loadCases = truss.getLoadCases();
     for ( i = 0; i < loadCasesNum; ++i )
     {
-        TrussUnit::LoadCase& loadCase = loadCases.createLoadCase();
+        TrussUnit::LoadCase* loadCase;
+        if ( i == 0 )
+            loadCase = loadCases.getCurrentLoadCase();
+        else
+            loadCase = &loadCases.createLoadCase();
+
         if ( i == 2 )
-            loadCases.setCurrentLoadCase ( loadCase );
+            loadCases.setCurrentLoadCase ( *loadCase );
 
         for ( uint j = 1; j <= nodesNum; ++j )
         {
@@ -309,7 +326,7 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
                 TrussNode* node = truss.findNodeByNumber( j );
                 if ( node == 0 )
                     throw WrongFormatException();
-                loadCase.addLoad ( *node, xForce , yForce );
+                loadCase->addLoad ( *node, xForce , yForce );
             }
         }
     }

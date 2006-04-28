@@ -413,45 +413,27 @@ QWidget* PivotTableDelegate::createEditor ( QWidget *parent,
                                             const QStyleOptionViewItem& ,
                                             const QModelIndex& index ) const
 {
-    
-    if ( index.column() != 2 ) {
-        // create editor for node number cells
-        QComboBox *editor = new QComboBox( parent );
-        editor->installEventFilter(const_cast<PivotTableDelegate*>(this));
-        return editor;
-    }
+    if ( index.column() == 2 )
+        return 0;
 
-    // create editor for thickness cell
-    QLineEdit* editor = new QLineEdit( parent );
-    editor->setFrame( false );
-    RangeValidator* validator = new RangeValidator( editor );
-    validator->setRange( 0.0, pivotThickLimit );
-    validator->setDecimals( 2 );
-    editor->setValidator( validator );
-    editor->setMaxLength( 6 );
+    // create editor for node number cells
+    QComboBox *editor = new QComboBox( parent );
+    editor->installEventFilter(const_cast<PivotTableDelegate*>(this));
     return editor;
 }
 
 void PivotTableDelegate::setEditorData ( QWidget *editor,
                                          const QModelIndex &index ) const
 {
-    // fill editor of the node number cell
-    if ( index.column() != 2 ) {
-        int currValue = index.model()->data( index, Qt::DisplayRole ).toInt();
-        QComboBox *comboBox = dynamic_cast<QComboBox*>(editor);
-        Q_ASSERT( comboBox != 0 );
-        comboBox->addItem( QString::number(currValue) );
-        comboBox->addItems( this->getComboArgList( index ) );
-        comboBox->setCurrentIndex( 0 );
+    if ( index.column() == 2 )
         return;
-    }
 
-    // fill editor of the thickness cell
-    QString thickness = index.model()->data( index, Qt::DisplayRole ).toString();
-    QLineEdit* lineEdit = dynamic_cast<QLineEdit*>( editor );
-    Q_ASSERT( editor != 0 );
-    lineEdit->setText( thickness );
-    lineEdit->setAlignment( Qt::AlignLeft );
+    int currValue = index.model()->data( index, Qt::DisplayRole ).toInt();
+    QComboBox *comboBox = dynamic_cast<QComboBox*>(editor);
+    Q_ASSERT( comboBox != 0 );
+    comboBox->addItem( QString::number(currValue) );
+    comboBox->addItems( this->getComboArgList( index ) );
+    comboBox->setCurrentIndex( 0 );
     return;
 }
 
@@ -459,24 +441,14 @@ void PivotTableDelegate::setModelData ( QWidget* editor,
                                         QAbstractItemModel* model, 
                                         const QModelIndex& index ) const
 {
-    // set data for node number cell
-    if ( index.column() != 2 ) {
-        QComboBox *comboBox = dynamic_cast<QComboBox*>(editor);
-        QVariant newValue( comboBox->currentText() );
-        model->setData( index, newValue );
-        emit const_cast<PivotTableDelegate*>(this)->
-                cellWasChanged( index.row(), index.column() );
+    if ( index.column() == 2 )
         return;
-    }
-
-    // set data for thickness cell
-    QLineEdit* lineEdit = dynamic_cast<QLineEdit*>( editor );
-    Q_ASSERT( lineEdit );
-    QVariant newValue( lineEdit->text() );
+    
+    QComboBox *comboBox = dynamic_cast<QComboBox*>(editor);
+    QVariant newValue( comboBox->currentText() );
     model->setData( index, newValue );
     emit const_cast<PivotTableDelegate*>(this)->
             cellWasChanged( index.row(), index.column() );
-
     return;
 }
 
@@ -509,20 +481,19 @@ void PivotTable::setNodeNumber ( int row, int col, int numb )
     horizontalHeader()->resizeSection( col, nodeColumnWidth );
 }
 
-void PivotTable::setThickness ( int row, double thick )
-{
-    QTableWidgetItem* cell = 
-        new QTableWidgetItem( QString("%1").arg( thick,0,'f',2 ) );
-    cell->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter );
-    setItem( row, 2, cell );
-    horizontalHeader()->resizeSection( 2, thicknessColumnWidth );
-}
-
-double PivotTable::getThickness ( int row ) const
+void PivotTable::setPivotLength ( int row, double length )
 {
     QTableWidgetItem* cell = item( row, 2 );
-    Q_ASSERT( cell != 0 );
-    return cell->text().toDouble();
+    QString len = QString("%1").arg( length, 0, 'f', 2 );
+    if ( cell )
+        cell->setData( Qt::EditRole, QVariant(len) );
+    else {
+        cell = new QTableWidgetItem;
+        cell->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter );
+        cell->setData( Qt::EditRole, QVariant(len) );
+        setItem( row, 2, cell );
+    }
+    horizontalHeader()->resizeSection( 2, thicknessColumnWidth );
 }
 
 void PivotTable::addPivot ( const TrussPivot& pivot, int row )
@@ -534,7 +505,7 @@ void PivotTable::addPivot ( const TrussPivot& pivot, int row )
     Node& last = pivot.getLastNode();
     setNodeNumber( row, 0, first.getNumber() );
     setNodeNumber( row, 1, last.getNumber() );
-    setThickness( row, pivot.getThickness() );
+    recalcPivotLength( pivot );
     for ( int i = row; i < rowCount(); ++i )
         verticalHeader()->resizeSection( i, tableRowHeight );
 }
@@ -545,6 +516,13 @@ void PivotTable::setNodesTotalNumber ( int newNodesNumb )
         dynamic_cast<PivotTableDelegate*>( itemDelegate() );
     Q_ASSERT( delegate != 0 );
     delegate->setNodesTotalNumber( newNodesNumb );
+}
+
+void PivotTable::recalcPivotLength ( const TrussPivot& pivot )
+{
+    double length = getPointDistance( pivot.getFirstNode().getPoint(), 
+                                      pivot.getLastNode().getPoint() );
+    setPivotLength( pivot.getNumber() - 1, length );
 }
 
 /*****************************************************************************
@@ -667,7 +645,7 @@ void GeometryTabWidget::initPivotsTab ()
     pivotTable->setShowGrid( true );
 
     QStringList headerList;
-    headerList << tr("Node1") << tr("Node2") << tr("Thickness");
+    headerList << tr("Node1") << tr("Node2") << tr("Length");
     pivotTable->setHorizontalHeaderLabels( headerList );
     pivotTable->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
     pivotTable->hide();
@@ -682,9 +660,9 @@ void GeometryTabWidget::initAreaTab ()
     sizeGroupBox = new QGroupBox( tr( "Area size" ), parentFrame );
     QLabel* xSizeLabel = new QLabel( tr( "Size by X:" ), sizeGroupBox );
     QLabel* ySizeLabel = new QLabel( tr( "Size by Y:" ), sizeGroupBox );
-    xSizeEdit = new QDoubleSpinBox( sizeGroupBox );
+    xSizeEdit = new QDoubleSpinBox;
     xSizeEdit->setMaximum( areaMaxDimension );
-    ySizeEdit = new QDoubleSpinBox( sizeGroupBox );
+    ySizeEdit = new QDoubleSpinBox;
     ySizeEdit->setMaximum( areaMaxDimension );
 
     QVBoxLayout* parenLayout = new QVBoxLayout( parentFrame );
@@ -1017,12 +995,15 @@ void GeometryTabWidget::addPivotToTable ( const Node& first, const Node& last )
         pivotTable->addPivot( *pivot );
         connect( pivot, SIGNAL(onDrawingStatusChange(bool)),
                         SLOT(showPivotTableRow(bool)) );
-        connect( pivot, SIGNAL(onThicknessChange(double)),
-                        SLOT(updatePivotTableThickness()) );
         connect( pivot, SIGNAL(onFirstNodeChange()),
                         SLOT(updatePivotTableFirstNode()) );
         connect( pivot, SIGNAL(onLastNodeChange()),
                         SLOT(updatePivotTableLastNode()) );
+        connect( &first, SIGNAL(onPositionChange(double, double)),
+                         SLOT(updatePivotLength()) );
+        connect( &last, SIGNAL(onPositionChange(double, double)),
+                        SLOT(updatePivotLength()) );
+
     } catch ( ... ) { return; }
 
     pivotTable->setNodesTotalNumber( focusWindow->getNodeList().size() );
@@ -1031,7 +1012,7 @@ void GeometryTabWidget::addPivotToTable ( const Node& first, const Node& last )
 }
 
 void GeometryTabWidget::removePivotFromTable ( const Node& first, 
-                                                 const Node& last )
+                                               const Node& last )
 {
     if ( sender() != focusWindow )
         return;
@@ -1044,12 +1025,14 @@ void GeometryTabWidget::removePivotFromTable ( const Node& first,
         pivotTable->removeRow( pivot->getNumber() - 1 );
         disconnect( pivot, SIGNAL(onDrawingStatusChange(bool)),
                      this, SLOT(showPivotTableRow(bool)) );
-        disconnect( pivot, SIGNAL(onThicknessChange(double)),
-                     this, SLOT(updatePivotTableThickness()) );
         disconnect( pivot, SIGNAL(onFirstNodeChange()),
                      this, SLOT(updatePivotTableFirstNode()) );
         disconnect( pivot, SIGNAL(onLastNodeChange()),
                      this, SLOT(updatePivotTableLastNode()) );
+        disconnect( &first, SIGNAL(onPositionChange(double, double)),
+                      this, SLOT(updatePivotLength()) );
+        disconnect( &last, SIGNAL(onPositionChange(double, double)),
+                     this, SLOT(updatePivotLength()) );
     } catch ( ... ) { return; }
     
     pivotsNumbLabel->setText( "Total pivots: " + 
@@ -1128,14 +1111,28 @@ void GeometryTabWidget::updatePivotTableLastNode ()
     catch ( ... ) { return; }
 }
 
-void GeometryTabWidget::updatePivotTableThickness ()
+void GeometryTabWidget::updatePivotLength ()
 {
-    try { 
-        const TrussPivot& pivot = dynamic_cast<const TrussPivot&>(*sender());
-        pivotTable->setThickness( pivot.getNumber() - 1, 
-                                  pivot.getThickness() );
+    if ( ! focusWindow )
+        return;
+    
+    const Node* node = dynamic_cast<const Node*>(sender());
+    Q_ASSERT( node != 0 );
+
+    QList<QTableWidgetItem*> cells = 
+        pivotTable->findItems( QString::number( node->getNumber() ), 
+                               Qt::MatchExactly );
+    if ( cells.empty() )
+        return;
+
+    QList<QTableWidgetItem*>::iterator iter = cells.begin();
+    for ( ; iter != cells.end(); ++iter ) {
+        int pivotRow = pivotTable->row( *iter );
+        TrussPivot* pivot = focusWindow->findPivotByNumber( pivotRow + 1 );
+        if ( ! pivot )
+            continue;
+        pivotTable->recalcPivotLength( *pivot );
     }
-    catch ( ... ) { return; }
 }
 
 void GeometryTabWidget::updatePivotState ( int row, int col )
@@ -1150,11 +1147,6 @@ void GeometryTabWidget::updatePivotState ( int row, int col )
     }
     if ( ! pivot )
         return;
-
-    if ( col == pivotTable->columnCount() - 1 ) {
-        pivot->setThickness( pivotTable->getThickness( row ) );
-        return;
-    }
 
     QTableWidgetItem* item = pivotTable->item( row, col );
     Q_ASSERT( item != 0 );
@@ -1212,9 +1204,9 @@ void GeometryTabWidget::updateTableTrussAreaSize ( const DoubleSize& areaSize )
 void GeometryTabWidget::updateTrussAreaSize ( double newValue )
 {
     DoubleSize areaSize = focusWindow->getTrussAreaSize();
-    if ( sender() == xSizeEdit )
+    if ( sender() == xSizeEdit && areaSize.width() != newValue )
         focusWindow->setTrussAreaSize( DoubleSize(newValue, areaSize.height()) );
-    else
+    else if ( sender() == ySizeEdit && areaSize.height() != newValue )
         focusWindow->setTrussAreaSize( DoubleSize(areaSize.width(), newValue) );
 }
 
@@ -1228,8 +1220,10 @@ void GeometryTabWidget::updateAreaSizeSpinBoxes()
     xSizeEdit->blockSignals( true );
     ySizeEdit->blockSignals( true );    
     DoubleSize trussSize = focusWindow->getTrussSize();
-    xSizeEdit->setMinimum( trussSize.width() );
-    ySizeEdit->setMinimum( trussSize.height() );
+    if ( xSizeEdit->minimum() != trussSize.width() )
+        xSizeEdit->setMinimum( trussSize.width() );
+    if ( ySizeEdit->minimum() != trussSize.height() )
+        ySizeEdit->setMinimum( trussSize.height() );
     xSizeEdit->blockSignals( false );
     ySizeEdit->blockSignals( false );
 }

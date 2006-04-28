@@ -14,9 +14,11 @@
 #include "TrussUnitWindow.h"
 
 class TrussLoad;
+class MaterialComboBox;
 class QCheckBox;
 class QColorGroup;
 class QComboBox;
+class QDoubleSpinBox;
 class QGroupBox;
 class QLabel;
 class QLineEdit;
@@ -61,7 +63,7 @@ public:
 };
 
 /*****************************************************************************/
-/*
+
 class PivotPropertyTableDelegate : public QItemDelegate
 {
     Q_OBJECT
@@ -75,28 +77,37 @@ public:
 
     void setModelData ( QWidget* editor, QAbstractItemModel* model, 
                         const QModelIndex& index ) const;
-
+    
+    void paint ( QPainter* painter, const QStyleOptionViewItem& option,
+                 const QModelIndex& index ) const;
+    
     void updateEditorGeometry ( QWidget *editor,
                                 const QStyleOptionViewItem& option, 
                                 const QModelIndex& index ) const;
 
+protected slots:
+    void setMaterialLibrary ( const TrussMaterialLibrary& );
+
 signals:
     void cellWasChanged ( int, int );
+
+private:
+    const TrussMaterialLibrary* materialLib;
 };
-*/
+
 /*****************************************************************************/
-/*
+
 class PivotPropertyTable : public QTableWidget
 {
 public:
     PivotPropertyTable ( QWidget* parent = 0 );
-    virtual void setMaterial ( int row, int col, const TrussMaterial& );
-    virtual TrussMaterial& getMaterial ( int row ) const;
+    virtual void setMaterial ( int row, const TrussMaterial& );
+    virtual const TrussMaterial* getMaterial ( int row ) const;
     virtual void setThickness ( int row, double thick );
     virtual double getThickness ( int row ) const;
     virtual void addPivot ( const TrussPivot&, int row = -1 );
 };
-*/
+
 /*****************************************************************************/
 
 class TrussPropertyTabWidget : public QTabWidget
@@ -106,6 +117,7 @@ public:
     TrussPropertyTabWidget ( QWidget* parent = 0 );
     virtual ~TrussPropertyTabWidget ();
     virtual void changeFocusWindow ( TrussUnitWindow* focusWindow );
+    virtual void changeMaterialLibrary ( const TrussMaterialLibrary& lib );
 
 protected:
     virtual void init ();
@@ -113,7 +125,7 @@ protected:
     virtual void initPivotPropertyTab ();
     virtual void fillLoadTab ();
     virtual void fillLoadTable ( const TrussUnit::LoadCase* loadCase );
-    //virtual void fillPivotPropertyTable ();
+    virtual void fillPivotPropertyTab ();
 
 protected slots:
     virtual void trussUnitWindowWasCreated ( TrussUnitWindow& );
@@ -133,22 +145,29 @@ protected slots:
     virtual void updateTableLoad ( const Node& );
     virtual void updateTrussLoad ( int, int );
 
-/*
     virtual void addPivotToTable ( const Node&, const Node& );
     virtual void removePivotFromTable ( const Node&, const Node& );
-    virtual void showPivotTableRow ( bool );
-    virtual void updatePivotTableMaterial ();
-    virtual void updatePivotTableThickness ();
+    virtual void showPivotPropertyTableRow ( bool );
+    
+    virtual void updateTableMaterial ();
+    virtual void updateTableThickness ();
     virtual void updatePivotState ( int row, int col );
-*/
+    virtual void levelPivotState ();
+
+    virtual void changeLevelEditor ( int );
+
+signals:
+    void onMaterialLibraryChanged ( const TrussMaterialLibrary& );
+
 private:
     TrussUnitWindow *focusWindow;
     LoadTable *loadTable;
-    //PivotPropertyTable *pivotPropTable;
+    PivotPropertyTable *pivotPropTable;
     QLabel *nodesNumbLabel, *loadedNodesLabel, *pivotsNumbLabel;
-    QPushButton *createLoadCaseBtn, *removeLoadCaseBtn;
+    QPushButton *createLoadCaseBtn, *removeLoadCaseBtn, *levelButton;
     QComboBox *loadCaseComboBox;
-    QGroupBox *loadCaseGroupBox;
+    QDoubleSpinBox *thickSpinBox;
+    MaterialComboBox *materialComboBox;
     QSpacerItem *loadSpacer, *pivotPropSpacer;
 };
 
