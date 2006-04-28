@@ -48,6 +48,7 @@ void MaterialComboBox::setArgList ()
     if ( ! materialLib )
         return;
 
+    clear();
     QStringList argList;
     for ( int i = 0; i < materialLib->countMaterials(); ++i ) {
         TrussMaterial* m = materialLib->getMaterial( i );
