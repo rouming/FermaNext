@@ -82,6 +82,7 @@ FermaNextProject::~FermaNextProject ()
         stackedWidget->removeWidget( projectTab );
     delete trussWindowManager;
     delete projectTab;
+    delete materialLibrary;
 }
 
 void FermaNextProject::loadFromFile ( const QString& fileName )
