@@ -28,7 +28,8 @@ Plugin::ResolvingMode Plugin::resolvingMode () const
 bool Plugin::dependsOnPluginType ( const QString& type ) const
 { return requiredPluginTypes().contains( type ); }
 
-void Plugin::resolveDependence () throw (RequiredPluginIsNotResolvedException)
+void Plugin::resolveDependence () 
+    /*throw (RequiredPluginIsNotResolvedException)*/
 {  
     requiredPluginsMap =
         pluginManager().resolveDependence( *this, requiredPluginTypes() ); 

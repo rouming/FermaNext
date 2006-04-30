@@ -28,7 +28,7 @@ TrussNode::TrussNode ( double x, double y, Fixation fix,
 }
 
 void TrussNode::loadFromXML ( const QDomElement& nodeElem ) 
-    throw (LoadException)
+    /*throw (LoadException)*/
 {
     XMLSerializableObject::loadFromXML( nodeElem );
 
@@ -130,7 +130,8 @@ void TrussNode::drawFixation ( scanline_rasterizer& ras,
         {
             rightPnt.setY ( rightPnt.y() + 4 );
             leftPnt.setY ( leftPnt.y() + 4 );
-            drawLine ( ras, solidRend, sl, leftPnt, rightPnt, lineWidth - 1, color );
+            drawLine ( ras, solidRend, sl, leftPnt, rightPnt, 
+                       lineWidth - 1, color );
         }
     }
 
@@ -151,7 +152,8 @@ void TrussNode::drawFixation ( scanline_rasterizer& ras,
         {
             rightPnt.setX ( rightPnt.x() + 4 );
             leftPnt.setX ( leftPnt.x() + 4 );
-            drawLine ( ras, solidRend, sl, leftPnt, rightPnt, lineWidth - 1, color );
+            drawLine ( ras, solidRend, sl, leftPnt, 
+                       rightPnt, lineWidth - 1, color );
         }
     }
 
@@ -177,7 +179,8 @@ void TrussNode::drawFixation ( scanline_rasterizer& ras,
         {
             rightPnt.setX ( rightPnt.x() + 4 );
             leftPnt.setX ( leftPnt.x() + 4 );
-            drawLine ( ras, solidRend, sl, leftPnt, rightPnt, lineWidth - 1, color );
+            drawLine ( ras, solidRend, sl, leftPnt, 
+                       rightPnt, lineWidth - 1, color );
         }
     }
 }
@@ -190,10 +193,13 @@ void TrussNode::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
 
     const DoublePoint& nodeCoord = getPoint();
     QPoint nodePos;
-    nodePos.setX( int( nodeCoord.x() * scaleMult.x() ) + trussBufIndent );
-    nodePos.setY( flipY ? int( ( trussAreaHeight - nodeCoord.y() ) * 
-                  scaleMult.y() ) + trussBufIndent : int( nodeCoord.y() * 
-                  scaleMult.y() + trussBufIndent ) );
+    nodePos.setX( int( nodeCoord.x() * scaleMult.x() ) + 
+                  Global::trussBufIndent );
+    nodePos.setY( Global::flipY ? 
+                     int( ( trussAreaHeight - nodeCoord.y() ) * 
+                          scaleMult.y() ) + Global::trussBufIndent : 
+                     int( nodeCoord.y() * 
+                          scaleMult.y() + Global::trussBufIndent ) );
 
     solidRenderer solidRend ( baseRend );
     scanline_rasterizer ras;
@@ -206,14 +212,15 @@ void TrussNode::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
         highlightKoeff = 1;
     }
 
-//  draw node' outline
+    //  draw node' outline
     solidRend.color ( agg::rgba(10, 10, 10) );
-    ell.init ( nodePos.x(), nodePos.y(), nodesRadius + highlightKoeff + 1, 
-                                         nodesRadius + highlightKoeff + 1, 16 );
+    ell.init ( nodePos.x(), nodePos.y(), 
+               Global::nodesRadius + highlightKoeff + 1, 
+               Global::nodesRadius + highlightKoeff + 1, 16 );
     ras.add_path ( ell );
     agg::render_scanlines ( ras, sl, solidRend );
 
-//  draw fixation
+    //  draw fixation
     if ( getFixation () )
         drawFixation ( ras, solidRend, sl, nodePos, 2, agg::rgba(0, 0, 35) ); 
 
@@ -221,13 +228,13 @@ void TrussNode::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
     {
         // draw translucent highlight
         solidRend.color ( agg::rgba(200, 135, 15, 0.6) );
-        ell.init ( nodePos.x(), nodePos.y(), nodesRadius + 5, 
-                                             nodesRadius + 5, 16 );
+        ell.init ( nodePos.x(), nodePos.y(), Global::nodesRadius + 5, 
+                                             Global::nodesRadius + 5, 16 );
         ras.add_path ( ell );
         agg::render_scanlines ( ras, sl, solidRend );
     }
 
-//  draw node
+    //  draw node
     agg::trans_affine mtx;
     mtx *= agg::trans_affine_scaling ( 1 / 2.0 );
     mtx *= agg::trans_affine_translation ( nodePos.x(), nodePos.y() );
@@ -245,7 +252,7 @@ void TrussNode::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
         fillColorArray( gradColors, begin, middle, end );
         drawGradientEllipse( baseRend, ras, sl, gradFunc, gradColors, 
                              mtx, nodePos.x(), nodePos.y(), 
-                             nodesRadius + highlightKoeff, 0, 10 ); 
+                             Global::nodesRadius + highlightKoeff, 0, 10 ); 
     }
     else 
     {
@@ -255,7 +262,7 @@ void TrussNode::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
         fillColorArray( gradColors, begin, middle, end );
         drawGradientEllipse( baseRend, ras, sl, gradFunc, gradColors, 
                              mtx, nodePos.x(), nodePos.y(), 
-                             nodesRadius + highlightKoeff, 0, 10 ); 
+                             Global::nodesRadius + highlightKoeff, 0, 10 ); 
     }
 }
 

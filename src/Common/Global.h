@@ -22,6 +22,8 @@
 
 class Config;
 
+namespace Global {
+
 /************************************
  * Main Consts 
  ************************************/
@@ -34,13 +36,13 @@ extern const QString untitledWorkspaceName;
 
 extern const int nodesRadius,
                  pivotsWidth,
-                 defaultThickness,
                  defaultBufWidth,
                  defaultBufHeight,
                  trussBufIndent;
 
 extern const double areaMaxDimension,
-                    pivotThickLimit;
+                    pivotThickLimit,
+                    defaultThickness;
 
 /************************************
  * Truss Unit Window Consts
@@ -114,5 +116,6 @@ QString filePathToRelative ( const QString& fname, const QString& dir);
 // Convert relative path to absolute
 QString filePathToAbsolute ( const QString& fname, const QString& dir);
 
+} //namespace Global
 
 #endif //GLOBAL_H

@@ -34,7 +34,7 @@ TrussMaterial::~TrussMaterial ()
 {}
 
 void TrussMaterial::loadFromXML ( const QDomElement& materialElem ) 
-    throw (LoadException)
+    /*throw (LoadException)*/
 {
     XMLSerializableObject::loadFromXML( materialElem );
 
@@ -65,7 +65,8 @@ void TrussMaterial::loadFromXML ( const QDomElement& materialElem )
     if ( ! materialElem.hasAttribute( "elasticityModule" ) )
         throw LoadException();
 
-    double elast = materialElem.attribute( "elasticityModule" ).toDouble( &ok );
+    double elast = 
+        materialElem.attribute( "elasticityModule" ).toDouble( &ok );
     if ( !ok ) throw LoadException();
 
     setElasticityModule( elast );
@@ -166,7 +167,7 @@ TrussMaterialLibrary::~TrussMaterialLibrary ()
 }
 
 void TrussMaterialLibrary::loadFromXML ( const QDomElement& projElem ) 
-    throw (LoadException)
+    /*throw (LoadException)*/
 {
     XMLSerializableObject::loadFromXML( projElem );
 
@@ -175,7 +176,8 @@ void TrussMaterialLibrary::loadFromXML ( const QDomElement& projElem )
     /** 
      * Create materials
      ********************/
-    QDomNodeList trussMaterials = projElem.elementsByTagName( "TrussMaterial" );
+    QDomNodeList trussMaterials = 
+        projElem.elementsByTagName( "TrussMaterial" );
     for ( int i = 0; i < trussMaterials.count(); ++i ) {
         QDomNode material = trussMaterials.item( i );
         if ( ! material.isElement() )
@@ -202,11 +204,11 @@ QDomElement TrussMaterialLibrary::saveToXML ( QDomDocument& doc )
     return materialLibElem;
 }
 
-TrussMaterial& TrussMaterialLibrary::createMaterial ( const QString& name, 
-                                                      double s, double e,
-                                                      double d ) /*throw 
-                                                 (WrongMaterialNameException, 
-                                                  WrongCharacteristicException)*/
+TrussMaterial& TrussMaterialLibrary::createMaterial ( 
+    const QString& name, 
+    double s, double e,
+    double d ) /*throw (WrongMaterialNameException, 
+                        WrongCharacteristicException)*/
 {
     TrussMaterial* material = 0;
     TrussMaterialListConstIter iter = materials.begin();

@@ -8,7 +8,7 @@
  *****************************************************************************/
 
 AggToolBarHideButton::AggToolBarHideButton () :
-    AggButton ( QPoint(0,0), buttonWidth * 3, 6 ),
+    AggButton ( QPoint(0,0), Global::buttonWidth * 3, 6 ),
     fillCol( agg::rgba( 65, 90, 110, 0.5 ) ),
     lineCol( agg::rgba( 10, 10, 10 ) ), 
     highlightFill( agg::rgba( 1, 1, 1, 0.5 ) )
@@ -72,7 +72,7 @@ AggTrussToolBar::AggTrussToolBar  ( QPoint pos, int bordLeft, int bordRight,
 {
     initHideButton();
     thread->setFrameDelayMsec( 1 );
-    thread->setFrameRate( pixHideNumb );
+    thread->setFrameRate( Global::pixHideNumb );
 
     QObject::connect( thread, SIGNAL( onAnimationRun() ),
                       SLOT( moveToolBar() ) );
@@ -112,8 +112,9 @@ QPoint AggTrussToolBar::hideButtonPos ()
 {
     if ( hideButton == 0 )
         return QPoint(0,0);
-    return QPoint( (getWidth() - hideButton->getWidth()) / 2 + bufferEmptyArea,
-                   bufferEmptyArea - hideButton->getHeight() / 2 );
+    return QPoint( (getWidth() - hideButton->getWidth()) / 2 + 
+                   Global::bufferEmptyArea,
+                   Global::bufferEmptyArea - hideButton->getHeight() / 2 );
 }
 
 void AggTrussToolBar::initHideButton ()
@@ -158,9 +159,9 @@ void AggTrussToolBar::moveToolBar ()
     QPoint pos = getPosition();
     if ( hideButton->isPressed() )
     {
-        pixNumb -= pixHideNumb;
-        pos.setY ( pos.y() + pixHideNumb );
-        if ( pixNumb == pixHideNumb )
+        pixNumb -= Global::pixHideNumb;
+        pos.setY ( pos.y() + Global::pixHideNumb );
+        if ( pixNumb == Global::pixHideNumb )
         {
             setVisible ( false );
             enabled = true;
@@ -168,8 +169,8 @@ void AggTrussToolBar::moveToolBar ()
     }
     else
     {
-        pixNumb -= pixHideNumb;
-        pos.setY ( pos.y() - pixHideNumb );
+        pixNumb -= Global::pixHideNumb;
+        pos.setY ( pos.y() - Global::pixHideNumb );
         if ( pixNumb == hideButton->getHeight() )
             enabled = true;
     }
@@ -215,8 +216,8 @@ QPoint AggTrussToolBar::getDynarowBufPos ( int x, int y ) const
 {
     // get inner buffer coords from widget coords
     QPoint pos = getPosition ();
-    pos.setX ( x - pos.x() + bufferEmptyArea );
-    pos.setY ( y - pos.y() + bufferEmptyArea );
+    pos.setX ( x - pos.x() + Global::bufferEmptyArea );
+    pos.setY ( y - pos.y() + Global::bufferEmptyArea );
     return pos;
 }
 
@@ -230,7 +231,8 @@ bool AggTrussToolBar::inToolBarRect ( int x, int y, bool bordCheck ) const
     if ( bordCheck )
     {
         if ( x > pos.x() + getBorderLeft() && 
-             x < pos.x() + getWidth() - getBorderRight() - getButtonSeparation() &&
+             x < pos.x() + getWidth() - 
+                 getBorderRight() - getButtonSeparation() &&
              y > pos.y() + getBorderTop() && 
              y < pos.y() + getHeight() - getBorderBottom() ||
              hideButton && hideButton->inButtonRect( bufPos.x(), bufPos.y() ) )
@@ -386,9 +388,11 @@ void AggTrussToolBar::paint ( base_renderer& baseRenderer ) const
             mtx *= agg::trans_affine_translation( 0, -10 );
             interpolator inter ( mtx );
 
-            agg::rounded_rect bar ( bufferEmptyArea, bufferEmptyArea, 
-                                    bufferEmptyArea + getWidth(), 
-                                    bufferEmptyArea + getRenderingBuffer().height(), 
+            agg::rounded_rect bar ( Global::bufferEmptyArea, 
+                                    Global::bufferEmptyArea, 
+                                    Global::bufferEmptyArea + getWidth(), 
+                                    Global::bufferEmptyArea + 
+                                      getRenderingBuffer().height(), 
                                     cornerRadius );
             ras.add_path ( bar );
 
@@ -397,8 +401,9 @@ void AggTrussToolBar::paint ( base_renderer& baseRenderer ) const
 
             linear_gradient_span_gen gradSpanGen ( gradSpan, inter, 
                                                    gradFunc, gradColors, 
-                                                   bufferEmptyArea, 
-                                                   bufferEmptyArea + getHeight() );
+                                                   Global::bufferEmptyArea, 
+                                                   Global::bufferEmptyArea + 
+                                                     getHeight() );
             linear_gradient_renderer gradRend ( baseRend, gradSpanGen );
 
             agg::render_scanlines( ras, sl, gradRend );
@@ -411,8 +416,10 @@ void AggTrussToolBar::paint ( base_renderer& baseRenderer ) const
 
     QPoint pos = getPosition ();
 
-    baseRenderer.blend_from ( toolBarPixf, 0, pos.x() - bufferEmptyArea, 
-                              pos.y() - bufferEmptyArea, unsigned(1.0 * 255) );
+    baseRenderer.blend_from ( toolBarPixf, 0, pos.x() - 
+                              Global::bufferEmptyArea, 
+                              pos.y() - Global::bufferEmptyArea, 
+                              uint(1.0 * 255) );
 
 }
 

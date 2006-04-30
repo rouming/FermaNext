@@ -16,7 +16,7 @@ XMLSerializableObject::~XMLSerializableObject ()
  * from XML format.
  */
 void XMLSerializableObject::loadFromXML ( const QDomElement& elem )
-    throw (LoadException)
+    /*throw (LoadException)*/
 {
     if ( ! elem.hasAttribute( "uuid" ) )
         throw LoadException();

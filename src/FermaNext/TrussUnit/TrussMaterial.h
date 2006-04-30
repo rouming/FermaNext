@@ -23,7 +23,7 @@ public:
     virtual ~TrussMaterial ();
 
     // XML serialization
-    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
+    virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
     virtual QDomElement saveToXML ( QDomDocument& );
 
     virtual void setMaterialName ( const QString& );
@@ -59,13 +59,13 @@ public:
     TrussMaterialLibrary ();
     virtual ~TrussMaterialLibrary ();
 
-    virtual TrussMaterial& createMaterial ( const QString&, 
-                                            double, double, double ); 
-                                            /*throw (WrongMaterialNameException, 
-                                              WrongCharacteristicException)*/
+    virtual TrussMaterial& createMaterial ( 
+        const QString&, 
+        double, double, double ) /*throw (WrongMaterialNameException, 
+                                          WrongCharacteristicException)*/;
 
     // XML serialization
-    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
+    virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
     virtual QDomElement saveToXML ( QDomDocument& );
 
     virtual bool removeMaterial ( TrussMaterial& );

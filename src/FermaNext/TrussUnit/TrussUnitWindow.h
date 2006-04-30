@@ -21,7 +21,7 @@ public:
     virtual void setWindowOwner ( QWidget* owner );
 
     // XML serialization
-    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
+    virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
     virtual QDomElement saveToXML ( QDomDocument& );
 
     // Manage window position

@@ -18,7 +18,8 @@ int main ( int argc, char* argv[] )
     // Set default style
     //QApplication::setStyle( QStyleFactory::create ("plastique") );
 
-    QPixmap pixmap( imagesPath() + pathSeparator() + "splash.png" );
+    QPixmap pixmap( Global::imagesPath() + 
+                    Global::pathSeparator() + "splash.png" );
     Splash* splash = new Splash( pixmap );
     splash->show();
 
@@ -34,8 +35,8 @@ int main ( int argc, char* argv[] )
     QObject::connect( &plgMng, SIGNAL(onBeforePluginLoad(const QString&)), 
                       splash, SLOT(pluginMessage(const QString&)) );
 
-    plgMng.registerPluginLoaders( pluginLoadersPath() );
-    plgMng.loadPlugins( pluginsPath() );    
+    plgMng.registerPluginLoaders( Global::pluginLoadersPath() );
+    plgMng.loadPlugins( Global::pluginsPath() );    
 
     splash->message( "Setting up GUI .." );
 

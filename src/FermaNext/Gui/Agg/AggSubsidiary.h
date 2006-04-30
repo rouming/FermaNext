@@ -35,28 +35,28 @@
 
 /*****************************************************************************/
 
-typedef agg::rendering_buffer_dynarow<4>                    rbuf_dynarow;
+typedef agg::rendering_buffer_dynarow<4>                   rbuf_dynarow;
 typedef agg::pixfmt_custom_rbuf_rgba<agg::blender_rgba32, 
-                                          rbuf_dynarow>     pixf_dynarow;
-typedef agg::renderer_base<pixf_dynarow>                    ren_dynarow;
-typedef agg::renderer_scanline_aa_solid<ren_dynarow>        solidRenderer;
-typedef agg::rasterizer_scanline_aa<>                       scanline_rasterizer;
-typedef agg::pixfmt_rgb24                                   pixfmt;
-typedef pixfmt::color_type                                  color_type;
-typedef agg::renderer_base<pixfmt>                          base_renderer;
-typedef agg::renderer_scanline_aa_solid<base_renderer>      solid_renderer;
-typedef agg::gradient_circle                                radial_gradient;
-typedef agg::gradient_y                                     linear_gradient;
-typedef agg::span_interpolator_linear<>                     interpolator;
-typedef agg::pod_auto_array<color_type, 256>                color_array_type;
+                                          rbuf_dynarow>    pixf_dynarow;
+typedef agg::renderer_base<pixf_dynarow>                   ren_dynarow;
+typedef agg::renderer_scanline_aa_solid<ren_dynarow>       solidRenderer;
+typedef agg::rasterizer_scanline_aa<>                      scanline_rasterizer;
+typedef agg::pixfmt_rgb24                                  pixfmt;
+typedef pixfmt::color_type                                 color_type;
+typedef agg::renderer_base<pixfmt>                         base_renderer;
+typedef agg::renderer_scanline_aa_solid<base_renderer>     solid_renderer;
+typedef agg::gradient_circle                               radial_gradient;
+typedef agg::gradient_y                                    linear_gradient;
+typedef agg::span_interpolator_linear<>                    interpolator;
+typedef agg::pod_auto_array<color_type, 256>               color_array_type;
 typedef agg::span_gradient<color_type, interpolator, 
                            radial_gradient, 
-                           color_array_type>                radial_gradient_span_gen;
+                           color_array_type>          radial_gradient_span_gen;
 typedef agg::span_gradient<color_type, interpolator, 
                            linear_gradient, 
-                           color_array_type>                linear_gradient_span_gen;
+                           color_array_type>          linear_gradient_span_gen;
 
-typedef agg::span_allocator<color_type>                     gradient_span_alloc;
+typedef agg::span_allocator<color_type>               gradient_span_alloc;
 
 typedef agg::renderer_scanline_aa<ren_dynarow, 
                                   radial_gradient_span_gen> radial_gradient_renderer;
@@ -101,8 +101,9 @@ struct arrow
     marker_type    m;
     concat_type    c;
 
-    arrow ( line& l, double w );
-    arrow ( line& l, double w, int downLen, int upLen, int sideWid, int sideLen );
+    arrow( line& l, double w );
+    arrow( line& l, double w, int downLen, 
+           int upLen, int sideWid, int sideLen );
     void rewind ( unsigned id );
     unsigned vertex ( double* x, double* y );
 };

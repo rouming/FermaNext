@@ -29,8 +29,9 @@ NodeTableDelegate::NodeTableDelegate ( QObject* parent ) :
     areaSize( 0, 0 )
 {}
 
-QRect NodeTableDelegate::getCheckBoxDrawArea( const QStyleOptionViewItem &option, 
-                                              bool forFirstCheckBox ) const
+QRect NodeTableDelegate::getCheckBoxDrawArea( 
+    const QStyleOptionViewItem &option, 
+    bool forFirstCheckBox ) const
 {
     int cellWidth = option.rect.bottomRight().x() - 
                     option.rect.topLeft().x();
@@ -39,18 +40,18 @@ QRect NodeTableDelegate::getCheckBoxDrawArea( const QStyleOptionViewItem &option
 
     // check box top left positions
     if ( forFirstCheckBox )
-        cbTopLeft = QPoint( option.rect.topLeft().x() + checkBoxIndent, 
-                            option.rect.topLeft().y() + checkBoxIndent );
+        cbTopLeft = QPoint(option.rect.topLeft().x() + Global::checkBoxIndent,
+                           option.rect.topLeft().y() + Global::checkBoxIndent);
     else
-        cbTopLeft = QPoint( option.rect.topLeft().x() + cellWidth / 2,
-                            option.rect.topLeft().y() + checkBoxIndent );
+        cbTopLeft = QPoint(option.rect.topLeft().x() + cellWidth / 2,
+                           option.rect.topLeft().y() + Global::checkBoxIndent);
 
     // get axis labels pixel size
     QSize xLabelSize = option.fontMetrics.size( Qt::TextSingleLine, "X" ),
           yLabelSize = option.fontMetrics.size( Qt::TextSingleLine, "Y" );
 
-    return QRect( cbTopLeft, cbTopLeft + QPoint( checkBoxLen + 6 + 
-                  xLabelSize.width(), checkBoxLen + 1 ) );
+    return QRect( cbTopLeft, cbTopLeft + QPoint( Global::checkBoxLen + 6 + 
+                  xLabelSize.width(), Global::checkBoxLen + 1 ) );
 }
 
 void NodeTableDelegate::getCheckStates ( bool& checkState1, bool& checkState2,
@@ -137,9 +138,9 @@ void NodeTableDelegate::paint ( QPainter* painter,
 
         // define area in which axis labels will be painted
         QRect strRect1 = 
-            checkBoxRect1.adjusted( checkBoxLen + 1, 0, 0, 0 );
+            checkBoxRect1.adjusted( Global::checkBoxLen + 1, 0, 0, 0 );
         QRect strRect2 = 
-            checkBoxRect2.adjusted( checkBoxLen + 1, 0, 0, 0 );
+            checkBoxRect2.adjusted( Global::checkBoxLen + 1, 0, 0, 0 );
         
         bool checked1, checked2;
         getCheckStates( checked1, checked2, index );
@@ -188,9 +189,9 @@ QSize NodeTableDelegate::sizeHint( const QStyleOptionViewItem&,
                                    const QModelIndex& index ) const
 {
     if ( index.column() != 2 )
-        return QSize( 39, tableRowHeight );
+        return QSize( 39, Global::tableRowHeight );
     else 
-        return QSize( 61, tableRowHeight );
+        return QSize( 61, Global::tableRowHeight );
 }
 
 bool NodeTableDelegate::editorEvent ( QEvent* event, 
@@ -241,9 +242,10 @@ bool NodeTableDelegate::editorEvent ( QEvent* event,
     return true;
 }
 
-void NodeTableDelegate::updateEditorGeometry ( QWidget* editor,
-                                            const QStyleOptionViewItem& option, 
-                                            const QModelIndex& ) const
+void NodeTableDelegate::updateEditorGeometry ( 
+    QWidget* editor,
+    const QStyleOptionViewItem& option, 
+    const QModelIndex& ) const
 {
     editor->setGeometry( option.rect );
 }
@@ -346,13 +348,13 @@ void NodeTable::addNode ( const Node& node )
     setCoord( row, 1, node.getY() );
     setFixationItem( row, node.getFixation() );
     for ( int i = row; i < rowCount(); ++i )
-        verticalHeader()->resizeSection( i, tableRowHeight );
+        verticalHeader()->resizeSection( i, Global::tableRowHeight );
     //updateMaximumHeight();
 }
 
 void NodeTable::updateMaximumHeight ()
 {
-//    setMaximumHeight( rowCount() * tableRowHeight + lineWidth() * 2 +
+//    setMaximumHeight( rowCount() * Global::tableRowHeight + lineWidth() * 2 +
 //                      horizontalHeader()->height() );
 }
 
@@ -370,7 +372,8 @@ void PivotTableDelegate::setNodesTotalNumber ( int newNodesNumb )
     nodesNumb = newNodesNumb;
 }
 
-QStringList PivotTableDelegate::getComboArgList ( const QModelIndex &index ) const
+QStringList PivotTableDelegate::getComboArgList ( 
+    const QModelIndex &index ) const
 {
     int row = index.row(),
         col = index.column(),
@@ -452,9 +455,10 @@ void PivotTableDelegate::setModelData ( QWidget* editor,
     return;
 }
 
-void PivotTableDelegate::updateEditorGeometry ( QWidget* editor,
-                                            const QStyleOptionViewItem& option, 
-                                            const QModelIndex& ) const
+void PivotTableDelegate::updateEditorGeometry ( 
+    QWidget* editor,
+    const QStyleOptionViewItem& option, 
+    const QModelIndex& ) const
 {
     editor->setGeometry( option.rect );
 }
@@ -478,7 +482,7 @@ void PivotTable::setNodeNumber ( int row, int col, int numb )
         cell->setData( Qt::EditRole, QVariant(numb) );
         setItem( row, col, cell );
     }
-    horizontalHeader()->resizeSection( col, nodeColumnWidth );
+    horizontalHeader()->resizeSection( col, Global::nodeColumnWidth );
 }
 
 void PivotTable::setPivotLength ( int row, double length )
@@ -493,7 +497,7 @@ void PivotTable::setPivotLength ( int row, double length )
         cell->setData( Qt::EditRole, QVariant(len) );
         setItem( row, 2, cell );
     }
-    horizontalHeader()->resizeSection( 2, thicknessColumnWidth );
+    horizontalHeader()->resizeSection( 2, Global::thicknessColumnWidth );
 }
 
 void PivotTable::addPivot ( const TrussPivot& pivot, int row )
@@ -507,7 +511,7 @@ void PivotTable::addPivot ( const TrussPivot& pivot, int row )
     setNodeNumber( row, 1, last.getNumber() );
     recalcPivotLength( pivot );
     for ( int i = row; i < rowCount(); ++i )
-        verticalHeader()->resizeSection( i, tableRowHeight );
+        verticalHeader()->resizeSection( i, Global::tableRowHeight );
 }
 
 void PivotTable::setNodesTotalNumber ( int newNodesNumb )
@@ -661,9 +665,9 @@ void GeometryTabWidget::initAreaTab ()
     QLabel* xSizeLabel = new QLabel( tr( "Size by X:" ), sizeGroupBox );
     QLabel* ySizeLabel = new QLabel( tr( "Size by Y:" ), sizeGroupBox );
     xSizeEdit = new QDoubleSpinBox;
-    xSizeEdit->setMaximum( areaMaxDimension );
+    xSizeEdit->setMaximum( Global::areaMaxDimension );
     ySizeEdit = new QDoubleSpinBox;
-    ySizeEdit->setMaximum( areaMaxDimension );
+    ySizeEdit->setMaximum( Global::areaMaxDimension );
 
     QVBoxLayout* parenLayout = new QVBoxLayout( parentFrame );
     parenLayout->addWidget( sizeGroupBox );
@@ -844,7 +848,7 @@ void GeometryTabWidget::showNodeTableRow ( bool visible )
             /*
             QHeader* horHeader = nodeTable->horizontalHeader();
             nodeTable->setMaximumHeight( ( nodeTable->numRows() - 1 ) * 
-                                         tableRowHeight + 
+                                         Global::tableRowHeight + 
                                          horHeader->height() + 
                                          nodeTable->lineWidth() * 2 );*/
         }
@@ -1205,9 +1209,9 @@ void GeometryTabWidget::updateTrussAreaSize ( double newValue )
 {
     DoubleSize areaSize = focusWindow->getTrussAreaSize();
     if ( sender() == xSizeEdit && areaSize.width() != newValue )
-        focusWindow->setTrussAreaSize( DoubleSize(newValue, areaSize.height()) );
+        focusWindow->setTrussAreaSize(DoubleSize(newValue, areaSize.height()));
     else if ( sender() == ySizeEdit && areaSize.height() != newValue )
-        focusWindow->setTrussAreaSize( DoubleSize(areaSize.width(), newValue) );
+        focusWindow->setTrussAreaSize(DoubleSize(areaSize.width(), newValue));
 }
 
 /*

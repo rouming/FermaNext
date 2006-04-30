@@ -32,8 +32,8 @@ public:
     virtual ~TrussUnitWindowManager ();
 
     virtual TrussUnitWindow& createTrussUnitWindowFromFile ( 
-         const QString& fileName ) throw (ReadFileException,
-                                          WrongFormatException);
+         const QString& fileName ) /*throw (ReadFileException,
+                                            WrongFormatException)*/;
 
     virtual WindowList getTrussUnitWindowList ();
 
@@ -48,9 +48,9 @@ protected:
     virtual WindowListIter removeTrussUnitWindow ( WindowListIter );
 
     virtual void loadOldVersion ( TrussUnit&, QFile& ) 
-        throw (WrongFormatException);
+        /*throw (WrongFormatException)*/;
     virtual void loadNewVersion ( TrussUnit&, QFile& ) 
-        throw (WrongFormatException);
+        /*throw (WrongFormatException)*/;
 
     // If 'silence' is true, truss manager doesn't emit 
     // 'onTrussUnitWindowCreate' signal. "Quiet" creation used to create truss

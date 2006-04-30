@@ -30,12 +30,12 @@ public:
 
     virtual ~FermaNextProject ();
 
-    virtual void loadFromFile ( const QString& ) throw (IOException, 
-                                                        WrongXMLDocException,
-                                                        LoadException);
-    virtual void saveToFile () throw (FileNameIsNotDefinedException, 
-                                      IOException);
-    virtual void saveToFile ( const QString& ) throw (IOException);
+    virtual void loadFromFile ( const QString& ) /*throw (IOException, 
+                                                          WrongXMLDocException,
+                                                          LoadException)*/;
+    virtual void saveToFile () /*throw (FileNameIsNotDefinedException, 
+                                        IOException)*/;
+    virtual void saveToFile ( const QString& ) /*throw (IOException)*/;
     
     virtual const QString& getProjectFileName () const;
     virtual bool isFileNameDefined () const;
@@ -58,7 +58,7 @@ public:
 
 protected:
     // XML serialization
-    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
+    virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
     virtual QDomElement saveToXML ( QDomDocument& );
 
     virtual void setProjectFileName ( const QString& );

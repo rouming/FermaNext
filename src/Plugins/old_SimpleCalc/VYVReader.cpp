@@ -91,7 +91,8 @@ bool VYVReader::write ( const QString& fileName ) const
         for (j = 0; j < Data.pivotsNum; j++) {
             Message = 
                 QString::number( j+1) + " Стержень : " + 
-                QString::number(Data.safetyFactor[Data.pivotsNum*i+j],'e',3) + "\n";
+                QString::number(
+                          Data.safetyFactor[Data.pivotsNum*i+j],'e',3) + "\n";
             OutFile.write(Message.toAscii().data(), Message.length());
         }
     }

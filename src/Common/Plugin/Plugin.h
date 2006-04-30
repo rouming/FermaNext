@@ -157,7 +157,8 @@ public:
      * @throw RequiredPluginIsNotResolvedException some plugin dependence 
      * can't be resolved
      */
-    void resolveDependence () throw (RequiredPluginIsNotResolvedException);
+    void resolveDependence () 
+        /*throw (RequiredPluginIsNotResolvedException)*/;
 
 protected:
     /** 

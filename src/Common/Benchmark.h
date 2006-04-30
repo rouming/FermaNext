@@ -67,7 +67,7 @@ private:
 
 #ifdef BENCHMARK_ON
 
-#define BEGIN_BENCHMARK(mark_name) Benchmark::benchmark().beginMark(mark_name); 
+#define BEGIN_BENCHMARK(mark_name) Benchmark::benchmark().beginMark(mark_name);
 #define CLOSE_BENCHMARK Benchmark::benchmark().closeMark();
 #define CLOSE_ALL_BENCHMARKS Benchmark::benchmark().closeAllMarks();
 

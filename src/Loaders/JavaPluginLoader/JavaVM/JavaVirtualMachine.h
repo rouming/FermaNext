@@ -48,9 +48,9 @@ private:
 
     void createJavaVM ( const QString& sharedLibName,
                         JavaVMVersion, const QStringList& options )
-        throw (JavaVMException, JavaVMDynaLoadException);
+        /*throw (JavaVMException, JavaVMDynaLoadException)*/;
     void createJavaVM ( JavaVMVersion, const QStringList& options )
-        throw (JavaVMException);
+        /*throw (JavaVMException)*/;
 
     void destroyJavaVM ();
 
@@ -58,7 +58,7 @@ public:
     JavaVirtualMachine ();
     JavaVirtualMachine ( const QString& sharedLibName,
                          JavaVMVersion, const QStringList& options )
-        throw (JavaVMException, JavaVMDynaLoadException);
+        /*throw (JavaVMException, JavaVMDynaLoadException)*/;
     ~JavaVirtualMachine ();
 
     bool isJVMLoaded () const;

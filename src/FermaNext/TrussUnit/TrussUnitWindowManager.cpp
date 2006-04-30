@@ -36,7 +36,8 @@ const QString& TrussUnitWindowManager::oldFormatExtension ()
 
 /*****************************************************************************/
 
-TrussUnitWindowManager::TrussUnitWindowManager ( const TrussMaterialLibrary& lib) :
+TrussUnitWindowManager::TrussUnitWindowManager ( 
+    const TrussMaterialLibrary& lib) :
     materialLib(lib),
     defaultMaterial(0)
 {}
@@ -49,11 +50,8 @@ TrussUnitWindowManager::~TrussUnitWindowManager ()
 void TrussUnitWindowManager::clearTrussUnitWindows ()
 {
     WindowListIter iter = trussWindows.begin();
-    for ( ; iter != trussWindows.end(); ) {
-        TrussUnitWindow* trussWindow = *iter;
-        ObjectStateManager* stateMng = stateManagerMap[trussWindow];
+    for ( ; iter != trussWindows.end(); )
         iter = removeTrussUnitWindow( iter );
-    }
     stateManagerMap.clear();
 }
 
@@ -113,8 +111,10 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow (
                       SLOT(trussWindowAfterRevive(StatefulObject&)) );
     QObject::connect( trussWindow, SIGNAL(onAfterDesist(StatefulObject&)), 
                       SLOT(trussWindowAfterDesist(StatefulObject&)) );
-    QObject::connect( this, SIGNAL(onDefaultMaterialChange(const TrussMaterial&)), 
-                      trussWindow, SLOT(setDefaultMaterial(const TrussMaterial&)) );
+    QObject::connect( this, 
+                      SIGNAL(onDefaultMaterialChange(const TrussMaterial&)), 
+                      trussWindow, 
+                      SLOT(setDefaultMaterial(const TrussMaterial&)) );
     trussWindows.push_back(trussWindow);
 
     if ( ! silence )
@@ -124,8 +124,8 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow (
 }
 
 TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindowFromFile ( 
-    const QString& fileName ) throw (ReadFileException,
-                                     WrongFormatException)
+    const QString& fileName ) /*throw (ReadFileException,
+                                       WrongFormatException)*/
 {
     QFile file( fileName );
     if ( !file.open(QIODevice::ReadOnly) )
@@ -177,7 +177,8 @@ bool TrussUnitWindowManager::removeTrussUnitWindow (
     return true;
 }
 
-WindowListIter TrussUnitWindowManager::removeTrussUnitWindow ( WindowListIter iter )
+WindowListIter TrussUnitWindowManager::removeTrussUnitWindow ( 
+    WindowListIter iter )
 {
     if ( iter == trussWindows.end() )
         return trussWindows.end();
@@ -205,7 +206,7 @@ WindowList TrussUnitWindowManager::getTrussUnitWindowList ()
 }
 
 void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file ) 
-    throw (WrongFormatException)
+    /*throw (WrongFormatException)*/
 {
     char line[256];
 
@@ -218,13 +219,19 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
     file.readLine( line, 256 );
     //int ny1  = strtol( line,  NULL, 10 );
     file.readLine( line, 256 );
-    double elasticityModule = strtod( line,  NULL ); //e1
+
+    // FIXME: should we read material from old format?
+
+    //double elasticityModule = strtod( line,  NULL ); //e1
 
     file.readLine( line, 256 );
     uint loadCasesNum = strtol( line,  NULL, 10 ); //nsn1
 
     file.readLine( line, 256 );
-    double workingStress = strtod( line,  NULL ); //sd1
+
+    // FIXME: should we read material from old format?
+
+    //double workingStress = strtod( line,  NULL ); //sd1
 
     //TrussMaterial& material = truss.getMaterial();
     //material.setElasticityModule( elasticityModule );
@@ -362,7 +369,7 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
 
 void TrussUnitWindowManager::loadNewVersion ( TrussUnit& truss, 
                                               QFile& xmlFile )
-    throw (WrongFormatException)
+    /*throw (WrongFormatException)*/
 {
     QDomDocument doc;
     QIODevice* xmlIODev = &xmlFile;

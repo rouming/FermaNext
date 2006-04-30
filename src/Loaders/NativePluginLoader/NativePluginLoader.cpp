@@ -43,7 +43,7 @@ QString NativePluginLoader::pluginLoaderStatusMsg () const
 { return QString(); }
 
 Plugin& NativePluginLoader::specificLoadPlugin ( const QString& pathToPlugin )
-    throw (PluginLoadException)
+    /*throw (PluginLoadException)*/
 {
     DynaLoader* dynaLoader = new DynaLoader;
     NativePlugin* plugin = 0;

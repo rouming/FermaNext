@@ -92,7 +92,7 @@ void FRMWriter::write ( const QString& name )
             out << 1 << "\n" << 1 << "\n";
     }
 
-    for ( uint loadInd = 1; loadInd <= loadCases.countLoadCases(); 
+    for ( int loadInd = 1; loadInd <= loadCases.countLoadCases(); 
           ++loadInd ) {
         TrussTopology::LoadCase* loadCase = loadCases.findLoadCase( loadInd );
         if ( loadCase == 0 )

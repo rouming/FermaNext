@@ -30,7 +30,7 @@ JavaVirtualMachine::JavaVirtualMachine () :
 JavaVirtualMachine::JavaVirtualMachine ( const QString& sharedLibName,
                                          JavaVMVersion version,
                                          const QStringList& options )
-    throw (JavaVMException, JavaVMDynaLoadException) :
+    /*throw (JavaVMException, JavaVMDynaLoadException)*/ :
     pimpl_(0)
 {
     createJavaVM( sharedLibName, version, options );
@@ -49,7 +49,7 @@ bool JavaVirtualMachine::isJVMLoaded () const
 void JavaVirtualMachine::createJavaVM ( const QString& sharedLibName,
                                         JavaVMVersion version,
                                         const QStringList& optionsList )
-    throw (JavaVMException, JavaVMDynaLoadException)
+    /*throw (JavaVMException, JavaVMDynaLoadException)*/
 {
     if ( pimpl_ != 0 )
         destroyJavaVM();
@@ -62,7 +62,7 @@ void JavaVirtualMachine::createJavaVM ( const QString& sharedLibName,
 
 void JavaVirtualMachine::createJavaVM ( JavaVMVersion version,
                                         const QStringList& optionsList )
-    throw (JavaVMException)
+    /*throw (JavaVMException)*/
 {
     JavaVMException excpt;
 

@@ -21,7 +21,7 @@ public:
     inline const QString& getUUID () const
     { return uuid; }
 
-    inline void setUUID ( const QString& id ) throw (WrongUUIDException)
+    inline void setUUID ( const QString& id ) /*throw (WrongUUIDException)*/
     { 
         if ( ! UUIDGen::isValidUUID( id ) )
             throw WrongUUIDException();

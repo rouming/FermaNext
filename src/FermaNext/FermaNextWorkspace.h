@@ -41,16 +41,15 @@ public:
 
     virtual ProjectList getProjectList () const;
 
-    virtual void loadFromFile ( const QString& ) throw (IOException, 
-                                                        WrongXMLDocException,
-                                                        LoadException);
-    virtual void saveToFile () throw (FileNameIsNotDefinedException,
-                                      IOException,
-                                      ProjectFileNameIsNotDefinedException);
+    virtual void loadFromFile ( const QString& ) /*throw (IOException, 
+                                                          WrongXMLDocException,
+                                                          LoadException)*/;
+    virtual void saveToFile () 
+        /*throw (FileNameIsNotDefinedException,
+                 IOException, ProjectFileNameIsNotDefinedException)*/;
 
     virtual void saveToFile ( const QString& ) 
-                         throw (IOException, 
-                                ProjectFileNameIsNotDefinedException);
+        /*throw (IOException, ProjectFileNameIsNotDefinedException)*/;
 
     virtual const QString& getWorkspaceFileName () const;
     virtual bool isFileNameDefined () const;
@@ -64,7 +63,7 @@ public:
 
     virtual FermaNextProject& createProject ( const QString& name );
     virtual FermaNextProject& createProjectFromFile ( const QString& ) 
-                                    throw (LoadException);
+        /*throw(LoadException)*/;
 
     virtual bool removeProject ( FermaNextProject& );
     virtual bool removeProject ( const QString& name );
@@ -92,7 +91,7 @@ protected slots:
 protected:
     // XML serialization
     virtual void loadFromXML ( const QDomElement&, const QString& wspFileName )
-        throw (LoadException);
+        /*throw (LoadException)*/;
 
     virtual QDomElement saveToXML ( QDomDocument& );
 
