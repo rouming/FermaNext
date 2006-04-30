@@ -7,7 +7,7 @@
 
 AggTrussWindowButton::AggTrussWindowButton ( const QPoint& pos, 
                                              const QString& fname ) :
-    AggButton ( pos, headWidth - 6, headWidth - 6 ),
+    AggButton ( pos, Global::headWidth - 6, Global::headWidth - 6 ),
     windowHighlighted( true ),
     edgingCol( agg::rgba( 0, 0, 0, 0.7 ) ),
     normalCol( agg::rgba( 20, 60, 80, 0.5 ) ),
@@ -83,8 +83,8 @@ void AggTrussWindowButton::paint ( ren_dynarow& baseRend,
     mtx *= agg::trans_affine_translation( 0, 1 );
     interpolator inter ( mtx );
     fillColorArray( gradColors, barFirstColor, barMiddleColor, barLastColor );
-    linear_gradient_span_gen gradSpanGen ( gradSpan, inter, gradFunc, gradColors, 
-                                           -height, 2*height );
+    linear_gradient_span_gen gradSpanGen ( gradSpan, inter, gradFunc, 
+                                           gradColors, -height, 2*height );
     linear_gradient_renderer gradRend ( baseRend, gradSpanGen );
 
     agg::render_scanlines( ras, sl, gradRend );
@@ -96,7 +96,8 @@ void AggTrussWindowButton::paint ( ren_dynarow& baseRend,
     }
     QPoint iconPos( int(( topPos.x() + width / 6 ) / scaleX), 
                     int(( topPos.y() + 1 ) / scaleY) );
-    drawSvg ( baseRend, ras, sl, pathRend, solidRend, mtx, iconPos.x(), 
-              iconPos.y(), scaleX, scaleY, svgExpand, svgGamma );
+    drawSvg ( baseRend, ras, sl, pathRend, solidRend, mtx, 
+              iconPos.x(), iconPos.y(), scaleX, scaleY, 
+              Global::svgExpand, Global::svgGamma );
 }
 

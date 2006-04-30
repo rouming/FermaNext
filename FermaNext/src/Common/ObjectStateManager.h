@@ -65,7 +65,7 @@ protected:
 
     // Tries to remove top of the stack, if current block is pointing
     // not to the top
-    virtual bool tryToRemoveStackTop () throw (UnknownException);
+    virtual bool tryToRemoveStackTop () /*throw (UnknownException)*/;
 
     // Tries to create new block if it was not created,
     // otherwise returns old block
@@ -91,33 +91,33 @@ public:
     virtual void saveState ( ObjectState& );
 
     // Manages the undo/redo cookery
-    virtual void undo () throw (UnknownException, UndoException, 
-                                StateBlockIsNotEnded);
-    virtual void redo () throw (UnknownException, RedoException,
-                                StateBlockIsNotEnded);
+    virtual void undo () /*throw (UnknownException, UndoException, 
+                                  StateBlockIsNotEnded)*/;
+    virtual void redo () /*throw (UnknownException, RedoException,
+                                  StateBlockIsNotEnded)*/;
 
     // Steps back for one state block and then removes it
-    virtual void stepBack () throw (UnknownException, UndoException, 
-                                    StateBlockIsNotEnded);
+    virtual void stepBack () /*throw (UnknownException, UndoException, 
+                                      StateBlockIsNotEnded)*/;
 
     // Momentary step to saved state block by index
     // (undo or redo from the current position to defined direction) 
     // if indx is 0 -- try to undo all states
     virtual void step ( uint indx ) 
-        throw (UnknownException, OutOfBoundsException, StepException,
-               RedoException, UndoException, StateBlockIsNotEnded);
+        /*throw (UnknownException, OutOfBoundsException, StepException,
+                 RedoException, UndoException, StateBlockIsNotEnded)*/;
 
     // Step to the begin of the stack
     // same as 'step(0)' call
     virtual void stepToBegin () 
-        throw (UnknownException, OutOfBoundsException, StepException,
-               RedoException, UndoException, StateBlockIsNotEnded);
+        /*throw (UnknownException, OutOfBoundsException, StepException,
+                 RedoException, UndoException, StateBlockIsNotEnded)*/;
 
     // Step to the end of the stack (see step)
     // same as 'step( countStateBlocks() )' call
     virtual void stepToEnd () 
-        throw (UnknownException, OutOfBoundsException, StepException,
-               RedoException, UndoException, StateBlockIsNotEnded);
+        /*throw (UnknownException, OutOfBoundsException, StepException,
+                 RedoException, UndoException, StateBlockIsNotEnded)*/;
 
     // Returns list of names which were concatenated from 
     // state names of every block

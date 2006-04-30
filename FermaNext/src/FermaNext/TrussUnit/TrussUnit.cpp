@@ -106,7 +106,7 @@ TrussUnit::~TrussUnit ()
 
 
 void TrussUnit::loadFromXML ( const QDomElement& elem ) 
-    throw (LoadException)
+    /*throw (LoadException)*/
 {
     XMLSerializableObject::loadFromXML( elem );
 
@@ -316,7 +316,7 @@ QDomElement TrussUnit::saveToXML ( QDomDocument& doc )
      * Save load cases
      *********************/
     LoadCases& loadCases = getLoadCases();    
-    for ( uint indx = 1; indx <= loadCases.countLoadCases(); ++indx ) {
+    for ( int indx = 1; indx <= loadCases.countLoadCases(); ++indx ) {
         LoadCase* loadCase = loadCases.findLoadCase( indx );
         QDomElement loadCaseElem = doc.createElement( "LoadCase" );
         // Save current
@@ -430,8 +430,8 @@ void TrussUnit::removePivotsHighlight ( const TrussPivot* excPivot )
 
 void TrussUnit::setTrussPosition ( const QPoint& pos )
 {
-    leftTopPos.setX( pos.x() - trussBufIndent );
-    leftTopPos.setY( pos.y() - trussBufIndent );
+    leftTopPos.setX( pos.x() - Global::trussBufIndent );
+    leftTopPos.setY( pos.y() - Global::trussBufIndent );
 }
 
 void TrussUnit::setTrussAreaSizeInPix ( const QSize &size )
@@ -449,11 +449,12 @@ DoublePoint TrussUnit::getTrussScaleMultiplier () const
 
 DoublePoint TrussUnit::getTrussCoordFromWidgetPos ( int x, int y ) const
 {
-    // TODO: flipY comparison
+    // TODO: Global::flipY comparison
     DoublePoint scaleMult = getTrussScaleMultiplier ();
-    double trussX = ( x - leftTopPos.x() - trussBufIndent ) / scaleMult.x();
+    double trussX = ( x - leftTopPos.x() - Global::trussBufIndent ) / 
+                    scaleMult.x();
     double trussY = ( leftTopPos.y() + pixAreaSize.height() + 
-                      trussBufIndent - y ) / scaleMult.y();
+                      Global::trussBufIndent - y ) / scaleMult.y();
     return DoublePoint( trussX, trussY );
 }
 
@@ -465,10 +466,12 @@ DoublePoint TrussUnit::getTrussCoordFromWidgetPos ( QPoint pos ) const
 QPoint TrussUnit::getWidgetPosFromTrussCoord ( double x, double y ) const
 {
     DoublePoint scaleMult = getTrussScaleMultiplier ();
-    int widgetX = int ( x * scaleMult.x() ) + trussBufIndent + leftTopPos.x();
-    int widgetY = ( flipY ? int( ( getTrussAreaSize().height() - y ) * 
-                   scaleMult.y() ) + trussBufIndent + leftTopPos.y() : 
-                   int(y * scaleMult.y()) + trussBufIndent + leftTopPos.y() );
+    int widgetX = int ( x * scaleMult.x() ) + 
+                  Global::trussBufIndent + leftTopPos.x();
+    int widgetY = ( Global::flipY ? int( ( getTrussAreaSize().height() - y ) * 
+                   scaleMult.y() ) + Global::trussBufIndent + leftTopPos.y() : 
+                   int(y * scaleMult.y()) + 
+                    Global::trussBufIndent + leftTopPos.y() );
     return QPoint( widgetX, widgetY );
 }
 
@@ -969,7 +972,8 @@ DoublePointArray TrussUnit::getPivotCrossPoints (
     if ( nonCrossingPivots.empty() )
         return crossPoints;
 
-    // find points at which pivots from incoming list intersect with other pivots
+    // find points at which pivots from incoming 
+    // list intersect with other pivots
     PivotList pivotList = getPivotList ();
     PivotList::reverse_iterator rev_iter = pivotList.rbegin();
     for ( ; rev_iter != pivotList.rend(); ++rev_iter )
@@ -1343,8 +1347,8 @@ void TrussUnit::drawPivotNumber( TrussPivot* pivot,
     if ( ! pivot->isVisible() || ! pivot->getDrawingStatus() )
         return;
 
-    QPoint p1 = getWidgetPosFromTrussCoord ( pivot->getFirstNode().getPoint() );
-    QPoint p2 = getWidgetPosFromTrussCoord ( pivot->getLastNode().getPoint() );
+    QPoint p1 = getWidgetPosFromTrussCoord( pivot->getFirstNode().getPoint() );
+    QPoint p2 = getWidgetPosFromTrussCoord( pivot->getLastNode().getPoint() );
 
     int rad;
     glyph_gen glyph( 0 );
@@ -1461,8 +1465,9 @@ void TrussUnit::paint ( ren_dynarow& baseRend ) const
                  *nodesIter != lastFront )
             {
                 TrussNode* node = *nodesIter;
-                QPoint nodePos = getWidgetPosFromTrussCoord( node->getPoint() ) - 
-                                 leftTopPos;
+                QPoint nodePos = 
+                    getWidgetPosFromTrussCoord( node->getPoint() )-leftTopPos;
+
                 if ( loadCase ) 
                 {
                     TrussLoad* load = loadCase->findLoad( *node );
@@ -1473,8 +1478,8 @@ void TrussUnit::paint ( ren_dynarow& baseRend ) const
            
         if ( frontNode ) 
         {
-            QPoint nodePos = getWidgetPosFromTrussCoord( frontNode->getPoint() ) - 
-                             leftTopPos;
+            QPoint nodePos = 
+                getWidgetPosFromTrussCoord( frontNode->getPoint() )-leftTopPos;
             if ( loadCase ) 
             {
                 pos = getWidgetPosFromTrussCoord( frontNode->getPoint() );
@@ -1486,8 +1491,9 @@ void TrussUnit::paint ( ren_dynarow& baseRend ) const
 
         if ( firstFront && firstFront != frontNode ) 
         {
-            QPoint nodePos = getWidgetPosFromTrussCoord( firstFront->getPoint() ) - 
-                             leftTopPos;
+            QPoint nodePos = 
+                getWidgetPosFromTrussCoord( firstFront->getPoint() ) - 
+                leftTopPos;
             if ( loadCase ) 
             {
                 pos = getWidgetPosFromTrussCoord( firstFront->getPoint() );
@@ -1499,8 +1505,9 @@ void TrussUnit::paint ( ren_dynarow& baseRend ) const
 
         if ( lastFront && lastFront != frontNode ) 
         {
-            QPoint nodePos = getWidgetPosFromTrussCoord( lastFront->getPoint() ) - 
-                             leftTopPos;
+            QPoint nodePos = 
+                getWidgetPosFromTrussCoord( lastFront->getPoint() ) - 
+                leftTopPos;
             if ( loadCase ) 
             {
                 pos = getWidgetPosFromTrussCoord( lastFront->getPoint() );

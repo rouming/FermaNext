@@ -89,7 +89,7 @@ public:
      * @return plugin which is successfully loaded
      */
     Plugin& loadPlugin ( const QString& pathToPlugin )
-        throw (PluginLoadException, PluginIsAlreadyLoadedException);
+        /*throw (PluginLoadException, PluginIsAlreadyLoadedException)*/;
 
     /**
      * Front-end for plugin unloading, called by #PluginManager.
@@ -152,7 +152,7 @@ protected:
      * @return plugin which is successfully loaded
      */
     virtual Plugin& specificLoadPlugin ( const QString& pathToPlugin )
-        throw (PluginLoadException) = 0;
+        /*throw (PluginLoadException)*/ = 0;
 
     /**
      * Specific plugin unloading. Override this method in derived class.

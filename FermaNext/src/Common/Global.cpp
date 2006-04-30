@@ -7,6 +7,8 @@
 #include "Global.h"
 #include "Config.h"
 
+namespace Global {
+
 /************************************
  * Main Consts 
  ************************************/
@@ -19,13 +21,13 @@ const QString untitledWorkspaceName = QObject::tr("Unnamed workspace");
 
 const int nodesRadius = 4,
           pivotsWidth = 2,
-          defaultThickness = 0.1,
           trussBufIndent = 24,
           defaultBufWidth = 204 + trussBufIndent,
           defaultBufHeight = 188 + trussBufIndent;
 
 const double areaMaxDimension = 999.99,
-             pivotThickLimit = 999.99;
+             pivotThickLimit = 999.99,
+             defaultThickness = 0.1;
 
 /************************************
  * Truss Unit Window Consts
@@ -219,5 +221,7 @@ QString filePathToAbsolute ( const QString& fname, const QString& dir )
 
     return cutdir + cutname;
 }
+
+} //namespace Global
 
 /*****************************************************************************/

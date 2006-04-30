@@ -76,7 +76,7 @@ void PluginManager::unregisterPluginLoaders ()
 }
 
 void PluginManager::registerPluginLoader ( const QString& pathToLoaderLib )
-    throw (RegisterPluginLoaderException)
+    /*throw (RegisterPluginLoaderException)*/
 {
     DynaLoader* nativeLib = new DynaLoader;
     LoadingPriority priority;
@@ -170,9 +170,10 @@ void PluginManager::unregisterPluginLoader ( PluginLoader& loader )
     }    
 }
 
-RequiredPluginsMap PluginManager::resolveDependence ( Plugin& plugin, 
-                                                      const QStringList& types )
-    throw (RequiredPluginIsNotResolvedException)
+RequiredPluginsMap PluginManager::resolveDependence ( 
+    Plugin& plugin, 
+    const QStringList& types )
+    /*throw (RequiredPluginIsNotResolvedException)*/
 {
     QStringList unresolvedTypes;
     RequiredPluginsMap requiredPlugins;
@@ -204,7 +205,7 @@ RequiredPluginsMap PluginManager::resolveDependence ( Plugin& plugin,
 Plugin& PluginManager::chooseRequiredPlugin ( Plugin& /*plugin*/, 
                                               const QString& /*type*/,
                                               const PluginList& plugins ) 
-    throw (PluginListIsEmptyException)
+    /*throw (PluginListIsEmptyException)*/
 {
     if ( plugins.size() == 0 )
         throw PluginListIsEmptyException();    

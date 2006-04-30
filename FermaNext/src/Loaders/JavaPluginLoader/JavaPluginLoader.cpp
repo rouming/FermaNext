@@ -302,7 +302,7 @@ QString JavaPluginLoader::pluginLoaderStatusMsg () const
 { return javaVM ? QString() : "Can't load JVM!";  }
 
 Plugin& JavaPluginLoader::specificLoadPlugin ( const QString& )
-    throw (PluginLoadException)
+    /*throw (PluginLoadException)*/
 { return *((Plugin*)0); }
 
 void JavaPluginLoader::specificUnloadPlugin ( Plugin& )

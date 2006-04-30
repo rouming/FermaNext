@@ -200,7 +200,7 @@ bool ObjectStateManager::removeBlockByState (  ObjectState& st )
     return true;
 }
 
-bool ObjectStateManager::tryToRemoveStackTop () throw (UnknownException)
+bool ObjectStateManager::tryToRemoveStackTop () /*throw (UnknownException)*/
 {
     // Is empty
     if ( countStateBlocks() == 0 )
@@ -281,8 +281,8 @@ void ObjectStateManager::saveState ( ObjectState& st )
     emit onSaveState(*this, st);
 }
 
-void ObjectStateManager::undo () throw (UnknownException, UndoException, 
-                                        StateBlockIsNotEnded) 
+void ObjectStateManager::undo () /*throw (UnknownException, UndoException, 
+                                          StateBlockIsNotEnded)*/
 {    
     // Nothing to undo
     if ( countStateBlocks() == 0 ) 
@@ -321,8 +321,8 @@ void ObjectStateManager::undo () throw (UnknownException, UndoException,
     emit afterUndo(*this);
 }
 
-void ObjectStateManager::redo () throw (UnknownException, RedoException,
-                                        StateBlockIsNotEnded)
+void ObjectStateManager::redo () /*throw (UnknownException, RedoException,
+                                          StateBlockIsNotEnded)*/
 {
     // Nothing to redo
     if ( countStateBlocks() == 0 ) 
@@ -362,8 +362,8 @@ void ObjectStateManager::redo () throw (UnknownException, RedoException,
     emit afterRedo(*this);
 }
 
-void ObjectStateManager::stepBack () throw (UnknownException, UndoException, 
-                                            StateBlockIsNotEnded) 
+void ObjectStateManager::stepBack () /*throw (UnknownException, UndoException, 
+                                              StateBlockIsNotEnded)*/
 {    
     // Nothing to undo
     if ( countStateBlocks() == 0 ) 
@@ -406,8 +406,8 @@ void ObjectStateManager::stepBack () throw (UnknownException, UndoException,
 }
 
 void ObjectStateManager::step ( uint indx ) 
-    throw (UnknownException, OutOfBoundsException, StepException,
-           RedoException, UndoException, StateBlockIsNotEnded)
+    /*throw (UnknownException, OutOfBoundsException, StepException,
+             RedoException, UndoException, StateBlockIsNotEnded)*/
 {
     size_t stateBlocksNum = countStateBlocks();
 
@@ -477,15 +477,15 @@ void ObjectStateManager::step ( uint indx )
 }
 
 void ObjectStateManager::stepToBegin () 
-    throw (UnknownException, OutOfBoundsException, StepException,
-           RedoException, UndoException, StateBlockIsNotEnded)
+    /*throw (UnknownException, OutOfBoundsException, StepException,
+             RedoException, UndoException, StateBlockIsNotEnded)*/
 {
     step(0);
 }
 
 void ObjectStateManager::stepToEnd () 
-    throw (UnknownException, OutOfBoundsException, StepException,
-           RedoException, UndoException, StateBlockIsNotEnded)
+    /*throw (UnknownException, OutOfBoundsException, StepException,
+             RedoException, UndoException, StateBlockIsNotEnded)*/
 {
     step( countStateBlocks() );
 }

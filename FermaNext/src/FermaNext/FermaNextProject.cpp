@@ -86,7 +86,7 @@ FermaNextProject::~FermaNextProject ()
 }
 
 void FermaNextProject::loadFromFile ( const QString& fileName )
-    throw (IOException, WrongXMLDocException, LoadException)
+    /*throw (IOException, WrongXMLDocException, LoadException)*/
 {
     QFile xmlFile( fileName );
     if ( ! xmlFile.open( QIODevice::ReadOnly ) )
@@ -106,8 +106,8 @@ void FermaNextProject::loadFromFile ( const QString& fileName )
     setProjectFileName( fileName );
 }
 
-void FermaNextProject::saveToFile () throw (FileNameIsNotDefinedException, 
-                                            IOException)
+void FermaNextProject::saveToFile () /*throw (FileNameIsNotDefinedException, 
+                                              IOException)*/
 {
     if ( ! isFileNameDefined() )
         throw FileNameIsNotDefinedException();
@@ -115,7 +115,7 @@ void FermaNextProject::saveToFile () throw (FileNameIsNotDefinedException,
 }
 
 void FermaNextProject::saveToFile ( const QString& fileName )
-    throw (IOException)
+    /*throw (IOException)*/
 {
     QFile xmlFile( fileName );
     if ( ! xmlFile.open( QIODevice::WriteOnly ) )
@@ -211,7 +211,7 @@ QDomElement FermaNextProject::saveToXML ( QDomDocument& doc )
 }
 
 void FermaNextProject::loadFromXML ( const QDomElement& prjElem ) 
-    throw (LoadException)
+    /*throw (LoadException)*/
 {
     XMLSerializableObject::loadFromXML( prjElem );
 
@@ -225,7 +225,8 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
     /**
      * Create truss material library
      *********************************/
-    QDomNodeList materialLib = prjElem.elementsByTagName( "TrussMaterialLibrary" );
+    QDomNodeList materialLib = 
+        prjElem.elementsByTagName( "TrussMaterialLibrary" );
     if ( materialLib.count() != 1 )
         throw LoadException();
     if ( ! materialLib.item(0).isElement() )

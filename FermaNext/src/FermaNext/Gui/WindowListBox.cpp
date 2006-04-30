@@ -63,33 +63,33 @@ void TrussUnitWindowItem::fillPopup ( QMenu* popup ) const
 {
     if ( isShown() ) {
         if ( isSelectedInGroup() ) {
-            popup->addAction( QIcon(imagesPath() + "/unselect.png"),
+            popup->addAction( QIcon(Global::imagesPath() + "/unselect.png"),
                               "Unselect", this, SLOT(unselectFromGroup()) );
         } else {
-            popup->addAction( QIcon(imagesPath() + "/select.png"),
+            popup->addAction( QIcon(Global::imagesPath() + "/select.png"),
                               "Select", this, SLOT(selectInGroup()) );
         }
         popup->addSeparator();
-        popup->addAction( QIcon(imagesPath() + "/select.png"),
+        popup->addAction( QIcon(Global::imagesPath() + "/select.png"),
                           "Select All", this, SLOT(selectAllInGroup()) );
-        popup->addAction( QIcon(imagesPath() + "/unselect.png"),
+        popup->addAction( QIcon(Global::imagesPath() + "/unselect.png"),
                           "Unselect All", this, SLOT(unselectAllFromGroup()));
         popup->addSeparator();
-        popup->addAction( QIcon(imagesPath() + "/calculate.png"),
+        popup->addAction( QIcon(Global::imagesPath() + "/calculate.png"),
                           "Calculate", this, SLOT(calculate()) );
         popup->addSeparator();
-        popup->addAction( QIcon(imagesPath() + "/delete.png"),
+        popup->addAction( QIcon(Global::imagesPath() + "/delete.png"),
                           "Remove", this, SLOT(remove()) );
         popup->addSeparator();
 
-        popup->addAction( QIcon(imagesPath() + "/hide.png"),
+        popup->addAction( QIcon(Global::imagesPath() + "/hide.png"),
                           "Hide", this, SLOT(hide()) );
 
     } else {
-        popup->addAction( QIcon(imagesPath() + "/show.png"),
+        popup->addAction( QIcon(Global::imagesPath() + "/show.png"),
                           "Show", this, SLOT(show()) );
         popup->addSeparator();
-        popup->addAction( QIcon(imagesPath() + "/delete.png"),
+        popup->addAction( QIcon(Global::imagesPath() + "/delete.png"),
                           "Remove", this, SLOT(remove()) );
 
     }
@@ -245,9 +245,11 @@ WindowListBox::WindowListBox ( FermaNextProject& prj, QWidget* parent ) :
 
     // Catch truss creation/removing
     TrussUnitWindowManager& trussMng = project.getTrussUnitWindowManager();
-    QObject::connect( &trussMng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
+    QObject::connect( &trussMng, 
+                      SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
                       SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
-    QObject::connect( &trussMng, SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
+    QObject::connect( &trussMng, 
+                      SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
                       SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
 }
 
@@ -281,8 +283,8 @@ void WindowListBox::addTrussUnitWindow ( TrussUnitWindow& truss )
 {
     TrussUnitWindowItem* item = new TrussUnitWindowItem( 
                   project, truss, *this, 
-                  QIcon(imagesPath() + "/project.png"),
-                  QIcon(imagesPath() + "/project_d.png"));
+                  QIcon(Global::imagesPath() + "/project.png"),
+                  QIcon(Global::imagesPath() + "/project_d.png"));
 
     IndexedItem iitem = { item, row(item) };
     windowItems[&truss] = iitem;

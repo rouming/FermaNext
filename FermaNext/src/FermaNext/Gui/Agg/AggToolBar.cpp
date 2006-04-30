@@ -53,8 +53,9 @@ void AggToolBarButton::paint ( ren_dynarow& baseRend,
     QPoint iconPos( int((pos.x() + width/4) / scaleX), 
                     int((pos.y() + height/8) / scaleY) );
 
-    drawSvg ( baseRend, ras, sl, pathRend, solidRend, mtx, iconPos.x(), 
-              iconPos.y(), scaleX, scaleY, svgExpand, svgGamma );
+    drawSvg ( baseRend, ras, sl, pathRend, solidRend, mtx, 
+              iconPos.x(), iconPos.y(), scaleX, scaleY, 
+              Global::svgExpand, Global::svgGamma );
 }
 
 /*****************************************************************************
@@ -69,10 +70,12 @@ AggToolBar::AggToolBar( QPoint pos, int bordLeft, int bordRight, int bordTop,
     borderTop(bordTop),
     borderBottom(bordBottom),
     separation(separation_),
-    // Consider that we may need additional space (bufferEmptyArea)
+    // Consider that we may need additional space (Global::bufferEmptyArea)
     // for the different agg effects
-    toolBarBuf( new rbuf_dynarow( bordLeft + bordRight + 2 * bufferEmptyArea,
-                                  bordTop + bordBottom + bufferEmptyArea ) ),
+    toolBarBuf( new rbuf_dynarow( bordLeft + bordRight + 
+                                  2 * Global::bufferEmptyArea,
+                                  bordTop + bordBottom + 
+                                  Global::bufferEmptyArea ) ),
     renderedFlag(false),
     visible(true),
     hinted(false)
@@ -108,8 +111,9 @@ AggToolBarButton& AggToolBar::addButton ( const QString& fname,
                                           QWidget* widget,  const char* signal,
                                           const char* slot )
 {
-    AggToolBarButton* button = new AggToolBarButton( fname, label, leftTopPos, 
-                                                     buttonWidth, buttonHeight );
+    AggToolBarButton* button = 
+        new AggToolBarButton( fname, label, leftTopPos, 
+                              buttonWidth, buttonHeight );
     buttons.push_back ( button );
 
     QObject::connect( button, SIGNAL( onButtonPress() ),
@@ -130,9 +134,9 @@ AggToolBarButton& AggToolBar::addButton ( const QString& fname,
     toolBarWidth = toolBarWidth + buttonWidth + separation;
 
     // Expand buffer for the new buttons if necessary
-    if ( toolBarBuf->width() < toolBarWidth + 2 * bufferEmptyArea )
-        toolBarBuf->init( toolBarWidth + 2 * bufferEmptyArea, 
-                          toolBarHeight + bufferEmptyArea );
+    if ( toolBarBuf->width() < toolBarWidth + 2 * Global::bufferEmptyArea )
+        toolBarBuf->init( toolBarWidth + 2 * Global::bufferEmptyArea, 
+                          toolBarHeight + Global::bufferEmptyArea );
 
     // Renew tool bar widget position and centering tool bar
     toolBarLeftTopPos.setX( centerPos.x() - toolBarWidth/2 );
@@ -163,8 +167,9 @@ void AggToolBar::removeButton ( AggToolBarButton& btn )
 
     // Compress buffer if its up to twice as much as an actual tool bar width
     // with additional area
-    if ( toolBarBuf->width() > toolBarWidth * 2 + 2 * bufferEmptyArea )
-        toolBarBuf->init( toolBarWidth, toolBarHeight + bufferEmptyArea );
+    if ( toolBarBuf->width() > toolBarWidth * 2 + 2 * Global::bufferEmptyArea )
+        toolBarBuf->init( toolBarWidth, 
+                          toolBarHeight + Global::bufferEmptyArea );
 
     // Renew tool bar widget position and centering tool bar
     toolBarLeftTopPos.setX( centerPos.x() - toolBarWidth/2 );
@@ -232,7 +237,8 @@ void AggToolBar::clearToolBar ()
     // Clear all buttons.
     clean();
 
-    toolBarBuf->init( borderLeft + borderRight + separation + 2 * bufferEmptyArea, 
+    toolBarBuf->init( borderLeft + borderRight + separation + 
+                      2 * Global::bufferEmptyArea, 
                       toolBarBuf->height() );
 
     // Renew tool bar widget position and centering tool bar
@@ -299,7 +305,7 @@ void AggToolBar::setButtonSeparation ( int s )
 
     // Expand or compress buffer if necessary
     if ( toolBarBuf->width() < toolBarWidth || 
-         toolBarBuf->width() > toolBarWidth * 2 + 2 * bufferEmptyArea )
+         toolBarBuf->width() > toolBarWidth * 2 + 2 * Global::bufferEmptyArea )
         toolBarBuf->init( toolBarWidth, toolBarBuf->height() );
 
     separation = s;

@@ -65,7 +65,7 @@ public:
     virtual ~TrussUnit ();
 
     // XML serialization
-    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
+    virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
     virtual QDomElement saveToXML ( QDomDocument& );
     virtual void setMaterialUUIDMap ( const QMap<QString, TrussMaterial*>& );
 
@@ -214,7 +214,7 @@ public:
     TrussNode ( double x, double y, Fixation, ObjectStateManager* );
 
     // XML serialization
-    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
+    virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
     virtual QDomElement saveToXML ( QDomDocument& );
 
     void drawFixation ( scanline_rasterizer& ras, solidRenderer& solidRend, 
@@ -246,7 +246,7 @@ public:
     TrussPivot ( TrussNode&, TrussNode&, ObjectStateManager* );
 
     // XML serialization
-    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
+    virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
     virtual QDomElement saveToXML ( QDomDocument& );
     virtual void setMaterialUUIDMap ( const QMap<QString, TrussMaterial*>& );
 

@@ -148,7 +148,7 @@ void AggPopupHint::paint ( base_renderer& baseRenderer ) const
     }
 
     QPoint pos = getHintPosition();
-    baseRenderer.blend_from ( pixf, 0, pos.x(), pos.y(), unsigned( 1.0 * 255 ) );
+    baseRenderer.blend_from ( pixf, 0, pos.x(), pos.y(), uint( 1.0 * 255 ) );
 }
 
 /*****************************************************************************/

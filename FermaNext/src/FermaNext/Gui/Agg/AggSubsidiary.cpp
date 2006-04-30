@@ -41,7 +41,8 @@ arrow::arrow ( line& l, double w ) :
     s.shorten( w * 2.0 );
 }
 
-arrow::arrow ( line& l, double w, int downLen, int upLen, int sideWid, int sideLen ) : 
+arrow::arrow ( line& l, double w, int downLen, 
+               int upLen, int sideWid, int sideLen ) : 
     s( l ),
     ah(),
     m( s.markers(), ah ),
@@ -68,7 +69,8 @@ void drawText ( textRenderer& textRend, const QString& str, color_type col,
                 const QPoint& point )
 {
     textRend.color( col );    
-    textRend.render_text( point.x(), point.y(), str.toAscii().data(), flipY );
+    textRend.render_text( point.x(), point.y(), str.toAscii().data(), 
+                          Global::flipY );
 }
 
 void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
@@ -88,7 +90,7 @@ void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
                 const QPoint& point2 )
 {
     drawLine ( ras, solidRend, sl, point1, point2, 
-               coordLineWidth, agg::rgba(90, 90, 90) );
+               Global::coordLineWidth, agg::rgba(90, 90, 90) );
 }
 
 void drawCurve ( scanline_rasterizer& ras, solidRenderer& solidRend,
@@ -112,7 +114,8 @@ void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
                  int upLen, int sideWid, int sideLen )
 {
     line newLine ( tail.x(), tail.y(), head.x(), head.y() );
-    arrow newArrow ( newLine, coordLineWidth, downLen, upLen, sideWid, sideLen );
+    arrow newArrow ( newLine, Global::coordLineWidth, 
+                     downLen, upLen, sideWid, sideLen );
     ras.add_path ( newArrow );
     solidRend.color ( color );
     agg::render_scanlines ( ras, sl, solidRend );
@@ -122,7 +125,8 @@ void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
                  agg::scanline_p8& sl, const QPoint& tail, 
                  const QPoint& head )
 {
-    drawArrow ( ras, solidRend, sl, tail, head, agg::rgba(90, 90, 90), 4, 1, 4, 6 );
+    drawArrow ( ras, solidRend, sl, tail, head, 
+                agg::rgba(90, 90, 90), 4, 1, 4, 6 );
 }
 
 void fillColorArray ( color_array_type& colArray, color_type first, 

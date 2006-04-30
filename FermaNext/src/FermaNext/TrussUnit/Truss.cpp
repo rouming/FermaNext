@@ -16,7 +16,7 @@ TrussDimension::TrussDimension ( LengthMeasure lm, ForceMeasure fm ) :
 
 TrussDimension::TrussDimension ( const QString& lengthMeasure_,
                                  const QString& forceMeasure_ ) 
-    throw (WrongArgsException)
+    /*throw (WrongArgsException)*/
 {
     LengthMeasure lengthMeasure = mm;
     if ( lengthMeasure_ == "mm" )

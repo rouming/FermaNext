@@ -14,7 +14,7 @@ PluginLoader::~PluginLoader ()
 {}
 
 Plugin& PluginLoader::loadPlugin ( const QString& pathToPlugin )
-    throw (PluginLoadException, PluginIsAlreadyLoadedException)
+    /*throw (PluginLoadException, PluginIsAlreadyLoadedException)*/
 {
     if ( pluginMap.contains( pathToPlugin ) )
         throw PluginIsAlreadyLoadedException();

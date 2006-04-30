@@ -52,7 +52,7 @@ int ProjectToolBox::addProject ( FermaNextProject& prj )
     QObject::connect( &prj, SIGNAL(onNameChange(const QString&)),
                             SLOT(projectRename(const QString&)) );
 
-    QIcon iconSet( imagesPath() + "/project_toolbox.png"  );
+    QIcon iconSet( Global::imagesPath() + "/project_toolbox.png"  );
     int result = addItem( page, iconSet, prj.getName() );    
     setCurrentWidget(page);
     prj.activate();
@@ -125,7 +125,9 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
     trussUnitsLayout->addWidget( calculateAllButton );
     calculateAllButton->setFlat( true );
     calculateAllButton->setText( tr("Calculate all") );    
-    calculateAllButton->setIcon( QIcon(imagesPath() + "/calculate_all.png") );        
+    calculateAllButton->setIcon( 
+                       QIcon(Global::imagesPath() + "/calculate_all.png") );
+        
     connect( calculateAllButton, SIGNAL(clicked()), 
              SLOT(calculateAllIsPressed()) ); 
 
@@ -178,8 +180,8 @@ void ProjectToolBox::activateSelected ( int index )
             break;
         }
 
-    QIcon activeIconSet( imagesPath() + "/project_toolbox.png" );
-    QIcon disablesIconSet( imagesPath() + "/project_d.png" );
+    QIcon activeIconSet( Global::imagesPath() + "/project_toolbox.png" );
+    QIcon disablesIconSet( Global::imagesPath() + "/project_d.png" );
     for ( int ind = 0; ind < count(); ++ind )
         setItemIcon( ind, disablesIconSet );
     setItemIcon( index, activeIconSet );        
@@ -214,13 +216,15 @@ void ProjectToolBox::importIsPressed ()
         mng.createTrussUnitWindowFromFile(fileName);
 
     } catch ( TrussUnitWindowManager::ReadFileException& ) {
-        QMessageBox::critical( 0, "TrussUnitWindowManager::ReadFileException",
-                               QString("TrussUnitWindowManager::ReadFileException") );
+        QMessageBox::critical( 
+                   0, "TrussUnitWindowManager::ReadFileException",
+                   QString("TrussUnitWindowManager::ReadFileException") );
         return;
 
     } catch ( TrussUnitWindowManager::WrongFormatException& ) {
-        QMessageBox::critical( 0, "TrussUnitWindowManager::WrongFormatException",
-                               QString("TrussUnitWindowManager::WrongFormatException") );
+        QMessageBox::critical( 
+                   0, "TrussUnitWindowManager::WrongFormatException",
+                   QString("TrussUnitWindowManager::WrongFormatException") );
     }
 }
 
@@ -235,7 +239,8 @@ void ProjectToolBox::newTrussIsPressed ()
             tr("Truss unit creation"), 
             tr("Enter truss unit name:") );
     if ( !trussName.isEmpty() ) {
-        TrussUnitWindowManager& trussMng = currPrj->getTrussUnitWindowManager();
+        TrussUnitWindowManager& trussMng = 
+            currPrj->getTrussUnitWindowManager();
         TrussUnitWindow& truss = trussMng.createTrussUnitWindow(trussName);
         truss.setTrussAreaSize( DoubleSize( 300, 300 ) );
     } else {

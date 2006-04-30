@@ -67,9 +67,10 @@ void LoadTableDelegate::setModelData ( QWidget* editor,
     return;
 }
 
-void LoadTableDelegate::updateEditorGeometry ( QWidget* editor,
-                                            const QStyleOptionViewItem& option, 
-                                            const QModelIndex& ) const
+void LoadTableDelegate::updateEditorGeometry ( 
+    QWidget* editor,
+    const QStyleOptionViewItem& option, 
+    const QModelIndex& ) const
 {
     editor->setGeometry( option.rect );
 }
@@ -107,8 +108,8 @@ void LoadTable::setLoad ( int row, const TrussLoad& load )
         setItem( row, 1, cellY );
     }
     
-    horizontalHeader()->resizeSection( 0, loadColumnWidth );
-    horizontalHeader()->resizeSection( 1, loadColumnWidth );
+    horizontalHeader()->resizeSection( 0, Global::loadColumnWidth );
+    horizontalHeader()->resizeSection( 1, Global::loadColumnWidth );
 }
 
 TrussLoad LoadTable::getLoad ( int row ) const
@@ -146,9 +147,10 @@ PivotPropertyTableDelegate::PivotPropertyTableDelegate ( QWidget* parent ) :
     materialLib( 0 )
 {}
 
-QWidget* PivotPropertyTableDelegate::createEditor ( QWidget *parent, 
-                                                const QStyleOptionViewItem& ,
-                                                const QModelIndex& index ) const
+QWidget* PivotPropertyTableDelegate::createEditor ( 
+    QWidget *parent, 
+    const QStyleOptionViewItem& ,
+    const QModelIndex& index ) const
 {
     
     if ( index.column() != 0 ) {
@@ -161,15 +163,16 @@ QWidget* PivotPropertyTableDelegate::createEditor ( QWidget *parent,
     QLineEdit* editor = new QLineEdit( parent );
     editor->setFrame( false );
     RangeValidator* validator = new RangeValidator( editor );
-    validator->setRange( 0.0, pivotThickLimit );
+    validator->setRange( 0.0, Global::pivotThickLimit );
     validator->setDecimals( 2 );
     editor->setValidator( validator );
     editor->setMaxLength( 6 );
     return editor;
 }
 
-void PivotPropertyTableDelegate::setEditorData ( QWidget *editor,
-                                                 const QModelIndex &index ) const
+void PivotPropertyTableDelegate::setEditorData ( 
+    QWidget *editor,
+    const QModelIndex &index ) const
 {
     // fill editor of the material cell
     if ( index.column() != 0 ) {
@@ -185,7 +188,8 @@ void PivotPropertyTableDelegate::setEditorData ( QWidget *editor,
     }
 
     // fill editor of the thickness cell
-    QString thickness = index.model()->data( index, Qt::DisplayRole ).toString();
+    QString thickness = 
+        index.model()->data( index, Qt::DisplayRole ).toString();
     QLineEdit* lineEdit = dynamic_cast<QLineEdit*>( editor );
     Q_ASSERT( editor != 0 );
     lineEdit->setText( thickness );
@@ -193,9 +197,10 @@ void PivotPropertyTableDelegate::setEditorData ( QWidget *editor,
     return;
 }
 
-void PivotPropertyTableDelegate::setModelData ( QWidget* editor, 
-                                                QAbstractItemModel* model, 
-                                                const QModelIndex& index ) const
+void PivotPropertyTableDelegate::setModelData ( 
+    QWidget* editor, 
+    QAbstractItemModel* model, 
+    const QModelIndex& index ) const
 {
     // set data for material cell
     if ( index.column() != 0 ) {
@@ -250,15 +255,16 @@ void PivotPropertyTableDelegate::paint ( QPainter* painter,
     }
 }
 
-void PivotPropertyTableDelegate::updateEditorGeometry ( QWidget* editor,
-                                            const QStyleOptionViewItem& option, 
-                                            const QModelIndex& ) const
+void PivotPropertyTableDelegate::updateEditorGeometry ( 
+    QWidget* editor,
+    const QStyleOptionViewItem& option, 
+    const QModelIndex& ) const
 {
     editor->setGeometry( option.rect );
 }
 
 void PivotPropertyTableDelegate::setMaterialLibrary ( 
-                                    const TrussMaterialLibrary& matLib )
+    const TrussMaterialLibrary& matLib )
 {
     materialLib = &matLib;
 }
@@ -273,7 +279,7 @@ PivotPropertyTable::PivotPropertyTable ( QWidget* parent ) :
 
 void PivotPropertyTable::setThickness ( int row, double thick )
 {
-    if ( row >= rowCount() || thick > pivotThickLimit )
+    if ( row >= rowCount() || thick > Global::pivotThickLimit )
         return;
 
     QTableWidgetItem* cell = item( row, 0 );
@@ -284,7 +290,7 @@ void PivotPropertyTable::setThickness ( int row, double thick )
         cell->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter );
         setItem( row, 0, cell );
     }    
-    horizontalHeader()->resizeSection( 0, thicknessColumnWidth );
+    horizontalHeader()->resizeSection( 0, Global::thicknessColumnWidth );
 }
 
 double PivotPropertyTable::getThickness ( int row ) const
@@ -311,7 +317,7 @@ void PivotPropertyTable::setMaterial ( int row, const TrussMaterial& m )
         setItem( row, 1, cell );
     }   
 
-    horizontalHeader()->resizeSection( 1, materialColumnWidth );
+    horizontalHeader()->resizeSection( 1, Global::materialColumnWidth );
 }
 
 const TrussMaterial* PivotPropertyTable::getMaterial ( int row ) const
@@ -384,10 +390,10 @@ void TrussPropertyTabWidget::initLoadTab ()
         new QLabel( tr( "Current: " ), loadCaseGroupBox );
     loadCaseComboBox = new QComboBox( loadCaseGroupBox );
     createLoadCaseBtn = new QPushButton( loadCaseGroupBox );
-    createLoadCaseBtn->setIcon( QIcon( imagesPath() + "/plus.png" ) );
+    createLoadCaseBtn->setIcon( QIcon( Global::imagesPath() + "/plus.png" ) );
     createLoadCaseBtn->setFixedSize( QSize( 22, 22 ) );
     removeLoadCaseBtn = new QPushButton( loadCaseGroupBox );
-    removeLoadCaseBtn->setIcon( QIcon( imagesPath() + "/minus.png" ) );
+    removeLoadCaseBtn->setIcon( QIcon( Global::imagesPath() + "/minus.png" ) );
     removeLoadCaseBtn->setFixedSize( QSize( 22, 22 ) );
     removeLoadCaseBtn->setEnabled( false );
 
@@ -428,7 +434,7 @@ void TrussPropertyTabWidget::initLoadTab ()
                 *vertHeader = loadTable->verticalHeader();
     horHeader->setClickable( false );
     horHeader->setResizeMode( QHeaderView::Custom );
-    vertHeader->setDefaultSectionSize( tableRowHeight );
+    vertHeader->setDefaultSectionSize( Global::tableRowHeight );
     vertHeader->setClickable( false );
     vertHeader->setResizeMode( QHeaderView::Custom );
     loadTable->setShowGrid( true );
@@ -453,8 +459,10 @@ void TrussPropertyTabWidget::initPivotPropertyTab ()
 
     connect( delegate, SIGNAL(cellWasChanged(int, int)),
                        SLOT(updatePivotState(int, int)) );
-    connect( this, SIGNAL(onMaterialLibraryChanged(const TrussMaterialLibrary&)),
-             delegate, SLOT(setMaterialLibrary(const TrussMaterialLibrary&)) );
+    connect( this, 
+             SIGNAL(onMaterialLibraryChanged(const TrussMaterialLibrary&)),
+             delegate, 
+             SLOT(setMaterialLibrary(const TrussMaterialLibrary&)) );
 
     QGroupBox* levelGroupBox = 
             new QGroupBox( tr( "Leveling" ), parentFrame );
@@ -463,7 +471,7 @@ void TrussPropertyTabWidget::initPivotPropertyTab ()
     levelComboBox->addItem( "by Material" );
     levelComboBox->setCurrentIndex( 0 );
     thickSpinBox = new QDoubleSpinBox( levelGroupBox );
-    thickSpinBox->setMaximum( pivotThickLimit );
+    thickSpinBox->setMaximum( Global::pivotThickLimit );
     thickSpinBox->setFixedHeight( 21 );
     materialComboBox = new MaterialComboBox( levelGroupBox );
     materialComboBox->setVisible( false );
@@ -472,7 +480,7 @@ void TrussPropertyTabWidget::initPivotPropertyTab ()
                             SLOT(changeLevelEditor(int)) );
 
     levelButton = new QPushButton( levelGroupBox );
-    levelButton->setIcon( QIcon( imagesPath() + "/tick.png" ) );
+    levelButton->setIcon( QIcon( Global::imagesPath() + "/tick.png" ) );
     levelButton->setFixedSize( QSize( 21, 21 ) );
 
     connect( levelButton, SIGNAL(pressed()),
@@ -510,7 +518,7 @@ void TrussPropertyTabWidget::initPivotPropertyTab ()
                 *vertHeader = pivotPropTable->verticalHeader();
     horHeader->setClickable( false );
     horHeader->setResizeMode( QHeaderView::Custom );
-    vertHeader->setDefaultSectionSize( tableRowHeight );
+    vertHeader->setDefaultSectionSize( Global::tableRowHeight );
     vertHeader->setClickable( false );
     vertHeader->setResizeMode( QHeaderView::Custom );
     pivotPropTable->setShowGrid( true );
@@ -526,7 +534,8 @@ void TrussPropertyTabWidget::initPivotPropertyTab ()
 
 
 // connect new truss unit window with geometry widget
-void TrussPropertyTabWidget::trussUnitWindowWasCreated ( TrussUnitWindow& window )
+void TrussPropertyTabWidget::trussUnitWindowWasCreated ( 
+    TrussUnitWindow& window )
 {
     changeFocusWindow( &window );
 
@@ -577,7 +586,8 @@ void TrussPropertyTabWidget::trussUnitWindowWasCreated ( TrussUnitWindow& window
                       SLOT(removePivotFromTable(const Node&, const Node&)) );
 }
 
-void TrussPropertyTabWidget::changeFocusWindow ( TrussUnitWindow* newFocusWindow )
+void TrussPropertyTabWidget::changeFocusWindow ( 
+    TrussUnitWindow* newFocusWindow )
 {
     focusWindow = newFocusWindow;
     if ( focusWindow ) {
@@ -599,7 +609,7 @@ void TrussPropertyTabWidget::changeFocusWindow ( TrussUnitWindow* newFocusWindow
 }
 
 void TrussPropertyTabWidget::changeMaterialLibrary ( 
-                                            const TrussMaterialLibrary& lib )
+    const TrussMaterialLibrary& lib )
 {
     materialComboBox->setMaterialLibrary( lib );
     emit onMaterialLibraryChanged( lib );
@@ -638,7 +648,8 @@ void TrussPropertyTabWidget::fillLoadTab ()
                              QString::number(nodeList.size()) );
 }
 
-void TrussPropertyTabWidget::fillLoadTable ( const TrussUnit::LoadCase* loadCase )
+void TrussPropertyTabWidget::fillLoadTable ( 
+    const TrussUnit::LoadCase* loadCase )
 {
     if ( ! focusWindow || ! loadCase )
         return;
@@ -671,7 +682,7 @@ void TrussPropertyTabWidget::fillLoadCaseComboBox ()
 
     TrussUnit::LoadCases& loadCases = focusWindow->getLoadCases();
     QStringList argList;
-    uint i;
+    int i;
     for ( i = 0; i < loadCases.countLoadCases(); ++i )
         argList.push_back( QString::number( i + 1 ) );
     loadCaseComboBox->addItems( argList );
@@ -874,7 +885,8 @@ void TrussPropertyTabWidget::fillPivotPropertyTab ()
                               QString::number(pivotList.size()) );
 }
 
-void TrussPropertyTabWidget::addPivotToTable ( const Node& first, const Node& last )
+void TrussPropertyTabWidget::addPivotToTable ( 
+    const Node& first, const Node& last )
 {
     if ( sender() != focusWindow )
         return;
@@ -902,7 +914,7 @@ void TrussPropertyTabWidget::addPivotToTable ( const Node& first, const Node& la
 }
 
 void TrussPropertyTabWidget::removePivotFromTable ( const Node& first, 
-                                                 const Node& last )
+                                                    const Node& last )
 {
     if ( sender() != focusWindow )
         return;

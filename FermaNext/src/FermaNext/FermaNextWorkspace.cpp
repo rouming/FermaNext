@@ -26,8 +26,8 @@ const QString& FermaNextWorkspace::formatExtension ()
 /*****************************************************************************/
 
 FermaNextWorkspace::FermaNextWorkspace () :
-    name( untitledWorkspaceName ),
-    fermaConfig( ::config() ),
+    name( Global::untitledWorkspaceName ),
+    fermaConfig( Global::config() ),
     pluginMng( fermaConfig ),
     fermaMainWindow(0),
     stackedWidget(0)
@@ -43,7 +43,7 @@ FermaNextWorkspace::~FermaNextWorkspace ()
 }
 
 void FermaNextWorkspace::loadFromFile ( const QString& fileName )
-    throw (IOException, WrongXMLDocException, LoadException)
+    /*throw (IOException, WrongXMLDocException, LoadException)*/
 {
     QFile xmlFile( fileName );
     if ( ! xmlFile.open( QIODevice::ReadOnly ) )
@@ -64,9 +64,9 @@ void FermaNextWorkspace::loadFromFile ( const QString& fileName )
 }
 
 void FermaNextWorkspace::saveToFile ()
-    throw (FileNameIsNotDefinedException,
-           IOException, 
-           ProjectFileNameIsNotDefinedException)
+    /*throw (FileNameIsNotDefinedException,
+             IOException, 
+             ProjectFileNameIsNotDefinedException)*/
 {
     const QString& fileName = getWorkspaceFileName();
     if ( ! isFileNameDefined() )
@@ -76,7 +76,7 @@ void FermaNextWorkspace::saveToFile ()
 }
 
 void FermaNextWorkspace::saveToFile ( const QString& fileName )
-    throw (IOException, ProjectFileNameIsNotDefinedException)
+    /*throw (IOException, ProjectFileNameIsNotDefinedException)*/
 {
     ProjectListIter iter = projects.begin();
     for ( ; iter != projects.end(); ++iter ) {
@@ -105,7 +105,7 @@ void FermaNextWorkspace::saveToFile ( const QString& fileName )
 
 void FermaNextWorkspace::loadFromXML ( const QDomElement& wspElem,
                                        const QString& wspFileName )
-    throw (LoadException)
+    /*throw (LoadException)*/
 {
     XMLSerializableObject::loadFromXML( wspElem );
 
@@ -164,7 +164,8 @@ QDomElement FermaNextWorkspace::saveToXML ( QDomDocument& doc )
     for ( ; iter != projects.end(); ++iter ) {
         FermaNextProject* prj = *iter;
         const QString& prjFileName = prj->getProjectFileName();
-        QString relPrjFileName = filePathToRelative( prjFileName, wspDirPath );
+        QString relPrjFileName = 
+            Global::filePathToRelative( prjFileName, wspDirPath );
         QDomElement prjElem = doc.createElement( "FermaNextProject" );        
         prjElem.setAttribute( "projectURL", relPrjFileName );
         if ( prj->isActivated() )
@@ -203,7 +204,7 @@ void FermaNextWorkspace::clearProjects ()
 void FermaNextWorkspace::reset ()
 {
     emit onReset();
-    name = untitledWorkspaceName;
+    name = Global::untitledWorkspaceName;
     clearProjects();
     setWorkspaceFileName( "" );
 }
@@ -239,7 +240,7 @@ FermaNextProject& FermaNextWorkspace::createProject ( const QString& name )
 
 FermaNextProject& FermaNextWorkspace::createProjectFromFile ( 
     const QString& fileName ) 
-    throw (LoadException)
+    /*throw (LoadException)*/
 {
     FermaNextProject& prj = createProject( QString() );
     try { prj.loadFromFile( fileName ); }

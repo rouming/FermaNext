@@ -2,7 +2,7 @@
 #ifndef AGGTOOLBAR_H
 #define AGGTOOLBAR_H
 
-#include <vector>
+#include <QList>
 
 #include "AggButton.h"
 #include "AggSubsidiary.h"
@@ -90,9 +90,9 @@ protected slots:
     void clearToolBarRenderedFlag ();
 
 protected:
-    typedef std::vector<AggToolBarButton*> ButtonList;
-    typedef ButtonList::iterator ButtonListIter;
-    typedef ButtonList::const_iterator ButtonListConstIter;
+    typedef QList<AggToolBarButton*> ButtonList;
+    typedef ButtonList::Iterator ButtonListIter;
+    typedef ButtonList::ConstIterator ButtonListConstIter;
 
     virtual void clean ();
 

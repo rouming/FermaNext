@@ -57,7 +57,7 @@ DynaLoader::DynaLoader () :
 {}
 
 DynaLoader::DynaLoader ( const QString& fileName )
-    throw (DynaLoader::LibraryLoadException) :
+    /*throw (DynaLoader::LibraryLoadException)*/ :
     handle(0)
 {
     loadLibrary( fileName );
@@ -69,7 +69,7 @@ DynaLoader::~DynaLoader ()
 }
 
 void DynaLoader::loadLibrary ( const QString& fileName ) 
-    throw (DynaLoader::LibraryLoadException)
+    /*throw (DynaLoader::LibraryLoadException)*/
 {
     freeLibrary();    
     QFileInfo dlInfo( fileName );
@@ -103,7 +103,7 @@ bool DynaLoader::freeLibrary ()
 }
 
 ProcAddress DynaLoader::getProcAddress ( const QString& funcName ) const
-    throw (DynaLoader::AddressException)
+    /*throw (DynaLoader::AddressException)*/
 {
     ProcAddress address = dl_sym(handle, funcName.toAscii().data());
     if ( address == 0 )

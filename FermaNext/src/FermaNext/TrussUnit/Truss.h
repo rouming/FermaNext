@@ -39,7 +39,8 @@ public:
     TrussDimension ( LengthMeasure, ForceMeasure );
     // Try to parse arguments
     TrussDimension ( const QString& lengthMeasure, 
-                     const QString& forceMeasure ) throw (WrongArgsException);
+                     const QString& forceMeasure ) 
+        /*throw (WrongArgsException)*/;
 
     TrussDimension& operator= ( const TrussDimension& );
 
@@ -327,7 +328,7 @@ public:
     }
 
     virtual P& createPivot ( uint firstNodeIndex, uint lastNodeIndex ) 
-                                          throw (NodeIndexOutOfBoundException) 
+        /*throw (NodeIndexOutOfBoundException)*/
     {
         if ( firstNodeIndex >= nodes.size() || lastNodeIndex >= nodes.size() )
             throw NodeIndexOutOfBoundException();
@@ -405,7 +406,7 @@ public:
 
         LoadCases& loadCases = getLoadCases();
         TrussTopology::LoadCases& topologyLoadCases = topology->getLoadCases();
-        for ( uint loadCaseInd = 1; loadCaseInd <= loadCases.countLoadCases();
+        for ( int loadCaseInd = 1; loadCaseInd <= loadCases.countLoadCases();
               ++loadCaseInd ) {
             LoadCase* loadCase = loadCases.findLoadCase( loadCaseInd );
             if ( loadCase == 0 )

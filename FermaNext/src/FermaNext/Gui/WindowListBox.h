@@ -67,7 +67,8 @@ public:
     void contextMenuEvent ( QContextMenuEvent* );
 
 protected:
-    TrussUnitWindowItem* findByTrussUnitWindow ( const TrussUnitWindow& ) const;
+    TrussUnitWindowItem* findByTrussUnitWindow ( 
+        const TrussUnitWindow& ) const;
 
 public slots:
     virtual void addTrussUnitWindow ( TrussUnitWindow& );

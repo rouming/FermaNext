@@ -167,9 +167,9 @@ public:
         return loads;
     }
 
-    virtual size_t countLoads () const
+    virtual int countLoads () const
     {
-        size_t loadsNum = 0;
+        int loadsNum = 0;
         TrussLoadMapConstIter iter = loads.begin();
         for ( ; iter != loads.end(); ++iter ) {
             if ( iter.value()->isEnabled() ) 

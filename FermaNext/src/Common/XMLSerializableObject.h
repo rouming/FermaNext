@@ -17,7 +17,7 @@ public:
 
 protected:
     // Override this methods in parent class to provide object serialization.
-    virtual void loadFromXML ( const QDomElement& ) throw (LoadException);
+    virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
     virtual QDomElement saveToXML ( QDomDocument& );
 };
 

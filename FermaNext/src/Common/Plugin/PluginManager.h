@@ -78,7 +78,7 @@ public:
      */
     RequiredPluginsMap resolveDependence ( Plugin& plugin, 
                                            const QStringList& types )
-        throw (RequiredPluginIsNotResolvedException);
+        /*throw (RequiredPluginIsNotResolvedException)*/;
 
     /**
      * Register all plugin loaders from specified path.
@@ -261,7 +261,7 @@ private:
      * has not been registered
      */
     void registerPluginLoader ( const QString& pathToLoaderLib )
-        throw (RegisterPluginLoaderException);
+        /*throw (RegisterPluginLoaderException)*/;
 
     /**
      * Simply unregisters plugin loader.
@@ -281,7 +281,7 @@ private:
     Plugin& chooseRequiredPlugin ( Plugin& plugin, 
                                    const QString& type,
                                    const PluginList& plugins )
-        throw (PluginListIsEmptyException);
+        /*throw (PluginListIsEmptyException)*/;
 
     /** Hidden copy constructor. */
     PluginManager ( const PluginManager& );

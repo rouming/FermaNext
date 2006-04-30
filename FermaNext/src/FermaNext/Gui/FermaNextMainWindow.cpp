@@ -242,7 +242,7 @@ void FermaNextMainWindow::setupFileActions ()
 
     QAction *a;
     // New
-    a = new QAction( QIcon(imagesPath() + "/filenew.png"), 
+    a = new QAction( QIcon(Global::imagesPath() + "/filenew.png"), 
                      tr( "&New..." ), this );
     a->setShortcut( tr("CTRL+N") );
     connect( a, SIGNAL(triggered()), SLOT(fileNew()) );
@@ -250,7 +250,7 @@ void FermaNextMainWindow::setupFileActions ()
     menu->addAction( a );
 
     // Open
-    a = new QAction( QIcon(imagesPath() + "/fileopen.png"), 
+    a = new QAction( QIcon(Global::imagesPath() + "/fileopen.png"), 
                       tr( "&Open..." ), this );
     a->setShortcut( tr("CTRL+O") );
     connect( a, SIGNAL(triggered()), SLOT(fileOpen()) );
@@ -258,8 +258,9 @@ void FermaNextMainWindow::setupFileActions ()
     menu->addAction( a );   
 
     // Save
-    saveProjectAction = new QAction( QIcon(imagesPath() + "/filesave.png"),
-                                     tr( "&Save..." ), this );
+    saveProjectAction = 
+        new QAction( QIcon(Global::imagesPath() + "/filesave.png"),
+                     tr( "&Save..." ), this );
     saveProjectAction->setShortcut( tr("CTRL+S") );
     connect( saveProjectAction, SIGNAL(triggered()), SLOT(fileSave()) );
     tb->addAction( saveProjectAction );
@@ -268,8 +269,9 @@ void FermaNextMainWindow::setupFileActions ()
     menu->addSeparator();
 
     // Save All
-    saveAllAction = new QAction( QIcon(imagesPath() + "/filesaveall.png"),
-                                 tr( "&Save All..." ), this );
+    saveAllAction = 
+        new QAction( QIcon(Global::imagesPath() + "/filesaveall.png"),
+                     tr( "&Save All..." ), this );
     saveAllAction->setShortcut( tr("CTRL+SHIFT+S") );
     connect( saveAllAction, SIGNAL(triggered()), SLOT(fileSaveAll()) );
     tb->addAction( saveAllAction );
@@ -335,7 +337,7 @@ void FermaNextMainWindow::setupFileActions ()
     a->setDisabled(true);
 
     // Print
-    printAction = new QAction( QIcon(imagesPath() + "/fileprint.xpm"), 
+    printAction = new QAction( QIcon(Global::imagesPath() + "/fileprint.xpm"), 
                                tr( "&Print..." ),  this ); 
     printAction->setShortcut( tr("CTRL+P") );
     connect( printAction, SIGNAL(triggered()), SLOT(filePrint()) );        
@@ -356,7 +358,7 @@ void FermaNextMainWindow::setupEditActions ()
     QMenu* menu = menuBar()->addMenu( tr( "&Edit" ) );
 
     // Undo
-    undoAction = new QAction( QIcon(imagesPath() + "/undo.png"), 
+    undoAction = new QAction( QIcon(Global::imagesPath() + "/undo.png"), 
                               tr( "&Undo" ), this );
     undoAction->setShortcut( tr("CTRL+Z") );                               
     connect( undoAction, SIGNAL(triggered()), SLOT(editUndo()) );
@@ -365,7 +367,7 @@ void FermaNextMainWindow::setupEditActions ()
     menu->addAction( undoAction );
 
     // Redo
-    redoAction = new QAction( QIcon(imagesPath() + "/redo.png"), 
+    redoAction = new QAction( QIcon(Global::imagesPath() + "/redo.png"), 
                               tr( "&Redo" ), this );
     redoAction->setShortcut( tr("CTRL+Y") );
     connect( redoAction, SIGNAL(triggered()), SLOT(editRedo()) );
@@ -449,7 +451,7 @@ void FermaNextMainWindow::reloadPlugins ( bool reload )
 
     if ( reload ) {        
         plgManager.unloadPlugins();
-        plgManager.loadPlugins( pluginsPath() );
+        plgManager.loadPlugins( Global::pluginsPath() );
     }
 
     QStringList names;
@@ -666,7 +668,7 @@ void FermaNextMainWindow::fileClose ()
 void FermaNextMainWindow::fileOpenWsp ()
 {
     if ( QMessageBox::question( this,
-                                tr("Open workspace"),                                  
+                                tr("Open workspace"),
                                 tr("Open new workspace?"),
                                 tr("&Yes"), tr("&No"),
                                 QString::null, 0, 1 ) )

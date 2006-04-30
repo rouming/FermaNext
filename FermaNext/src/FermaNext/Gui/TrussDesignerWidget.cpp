@@ -215,7 +215,7 @@ void LoadPopupMenu::okClicked()
  *****************************************************************************/
 
 TrussDesignerWidget::TrussDesignerWidget ( QWidget* p ) :
-    AggWidget(p, flipY),
+    AggWidget(p, Global::flipY),
     fixationPopup( new FixationPopupMenu(this) ),
     loadPopup( new LoadPopupMenu(this) ),
     focusedWindow(0),
@@ -235,8 +235,10 @@ TrussDesignerWidget::TrussDesignerWidget ( QWidget* p ) :
     // Temp
     X(50), Y(50)
 {
-    QObject::connect( toolBar, SIGNAL(onHintShowsUp(const QString&,const QPoint,bool)),
-                      aggHint, SLOT(show(const QString&,const QPoint,bool)) );
+    QObject::connect( toolBar, 
+                      SIGNAL(onHintShowsUp(const QString&,const QPoint,bool)),
+                      aggHint, 
+                      SLOT(show(const QString&,const QPoint,bool)) );
 
     QObject::connect( toolBar, SIGNAL( onHintHides(bool) ),
                       aggHint, SLOT( hide(bool) ) );
@@ -267,22 +269,25 @@ void TrussDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow )
     trussWindow.setWindowOwner( this );
 
     // We should repaint all area after truss changes its visibility or state
-    QObject::connect( &trussWindow, SIGNAL(onVisibleChange(bool)), 
-                                    SLOT(trussWindowChangedVisibility(bool)) );
-    QObject::connect( &trussWindow, SIGNAL(onStateChange()),
-                                    SLOT(update()) );
-    QObject::connect( &trussWindow, SIGNAL(onBeforeDesist(StatefulObject&)), 
-                                    SLOT(trussWindowDesisted(StatefulObject&)) );
+    QObject::connect( &trussWindow, 
+                      SIGNAL(onVisibleChange(bool)), 
+                      SLOT(trussWindowChangedVisibility(bool)) );
+    QObject::connect( &trussWindow, 
+                      SIGNAL(onStateChange()),
+                      SLOT(update()) );
+    QObject::connect( &trussWindow, 
+                      SIGNAL(onBeforeDesist(StatefulObject&)), 
+                      SLOT(trussWindowDesisted(StatefulObject&)));
 
     QObject::connect( &trussWindow, SIGNAL(onHintShowsUp(const QString&, 
                                                          const QPoint,bool)),
-                           aggHint, SLOT(show(const QString&,const QPoint,bool)) );
+                      aggHint, SLOT(show(const QString&,const QPoint,bool)) );
     QObject::connect( &trussWindow, SIGNAL(onHintShowsUp(const QString&, 
                                                          const QPoint,bool)),
                                     SLOT( update() ) );
 
     QObject::connect( &trussWindow, SIGNAL( onHintHides(bool) ),
-                           aggHint, SLOT( hide(bool) ) );
+                      aggHint, SLOT( hide(bool) ) );
     QObject::connect( &trussWindow, SIGNAL( onHintHides(bool) ),
                                     SLOT( update() ) );
 
@@ -319,36 +324,54 @@ void TrussDesignerWidget::initToolBar ()
 
     int separation = toolBar->getButtonSeparation();
 
-    QPoint leftTopPos ( bufferEmptyArea + toolBar->getBorderLeft() + separation, 
-                        bufferEmptyArea + toolBar->getBorderTop() );
-    toolBar->addButton ( imagesSvgPath() + "/arrowIcon.svg", "Arrow", leftTopPos, 
-                         buttonWidth, buttonHeight, this, SIGNAL( pressSelectButton() ),
-                         SLOT( changeBehaviourToSelect() ) ).setHint("Select 'Esc'");
+    QPoint leftTopPos( 
+        Global::bufferEmptyArea + toolBar->getBorderLeft() + separation, 
+        Global::bufferEmptyArea + toolBar->getBorderTop() );
+    toolBar->addButton( 
+        Global::imagesSvgPath() + "/arrowIcon.svg", "Arrow", leftTopPos, 
+        Global::buttonWidth, Global::buttonHeight, this, 
+        SIGNAL( pressSelectButton() ),
+        SLOT( changeBehaviourToSelect() ) ).setHint("Select 'Esc'");
 
-    leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation);
-    toolBar->addButton ( imagesSvgPath() + "/nodeIcon.svg", "Node", leftTopPos, 
-                         buttonWidth,buttonHeight, this, SIGNAL( pressNodeDrawButton() ),
-                         SLOT( changeBehaviourToNodeDraw() ) ).setHint("Draw node 'N'");
+    leftTopPos.setX( leftTopPos.x() + Global::buttonWidth + separation);
+    toolBar->addButton( Global::imagesSvgPath() + "/nodeIcon.svg", "Node", 
+                        leftTopPos, 
+                        Global::buttonWidth,Global::buttonHeight, this, 
+                        SIGNAL( pressNodeDrawButton() ),
+                        SLOT( changeBehaviourToNodeDraw() ) ).
+                          setHint("Draw node 'N'");
 
-    leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
-    toolBar->addButton ( imagesSvgPath() + "/pivotIcon.svg", "Pivot", leftTopPos, 
-                         buttonWidth, buttonHeight, this, SIGNAL( pressPivotDrawButton() ),
-                         SLOT(changeBehaviourToPivotDraw()) ).setHint("Draw pivot 'P'");
+    leftTopPos.setX( leftTopPos.x() + Global::buttonWidth + separation );
+    toolBar->addButton( Global::imagesSvgPath() + "/pivotIcon.svg", 
+                        "Pivot", leftTopPos, Global::buttonWidth, 
+                        Global::buttonHeight, this, 
+                        SIGNAL( pressPivotDrawButton() ),
+                        SLOT(changeBehaviourToPivotDraw()) ).
+                          setHint("Draw pivot 'P'");
 
-    leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
-    toolBar->addButton ( imagesSvgPath() + "/fixIcon.svg", "Fixation", leftTopPos, 
-                         buttonWidth, buttonHeight, this, SIGNAL( pressFixDrawButton() ), 
-                         SLOT( changeBehaviourToFixDraw() ) ).setHint("Set node fixation 'F'");
+    leftTopPos.setX( leftTopPos.x() + Global::buttonWidth + separation );
+    toolBar->addButton( Global::imagesSvgPath() + "/fixIcon.svg", 
+                        "Fixation", leftTopPos, 
+                        Global::buttonWidth, Global::buttonHeight, this, 
+                        SIGNAL( pressFixDrawButton() ), 
+                        SLOT( changeBehaviourToFixDraw() ) ).
+                          setHint("Set node fixation 'F'");
 
-    leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
-    toolBar->addButton ( imagesSvgPath() + "/forceIcon.svg", "Load", leftTopPos, 
-                         buttonWidth, buttonHeight, this, SIGNAL( pressLoadDrawButton() ),
-                         SLOT( changeBehaviourToLoadDraw() ) ).setHint("Load node 'L'");
+    leftTopPos.setX( leftTopPos.x() + Global::buttonWidth + separation );
+    toolBar->addButton( Global::imagesSvgPath() + "/forceIcon.svg", "Load", 
+                        leftTopPos, 
+                        Global::buttonWidth, Global::buttonHeight, this, 
+                        SIGNAL( pressLoadDrawButton() ),
+                        SLOT( changeBehaviourToLoadDraw() ) ).
+                          setHint("Load node 'L'");
 
-    leftTopPos.setX ( leftTopPos.x() + buttonWidth + separation );
-    toolBar->addButton ( imagesSvgPath() + "/eraseIcon.svg", "Erase", leftTopPos, 
-                         buttonWidth, buttonHeight, this, SIGNAL( pressEraseButton() ),
-                         SLOT( changeBehaviourToErase() ) ).setHint("Erase 'R'");
+    leftTopPos.setX( leftTopPos.x() + Global::buttonWidth + separation );
+    toolBar->addButton( Global::imagesSvgPath() + "/eraseIcon.svg", "Erase", 
+                        leftTopPos, 
+                        Global::buttonWidth, Global::buttonHeight, this, 
+                        SIGNAL( pressEraseButton() ),
+                        SLOT( changeBehaviourToErase() ) ).
+                          setHint("Erase 'R'");
 }
 
 void TrussDesignerWidget::changeBehaviourToSelect ()
@@ -827,7 +850,7 @@ void TrussDesignerWidget::aggKeyPressEvent ( QKeyEvent* ke )
 void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
 {
     int x = me->x();
-    int y = flipY ? height() - me->y() : me->y();
+    int y = Global::flipY ? height() - me->y() : me->y();
     /*  
         x, y - current mouse position;
         xPos, yPos - previous mouse position;
@@ -844,17 +867,17 @@ void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         int dx = x - xPos;
         QPoint point1 = selectedWindow->getWindowLeftTopPos ();
         QPoint point2 = selectedWindow->getWindowRightBottomPos ();
-        if ( abs ( xPos - point1.x() ) <= bordWidth )
+        if ( abs ( xPos - point1.x() ) <= Global::bordWidth )
         {
             point1.setX ( point1.x() + dx );
-            if ( abs ( point2.x() - point1.x() ) < resizeLimit )
-                point1.setX( point2.x() - resizeLimit );
+            if ( abs ( point2.x() - point1.x() ) < Global::resizeLimit )
+                point1.setX( point2.x() - Global::resizeLimit );
         }
-        if ( abs ( xPos - point2.x() ) <= bordWidth )
+        if ( abs ( xPos - point2.x() ) <= Global::bordWidth )
         {
             point2.setX ( point2.x() + dx );
-            if ( abs ( point2.x() - point1.x() ) < resizeLimit )
-               point2.setX( point1.x() + resizeLimit );
+            if ( abs ( point2.x() - point1.x() ) < Global::resizeLimit )
+               point2.setX( point1.x() + Global::resizeLimit );
         }
         selectedWindow->resize( point1, point2 );
         update();
@@ -865,17 +888,17 @@ void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         int dy = y - yPos;
         QPoint point1 = selectedWindow->getWindowLeftTopPos ();
         QPoint point2 = selectedWindow->getWindowRightBottomPos ();
-        if ( abs ( yPos - point1.y() ) <= bordWidth )
+        if ( abs ( yPos - point1.y() ) <= Global::bordWidth )
         {
             point1.setY ( point1.y() + dy );
-            if ( abs ( point2.y() - point1.y() ) < resizeLimit )
-                point1.setY( point2.y() - resizeLimit );
+            if ( abs ( point2.y() - point1.y() ) < Global::resizeLimit )
+                point1.setY( point2.y() - Global::resizeLimit );
         }
-        if ( abs ( yPos - point2.y() ) <= bordWidth )
+        if ( abs ( yPos - point2.y() ) <= Global::bordWidth )
         {
             point2.setY ( point2.y() + dy );
-            if ( abs ( point2.y() - point1.y() ) < resizeLimit )
-               point2.setY( point1.y() + resizeLimit );
+            if ( abs ( point2.y() - point1.y() ) < Global::resizeLimit )
+               point2.setY( point1.y() + Global::resizeLimit );
         }
         selectedWindow->resize( point1, point2 );
         update();
@@ -887,29 +910,33 @@ void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         int dy = y - yPos;
         QPoint point1 = selectedWindow->getWindowLeftTopPos ();
         QPoint point2 = selectedWindow->getWindowRightBottomPos ();
-        if ( abs ( xPos - (point1.x() + bordWidth) ) <= bordWidth )
+        if ( abs ( xPos - (point1.x() + Global::bordWidth) ) <= 
+             Global::bordWidth )
         {
             point1.setX ( point1.x() + dx );
-            if ( abs ( point2.x() - point1.x() ) < resizeLimit )
-                point1.setX( point2.x() - resizeLimit );
+            if ( abs ( point2.x() - point1.x() ) < Global::resizeLimit )
+                point1.setX( point2.x() - Global::resizeLimit );
         }
-        if ( abs ( xPos - (point2.x() - bordWidth) ) <= bordWidth )
+        if ( abs ( xPos - (point2.x() - Global::bordWidth) ) <= 
+             Global::bordWidth )
         {
             point2.setX ( point2.x() + dx );
-            if ( abs ( point2.x() - point1.x() ) < resizeLimit )
-               point2.setX( point1.x() + resizeLimit );
+            if ( abs ( point2.x() - point1.x() ) < Global::resizeLimit )
+               point2.setX( point1.x() + Global::resizeLimit );
         }
-        if ( abs ( yPos - (point1.y() + bordWidth) ) <= bordWidth )
+        if ( abs ( yPos - (point1.y() + Global::bordWidth) ) <= 
+             Global::bordWidth )
         {
             point1.setY ( point1.y() + dy );
-            if ( abs ( point2.y() - point1.y() ) < resizeLimit )
-                point1.setY( point2.y() - resizeLimit );
+            if ( abs ( point2.y() - point1.y() ) < Global::resizeLimit )
+                point1.setY( point2.y() - Global::resizeLimit );
         }
-        if ( abs ( yPos - (point2.y() - bordWidth) ) <= bordWidth )
+        if ( abs ( yPos - (point2.y() - Global::bordWidth) ) <= 
+             Global::bordWidth )
         {
             point2.setY ( point2.y() + dy );
-            if ( abs ( point2.y() - point1.y() ) < resizeLimit )
-               point2.setY( point1.y() + resizeLimit );
+            if ( abs ( point2.y() - point1.y() ) < Global::resizeLimit )
+               point2.setY( point1.y() + Global::resizeLimit );
         }
         selectedWindow->resize( point1, point2 );
         update();
@@ -922,29 +949,33 @@ void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         int dy = y - yPos;
         QPoint point1 = selectedWindow->getWindowLeftTopPos ();
         QPoint point2 = selectedWindow->getWindowRightBottomPos ();
-        if ( abs ( xPos - (point1.x() + bordWidth) ) <= bordWidth )
+        if ( abs ( xPos - (point1.x() + Global::bordWidth) ) <= 
+             Global::bordWidth )
         {
             point1.setX ( point1.x() + dx );
-            if ( abs ( point2.x() - point1.x() ) < resizeLimit )
-                point1.setX ( point2.x() - resizeLimit );
+            if ( abs ( point2.x() - point1.x() ) < Global::resizeLimit )
+                point1.setX ( point2.x() - Global::resizeLimit );
         }
-        if ( abs ( xPos - (point2.x() - bordWidth) ) <= bordWidth )
+        if ( abs ( xPos - (point2.x() - Global::bordWidth) ) <= 
+             Global::bordWidth )
         {
             point2.setX ( point2.x() + dx );
-            if ( abs ( point2.x() - point1.x() ) < resizeLimit )
-               point2.setX ( point1.x() + resizeLimit );
+            if ( abs ( point2.x() - point1.x() ) < Global::resizeLimit )
+               point2.setX ( point1.x() + Global::resizeLimit );
         }
-        if ( abs ( yPos - (point1.y() + bordWidth) ) <= bordWidth )
+        if ( abs ( yPos - (point1.y() + Global::bordWidth) ) <= 
+             Global::bordWidth )
         {
             point1.setY ( point1.y() + dy );
-            if ( abs ( point2.y() - point1.y() ) < resizeLimit )
-                point1.setY ( point2.y() - resizeLimit );
+            if ( abs ( point2.y() - point1.y() ) < Global::resizeLimit )
+                point1.setY ( point2.y() - Global::resizeLimit );
         }
-        if ( abs ( yPos - (point2.y() - bordWidth) ) <= bordWidth )
+        if ( abs ( yPos - (point2.y() - Global::bordWidth) ) <= 
+             Global::bordWidth )
         {
             point2.setY ( point2.y() + dy );
-            if ( abs ( point2.y() - point1.y() ) < resizeLimit )
-               point2.setY ( point1.y() + resizeLimit );
+            if ( abs ( point2.y() - point1.y() ) < Global::resizeLimit )
+               point2.setY ( point1.y() + Global::resizeLimit );
         }
         selectedWindow->resize( point1, point2 );
         update();
@@ -966,20 +997,20 @@ void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         int bottom = top + selectedWindow->getWindowSize().height();
 
 	    // snap window to screen edges
-	    if ( top < snapPixels && top > -snapPixels )
+	    if ( top < Global::snapPixels && top > -Global::snapPixels )
 		    leftTop.setY( 0 );
 
-	    if ( left < snapPixels && left > -snapPixels)
+	    if ( left < Global::snapPixels && left > -Global::snapPixels)
 		    leftTop.setX( 0 );
 
         int widgetOffset = 4;
-	    if ( right < width() - widgetOffset + snapPixels && 
-             right > width() - widgetOffset - snapPixels )
+	    if ( right < width() - widgetOffset + Global::snapPixels && 
+             right > width() - widgetOffset - Global::snapPixels )
 		    leftTop.setX( width() - 4 - 
                           selectedWindow->getWindowSize().width() );
 
-	    if ( bottom < height() - widgetOffset + snapPixels && 
-             bottom > height() - widgetOffset - snapPixels )
+	    if ( bottom < height() - widgetOffset + Global::snapPixels && 
+             bottom > height() - widgetOffset - Global::snapPixels )
 		    leftTop.setY( height() - widgetOffset - 
                           selectedWindow->getWindowSize().width() );
 
@@ -1023,7 +1054,7 @@ void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                 removeTrussElemHighlight();
                 TrussNode* node = w->findNodeByWidgetPos( x, y );
                 TrussPivot* pivot = 
-                    w->findPivotByWidgetPos( x, y, 2 * w->getPivotPrecision() );
+                    w->findPivotByWidgetPos(x, y, 2 * w->getPivotPrecision());
                 if ( node )
                 {
                     w->setCursorCoord( node->getPoint() );
@@ -1088,14 +1119,15 @@ void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                           designerBehaviour == onFixDraw ||
                           designerBehaviour == onLoadDraw )
                 {
-                    selectedNode = selectedWindow->findNodeByWidgetPos( x, y );
-                    selectedPivot = selectedWindow->findPivotByWidgetPos( x, y );
+                    selectedNode = selectedWindow->findNodeByWidgetPos(x, y);
+                    selectedPivot = selectedWindow->findPivotByWidgetPos(x, y);
                     if ( selectedNode )
                     {
                         removeTrussElemHighlight ();
                         clearAllCursorCoordFields ();
                         selectedWindow->setFocusOnNode( selectedNode );
-                        selectedWindow->setCursorCoord( selectedNode->getPoint() );
+                        selectedWindow->setCursorCoord( 
+                                                   selectedNode->getPoint() );
                         nodeBehaviour = onNodeSelect;
                         if ( designerBehaviour == onErase ||
                              designerBehaviour == onFixDraw ||
@@ -1149,7 +1181,7 @@ void TrussDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
     buttonPressed = false;
 
     int x = me->x();
-    int y = flipY ? height() - me->y() : me->y();
+    int y = Global::flipY ? height() - me->y() : me->y();
 
     removeTrussElemHighlight();
     if ( designerBehaviour == onPivotLastNodeDraw )
@@ -1265,7 +1297,7 @@ void TrussDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
 {
     QWidget::setFocus();
     xPos = me->x();
-    yPos = flipY ? height() - me->pos().y() : me->pos().y();
+    yPos = Global::flipY ? height() - me->pos().y() : me->pos().y();
 
     if ( toolBar->inToolBarRect( xPos, yPos ) )
     {
@@ -1328,7 +1360,7 @@ void TrussDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                     selectedWindow->desistAdjoiningPivots( *selectedNode );
                     ObjectState& state = 
                         selectedNode->createState( "remove node" );
-                    state.addAction( new TrussNodeRemoveAction( *selectedNode ) );
+                    state.addAction( new TrussNodeRemoveAction(*selectedNode));
                     state.save();
                     selectedNode->desist();
                     mng->endStateBlock();
@@ -1344,7 +1376,8 @@ void TrussDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                         emit onFixationSet( *selectedNode );
                     }
                     else if ( designerBehaviour == onLoadDraw ) {
-                        loadPopup->showLoadPopup(me, selectedNode, selectedWindow);
+                        loadPopup->showLoadPopup( me, selectedNode, 
+                                                  selectedWindow );
                         emit onLoadSet( *selectedNode ); 
                     }               
                     else
@@ -1363,14 +1396,16 @@ void TrussDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                     // Save remove pivot action
                     ObjectState& state = 
                         selectedPivot->createState( "remove pivot" );
-                    state.addAction( new TrussPivotRemoveAction( *selectedPivot ) );
+                    state.addAction( 
+                        new TrussPivotRemoveAction( *selectedPivot ) );
                     state.save();
                     selectedPivot->desist();
                     update();
                 }
                 else
                 {
-                    // Convert widget coordinates into truss (absolute) coordinates
+                    // Convert widget coordinates into truss (absolute) 
+                    // coordinates
                     DoublePoint trussCoord = selectedWindow->
                                       getTrussCoordFromWidgetPos( xPos, yPos );
                     const DoublePoint& firstPos = 
@@ -1378,11 +1413,16 @@ void TrussDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                     const DoublePoint& lastPos  = 
                         selectedPivot->getLastNode().getPoint();
 
-                    // Get first and last nodes displacements about a clicked point 
-                    firstNodeClickDist.setX( int(firstPos.x() - trussCoord.x()) );
-                    firstNodeClickDist.setY( int(firstPos.y() - trussCoord.y()) );
-                    lastNodeClickDist.setX( int(lastPos.x()  - trussCoord.x()) );
-                    lastNodeClickDist.setY( int(lastPos.y()  - trussCoord.y()) );
+                    // Get first and last nodes displacements 
+                    // about a clicked point 
+                    firstNodeClickDist.setX( 
+                        int(firstPos.x() - trussCoord.x()) );
+                    firstNodeClickDist.setY( 
+                        int(firstPos.y() - trussCoord.y()) );
+                    lastNodeClickDist.setX( 
+                        int(lastPos.x()  - trussCoord.x()) );
+                    lastNodeClickDist.setY( 
+                        int(lastPos.y()  - trussCoord.y()) );
 
                     // Save pos for Undo/Redo
                     beforeDragFirstPos = firstPos;
@@ -1407,11 +1447,13 @@ void TrussDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                         selectedWindow->createNode ( nodeCoord.x(), 
                                                      nodeCoord.y() );
 
-                    ObjectStateManager* mng = selectedWindow->getStateManager();
+                    ObjectStateManager* mng = 
+                        selectedWindow->getStateManager();
                     mng->startStateBlock();
 
                     saveNodeStateAfterCreate( newNode );
-                    selectedWindow->updateAfterNodeManipulation( &newNode, true );
+                    selectedWindow->updateAfterNodeManipulation( 
+                        &newNode, true );
 
                     mng->endStateBlock();
                     update();
@@ -1445,8 +1487,8 @@ void TrussDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                         selectedWindow->createNode( nodeCoord.x(), 
                                                     nodeCoord.y() );
                     lastNode.setVisible ( false );
-                    selectedPivot = &( selectedWindow->createPivot( *firstNode, 
-                                                                    lastNode ) );
+                    selectedPivot = &selectedWindow->createPivot( *firstNode, 
+                                                                  lastNode );
                     selectedPivot->setDrawingStatus ( false );
                     selectedNode = &lastNode;
                     designerBehaviour = onPivotLastNodeDraw;

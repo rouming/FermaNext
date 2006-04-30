@@ -46,7 +46,7 @@ protected:
      * @see PluginLoader::specificLoadPlugin
      */
     virtual Plugin& specificLoadPlugin ( const QString& pathToPlugin )
-        throw (PluginLoadException);
+        /*throw (PluginLoadException)*/;
 
     /** 
      * Unloads native plugins.

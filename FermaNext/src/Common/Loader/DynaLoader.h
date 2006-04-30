@@ -50,17 +50,18 @@ public:
           DynaLoaderException(m) {} };
 
     DynaLoader ();
-    DynaLoader ( const QString& fileName ) throw (LibraryLoadException);
+    DynaLoader ( const QString& fileName ) /*throw (LibraryLoadException)*/;
     ~DynaLoader ();
 
-    void loadLibrary ( const QString& fileName ) throw (LibraryLoadException);
+    void loadLibrary ( const QString& fileName ) 
+        /*throw (LibraryLoadException)*/;
 
     ProcAddress getProcAddress ( const QString& funcName ) const
-                                                     throw (AddressException);
+        /*throw (AddressException)*/;
 
     template <class AddressPointer>
     ProcAddress getAddress ( const QString& funcName ) const
-        throw (AddressException)
+        /*throw (AddressException)*/
     { return (AddressPointer)getProcAddress(funcName); }
 
 

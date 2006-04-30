@@ -59,7 +59,7 @@ signals:
 
 private:
     typedef std::vector<AbstractObjectAction*> ActionList;
-    typedef std::vector<AbstractObjectAction*>::iterator ActionListIter;        
+    typedef std::vector<AbstractObjectAction*>::iterator ActionListIter;
     typedef std::vector<AbstractObjectAction*>::reverse_iterator ActionListRevIter;
     
     ActionList actions;
