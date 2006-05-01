@@ -8,36 +8,59 @@
 
 /*****************************************************************************/
 
-ConfigTestThread::ConfigTestThread ( Config& cfg ) :
-    config(cfg)
-{
-    QObject::connect( &config, 
-                      SIGNAL(onNodeCreated(Config::Node)), 
-                      SLOT(nodeCreated(Config::Node)),
-                      Qt::QueuedConnection );
-}
+int ConfigTestThread::threadCounter = 0;
+
+ConfigTestThread::ConfigTestThread () :
+    config(0),
+    name( QString("Thread #%1").arg(++threadCounter) )
+{}
 
 void ConfigTestThread::nodeChanged ( Config::Node )
 {
-    qWarning("Created");
+    qWarning( qPrintable(name + ": node changed") );
 }
 
 void ConfigTestThread::nodeCreated ( Config::Node )
 {
-    qWarning("Created");
+    qWarning( qPrintable(name + ": node created") );
 }
 
 void ConfigTestThread::nodeRemoved ( Config::Node )
 {
-    qWarning("Created");
+    qWarning( qPrintable(name + ": node removed") );
+}
+
+void ConfigTestThread::setConfig ( Config* cfg )
+{
+    if ( config )
+        config->disconnect( this );
+    config = cfg;
+    if ( config ) {
+        QObject::connect( config, 
+                          SIGNAL(onNodeCreated(Config::Node)), 
+                          SLOT(nodeCreated(Config::Node)),
+                          Qt::QueuedConnection );
+
+        QObject::connect( config, 
+                          SIGNAL(onNodeChanged(Config::Node)), 
+                          SLOT(nodeChanged(Config::Node)),
+                          Qt::QueuedConnection );
+
+        QObject::connect( config, 
+                          SIGNAL(onNodeRemoved(Config::Node)), 
+                          SLOT(nodeRemoved(Config::Node)),
+                          Qt::QueuedConnection );
+
+    }
+
 }
 
 void ConfigTestThread::run ()
 {
-    ConfigNode rootNode = config.rootNode();    
+    ConfigNode rootNode = config->rootNode();    
     for ( uint i = 0; i < 10; ++i ) {
-        rootNode.createChildNode( "1" );
-        QCoreApplication::processEvents();
+        //qWarning( qPrintable(QString("changing ") + name) );
+        rootNode.createChildNode( name );
     }
 }
 
@@ -83,12 +106,10 @@ public:
 
     void run () 
     {
-        
-                
         configCreationRemoving();
         childNodesCreateRemove();
 
-        //        QCoreApplication::quit();
+        QCoreApplication::quit();
     }
 
 
@@ -112,10 +133,6 @@ public:
         my_assert( !QFile::exists(ConfigFileName), 
                    "Config file should be destroyed " );
 
-        Config& config3 = Config::instance( ConfigFileName );
-        my_assert( &config == &config3, "Instance should be new" );
-
-        Config::destroyInstance( config3 );
         QFile configFile( ConfigFileName );
         bool openRes = configFile.open( QIODevice::WriteOnly | 
                                         QIODevice::Append );
@@ -140,12 +157,13 @@ public:
         testCaseBegin("childNodesCreateRemove");
         
         Config& config = Config::instance( ConfigFileName );
+        
+        thread1.setConfig( &config );
+        thread2.setConfig( &config );
+        thread3.setConfig( &config );
+        thread4.setConfig( &config );
+        thread5.setConfig( &config );
 
-        ConfigTestThread thread1( config );
-        ConfigTestThread thread2( config );
-        ConfigTestThread thread3( config );
-        ConfigTestThread thread4( config );
-        ConfigTestThread thread5( config );
 
         thread1.start();
         thread2.start();
@@ -177,6 +195,12 @@ protected:
 private:
     uint passed;
     uint failed;
+
+    ConfigTestThread thread1;
+    ConfigTestThread thread2;
+    ConfigTestThread thread3;
+    ConfigTestThread thread4;
+    ConfigTestThread thread5;
 };
 
 int main ( int argc, char** argv )

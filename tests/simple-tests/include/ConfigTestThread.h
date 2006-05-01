@@ -7,11 +7,11 @@ class ConfigTestThread : public QThread
 {
     Q_OBJECT
 public:
-    ConfigTestThread ();    
+    ConfigTestThread ();
     
     void run ();
 
-    void set
+    void setConfig ( Config* );
 
 
 public slots:
@@ -21,5 +21,8 @@ public slots:
 
 private:
     Config* config;
+    QString name;
+
+    static int threadCounter;
 };
 
