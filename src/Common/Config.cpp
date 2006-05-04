@@ -50,6 +50,7 @@ Config::Node::Node ( const Node& node ) :
     cfg( node.cfg ),
     parent( node.parent ),
     xmlData( node.xmlData ),
+    textData( node.textData ),
     childs( node.childs ),
     removedFlag( node.removedFlag ),
     fullyParsed( node.fullyParsed )
@@ -60,11 +61,15 @@ Config::Node& Config::Node::operator= ( const Config::Node& node )
     cfg = node.cfg;
     parent = node.parent;
     xmlData = node.xmlData;
+    textData = node.textData;
     childs = node.childs;
     removedFlag = node.removedFlag;
     fullyParsed = node.fullyParsed;
     return *this;
 }
+
+bool Config::Node::operator== ( const Config::Node& node )
+{ return node.xmlData == xmlData; }
 
 Config* Config::Node::config () const
 { return cfg; }
@@ -77,6 +82,21 @@ void Config::Node::remove ()
     if ( parent == 0 )
         return;
     QMutexLocker locker( cfg->notificationMutex );
+    // Remove from child
+    parent->childs.erase( qFind(parent->childs.begin(), parent->childs.end(), *this) );
+    // Remove xml
+    parent->xmlData.removeChild( xmlData );
+    removedFlag = true;
+    // Notify about changes
+    cfg->nodeHasBeenRemoved( *this );
+}
+
+void Config::Node::fromParentRemove ()
+{ 
+    if ( parent == 0 )
+        return;
+    QMutexLocker locker( cfg->notificationMutex );
+    // Remove xml
     parent->xmlData.removeChild( xmlData );
     removedFlag = true;
     // Notify about changes
@@ -215,21 +235,25 @@ Config::Node Config::Node::createChildNode ( const QString& tagName )
     return node;
 }
 
-bool Config::Node::removeChildNode ( const QString& tagName )
+bool Config::Node::removeChildNodes ( const QString& tagName )
 {
     // Suspended parse
     if ( !fullyParsed )
         parse();
-    QList<Config::Node>::Iterator iter = childs.begin();
-    for ( ; iter != childs.end(); ++iter ) {
-        Config::Node& node = *iter;
+    bool smthRemoved = false;
+    QList<Config::Node>::Iterator it = childs.begin();
+    for ( ; it != childs.end(); ) {
+        Config::Node& node = *it;
         if ( node.getTagName() == tagName ) {
-            node.remove();
-            iter = childs.erase(iter);
-            return true;
+            node.fromParentRemove();
+            it = childs.erase( it );
+            smthRemoved = true;
         }
+        else 
+            ++it;
+        
     }
-    return false;
+    return (smthRemoved ? true : false);
 }
 
 void Config::Node::removeAllChildNodes ()
@@ -237,11 +261,11 @@ void Config::Node::removeAllChildNodes ()
     // Suspended parse
     if ( !fullyParsed )
         parse();
-    QList<Config::Node>::Iterator iter = childs.begin();
-    while (  iter != childs.end() ) {
-        Config::Node& node = *iter;
-        node.remove();
-        iter = childs.erase(iter);
+    QList<Config::Node>::Iterator it = childs.begin();
+    while ( it != childs.end() ) {
+        Config::Node& node = *it;
+        node.fromParentRemove();
+        it = childs.erase( it );
     }
 }
 

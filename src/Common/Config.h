@@ -49,7 +49,10 @@ public:
         /** Just a copy constructor */
         Node ( const Node& );
         /** Just an assignmen operator */
-        Node& operator= ( const Node& );        
+        Node& operator= ( const Node& );
+
+        /** For search in lists and vectors */
+        bool operator== ( const Node& );
 
         /** Returns config, from which this node was created */
         Config* config () const;
@@ -116,8 +119,8 @@ public:
 
         /** Creates child node with specified tag name */
         Node createChildNode ( const QString& tagName );
-        /** Tries to remove child node with specified tag name */
-        bool removeChildNode ( const QString& tagName );
+        /** Tries to remove child nodes with specified tag name */
+        bool removeChildNodes ( const QString& tagName );
         /** Removes all child nodes */
         void removeAllChildNodes ();
 
@@ -133,6 +136,13 @@ public:
          * from some const, so const_cast is made inside.
          */
         void parse () const;
+
+        /** 
+         * Removes this node from config, but instead #remove, this method
+         * is called from parent and it does nothing agains removing itself
+         * from parent's child list, this should be done by parent.
+         */
+        void fromParentRemove ();
         
     private:
         Config* cfg;

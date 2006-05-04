@@ -1,13 +1,17 @@
 
+#include <iostream>
+
 #include <QFile>
 #include <QThread>
 #include <QCoreApplication>
 
-#include "../include/ConfigTestThread.h"
-#include <iostream>
+//#include "../include/ConfigTestThread.h"
+
+#include "Config.h"
+
 
 /*****************************************************************************/
-
+/*
 int ConfigTestThread::threadCounter = 0;
 
 ConfigTestThread::ConfigTestThread () :
@@ -63,7 +67,7 @@ void ConfigTestThread::run ()
         rootNode.createChildNode( name );
     }
 }
-
+*/
 /*****************************************************************************/
 
 const QString ConfigFileName( "../build/config.xml" );
@@ -155,52 +159,77 @@ public:
     void childNodesCreateRemove ()
     {
         testCaseBegin("childNodesCreateRemove");
-        
+
         Config& config = Config::instance( ConfigFileName );
+        ConfigNode rootNode = config.rootNode();
+        rootNode.createChildNode( "One" );
+        rootNode.createChildNode( "Two" );
+        rootNode.createChildNode( "Three" );
+
+        ConfigNodeList nodes = rootNode.childNodes();
+        my_assert( nodes.size() == 3, "3 child nodes after create" );
+
+        my_assert( nodes[0].getTagName() == "One", "First is 'One'" );
+        my_assert( nodes[1].getTagName() == "Two", "Second is 'Two'" );
+        my_assert( nodes[2].getTagName() == "Three", "Third is 'Three'" );
+
+        nodes[0].remove();
+        rootNode.removeChildNodes( "Two" );
+
+        nodes = rootNode.childNodes();
+
+        my_assert( nodes.size() == 1, "1 child node after remove" );
+        my_assert( nodes[0].getTagName() == "Three", "First is 'Three'" );
+
+        rootNode.createChildNode( "Three" );
+        rootNode.createChildNode( "Three" );
+
+        nodes = rootNode.findChildNodes( "Three" );
+        my_assert( nodes.size() == 3, "3 child nodes after create" );
+
+        my_assert( nodes[0].getTagName() == "Three", "First is 'Three'" );
+        my_assert( nodes[1].getTagName() == "Three", "Second is 'Three'" );
+        my_assert( nodes[2].getTagName() == "Three", "Third is 'Three'" );
+
+        rootNode.createChildNode( "OtherNode" );
+
+        rootNode.removeChildNodes( "Three" );
+
+        nodes = rootNode.childNodes();
+        my_assert( nodes.size() == 1, "1 child nodes after remove" );
+
+        int i = 0;
+        ConfigNode node = rootNode;
+        for ( i = 0; i < 1; ++i )
+            node = node.createChildNode( QString("%1").arg(i) );
+
+        nodes = rootNode.childNodes();
+        my_assert( nodes.size() == 2, "2 child nodes after create" );
+
+        foreach ( ConfigNode node, nodes ) {
+            if ( i % 2 )
+                node.remove();
+            else
+                rootNode.removeChildNodes( node.getTagName() );
+        }
+
+        nodes = rootNode.childNodes();
+        my_assert( nodes.size() == 0, "0 child nodes after remove" );
         
-        thread1.setConfig( &config );
-        thread2.setConfig( &config );
-        thread3.setConfig( &config );
-        thread4.setConfig( &config );
-        thread5.setConfig( &config );
-
-
-        thread1.start();
-        thread2.start();
-        thread3.start();
-        thread4.start();
-        thread5.start();
-
-
-        thread1.wait();
-        thread2.wait();
-        thread3.wait();
-        thread4.wait();
-        thread5.wait();
 
         testCaseEnd();
     }
 
-protected:
-    virtual bool event ( QEvent* e )
-    { 
-        if ( !isRunning() ) {
-            start();
-            return true;
-        }
-        return QObject::event(e);
-    }
-
-
 private:
     uint passed;
     uint failed;
-
+    /*
     ConfigTestThread thread1;
     ConfigTestThread thread2;
     ConfigTestThread thread3;
     ConfigTestThread thread4;
     ConfigTestThread thread5;
+    */
 };
 
 int main ( int argc, char** argv )
@@ -217,10 +246,10 @@ int main ( int argc, char** argv )
 
     #1. file creation (file removing)
     #2. file parse error
-    3. create nodes (+ threads, + signal catch)
-    4. remove nodes (+ threads, + signal catch)
-    4. remove all child nodes (+ threads, + signal catch)
-    5. find nodes 
+    #3. create nodes (+ threads, + signal catch)
+    #4. remove nodes (+ threads, + signal catch)
+    #4. remove all child nodes (+ threads, + signal catch)
+    #5. find nodes 
     6. changing attributes (+ threads, + signal catch)
     7. remove attributes by name (+ threads, + signal catch)
     7. clearing all attributes (+ threads, + signal catch)
