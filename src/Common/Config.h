@@ -11,6 +11,7 @@
 #include <QMutex>
 #include <QHash>
 #include <QFile>
+#include <QAtomic>
 
 typedef QPair<QString, QString> NodeAttribute;
 typedef QList<NodeAttribute> NodeAttributeList;
@@ -22,6 +23,61 @@ class ConfigNodeTypeRegistrator
 public:
     ConfigNodeTypeRegistrator () 
     {  qRegisterMetaType< Type >( "Config::Node" ); }
+};
+
+/** Subsidiary config shared data container */
+template <class Data>
+class ConfigSharedData
+{
+public:
+    ConfigSharedData () : 
+        ref( new QAtomic(1) ),
+        data( new Data )
+    {}
+
+    ConfigSharedData ( const ConfigSharedData<Data>& d ) :
+        ref( d.ref ),
+        data( d.data )
+    { ref->ref(); }
+
+    ConfigSharedData<Data>& operator= ( const ConfigSharedData<Data>& d )
+    {
+        if ( ! ref->deref() ) {
+            delete ref;
+            delete data;
+        }
+        ref = d.ref;
+        data = d.data;
+        ref->ref();
+        return *this;
+    }
+
+    ~ConfigSharedData ()
+    {
+        if ( ! ref->deref() ) {
+            delete ref;
+            delete data;
+        }
+    }
+
+    const Data* operator-> () const
+    { return data; }
+
+    Data* operator-> ()
+    { return data; }
+
+private:
+    QAtomic* ref;
+    Data* data;
+};
+
+/** Config node data */
+template <class N>
+struct NodeData
+{
+    QList<N> childs;
+    bool removedFlag;
+    bool fullyParsed;
 };
 
 /**
@@ -48,7 +104,7 @@ public:
         
         /** Just a copy constructor */
         Node ( const Node& );
-        /** Just an assignmen operator */
+        /** Just an assignment operator */
         Node& operator= ( const Node& );
 
         /** For search in lists and vectors */
@@ -57,8 +113,11 @@ public:
         /** Returns config, from which this node was created */
         Config* config () const;
 
-        /** Returns parent node */
-        Node* parentNode () const;
+        /** 
+         * Returns parent node. 
+         * Node is null (#isNull) if it is a root node
+         */
+        Node parentNode () const;
 
         /** Removes this node from config */
         void remove ();
@@ -70,8 +129,8 @@ public:
         bool isRemoved () const;
 
         /** 
-         * Node can be null, if it was constructed only 
-         * with config parameter
+         * Node can be null, if it was 
+         * constructed with default constructor.
          */
         bool isNull () const;
 
@@ -149,9 +208,7 @@ public:
         Node* parent;
         QDomElement xmlData;
         QDomText textData;
-        QList<Node> childs;
-        bool removedFlag;
-        bool fullyParsed;
+        ConfigSharedData< NodeData<Node> > data;
     };
 
     // Inner Node class should be a friend of Config to have possibility 

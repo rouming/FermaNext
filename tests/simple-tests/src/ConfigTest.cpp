@@ -161,7 +161,9 @@ public:
         testCaseBegin("childNodesCreateRemove");
 
         Config& config = Config::instance( ConfigFileName );
+
         ConfigNode rootNode = config.rootNode();
+
         rootNode.createChildNode( "One" );
         rootNode.createChildNode( "Two" );
         rootNode.createChildNode( "Three" );
@@ -207,14 +209,14 @@ public:
         my_assert( nodes.size() == 2, "2 child nodes after create" );
 
         foreach ( ConfigNode node, nodes ) {
-            if ( i % 2 )
-                node.remove();
-            else
-                rootNode.removeChildNodes( node.getTagName() );
+            //            if ( i % 2 )
+            node.remove();
+                //            else
+            //rootNode.removeChildNodes( node.getTagName() );
         }
 
-        nodes = rootNode.childNodes();
-        my_assert( nodes.size() == 0, "0 child nodes after remove" );
+        std::cout << "SZ " << rootNode.childNodes().size() << "\n";
+        my_assert( rootNode.childNodes().size() == 0, "0 child nodes after remove" );
         
 
         testCaseEnd();
@@ -232,15 +234,37 @@ private:
     */
 };
 
+struct Data 
+{
+    int val1;
+    int val2;
+    QList<int> list;
+};
+
+#include <QAtomic>
+
+
+
 int main ( int argc, char** argv )
 {
+
+    ConfigSharedData< NodeData<int> > sd;
+    ConfigSharedData< NodeData<int> > sd2 = sd;
+    ConfigSharedData< NodeData<int> > sd3; sd3 = sd2;
+
+
+
+    //    exit(1);
+
     QCoreApplication app( argc, argv );
 
     ConfigTest test;
+
     test.start();
     
     app.exec();
     test.wait();    
+
 
     /*
 
