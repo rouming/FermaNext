@@ -29,7 +29,7 @@ void ConfigTestThread::nodeCreated ( Config::Node )
     qWarning( qPrintable(name + ": node created") );
 }
 
-void ConfigTestThread::nodeRemoved ( Config::Node )
+void ConfigTestThread::nodeRemoved ( Config::Node n )
 {
     qWarning( qPrintable(name + ": node removed") );
 }
@@ -63,7 +63,6 @@ void ConfigTestThread::run ()
 {
     ConfigNode rootNode = config->rootNode();    
     for ( uint i = 0; i < 10; ++i ) {
-        //qWarning( qPrintable(QString("changing ") + name) );
         rootNode.createChildNode( name );
     }
 }
@@ -112,6 +111,12 @@ public:
     {
         configCreationRemoving();
         childNodesCreateRemove();
+        attributesCreateRemove();
+        valueSetReset();
+        tagNameChanging();
+
+        // Destroy everyrhing
+        Config::destroyInstance( ConfigFileName, true );
 
         QCoreApplication::quit();
     }
@@ -193,34 +198,197 @@ public:
         my_assert( nodes[1].getTagName() == "Three", "Second is 'Three'" );
         my_assert( nodes[2].getTagName() == "Three", "Third is 'Three'" );
 
-        rootNode.createChildNode( "OtherNode" );
+        ConfigNode node = rootNode.createChildNode( "OtherNode" );
 
         rootNode.removeChildNodes( "Three" );
+        node.remove();
 
         nodes = rootNode.childNodes();
-        my_assert( nodes.size() == 1, "1 child nodes after remove" );
+        my_assert( nodes.size() == 0, "0 child nodes after remove" );
 
         int i = 0;
-        ConfigNode node = rootNode;
-        for ( i = 0; i < 1; ++i )
+        node = rootNode;
+        for ( i = 0; i < 50; ++i )
             node = node.createChildNode( QString("%1").arg(i) );
 
         nodes = rootNode.childNodes();
-        my_assert( nodes.size() == 2, "2 child nodes after create" );
+        my_assert( nodes.size() == 1, "1 child nodes after `tree` create" );
 
-        foreach ( ConfigNode node, nodes ) {
-            //            if ( i % 2 )
-            node.remove();
-                //            else
-            //rootNode.removeChildNodes( node.getTagName() );
-        }
-
-        std::cout << "SZ " << rootNode.childNodes().size() << "\n";
-        my_assert( rootNode.childNodes().size() == 0, "0 child nodes after remove" );
-        
+        nodes[0].remove();
+        nodes = rootNode.childNodes();
+        my_assert( nodes.size() == 0, "0 child nodes after remove" );
 
         testCaseEnd();
     }
+
+    void attributesCreateRemove ()
+    {
+        testCaseBegin("attributesCreateRemove");
+
+        Config& config = Config::instance( ConfigFileName );
+
+        ConfigNode rootNode = config.rootNode();
+
+        ConfigNode node = rootNode;
+        int i = 0;
+        for ( i = 0; i < 10; ++i ) {
+            ConfigNode newNode1 = node.createChildNode( 
+                                       QString("NewNode1_%1").arg(i) );
+            ConfigNode newNode2 = node.createChildNode( 
+                                       QString("NewNode2_%1").arg(i) );
+
+            newNode1.addAttribute( NodeAttribute(
+                                              QString("Attr1_%1").arg(i), 
+                                              QString("Value1_%1").arg(i)) );
+            newNode1.addAttribute( NodeAttribute(
+                                              QString("Attr2_%1").arg(i),
+                                              QString("Value2_%1").arg(i)) );
+
+            newNode2.addAttribute( NodeAttribute(
+                                              QString("Attr1_%1").arg(i),
+                                              QString("Value1_%1").arg(i)) );
+
+            newNode2.addAttribute( NodeAttribute(
+                                              QString("Attr2_%1").arg(i),
+                                              QString("Value2_%1").arg(i)) );
+
+            node = newNode2;
+        }
+
+
+        node = rootNode;
+        for ( i = 0; i < 10; ++i ) {
+            ConfigNodeList nodes = node.childNodes();
+            ConfigNode lastNode;
+            int j = 0;
+            foreach ( ConfigNode node, nodes ) {
+                ++j;
+                my_assert( node.getTagName() == 
+                           QString("NewNode%1_%2").arg(j).arg(i), 
+                           "Correct tag name" );
+                NodeAttributeList attrs = node.getAttributes();
+                int k = 0;
+                foreach ( NodeAttribute attr, attrs ) {
+                    ++k;
+                    my_assert( attr.first == 
+                               QString("Attr%1_%2").arg(k).arg(i),
+                      QString("Correct attr for node #%1,%2").arg(j).arg(i) );
+                    my_assert( attr.second ==
+                               QString("Value%1_%2").arg(k).arg(i),
+                      QString("Correct val for node #%1,%2").arg(j).arg(i) );
+
+                    // Remove only first attr
+                    if ( k == 0 ) {
+                        bool remRes = node.removeAttribute( attr.first );
+                        my_assert( remRes, "True result after attr remove" );
+                    }
+                }
+                node.clearAttributes();
+                attrs = node.getAttributes();
+                my_assert( attrs.size() == 0, "0 attrs after clear" );
+                
+                node.remove();
+                lastNode = node;
+            }
+            node = lastNode;
+        }
+
+        my_assert( rootNode.childNodes().size() == 0, 
+                   "Root node should be empty" );
+
+        testCaseEnd();
+    }
+
+    void valueSetReset ()
+    {
+        testCaseBegin("valueSetReset");
+
+        Config& config = Config::instance( ConfigFileName );
+
+        ConfigNode rootNode = config.rootNode();
+
+        ConfigNode node = rootNode;
+        ConfigNode lastNode;
+        int i = 0;
+        for ( i = 1; i <= 10; ++i ) {
+            node = node.createChildNode( "NewNode" );
+
+            my_assert( !node.hasValue(), "No value" );
+
+            node.createChildNode( "TempNode" );
+
+            my_assert( !node.hasValue() && 
+                       node.childNodes().size() != 0, 
+                       "No value and has a child" );
+
+            node.setValue( "Value" );
+
+            my_assert( node.hasValue() && 
+                       node.childNodes().size() == 0, 
+                       "Has value and children list is empty" );
+            
+            // Last node
+            if ( i == 10 ) {
+                node.setValue("Last Node");
+                lastNode = node;
+            }
+        }
+
+        my_assert( lastNode.getValue() == "Last Node",
+                   "Correct last node value" );
+        my_assert( lastNode.childNodes().size() == 0,
+                   "No children for last node" );
+
+        lastNode = lastNode.parentNode();
+
+        while ( !lastNode.parentNode().isNull() ) {
+            my_assert( lastNode.getValue() == QString() && 
+                       lastNode.childNodes().size() != 0, 
+                       "Value is empty and has children" );
+
+            lastNode.setValue( "Value" );
+
+            my_assert( lastNode.getValue() == "Value" && 
+                       lastNode.childNodes().size() == 0, 
+                       "Has value and children list is empty" );
+
+            lastNode = lastNode.parentNode();
+        }
+
+        rootNode.removeAllChildNodes();
+
+        my_assert( rootNode.childNodes().size() == 0,
+                   "Root node should be empty" );
+
+        testCaseEnd();
+    }
+
+    void tagNameChanging ()
+    {
+        testCaseBegin("tagNameChanging");
+
+        Config& config = Config::instance( ConfigFileName );
+
+        ConfigNode rootNode = config.rootNode();
+
+        int i = 0;
+        for ( i = 1; i <= 5; ++i ) {
+            ConfigNode node = rootNode.createChildNode( "NewNode" );
+            my_assert( node.getTagName() == "NewNode",
+                       "Correct initial tag name" );
+            node.setTagName( "OtherNewNode" );
+            my_assert( node.getTagName() == "OtherNewNode",
+                       "Correct tag name after change" );
+            node.remove();
+        }
+
+        my_assert( rootNode.childNodes().size() == 0,
+                   "Root node should be empty" );
+
+        testCaseEnd();
+    }
+        
+
 
 private:
     uint passed;
@@ -234,28 +402,8 @@ private:
     */
 };
 
-struct Data 
-{
-    int val1;
-    int val2;
-    QList<int> list;
-};
-
-#include <QAtomic>
-
-
-
 int main ( int argc, char** argv )
 {
-
-    ConfigSharedData< NodeData<int> > sd;
-    ConfigSharedData< NodeData<int> > sd2 = sd;
-    ConfigSharedData< NodeData<int> > sd3; sd3 = sd2;
-
-
-
-    //    exit(1);
-
     QCoreApplication app( argc, argv );
 
     ConfigTest test;
@@ -267,19 +415,20 @@ int main ( int argc, char** argv )
 
 
     /*
-
+      Test cases:
+    
     #1. file creation (file removing)
     #2. file parse error
     #3. create nodes (+ threads, + signal catch)
     #4. remove nodes (+ threads, + signal catch)
     #4. remove all child nodes (+ threads, + signal catch)
     #5. find nodes 
-    6. changing attributes (+ threads, + signal catch)
-    7. remove attributes by name (+ threads, + signal catch)
-    7. clearing all attributes (+ threads, + signal catch)
-    8. setting value  (+ threads, + signal catch, +checking child removal)
-    8. resetting value  (+ threads, + signal catch)
-    9. tag name changing (+ threads, + signal catch)
+    #6. changing attributes (+ threads, + signal catch)
+    #7. remove attributes by name (+ threads, + signal catch)
+    #7. clearing all attributes (+ threads, + signal catch)
+    #8. setting value  (+ threads, + signal catch, +checking child removal)
+    #8. resetting value  (+ threads, + signal catch)
+    #9. tag name changing (+ threads, + signal catch)
 
     */
 
