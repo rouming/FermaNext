@@ -8,10 +8,10 @@
 #include <QList>
 #include <QDomElement>
 #include <QDomDocument>
-#include <QMutex>
 #include <QHash>
 #include <QFile>
-#include <QAtomic>
+
+class QMutex;
 
 typedef QPair<QString, QString> NodeAttribute;
 typedef QList<NodeAttribute> NodeAttributeList;
@@ -25,60 +25,8 @@ public:
     {  qRegisterMetaType< Type >( "Config::Node" ); }
 };
 
-/** Subsidiary config shared data container */
-template <class Data>
-class ConfigSharedData
-{
-public:
-    ConfigSharedData () : 
-        ref( new QAtomic(1) ),
-        data( new Data )
-    {}
-
-    ConfigSharedData ( const ConfigSharedData<Data>& d ) :
-        ref( d.ref ),
-        data( d.data )
-    { ref->ref(); }
-
-    ConfigSharedData<Data>& operator= ( const ConfigSharedData<Data>& d )
-    {
-        if ( ! ref->deref() ) {
-            delete ref;
-            delete data;
-        }
-        ref = d.ref;
-        data = d.data;
-        ref->ref();
-        return *this;
-    }
-
-    ~ConfigSharedData ()
-    {
-        if ( ! ref->deref() ) {
-            delete ref;
-            delete data;
-        }
-    }
-
-    const Data* operator-> () const
-    { return data; }
-
-    Data* operator-> ()
-    { return data; }
-
-private:
-    QAtomic* ref;
-    Data* data;
-};
-
-/** Config node data */
-template <class N>
-struct NodeData
-{
-    QList<N> childs;
-    bool removedFlag;
-    bool fullyParsed;
-};
+/** Private config node data */
+template <class N> class ConfigNodePrivate;
 
 /**
  * Configuration class, which manages xml configuration.
@@ -95,11 +43,13 @@ public:
     public:
         /** Constructs null node */
         Node ();
-        /** Prases root configuration xml node  */
+        /** Destructor */
+        ~Node ();
+        /** Parses root configuration xml node  */
         Node ( Config&, const QDomElement& rootNode );
         /** Constructs configuration xml node with parent */
         Node ( Node& parent, const QString& tagName );
-        /** Prases xml node  */
+        /** Parses xml node  */
         Node ( Node& parent, const QDomElement& );
         
         /** Just a copy constructor */
@@ -189,6 +139,9 @@ public:
         QList<Node> childNodes () const;
 
     private:
+        /** Constructs with new data */
+        Node ( ConfigNodePrivate<Node>* );
+
         /**
          * Parse childs for node
          * Sure, this method is not a const one, but it can be called
@@ -204,11 +157,7 @@ public:
         void fromParentRemove ();
         
     private:
-        Config* cfg;
-        Node* parent;
-        QDomElement xmlData;
-        QDomText textData;
-        ConfigSharedData< NodeData<Node> > data;
+        ConfigNodePrivate<Node>* data;
     };
 
     // Inner Node class should be a friend of Config to have possibility 

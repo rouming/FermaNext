@@ -4,141 +4,190 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include <QMetaType>
+#include <QAtomic>
+#include <QMutex>
 
 #include "Config.h"
+
+/*****************************************************************************
+ * Private config node data
+ *****************************************************************************/
+
+template <class N>
+class ConfigNodePrivate
+{
+public:
+    ConfigNodePrivate () :
+        ref(1), parent(0),  cfg(0), 
+        removedFlag(false),
+        fullyParsed(false)
+    {}
+        
+    QAtomic ref;
+    ConfigNodePrivate<N>* parent;
+    Config* cfg;
+    QDomElement xmlData;
+    QDomText textData;
+    QList<N> childs;
+    bool removedFlag;
+    bool fullyParsed;
+};
 
 /*****************************************************************************
  * Config::Node
  *****************************************************************************/
 
 Config::Node::Node () :
-    cfg(0),
-    parent(0)
+    data(0)
+{}
+
+Config::Node::~Node ()
 {
-    data->removedFlag = false;
-    data->fullyParsed = false;
+    if ( data && !data->ref.deref() ) {
+        // Zeroes parents
+        ConfigNodeList::Iterator it = data->childs.begin();
+        for ( ; it != data->childs.end(); ++it )
+            it->data->parent = 0;            
+        delete data;
+    }
 }
 
 Config::Node::Node ( Config& config_, const QDomElement& xmlData_ ) :
-    cfg(&config_),
-    parent(0),
-    xmlData(xmlData_)
+    data( new ConfigNodePrivate<Config::Node> )
 {
-    data->removedFlag = false;
-    data->fullyParsed = false;
+    data->cfg = &config_;    
+    data->xmlData = xmlData_;
 }
 
 Config::Node::Node ( Node& parent_, const QString& tagName ) :
-    cfg(parent_.cfg),
-    parent(&parent_)
+    data( new ConfigNodePrivate<Config::Node> )
 {
-    QMutexLocker locker( cfg->notificationMutex );
+    data->cfg = parent_.data->cfg;
+    data->parent = parent_.data;
 
-    data->removedFlag = false;
-    data->fullyParsed = false;
-
-    xmlData = cfg->configDoc.createElement( tagName );
-    parent->xmlData.appendChild( xmlData );
-    cfg->nodeHasBeenCreated( *this );
+    QMutexLocker locker( data->cfg->notificationMutex );
+    data->xmlData = data->cfg->configDoc.createElement( tagName );
+    data->parent->xmlData.appendChild( data->xmlData );
+    data->cfg->nodeHasBeenCreated( *this );
 }
 
 Config::Node::Node ( Node& parent_, const QDomElement& xmlData_ ) :
-    cfg(parent_.cfg),
-    parent(&parent_),
-    xmlData(xmlData_)
+    data( new ConfigNodePrivate<Config::Node> )
 {
-    data->removedFlag = false;
-    data->fullyParsed = false;
+    data->cfg = parent_.data->cfg;
+    data->parent = parent_.data;
+    data->xmlData = xmlData_;
+}
+
+Config::Node::Node ( ConfigNodePrivate<Config::Node>* nodeData ) :
+    data( nodeData )
+{
+    if ( data )
+        data->ref.ref();
 }
 
 Config::Node::Node ( const Node& node ) :
-    cfg( node.cfg ),
-    parent( node.parent ),
-    xmlData( node.xmlData ),
-    textData( node.textData ),
     data( node.data )
-{}
+{
+    if ( data )
+        data->ref.ref();
+}
 
 Config::Node& Config::Node::operator= ( const Config::Node& node )
 {
-    cfg = node.cfg;
-    parent = node.parent;
-    xmlData = node.xmlData;
-    textData = node.textData;
-    data = node.data;
+    ConfigNodePrivate<Config::Node>* p = node.data;
+    if ( p )
+        p->ref.ref();
+    p = qAtomicSetPtr( &data, p );
+    if ( p && !p->ref.deref() )
+        delete p;
     return *this;
 }
 
 bool Config::Node::operator== ( const Config::Node& node )
-{ return node.xmlData == xmlData; }
+{ return (node.data == data); }
 
 Config* Config::Node::config () const
-{ return cfg; }
+{ return data->cfg; }
 
-Config::Node* Config::Node::parentNode () const
-{ return parent;  }
+Config::Node Config::Node::parentNode () const
+{ return Config::Node( data->parent );  }
 
 void Config::Node::remove ()
 { 
-    if ( parent == 0 )
+    if ( isNull() || data->parent == 0 )
         return;
-    QMutexLocker locker( cfg->notificationMutex );
+    QMutexLocker locker( data->cfg->notificationMutex );
     // Remove from child
-    ConfigNodeList::Iterator it = qFind(parent->data->childs.begin(), 
-                                        parent->data->childs.end(), *this);
+    ConfigNodeList& parentChilds = data->parent->childs;
+    ConfigNodeList::Iterator it = qFind( parentChilds.begin(), 
+                                         parentChilds.end(), *this );
 
-    qWarning( "Before %d", parent->data->childs.size() );
+    if ( it != parentChilds.end() )
+        parentChilds.erase( it );
 
-    if ( it == parent->data->childs.end() )
-        qWarning( "DDD %d", parent->data->childs.size() );
-    if ( it != parent->data->childs.end() )
-        parent->data->childs.erase( it );
-
-    qWarning( "After %d", parent->data->childs.size() );
     // Remove xml
-    parent->xmlData.removeChild( xmlData );
+    data->parent->xmlData.removeChild( data->xmlData );
+    // Disconnect from parent node
+    data->parent = 0;
     data->removedFlag = true;
     // Notify about changes
-    cfg->nodeHasBeenRemoved( *this );
+    data->cfg->nodeHasBeenRemoved( *this );
 }
 
 void Config::Node::fromParentRemove ()
 { 
-    if ( parent == 0 )
+    if ( isNull() || data->parent == 0 )
         return;
-    QMutexLocker locker( cfg->notificationMutex );
+    QMutexLocker locker( data->cfg->notificationMutex );
     // Remove xml
-    parent->xmlData.removeChild( xmlData );
+    data->parent->xmlData.removeChild( data->xmlData );
+    // Disconnect from parent node
+    data->parent = 0;
     data->removedFlag = true;
     // Notify about changes
-    cfg->nodeHasBeenRemoved( *this );
+    data->cfg->nodeHasBeenRemoved( *this );
 }
 
 bool Config::Node::isRemoved () const
-{ return data->removedFlag; }
+{ 
+    if ( isNull() )
+        return true;
+    return data->removedFlag;
+}
 
 bool Config::Node::isNull () const
-{ return cfg == 0; }
+{ return data == 0; }
 
 QString Config::Node::getTagName () const
-{ return xmlData.tagName(); }
+{ 
+    if ( isNull() )
+        return QString();
+    return data->xmlData.tagName(); 
+}
 
 void Config::Node::setTagName ( const QString& tagName )
 {
-    QMutexLocker locker( cfg->notificationMutex );
-    xmlData.setTagName( tagName );
+    if ( isNull() )
+        return;
+    QMutexLocker locker( data->cfg->notificationMutex );
+    data->xmlData.setTagName( tagName );
     // Notify about changes
-    cfg->nodeHasBeenChanged( *this );
+    data->cfg->nodeHasBeenChanged( *this );
 }
 
 bool Config::Node::hasValue () const
-{ return !textData.isNull(); }
+{ 
+    if ( isNull() )
+        return false;
+    return !data->textData.isNull(); 
+}
 
 QString Config::Node::getValue () const
 {
-    if ( !xmlData.hasChildNodes() )
+    if ( isNull() || !data->xmlData.hasChildNodes() )
         return QString();
-    QDomNode n = xmlData.firstChild();
+    QDomNode n = data->xmlData.firstChild();
     if ( n.isText() )
         return n.toText().data();
     return QString();
@@ -146,40 +195,44 @@ QString Config::Node::getValue () const
 
 void Config::Node::setValue ( const QString& value )
 {
-    QMutexLocker locker( cfg->notificationMutex );
+    if ( isNull() )
+        return;
+    QMutexLocker locker( data->cfg->notificationMutex );
 
     if ( hasValue() ) {
-        QDomText newTextData = cfg->configDoc.createTextNode( value );
-        xmlData.replaceChild( newTextData, textData );
+        QDomText newTextData = data->cfg->configDoc.createTextNode( value );
+        data->xmlData.replaceChild( newTextData, data->textData );
     } else {
         // This is not a text node, so clear all childs
         removeAllChildNodes();
-        textData = cfg->configDoc.createTextNode( value );
-        xmlData.appendChild( textData );
+        data->textData = data->cfg->configDoc.createTextNode( value );
+        data->xmlData.appendChild( data->textData );
     }
 
     // Notify about changes
-    cfg->nodeHasBeenChanged( *this );
+    data->cfg->nodeHasBeenChanged( *this );
 }
 
 void Config::Node::resetValue ()
 {
-    if ( !hasValue() )
+    if ( isNull() || !hasValue() )
         return;
 
-    QMutexLocker locker( cfg->notificationMutex );
+    QMutexLocker locker( data->cfg->notificationMutex );
 
-    xmlData.removeChild( textData );
-    textData.clear();
+    data->xmlData.removeChild( data->textData );
+    data->textData.clear();
 
     // Notify about changes
-    cfg->nodeHasBeenChanged( *this );
+    data->cfg->nodeHasBeenChanged( *this );
 }
 
 NodeAttributeList Config::Node::getAttributes () const
-{
+{    
     NodeAttributeList resultList;
-    QDomNamedNodeMap attributes = xmlData.attributes();
+    if ( isNull() )
+        return resultList;
+    QDomNamedNodeMap attributes = data->xmlData.attributes();
     int size = attributes.size();
     for ( int i = 0; i < size; ++i ) {
         QDomNode node = attributes.item(i);
@@ -193,46 +246,50 @@ NodeAttributeList Config::Node::getAttributes () const
 
 bool Config::Node::addAttribute ( const NodeAttribute& attr )
 {
-    if ( xmlData.hasAttribute( attr.first ) )
+    if ( isNull() || data->xmlData.hasAttribute(attr.first) )
         return false;
-    QMutexLocker locker( cfg->notificationMutex );
-    xmlData.setAttribute( attr.first, attr.second );
+    QMutexLocker locker( data->cfg->notificationMutex );
+    data->xmlData.setAttribute( attr.first, attr.second );
     // Notify about changes
-    cfg->nodeHasBeenChanged( *this );
+    data->cfg->nodeHasBeenChanged( *this );
     return true;
 }
 
 bool Config::Node::removeAttribute ( const QString& attrName )
 {
-    if ( ! xmlData.hasAttribute( attrName ) )
+    if ( isNull() || !data->xmlData.hasAttribute(attrName) )
         return false;
-    QMutexLocker locker( cfg->notificationMutex );
-    xmlData.removeAttribute( attrName );
+    QMutexLocker locker( data->cfg->notificationMutex );
+    data->xmlData.removeAttribute( attrName );
     // Notify about changes
-    cfg->nodeHasBeenChanged( *this );
+    data->cfg->nodeHasBeenChanged( *this );
     return true;
 }
 
 void Config::Node::clearAttributes ()
 {
+    if ( isNull() )
+        return;
     QStringList attrNames;
-    QDomNamedNodeMap attributes = xmlData.attributes();
+    QDomNamedNodeMap attributes = data->xmlData.attributes();
     int size = attributes.size();
     int i = 0;
     for ( i = 0; i < size; ++i )
         attrNames.append( attributes.item(i).toAttr().name() );
 
-    QMutexLocker locker( cfg->notificationMutex );
+    QMutexLocker locker( data->cfg->notificationMutex );
 
     for ( i = 0; i < size; ++i )        
-        xmlData.removeAttribute( attrNames.at(i) );
+        data->xmlData.removeAttribute( attrNames.at(i) );
 
     // Notify about changes
-    cfg->nodeHasBeenChanged( *this );
+    data->cfg->nodeHasBeenChanged( *this );
 }
 
 Config::Node Config::Node::createChildNode ( const QString& tagName )
 {
+    if ( isNull() )
+        return Config::Node();
     // Suspended parse
     if ( !data->fullyParsed )
         parse();
@@ -248,6 +305,8 @@ Config::Node Config::Node::createChildNode ( const QString& tagName )
 
 bool Config::Node::removeChildNodes ( const QString& tagName )
 {
+    if ( isNull() )
+        return false;
     // Suspended parse
     if ( !data->fullyParsed )
         parse();
@@ -269,6 +328,8 @@ bool Config::Node::removeChildNodes ( const QString& tagName )
 
 void Config::Node::removeAllChildNodes ()
 {
+    if ( isNull() )
+        return;
     // Suspended parse
     if ( !data->fullyParsed )
         parse();
@@ -298,6 +359,8 @@ QList<Config::Node> Config::Node::findChildNodes (
 
 QList<Config::Node> Config::Node::childNodes () const
 { 
+    if ( isNull() )
+        return QList<Config::Node>();
     // Suspended parse
     if ( !data->fullyParsed )
         parse();
@@ -306,6 +369,9 @@ QList<Config::Node> Config::Node::childNodes () const
 
 void Config::Node::parse () const
 {
+    if ( isNull() )
+        return;
+
     // We are using const cast to make this method constant,
     // as it is called from other constant methods
     Config::Node* self = const_cast<Config::Node*>(this);
@@ -314,7 +380,7 @@ void Config::Node::parse () const
     self->data->childs.clear();
 
     bool hasValueParsed = false;
-    QDomNode n = xmlData.firstChild();
+    QDomNode n = self->data->xmlData.firstChild();
     while( !n.isNull() ) {
         if ( n.isText() ) { 
             hasValueParsed = true;
@@ -327,7 +393,7 @@ void Config::Node::parse () const
     if ( hasValueParsed )
         return;
 
-    n = xmlData.firstChild();
+    n = self->data->xmlData.firstChild();
     while( !n.isNull() ) {
         if ( n.isElement() ) {
             QDomElement element = n.toElement();
