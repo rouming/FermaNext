@@ -834,11 +834,8 @@ void TrussDesignerWidget::aggKeyPressEvent ( QKeyEvent* ke )
     {
         if ( selectedWindow ) {
             ObjectStateManager* mng = selectedWindow->getStateManager();
-
-            // End state block which was started in press mouse event.
-            if ( mng && mng->stateBlockisNotEnded() ) 
-                mng->endStateBlock();
-            mng->stepBack();
+            // Rollback state block which was started in press mouse event.
+            mng->rollbackNotEndedBlock();
         }
         selectedNode = 0;
         selectedPivot = 0;

@@ -91,10 +91,10 @@ void ObjectStateManager::StateBlock::clear ()
 
 ObjectStateManager::ObjectStateManager ( size_t stackSize ) :
     currentBlock(0),
+    newlyCreatedBlock(0),
     possibleStackSize(stackSize),
     startedBlocks(0),
-    isStateCallFlag(false),
-    newlyCreatedBlock(false)
+    isStateCallFlag(false)
 {
     stateBlocks.reserve(possibleStackSize);
 }
@@ -128,12 +128,15 @@ void ObjectStateManager::endStateBlock ()
 
     // Outer last block is ended and something was saved in it
     if ( startedBlocks == 0 && newlyCreatedBlock ) {
-        newlyCreatedBlock = false;
+        tryToShiftStack();
+        currentBlock = newlyCreatedBlock;
+        newlyCreatedBlock = 0;
+        stateBlocks.push_back(currentBlock);
         emit onStateBlockIsEnded(*this);
     }
 }
 
-bool ObjectStateManager::stateBlockisNotEnded () const
+bool ObjectStateManager::stateBlockIsNotEnded () const
 {
     return (startedBlocks != 0);
 }
@@ -150,8 +153,17 @@ ObjectStateManager::StateBlock* ObjectStateManager::findBlock (
     return 0;
 }
 
-bool ObjectStateManager::removeBlockByState (  ObjectState& st )
+bool ObjectStateManager::removeBlockByState ( ObjectState& st )
 {
+    // Newly created block may contain removing state
+    if ( newlyCreatedBlock && newlyCreatedBlock->contains(st) ) {
+        delete newlyCreatedBlock;
+        newlyCreatedBlock = 0;
+        emit onRemoveState( *this, st );
+        return true;
+    }
+
+    // Try to find state in stack
     StateBlock* block = findBlock(st);
     if ( block == 0 )
         return false;
@@ -200,7 +212,7 @@ bool ObjectStateManager::removeBlockByState (  ObjectState& st )
     return true;
 }
 
-bool ObjectStateManager::tryToRemoveStackTop () /*throw (UnknownException)*/
+bool ObjectStateManager::tryToRemoveStackTop ()
 {
     // Is empty
     if ( countStateBlocks() == 0 )
@@ -213,9 +225,8 @@ bool ObjectStateManager::tryToRemoveStackTop () /*throw (UnknownException)*/
     if ( currentBlock != 0 ) {
         iter = std::find(stateBlocks.begin(), stateBlocks.end(), currentBlock);
  
-       // Strange.
-        if ( iter == stateBlocks.end() )
-            throw UnknownException();
+        // Paranoid check
+        Q_ASSERT( iter != stateBlocks.end() );
 
         // Nothing to do if current block is at the top of the stack
         if ( ++iter == stateBlocks.end() )
@@ -255,22 +266,14 @@ bool ObjectStateManager::tryToShiftStack ()
     return true;
 }
 
-ObjectStateManager::StateBlock& ObjectStateManager::tryToCreateStateBlock ()
-{
-    if ( ! newlyCreatedBlock ) {
-        tryToShiftStack();
-        currentBlock = new StateBlock(*this);
-        stateBlocks.push_back(currentBlock);
-        newlyCreatedBlock = true;
-    }   
-    return *currentBlock;
-}
-
 void ObjectStateManager::saveState ( ObjectState& st )
 {
     startStateBlock();
+    // Create state block if it was not created
+    if ( newlyCreatedBlock == 0 )
+        newlyCreatedBlock = new StateBlock(*this);
     // Save state
-    tryToCreateStateBlock().addState(st);
+    newlyCreatedBlock->addState(st);
     endStateBlock();
 
     // Connect to know when state is ready to be destroyed.
@@ -281,7 +284,7 @@ void ObjectStateManager::saveState ( ObjectState& st )
     emit onSaveState(*this, st);
 }
 
-void ObjectStateManager::undo () /*throw (UnknownException, UndoException, 
+void ObjectStateManager::undo () /*throw (UndoException, 
                                           StateBlockIsNotEnded)*/
 {    
     // Nothing to undo
@@ -299,9 +302,9 @@ void ObjectStateManager::undo () /*throw (UnknownException, UndoException,
     BlockListIter iter = std::find( stateBlocks.begin(), 
                                     stateBlocks.end(), 
                                     currentBlock);
-    // Hm. Strange.
-    if ( iter == stateBlocks.end() )                
-        throw UnknownException();
+
+    // Paranoid check
+    Q_ASSERT( iter != stateBlocks.end() );
 
     // Safe undo
     emit beforeUndo(*this);
@@ -321,7 +324,7 @@ void ObjectStateManager::undo () /*throw (UnknownException, UndoException,
     emit afterUndo(*this);
 }
 
-void ObjectStateManager::redo () /*throw (UnknownException, RedoException,
+void ObjectStateManager::redo () /*throw (RedoException,
                                           StateBlockIsNotEnded)*/
 {
     // Nothing to redo
@@ -339,9 +342,8 @@ void ObjectStateManager::redo () /*throw (UnknownException, RedoException,
     else {
         iter = std::find(stateBlocks.begin(), stateBlocks.end(), currentBlock);
 
-        // Hm. Strange.
-        if ( iter == stateBlocks.end() )
-            throw UnknownException();
+        // Paranoid check
+        Q_ASSERT( iter != stateBlocks.end() );
 
         ++iter;
 
@@ -362,52 +364,32 @@ void ObjectStateManager::redo () /*throw (UnknownException, RedoException,
     emit afterRedo(*this);
 }
 
-void ObjectStateManager::stepBack () /*throw (UnknownException, UndoException, 
-                                              StateBlockIsNotEnded)*/
-{    
-    // Nothing to undo
-    if ( countStateBlocks() == 0 ) 
-        throw UndoException();
-
-    // Nothing to undo
-    if ( currentBlock == 0 )
-        throw UndoException();
-
-    // Can't undo if block is not ended
-    if ( startedBlocks )
-        throw StateBlockIsNotEnded();
-
-    BlockListIter iter = std::find( stateBlocks.begin(), 
-                                    stateBlocks.end(), 
-                                    currentBlock);
-    // Hm. Strange.
-    if ( iter == stateBlocks.end() )                
-        throw UnknownException();
+void ObjectStateManager::rollbackNotEndedBlock ()
+{
+    // Nothing to do
+    if ( newlyCreatedBlock == 0 )
+        return;
 
     // Safe undo
-    emit beforeStepBack(*this);
+    emit beforeUndo(*this);
     stateCall(true);
 
-    currentBlock->undo();
-    
-    delete *iter;
-    stateBlocks.erase( iter );
-
-    // Should zero current block if we undoed the first block
-    if ( iter == stateBlocks.begin() )
-        currentBlock = 0;
-    else {
-        --iter;
-        currentBlock = *iter;
-    }
+    // Undo block
+    newlyCreatedBlock->undo();
 
     stateCall(false);
-    emit afterStepBack(*this);
+    emit afterUndo(*this);
+
+    // Free created block
+    delete newlyCreatedBlock;
+    newlyCreatedBlock = 0;
+    // Zero started blocks
+    startedBlocks = 0;
 }
 
 void ObjectStateManager::step ( uint indx ) 
-    /*throw (UnknownException, OutOfBoundsException, StepException,
-             RedoException, UndoException, StateBlockIsNotEnded)*/
+    /*throw (OutOfBoundsException, StepException, RedoException, 
+             UndoException, StateBlockIsNotEnded)*/
 {
     size_t stateBlocksNum = countStateBlocks();
 
@@ -437,9 +419,8 @@ void ObjectStateManager::step ( uint indx )
         stepIter = std::find( stateBlocks.begin(), stateBlocks.end(), 
                               stepToBlock );
 
-    // Hm. Strange.
-    if ( stepIter == stateBlocks.end() )
-        throw UnknownException();
+    // Paranoid check
+    Q_ASSERT( stepIter != stateBlocks.end() );
 
     BlockListIter currIter;
     
@@ -449,9 +430,8 @@ void ObjectStateManager::step ( uint indx )
         currIter = std::find( stateBlocks.begin(), stateBlocks.end(), 
                               currentBlock);
 
-    // Hm. Strange.
-    if ( currIter == stateBlocks.end() )
-        throw UnknownException();
+    // Paranoid check
+    Q_ASSERT( currIter != stateBlocks.end() );
 
     BlockListIter begin = currIter, end = stepIter;
 
@@ -477,15 +457,15 @@ void ObjectStateManager::step ( uint indx )
 }
 
 void ObjectStateManager::stepToBegin () 
-    /*throw (UnknownException, OutOfBoundsException, StepException,
-             RedoException, UndoException, StateBlockIsNotEnded)*/
+    /*throw (OutOfBoundsException, StepException, RedoException, 
+             UndoException, StateBlockIsNotEnded)*/
 {
     step(0);
 }
 
 void ObjectStateManager::stepToEnd () 
-    /*throw (UnknownException, OutOfBoundsException, StepException,
-             RedoException, UndoException, StateBlockIsNotEnded)*/
+    /*throw (OutOfBoundsException, StepException, RedoException, 
+             UndoException, StateBlockIsNotEnded)*/
 {
     step( countStateBlocks() );
 }
@@ -533,10 +513,9 @@ size_t ObjectStateManager::countStatesToRedo () const
     BlockListConstIter iter = std::find( stateBlocks.begin(),
                                          stateBlocks.end(),
                                          currentBlock );
-    // Hm. Strange.
-    if ( iter == stateBlocks.end() )
-        //throw UnknownException();
-        return 0;
+
+    // Paranoid check
+    Q_ASSERT( iter != stateBlocks.end() );
 
     size_t statesNum = 0;
     while ( ++iter != stateBlocks.end() )
@@ -551,10 +530,9 @@ size_t ObjectStateManager::countStateBlocksToRedo () const
     BlockListConstIter iter = std::find( stateBlocks.begin(),
                                          stateBlocks.end(),
                                          currentBlock );
-    // Hm. Strange.
-    if ( iter == stateBlocks.end() )
-        //throw UnknownException();
-        return 0;
+
+    // Paranoid check
+    Q_ASSERT( iter != stateBlocks.end() );
 
     size_t statesNum = 0;
     while ( ++iter != stateBlocks.end() )
@@ -569,10 +547,9 @@ size_t ObjectStateManager::countStatesToUndo () const
     BlockListConstIter iter = std::find( stateBlocks.begin(),
                                          stateBlocks.end(),
                                          currentBlock );
-    // Hm. Strange.
-    if ( iter == stateBlocks.end() )
-        //throw UnknownException();
-        return 0;    
+
+    // Paranoid check
+    Q_ASSERT( iter != stateBlocks.end() );
 
     size_t statesNum = 0;
     while ( iter != stateBlocks.begin() ) {
@@ -591,10 +568,9 @@ size_t ObjectStateManager::countStateBlocksToUndo () const
     BlockListConstIter iter = std::find( stateBlocks.begin(),
                                          stateBlocks.end(),
                                          currentBlock );
-    // Hm. Strange.
-    if ( iter == stateBlocks.end() )
-        //throw UnknownException();
-        return 0;    
+
+    // Paranoid check
+    Q_ASSERT( iter != stateBlocks.end() );
 
     size_t statesNum = 0;
     while ( iter-- != stateBlocks.begin() )
