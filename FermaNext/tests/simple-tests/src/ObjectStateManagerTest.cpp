@@ -68,8 +68,8 @@ void start_end_state_block_test ()
 
     ObjectState& st1 = o.createState();
     m.saveState(st1);
-    my_assert(m.countStateBlocks() == 1, "m.startStateBlock(): 1 block after save");
-    my_assert(m.countStates() == 1, "m.countStates(): 1 state after save");
+    my_assert(m.countStateBlocks() == 0, "m.startStateBlock(): 0 block after save (block is not ended yet)");
+    my_assert(m.countStates() == 0, "m.countStates(): 0 state after save (block is not ended yet)");
     m.endStateBlock();
 
     my_assert(m.countStateBlocks() == 1, "m.startStateBlock(): 1 state block: block is correctly ended");
@@ -82,21 +82,21 @@ void start_end_state_block_test ()
     m.saveState(st2);
     // Doesn't create new block because previous one is not closed
     m.startStateBlock();
-    my_assert( m.countStateBlocks() == 2, "Should be 2 block" );
+    my_assert( m.countStateBlocks() == 1, "Should be 1 block as before (block is not ended)" );
     ObjectState& st3 = o.createState();
     m.saveState(st3);
-    my_assert( m.countStates() == 3, "Should be 3 states" );
+    my_assert( m.countStates() == 1, "Again 1 state (block is not ended)" );
 
     // Close inner block.
     m.endStateBlock();
-    my_assert( m.countStateBlocks() == 2, "Should be 2 blocks: outer block is not ended" );
+    my_assert( m.countStateBlocks() == 1, "Should be 1 blocks: outer block is not ended" );
     // Checks that outer block is not closed
     m.startStateBlock();
-    my_assert( m.countStateBlocks() == 2, "Should be 2 blocks as before" );
+    my_assert( m.countStateBlocks() == 1, "Should be 1 blocks as before" );
     ObjectState& st4 = o.createState();
     m.saveState(st4);
-    my_assert( m.countStates() == 4, "Should be 4 states after save" );
-    my_assert( m.countStateBlocks() == 2, "Should be 2 blocks as before: inner block has been started" );
+    my_assert( m.countStates() == 1, "Should be again 1 state after save, because block is not ended" );
+    my_assert( m.countStateBlocks() == 1, "Should be 1 blocks as before: inner block has been started" );
     m.endStateBlock();
 
     // Really close outer block.
@@ -109,9 +109,13 @@ void start_end_state_block_test ()
     my_assert( m.countStateBlocks() == 2, "Should be 2 blocks: nothing is saved yet" );
     ObjectState& st5 = o.createState();
     m.saveState(st5);
-    my_assert( m.countStates() == 5, "Should be 5 states" );
-    my_assert(m.countStateBlocks() == 3, "m.startStateBlock(): 3 state blocks after save");
+    my_assert( m.countStates() == 4, "Should be 4 states as before (block is started but not ended)" );
+    my_assert( m.countStateBlocks() == 2, "m.startStateBlock(): 2 state blocks as before after save (we've not closed this block yet)");
     m.endStateBlock();
+
+    my_assert( m.countStates() == 5, "Should be 5 states after block is ended" );
+    my_assert( m.countStateBlocks() == 3, "m.startStateBlock(): 3 state blocks ");
+
 
     // Undo one last state block
     m.undo();
@@ -121,9 +125,27 @@ void start_end_state_block_test ()
     ObjectState& st6 = o.createState();
     m.saveState(st6);
     // Check that top of the stack was removed
-    my_assert( m.countStateBlocks() == 3, "Should be again 3 blocks: top was removed after save so number has not been changed" );
+    my_assert( m.countStateBlocks() == 3, "Should be again 3 blocks: block is not ended" );
     m.endStateBlock();
-    my_assert( m.countStateBlocks() == 3, "Should be again 3 blocks: block is ended" );
+    my_assert( m.countStateBlocks() == 3, "Should be again 3 blocks: top was removed after save so number has not been changed" );
+    my_assert( m.countStates() == 5, "Should be again 5 states: top was removed after save so number has not been changed" );
+
+
+    // Rollback not ended block check
+    SomeObject obj(666, m);
+    m.startStateBlock();
+    // Save state
+    obj.value(777);
+
+    my_assert( obj.value() == 777, "Check object value before rollback" );
+
+    m.rollbackNotEndedBlock();
+
+    my_assert( obj.value() == 666, "Check object value after rollback" );
+
+    my_assert( m.countStateBlocks() == 3, "Should be again 3 blocks after rollback" );
+    my_assert( m.countStates() == 5, "Should be again 5 states after rollback" );
+    my_assert( !m.stateBlockIsNotEnded() , "Block should be correctly ended after rollback" );
 
     delete mng;
     
@@ -333,8 +355,8 @@ void block_removing_test ()
     obj1->value(555);
     obj2->value(555);
 
-    my_assert( m.countStateBlocks() == 2, "4. 2 state blocks" );
-    my_assert( m.countStates() == 3, "4. 3 states after save " );
+    my_assert( m.countStateBlocks() == 1, "4. 1 state block" );
+    my_assert( m.countStates() == 1, "4. 1 state after save " );    
     
     delete obj2;
 
@@ -345,7 +367,9 @@ void block_removing_test ()
     // should be removed by dying state
     obj1->value(444);
 
-    my_assert( m.countStateBlocks() == 1, "4. 1 state block after save" );
+    m.endStateBlock();
+
+    my_assert( m.countStateBlocks() == 2, "4. 2 state block after save" );
     my_assert( m.countStates() == 2, "4. 2 states after save " );
 
     delete obj1;

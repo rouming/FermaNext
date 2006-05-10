@@ -18,7 +18,6 @@ public:
     class UndoException {};
     class RedoException {};
     class StateBlockIsNotEnded {};
-    class UnknownException {};
 
 protected:
     class StateBlock
@@ -65,11 +64,7 @@ protected:
 
     // Tries to remove top of the stack, if current block is pointing
     // not to the top
-    virtual bool tryToRemoveStackTop () /*throw (UnknownException)*/;
-
-    // Tries to create new block if it was not created,
-    // otherwise returns old block
-    virtual StateBlock& tryToCreateStateBlock ();
+    virtual bool tryToRemoveStackTop ();
 
 protected slots:
     // Removes all block and its states. Finds block by the state.
@@ -84,40 +79,38 @@ public:
     virtual void startStateBlock ();
     virtual void endStateBlock ();
     // Returns true if newly created block is not ended.
-    virtual bool stateBlockisNotEnded () const;
+    virtual bool stateBlockIsNotEnded () const;
 
     // Saves object state. If startStateBlock was called first, state
     // saves in this block.
     virtual void saveState ( ObjectState& );
 
     // Manages the undo/redo cookery
-    virtual void undo () /*throw (UnknownException, UndoException, 
-                                  StateBlockIsNotEnded)*/;
-    virtual void redo () /*throw (UnknownException, RedoException,
-                                  StateBlockIsNotEnded)*/;
+    virtual void undo () /*throw (UndoException, StateBlockIsNotEnded)*/;
+    virtual void redo () /*throw (RedoException, StateBlockIsNotEnded)*/;
 
-    // Steps back for one state block and then removes it
-    virtual void stepBack () /*throw (UnknownException, UndoException, 
-                                      StateBlockIsNotEnded)*/;
+    // Rollbacks and removes all states of started block, which 
+    // was started but has not been ended yet.
+    virtual void rollbackNotEndedBlock ();
 
     // Momentary step to saved state block by index
     // (undo or redo from the current position to defined direction) 
     // if indx is 0 -- try to undo all states
     virtual void step ( uint indx ) 
-        /*throw (UnknownException, OutOfBoundsException, StepException,
-                 RedoException, UndoException, StateBlockIsNotEnded)*/;
+        /*throw (OutOfBoundsException, StepException, RedoException, 
+                 UndoException, StateBlockIsNotEnded)*/;
 
     // Step to the begin of the stack
     // same as 'step(0)' call
     virtual void stepToBegin () 
-        /*throw (UnknownException, OutOfBoundsException, StepException,
-                 RedoException, UndoException, StateBlockIsNotEnded)*/;
+        /*throw (OutOfBoundsException, StepException, RedoException, 
+                 UndoException, StateBlockIsNotEnded)*/;
 
     // Step to the end of the stack (see step)
     // same as 'step( countStateBlocks() )' call
     virtual void stepToEnd () 
-        /*throw (UnknownException, OutOfBoundsException, StepException,
-                 RedoException, UndoException, StateBlockIsNotEnded)*/;
+        /*throw (OutOfBoundsException, StepException, RedoException, 
+                 UndoException, StateBlockIsNotEnded)*/;
 
     // Returns list of names which were concatenated from 
     // state names of every block
@@ -161,8 +154,6 @@ signals:
     void afterUndo ( ObjectStateManager& );
     void beforeRedo ( ObjectStateManager& );
     void afterRedo ( ObjectStateManager& );
-    void beforeStepBack ( ObjectStateManager& );
-    void afterStepBack( ObjectStateManager& );
     void beforeStep ( ObjectStateManager& );
     void afterStep ( ObjectStateManager& );
     void onSaveState ( ObjectStateManager&, ObjectState& );
@@ -176,10 +167,10 @@ private:
 
     BlockList stateBlocks;
     StateBlock* currentBlock;
+    StateBlock* newlyCreatedBlock;
     size_t possibleStackSize;
     size_t startedBlocks;
     bool isStateCallFlag;
-    bool newlyCreatedBlock;
 };
 
 #endif //STATEMANAGER_H
