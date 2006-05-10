@@ -26,7 +26,6 @@ CFG=Gui - Win32 Debug
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
-F90=df.exe
 RSC=rc.exe
 
 !IF  "$(CFG)" == "Gui - Win32 Debug"
@@ -41,6 +40,7 @@ RSC=rc.exe
 # PROP Output_Dir "..\..\..\build\debug"
 # PROP Intermediate_Dir "..\..\..\build\debug\obj\Gui"
 # PROP Target_Dir ""
+F90=df.exe
 MTL=midl
 # ADD MTL /nologo /mktyplib203 /win32 /D "_DEBUG"
 # ADD CPP /nologo /MDd /W3 /GR /GX /Zi /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include" /I "$(AGGDIR)/include" /I "$(AGGDIR)/svg" /I "." /I "Agg" /I "..\..\Common" /I "..\..\Common\Plugin" /I "..\..\Common\Loader" /I "..\TrussUnit" /I ".." /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\debug\mocs\Gui" /I "..\..\..\build\release\ui\Gui" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_LIB" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_THREAD_SUPPORT" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /FD -Zm200 /c
@@ -62,6 +62,7 @@ LIB32=link.exe -lib
 # PROP Output_Dir "..\..\..\build\release"
 # PROP Intermediate_Dir "..\..\..\build\release\obj\Gui"
 # PROP Target_Dir ""
+F90=df.exe
 MTL=midl
 # ADD MTL /nologo /mktyplib203 /win32 /D "NDEBUG"
 # ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include" /I "$(AGGDIR)/include" /I "$(AGGDIR)/svg" /I "." /I "Agg" /I "..\..\Common" /I "..\..\Common\Plugin" /I "..\..\Common\Loader" /I "..\TrussUnit" /I ".." /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\release\mocs\Gui" /I "..\..\..\build\release\ui\Gui" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_LIB" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_THREAD_SUPPORT" /D "QT_NO_DEBUG" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /FD -Zm200 /c
@@ -139,6 +140,10 @@ SOURCE=Splash.cpp
 # Begin Source File
 
 SOURCE=TrussDesignerWidget.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\TrussMaterialEditor.cpp
 # End Source File
 # Begin Source File
 
@@ -399,6 +404,29 @@ InputPath=GeometryTabWidget.h
 # Begin Source File
 
 SOURCE=.\GuiSubsidiary.h
+
+!IF  "$(CFG)" == "Gui - Win32 Debug"
+
+# Begin Custom Build - Running MOC on GuiSubsidiary.h
+InputPath=.\GuiSubsidiary.h
+
+"..\..\..\build\debug\mocs\Gui\moc_GuiSubsidiary.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\debug\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_GuiSubsidiary.cpp
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "Gui - Win32 Release"
+
+# Begin Custom Build - Running MOC on GuiSubsidiary.h
+InputPath=.\GuiSubsidiary.h
+
+"..\..\..\build\release\mocs\Gui\moc_GuiSubsidiary.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_GuiSubsidiary.cpp
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -416,11 +444,11 @@ InputPath=.\PreferencesWidget.h
 
 !ELSEIF  "$(CFG)" == "Gui - Win32 Release"
 
-# Begin Custom Build - Running MOC on PreferencesWidget.h
+# Begin Custom Build - Running MOC on GuiSubsidiary.h
 InputPath=.\PreferencesWidget.h
 
-"..\..\..\build\release\mocs\Gui\moc_PreferencesWidget.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_PreferencesWidget.cpp
+"..\..\..\build\release\mocs\Gui\moc_GuiSubsidiary.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_GuiSubsidiary.cpp
 
 # End Custom Build
 
@@ -508,6 +536,33 @@ InputPath=TrussDesignerWidget.h
 
 "..\..\..\build\release\mocs\Gui\moc_TrussDesignerWidget.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_TrussDesignerWidget.cpp
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\TrussMaterialEditor.h
+
+!IF  "$(CFG)" == "Gui - Win32 Debug"
+
+# Begin Custom Build - Running MOC on TrussMaterialEditor.h
+InputPath=.\TrussMaterialEditor.h
+
+"..\..\..\build\debug\mocs\Gui\moc_TrussMaterialEditor.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\debug\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\debug\mocs\Gui\moc_TrussMaterialEditor.cpp
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "Gui - Win32 Release"
+
+# Begin Custom Build - Running MOC on TrussMaterialEditor.h
+InputPath=.\TrussMaterialEditor.h
+
+"..\..\..\build\release\mocs\Gui\moc_TrussMaterialEditor.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	$(QTDIR)\bin\moc.exe  -DUNICODE -DQT_LARGEFILE_SUPPORT -DWIN32 -DQT_THREAD_SUPPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -I"$(QTDIR)/include/QtCore" -I"$(QTDIR)/include/QtGui" -I"$(QTDIR)/include/QtXml" -I"$(QTDIR)/include" -I"$(AGGDIR)/include" -I"$(AGGDIR)/svg" -I"." -I"Agg" -I"..\..\Common" -I"..\..\Common\Plugin" -I"..\..\Common\Loader" -I"..\TrussUnit" -I".." -I"$(QTDIR)/include/ActiveQt" -I"..\..\..\build\release\mocs\Gui" -I"..\..\..\build\release\ui\Gui" -I"$(QTDIR)/mkspecs/win32-msvc" -D_MSC_VER=1200 -DWIN32 $(InputPath) -o ..\..\..\build\release\mocs\Gui\moc_TrussMaterialEditor.cpp
 
 # End Custom Build
 
@@ -813,6 +868,10 @@ SOURCE=..\..\..\build\release\mocs\Gui\moc_GeometryTabWidget.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\build\debug\mocs\Gui\moc_GuiSubsidiary.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\build\debug\mocs\Gui\moc_PreferencesWidget.cpp
 
 !IF  "$(CFG)" == "Gui - Win32 Debug"
@@ -914,6 +973,10 @@ SOURCE=..\..\..\build\release\mocs\Gui\moc_TrussDesignerWidget.cpp
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\build\debug\mocs\Gui\moc_TrussMaterialEditor.cpp
 # End Source File
 # Begin Source File
 

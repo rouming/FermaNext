@@ -40,6 +40,7 @@ SOURCES = \
 #          ToolBarManager.cpp \
           TrussDesignerWidget.cpp \
           TrussPropertyTabWidget.cpp \
+          TrussMaterialEditor.cpp \
           UndoRedoListBox.cpp \
           WindowListBox.cpp \
           \
@@ -67,6 +68,7 @@ HEADERS = \
 #          ToolBarManager.h \
           TrussDesignerWidget.h \
           TrussPropertyTabWidget.h \
+          TrussMaterialEditor.h \
           UndoRedoListBox.h \
           WindowListBox.h \
           \

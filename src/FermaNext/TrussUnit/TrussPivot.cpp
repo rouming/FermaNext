@@ -44,11 +44,14 @@ void TrussPivot::loadFromXML ( const QDomElement& pivotElem )
      /** 
      * Set material
      *****************/
+    if ( ! pivotElem.hasAttribute( "materialID" ) )
+        return;
+
     QString materialID = pivotElem.attribute( "materialID" );
     if ( ! materialUUIDMap || ! materialUUIDMap->contains(materialID) )
         throw LoadException();
     
-    setMaterial( *materialUUIDMap->value(materialID) );
+    setMaterial( materialUUIDMap->value(materialID) );
 }
 
 QDomElement TrussPivot::saveToXML ( QDomDocument& doc )
@@ -70,7 +73,10 @@ QDomElement TrussPivot::saveToXML ( QDomDocument& doc )
     /** 
      * Save material
      *****************/
-    pivotElem.setAttribute( "materialID", getMaterial().getUUID() );
+    const TrussMaterial* m = getMaterial();
+    if ( ! m )
+        return pivotElem;
+    pivotElem.setAttribute( "materialID", m->getUUID() );
 
     return pivotElem;
 }

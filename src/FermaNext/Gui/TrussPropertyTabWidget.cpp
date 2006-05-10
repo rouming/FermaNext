@@ -139,6 +139,46 @@ int LoadTable::getLoadedNodesNumber () const
 }
 
 /*****************************************************************************
+ * Material Table Item
+ *****************************************************************************/
+
+
+MaterialTableItem::MaterialTableItem ( const TrussMaterial* m /* = 0 */, 
+                                       int type /* = Type */ ) :
+    QTableWidgetItem( type )
+{
+    setMaterial( m );
+}
+
+void MaterialTableItem::setMaterial ( const TrussMaterial* m )
+{
+    QVariant material;
+    qVariantSetValue<const TrussMaterial*>( material, m );
+    setData( Qt::EditRole, material );
+
+    if ( m )
+        connect( m, SIGNAL(onAfterNameChange(const QString&)),
+                    SLOT(updateMaterialItemName(const QString&)) );
+}
+
+const TrussMaterial* MaterialTableItem::getMaterial () const
+{
+    QVariant material = data( Qt::DisplayRole );
+    Q_ASSERT( qVariantCanConvert<const TrussMaterial*>(material) );
+    const TrussMaterial* m = qVariantValue<const TrussMaterial*>(material);
+    return m;
+}
+
+void MaterialTableItem::updateMaterialItemName( const QString& name )
+{
+    const TrussMaterial* senderMaterial = 
+        dynamic_cast<const TrussMaterial*>(sender());
+    const TrussMaterial* m = getMaterial();
+    if ( m == senderMaterial )
+        setMaterial( senderMaterial );
+}
+
+/*****************************************************************************
  * Pivot Property Table Delegate
  *****************************************************************************/
 
@@ -183,7 +223,8 @@ void PivotPropertyTableDelegate::setEditorData (
         Q_ASSERT( qVariantCanConvert<const TrussMaterial*>(material) );
         const TrussMaterial* currentMaterial = 
                   qVariantValue<const TrussMaterial*>(material);
-        comboBox->setCurrentMaterial( *currentMaterial );
+        if ( currentMaterial )
+            comboBox->setCurrentMaterial( *currentMaterial );
         return;
     }
 
@@ -247,9 +288,9 @@ void PivotPropertyTableDelegate::paint ( QPainter* painter,
         Q_ASSERT( qVariantCanConvert<const TrussMaterial*>(material) );
         const TrussMaterial* currentMaterial = 
                   qVariantValue<const TrussMaterial*>(material);
-        Q_ASSERT( currentMaterial != 0 );
-        drawDisplay( painter, option, option.rect, 
-                     currentMaterial->getMaterialName() );
+        if ( currentMaterial )
+            drawDisplay( painter, option, option.rect, 
+                         currentMaterial->getMaterialName() );
         // since we draw the grid ourselves
         drawFocus( painter, option, option.rect ); 
     }
@@ -277,6 +318,14 @@ PivotPropertyTable::PivotPropertyTable ( QWidget* parent ) :
     QTableWidget( parent )
 {}
 
+MaterialTableItem* PivotPropertyTable::getMaterialCell ( int row ) const
+{
+    QTableWidgetItem* cell = item( row, 1 );
+    if ( ! cell )
+        return 0;
+    return dynamic_cast<MaterialTableItem*>(cell);
+}
+
 void PivotPropertyTable::setThickness ( int row, double thick )
 {
     if ( row >= rowCount() || thick > Global::pivotThickLimit )
@@ -300,33 +349,25 @@ double PivotPropertyTable::getThickness ( int row ) const
     return cell->text().toDouble();
 }
 
-void PivotPropertyTable::setMaterial ( int row, const TrussMaterial& m )
+void PivotPropertyTable::setMaterial ( int row, const TrussMaterial* m )
 {
-    QTableWidgetItem* cell = item( row, 1 );
-    if ( cell ) {
-        QVariant material;
-        qVariantSetValue<const TrussMaterial*>( material, &m );
-        cell->setData( Qt::EditRole, material );
-    }
+    MaterialTableItem* cell = getMaterialCell( row );
+    if ( cell )
+        cell->setMaterial( m );
     else {
-        cell = new QTableWidgetItem();
-        QVariant material;
-        qVariantSetValue<const TrussMaterial*>( material, &m );
-        cell->setData( Qt::EditRole, material );
-        cell->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter );
+        cell = new MaterialTableItem( m );
         setItem( row, 1, cell );
     }   
-
     horizontalHeader()->resizeSection( 1, Global::materialColumnWidth );
 }
 
 const TrussMaterial* PivotPropertyTable::getMaterial ( int row ) const
 {
-    QTableWidgetItem* cell = item( row, 1 );
-    Q_ASSERT( cell != 0 );
-    QVariant material = cell->data( Qt::DisplayRole );
-    Q_ASSERT( qVariantCanConvert<const TrussMaterial*>(material) );
-    return qVariantValue<const TrussMaterial*>(material);
+    MaterialTableItem* cell = getMaterialCell( row );
+    if ( ! cell )
+        return 0;
+
+    return cell->getMaterial();
 }
 
 void PivotPropertyTable::addPivot ( const TrussPivot& pivot, int row )
@@ -357,7 +398,8 @@ TrussPropertyTabWidget::TrussPropertyTabWidget ( QWidget* p ) :
     thickSpinBox(0),
     materialComboBox(0),
     loadSpacer(0),
-    pivotPropSpacer(0)
+    pivotPropSpacer(0),
+    isLevelButtonEnabled(true)
 {
     init();
 }
@@ -472,13 +514,18 @@ void TrussPropertyTabWidget::initPivotPropertyTab ()
     levelComboBox->setCurrentIndex( 0 );
     thickSpinBox = new QDoubleSpinBox( levelGroupBox );
     thickSpinBox->setMaximum( Global::pivotThickLimit );
+    thickSpinBox->setSingleStep( 0.01 );
+    thickSpinBox->setValue( 0.1 );
     thickSpinBox->setFixedHeight( 21 );
     materialComboBox = new MaterialComboBox( levelGroupBox );
     materialComboBox->setVisible( false );
 
     connect( levelComboBox, SIGNAL(currentIndexChanged(int)),
                             SLOT(changeLevelEditor(int)) );
-
+   
+    connect( materialComboBox, SIGNAL(comboBoxIsEmpty(bool)),
+                               SLOT(updateLevelButtonState(bool)) );
+    
     levelButton = new QPushButton( levelGroupBox );
     levelButton->setIcon( QIcon( Global::imagesPath() + "/tick.png" ) );
     levelButton->setFixedSize( QSize( 21, 21 ) );
@@ -613,6 +660,11 @@ void TrussPropertyTabWidget::changeMaterialLibrary (
 {
     materialComboBox->setMaterialLibrary( lib );
     emit onMaterialLibraryChanged( lib );
+}
+
+void TrussPropertyTabWidget::clearMaterialComboBox ()
+{
+    materialComboBox->clearMaterialLibrary();
 }
 
 /******************************* loads ***************************************/
@@ -963,10 +1015,14 @@ void TrussPropertyTabWidget::showPivotPropertyTableRow ( bool visible )
 
 void TrussPropertyTabWidget::updateTableMaterial ()
 {
+    if ( ! focusWindow )
+        return;
+    
     try { 
         const TrussPivot& pivot = dynamic_cast<const TrussPivot&>(*sender());
-        pivotPropTable->setMaterial( pivot.getNumber() - 1, 
-                                     pivot.getMaterial() );
+        if ( focusWindow->findPivotByNumber( pivot.getNumber() ) == &pivot )
+            pivotPropTable->setMaterial( pivot.getNumber() - 1, 
+                                         pivot.getMaterial() );
     }
     catch ( ... ) { return; }
 }
@@ -998,9 +1054,8 @@ void TrussPropertyTabWidget::updatePivotState ( int row, int col )
         pivot->setThickness( pivotPropTable->getThickness( row ) );
         return;
     }
-    else {
-        pivot->setMaterial( *pivotPropTable->getMaterial( row ) );
-    }
+    else
+        pivot->setMaterial( pivotPropTable->getMaterial( row ) );
 }
 
 void TrussPropertyTabWidget::levelPivotState ()
@@ -1013,8 +1068,7 @@ void TrussPropertyTabWidget::levelPivotState ()
     } else if ( materialComboBox->isVisible() ) {
         for ( ; pivotIter != pivotList.end(); ++pivotIter ) {
             const TrussMaterial* m = materialComboBox->getCurrentMaterial();
-            if ( m )
-                (*pivotIter)->setMaterial( *m );
+            (*pivotIter)->setMaterial( m );
         }
     }
 }
@@ -1024,10 +1078,18 @@ void TrussPropertyTabWidget::changeLevelEditor ( int indx )
     if ( indx == 0 ) {
         thickSpinBox->setVisible( true );
         materialComboBox->setVisible( false );
+        levelButton->setEnabled( true );
     } else {
         thickSpinBox->setVisible( false );
         materialComboBox->setVisible( true );
+        levelButton->setEnabled( isLevelButtonEnabled );
     }
+}
+
+void TrussPropertyTabWidget::updateLevelButtonState ( bool noMaterials )
+{
+    levelButton->setEnabled( ! noMaterials );
+    isLevelButtonEnabled = ! noMaterials;
 }
 
 /***************************************************************************/

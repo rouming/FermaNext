@@ -38,8 +38,7 @@ const QString& TrussUnitWindowManager::oldFormatExtension ()
 
 TrussUnitWindowManager::TrussUnitWindowManager ( 
     const TrussMaterialLibrary& lib) :
-    materialLib(lib),
-    defaultMaterial(0)
+    materialLib(lib)
 {}
 
 TrussUnitWindowManager::~TrussUnitWindowManager ()
@@ -83,12 +82,6 @@ void TrussUnitWindowManager::trussWindowAfterDesist ( StatefulObject& st )
     } catch ( ... ) {}
 }
 
-void TrussUnitWindowManager::changeDefaultMaterial( const TrussMaterial& m )
-{
-    defaultMaterial = &m;
-    emit onDefaultMaterialChange(m);
-}
-
 TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow (
     const QString& name )
 {
@@ -104,7 +97,6 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow (
 
     ObjectStateManager* stateManager = new ObjectStateManager;
     TrussUnitWindow* trussWindow = new TrussUnitWindow(name, stateManager);
-    trussWindow->setDefaultMaterial( *defaultMaterial );
     stateManagerMap[trussWindow] = stateManager;
 
     QObject::connect( trussWindow, SIGNAL(onAfterRevive(StatefulObject&)), 
@@ -112,9 +104,9 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow (
     QObject::connect( trussWindow, SIGNAL(onAfterDesist(StatefulObject&)), 
                       SLOT(trussWindowAfterDesist(StatefulObject&)) );
     QObject::connect( this, 
-                      SIGNAL(onDefaultMaterialChange(const TrussMaterial&)), 
+                      SIGNAL(beforeMaterialRemove(const TrussMaterial&)), 
                       trussWindow, 
-                      SLOT(setDefaultMaterial(const TrussMaterial&)) );
+                      SLOT(removePivotMaterial(const TrussMaterial&)) );
     trussWindows.push_back(trussWindow);
 
     if ( ! silence )

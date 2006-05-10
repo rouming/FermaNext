@@ -30,17 +30,13 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
     justStrengthAnalisysWidget( new QWidget ),
     designerWidget( new TrussDesignerWidget ),
     materialLibrary( new TrussMaterialLibrary ),
-    defaultMaterial( 0 ),
     trussWindowManager( new TrussUnitWindowManager( *materialLibrary ) )
 {
-    connect( this, SIGNAL(onDefaultMaterialChange(const TrussMaterial&)), 
+    connect( materialLibrary, 
+             SIGNAL(onBeforeMaterialRemoval(const TrussMaterial&)), 
              trussWindowManager, 
-             SLOT(changeDefaultMaterial(const TrussMaterial&)) );
+             SIGNAL(beforeMaterialRemove(const TrussMaterial&)) );
 
-    TrussMaterial* m = materialLibrary->getMaterial( 0 );
-    if ( m )
-        setDefaultMaterial(*m);
-    
     // Should be hidden while creating other widgets
     // Only for aesthetic purposes 
     projectTab->setVisible(false);
@@ -202,11 +198,6 @@ QDomElement FermaNextProject::saveToXML ( QDomDocument& doc )
     QDomElement materialLibElem = doc.createElement( "TrussMaterialLibrary" );
     prjElem.appendChild( materialLibrary->saveToXML( doc ) );
 
-    /** 
-     * Save default material
-     ************************/
-    prjElem.setAttribute( "defaultMaterialID", defaultMaterial->getUUID() );
-
     return prjElem;
 }
 
@@ -235,19 +226,8 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
     QDomElement materialLibElem = materialLib.item(0).toElement();
     materialLibrary->loadFromXML( materialLibElem );
     
-    /**
-     * Set default material
-     ************************/
-    if ( ! prjElem.hasAttribute( "defaultMaterialID" ) )
-        throw LoadException();
-    
-    QString defaultMaterialID = prjElem.attribute( "defaultMaterialID" );
     const QMap<QString, TrussMaterial*>* uuidMap = 
                         &materialLibrary->getMaterialUUIDMap();
-    if ( ! uuidMap || ! uuidMap->contains(defaultMaterialID) )
-        throw LoadException();
-    
-    setDefaultMaterial( *uuidMap->value(defaultMaterialID) );
     
     /**
      * Create truss unit windows
@@ -327,20 +307,6 @@ CalcDataToolBar& FermaNextProject::getCalcDataToolBar ()
 FermaNextWorkspace& FermaNextProject::getWorkspace()
 {
     return currentWorkspace;
-}
-
-void FermaNextProject::setDefaultMaterial ( const TrussMaterial& m )
-{
-    if ( defaultMaterial == &m )
-        return;
-
-    defaultMaterial = &m;
-    emit onDefaultMaterialChange( m );
-}
-
-const TrussMaterial& FermaNextProject::getDefaultMaterial () const
-{
-    return *defaultMaterial;
 }
 
 TrussMaterialLibrary& FermaNextProject::getMaterialLibrary () const

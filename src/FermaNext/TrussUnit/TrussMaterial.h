@@ -10,14 +10,17 @@
 
 #include "XMLSerializableObject.h"
 
-class TrussMaterial : public XMLSerializableObject
+class TrussMaterial : public QObject,
+                      public XMLSerializableObject
 {
+    Q_OBJECT
 public:
     TrussMaterial ();
     TrussMaterial ( const QString&,
                     double workingStress,
                     double elasticityModule,
                     double density );
+    TrussMaterial ( const TrussMaterial& );
     TrussMaterial& operator= ( const TrussMaterial& );
 
     virtual ~TrussMaterial ();
@@ -35,7 +38,20 @@ public:
     virtual double getWorkingStress () const;
     virtual double getElasticityModule () const;
     virtual double getDensity () const;
+
+signals:
+    void onBeforeNameChange ( const QString& );
+    void onAfterNameChange ( const QString& );
     
+    void onBeforeElasticityModuleChange ( double );
+    void onAfterElasticityModuleChange ( double );
+    
+    void onBeforeWorkingStressChange ( double );
+    void onAfterWorkingStressChange ( double );
+
+    void onBeforeDensityChange ( double );    
+    void onAfterDensityChange ( double );
+
 private:
     QString materialName;
     double workingStress;
@@ -52,23 +68,28 @@ class TrussMaterialLibrary : public QObject,
 public:
     // Material library exceptions
     class WrongMaterialNameException {};
-    class WrongCharacteristicException {};
+    class WrongElasticityModuleException {};
+    class WrongWorkingStressException {};
+    class WrongDensityException {};
 
     typedef QMap<QString, TrussMaterial*> TrussMaterialUUIDMap;
 
     TrussMaterialLibrary ();
     virtual ~TrussMaterialLibrary ();
 
-    virtual TrussMaterial& createMaterial ( 
-        const QString&, 
-        double, double, double ) /*throw (WrongMaterialNameException, 
-                                          WrongCharacteristicException)*/;
+    virtual TrussMaterial& createMaterial ( const QString&, 
+                                            double, double, double ); 
+                                           /*throw (WrongMaterialNameException, 
+                                            WrongElasticityModuleException,
+                                            WrongWorkingStressException,
+                                            WrongDensityException)*/
 
     // XML serialization
     virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
     virtual QDomElement saveToXML ( QDomDocument& );
 
     virtual bool removeMaterial ( TrussMaterial& );
+    virtual bool removeMaterial ( const QString& name );
     virtual bool removeMaterial ( int indx );
     
     virtual TrussMaterial* getMaterial ( int indx ) const;
@@ -81,8 +102,22 @@ public:
 protected:
     virtual void clean ();
 
+protected slots:
+    virtual void checkMaterialName ( const QString& ); 
+    /*throw (WrongMaterialNameException)*/
+
+    virtual void checkElasticityModule ( double );
+    /*throw (WrongElasticityModuleException)*/
+
+    virtual void checkWorkingStress ( double );
+    /*throw (WrongWorkingStressException)*/
+    
+    virtual void checkDensity ( double );
+    /*throw (WrongDensityException)*/
+
 signals:
-    void onAfterMaterialCreation ( TrussMaterial& );
+    void onAfterMaterialCreation ( const TrussMaterial& );
+    void onBeforeMaterialRemoval ( const TrussMaterial& );
     void onAfterMaterialRemoval ();
     
 private:
