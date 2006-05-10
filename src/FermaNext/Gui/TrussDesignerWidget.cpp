@@ -549,7 +549,7 @@ void TrussDesignerWidget::clearWindowFocus ()
         focusedWindow->setHighlighted(false);
         // Correct block close if we catch focus change before release event.
         ObjectStateManager* mng = focusedWindow->getStateManager();
-        if ( mng && mng->stateBlockisNotEnded() )
+        if ( mng && mng->stateBlockIsNotEnded() )
             mng->endStateBlock();
         TrussUnitWindow* fWindow = focusedWindow;
         focusedWindow = 0;
@@ -1285,7 +1285,7 @@ void TrussDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
     // End state block which was started in press mouse event.
     if ( focusedWindow ) {
         ObjectStateManager* mng = focusedWindow->getStateManager();
-        if ( mng && mng->stateBlockisNotEnded() ) 
+        if ( mng && mng->stateBlockIsNotEnded() ) 
             mng->endStateBlock();
     }
 }
