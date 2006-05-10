@@ -65,14 +65,13 @@ protected slots:
     // and to emit the signal further
     virtual void trussWindowAfterRevive ( StatefulObject& );
     virtual void trussWindowAfterDesist ( StatefulObject& );
-    virtual void changeDefaultMaterial ( const TrussMaterial& );
 
 signals:
     void onTrussUnitWindowCreate ( TrussUnitWindow& );
     void onTrussUnitWindowRemove ( TrussUnitWindow& );
     void onTrussUnitWindowRevive ( TrussUnitWindow& );
     void onTrussUnitWindowDesist ( TrussUnitWindow& );
-    void onDefaultMaterialChange ( const TrussMaterial& );
+    void beforeMaterialRemove ( const TrussMaterial& );
 
 private:
     // Every truss has it's own state manager.
@@ -83,7 +82,6 @@ private:
     StateManagerMap stateManagerMap;
    
     const TrussMaterialLibrary& materialLib;
-    const TrussMaterial* defaultMaterial;
 };
 
 #endif //TRUSSUNITWINDOWMANAGER_H

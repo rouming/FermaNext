@@ -52,8 +52,6 @@ public:
 //    virtual CalcDataToolBar& getCalcDataToolBar ();
     virtual FermaNextWorkspace& getWorkspace();
 
-    virtual void setDefaultMaterial ( const TrussMaterial& );
-    virtual const TrussMaterial& getDefaultMaterial () const;
     virtual TrussMaterialLibrary& getMaterialLibrary () const;
 
 protected:
@@ -67,7 +65,6 @@ signals:
     void onActivate ( FermaNextProject& );
     void onNameChange ( const QString& );
     void onProjectFileNameChange ( const QString& );
-    void onDefaultMaterialChange ( const TrussMaterial& );
   
 private:
     friend class FermaNextWorkspace;
@@ -87,7 +84,6 @@ private:
     QWidget* justStrengthAnalisysWidget;
     TrussDesignerWidget* designerWidget;
     TrussMaterialLibrary* materialLibrary;
-    const TrussMaterial* defaultMaterial;
     TrussUnitWindowManager* trussWindowManager;
 };
 

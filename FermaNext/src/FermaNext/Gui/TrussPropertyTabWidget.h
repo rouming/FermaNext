@@ -64,11 +64,25 @@ public:
 
 /*****************************************************************************/
 
+class MaterialTableItem : public QObject, public QTableWidgetItem
+{
+    Q_OBJECT
+public:
+    MaterialTableItem ( const TrussMaterial* m = 0, int type = Type );
+    void setMaterial ( const TrussMaterial* );
+    const TrussMaterial* getMaterial () const;
+
+protected slots:
+    void updateMaterialItemName ( const QString& );
+};
+
+/*****************************************************************************/
+
 class PivotPropertyTableDelegate : public QItemDelegate
 {
     Q_OBJECT
 public:
-    PivotPropertyTableDelegate( QWidget* parent = 0 );
+    PivotPropertyTableDelegate ( QWidget* parent = 0 );
     
     QWidget* createEditor ( QWidget *parent, const QStyleOptionViewItem&,
                             const QModelIndex& ) const;
@@ -101,10 +115,11 @@ class PivotPropertyTable : public QTableWidget
 {
 public:
     PivotPropertyTable ( QWidget* parent = 0 );
-    virtual void setMaterial ( int row, const TrussMaterial& );
-    virtual const TrussMaterial* getMaterial ( int row ) const;
+    virtual MaterialTableItem* getMaterialCell ( int row ) const;
     virtual void setThickness ( int row, double thick );
     virtual double getThickness ( int row ) const;
+    virtual void setMaterial ( int row, const TrussMaterial* );
+    virtual const TrussMaterial* getMaterial ( int row ) const;
     virtual void addPivot ( const TrussPivot&, int row = -1 );
 };
 
@@ -118,6 +133,7 @@ public:
     virtual ~TrussPropertyTabWidget ();
     virtual void changeFocusWindow ( TrussUnitWindow* focusWindow );
     virtual void changeMaterialLibrary ( const TrussMaterialLibrary& lib );
+    virtual void clearMaterialComboBox ();
 
 protected:
     virtual void init ();
@@ -155,6 +171,7 @@ protected slots:
     virtual void levelPivotState ();
 
     virtual void changeLevelEditor ( int );
+    virtual void updateLevelButtonState ( bool );
 
 signals:
     void onMaterialLibraryChanged ( const TrussMaterialLibrary& );
@@ -169,6 +186,7 @@ private:
     QDoubleSpinBox *thickSpinBox;
     MaterialComboBox *materialComboBox;
     QSpacerItem *loadSpacer, *pivotPropSpacer;
+    bool isLevelButtonEnabled;
 };
 
 #endif //TRUSSPROPERTYWINDOW_H

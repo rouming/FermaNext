@@ -6,7 +6,7 @@
  *****************************************************************************/
 
 PreferencesWidget::PreferencesWidget ( QWidget* parent, Qt::WFlags f ) :
-    QWidget( parent, f )
+    QDialog( parent, f )
 {}
 
 /*****************************************************************************/

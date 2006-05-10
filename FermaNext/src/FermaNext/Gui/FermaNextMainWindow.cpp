@@ -26,6 +26,7 @@
 #include "UndoRedoListBox.h"
 #include "GeometryTabWidget.h"
 #include "TrussPropertyTabWidget.h"
+#include "TrussMaterialEditor.h"
 #include "PreferencesWidget.h"
 
 const QString fermaTitle( QObject::tr( "Educational CAD System 'Ferma'" ) );
@@ -85,6 +86,17 @@ void FermaNextMainWindow::init ()
                              SLOT(refreshGeometryAndPropertyWindows()) );
     projectsDockWidget->setWidget( projectToolBox );    
 
+    materialEditor = new TrussMaterialEditor( this );
+
+    connect( &workspace, SIGNAL(onProjectCreate(FermaNextProject&)),
+             materialEditor, SLOT(addProjectItem(FermaNextProject&)) );
+
+    connect( &workspace, SIGNAL(onBeforeProjectRemove(FermaNextProject&)),
+             materialEditor, SLOT(removeProjectItem(FermaNextProject&)) );
+
+    connect( &workspace, SIGNAL(onProjectActivated(FermaNextProject&)),
+             materialEditor, SLOT(setCurrentProjectItem(FermaNextProject&)) );
+
     preferencesWidget = new PreferencesWidget( this );
 
     addDockWidget( Qt::LeftDockWidgetArea, projectsDockWidget );
@@ -96,7 +108,7 @@ void FermaNextMainWindow::initUndoRedoWindow ()
 
     undoRedoHistoryWidget->setFixedSize( 140, 110 );
     // Pretty history widget offset from the end point of the screen
-    undoRedoHistoryWidget->move( QApplication::desktop()->width() - 170, 70 );
+    undoRedoHistoryWidget->move( QApplication::desktop()->width() - 170, 80 );
     undoRedoHistoryWidget->setWindowTitle( tr("History") );
     undoRedoListBox = new UndoRedoListBox( undoRedoHistoryWidget );
     undoRedoHistoryWidget->installEventFilter( this );
@@ -114,7 +126,7 @@ void FermaNextMainWindow::initGeometryWindow ()
     geometryWindow->setFixedSize( 195, 174 );
     geometryWindow->setWindowTitle( tr("Truss Geometry") );
     geometryTabWidget = new GeometryTabWidget( geometryWindow );
-    geometryWindow->move( QApplication::desktop()->width() - 225, 210 );
+    geometryWindow->move( QApplication::desktop()->width() - 225, 220 );
     geometryWindow->installEventFilter( this );
 
     QVBoxLayout* tabLayout = new QVBoxLayout;
@@ -133,7 +145,7 @@ void FermaNextMainWindow::initTrussPropertyWindow ()
     trussPropertyWindow->setFixedSize( 195, 230 );
     trussPropertyWindow->setWindowTitle( tr("Truss Properties") );
     trussPropTabWidget = new TrussPropertyTabWidget( trussPropertyWindow );
-    trussPropertyWindow->move( QApplication::desktop()->width() - 225, 415 );
+    trussPropertyWindow->move( QApplication::desktop()->width() - 225, 425 );
     trussPropertyWindow->installEventFilter( this );
 
     QVBoxLayout* tabLayout = new QVBoxLayout;
@@ -153,6 +165,10 @@ void FermaNextMainWindow::someProjectRemoved ( FermaNextProject& prj )
         undoRedoHistoryWidget->hide();
         geometryWindow->hide();
         trussPropertyWindow->hide();
+        trussPropTabWidget->clearMaterialComboBox();
+        showUndoRedoAction->setEnabled( false );
+        showTrussPropWindowAction->setEnabled( false );
+        showGeometryWindowAction->setEnabled( false );
     }
     TrussDesignerWidget& designerWidget = prj.getDesignerWidget();
     designerWidget.disconnect( this );
@@ -162,12 +178,16 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
 {
     if ( !projectsDockWidget->isVisible() && 0 < workspace.countProjects() ) {
         projectsDockWidget->show();
-        undoRedoHistoryWidget->show();
-        geometryWindow->show();
-        trussPropertyWindow->show();
-        trussPropTabWidget->changeMaterialLibrary( prj.getMaterialLibrary() );
+        showUndoRedoAction->setEnabled( true );
+        showTrussPropWindowAction->setEnabled( true );
+        showGeometryWindowAction->setEnabled( true );
+        if ( showUndoRedoAction->isChecked() )
+            undoRedoHistoryWidget->show();
+        if ( showTrussPropWindowAction->isChecked() )
+            geometryWindow->show();
+        if ( showGeometryWindowAction->isChecked() )
+            trussPropertyWindow->show();
     }
-
     TrussDesignerWidget& designerWidget = prj.getDesignerWidget();
 
     connect( &designerWidget, SIGNAL(onFocusLose(TrussUnitWindow&)),
@@ -200,20 +220,23 @@ void FermaNextMainWindow::createProject ()
         TrussUnitWindow& trussWindow = mng.createTrussUnitWindow("Truss unit");
         trussWindow.setTrussAreaSize( DoubleSize( 300, 300 ) );
 
+        TrussMaterialLibrary& materialLib = prj.getMaterialLibrary();
+        TrussMaterial* m = &materialLib.createMaterial( tr( "Aluminum Alloy" ), 
+                                                       30000, 7000000, 0.028 );
+        materialLib.createMaterial( tr( "Steel" ), 70000, 20000000, 0.078 );
+    
         TrussNode& node1 = trussWindow.createNode ( 280, 30 );
         TrussNode& node2 = trussWindow.createNode( 0, 0 );
         TrussNode& node3 = trussWindow.createNode( 130, 130 );
-        trussWindow.createPivot( node2, node3 );
+        trussWindow.createPivot( node2, node3 ).setMaterial( m );
 
         TrussNode& node4 = trussWindow.createNode( 250, 300 );
-        trussWindow.createPivot ( node4, node3 );
+        trussWindow.createPivot ( node4, node3 ).setMaterial( m );
 
         TrussNode& node5 = trussWindow.createNode( 0, 300 );
-        trussWindow.createPivot ( node5, node3 );
-
-        trussWindow.createPivot ( node5, node4 );
-
-        trussWindow.createPivot ( node5, node2 );
+        trussWindow.createPivot ( node5, node3 ).setMaterial( m );
+        trussWindow.createPivot ( node5, node4 ).setMaterial( m );
+        trussWindow.createPivot ( node5, node2 ).setMaterial( m );
 
         node1.setFixation( Node::FixationByX );
         node2.setFixation( Node::FixationByY );
@@ -223,6 +246,7 @@ void FermaNextMainWindow::createProject ()
             trussWindow.getLoadCases().getCurrentLoadCase();
         if ( currentCase )
             currentCase->addLoad( node4, 300, 100 );
+
 #endif
 /*********** TEMP TRUSS UNIT **************************/
 
@@ -315,13 +339,6 @@ void FermaNextMainWindow::setupFileActions ()
     connect( a, SIGNAL(triggered()), SLOT(fileCloseWsp()) );
     menu->addAction( a );
     menu->addSeparator();
-
-    /* Save All
-    a = new QAction( tr( "Save All" ), this );
-    a->setShortcut( tr("CTRL+SHIFT+S") );
-    connect( a, SIGNAL(triggered()), SLOT(fileSaveAll()) );
-    menu->addAction( a );
-    menu->addSeparator();*/
     
     // Page Setup
     a = new QAction( tr( "Page setup..." ), this );
@@ -337,7 +354,7 @@ void FermaNextMainWindow::setupFileActions ()
     a->setDisabled(true);
 
     // Print
-    printAction = new QAction( QIcon(Global::imagesPath() + "/fileprint.xpm"), 
+    printAction = new QAction( QIcon(Global::imagesPath() + "/print.png"), 
                                tr( "&Print..." ),  this ); 
     printAction->setShortcut( tr("CTRL+P") );
     connect( printAction, SIGNAL(triggered()), SLOT(filePrint()) );        
@@ -377,6 +394,14 @@ void FermaNextMainWindow::setupEditActions ()
     menu->addSeparator();
     tb->addSeparator();
 
+    // Material Editor
+    materialEditorAction = new QAction( tr( "&Material Editor" ), this );
+    materialEditorAction->setShortcut( tr("CTRL+M") );
+    connect( materialEditorAction, SIGNAL(triggered()), 
+                                   SLOT(editMaterials()) );
+    menu->addAction( materialEditorAction );
+    materialEditorAction->setEnabled( false );
+
     // Preferences
     QAction* prefAction = new QAction( tr( "&Preferences..." ), this );
     prefAction->setShortcut( tr("CTRL+K") );
@@ -386,30 +411,47 @@ void FermaNextMainWindow::setupEditActions ()
 
 void FermaNextMainWindow::setupViewActions ()
 {
+    QToolBar* tb = addToolBar( tr("View Actions") );
     QMenu* menu = menuBar()->addMenu( tr( "&View" ) );
-
+    
     // Contents
-    showUndoRedoAction = new QAction( tr( "&Show History Window" ), this );
+    showUndoRedoAction = new QAction( QIcon(Global::imagesPath() + 
+                                      "/undo_redo_window1.png"),
+                                      tr( "&Show History Window" ), this );
     showUndoRedoAction->setStatusTip( tr( "Show or hide history window" ) );
+    showUndoRedoAction->setCheckable( true );
+    showUndoRedoAction->setChecked( true );
     menu->addAction( showUndoRedoAction );
+    tb->addAction( showUndoRedoAction );
     connect( showUndoRedoAction, SIGNAL(toggled(bool)), 
              undoRedoHistoryWidget, SLOT(setVisible(bool)) );
+    showUndoRedoAction->setEnabled( false );
 
     showGeometryWindowAction = 
-        new QAction( tr( "&Show Truss Geometry Window" ), this );
+        new QAction( QIcon(Global::imagesPath() + "/truss_geom.png"),
+                     tr( "&Show Truss Geometry Window" ), this );
     showGeometryWindowAction->
         setStatusTip( tr( "Show or hide truss geometry window" ) );
+    showGeometryWindowAction->setCheckable( true );
+    showGeometryWindowAction->setChecked( true );
     menu->addAction( showGeometryWindowAction );
+    tb->addAction( showGeometryWindowAction );
     connect( showGeometryWindowAction, SIGNAL(toggled(bool)),
              geometryWindow, SLOT(setVisible(bool) ) );
-
+    showGeometryWindowAction->setEnabled( false );
+    
     showTrussPropWindowAction = 
-        new QAction( tr( "&Show Truss Property Window" ), this );
+        new QAction( QIcon(Global::imagesPath() + "/truss_prop.png"),
+                     tr( "&Show Truss Property Window" ), this );
     showTrussPropWindowAction->
         setStatusTip( tr( "Show or hide truss property window" ) );
+    showTrussPropWindowAction->setCheckable( true );
+    showTrussPropWindowAction->setChecked( true );
     menu->addAction( showTrussPropWindowAction );
+    tb->addAction( showTrussPropWindowAction );
     connect( showTrussPropWindowAction, SIGNAL(toggled(bool)), 
              trussPropertyWindow, SLOT(setVisible(bool)) );
+    showTrussPropWindowAction->setEnabled( false );  
 }
 
 void FermaNextMainWindow::setupProjectActions ()
@@ -514,6 +556,7 @@ void FermaNextMainWindow::refreshProjectActions ()
     saveAsProjectAction->setEnabled(enableActions);
     closeProjectAction->setEnabled(enableActions);
     printAction->setEnabled(enableActions);
+    materialEditorAction->setEnabled( enableActions );
 }
 
 void FermaNextMainWindow::refreshPluginsActions ()
@@ -922,12 +965,16 @@ void FermaNextMainWindow::editSelectAll ()
     qWarning("Not implmented yet!");
 }
 
+void FermaNextMainWindow::editMaterials ()
+{
+    materialEditor->exec();
+}
+
 void FermaNextMainWindow::editPreferences ()
 {   
     preferencesWidget->resize( 300, 300 );
-    preferencesWidget->setVisible(true);
-    preferencesWidget->setWindowTitle( "F" );
-    preferencesWidget->show();    
+    preferencesWidget->setWindowTitle( "Preferences" );
+    preferencesWidget->exec();    
 }
 
 void FermaNextMainWindow::helpContents ()

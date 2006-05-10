@@ -2,9 +2,9 @@
 #ifndef PREFERENCESWIDGET_H
 #define PREFERENCESWIDGET_H
 
-#include <QWidget>
+#include <QDialog>
 
-class PreferencesWidget : public QWidget
+class PreferencesWidget : public QDialog
 {
     Q_OBJECT
 public:

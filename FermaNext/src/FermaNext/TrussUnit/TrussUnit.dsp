@@ -40,6 +40,7 @@ RSC=rc.exe
 # PROP Output_Dir "..\..\..\build\debug"
 # PROP Intermediate_Dir "..\..\..\build\debug\obj\TrussUnit"
 # PROP Target_Dir ""
+F90=df.exe
 MTL=midl
 # ADD MTL /nologo /mktyplib203 /win32 /D "_DEBUG"
 # ADD CPP /nologo /MDd /W3 /GR /GX /Zi /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include" /I "$(AGGDIR)/include" /I "$(AGGDIR)/svg" /I "..\..\Common" /I "..\Gui\Agg" /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\debug\mocs\TrussUnit" /I "..\..\..\build\release\ui\TrussUnit" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_LIB" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_THREAD_SUPPORT" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /FD -Zm200 /c
@@ -61,6 +62,7 @@ LIB32=link.exe -lib
 # PROP Output_Dir "..\..\..\build\release"
 # PROP Intermediate_Dir "..\..\..\build\release\obj\TrussUnit"
 # PROP Target_Dir ""
+F90=df.exe
 MTL=midl
 # ADD MTL /nologo /mktyplib203 /win32 /D "NDEBUG"
 # ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include" /I "$(AGGDIR)/include" /I "$(AGGDIR)/svg" /I "..\..\Common" /I "..\Gui\Agg" /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\release\mocs\TrussUnit" /I "..\..\..\build\release\ui\TrussUnit" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_LIB" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_THREAD_SUPPORT" /D "QT_NO_DEBUG" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /FD -Zm200 /c

@@ -347,8 +347,6 @@ void NodeTable::addNode ( const Node& node )
     setCoord( row, 0, node.getX() );
     setCoord( row, 1, node.getY() );
     setFixationItem( row, node.getFixation() );
-    for ( int i = row; i < rowCount(); ++i )
-        verticalHeader()->resizeSection( i, Global::tableRowHeight );
     //updateMaximumHeight();
 }
 
@@ -510,8 +508,6 @@ void PivotTable::addPivot ( const TrussPivot& pivot, int row )
     setNodeNumber( row, 0, first.getNumber() );
     setNodeNumber( row, 1, last.getNumber() );
     recalcPivotLength( pivot );
-    for ( int i = row; i < rowCount(); ++i )
-        verticalHeader()->resizeSection( i, Global::tableRowHeight );
 }
 
 void PivotTable::setNodesTotalNumber ( int newNodesNumb )
@@ -596,6 +592,7 @@ void GeometryTabWidget::initNodesTab ()
                 *vertHeader = nodeTable->verticalHeader();
     horHeader->setClickable( false );
     horHeader->setResizeMode( QHeaderView::Custom );
+    vertHeader->setDefaultSectionSize( Global::tableRowHeight );
     vertHeader->setClickable( false );
     vertHeader->setResizeMode( QHeaderView::Custom );
     nodeTable->setShowGrid( true );
@@ -644,6 +641,7 @@ void GeometryTabWidget::initPivotsTab ()
                 *vertHeader = pivotTable->verticalHeader();
     horHeader->setClickable( false );
     horHeader->setResizeMode( QHeaderView::Custom );
+    vertHeader->setDefaultSectionSize( Global::tableRowHeight );
     vertHeader->setClickable( false );
     vertHeader->setResizeMode( QHeaderView::Custom );
     pivotTable->setShowGrid( true );

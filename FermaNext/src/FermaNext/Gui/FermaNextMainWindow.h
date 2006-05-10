@@ -12,6 +12,7 @@ class FermaNextWorkspace;
 class UndoRedoListBox;
 class GeometryTabWidget;
 class TrussPropertyTabWidget;
+class TrussMaterialEditor;
 class PreferencesWidget;
 class QFile;
 class QMenu;
@@ -73,6 +74,7 @@ protected slots:
     void editPaste ();
     void editCut ();    
     void editSelectAll ();
+    void editMaterials ();
     void editPreferences ();
 
     void helpContents ();
@@ -94,7 +96,7 @@ protected slots:
 private:
     // Current system workspace
     FermaNextWorkspace& workspace;
-    // Dock widgget on wich all projects are located
+    // Dock widget on which all projects are located
     QDockWidget* projectsDockWidget;
     // Undo/redo history widget
     QWidget* undoRedoHistoryWidget;
@@ -112,7 +114,8 @@ private:
     TrussPropertyTabWidget* trussPropTabWidget;
     // Preferences widget
     PreferencesWidget* preferencesWidget;
-
+    // Material editor
+    TrussMaterialEditor* materialEditor;
 
     // Some actions
     QAction* undoAction;
@@ -125,7 +128,8 @@ private:
     QAction* showUndoRedoAction;
     QAction* showGeometryWindowAction;
     QAction* showTrussPropWindowAction;
-    
+    QAction* materialEditorAction;
+
     // Plugins menu
     QMenu* pluginsMenu;
 };

@@ -73,7 +73,6 @@ public:
 
 public slots:
     virtual void setTrussAreaSize ( const DoubleSize& ) = 0;
-    virtual void setDefaultMaterial ( const TrussMaterial& ) = 0;
 
 protected slots:
     void stateIsChanged ();
@@ -92,6 +91,8 @@ protected slots:
     virtual void topologyAfterRevive ( StatefulObject& ) = 0;
     virtual void topologyBeforeDesist ( StatefulObject& ) = 0;
     virtual void topologyAfterDesist ( StatefulObject& ) = 0;
+
+    virtual void removePivotMaterial ( const TrussMaterial& mat ) = 0;
 
 signals:
     // Truss signals
@@ -365,7 +366,6 @@ public:
         QObject::connect( pivot, SIGNAL(onLastNodeChange()),
                                  SLOT(stateIsChanged()) );
         
-        pivot->setMaterial( *defaultMaterial );
         pivots.push_back(pivot);
 
         // Force reindex of elements numbers
@@ -596,11 +596,6 @@ public:
         return loadCases;
     }
 
-    virtual void setDefaultMaterial ( const TrussMaterial& mat )
-    {
-        defaultMaterial = &mat;
-    }
-
     virtual const TrussDimension& getDimension () const
     {
         return dimension;
@@ -719,6 +714,17 @@ protected:
             emit onStateChange();
         }
         catch ( ... ) { return; }
+    }
+
+    virtual void removePivotMaterial ( const TrussMaterial& mat )
+    {
+        PivotList pivots = getPivotList();
+        for ( PivotListIter iter = pivots.begin(); 
+              iter != pivots.end(); ++iter ) {
+            P* pivot = *iter;
+            if ( pivot->getMaterial() == &mat )
+                pivot->setMaterial( 0 );
+        }
     }
 
 /****************************** toplogies ************************************/
@@ -930,7 +936,6 @@ private:
     TopologyList topologies;
     DoubleSize trussAreaSize;
     LoadCases loadCases;
-    const TrussMaterial* defaultMaterial;
     TrussDimension dimension;
 };
 
@@ -939,7 +944,7 @@ private:
  *****************************************************************************/
 
 // Pivot emitter. All signals logic was moved to this 
-// classe because of Qt rejection to moc templates.
+// class because of Qt rejection to moc templates.
 
 class PivotEmitter : public StatefulObject
 {
@@ -992,13 +997,13 @@ public:
     { last = last_;
       emit onLastNodeChange(); }
     
-    virtual const TrussMaterial& getMaterial () const
-    { return *material; }
-    virtual void setMaterial ( const TrussMaterial& mat )
+    virtual const TrussMaterial* getMaterial () const
+    { return material; }
+    virtual void setMaterial ( const TrussMaterial* mat )
     { 
-        if ( material == &mat )
+        if ( material == mat )
             return;
-        material = &mat; 
+        material = mat; 
         emit onMaterialChange();
     }
 
