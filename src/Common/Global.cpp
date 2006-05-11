@@ -125,6 +125,24 @@ Config& config ()
     return Config::instance( configFileName() );
 }
 
+QString applicationVersion ()
+{
+#ifndef FERMA_VERSION
+#error Macros 'FERMA_VERSION' is required.
+#endif
+    QString version;
+#if (defined DEBUG || defined _DEBUG)
+    version = QObject::tr("debug ");
+#endif
+    version += QString("%1, %2").arg( FERMA_VERSION ).arg("" __DATE__ "");
+    return version;
+}
+
+QString applicationName ()
+{
+    return QObject::tr("FermaNext");
+}
+
 QString applicationDirPath ()
 {
     if ( qApp ) 

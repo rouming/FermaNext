@@ -1,3 +1,7 @@
+FERMA_VERSION=\"0.2.0-alpha\"
+
+DEFINES += FERMA_VERSION=$$FERMA_VERSION
+
 CONFIG += debug_and_release
 
 !isEmpty(BUILD_NAME) {
@@ -11,4 +15,3 @@ CONFIG += debug_and_release
 CONFIG(debug, debug|release) {
    CONFIG += console
 }
-

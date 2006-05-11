@@ -9,7 +9,8 @@ class Splash : public QSplashScreen
 {
     Q_OBJECT
 public:
-    Splash ( const QPixmap& pixmap=QPixmap(), Qt::WFlags f=0 );
+    Splash ( const QPixmap& pixmap, const QString& appName, 
+             const QString& appVersion );
 
 public slots:
     void pluginLoaderMessage ( const QString& );
@@ -18,6 +19,10 @@ public slots:
 
 protected:
     void drawContents ( QPainter* );
+
+private:
+    QString appName;
+    QString appVersion;
 };
 
 #endif //SPLASH_H
