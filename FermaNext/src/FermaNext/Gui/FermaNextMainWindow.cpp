@@ -416,7 +416,7 @@ void FermaNextMainWindow::setupViewActions ()
     
     // Contents
     showUndoRedoAction = new QAction( QIcon(Global::imagesPath() + 
-                                      "/undo_redo_window1.png"),
+                                      "/undo_redo_window.png"),
                                       tr( "&Show History Window" ), this );
     showUndoRedoAction->setStatusTip( tr( "Show or hide history window" ) );
     showUndoRedoAction->setCheckable( true );
