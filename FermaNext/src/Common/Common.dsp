@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Target_Dir ""
 MTL=midl
 # ADD MTL /nologo /mktyplib203 /win32 /D "_DEBUG"
-# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include" /I "." /I "Plugin" /I "Loader" /I "$(QTDIR)/include/ActiveQt" /I "..\..\build\debug\mocs\Common" /I "..\..\build\release\ui\Common" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_LIB" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /D "QT_THREAD_SUPPORT" /D FERMA_VERSION=\"0.2.0-alpha\" /FD -Zm200 /c
+# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include" /I "." /I "Plugin" /I "Loader" /I "$(QTDIR)/include/ActiveQt" /I "..\..\build\debug\mocs\Common" /I "..\..\build\release\ui\Common" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_LIB" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /D "QT_THREAD_SUPPORT" /FD -DFERMA_VERSION=\"0.2.0-alpha\" -Zm200 /c
 # ADD BASE RSC /l 0x419
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -64,7 +64,7 @@ LIB32=link.exe -lib
 # PROP Target_Dir ""
 MTL=midl
 # ADD MTL /nologo /mktyplib203 /win32 /D "NDEBUG"
-# ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include" /I "." /I "Plugin" /I "Loader" /I "$(QTDIR)/include/ActiveQt" /I "..\..\build\release\mocs\Common" /I "..\..\build\release\ui\Common" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_LIB" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_NO_DEBUG" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /D "QT_THREAD_SUPPORT" /D FERMA_VERSION=\"0.2.0-alpha\" /FD -Zm200 /c
+# ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include" /I "." /I "Plugin" /I "Loader" /I "$(QTDIR)/include/ActiveQt" /I "..\..\build\release\mocs\Common" /I "..\..\build\release\ui\Common" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_LIB" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_NO_DEBUG" /D "QT_XML_LIB" /D "QT_GUI_LIB" /D "QT_CORE_LIB" /D "QT_THREAD_SUPPORT" /FD -DFERMA_VERSION=\"0.2.0-alpha\" -Zm200 /c
 # ADD BASE RSC /l 0x419
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
