@@ -185,7 +185,6 @@ private:
     QComboBox *loadCaseComboBox;
     QDoubleSpinBox *thickSpinBox;
     MaterialComboBox *materialComboBox;
-    QSpacerItem *loadSpacer, *pivotPropSpacer;
     bool isLevelButtonEnabled;
 };
 

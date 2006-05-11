@@ -142,7 +142,7 @@ void FermaNextMainWindow::initGeometryWindow ()
 void FermaNextMainWindow::initTrussPropertyWindow ()
 {
     trussPropertyWindow = new QWidget( this, Qt::Window | Qt::Tool );
-    trussPropertyWindow->setFixedSize( 195, 230 );
+    trussPropertyWindow->setFixedSize( 195, 228 );
     trussPropertyWindow->setWindowTitle( tr("Truss Properties") );
     trussPropTabWidget = new TrussPropertyTabWidget( trussPropertyWindow );
     trussPropertyWindow->move( QApplication::desktop()->width() - 225, 425 );

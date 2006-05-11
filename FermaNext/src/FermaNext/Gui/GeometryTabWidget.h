@@ -91,7 +91,7 @@ public:
     virtual void setFixationItem ( int row, Node::Fixation fix );
     virtual FixationItem* getFixationItem ( int row ) const;
     virtual void addNode ( const Node& );
-    virtual void updateMaximumHeight ();
+    virtual void updateMaximumHeight ( int numRows = -1 );
 };
 
 /*****************************************************************************/
@@ -168,12 +168,14 @@ protected slots:
     virtual void addNodeToTable ( const Node& );
     virtual void showNodeTableRow ( bool );
     virtual void removeNodeFromTable ( const Node& );
+
     virtual void updateNodeTableCoords ();
     virtual void updateNodeTableFixation ();
     virtual void updateNodeState ( int, int );
 
     virtual void addPivotToTable ( const Node&, const Node& );
     virtual void removePivotFromTable ( const Node&, const Node& );
+    
     virtual void updateNodesNumbers ( const Node& node );
     virtual void showPivotTableRow ( bool );
     virtual void updatePivotTableFirstNode ();
@@ -192,7 +194,6 @@ private:
     QLabel *nodesNumbLabel, *fixedNodesLabel, *pivotsNumbLabel;
     QGroupBox *sizeGroupBox;
     QDoubleSpinBox *xSizeEdit, *ySizeEdit;
-    QSpacerItem *nodesSpacer, *pivotsSpacer;
     // Undo/Redo
     DoublePoint beforeMovingNodePos;
 };

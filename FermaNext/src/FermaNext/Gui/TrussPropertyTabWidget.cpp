@@ -397,8 +397,6 @@ TrussPropertyTabWidget::TrussPropertyTabWidget ( QWidget* p ) :
     loadCaseComboBox(0),
     thickSpinBox(0),
     materialComboBox(0),
-    loadSpacer(0),
-    pivotPropSpacer(0),
     isLevelButtonEnabled(true)
 {
     init();
@@ -450,8 +448,7 @@ void TrussPropertyTabWidget::initLoadTab ()
     QHBoxLayout* loadCaseLayout = new QHBoxLayout( loadCaseGroupBox );
     parentLayout->addLayout( topLayout );
     parentLayout->addLayout( tableLayout );
-    loadSpacer = new QSpacerItem( 0, 0 );
-    parentLayout->addItem( loadSpacer );
+    parentLayout->addStretch(1);
     topLayout->addWidget( nodesNumbLabel );
     topLayout->addWidget( loadedNodesLabel );
     tableLayout->addWidget( loadTable );
@@ -542,8 +539,7 @@ void TrussPropertyTabWidget::initPivotPropertyTab ()
     parentLayout->addLayout( tableLayout );
     topLayout->addWidget( pivotsNumbLabel );
     tableLayout->addWidget( pivotPropTable );
-    pivotPropSpacer = new QSpacerItem( 0, 0 );
-    parentLayout->addItem( pivotPropSpacer );
+    parentLayout->addStretch( 1 );
     parentLayout->addWidget( levelGroupBox );
     bottomLayout->addWidget( levelComboBox, 0, 0 );
     bottomLayout->addWidget( thickSpinBox, 0, 1 );
@@ -647,8 +643,6 @@ void TrussPropertyTabWidget::changeFocusWindow (
     removeLoadCaseBtn->setEnabled( false );
     levelButton->setEnabled( false );
     pivotPropTable->hide();
-    loadSpacer->changeSize( 0, loadTable->height() + 1 );
-    pivotPropSpacer->changeSize( 0, loadTable->height() + 1 );
     nodesNumbLabel->setText( "Total nodes: " );
     pivotsNumbLabel->setText( "Total pivots: " );
     loadedNodesLabel->setText( "Loaded nodes: " );
@@ -686,12 +680,10 @@ void TrussPropertyTabWidget::fillLoadTab ()
     TrussUnit::NodeList nodeList = focusWindow->getNodeList();
     if ( nodeList.empty() ) {
         loadTable->hide();
-        loadSpacer->changeSize( 0, loadTable->height() );
         nodesNumbLabel->setText( "Total nodes: 0" );
         loadedNodesLabel->setText( "Loaded nodes: 0" );
         return;
     }
-    loadSpacer->changeSize( 0, 0 );
     loadTable->show();
 
     fillLoadTable( loadCases.getCurrentLoadCase() );
@@ -757,10 +749,8 @@ void TrussPropertyTabWidget::addLoadTableRow ( const Node& node )
     connect( trussNode, SIGNAL(onVisibleChange(bool)),
                  SLOT(showLoadTableRow(bool)) );
 
-    if ( loadTable->isHidden() ) {
+    if ( loadTable->isHidden() )
         loadTable->show();
-        loadSpacer->changeSize( 0, 0 );
-    }
 
     TrussUnit::LoadCase* currentCase = 
         focusWindow->getLoadCases().getCurrentLoadCase();
@@ -811,10 +801,8 @@ void TrussPropertyTabWidget::removeLoadTableRow ( const Node& node )
     loadedNodesLabel->setText( "Loaded nodes: " + 
                       QString::number(loadTable->getLoadedNodesNumber()) );
 
-    if ( ! loadTable->rowCount() ) {
-        loadSpacer->changeSize( 0, loadTable->height() );
+    if ( ! loadTable->rowCount() )
         loadTable->hide();
-    }
 }
 
 void TrussPropertyTabWidget::changeTabCurrentLoadCase ( int currentIndx )
@@ -917,17 +905,18 @@ void TrussPropertyTabWidget::fillPivotPropertyTab ()
     // clear table
     pivotPropTable->setRowCount( 0 );
 
-    levelButton->setEnabled( true );
-
     TrussUnit::PivotList pivotList = focusWindow->getPivotList ();
     if ( pivotList.empty() ) {
         pivotPropTable->hide();
-        pivotPropSpacer->changeSize( 0, pivotPropTable->height() );
+        levelButton->setEnabled( false );
         pivotsNumbLabel->setText( "Total pivots: 0" );
         return;
     }
-    pivotPropSpacer->changeSize( 0, 0 );
     pivotPropTable->show();
+    if ( thickSpinBox->isVisible() )
+        levelButton->setEnabled( true );
+    else
+        levelButton->setEnabled( isLevelButtonEnabled );
 
     TrussUnit::PivotListIter iter = pivotList.begin();
     for ( ; iter != pivotList.end(); ++iter )
@@ -945,8 +934,12 @@ void TrussPropertyTabWidget::addPivotToTable (
 
     if ( pivotPropTable->isHidden() ) {
         pivotPropTable->show();
-        pivotPropSpacer->changeSize( 0, 0 );
+        if ( thickSpinBox->isVisible() )
+            levelButton->setEnabled( true );
+        else
+            levelButton->setEnabled( isLevelButtonEnabled );
     }
+
     try { 
         const TrussNode& node1 = dynamic_cast<const TrussNode&>(first);
         const TrussNode& node2 = dynamic_cast<const TrussNode&>(last);
@@ -989,7 +982,7 @@ void TrussPropertyTabWidget::removePivotFromTable ( const Node& first,
                      QString::number(focusWindow->getPivotList().size() - 1) );
 
     if ( ! pivotPropTable->rowCount() ) {
-        pivotPropSpacer->changeSize( 0, loadTable->height() );
+        levelButton->setEnabled( false );
         pivotPropTable->hide();
     }
 }
@@ -1078,17 +1071,20 @@ void TrussPropertyTabWidget::changeLevelEditor ( int indx )
     if ( indx == 0 ) {
         thickSpinBox->setVisible( true );
         materialComboBox->setVisible( false );
-        levelButton->setEnabled( true );
+        if ( focusWindow )
+            levelButton->setEnabled( true );
     } else {
         thickSpinBox->setVisible( false );
         materialComboBox->setVisible( true );
-        levelButton->setEnabled( isLevelButtonEnabled );
+        if ( focusWindow )
+            levelButton->setEnabled( isLevelButtonEnabled );
     }
 }
 
 void TrussPropertyTabWidget::updateLevelButtonState ( bool noMaterials )
 {
-    levelButton->setEnabled( ! noMaterials );
+    if ( focusWindow && materialComboBox->isVisible() )
+        levelButton->setEnabled( ! noMaterials );
     isLevelButtonEnabled = ! noMaterials;
 }
 
