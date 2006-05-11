@@ -347,13 +347,16 @@ void NodeTable::addNode ( const Node& node )
     setCoord( row, 0, node.getX() );
     setCoord( row, 1, node.getY() );
     setFixationItem( row, node.getFixation() );
-    //updateMaximumHeight();
+    updateMaximumHeight();
 }
 
-void NodeTable::updateMaximumHeight ()
-{
-//    setMaximumHeight( rowCount() * Global::tableRowHeight + lineWidth() * 2 +
-//                      horizontalHeader()->height() );
+void NodeTable::updateMaximumHeight ( int numRows /* = -1 */ )
+{/*
+    if ( numRows == -1 )
+        numRows = rowCount();
+
+    setMaximumHeight( numRows * Global::tableRowHeight + lineWidth() * 2 +
+                      horizontalHeader()->height() + 1 );*/
 }
 
 /*****************************************************************************
@@ -575,8 +578,7 @@ void GeometryTabWidget::initNodesTab ()
     topLayout->addWidget( nodesNumbLabel );
     topLayout->addWidget( fixedNodesLabel );
     bottomLayout->addWidget( nodeTable );
-    nodesSpacer = new QSpacerItem( 0, 0 );
-    parentLayout->addItem( nodesSpacer );
+    parentLayout->addStretch( 1 );
     topLayout->setMargin( 5 );
     topLayout->setSpacing( 5 );
     bottomLayout->setMargin( 1 );
@@ -624,8 +626,7 @@ void GeometryTabWidget::initPivotsTab ()
     parentLayout->addLayout( bottomLayout );
     topLayout->addWidget( pivotsNumbLabel );
     bottomLayout->addWidget( pivotTable );
-    pivotsSpacer = new QSpacerItem( 0, 0 );
-    parentLayout->addItem( pivotsSpacer );
+    parentLayout->addStretch( 1 );
     topLayout->setMargin( 5 );
     topLayout->setSpacing( 5 );
     bottomLayout->setMargin( 1 );
@@ -743,8 +744,6 @@ void GeometryTabWidget::changeFocusWindow ( TrussUnitWindow* newFocusWindow )
     nodeTable->hide();
     pivotTable->hide();
     sizeGroupBox->hide();
-    nodesSpacer->changeSize( 0, nodeTable->height() + 1 );
-    pivotsSpacer->changeSize( 0, nodeTable->height() + 1 );
     nodesNumbLabel->setText( "Total nodes: " );
     pivotsNumbLabel->setText( "Total pivots: " );
     fixedNodesLabel->setText( "Fixed nodes: " );
@@ -778,12 +777,10 @@ void GeometryTabWidget::fillNodeTable ()
     TrussUnit::NodeList nodeList = focusWindow->getNodeList();
     if ( nodeList.empty() ) {
         nodeTable->hide();
-        nodesSpacer->changeSize( 0, nodeTable->height() );
         nodesNumbLabel->setText( "Total nodes: 0" );
         fixedNodesLabel->setText( "Fixed nodes: 0" );
         return;
     }
-    nodesSpacer->changeSize( 0, 0 );
     nodeTable->show();
 
     TrussUnit::NodeListIter iter = nodeList.begin();
@@ -808,10 +805,8 @@ void GeometryTabWidget::addNodeToTable ( const Node& node )
     }
     catch ( ... ) { return; }
 
-    if ( nodeTable->isHidden() ) {
+    if ( nodeTable->isHidden() )
         nodeTable->show();
-        nodesSpacer->changeSize( 0, 0 );
-    }
 
     nodeTable->addNode( node );
     nodesNumbLabel->setText( "Total nodes: " + 
@@ -837,18 +832,15 @@ void GeometryTabWidget::showNodeTableRow ( bool visible )
             nodeTable->showRow( row );
             nodesNumbLabel->setText( "Total nodes: " + 
                 QString::number(focusWindow->getNodeList().size()) );
-            //nodeTable->updateMaximumHeight();
+            nodeTable->updateMaximumHeight();
         }
         else {
             nodeTable->hideRow( row );
             nodesNumbLabel->setText( "Total nodes: " + 
                 QString::number(focusWindow->getNodeList().size() - 1) );
-            /*
-            QHeader* horHeader = nodeTable->horizontalHeader();
-            nodeTable->setMaximumHeight( ( nodeTable->numRows() - 1 ) * 
-                                         Global::tableRowHeight + 
-                                         horHeader->height() + 
-                                         nodeTable->lineWidth() * 2 );*/
+            
+            QHeaderView* horHeader = nodeTable->horizontalHeader();
+            nodeTable->updateMaximumHeight( nodeTable->rowCount() - 1 );
         }
     }
     catch ( ... ) { return; }
@@ -865,11 +857,10 @@ void GeometryTabWidget::removeNodeFromTable ( const Node& node )
     fixedNodesLabel->setText( "Fixed nodes: " + 
                       QString::number(nodeTable->getFixedNodesNumber()) );
 
-    if ( ! nodeTable->rowCount() ) {
-        nodesSpacer->changeSize( 0, nodeTable->height() );
+    if ( ! nodeTable->rowCount() )
         nodeTable->hide();
-    }
-    //nodeTable->updateMaximumHeight();
+
+    nodeTable->updateMaximumHeight();
 
     // prevent double connection after revive
     disconnect( &node, SIGNAL(onPositionChange(double, double)),
@@ -965,11 +956,9 @@ void GeometryTabWidget::fillPivotTable ()
     TrussUnit::PivotList pivotList = focusWindow->getPivotList ();
     if ( pivotList.empty() ) {
         pivotTable->hide();
-        pivotsSpacer->changeSize( 0, pivotTable->height() );
         pivotsNumbLabel->setText( "Total pivots: 0" );
         return;
     }
-    pivotsSpacer->changeSize( 0, 0 );
     pivotTable->show();
 
     TrussUnit::PivotListIter iter = pivotList.begin();
@@ -985,10 +974,9 @@ void GeometryTabWidget::addPivotToTable ( const Node& first, const Node& last )
     if ( sender() != focusWindow )
         return;
 
-    if ( pivotTable->isHidden() ) {
+    if ( pivotTable->isHidden() )
         pivotTable->show();
-        pivotsSpacer->changeSize( 0, 0 );
-    }
+
     try { 
         const TrussNode& node1 = dynamic_cast<const TrussNode&>(first);
         const TrussNode& node2 = dynamic_cast<const TrussNode&>(last);
@@ -1040,10 +1028,8 @@ void GeometryTabWidget::removePivotFromTable ( const Node& first,
     pivotsNumbLabel->setText( "Total pivots: " + 
                      QString::number(focusWindow->getPivotList().size() - 1) );
 
-    if ( ! pivotTable->rowCount() ) {
-        pivotsSpacer->changeSize( 0, nodeTable->height() );
+    if ( ! pivotTable->rowCount() )
         pivotTable->hide();
-    }
 }
 
 void GeometryTabWidget::updateNodesNumbers ( const Node& node )
