@@ -20,7 +20,9 @@ int main ( int argc, char* argv[] )
 
     QPixmap pixmap( Global::imagesPath() + 
                     Global::pathSeparator() + "splash.png" );
-    Splash* splash = new Splash( pixmap );
+    Splash* splash = new Splash( pixmap, 
+                                 Global::applicationName(),
+                                 Global::applicationVersion() );
     splash->show();
 
     FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();

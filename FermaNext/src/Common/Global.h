@@ -106,6 +106,14 @@ QString pluginLoadersPath ();
 QString configFileName ();
 Config& config ();
 
+// Returns application version in format: 
+//    for release build: 'x.x.x, MMM DD YYYY'
+//    for debug   build: 'debug x.x.x, MMM DD YYYY'
+QString applicationVersion ();
+
+// Returns application name
+QString applicationName ();
+
 // Sage return of the directory that 
 // contains the application executable.
 QString applicationDirPath ();
