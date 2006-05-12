@@ -86,7 +86,7 @@ public slots:
     virtual void trussWindowLostFocus ( TrussUnitWindow& );
 
 protected slots:
-    virtual void raiseWindowItem ( QListWidgetItem* );
+    virtual void raiseSelectedWindowItem ();
 
 private:
     struct IndexedItem 

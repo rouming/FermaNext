@@ -23,7 +23,8 @@ protected:
     class StateBlock
     {   
     public:
-        StateBlock ( ObjectStateManager& );
+        StateBlock ( ObjectStateManager&, 
+                     const QString& blockName = QString() );
         ~StateBlock ();
         
         // Manage states
@@ -33,6 +34,12 @@ protected:
         bool contains ( const ObjectState& ) const;
         bool isEmpty () const;
         size_t countStates () const;
+
+        // Returns block name
+        const QString&  getBlockName () const;
+        // Sets block name
+        void setBlockName ( const QString& );
+
         // Returns concatenated string of state names
         QString concatStateNames () const;
 
@@ -50,6 +57,7 @@ protected:
         typedef StateList::const_iterator StateListConstIter;
         typedef StateList::reverse_iterator StateListRevIter;
         
+        QString blockName;
         StateList states;
         ObjectStateManager& stateMng;
         bool blockIsClosed;
@@ -77,7 +85,7 @@ public:
 
     //Manages state blocks
     virtual void startStateBlock ();
-    virtual void endStateBlock ();
+    virtual void endStateBlock ( const QString& blockName = QString() );
     // Returns true if newly created block is not ended.
     virtual bool stateBlockIsNotEnded () const;
 
@@ -112,8 +120,7 @@ public:
         /*throw (OutOfBoundsException, StepException, RedoException, 
                  UndoException, StateBlockIsNotEnded)*/;
 
-    // Returns list of names which were concatenated from 
-    // state names of every block
+    // Returns names of all blocks
     virtual QStringList stateBlockNames () const;
 
     // Returns current position of redoed state block.

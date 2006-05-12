@@ -1191,7 +1191,12 @@ void TrussDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
 
         selectedWindow->updateAfterNodeManipulation ( selectedNode, false );
 
-        mng->endStateBlock();
+        QString msg( tr("Create pivot (%1,%2)(%3,%4)").
+                       arg(int(selectedPivot->getFirstNode().getX())).
+                       arg(int(selectedPivot->getFirstNode().getY())).
+                       arg(int(selectedPivot->getLastNode().getX())).
+                       arg(int(selectedPivot->getLastNode().getY())) );
+        mng->endStateBlock( msg );
 
         update();
         designerBehaviour = onPivotFirstNodeDraw;
@@ -1211,7 +1216,12 @@ void TrussDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
 
         selectedWindow->updateAfterNodeManipulation ( selectedNode, true );
 
-        mng->endStateBlock();
+        QString msg( tr("Move node (%1,%2) -> (%3,%4)").
+                       arg(int(beforeDragNodePos.getX())).
+                       arg(int(beforeDragNodePos.getY())).
+                       arg(int(selectedNode->getX())).
+                       arg(int(selectedNode->getY())) );
+        mng->endStateBlock( msg );
 
         update();
 
@@ -1245,7 +1255,12 @@ void TrussDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
 
         selectedWindow->updateAfterPivotManipulation ( selectedPivot, true );
 
-        mng->endStateBlock();
+        QString msg( tr("Move pivot (%1,%2)(%3,%4)").
+                       arg(int(selectedPivot->getFirstNode().getX())).
+                       arg(int(selectedPivot->getFirstNode().getY())).
+                       arg(int(selectedPivot->getLastNode().getX())).
+                       arg(int(selectedPivot->getLastNode().getY())) );
+        mng->endStateBlock( msg );
 
         update();
 
@@ -1360,7 +1375,11 @@ void TrussDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                     state.addAction( new TrussNodeRemoveAction(*selectedNode));
                     state.save();
                     selectedNode->desist();
-                    mng->endStateBlock();
+
+                    QString msg( tr("Remove node (%1,%2)").
+                                   arg(int(selectedNode->getX())).
+                                   arg(int(selectedNode->getY())) );
+                    mng->endStateBlock( msg );
     
                     update();
                 }
@@ -1391,12 +1410,22 @@ void TrussDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                 if ( designerBehaviour == onErase )
                 {
                     // Save remove pivot action
+                    ObjectStateManager* mng = selectedPivot->getStateManager();
+                    mng->startStateBlock();
                     ObjectState& state = 
                         selectedPivot->createState( "remove pivot" );
                     state.addAction( 
                         new TrussPivotRemoveAction( *selectedPivot ) );
                     state.save();
                     selectedPivot->desist();
+
+                    QString msg( tr("Remove pivot (%1,%2)(%3,%4)").
+                                arg(int(selectedPivot->getFirstNode().getX())).
+                                arg(int(selectedPivot->getFirstNode().getY())).
+                                arg(int(selectedPivot->getLastNode().getX())).
+                                arg(int(selectedPivot->getLastNode().getY())));
+                    mng->endStateBlock( msg );
+
                     update();
                 }
                 else
@@ -1452,7 +1481,11 @@ void TrussDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                     selectedWindow->updateAfterNodeManipulation( 
                         &newNode, true );
 
-                    mng->endStateBlock();
+                    QString msg( tr("Create node (%1,%2)").
+                                   arg(int(newNode.getX())).
+                                   arg(int(newNode.getY())) );  
+                    mng->endStateBlock( msg );
+
                     update();
                 }
             }

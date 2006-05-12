@@ -106,9 +106,9 @@ void FermaNextMainWindow::initUndoRedoWindow ()
 {
     undoRedoHistoryWidget = new QWidget( this, Qt::Window | Qt::Tool );
 
-    undoRedoHistoryWidget->setFixedSize( 140, 110 );
+    undoRedoHistoryWidget->setFixedSize( 195, 120 );
     // Pretty history widget offset from the end point of the screen
-    undoRedoHistoryWidget->move( QApplication::desktop()->width() - 170, 80 );
+    undoRedoHistoryWidget->move( QApplication::desktop()->width() - 225, 75 );
     undoRedoHistoryWidget->setWindowTitle( tr("History") );
     undoRedoListBox = new UndoRedoListBox( undoRedoHistoryWidget );
     undoRedoHistoryWidget->installEventFilter( this );
@@ -145,7 +145,7 @@ void FermaNextMainWindow::initTrussPropertyWindow ()
     trussPropertyWindow->setFixedSize( 195, 228 );
     trussPropertyWindow->setWindowTitle( tr("Truss Properties") );
     trussPropTabWidget = new TrussPropertyTabWidget( trussPropertyWindow );
-    trussPropertyWindow->move( QApplication::desktop()->width() - 225, 425 );
+    trussPropertyWindow->move( QApplication::desktop()->width() - 225, 420 );
     trussPropertyWindow->installEventFilter( this );
 
     QVBoxLayout* tabLayout = new QVBoxLayout;

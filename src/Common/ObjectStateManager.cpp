@@ -8,7 +8,9 @@
  * State Block
  *****************************************************************************/
 
-ObjectStateManager::StateBlock::StateBlock ( ObjectStateManager& mng ) : 
+ObjectStateManager::StateBlock::StateBlock ( ObjectStateManager& mng,
+                                             const QString& blockName_ ) :
+    blockName(blockName_),
     stateMng(mng)
 {}
 
@@ -49,6 +51,12 @@ size_t ObjectStateManager::StateBlock::countStates () const
 {
     return states.size();
 }
+
+const QString&  ObjectStateManager::StateBlock::getBlockName () const
+{ return blockName; }
+
+void ObjectStateManager::StateBlock::setBlockName ( const QString& name )
+{ blockName = name; }
 
 QString ObjectStateManager::StateBlock::concatStateNames () const
 {
@@ -118,13 +126,19 @@ void ObjectStateManager::startStateBlock ()
     ++startedBlocks;
 }
 
-void ObjectStateManager::endStateBlock ()
+void ObjectStateManager::endStateBlock ( const QString& blockName )
 {
     if ( startedBlocks == 0 )
         return;
 
     // We should decrement inner blocks
     --startedBlocks;
+
+    // Block was created and contains at least one state
+    if ( newlyCreatedBlock ) {
+        if ( ! blockName.isEmpty() )
+            newlyCreatedBlock->setBlockName( blockName );
+    }
 
     // Outer last block is ended and something was saved in it
     if ( startedBlocks == 0 && newlyCreatedBlock ) {
@@ -475,7 +489,7 @@ QStringList ObjectStateManager::stateBlockNames () const
     QStringList names;
     BlockListConstIter iter = stateBlocks.begin();
     for ( ; iter != stateBlocks.end(); ++iter )
-        names.push_back( (*iter)->concatStateNames() );
+        names.append( (*iter)->getBlockName() );
     return names;
 }
 
