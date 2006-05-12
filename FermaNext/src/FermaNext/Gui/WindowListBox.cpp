@@ -233,8 +233,8 @@ WindowListBox::WindowListBox ( FermaNextProject& prj, QWidget* parent ) :
     project(prj)
 {
     // Catch double click on item
-    QObject::connect( this, SIGNAL(itemPressed(QListWidgetItem*)),
-                      SLOT(raiseWindowItem(QListWidgetItem*)) );
+    QObject::connect( this, SIGNAL(itemSelectionChanged()),
+                      SLOT(raiseSelectedWindowItem()) );
 
     // Catch focus changes
     TrussDesignerWidget& w = prj.getDesignerWidget();
@@ -315,12 +315,14 @@ void WindowListBox::unselectAllFromGroup ()
         iter.value().item->unselectFromGroup();
 }
 
-void WindowListBox::raiseWindowItem ( QListWidgetItem* it )
-{    
-    if ( it == 0 )
+void WindowListBox::raiseSelectedWindowItem ()
+{
+    QList<QListWidgetItem*> selected = selectedItems();
+    if ( selected.size() != 1 )
         return;
-    try { 
-        TrussUnitWindowItem& item = dynamic_cast<TrussUnitWindowItem&>(*it);
+    try {
+        TrussUnitWindowItem& item = 
+            dynamic_cast<TrussUnitWindowItem&>( *selected.at(0) );
         item.raise();
     }
     catch ( ... ) { return; }

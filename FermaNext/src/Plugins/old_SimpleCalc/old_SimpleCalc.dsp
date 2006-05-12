@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "..\..\..\build\release\obj\old_SimpleCalc.plg"
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
-# ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "$(QTDIR)/include/QtNetwork" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include" /I "..\..\Common" /I "..\..\Common\Plugin" /I "..\..\Common\Loader" /I "..\..\FermaNext\TrussUnit" /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\release\mocs\old_SimpleCalc.plg" /I "..\..\..\build\release\ui\old_SimpleCalc.plg" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_USRDLL" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_NO_DEBUG" /D "QT_PLUGIN" /D "QT_CORE_LIB" /D "QT_GUI_LIB" /D "QT_NETWORK_LIB" /FD -Zm200 /c
+# ADD CPP /nologo /MD /W3 /GR /GX /O1 /I "$(QTDIR)/include/QtNetwork" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include" /I "..\..\Common" /I "..\..\Common\Plugin" /I "..\..\Common\Loader" /I "..\..\FermaNext\TrussUnit" /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\release\mocs\old_SimpleCalc.plg" /I "..\..\..\build\release\ui\old_SimpleCalc.plg" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_USRDLL" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_NO_DEBUG" /D "QT_PLUGIN" /D "QT_CORE_LIB" /D "QT_GUI_LIB" /D "QT_NETWORK_LIB" /D "QT_XML_LIB" /FD -Zm200 /c
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419
 # ADD RSC /l 0x409 /d "NDEBUG"
@@ -71,7 +71,7 @@ PostBuild_Cmds=xcopy /y Simple_f.dll ..\..\..\plugins	xcopy /y win_Simple_f.dll 
 # PROP Intermediate_Dir "..\..\..\build\debug\obj\old_SimpleCalc.plg"
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
-# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /I "$(QTDIR)/include/QtNetwork" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include" /I "..\..\Common" /I "..\..\Common\Plugin" /I "..\..\Common\Loader" /I "..\..\FermaNext\TrussUnit" /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\debug\mocs\old_SimpleCalc.plg" /I "..\..\..\build\debug\ui\old_SimpleCalc.plg" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_USRDLL" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_PLUGIN" /D "QT_CORE_LIB" /D "QT_GUI_LIB" /D "QT_NETWORK_LIB" /FD -Zm200 /c
+# ADD CPP /nologo /MDd /W3 /GR /GX /Zi /I "$(QTDIR)/include/QtNetwork" /I "$(QTDIR)/include/QtXml" /I "$(QTDIR)/include/QtGui" /I "$(QTDIR)/include/QtCore" /I "$(QTDIR)/include" /I "..\..\Common" /I "..\..\Common\Plugin" /I "..\..\Common\Loader" /I "..\..\FermaNext\TrussUnit" /I "$(QTDIR)/include/ActiveQt" /I "..\..\..\build\debug\mocs\old_SimpleCalc.plg" /I "..\..\..\build\debug\ui\old_SimpleCalc.plg" /I "$(QTDIR)/mkspecs/win32-msvc" /D "_USRDLL" /D "UNICODE" /D "QT_LARGEFILE_SUPPORT" /D "WIN32" /D "QT_THREAD_SUPPORT" /D "QT_DLL" /D "QT_PLUGIN" /D "QT_CORE_LIB" /D "QT_GUI_LIB" /D "QT_NETWORK_LIB" /D "QT_XML_LIB" /FD -Zm200 /c
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419
 # ADD RSC /l 0x409 /d "_DEBUG"
