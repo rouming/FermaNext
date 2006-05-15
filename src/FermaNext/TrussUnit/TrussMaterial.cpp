@@ -22,13 +22,14 @@ TrussMaterial::TrussMaterial ( const QString& name,
     density(density_)
 {}
 
-TrussMaterial::TrussMaterial ( const TrussMaterial& mat )
-{
-    materialName = mat.getMaterialName();
-    workingStress = mat.getWorkingStress();
-    elasticityModule = mat.getElasticityModule();
-    density = mat.getDensity();
-}
+TrussMaterial::TrussMaterial ( const TrussMaterial& mat ) :
+    QObject(),
+    XMLSerializableObject(),
+    materialName( mat.materialName ),
+    workingStress( mat.workingStress ),
+    elasticityModule( mat.elasticityModule ),
+    density( mat.density )
+{}
 
 TrussMaterial& TrussMaterial::operator= ( const TrussMaterial& mat )
 {

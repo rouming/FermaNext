@@ -350,7 +350,7 @@ void NodeTable::addNode ( const Node& node )
     updateMaximumHeight();
 }
 
-void NodeTable::updateMaximumHeight ( int numRows /* = -1 */ )
+void NodeTable::updateMaximumHeight ( int /*numRows*/ /*= -1 */ )
 {/*
     if ( numRows == -1 )
         numRows = rowCount();
@@ -839,7 +839,6 @@ void GeometryTabWidget::showNodeTableRow ( bool visible )
             nodesNumbLabel->setText( "Total nodes: " + 
                 QString::number(focusWindow->getNodeList().size() - 1) );
             
-            QHeaderView* horHeader = nodeTable->horizontalHeader();
             nodeTable->updateMaximumHeight( nodeTable->rowCount() - 1 );
         }
     }

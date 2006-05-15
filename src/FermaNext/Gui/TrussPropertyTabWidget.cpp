@@ -169,7 +169,7 @@ const TrussMaterial* MaterialTableItem::getMaterial () const
     return m;
 }
 
-void MaterialTableItem::updateMaterialItemName( const QString& name )
+void MaterialTableItem::updateMaterialItemName( const QString& )
 {
     const TrussMaterial* senderMaterial = 
         dynamic_cast<const TrussMaterial*>(sender());
