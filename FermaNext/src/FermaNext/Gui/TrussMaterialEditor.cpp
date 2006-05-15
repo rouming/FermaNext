@@ -135,9 +135,9 @@ TrussMaterialEditDialog::TrussMaterialEditDialog ( QWidget* parent /* = 0 */,
 
 void TrussMaterialEditDialog::init ()
 {
-    int maxElasticityModule = 999999999.99;
-    int maxWorkingStress = 9999999.99;
-    int maxMaterialDensity = 999.99;
+    int maxElasticityModule = int(999999999.99);
+    int maxWorkingStress = int(9999999.99);
+    int maxMaterialDensity = int(999.99);
 
     QGroupBox* materialPropBox = new QGroupBox( tr( "Material Properties" ) );
     nameLineEdit = new QLineEdit( materialPropBox );
