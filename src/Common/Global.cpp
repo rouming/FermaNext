@@ -120,6 +120,11 @@ QString configFileName ()
     return applicationDirPath() + pathSeparator() + "config.xml";
 }
 
+QString loggingFileName ()
+{
+    return applicationDirPath() + pathSeparator() + "log4cxx.properties";
+}
+
 Config& config ()
 {
     return Config::instance( configFileName() );

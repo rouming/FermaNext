@@ -1,8 +1,17 @@
 
+#include <algorithm>
+
 #include "ObjectStateManager.h"
 #include "StatefulObject.h"
+#include "Log4CXX.h"
 
-#include <algorithm>
+/*****************************************************************************
+ * Logger
+ *****************************************************************************/
+
+using log4cxx::LoggerPtr;
+using log4cxx::Logger;
+LoggerPtr logger( Logger::getLogger("common.ObjectStateManager") );
 
 /*****************************************************************************
  * State Block
@@ -122,12 +131,15 @@ void ObjectStateManager::clear ()
 
 void ObjectStateManager::startStateBlock ()
 {
+    LOG4CXX_DEBUG(logger, "startStateBlock");
     // We should increment inner blocks
     ++startedBlocks;
 }
 
 void ObjectStateManager::endStateBlock ( const QString& blockName )
 {
+    LOG4CXX_DEBUG(logger, "endStateBlock");
+
     if ( startedBlocks == 0 )
         return;
 
@@ -282,6 +294,8 @@ bool ObjectStateManager::tryToShiftStack ()
 
 void ObjectStateManager::saveState ( ObjectState& st )
 {
+    LOG4CXX_DEBUG(logger, "saveState");
+
     startStateBlock();
     // Create state block if it was not created
     if ( newlyCreatedBlock == 0 )
@@ -301,6 +315,8 @@ void ObjectStateManager::saveState ( ObjectState& st )
 void ObjectStateManager::undo () /*throw (UndoException, 
                                           StateBlockIsNotEnded)*/
 {    
+    LOG4CXX_DEBUG(logger, "undo");
+
     // Nothing to undo
     if ( countStateBlocks() == 0 ) 
         throw UndoException();
@@ -341,6 +357,8 @@ void ObjectStateManager::undo () /*throw (UndoException,
 void ObjectStateManager::redo () /*throw (RedoException,
                                           StateBlockIsNotEnded)*/
 {
+    LOG4CXX_DEBUG(logger, "redo");
+
     // Nothing to redo
     if ( countStateBlocks() == 0 ) 
         throw RedoException();
@@ -380,6 +398,8 @@ void ObjectStateManager::redo () /*throw (RedoException,
 
 void ObjectStateManager::rollbackNotEndedBlock ()
 {
+    LOG4CXX_DEBUG(logger, "rollbackNotEndedBlock");
+
     // Nothing to do
     if ( newlyCreatedBlock == 0 )
         return;
@@ -400,6 +420,8 @@ void ObjectStateManager::step ( uint indx )
     /*throw (OutOfBoundsException, StepException, RedoException, 
              UndoException, StateBlockIsNotEnded)*/
 {
+    LOG4CXX_DEBUG(logger, "step(uint)");
+
     size_t stateBlocksNum = countStateBlocks();
 
     // Nothing to do

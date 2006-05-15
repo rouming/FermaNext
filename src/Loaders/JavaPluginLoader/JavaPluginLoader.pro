@@ -2,9 +2,9 @@
 TARGET = JavaPluginLoader.ldr
 
 LEVEL = ../../..
-include(../../../FermaNext.pri)
+include($$LEVEL/FermaNext.pri)
 
-DESTDIR = ../../../plugins/loaders/
+DESTDIR = $$LEVEL/plugins/loaders/
 QT += core gui xml
 
 TEMPLATE = lib
@@ -12,18 +12,18 @@ CONFIG += plugin warn_on thread
 
 DEFINES += QT_THREAD_SUPPORT
 
-INCLUDEPATH = ../../Common \
-              ../../Common/Plugin \
-              ../../Common/Loader \
-              $$(JAVA_HOME)/include
+INCLUDEPATH += ../../Common \
+               ../../Common/Plugin \
+               ../../Common/Loader \
+               $$(JAVA_HOME)/include
 
 
 win32 {
-  LIBS = Common.lib
+  LIBS += Common.lib
   INCLUDEPATH += $$(JAVA_HOME)/include/win32
 }
 unix {
-  LIBS = -lCommon
+  LIBS += -lCommon
   INCLUDEPATH += $$(JAVA_HOME)/include/linux
 }
 
