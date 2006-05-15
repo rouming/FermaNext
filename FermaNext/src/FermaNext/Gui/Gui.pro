@@ -2,7 +2,7 @@
 TARGET = Gui
 
 LEVEL = ../../..
-include(../../../FermaNext.pri)
+include($$LEVEL/FermaNext.pri)
 
 TEMPLATE = lib
 CONFIG += staticlib warn_on thread
@@ -14,15 +14,15 @@ win32 {
 unix {
 }
 
-INCLUDEPATH = $$(AGGDIR)/include \
-              $$(AGGDIR)/svg \
-              . \
-              Agg \             
-              ../../Common \
-              ../../Common/Plugin \
-              ../../Common/Loader \
-              ../TrussUnit \
-              ../
+INCLUDEPATH += $$(AGGDIR)/include \
+               $$(AGGDIR)/svg \
+               . \
+               Agg \             
+               ../../Common \
+               ../../Common/Plugin \
+               ../../Common/Loader \
+               ../TrussUnit \
+               ../
 
 #FIXME QT3TO4
 #FORMS = ../gui/CalcDataWidget.ui

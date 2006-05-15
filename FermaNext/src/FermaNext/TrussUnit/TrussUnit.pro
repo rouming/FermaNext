@@ -2,7 +2,7 @@
 TARGET = TrussUnit
 
 LEVEL = ../../..
-include(../../../FermaNext.pri)
+include($$LEVEL/FermaNext.pri)
 
 QT += core xml
 
@@ -15,10 +15,10 @@ win32 {
 unix {
 }
 
-INCLUDEPATH = $$(AGGDIR)/include \
-              $$(AGGDIR)/svg \
-              ../../Common \
-              ../Gui/Agg
+INCLUDEPATH += $$(AGGDIR)/include \
+               $$(AGGDIR)/svg \
+               ../../Common \
+               ../Gui/Agg
 
 SOURCES = \
           Truss.cpp \

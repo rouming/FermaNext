@@ -104,6 +104,7 @@ QString imagesCursorsPath ();
 QString pluginsPath ();
 QString pluginLoadersPath ();
 QString configFileName ();
+QString loggingFileName ();
 Config& config ();
 
 // Returns application version in format: 
