@@ -41,7 +41,7 @@ public:
         InternalErrStatus,     /**< Internal error. */
     };
 
-    PluginLoader ( PluginManager& );
+    PluginLoader ( PluginManager&, const QString& path );
 
     /**
      * Override in derived classes and often call #unloadPlugins.
@@ -49,6 +49,12 @@ public:
      * except #unloadPlugins.
      */
     virtual ~PluginLoader ();
+
+    /**
+     * Returns path of a library, from which plugin loader was loaded.
+     * @return plugin loader path as a string.
+     */
+    const QString& pluginLoaderPath () const;
 
     /**
      * Returns plugin extension in following string format: \\w\\w\\w
@@ -185,8 +191,9 @@ private:
     typedef PluginMap::ConstIterator PluginMapConstIter;
 
     PluginManager& pluginMng;
+    QString path;
     Status status;
-    PluginMap pluginMap;
+    PluginMap pluginMap;    
 };
 
 #endif //PLUGINLOADER_H

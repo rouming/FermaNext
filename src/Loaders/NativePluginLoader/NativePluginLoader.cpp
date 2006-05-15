@@ -20,8 +20,9 @@ FERMA_NEXT_PLUGIN_LOADER(NativePluginLoader, (PluginManager::LoadingPriority)0)
  * Native Plugin Loader
  *****************************************************************************/
 
-NativePluginLoader::NativePluginLoader ( PluginManager& mng ) :
-    PluginLoader(mng)        
+NativePluginLoader::NativePluginLoader ( PluginManager& mng, 
+                                         const QString& path ) :
+    PluginLoader(mng, path)
 {}
 
 NativePluginLoader::~NativePluginLoader ()

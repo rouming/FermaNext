@@ -18,8 +18,9 @@ FERMA_NEXT_PLUGIN_LOADER(JavaPluginLoader, PluginManager::NormalPriority)
 
 /*****************************************************************************/
 
-JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng ) :
-    PluginLoader( plgMng ),
+JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng, 
+                                     const QString& path ) :
+    PluginLoader( plgMng, path ),
     javaVM(0),
     fnClass(0),
     fnObject(0)

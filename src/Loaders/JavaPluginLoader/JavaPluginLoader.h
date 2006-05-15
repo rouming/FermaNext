@@ -10,7 +10,7 @@ class JavaPluginLoader : public PluginLoader
 {
 public:
     /** Constructor */
-    JavaPluginLoader ( PluginManager& );
+    JavaPluginLoader ( PluginManager&, const QString& path );
 
     /** Destroys all laoded java plugins. */
     virtual ~JavaPluginLoader ();

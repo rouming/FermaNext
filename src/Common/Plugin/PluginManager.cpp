@@ -3,10 +3,19 @@
 #include "PluginManager.h"
 #include "DynaLoader.h"
 #include "Config.h"
+#include "Log4CXX.h"
 
 #include <algorithm>
 #include <QDir>
 #include <QRegExp>
+
+/*****************************************************************************
+ * Logger
+ *****************************************************************************/
+
+using log4cxx::LoggerPtr;
+using log4cxx::Logger;
+static LoggerPtr logger( Logger::getLogger("common.PluginManager") );
 
 /*****************************************************************************
  * Plugin Manager
@@ -40,6 +49,8 @@ Config& PluginManager::config ()
 
 void PluginManager::registerPluginLoaders ( const QString& path )
 {
+    LOG4CXX_DEBUG(logger, "registerPluginLoaders");
+
     QDir ldrDir( path, "*." + systemPluginLoaderExtension() + "." +
                        DynaLoader::libExtension(),
                  QDir::Name | QDir::IgnoreCase, 
@@ -50,15 +61,16 @@ void PluginManager::registerPluginLoaders ( const QString& path )
 
     // Try to register loaders from path
     for ( uint i = 0; i < ldrDir.count(); ++i ) {
-        try {  registerPluginLoader( path + QDir::separator() + ldrDir[i] ); }
-        catch ( RegisterPluginLoaderException& ) {
-            //TODO: log this exception
-        }
+        QString loaderPath = path + QDir::separator() + ldrDir[i];
+        try { registerPluginLoader( loaderPath ); }
+        catch ( RegisterPluginLoaderException& ) {}
     }
 }
 
 void PluginManager::unregisterPluginLoaders ()
 {
+    LOG4CXX_DEBUG(logger, "unregisterPluginLoaders");
+
     // Firstly unload all plugins.
     unloadPlugins();
 
@@ -78,6 +90,9 @@ void PluginManager::unregisterPluginLoaders ()
 void PluginManager::registerPluginLoader ( const QString& pathToLoaderLib )
     /*throw (RegisterPluginLoaderException)*/
 {
+    LOG4CXX_DEBUG(logger, "registerPluginLoader: " +
+                  pathToLoaderLib.toStdString() );
+
     DynaLoader* nativeLib = new DynaLoader;
     LoadingPriority priority;
     PluginLoader* loader = 0;
@@ -87,28 +102,39 @@ void PluginManager::registerPluginLoader ( const QString& pathToLoaderLib )
         PluginLoaderInstanceInitCall loaderInstanceInitCall = 
             (PluginLoaderInstanceInitCall)nativeLib->getProcAddress( 
                                            PLUGIN_LOADER_INSTANCE_INIT_CALL );
-        loader = loaderInstanceInitCall( *this, &priority );
+        loader = loaderInstanceInitCall( *this, pathToLoaderLib, &priority );
     }
     catch ( DynaLoader::LibraryLoadException& ) {
+        LOG4CXX_WARN(logger, "loader can't be registered: " + 
+                     pathToLoaderLib.toStdString() + ", can't load library");
+
         delete nativeLib;
-        // TODO: log this exception
         throw RegisterPluginLoaderException();
     }
     catch ( DynaLoader::AddressException& ) {
+        LOG4CXX_WARN(logger, "loader can't be registered: " + 
+                     pathToLoaderLib.toStdString() + ", can't find address");
+
         delete nativeLib;
-        // TODO: log this exception
         throw RegisterPluginLoaderException();
     }
     catch ( ... ) {
-        // Unknow loader exception
-        // TODO: log this exception
+        LOG4CXX_ERROR(logger, "loader can't be registered: " + 
+                      pathToLoaderLib.toStdString() + ", unknown exception");
         throw RegisterPluginLoaderException();
     }
 
     if ( loader == 0 ) {
+        LOG4CXX_WARN(logger, "loader can't be registered: " + 
+                     pathToLoaderLib.toStdString() + ", loader pointer is 0");
+
         delete nativeLib;
         throw RegisterPluginLoaderException();
     }
+
+    LOG4CXX_INFO(logger, "loader registered: " + 
+                 pathToLoaderLib.toStdString());
+
     PluginLoaderList* loaders = 0;
     if ( ! loadersMap.contains( priority ) ) {
         loaders = new PluginLoaderList;
@@ -123,6 +149,9 @@ void PluginManager::registerPluginLoader ( const QString& pathToLoaderLib )
 
 void PluginManager::unregisterPluginLoader ( PluginLoader& loader )
 {
+    LOG4CXX_DEBUG(logger, "unregisterPluginLoader: " +
+                  loader.pluginLoaderPath().toStdString());
+
     PluginLoadersMapIter loaderMapIt = loadersMap.begin();
     for ( ; loaderMapIt != loadersMap.end(); ++loaderMapIt ) {
         PluginLoaderList* loaders = loaderMapIt.value();
@@ -161,8 +190,12 @@ void PluginManager::unregisterPluginLoader ( PluginLoader& loader )
             pluginLoaderInstanceFiniCall();
         }
         catch ( DynaLoader::AddressException& ) {
-            // TODO: log this exception            
+            LOG4CXX_WARN(logger, "can't find address for fini call of loader: "
+                         + loader.pluginLoaderPath().toStdString());
         }
+
+        LOG4CXX_INFO(logger, "loader unloaded: "
+                     + loader.pluginLoaderPath().toStdString());
 
         delete nativeLib;
 
@@ -216,6 +249,8 @@ Plugin& PluginManager::chooseRequiredPlugin ( Plugin& /*plugin*/,
 
 void PluginManager::loadPlugins ( const QString& path )
 {
+    LOG4CXX_DEBUG(logger, "loadPlugins: " + path.toStdString());
+
     // Firstly unload all plugins
     unloadPlugins();
 
@@ -229,15 +264,22 @@ void PluginManager::loadPlugins ( const QString& path )
 
     for ( uint i = 0; i < preloadedLibsDir.count(); ++i ) {
         QString dir = preloadedLibsDir[i];
+        LOG4CXX_INFO(logger, "system lib: " + dir.toStdString());
+
         // Preload only simple dynamic system libs. Ignore FN plugins.
         if ( dir.contains( QRegExp( ".*\\." +  systemPluginExtension() + 
                                     "\\.\\w+$" ) ) )
             continue;
-        try {
-            DynaLoader* systemLib = 
-                new DynaLoader( path + QDir::separator() + dir );
+        QString systemLibPath = path + QDir::separator() + dir;
+        try {        
+            LOG4CXX_INFO(logger, "preload system lib: " + 
+                         systemLibPath.toStdString());
+            DynaLoader* systemLib = new DynaLoader( systemLibPath );
             systemLibs.push_back( systemLib );
-        } catch ( ... ) {}
+        } catch ( ... ) {
+            LOG4CXX_WARN(logger, "can't preload system lib: " + 
+                         systemLibPath.toStdString());
+        }
     }
 
     typedef std::vector<QString> PluginPathList;
@@ -269,22 +311,26 @@ void PluginManager::loadPlugins ( const QString& path )
     // Emit signal about number of plugins which are going to be loaded.
     emit onBeforePluginsLoad( pluginPathList.size() );
 
-    // Load all plugins by sored plugins paths in priority order..
+    // Load all plugins by stored plugins paths in priority order..
     PluginPathListConstIter pathIt = pluginPathList.begin();
     for ( ; pathIt != pluginPathList.end(); ++pathIt ) {
         const QString& path = *pathIt;
         try {
+            LOG4CXX_INFO(logger, "try to load plugin: " + path.toStdString());
             emit onBeforePluginLoad( path );
             PluginLoader* loader = pluginPathMap[ path ];
             Plugin& plg = loader->loadPlugin( path );
             plugins[&plg] = loader;
             emit onAfterPluginLoad( plg );
+            LOG4CXX_INFO(logger, "plugin loaded: " + path.toStdString());
         }
         catch ( PluginLoader::PluginIsAlreadyLoadedException& ) {
-            //TODO: this exception should be written to log
+            LOG4CXX_WARN(logger, "plugin can't be loaded: " + 
+                         path.toStdString() + ", plugin is already loaded");
         }
         catch ( PluginLoader::PluginLoadException& ) {
-            //TODO: this exception should be written to log
+            LOG4CXX_WARN(logger, "plugin can't be loaded: " + 
+                         path.toStdString());
         }
     }
 
@@ -297,6 +343,8 @@ void PluginManager::loadPlugins ( const QString& path )
 
 void PluginManager::unloadPlugins ()
 {
+    LOG4CXX_DEBUG(logger, "unloadPlugins");
+
     // Unload all plugins regardless of their status
     PluginList loadedPlgs = loadedPlugins( false );
     int pluginsSize = loadedPlgs.size();
@@ -320,6 +368,8 @@ void PluginManager::unloadPlugins ()
 
 void PluginManager::unloadPlugin ( Plugin& plg )
 {
+    LOG4CXX_DEBUG(logger, "unloadPlugin: " + plg.pluginPath().toStdString());
+
     if ( ! plugins.contains( &plg ) )
         return;
     PluginLoader* loader = plugins[&plg];
