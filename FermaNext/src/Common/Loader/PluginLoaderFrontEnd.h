@@ -17,7 +17,9 @@
  * @see PluginLoader
  */
 typedef PluginLoader* ( *PluginLoaderInstanceInitCall ) (
-                             PluginManager&, PluginManager::LoadingPriority* );
+                             PluginManager&, 
+                             const QString& path,
+                             PluginManager::LoadingPriority* );
 
 /** 
  * Destroyes plugin loader instance in native DLL.
@@ -41,10 +43,12 @@ typedef void ( *PluginLoaderInstanceFiniCall ) ();
 #define FERMA_NEXT_PLUGIN_LOADER(LoaderClass, priority) \
     static LoaderClass* loader_instance__ = 0; \
     PluginExport PluginLoader* PLUGIN_LOADER_INSTANCE_INIT ( \
-           PluginManager& mng, PluginManager::LoadingPriority* priorityOut ) \
+           PluginManager& mng, \
+           const QString& path, \
+           PluginManager::LoadingPriority* priorityOut ) \
     { \
       *priorityOut = priority; \
-      loader_instance__ = new LoaderClass( mng ); \
+      loader_instance__ = new LoaderClass( mng, path ); \
       return loader_instance__; \
     } \
     \

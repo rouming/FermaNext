@@ -11,7 +11,7 @@
 
 using log4cxx::LoggerPtr;
 using log4cxx::Logger;
-LoggerPtr logger( Logger::getLogger("common.ObjectStateManager") );
+static LoggerPtr logger( Logger::getLogger("common.ObjectStateManager") );
 
 /*****************************************************************************
  * State Block

@@ -1,43 +1,75 @@
 
 #include "PluginLoader.h"
 #include "Plugin.h"
+#include "Log4CXX.h"
+
+/*****************************************************************************
+ * Logger
+ *****************************************************************************/
+
+using log4cxx::LoggerPtr;
+using log4cxx::Logger;
+static LoggerPtr logger( Logger::getLogger("common.PluginManager") );
 
 /*****************************************************************************
  * Plugin Loader
  *****************************************************************************/
 
-PluginLoader::PluginLoader ( PluginManager& plgMng ) :
-    pluginMng(plgMng), status(OkStatus)
+PluginLoader::PluginLoader ( PluginManager& plgMng, const QString& path_ ) :
+    pluginMng(plgMng),
+    path(path_),
+    status(OkStatus)
 {}
 
 PluginLoader::~PluginLoader ()
 {}
 
+const QString& PluginLoader::pluginLoaderPath () const
+{ return path; }
+
 Plugin& PluginLoader::loadPlugin ( const QString& pathToPlugin )
     /*throw (PluginLoadException, PluginIsAlreadyLoadedException)*/
 {
-    if ( pluginMap.contains( pathToPlugin ) )
+    LOG4CXX_DEBUG(logger, "loadPlugin: " + pathToPlugin.toStdString() );
+
+    if ( pluginMap.contains( pathToPlugin ) ) {
+        LOG4CXX_WARN(logger, "plugin can't be loaded: " + 
+                     pathToPlugin.toStdString() + ", plugin is already loaded" );
         throw PluginIsAlreadyLoadedException();
-    Plugin& plugin = specificLoadPlugin( pathToPlugin );
-    pluginMap[pathToPlugin] = &plugin;
-    return plugin;
+    }
+    try { 
+        Plugin& plugin = specificLoadPlugin( pathToPlugin );
+        pluginMap[pathToPlugin] = &plugin;
+        return plugin;
+    } catch ( PluginLoader::PluginLoadException& ) {
+        LOG4CXX_WARN(logger, "plugin can't be loaded: " + 
+                     pathToPlugin.toStdString() + ", specific crash" );
+        throw;
+    }
 }
 
 void PluginLoader::unloadPlugin ( const QString& pathToPlugin )
 {
+    LOG4CXX_DEBUG(logger, "unloadPlugin(QString): " + pathToPlugin.toStdString() );
+
     if ( ! pluginMap.contains( pathToPlugin ) )
         return;
     specificUnloadPlugin( *pluginMap[pathToPlugin] );
     pluginMap.remove( pathToPlugin );
+    LOG4CXX_INFO(logger, "plugin unloaded: " + pathToPlugin.toStdString() );
 }
 
 void PluginLoader::unloadPlugin ( Plugin& plugin )
 {
+    QString pathToPlugin = plugin.pluginPath();
+    LOG4CXX_DEBUG(logger, "unloadPlugin(Plugin): " + pathToPlugin.toStdString() );
+
     PluginMapIter it = pluginMap.begin();
     for ( ; it != pluginMap.end(); ++it ) {
         if ( it.value() == &plugin ) {                
             specificUnloadPlugin( plugin );
             pluginMap.remove( it.key() );
+            LOG4CXX_INFO(logger, "plugin unloaded: " + pathToPlugin.toStdString() );
             return;
         }
     }
@@ -45,9 +77,14 @@ void PluginLoader::unloadPlugin ( Plugin& plugin )
 
 void PluginLoader::unloadPlugins ()
 {
+    LOG4CXX_DEBUG(logger, "unloadPlugins");
     PluginMapIter it = pluginMap.begin();
-    for ( ; it != pluginMap.end(); ++it )
-        specificUnloadPlugin( *it.value() );
+    for ( ; it != pluginMap.end(); ++it ) {
+        Plugin& plugin = *it.value();
+        QString pathToPlugin = plugin.pluginPath();
+        specificUnloadPlugin( plugin );
+        LOG4CXX_INFO(logger, "plugin unloaded: " + pathToPlugin.toStdString() );
+    }
     pluginMap.clear();
 }
 

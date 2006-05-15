@@ -10,7 +10,7 @@ class NativePlugin;
 class NativePluginLoader : public PluginLoader
 {
 public:
-    NativePluginLoader ( PluginManager& );
+    NativePluginLoader ( PluginManager&, const QString& path );
 
     /** 
      * Destroys all laoded native plugins.
