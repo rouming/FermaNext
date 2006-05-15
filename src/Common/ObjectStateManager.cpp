@@ -384,15 +384,10 @@ void ObjectStateManager::rollbackNotEndedBlock ()
     if ( newlyCreatedBlock == 0 )
         return;
 
-    // Safe undo
-    emit beforeUndo(*this);
-    stateCall(true);
-
-    // Undo block
+    // Silently undo block, nobody should know about
+    // this undo, because block, generally speaking, has
+    // not been started yet.
     newlyCreatedBlock->undo();
-
-    stateCall(false);
-    emit afterUndo(*this);
 
     // Free created block
     delete newlyCreatedBlock;
