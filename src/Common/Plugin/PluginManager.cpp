@@ -149,8 +149,10 @@ void PluginManager::registerPluginLoader ( const QString& pathToLoaderLib )
 
 void PluginManager::unregisterPluginLoader ( PluginLoader& loader )
 {
+    // For logging
+    QString loaderPath = loader.pluginLoaderPath();
     LOG4CXX_DEBUG(logger, "unregisterPluginLoader: " +
-                  loader.pluginLoaderPath().toStdString());
+                  loaderPath.toStdString());
 
     PluginLoadersMapIter loaderMapIt = loadersMap.begin();
     for ( ; loaderMapIt != loadersMap.end(); ++loaderMapIt ) {
@@ -191,11 +193,11 @@ void PluginManager::unregisterPluginLoader ( PluginLoader& loader )
         }
         catch ( DynaLoader::AddressException& ) {
             LOG4CXX_WARN(logger, "can't find address for fini call of loader: "
-                         + loader.pluginLoaderPath().toStdString());
+                         + loaderPath.toStdString());
         }
 
         LOG4CXX_INFO(logger, "loader unloaded: "
-                     + loader.pluginLoaderPath().toStdString());
+                     + loaderPath.toStdString());
 
         delete nativeLib;
 
