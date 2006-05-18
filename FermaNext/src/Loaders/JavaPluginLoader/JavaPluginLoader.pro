@@ -28,11 +28,13 @@ unix {
 }
 
 HEADERS = JavaPluginLoader.h \
+          JavaPlugin.h \
           \
           JavaVM/JavaVirtualMachine.h \
           JavaVM/JNITypes.h
 
 SOURCES = JavaPluginLoader.cpp \
+          JavaPlugin.cpp \
           \
           JavaVM/JavaVirtualMachine.cpp \
           \
