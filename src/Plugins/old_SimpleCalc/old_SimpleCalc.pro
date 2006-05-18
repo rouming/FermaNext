@@ -26,7 +26,8 @@ unix {
 INCLUDEPATH += ../../Common \
                ../../Common/Plugin \
                ../../Common/Loader \
-               ../../FermaNext/TrussUnit               
+               ../../FermaNext/TrussUnit \
+               ../../Loaders/NativePluginLoader
 
 HEADERS = old_SimpleCalc.h \
           VYVReader.h \

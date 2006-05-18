@@ -91,6 +91,10 @@ SOURCE="stubs-src\fermanext_trussunit_TrussUnit.cpp"
 # End Source File
 # Begin Source File
 
+SOURCE=.\JavaPlugin.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=JavaPluginLoader.cpp
 # End Source File
 # Begin Source File
@@ -101,6 +105,10 @@ SOURCE=JavaVM\JavaVirtualMachine.cpp
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\JavaPlugin.h
+# End Source File
 # Begin Source File
 
 SOURCE=JavaPluginLoader.h

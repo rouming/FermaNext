@@ -23,7 +23,9 @@ INCLUDEPATH += ../../Common \
                ../../Common/Plugin \
                ../../Common/Loader
 
-HEADERS = NativePluginLoader.h
+HEADERS = NativePluginLoader.h \
+          NativePluginFrontEnd.h \
+          NativePlugin.h
 
 SOURCES = NativePluginLoader.cpp
 
