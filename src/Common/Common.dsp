@@ -171,14 +171,6 @@ SOURCE=Plugin\CalculationInterface.h
 # End Source File
 # Begin Source File
 
-SOURCE=Plugin\CalculationJavaPlugin.h
-# End Source File
-# Begin Source File
-
-SOURCE=Plugin\CalculationNativePlugin.h
-# End Source File
-# Begin Source File
-
 SOURCE=Config.h
 
 !IF  "$(CFG)" == "Common - Win32 Debug"
@@ -220,19 +212,7 @@ SOURCE=Global.h
 # End Source File
 # Begin Source File
 
-SOURCE=Plugin\JavaPlugin.h
-# End Source File
-# Begin Source File
-
 SOURCE=Log4CXX.h
-# End Source File
-# Begin Source File
-
-SOURCE=Plugin\NativePlugin.h
-# End Source File
-# Begin Source File
-
-SOURCE=Plugin\NativePluginFrontEnd.h
 # End Source File
 # Begin Source File
 

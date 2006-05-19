@@ -46,6 +46,98 @@ bool JavaVirtualMachine::isJVMLoaded () const
     return pimpl_ != 0;
 }
 
+QString JavaVirtualMachine::getAndClearPendingException ( bool stackTrace )
+{
+    // Check VM is loaded
+    if ( !isJVMLoaded() )
+        return QString();
+
+    // Check pending exception
+    if ( !exceptionCheck() )
+        return QString();
+
+    JThrowable excp = exceptionOccurred();
+    // Paranoid check
+    if ( excp == 0 ) {
+        qWarning( "Exception exists but is zero!" );
+        return QString();
+    }
+
+    // Clears pending exception
+    exceptionClear();
+
+    JClass throwableClass = getObjectClass( excp );
+    Q_ASSERT( throwableClass );
+
+    JMethodID getMessageMethod = getMethodID( throwableClass, "toString",
+                                              "()Ljava/lang/String;" );
+    Q_ASSERT( getMessageMethod );
+
+    JString message = (JString)callObjectMethod( excp, getMessageMethod );
+    Q_ASSERT( message );
+
+    const char* msgChars = getStringUTFChars( message, 0 );
+    Q_ASSERT( msgChars );
+
+    QString excpDesc = QString::fromUtf8( msgChars );
+    releaseStringUTFChars( message, msgChars );
+
+    // Append stack trace to the string
+    if ( stackTrace ) {
+        // Creating an 'ByteArrayOutputStream' instance
+        JClass outputStreamClass = findClass( "java/io/ByteArrayOutputStream" );
+        Q_ASSERT( outputStreamClass );
+
+        JMethodID outputStreamCtor = getMethodID( outputStreamClass, 
+                                                  "<init>", "()V" );
+        Q_ASSERT( outputStreamCtor );
+
+        JObject outputStreamObj = newObject( outputStreamClass, 
+                                             outputStreamCtor );
+        Q_ASSERT( outputStreamObj );
+
+        // Creating an 'PrintStream' instance
+        JClass printStreamClass = findClass( "java/io/PrintStream" );
+        Q_ASSERT( printStreamClass );
+
+        JMethodID printStreamCtor = getMethodID( printStreamClass, 
+                              "<init>", "(Ljava/io/OutputStream;)V" );
+        Q_ASSERT( printStreamCtor );
+
+        JObject printStreamObj = newObject( printStreamClass, printStreamCtor,
+                                            outputStreamObj );
+        Q_ASSERT( printStreamObj );
+
+        // Printing stack trace into stream
+        JMethodID printStackTraceMethod = 
+            getMethodID( throwableClass, "printStackTrace",
+                         "(Ljava/io/PrintStream;)V" );
+        Q_ASSERT( printStackTraceMethod );
+
+        // FIXME: this call crashed all the application!!!!!!
+        //        STRANGE!
+        // Call
+        callVoidMethod( excp, printStackTraceMethod, printStreamObj );
+
+        // Getting stack trace as a string
+        JMethodID toStringMethod = getMethodID( outputStreamClass, 
+                                          "toString", "()Ljava/lang/String;" );
+        Q_ASSERT( toStringMethod );
+
+        JString stackTraceJStr = (JString)callObjectMethod( outputStreamObj,
+                                                            toStringMethod );
+        Q_ASSERT( stackTraceJStr );
+
+        const char* msgChars = getStringUTFChars( stackTraceJStr, 0 );
+        Q_ASSERT( msgChars );
+
+        excpDesc += QString::fromUtf8( msgChars );
+        releaseStringUTFChars( stackTraceJStr, msgChars );
+    }
+
+    return excpDesc;
+}
+
 void JavaVirtualMachine::createJavaVM ( const QString& sharedLibName,
                                         JavaVMVersion version,
                                         const QStringList& optionsList )

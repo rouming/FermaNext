@@ -6,15 +6,30 @@
 
 #include "PluginLoaderFrontEnd.h"
 #include "JavaPluginLoader.h"
+#include "JavaPlugin.h"
 #include "PluginManager.h"
 #include "Plugin.h"
 #include "Config.h"
+#include "Log4CXX.h"
 
 /*****************************************************************************
  * Plugin Loader hook
  *****************************************************************************/
 
 FERMA_NEXT_PLUGIN_LOADER(JavaPluginLoader, PluginManager::NormalPriority)
+
+/*****************************************************************************
+ * Logger
+ *****************************************************************************/
+
+using log4cxx::LoggerPtr;
+using log4cxx::Logger;
+static LoggerPtr logger( Logger::getLogger("loader.JavaPluginLoader") );
+
+/*****************************************************************************/
+
+static QString javaErrorMsg( "<<< Java exception caught >>>\n%1\n"
+                             "<<< Java exception >>>" );
 
 /*****************************************************************************/
 
@@ -23,7 +38,8 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
     PluginLoader( plgMng, path ),
     javaVM(0),
     fnClass(0),
-    fnObject(0)
+    fnObject(0),
+    plgLoaderObject(0)
 {
     const char* envJavaHome = getenv("JAVA_HOME");
     QString jvmLibPath;
@@ -279,18 +295,15 @@ JavaPluginLoader::~JavaPluginLoader ()
         if ( disposeAllFrames )
             javaVM->callVoidMethod( fnObject, disposeAllFrames );
         else {
-            // Clears pending exception
-            javaVM->exceptionClear();
-            qWarning( "Can't find 'disposeAllFrames' while destructing!\n"
-                      "Seems 'fermanext.system.FermaNext' is not a correct"
-                      "class" );
+            QString msg( "Can't find 'disposeAllFrames' while destructing!\n"
+                         "Seems 'fermanext.system.FermaNext' is not a valid"
+                         "class\n" );
+            QString e = javaVM->getAndClearPendingException();            
+            msg = msg + javaErrorMsg.arg(e);
+            LOG4CXX_ERROR(logger, msg.toStdString());
         }
         delete javaVM;
     }
-}
-
-void JavaPluginLoader::findMainAppJavaPackage ()
-{
 }
 
 const QString& JavaPluginLoader::pluginExtension () const
@@ -302,14 +315,147 @@ JavaPluginLoader::Status JavaPluginLoader::pluginLoaderStatusCode () const
 QString JavaPluginLoader::pluginLoaderStatusMsg () const
 { return javaVM ? QString() : "Can't load JVM!";  }
 
-Plugin& JavaPluginLoader::specificLoadPlugin ( const QString& )
+Plugin& JavaPluginLoader::specificLoadPlugin ( const QString& pluginPath )
     /*throw (PluginLoadException)*/
-{ return *((Plugin*)0); }
+{
+    LOG4CXX_DEBUG(logger, "specificLoadPlugin(QString): " + 
+                  pluginPath.toStdString() );
 
-void JavaPluginLoader::specificUnloadPlugin ( Plugin& )
-{}
+    // Suspended init
+    if ( plgLoaderObject == 0 ) {
+        JMethodID plgLoaderMethod = 
+            javaVM->getMethodID( fnClass, "pluginLoader", 
+                                 "()Lfermanext/system/JavaPluginLoader;" );
+        if ( plgLoaderMethod == 0 ) {
+            // Returns and clears pending exception
+            QString e = javaVM->getAndClearPendingException();
+            LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
+            throw PluginLoadException();
+        }
+        plgLoaderObject = javaVM->callObjectMethod( fnObject, plgLoaderMethod );
+        if ( plgLoaderObject == 0 ) {
+            // Returns and clears pending exception
+            QString e = javaVM->getAndClearPendingException();
+            LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
+            throw PluginLoadException();
+        }
+    }
+
+    JClass loaderClass = javaVM->getObjectClass( plgLoaderObject );
+    if ( loaderClass == 0 ) {
+        // Returns and clears pending exception
+        QString e = javaVM->getAndClearPendingException();
+        LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
+        throw PluginLoadException();
+    }
+    
+    JMethodID loadPluginMethod = javaVM->getMethodID( 
+                   loaderClass,
+                   "loadPlugin",
+                   "(Ljava/lang/String;)Lfermanext/system/JavaPlugin;" );
+    if ( loadPluginMethod == 0 ) {
+        // Returns and clears pending exception
+        QString e = javaVM->getAndClearPendingException();
+        LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
+        throw PluginLoadException();
+    }
+
+
+    // Create Java string
+    JString pluginPathJStr = javaVM->newStringUTF( pluginPath.toUtf8().data() );
+    
+    JValue jstrVal;
+    jstrVal.l = pluginPathJStr;
+    JObject javaPlgInst = javaVM->callObjectMethodA( plgLoaderObject, 
+                                                    loadPluginMethod, 
+                                                    &jstrVal );
+
+    if ( javaPlgInst == 0 ) {
+        // Returns and clears pending exception
+        QString e = javaVM->getAndClearPendingException();
+        LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
+        throw PluginLoadException();
+    }
+
+    return *new JavaPlugin( *javaVM, javaPlgInst, pluginManager(), pluginPath );
+}
+
+void JavaPluginLoader::specificUnloadPlugin ( Plugin& plugin )
+{
+    LOG4CXX_DEBUG(logger, "specificUnloadPlugin: " + 
+                  plugin.pluginPath().toStdString() );
+
+    // Nothing was loaded
+    if ( plgLoaderObject == 0 )
+        return;
+
+    JavaPlugin* javaPlugin = dynamic_cast<JavaPlugin*>( &plugin );
+    // Check casting
+    if ( javaPlugin == 0 )
+        return;
+
+    JClass loaderClass = javaVM->getObjectClass( plgLoaderObject );
+    if ( loaderClass == 0 ) {
+        // Returns and clears pending exception
+        QString e = javaVM->getAndClearPendingException();
+        LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
+        return;
+    }
+
+    JMethodID unloadPluginMethod = javaVM->getMethodID( 
+                                           loaderClass,
+                                           "unloadPlugin",
+                                           "(Lfermanext/system/JavaPlugin;)V" );
+    if ( unloadPluginMethod == 0 ) {
+        // Returns and clears pending exception
+        QString e = javaVM->getAndClearPendingException();
+        LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
+        return;
+    }
+
+    javaVM->callVoidMethod( plgLoaderObject, unloadPluginMethod,
+                            javaPlugin->javaPluginInstance() );
+    if ( javaVM->exceptionCheck() ) {
+        // Returns and clears pending exception
+        QString e = javaVM->getAndClearPendingException();
+        LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
+        return;
+    }                            
+}
 
 void JavaPluginLoader::specificUnloadPlugins ()
-{}
+{
+    LOG4CXX_DEBUG(logger, "specificUnloadPlugins" );
+
+    // Nothing was loaded
+    if ( plgLoaderObject == 0 )
+        return;
+
+
+    JClass loaderClass = javaVM->getObjectClass( plgLoaderObject );
+    if ( loaderClass == 0 ) {
+        // Returns and clears pending exception
+        QString e = javaVM->getAndClearPendingException();
+        LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
+        return;
+    }
+
+    JMethodID unloadPluginsMethod = javaVM->getMethodID( loaderClass,
+                                                        "unloadPlugins",
+                                                        "()V" );
+    if ( unloadPluginsMethod == 0 ) {
+        QString e = javaVM->getAndClearPendingException();
+        LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
+        return;
+    }
+
+    // Call 
+    javaVM->callVoidMethod( plgLoaderObject, unloadPluginsMethod );
+
+    if ( javaVM->exceptionCheck() ) {
+        QString e = javaVM->getAndClearPendingException();
+        LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
+    }
+}
 
 /*****************************************************************************/

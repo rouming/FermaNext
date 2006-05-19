@@ -29,26 +29,29 @@ struct RequiredPluginIsNotResolvedException { QStringList unresolvedTypes; };
  */
 struct PluginInfo
 {
+    PluginInfo ()
+    {}
+
     PluginInfo ( const QString& n, const QString& d, const QString& t ) :
         name(n), description(d), type(t)
     {}
 
-    const QString name;        /**< Plugin name. e.g. 'SimplePlugin'. */
-    const QString description; /**< Just plugin description. */
-    const QString type;        /**< String which represents plugin type. 
-                                  (e.g. 'calculation.simple').
-                                  So plugin type is a hierarchical structure 
-                                  of type names for easy search. (e.g. find all
-                                  plugins with types 'calculation.*', and the 
-                                  result can be: 'calculation.simple', 
-                                  'calculation.finiteelements', etc )
-                                  Another important moment is that nothing 
-                                  controls this type names. Plugin type is a 
-                                  contract between plugin and some part of the 
-                                  system, which wants to use this plugin. 
-                                  Types aren't hardcoded and aren't known by 
-                                  the whole system, i.e. logic bundle stays 
-                                  on your own. */
+    QString name;        /**< Plugin name. e.g. 'SimplePlugin'. */
+    QString description; /**< Just plugin description. */
+    QString type;        /**< String which represents plugin type. 
+                              (e.g. 'calculation.simple').
+                              So plugin type is a hierarchical structure 
+                              of type names for easy search. (e.g. find all
+                              plugins with types 'calculation.*', and the 
+                              result can be: 'calculation.simple', 
+                              'calculation.finiteelements', etc )
+                              Another important moment is that nothing 
+                              controls this type names. Plugin type is a 
+                              contract between plugin and some part of the 
+                              system, which wants to use this plugin. 
+                              Types aren't hardcoded and aren't known by 
+                              the whole system, i.e. logic bundle stays 
+                              on your own. */
 };
 
 /**
