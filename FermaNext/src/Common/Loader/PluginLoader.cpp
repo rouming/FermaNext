@@ -127,6 +127,13 @@ void PluginLoader::setStatus ( Status s )
     status = s; 
 }
 
+Plugin* PluginLoader::findPluginByPath ( const QString& pluginPath ) const
+{
+    if ( !pluginMap.contains(pluginPath) )
+        return 0;
+    return pluginMap[pluginPath];
+}
+
 PluginManager& PluginLoader::pluginManager ()
 {
     return pluginMng;

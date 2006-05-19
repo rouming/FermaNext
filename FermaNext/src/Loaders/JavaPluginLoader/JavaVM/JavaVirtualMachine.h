@@ -63,6 +63,15 @@ public:
 
     bool isJVMLoaded () const;
 
+    /**
+     * Converts last occured panding exception to QString and clears
+     * it with #exceptionClear call
+     * @param stackTrace if true, returned string contains exception
+     *        stack trace, if false - only short description.
+     * @return pending exception description and its stack trace
+     */
+    QString getAndClearPendingException ( bool stackTrace = false );
+
     /////////////////////////////////////////
     // Methods mapping from original jni.h
     /////////////////////////////////////////

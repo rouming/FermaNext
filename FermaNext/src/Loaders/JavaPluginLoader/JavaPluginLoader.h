@@ -64,12 +64,6 @@ private:
     /** Hidden copy operator. */
     JavaPluginLoader& operator= ( const JavaPluginLoader& );
 
-    /** 
-     * Tries to find 'fermanext.jar' and to 
-     * create an object of main 'FermaNext' class.
-     */
-    void findMainAppJavaPackage ();
-
 private:
     /** JVM */
     JavaVirtualMachine* javaVM;
@@ -77,6 +71,8 @@ private:
     JClass fnClass;
     /** Instance of java 'FermaNext' class */
     JObject fnObject;
+    /** Instance of java 'JavaPluginLoader' class */
+    JObject plgLoaderObject;
 };
 
 #endif //JAVAPLUGINLOADER_H

@@ -47,11 +47,6 @@ HEADERS = \
           XMLSerializableObject.h \
           \
           Plugin/CalculationInterface.h \
-          Plugin/CalculationJavaPlugin.h \
-          Plugin/CalculationNativePlugin.h \
-          Plugin/JavaPlugin.h \
-          Plugin/NativePlugin.h \
-          Plugin/NativePluginFrontEnd.h \
           Plugin/OptimizationInterface.h \
           Plugin/Plugin.h \
           Plugin/PluginManager.h \

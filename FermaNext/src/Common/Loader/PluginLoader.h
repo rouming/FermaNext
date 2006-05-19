@@ -148,6 +148,13 @@ public:
      */
     QString pathToPlugin ( const Plugin& plugin ) const;
 
+    /** 
+     * Try to find plugin by path. 
+     * @param pluginPath path to plugin
+     * @return Plugin instance if success, 0 otherwise
+     */
+    Plugin* findPluginByPath ( const QString& pluginPath ) const;
+
 protected:
     /**
      * Specific plugin loading. Override this method in derived class.

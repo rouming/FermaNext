@@ -5,23 +5,78 @@
  * Java Plugin
  *****************************************************************************/
 
-JavaPlugin::JavaPlugin ( PluginManager& mng, const QString& path ) :
-    Plugin( mng, path )
+JavaPlugin::JavaPlugin ( JavaVirtualMachine& jvm, 
+                         const JObject& javaPlgInst,
+                         PluginManager& mng, 
+                         const QString& path ) :
+    Plugin( mng, path ),
+    javaVM(jvm),
+    javaPluginInst(javaPlgInst)
 {
-    // TODO
+    /*** Get plugin info from Java plugin ***/
+
+    JClass plgInstCls = javaVM.getObjectClass( javaPluginInst );
+    Q_ASSERT( plgInstCls );
+
+    JMethodID plgInfoMethod = javaVM.getMethodID( plgInstCls, "pluginInfo",
+                                           "()Lfermanext/system/PluginInfo;" );
+    Q_ASSERT( plgInfoMethod );
+
+    JObject plgInfoObj = 
+        javaVM.callObjectMethod( javaPluginInst, plgInfoMethod );
+    Q_ASSERT( plgInfoObj );
+
+    JClass plgInfoCls = javaVM.getObjectClass( plgInfoObj );
+    Q_ASSERT( plgInfoCls );
+
+    // Get field ids
+    JFieldID nameField = javaVM.getFieldID( plgInfoCls, "name", 
+                                            "Ljava/lang/String;" );
+    Q_ASSERT( nameField );
+
+    JFieldID descField = javaVM.getFieldID( plgInfoCls, "description", 
+                                            "Ljava/lang/String;" );
+    Q_ASSERT( descField );
+
+    JFieldID typeField = javaVM.getFieldID( plgInfoCls, "type", 
+                                            "Ljava/lang/String;" );
+    Q_ASSERT( typeField );
+
+
+    // Get field values
+    JString nameStr = (JString)javaVM.getObjectField( plgInfoObj,
+                                                      nameField );
+    Q_ASSERT( nameStr );
+
+    JString descStr = (JString)javaVM.getObjectField( plgInfoObj,
+                                                      descField );
+    Q_ASSERT( descStr );
+
+    JString typeStr = (JString)javaVM.getObjectField( plgInfoObj,
+                                                      typeField );
+    Q_ASSERT( typeStr );
+
+    // Get chars
+    const char* nameChars = javaVM.getStringUTFChars( nameStr, 0 );
+    const char* descChars = javaVM.getStringUTFChars( descStr, 0 );
+    const char* typeChars = javaVM.getStringUTFChars( typeStr, 0 );
+
+    // Init native plugin info struct
+    pluginInf.name = QString::fromUtf8( nameChars );
+    pluginInf.description = QString::fromUtf8( descChars );
+    pluginInf.type = QString::fromUtf8( typeChars );
+
+    // Free chars
+    javaVM.releaseStringUTFChars( nameStr, nameChars );
+    javaVM.releaseStringUTFChars( descStr, descChars );
+    javaVM.releaseStringUTFChars( typeStr, typeChars );
 }
 
 JavaPlugin::~JavaPlugin ()
 {}
 
 const PluginInfo& JavaPlugin::pluginInfo () const
-{
-    // TODO
-    static PluginInfo inf( "TODO",
-                           "TODO",
-                           "TODO" );
-    return inf;
-}
+{ return pluginInf; }
 
 
 JavaPlugin::Status JavaPlugin::pluginStatusCode () const
@@ -52,5 +107,8 @@ void JavaPlugin::startWizardSetup ()
 {
     // TODO
 }
+
+JObject JavaPlugin::javaPluginInstance () const
+{ return javaPluginInst; }
 
 /*****************************************************************************/

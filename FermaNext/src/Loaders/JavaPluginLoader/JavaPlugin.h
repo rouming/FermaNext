@@ -4,6 +4,8 @@
 
 #include "Plugin.h"
 
+#include "JavaVM/JavaVirtualMachine.h"
+
 /** 
  * Java plugin class. Is a bridge between Ferma calls
  * and real Java plugins. See #Plugin for detailed 
@@ -12,7 +14,10 @@
 class JavaPlugin : public Plugin
 {
 public:
-    JavaPlugin ( PluginManager& mng, const QString& path );
+    JavaPlugin ( JavaVirtualMachine& javaVM,
+                 const JObject& javaPlgInst,
+                 PluginManager& mng, 
+                 const QString& path );
     virtual ~JavaPlugin ();
 
     virtual const PluginInfo& pluginInfo () const;
@@ -21,8 +26,18 @@ public:
 
     virtual const QStringList& requiredPluginTypes () const;
     virtual ResolvingMode resolvingMode () const;
+
+    JObject javaPluginInstance () const;
 protected:
     virtual void startWizardSetup ();
+
+private:
+    /** JVM instance */
+    JavaVirtualMachine& javaVM;
+    /** Java plugin instance */
+    JObject javaPluginInst;
+    /** Plugin info */
+    PluginInfo pluginInf;
 };
 
 #endif //JAVAPLUGIN_H

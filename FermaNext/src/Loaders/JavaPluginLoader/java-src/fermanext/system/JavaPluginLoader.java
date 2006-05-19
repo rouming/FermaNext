@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.jar.*;
 import java.net.*;
 import java.io.*;
+import java.lang.reflect.*;
 
 class PluginLoadException extends Exception {}
 
@@ -27,12 +28,18 @@ public class JavaPluginLoader
     public JavaPlugin loadPlugin ( String jarPath )
         throws PluginLoadException
     {
+        File file = new File( jarPath );
+
+        // Change path to absolute
+        // TODO: do we need this conversion? 
+        // jarPath = file.getAbsolutePath();
+
         if ( javaPlugins.containsKey(jarPath) )
             return javaPlugins.get(jarPath);
 
         String javaPluginClassName = null;
         try { 
-            JarFile jarFile = new JarFile( new File(jarPath) );
+            JarFile jarFile = new JarFile( file );
             Manifest man = jarFile.getManifest();
             // Jar file should contain Manifest
             if ( man == null ) {
@@ -52,10 +59,13 @@ public class JavaPluginLoader
         }
 
         try {
+            URL url = null;
             // Create correct url
             if ( !jarPath.startsWith("file:///") )
-                jarPath = "file:///" + jarPath;
-            URL url = new URL(jarPath);                
+                url = new URL("file:///" + jarPath);
+            else
+                url = new URL(jarPath);
+
             URLClassLoader loader = new URLClassLoader( new URL[]{ url } );
             Class javaPluginClass = fermanext.system.JavaPlugin.class;
             Class loadedClass = loader.loadClass( javaPluginClassName );
@@ -64,7 +74,14 @@ public class JavaPluginLoader
                 System.out.println("is not a javaplugin");
                 throw new PluginLoadException();
             }
-            JavaPlugin javaPluginInst = (JavaPlugin)loadedClass.newInstance();
+            // Find constructor of this Java plugin
+            Constructor javaPluginConstr = 
+                loadedClass.getConstructor( String.class );
+            // Create an instance of this Java plugin
+            JavaPlugin javaPluginInst = 
+                (JavaPlugin)javaPluginConstr.newInstance( jarPath );
+
+            // Correct save
             classLoaders.put( jarPath, loader );
             javaPlugins.put( jarPath, javaPluginInst );
             return javaPluginInst;
@@ -85,6 +102,18 @@ public class JavaPluginLoader
             System.out.println("IllegalAccessException");
             throw new PluginLoadException();
         }
+        catch ( NoSuchMethodException excp ) {
+            System.out.println("NoSuchMethodException");
+            throw new PluginLoadException();
+        }
+        catch ( SecurityException excp ) {
+            System.out.println("SecurityException");
+            throw new PluginLoadException();
+        }
+        catch ( InvocationTargetException excp ) {
+            System.out.println("InvocationTargetException");
+            throw new PluginLoadException();
+        }
     }
 
     public void unloadPlugin ( String jarPath )
@@ -95,13 +124,72 @@ public class JavaPluginLoader
         javaPlugins.remove(jarPath);
     }
 
+    public void unloadPlugin ( JavaPlugin plugin )
+    {
+        String jarPath = pathToPlugin( plugin );
+        if ( jarPath.length() == 0 )
+            return;
+        classLoaders.remove(jarPath);
+        javaPlugins.remove(jarPath);
+    }
+
+    public void unloadPlugins ()
+    {
+        classLoaders.clear();
+        javaPlugins.clear();
+    }
+
+    public Vector<JavaPlugin> loadedPlugins () 
+    {
+        Vector<JavaPlugin> plugins = new Vector();
+        Iterator<Map.Entry<String, JavaPlugin>> it = 
+            javaPlugins.entrySet().iterator();
+        while ( it.hasNext() ) {
+            Map.Entry<String, JavaPlugin> entry = it.next();
+            plugins.add( entry.getValue() );
+        }
+
+        return plugins;
+    }
+
+    public boolean pluginIsLoaded ( JavaPlugin plugin )
+    {
+        String jarPath = pathToPlugin( plugin );
+        if ( jarPath.length() == 0 )
+            return false;
+        return true;
+    }
+
+    public int countLoadedPlugins ()
+    {
+        return loadedPlugins().size();
+    }
+
+    public String pathToPlugin ( JavaPlugin plugin )
+    {
+        Iterator<Map.Entry<String, JavaPlugin>> it = 
+            javaPlugins.entrySet().iterator();
+        while ( it.hasNext() ) {
+            Map.Entry<String, JavaPlugin> entry = it.next();
+            if ( entry.getValue() == plugin ) 
+                return entry.getKey();            
+        }        
+        return new String();
+    }
+
 
     public static void main ( String[] args )
     {
         JavaPluginLoader loader = new JavaPluginLoader();
         try { 
-            loader.loadPlugin( args[0] );
-        } catch ( PluginLoadException excp )
-            {}
+            JavaPlugin javaPlugin = loader.loadPlugin( args[0] );
+            System.out.println( "Plugin loaded >>>>" );
+            System.out.println( "Path: " + javaPlugin.pluginPath() );
+            System.out.println( "Name: " + javaPlugin.pluginInfo().name );
+            System.out.println( "Desc: " + javaPlugin.pluginInfo().description);
+            System.out.println( "Type: " + javaPlugin.pluginInfo().type );
+        } catch ( PluginLoadException excp ) {
+            System.out.println("Can't load plugin");
+        }
     }
 }
