@@ -20,6 +20,9 @@ public:
                  const QString& path );
     virtual ~JavaPlugin ();
 
+    virtual void execute ( const QList<UUIDObject*>& ) 
+        /*throw (WrongExecutionArgsException)*/;
+
     virtual const PluginInfo& pluginInfo () const;
     virtual Status pluginStatusCode () const;
     virtual QString pluginStatusMsg () const;

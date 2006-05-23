@@ -9,6 +9,7 @@
 
 class Plugin;
 class PluginManager;
+class UUIDObject;
 
 /** Plugin list */
 typedef std::vector<Plugin*> PluginList;
@@ -23,6 +24,12 @@ typedef RequiredPluginsMap::ConstIterator RequiredPluginsMapIterConst;
 // Exceptions
 /** Occurs when required plugin types can't be resolved */
 struct RequiredPluginIsNotResolvedException { QStringList unresolvedTypes; };
+
+/** 
+ * Occurs when #Plugin::execute called with wrong arguments.
+ * Calling side should know correct order and type of arguments.
+ */
+class WrongExecutionArgsException {};
 
 /**
  * Plugin info, which provides basic knowledge about plugin: type and name.
@@ -89,10 +96,18 @@ public:
      */
     Plugin ( PluginManager& mng, const QString& path );
 
-    /**
-     * Destructor. Must be ovveriden in child classes.
-     */
+    /** Destructor. Must be ovveriden in child classes. */
     virtual ~Plugin ();
+
+    /** 
+     * Main entry point to execute plugin. 
+     * @param arguments to start execution
+     * @throw WrongExecutionArgsException occurs when 
+     *        contract (argument list) between calling side
+     *        and plugin is wrong. 
+     */
+    virtual void execute ( const QList<UUIDObject*>& arguments ) 
+        /*throw (WrongExecutionArgsException)*/ = 0;
 
     /** 
      * Returns plugin manager.

@@ -75,6 +75,12 @@ JavaPlugin::JavaPlugin ( JavaVirtualMachine& jvm,
 JavaPlugin::~JavaPlugin ()
 {}
 
+void JavaPlugin::execute ( const QList<UUIDObject*>& )
+    /*throw (WrongExecutionArgsException)*/
+{
+    //TODO
+}
+
 const PluginInfo& JavaPlugin::pluginInfo () const
 { return pluginInf; }
 
