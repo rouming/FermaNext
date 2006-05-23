@@ -167,10 +167,6 @@ SOURCE=Benchmark.h
 # End Source File
 # Begin Source File
 
-SOURCE=Plugin\CalculationInterface.h
-# End Source File
-# Begin Source File
-
 SOURCE=Config.h
 
 !IF  "$(CFG)" == "Common - Win32 Debug"
@@ -271,10 +267,6 @@ InputPath=ObjectStateManager.h
 
 !ENDIF 
 
-# End Source File
-# Begin Source File
-
-SOURCE=Plugin\OptimizationInterface.h
 # End Source File
 # Begin Source File
 

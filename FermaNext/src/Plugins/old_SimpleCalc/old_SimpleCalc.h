@@ -5,24 +5,24 @@
 #include <QString>
 
 #include "NativePlugin.h"
-#include "CalculationInterface.h"
 
 const QString fermaResExt = ".vyv";
 
 class TrussCalcData;
 
-class SimpleCalcPlugin : public CalculationInterface, 
-                         public NativePlugin
+class SimpleCalcPlugin : public NativePlugin
 {
 public:
     SimpleCalcPlugin ( PluginManager& mng, const QString& path );
     virtual ~SimpleCalcPlugin ();
 
+    virtual void execute ( const QList<UUIDObject*>& )
+        /*throw (WrongExecutionArgsException)*/;
+
     virtual const PluginInfo& pluginInfo () const;
     virtual Status pluginStatusCode () const;
     virtual QString pluginStatusMsg () const;
 
-    virtual void calculate ( TrussTopology&, TrussCalcData& ) const;
     virtual void startCalculation ( const QString& fileName ) const = 0;
 
 protected:

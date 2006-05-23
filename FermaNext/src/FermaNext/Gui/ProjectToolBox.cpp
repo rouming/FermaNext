@@ -12,7 +12,7 @@
 #include "TrussCalcData.h"
 //FIXME QT3TO4
 //#include "CalcDataWidget.h"
-#include "CalculationInterface.h"
+//#include "CalculationInterface.h"
 
 /*****************************************************************************
  * Project ToolBox
@@ -254,6 +254,8 @@ void ProjectToolBox::calculateAllIsPressed ()
     if ( currPrj == 0 )
         return;
 
+    // FIXME QT3TO4:
+    /*
     PluginManager& plgManager = workspace.pluginManager();
     PluginList plugins = plgManager.loadedPluginsOfType( CALCULATION_TYPE );
     if ( plugins.size() == 0 ) {
@@ -263,8 +265,6 @@ void ProjectToolBox::calculateAllIsPressed ()
         return;
     }
 
-    // FIXME QT3TO4:
-    /*
     CalcDataToolBar& calcToolBar = currPrj->getCalcDataToolBar();
     TrussUnitWindowManager& trussMng = currPrj->getTrussUnitWindowManager();
     WindowList trussWindows = trussMng.getTrussUnitWindowList();

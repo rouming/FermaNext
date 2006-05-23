@@ -10,7 +10,7 @@
 #include "TrussCalcData.h"
 //FIXME QT3TO4
 //#include "CalcDataWidget.h"
-#include "CalculationInterface.h"
+//#include "CalculationInterface.h"
 
 /*****************************************************************************
  * Truss Unit Window Item
@@ -163,6 +163,9 @@ void TrussUnitWindowItem::unselectAllFromGroup ()
 
 void TrussUnitWindowItem::calculate ()
 { 
+    // FIXME QT3TO4
+    /*
+
     FermaNextWorkspace& wsp = project.getWorkspace();    
     PluginManager& plgManager = wsp.pluginManager();
     PluginList plugins = plgManager.loadedPluginsOfType( CALCULATION_TYPE );
@@ -178,8 +181,6 @@ void TrussUnitWindowItem::calculate ()
     Plugin* plugin = plugins[0];
 
     try {
-        // FIXME QT3TO4
-        /*
         CalculationInterface& calcPlugin = 
             dynamic_cast<CalculationInterface&>(*plugin);
 
@@ -197,7 +198,6 @@ void TrussUnitWindowItem::calculate ()
 
         // TODO: toplogy manager
         topology.desist();
-        */
     }
     catch ( std::exception& ) {
         QMessageBox::critical( 0, tr("Plugin manager error"),
@@ -209,6 +209,7 @@ void TrussUnitWindowItem::calculate ()
                                   tr("Internal plugin error. \n"
                                      "Please, inform plugin developer.") );
     }
+    */
 }
 
 void TrussUnitWindowItem::remove ()

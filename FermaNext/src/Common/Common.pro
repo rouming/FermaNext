@@ -46,8 +46,6 @@ HEADERS = \
           UUIDObject.h \
           XMLSerializableObject.h \
           \
-          Plugin/CalculationInterface.h \
-          Plugin/OptimizationInterface.h \
           Plugin/Plugin.h \
           Plugin/PluginManager.h \
           \

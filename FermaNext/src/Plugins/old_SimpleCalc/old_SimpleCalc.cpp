@@ -53,9 +53,9 @@ const PluginInfo& SimpleCalcPlugin::pluginInfo () const
     return inf; 
 }
 
-void SimpleCalcPlugin::calculate ( TrussTopology& truss, 
-                                   TrussCalcData& data ) const
+void SimpleCalcPlugin::execute ( const QList<UUIDObject*>& )
 {
+    /* //TODO
     QString frmFile( tempFileName() );    
     QString vyvFile( frmFile + fermaResExt );
     FRMWriter frm(truss);
@@ -65,6 +65,7 @@ void SimpleCalcPlugin::calculate ( TrussTopology& truss,
     VYVReader vyv(data);
     vyv.read( vyvFile );
     QFile::remove( vyvFile );
+    */
 }
 
 void SimpleCalcPlugin::createTempFile ()
