@@ -8,9 +8,11 @@ CONFIG += debug_and_release
 DEFINES += FERMA_VERSION=$$FERMA_VERSION
 
 # Enable logging from ENV
-isEmpty(ENABLE_LOGGING) {
-  ENABLE_LOGGING = $$(ENABLE_LOGGING)
-}
+isEmpty(ENABLE_LOGGING): ENABLE_LOGGING = $$(ENABLE_LOGGING)
+
+# Disable logging. Disabling has higher priority
+isEmpty(DISABLE_LOGGING): DISABLE_LOGGING = $$(DISABLE_LOGGING)
+!isEmpty(DISABLE_LOGGING): ENABLE_LOGGING = 
 
 !isEmpty(ENABLE_LOGGING) {
      DEFINES += ENABLE_LOG4CXX

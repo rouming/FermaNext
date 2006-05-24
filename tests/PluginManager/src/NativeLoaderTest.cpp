@@ -5,8 +5,8 @@
 class NativeLoaderTest : public CommonNativeLoaderTest
 {
 public:
-    NativeLoaderTest ( PluginManager& mng ) : 
-        CommonNativeLoaderTest(mng)
+    NativeLoaderTest ( PluginManager& mng, const QString& path ) : 
+        CommonNativeLoaderTest(mng, path)
     {}
     virtual ~NativeLoaderTest () {}
     virtual const QString& pluginExtension () const 
