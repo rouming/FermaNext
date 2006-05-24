@@ -22,6 +22,8 @@ public:
 
     virtual ~CommonNativePluginTest () {}
 
+    virtual void execute ( const QList<UUIDObject*>& ) {}
+
     virtual PrivateSingleInstance& getPrivateSingleInstance () const = 0;
     virtual void throwStatusAsException () = 0;
         //throw(Plugin::Status)
@@ -33,8 +35,8 @@ public:
 class CommonNativeLoaderTest : public PluginLoader
 {
 public:
-    CommonNativeLoaderTest ( PluginManager& mng ) :
-        PluginLoader(mng) 
+    CommonNativeLoaderTest ( PluginManager& mng, const QString& path ) :
+        PluginLoader(mng, path) 
     {}
     virtual ~CommonNativeLoaderTest () {}
 

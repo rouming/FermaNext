@@ -13,11 +13,13 @@
 <property name="qt.dir" value="${env.QTDIR}"/>
 <property name="agg.dir" value="${env.AGGDIR}"/>
 <property name="ferma.src" value="../src"/>
+<property name="build.scripts.dir" value="build-scripts"/>
 
 <!-- Setup FermaNext includes -->
 <path id="ferma.includes">
   <dirset dir="${ferma.src}">
       <include name="Common/**"/>
+      <include name="Loaders/NativePluginLoader/**"/>
       <exclude name="**/obj"/>
       <exclude name="**/mocs"/>
       <exclude name="**/ui"/>
@@ -111,14 +113,15 @@ To clean garbage only for specified test:
     <property name="lib.extension" value=".lib"/>
     <property name="lib.suffix" value=""/>
     <property name="compiler" value="msvc"/>
+    <property name="make" value="nmake"/>
 </target>
 
 <target name="unix-init" depends="os-detect" if="is-unix">
-
     <property name="lib.prefix" value="lib"/>
     <property name="lib.extension" value=".a"/>
     <property name="lib.suffix" value=""/>
     <property name="compiler" value="g++"/>
+    <property name="make" value="make"/>
     <condition property="is-cygwin" value="true">
         <os family="windows"/>
     </condition>
@@ -141,7 +144,72 @@ Required features not present in cpptasks releases prior to Feb 2005
        </fail>
 </target>
 
-    <target name="build-tests" depends="init">
+    <target name="make-pro">
+        <!-- Run qmake at first -->
+        <exec dir="${build.scripts.dir}"
+              failonerror="Yes"
+              executable="qmake">
+           <arg line="${pro-file}"/>
+        </exec>
+
+        <!-- Start making -->
+        <exec dir="${build.scripts.dir}"
+              failonerror="Yes"
+              executable="${make}"/>
+        <delete dir="${plugins.dir}"/>
+
+        <!-- Delete all makefiles -->                
+        <delete>
+            <fileset dir="${build.scripts.dir}" includes="Makefile"/>
+            <fileset dir="${build.scripts.dir}" includes="Makefile.*"/>
+        </delete>
+
+    </target>    
+
+
+    <target name="clean-pro">
+        <!-- Run qmake at first -->
+        <exec dir="${build.scripts.dir}"
+              failonerror="Yes"
+              executable="qmake">
+           <arg line="${pro-file}"/>
+        </exec>
+
+        <!-- Start cleaning -->
+        <exec dir="${build.scripts.dir}"
+              failonerror="Yes"
+              executable="${make}">
+           <arg line="distclean"/>
+        </exec>
+        <delete dir="${plugins.dir}"/>
+    </target>    
+
+
+
+    <target name="build-libs" depends="init">
+       <foreach target="make-pro"
+                param="pro-file"
+                inheritall="true"
+                inheritrefs="true">
+         <path>
+             <fileset dir="${build.scripts.dir}" includes="*.pro"/>
+         </path>
+       </foreach>
+    </target>
+
+    <target name="clean-libs" depends="init">
+       <foreach target="clean-pro"
+                param="pro-file"
+                inheritall="true"
+                inheritrefs="true">
+         <path>
+             <fileset dir="${build.scripts.dir}" includes="*.pro"/>
+         </path>
+       </foreach>
+    </target>
+
+
+    <target name="build-tests" depends="build-libs">
         <subant target="build-test" inheritrefs="true">
             <property name="compiler" value="${compiler}"/>
             <property name="os.family" value="${os.family}"/>
@@ -161,7 +229,7 @@ Required features not present in cpptasks releases prior to Feb 2005
         </subant>
     </target>
 
-    <target name="clean" depends="init">
+    <target name="clean" depends="init, clean-libs">
         <subant target="clean-test" inheritrefs="true">
             <property name="os.family" value="${os.family}"/>
             <fileset dir="." includes="*/build.xml"/>
@@ -193,7 +261,7 @@ Required features not present in cpptasks releases prior to Feb 2005
         </subant>
     </target>
 
-    <target name="build-test" depends="check-single">
+    <target name="build-test" depends="check-single, build-libs">
         <subant target="build-test" inheritrefs="true">
             <property name="compiler" value="${compiler}"/>
             <property name="os.family" value="${os.family}"/>
@@ -203,7 +271,7 @@ Required features not present in cpptasks releases prior to Feb 2005
         </subant>
     </target>
 
-    <target name="clean-test" depends="check-single">
+    <target name="clean-test" depends="check-single, clean-libs">
         <subant target="clean-test" inheritrefs="true">
             <property name="os.family" value="${os.family}"/>
             <property name="testcase" value="${testcase}"/>

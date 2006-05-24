@@ -1,5 +1,6 @@
 QMAKE_EXTRA_TARGETS = release debug release-clean debug-clean \
-                      release-distclean debug-distclean vcproj
+                      release-distclean debug-distclean vcproj \
+                      build-tests clean-tests
 
 release.CONFIG = recursive
 debug.CONFIG = recursive
@@ -9,6 +10,17 @@ debug-clean.CONFIG = recursive
 
 release-distclean.CONFIG = recursive
 debug-distclean.CONFIG = recursive
+
+# Check ANT_HOME environment before running 'test' target
+ANT_HOME = $$(ANT_HOME)
+isEmpty(ANT_HOME) {
+    build-tests.commands = echo ANT_HOME environment is required for building tests.
+    clean-tests.commands = echo ANT_HOME environment is required for building tests.
+}
+!isEmpty(ANT_HOME) {
+    build-tests.commands = cd tests && $$(ANT_HOME)/bin/ant
+    clean-tests.commands = cd tests && $$(ANT_HOME)/bin/ant clean
+}
 
 TEMPLATE = subdirs
 
@@ -36,4 +48,4 @@ win32 {
 }
 
 win32::vcproj.commands = $$VCPROJ_CMDS
-unix::vcproj.commands = echo(Works only on Win32)
+unix::vcproj.commands = echo Works only on Win32

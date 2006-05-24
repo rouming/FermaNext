@@ -80,7 +80,7 @@
               <fileset dir="${src.dir}" includes="${loader.srcfile}"/>
 
               <linker name="${compiler}">
-                 <libset libs="Common" dir="../../build/Release"  />
+                 <libset libs="Common" dir="../../build/tests"  />
 
                  <!-- Windows Qt libsets -->
                  <libset libs="QtCore4, QtXml4, QtNetwork4" 
@@ -135,7 +135,7 @@
               <fileset dir="${src.dir}" includes="${plugin.srcfile}"/>
 
               <linker name="${compiler}">
-                 <libset libs="Common" dir="../../build/Release"  />
+                 <libset libs="Common" dir="../../build/tests"  />
 
                  <!-- Windows Qt libsets -->
                  <libset libs="QtCore4, QtXml4, QtNetwork4" 
@@ -192,7 +192,7 @@
               <linker name="${compiler}">
                  <linkerarg value="-export-dynamic" if="is-unix"/>
 
-                 <libset libs="Common" dir="../../build/Release"  />
+                 <libset libs="Common" dir="../../build/tests"  />
 
                  <!-- Windows Qt libsets -->
                  <libset libs="QtCore4, QtXml4, QtNetwork4" 
