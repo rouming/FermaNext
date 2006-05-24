@@ -404,10 +404,14 @@ void ObjectStateManager::rollbackNotEndedBlock ()
     if ( newlyCreatedBlock == 0 )
         return;
 
+    stateCall(true);
+
     // Silently undo block, nobody should know about
     // this undo, because block, generally speaking, has
     // not been started yet.
     newlyCreatedBlock->undo();
+
+    stateCall(false);
 
     // Free created block
     delete newlyCreatedBlock;
