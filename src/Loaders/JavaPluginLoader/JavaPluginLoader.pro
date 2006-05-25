@@ -38,7 +38,12 @@ SOURCES = JavaPluginLoader.cpp \
           \
           JavaVM/JavaVirtualMachine.cpp \
           \
+          stubs-src/fermanext_logging_log4cxx_BasicConfigurator.cpp \
+          stubs-src/fermanext_logging_log4cxx_Logger.cpp \
+          stubs-src/fermanext_logging_log4cxx_NDC.cpp \
+          stubs-src/fermanext_logging_log4cxx_PropertyConfigurator.cpp \
           stubs-src/fermanext_trussunit_TrussUnit.cpp
+
 
 # Build Java sources
 PRE_TARGETDEPS = JavaBuild
