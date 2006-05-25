@@ -56,6 +56,13 @@
     <target name="build.headers">
       <javah destdir="${stubs.headers}" 
              classpath="${src.build.dir}">
+         <!-- fermanext.logging.log4cxx -->
+         <class name="fermanext.logging.log4cxx.Logger"/>
+         <class name="fermanext.logging.log4cxx.BasicConfigurator"/>
+         <class name="fermanext.logging.log4cxx.PropertyConfigurator"/>
+         <class name="fermanext.logging.log4cxx.NDC"/>
+
+         <!-- fermanext.trussunit -->
          <class name="fermanext.trussunit.TrussUnit"/>
       </javah>
     </target>

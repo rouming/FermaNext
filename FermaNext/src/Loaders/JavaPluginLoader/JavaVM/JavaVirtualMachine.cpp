@@ -114,8 +114,6 @@ QString JavaVirtualMachine::getAndClearPendingException ( bool stackTrace )
                          "(Ljava/io/PrintStream;)V" );
         Q_ASSERT( printStackTraceMethod );
 
-        // FIXME: this call crashed all the application!!!!!!
-        //        STRANGE!
         // Call
         callVoidMethod( excp, printStackTraceMethod, printStreamObj );
 
