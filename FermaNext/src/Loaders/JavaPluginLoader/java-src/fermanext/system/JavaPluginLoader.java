@@ -6,6 +6,7 @@ import java.util.jar.*;
 import java.net.*;
 import java.io.*;
 import java.lang.reflect.*;
+import fermanext.logging.log4cxx.*;
 
 class PluginLoadException extends Exception {}
 
@@ -20,14 +21,21 @@ class PluginLoadException extends Exception {}
  */
 public class JavaPluginLoader
 {
-    /** Class loaders and loaded Java plugins */
-    private Map<String, URLClassLoader> classLoaders = new HashMap();
-    private Map<String, JavaPlugin> javaPlugins = new HashMap();
+    /** Loader logger */
+    private static Logger logger = 
+        Logger.getLogger("java.loader.JavaPluginLoader");
 
+    /** Class loaders and loaded Java plugins */
+    private Map<String, URLClassLoader> classLoaders = 
+        new HashMap<String, URLClassLoader>();
+    private Map<String, JavaPlugin> javaPlugins = 
+        new HashMap<String, JavaPlugin>();
 
     public JavaPlugin loadPlugin ( String jarPath )
         throws PluginLoadException
     {
+        logger.debug( "loadPlugin: " + jarPath );
+
         File file = new File( jarPath );
 
         // Change path to absolute
@@ -43,18 +51,18 @@ public class JavaPluginLoader
             Manifest man = jarFile.getManifest();
             // Jar file should contain Manifest
             if ( man == null ) {
-                System.out.println("man == null");
+                logger.warn( "Can't find Manifest file in " + jarPath );
                 throw new PluginLoadException();
             }
             // Manifest should contains 'Main-Class' attribute
             Attributes attrs = man.getMainAttributes();
             if ( !attrs.containsKey( Attributes.Name.MAIN_CLASS ) ) {
-                System.out.println("!Main-Class");
+                logger.warn( "Can't find 'Main-Class' attribute in Manifest" );
                 throw new PluginLoadException();
             }            
             javaPluginClassName = attrs.getValue( Attributes.Name.MAIN_CLASS );
         } catch ( IOException excp ) {
-            System.out.println("can't open jarile");
+            logger.warn( "Can't open JAR file" + jarPath );
             throw new PluginLoadException();
         }
 
@@ -67,11 +75,13 @@ public class JavaPluginLoader
                 url = new URL(jarPath);
 
             URLClassLoader loader = new URLClassLoader( new URL[]{ url } );
-            Class javaPluginClass = fermanext.system.JavaPlugin.class;
+            Class<fermanext.system.JavaPlugin> javaPluginClass = 
+                fermanext.system.JavaPlugin.class;
             Class loadedClass = loader.loadClass( javaPluginClassName );
             // Loaded class should extends basic Java plugin class
             if ( !javaPluginClass.isAssignableFrom(loadedClass) ) {
-                System.out.println("is not a javaplugin");
+                logger.warn( "Class " + javaPluginClassName  + 
+                             " is not a child of JavaPlugin: " + jarPath );
                 throw new PluginLoadException();
             }
             // Find constructor of this Java plugin
@@ -87,39 +97,44 @@ public class JavaPluginLoader
             return javaPluginInst;
             
         } catch ( MalformedURLException excp ) {
-            System.out.println("MalformedURLException");
+            logger.warn( "Can't find Jar file, URL is wrong: " + jarPath );
             throw new PluginLoadException();
         }
         catch ( ClassNotFoundException excp ) {
-            System.out.println("ClassNotFoundException");
+            logger.warn( "Can't find Main-Class '" + javaPluginClassName +  
+                         "' in " + jarPath );
             throw new PluginLoadException();
         }
         catch ( InstantiationException excp ) {
-            System.out.println("InstantiationException");
+            logger.warn( "Can't find Main-Class '" + javaPluginClassName +  
+                         "' in " + jarPath );
             throw new PluginLoadException();
         }
         catch ( IllegalAccessException excp ) {
-            System.out.println("IllegalAccessException");
+            logger.warn( "Main-Class '" + javaPluginClassName +  
+                         "' in " + jarPath + " is abstract" );
             throw new PluginLoadException();
         }
         catch ( NoSuchMethodException excp ) {
-            System.out.println("NoSuchMethodException");
-            throw new PluginLoadException();
-        }
-        catch ( SecurityException excp ) {
-            System.out.println("SecurityException");
+            logger.warn( "Can't find constructor of Main-Class '" + 
+                         javaPluginClassName + "' in " + jarPath );
             throw new PluginLoadException();
         }
         catch ( InvocationTargetException excp ) {
-            System.out.println("InvocationTargetException");
+            logger.warn( "Constructor of Main-Class '" + 
+                         javaPluginClassName + "' in " + jarPath + 
+                         " throws an exception" );
             throw new PluginLoadException();
         }
     }
 
     public void unloadPlugin ( String jarPath )
     {
-        if ( !javaPlugins.containsKey(jarPath) )
+        logger.debug( "unloadPlugin(String): " + jarPath );
+        if ( !javaPlugins.containsKey(jarPath) ) {
+            logger.info( "Can't find " + jarPath + " to unload" );
             return;
+        }
         classLoaders.remove(jarPath);
         javaPlugins.remove(jarPath);
     }
@@ -127,21 +142,25 @@ public class JavaPluginLoader
     public void unloadPlugin ( JavaPlugin plugin )
     {
         String jarPath = pathToPlugin( plugin );
-        if ( jarPath.length() == 0 )
+        logger.debug( "unloadPlugin(JavaPlugin): " + jarPath );
+        if ( jarPath.length() == 0 ) {
+            logger.info( "Can't find " + jarPath + " to unload" );
             return;
+        }
         classLoaders.remove(jarPath);
         javaPlugins.remove(jarPath);
     }
 
     public void unloadPlugins ()
     {
+        logger.debug( "unloadPlugins" );
         classLoaders.clear();
         javaPlugins.clear();
     }
 
     public Vector<JavaPlugin> loadedPlugins () 
     {
-        Vector<JavaPlugin> plugins = new Vector();
+        Vector<JavaPlugin> plugins = new Vector<JavaPlugin>();
         Iterator<Map.Entry<String, JavaPlugin>> it = 
             javaPlugins.entrySet().iterator();
         while ( it.hasNext() ) {
