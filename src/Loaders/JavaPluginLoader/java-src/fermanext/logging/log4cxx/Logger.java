@@ -10,7 +10,7 @@ public class Logger
     // Static root logger instance
     private static Logger rootLogger = null;
     // Static hash already created loggers
-    private static Map<String, Logger> loggers = new HashMap();
+    private static Map<String, Logger> loggers = new HashMap<String, Logger>();
 
     private String name = new String();
     private boolean isRootLogger = true;
