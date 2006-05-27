@@ -1,18 +1,22 @@
 
 package fermanext.system;
 
-class PluginInfo
-{
-    public PluginInfo ( String n, String d, String t )
-    { name = n; description = d; type = t; }
-
-    public String name = new String();
-    public String description = new String();
-    public String type = new String();
-}
+import java.util.UUID;
+import java.util.Vector;
 
 public abstract class JavaPlugin
 {
+    /** Plugin info */
+    class PluginInfo
+    {
+        public PluginInfo ( String n, String d, String t )
+        { name = n; description = d; type = t; }
+
+        public String name = new String();
+        public String description = new String();
+        public String type = new String();
+    }
+
     /** Status codes */
     public enum Status {
         OkStatus,
@@ -38,6 +42,11 @@ public abstract class JavaPlugin
      */
     public final String pluginPath ()
     { return path; }
+
+    /**
+     * Executes plugin with specified arguments.
+     */
+    public abstract void execute ( Vector<PluginExecutionArgument> args );
 
     /** 
      * Describes itself.

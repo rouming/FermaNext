@@ -17,6 +17,8 @@
 
 #else //ENABLE_LOG4CXX
 
+#include <string>
+
 // Define dummy LOG4CXX  macroses
 #define LOG4CXX_LOG(logger, level, message)
 #define LOG4CXX_DEBUG(logger, message)
