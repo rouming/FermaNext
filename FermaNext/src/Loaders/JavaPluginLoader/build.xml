@@ -5,6 +5,7 @@
     <property name="stubs.dir" value="stubs-src"/>
     <property name="stubs.headers" value="${stubs.dir}/include"/>
     <property name="pkg.name" value="fermanext"/>
+    <property name="plugins.dir" value="../../../plugins"/>
     <property name="loaders.dir" value="../../../plugins/loaders"/>
     <property name="build.dir" value="../../../build"/>
     <property name="dist.build.dir" value="${build.dir}/JavaPluginLoader.ldr"/>
@@ -42,10 +43,19 @@
         <param name="includes" value="${pkg.name}/**/*.java"/>
       </antcall>
 
-
+      <!-- System jar -->
       <jar jarfile="${lib.build.dir}/${src.build.jar}" 
            includes="${pkg.name}/**" 
            basedir="${src.build.dir}"/>
+
+      <!-- Demo plugin jar -->
+      <jar jarfile="${plugins.dir}/demo.plg.jar" 
+           includes="${pkg.name}/demo/DemoJavaPlugin.java"
+           basedir="${src.build.dir}">
+        <manifest>
+          <attribute name="Main-Class" value="fermanext.demo.DemoJavaPlugin"/>
+        </manifest>
+      </jar>
 
     </target>
 
