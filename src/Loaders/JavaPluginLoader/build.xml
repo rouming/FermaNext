@@ -50,7 +50,7 @@
 
       <!-- Demo plugin jar -->
       <jar jarfile="${plugins.dir}/demo.plg.jar" 
-           includes="${pkg.name}/demo/DemoJavaPlugin.java"
+           includes="${pkg.name}/demo/DemoJavaPlugin.class"
            basedir="${src.build.dir}">
         <manifest>
           <attribute name="Main-Class" value="fermanext.demo.DemoJavaPlugin"/>
