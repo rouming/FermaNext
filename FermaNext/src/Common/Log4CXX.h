@@ -19,6 +19,10 @@
 
 #include <string>
 
+#undef LOG4CXX_HAS_WCHAR_T
+#undef LOG4CXX_LOGCHAR_IS_WCHAR
+#define LOG4CXX_LOGCHAR_IS_UTF8
+
 // Define dummy LOG4CXX  macroses
 #define LOG4CXX_LOG(logger, level, message)
 #define LOG4CXX_DEBUG(logger, message)
@@ -30,6 +34,8 @@
 
 // Define dummy LOG4CXX classes
 namespace log4cxx {
+    typedef char logchar;
+
     class LoggerPtr 
     {
     public:
