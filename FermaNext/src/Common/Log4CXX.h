@@ -19,9 +19,9 @@
 
 #include <string>
 
-#undef LOG4CXX_HAS_WCHAR_T
-#undef LOG4CXX_LOGCHAR_IS_WCHAR
-#define LOG4CXX_LOGCHAR_IS_UTF8
+#define LOG4CXX_HAS_WCHAR_T 0
+#define LOG4CXX_LOGCHAR_IS_WCHAR 0
+#define LOG4CXX_LOGCHAR_IS_UTF8 1
 
 // Define dummy LOG4CXX  macroses
 #define LOG4CXX_LOG(logger, level, message)
