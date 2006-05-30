@@ -386,7 +386,7 @@ JObject JavaVirtualMachine::callObjectMethod ( JObject obj, JMethodID methodID, 
     va_list args;
     JObject res;
     va_start(args, methodID);
-    res = (JObject)pimpl_->env->CallObjectMethod( (jobject )obj, (jmethodID )methodID, args );
+    res = (JObject)pimpl_->env->CallObjectMethodV( (jobject )obj, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -406,7 +406,7 @@ JBoolean JavaVirtualMachine::callBooleanMethod ( JObject obj, JMethodID methodID
     va_list args;
     JBoolean res;
     va_start(args, methodID);
-    res = (JBoolean)pimpl_->env->CallBooleanMethod( (jobject )obj, (jmethodID )methodID, args );
+    res = (JBoolean)pimpl_->env->CallBooleanMethodV( (jobject )obj, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -426,7 +426,7 @@ JByte JavaVirtualMachine::callByteMethod ( JObject obj, JMethodID methodID, ... 
     va_list args;
     JByte res;
     va_start(args, methodID);
-    res = (JByte)pimpl_->env->CallByteMethod( (jobject )obj, (jmethodID )methodID, args );
+    res = (JByte)pimpl_->env->CallByteMethodV( (jobject )obj, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -446,7 +446,7 @@ JChar JavaVirtualMachine::callCharMethod ( JObject obj, JMethodID methodID, ... 
     va_list args;
     JChar res;
     va_start(args, methodID);
-    res = (JChar)pimpl_->env->CallCharMethod( (jobject )obj, (jmethodID )methodID, args );
+    res = (JChar)pimpl_->env->CallCharMethodV( (jobject )obj, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -466,7 +466,7 @@ JShort JavaVirtualMachine::callShortMethod ( JObject obj, JMethodID methodID, ..
     va_list args;
     JShort res;
     va_start(args, methodID);
-    res = (JShort)pimpl_->env->CallShortMethod( (jobject )obj, (jmethodID )methodID, args );
+    res = (JShort)pimpl_->env->CallShortMethodV( (jobject )obj, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -486,7 +486,7 @@ JInt JavaVirtualMachine::callIntMethod ( JObject obj, JMethodID methodID, ... )
     va_list args;
     JInt res;
     va_start(args, methodID);
-    res = (JInt)pimpl_->env->CallIntMethod( (jobject )obj, (jmethodID )methodID, args );
+    res = (JInt)pimpl_->env->CallIntMethodV( (jobject )obj, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -506,7 +506,7 @@ JLong JavaVirtualMachine::callLongMethod ( JObject obj, JMethodID methodID, ... 
     va_list args;
     JLong res;
     va_start(args, methodID);
-    res = (JLong)pimpl_->env->CallLongMethod( (jobject )obj, (jmethodID )methodID, args );
+    res = (JLong)pimpl_->env->CallLongMethodV( (jobject )obj, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -526,7 +526,7 @@ JFloat JavaVirtualMachine::callFloatMethod ( JObject obj, JMethodID methodID, ..
     va_list args;
     JFloat res;
     va_start(args, methodID);
-    res = (JFloat)pimpl_->env->CallFloatMethod( (jobject )obj, (jmethodID )methodID, args );
+    res = (JFloat)pimpl_->env->CallFloatMethodV( (jobject )obj, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -546,7 +546,7 @@ JDouble JavaVirtualMachine::callDoubleMethod ( JObject obj, JMethodID methodID, 
     va_list args;
     JDouble res;
     va_start(args, methodID);
-    res = (JDouble)pimpl_->env->CallDoubleMethod( (jobject )obj, (jmethodID )methodID, args );
+    res = (JDouble)pimpl_->env->CallDoubleMethodV( (jobject )obj, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -565,7 +565,7 @@ void JavaVirtualMachine::callVoidMethod ( JObject obj, JMethodID methodID, ... )
 {
     va_list args;
     va_start(args, methodID);
-    pimpl_->env->CallVoidMethod( (jobject )obj, (jmethodID )methodID, args );
+    pimpl_->env->CallVoidMethodV( (jobject )obj, (jmethodID )methodID, args );
     va_end(args);
 }
 
@@ -584,7 +584,7 @@ JObject JavaVirtualMachine::callNonvirtualObjectMethod ( JObject obj, JClass cla
     va_list args;
     JObject res;
     va_start(args, methodID);
-    res = (JObject)pimpl_->env->CallNonvirtualObjectMethod( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
+    res = (JObject)pimpl_->env->CallNonvirtualObjectMethodV( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -604,7 +604,7 @@ JBoolean JavaVirtualMachine::callNonvirtualBooleanMethod ( JObject obj, JClass c
     va_list args;
     JBoolean res;
     va_start(args, methodID);
-    res = (JBoolean)pimpl_->env->CallNonvirtualBooleanMethod( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
+    res = (JBoolean)pimpl_->env->CallNonvirtualBooleanMethodV( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -624,7 +624,7 @@ JByte JavaVirtualMachine::callNonvirtualByteMethod ( JObject obj, JClass clazz, 
     va_list args;
     JByte res;
     va_start(args, methodID);
-    res = (JByte)pimpl_->env->CallNonvirtualByteMethod( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
+    res = (JByte)pimpl_->env->CallNonvirtualByteMethodV( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -644,7 +644,7 @@ JChar JavaVirtualMachine::callNonvirtualCharMethod ( JObject obj, JClass clazz, 
     va_list args;
     JChar res;
     va_start(args, methodID);
-    res = (JChar)pimpl_->env->CallNonvirtualCharMethod( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
+    res = (JChar)pimpl_->env->CallNonvirtualCharMethodV( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -664,7 +664,7 @@ JShort JavaVirtualMachine::callNonvirtualShortMethod ( JObject obj, JClass clazz
     va_list args;
     JShort res;
     va_start(args, methodID);
-    res = (JShort)pimpl_->env->CallNonvirtualShortMethod( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
+    res = (JShort)pimpl_->env->CallNonvirtualShortMethodV( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -684,7 +684,7 @@ JInt JavaVirtualMachine::callNonvirtualIntMethod ( JObject obj, JClass clazz, JM
     va_list args;
     JInt res;
     va_start(args, methodID);
-    res = (JInt)pimpl_->env->CallNonvirtualIntMethod( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
+    res = (JInt)pimpl_->env->CallNonvirtualIntMethodV( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -704,7 +704,7 @@ JLong JavaVirtualMachine::callNonvirtualLongMethod ( JObject obj, JClass clazz, 
     va_list args;
     JLong res;
     va_start(args, methodID);
-    res = (JLong)pimpl_->env->CallNonvirtualLongMethod( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
+    res = (JLong)pimpl_->env->CallNonvirtualLongMethodV( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -724,7 +724,7 @@ JFloat JavaVirtualMachine::callNonvirtualFloatMethod ( JObject obj, JClass clazz
     va_list args;
     JFloat res;
     va_start(args, methodID);
-    res = (JFloat)pimpl_->env->CallNonvirtualFloatMethod( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
+    res = (JFloat)pimpl_->env->CallNonvirtualFloatMethodV( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -744,7 +744,7 @@ JDouble JavaVirtualMachine::callNonvirtualDoubleMethod ( JObject obj, JClass cla
     va_list args;
     JDouble res;
     va_start(args, methodID);
-    res = (JDouble)pimpl_->env->CallNonvirtualDoubleMethod( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
+    res = (JDouble)pimpl_->env->CallNonvirtualDoubleMethodV( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -763,7 +763,7 @@ void JavaVirtualMachine::callNonvirtualVoidMethod ( JObject obj, JClass clazz, J
 {
     va_list args;
     va_start(args, methodID);
-    pimpl_->env->CallNonvirtualVoidMethod( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
+    pimpl_->env->CallNonvirtualVoidMethodV( (jobject )obj, (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
 }
 
@@ -882,7 +882,7 @@ JObject JavaVirtualMachine::callStaticObjectMethod ( JClass clazz, JMethodID met
     va_list args;
     JObject res;
     va_start(args, methodID);
-    res = (JObject)pimpl_->env->CallStaticObjectMethod( (jclass )clazz, (jmethodID )methodID, args );
+    res = (JObject)pimpl_->env->CallStaticObjectMethodV( (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -902,7 +902,7 @@ JBoolean JavaVirtualMachine::callStaticBooleanMethod ( JClass clazz, JMethodID m
     va_list args;
     JBoolean res;
     va_start(args, methodID);
-    res = (JBoolean)pimpl_->env->CallStaticBooleanMethod( (jclass )clazz, (jmethodID )methodID, args );
+    res = (JBoolean)pimpl_->env->CallStaticBooleanMethodV( (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -922,7 +922,7 @@ JByte JavaVirtualMachine::callStaticByteMethod ( JClass clazz, JMethodID methodI
     va_list args;
     JByte res;
     va_start(args, methodID);
-    res = (JByte)pimpl_->env->CallStaticByteMethod( (jclass )clazz, (jmethodID )methodID, args );
+    res = (JByte)pimpl_->env->CallStaticByteMethodV( (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -942,7 +942,7 @@ JChar JavaVirtualMachine::callStaticCharMethod ( JClass clazz, JMethodID methodI
     va_list args;
     JChar res;
     va_start(args, methodID);
-    res = (JChar)pimpl_->env->CallStaticCharMethod( (jclass )clazz, (jmethodID )methodID, args );
+    res = (JChar)pimpl_->env->CallStaticCharMethodV( (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -962,7 +962,7 @@ JShort JavaVirtualMachine::callStaticShortMethod ( JClass clazz, JMethodID metho
     va_list args;
     JShort res;
     va_start(args, methodID);
-    res = (JShort)pimpl_->env->CallStaticShortMethod( (jclass )clazz, (jmethodID )methodID, args );
+    res = (JShort)pimpl_->env->CallStaticShortMethodV( (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -982,7 +982,7 @@ JInt JavaVirtualMachine::callStaticIntMethod ( JClass clazz, JMethodID methodID,
     va_list args;
     JInt res;
     va_start(args, methodID);
-    res = (JInt)pimpl_->env->CallStaticIntMethod( (jclass )clazz, (jmethodID )methodID, args );
+    res = (JInt)pimpl_->env->CallStaticIntMethodV( (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -1002,7 +1002,7 @@ JLong JavaVirtualMachine::callStaticLongMethod ( JClass clazz, JMethodID methodI
     va_list args;
     JLong res;
     va_start(args, methodID);
-    res = (JLong)pimpl_->env->CallStaticLongMethod( (jclass )clazz, (jmethodID )methodID, args );
+    res = (JLong)pimpl_->env->CallStaticLongMethodV( (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -1022,7 +1022,7 @@ JFloat JavaVirtualMachine::callStaticFloatMethod ( JClass clazz, JMethodID metho
     va_list args;
     JFloat res;
     va_start(args, methodID);
-    res = (JFloat)pimpl_->env->CallStaticFloatMethod( (jclass )clazz, (jmethodID )methodID, args );
+    res = (JFloat)pimpl_->env->CallStaticFloatMethodV( (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -1042,7 +1042,7 @@ JDouble JavaVirtualMachine::callStaticDoubleMethod ( JClass clazz, JMethodID met
     va_list args;
     JDouble res;
     va_start(args, methodID);
-    res = (JDouble)pimpl_->env->CallStaticDoubleMethod( (jclass )clazz, (jmethodID )methodID, args );
+    res = (JDouble)pimpl_->env->CallStaticDoubleMethodV( (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
@@ -1061,7 +1061,7 @@ void JavaVirtualMachine::callStaticVoidMethod ( JClass cls, JMethodID methodID, 
 {
     va_list args;
     va_start(args, methodID);
-    pimpl_->env->CallStaticVoidMethod( (jclass )cls, (jmethodID )methodID, args );
+    pimpl_->env->CallStaticVoidMethodV( (jclass )cls, (jmethodID )methodID, args );
     va_end(args);
 }
 
@@ -1449,6 +1449,13 @@ JInt JavaVirtualMachine::monitorExit ( JObject obj )
 {
     return (JInt)pimpl_->env->MonitorExit( (jobject )obj );
 }
+
+/*
+JInt JavaVirtualMachine::getJavaVM ( JavaVM **vm )
+{
+    return (JInt)pimpl_->env->GetJavaVM( vm );
+}
+*/
 
 void JavaVirtualMachine::getStringRegion ( JString str, JSize start, JSize len, JChar *buf )
 {
