@@ -11,11 +11,15 @@ JavaPlugin::JavaPlugin ( JavaVirtualMachine& jvm,
                          const QString& path ) :
     Plugin( mng, path ),
     javaVM(jvm),
-    javaPluginInst(javaPlgInst)
+    javaPluginInst( javaVM.newGlobalRef(javaPlgInst) )
 {
     /*** Get plugin info from Java plugin ***/
 
     JClass plgInstCls = javaVM.getObjectClass( javaPluginInst );
+    Q_ASSERT( plgInstCls );
+
+    // Create reference
+    plgInstCls = (JClass)javaVM.newGlobalRef( plgInstCls );
     Q_ASSERT( plgInstCls );
 
     JMethodID plgInfoMethod = javaVM.getMethodID( plgInstCls, "pluginInfo",
@@ -26,7 +30,15 @@ JavaPlugin::JavaPlugin ( JavaVirtualMachine& jvm,
         javaVM.callObjectMethod( javaPluginInst, plgInfoMethod );
     Q_ASSERT( plgInfoObj );
 
+    // Create reference
+    plgInfoObj = javaVM.newGlobalRef( plgInfoObj );
+    Q_ASSERT( plgInfoObj );
+
     JClass plgInfoCls = javaVM.getObjectClass( plgInfoObj );
+    Q_ASSERT( plgInfoCls );
+
+    // Create reference
+    plgInfoCls = (JClass)javaVM.newGlobalRef( plgInfoCls );
     Q_ASSERT( plgInfoCls );
 
     // Get field ids
@@ -41,7 +53,6 @@ JavaPlugin::JavaPlugin ( JavaVirtualMachine& jvm,
     JFieldID typeField = javaVM.getFieldID( plgInfoCls, "type", 
                                             "Ljava/lang/String;" );
     Q_ASSERT( typeField );
-
 
     // Get field values
     JString nameStr = (JString)javaVM.getObjectField( plgInfoObj,
@@ -70,10 +81,17 @@ JavaPlugin::JavaPlugin ( JavaVirtualMachine& jvm,
     javaVM.releaseStringUTFChars( nameStr, nameChars );
     javaVM.releaseStringUTFChars( descStr, descChars );
     javaVM.releaseStringUTFChars( typeStr, typeChars );
+
+    // Clear all references
+    javaVM.deleteGlobalRef( plgInstCls );
+    javaVM.deleteGlobalRef( plgInfoObj );
+    javaVM.deleteGlobalRef( plgInfoCls );
 }
 
 JavaPlugin::~JavaPlugin ()
-{}
+{
+    javaVM.deleteGlobalRef( javaPluginInst );
+}
 
 void JavaPlugin::execute ( const QList<UUIDObject*>& )
     /*throw (WrongExecutionArgsException)*/

@@ -91,6 +91,9 @@ public class JavaPluginLoader
             JavaPlugin javaPluginInst = 
                 (JavaPlugin)javaPluginConstr.newInstance( jarPath );
 
+            logger.debug( "javaPluginInst.pluginPath " +
+                          javaPluginInst.pluginPath() );
+
             // Correct save
             classLoaders.put( jarPath, loader );
             javaPlugins.put( jarPath, javaPluginInst );
@@ -132,7 +135,7 @@ public class JavaPluginLoader
     {
         logger.debug( "unloadPlugin(String): " + jarPath );
         if ( !javaPlugins.containsKey(jarPath) ) {
-            logger.info( "Can't find " + jarPath + " to unload" );
+            logger.warn( "Can't find '" + jarPath + "' to unload" );
             return;
         }
         classLoaders.remove(jarPath);
@@ -141,10 +144,10 @@ public class JavaPluginLoader
 
     public void unloadPlugin ( JavaPlugin plugin )
     {
-        String jarPath = pathToPlugin( plugin );
+        String jarPath = plugin.pluginPath();
         logger.debug( "unloadPlugin(JavaPlugin): " + jarPath );
         if ( jarPath.length() == 0 ) {
-            logger.info( "Can't find " + jarPath + " to unload" );
+            logger.warn( "Can't find '" + jarPath + "' to unload" );
             return;
         }
         classLoaders.remove(jarPath);

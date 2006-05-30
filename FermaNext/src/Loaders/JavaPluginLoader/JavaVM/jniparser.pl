@@ -106,7 +106,8 @@ sub parseMethodHead {
     $MethodName = $4;
     $ReturnType = replaceJType($2);
 
-    $method =~ s/(.*?)\s$/$1/;
+    $method =~ s/(.*?)\s$/$1\)/;
+
     return $method;
 }
 
@@ -138,6 +139,10 @@ sub parseMethodBody {
             }
         }
     }
+
+    # Specific thing
+    $MethodName =~ s/Call(.*)Method$/Call$1MethodV/;
+
     my $params = join ", ", @ParamVals;
     $params = " " . $params . " " if $params;
     return "{\n". $specBody->{before} .
@@ -150,8 +155,22 @@ sub parseMethodBody {
 my $headerFile = $file;
 my $srcFile = $file;
 
-$headerFile =~ s/(.*?){(.*?)}/"    " . parseMethodHead($1, 1) . ");\n\n"/gse;
-$srcFile =~ s/(.*?){(.*?)}/parseMethodHead($1, 0) . ")\n" . parseMethodBody() . "\n"/gse;
+$headerFile =~ s#(.*?){(.*?)}#
+             my $methodHead = parseMethodHead($1, 1) . ";";
+             if ( $methodHead =~ /getJavaVM/ ) {
+                 $methodHead = "//" . $methodHead;
+             }
+             "    " . $methodHead . "\n\n"
+                #gse;
+$srcFile =~ s#(.*?){(.*?)}#
+             my $methodHead = parseMethodHead($1, 0);
+             my $methodBody = parseMethodBody();
+             if ( $methodHead =~ /getJavaVM/ ) {
+                 $methodHead = "/*\n" . $methodHead;
+                 $methodBody .= "*/\n";
+             }
+             $methodHead . "\n" . $methodBody . "\n"
+                #gse;
 
 if ( $ARGV[1] eq 'header' ) {
     print <<HEADER;
@@ -223,9 +242,9 @@ public:
     /**
      * Converts last occured panding exception to QString and clears
      * it with #exceptionClear call
-     * @param stackTrace if true, returned string contains exception
+     * \@param stackTrace if true, returned string contains exception
      *        stack trace, if false - only short description.
-     * @return pending exception description and its stack trace
+     * \@return pending exception description and its stack trace
      */
     QString getAndClearPendingException ( bool stackTrace = false );
 
@@ -364,8 +383,6 @@ QString JavaVirtualMachine::getAndClearPendingException ( bool stackTrace )
                          "(Ljava/io/PrintStream;)V" );
         Q_ASSERT( printStackTraceMethod );
 
-        // FIXME: this call crashed all the application!!!!!!
-        //        STRANGE!
         // Call
         callVoidMethod( excp, printStackTraceMethod, printStreamObj );
 

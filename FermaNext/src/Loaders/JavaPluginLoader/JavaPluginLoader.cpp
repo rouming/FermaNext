@@ -181,11 +181,23 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
                       0, QObject::tr("Can't start JavaPluginLoader"), 
                       QObject::tr("JavaPluginLoader can't be started\n"
                                   "because subsidiary system class\n"
-                                  "'fermanext.FermaNext' doesn't exist")
+                                  "'fermanext.system.FermaNext' doesn't exist")
                               );
         delete javaVM;
         javaVM = 0;
         return;
+    }
+
+    // Create global Java ref
+    fnClass = (JClass)javaVM->newGlobalRef( fnClass );
+    if ( fnClass == 0 ) {
+        // Clears pending exception
+        javaVM->getAndClearPendingException();
+        LOG4CXX_ERROR(logger, "out of memory");
+
+        delete javaVM;
+        javaVM = 0;
+        return;        
     }
 
     JMethodID fnInstance =
@@ -201,6 +213,7 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
                                           "exist\nin system class "
                                           "'fermanext.system.FermaNext'")
                               );
+        javaVM->deleteGlobalRef( fnClass );
         fnClass = 0;
         delete javaVM;
         javaVM = 0;
@@ -215,14 +228,29 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
         QMessageBox::warning( 0, QObject::tr("Can't start JavaPluginLoader"), 
                               QObject::tr("Error has occured while calling\n"
                                           "'instance' method of 'fermanext."
-                                          "system.FermaNext'")
+                                          "fermanext.system.FermaNext'")
                               );
-
+        javaVM->deleteGlobalRef( fnClass );
         fnClass = 0;
         delete javaVM;
         javaVM = 0;
         return;
     }
+
+    // Create global Java ref
+    fnObject = javaVM->newGlobalRef( fnObject );
+    if ( fnObject == 0 ) {
+        // Clears pending exception
+        javaVM->getAndClearPendingException();
+        LOG4CXX_ERROR(logger, "out of memory");
+
+        javaVM->deleteGlobalRef( fnClass );
+        fnClass = 0;
+        delete javaVM;
+        javaVM = 0;
+        return;
+    }
+
 
 //===========================================================================
 // Remove in the future! Only for debug purposes!
@@ -302,6 +330,10 @@ JavaPluginLoader::~JavaPluginLoader ()
             msg = msg + javaErrorMsg.arg(e);
             LOG4CXX_ERROR(logger, msg.toStdString());
         }
+        javaVM->deleteGlobalRef( fnClass );
+        javaVM->deleteGlobalRef( fnObject );
+        if ( plgLoaderObject )
+            javaVM->deleteGlobalRef( plgLoaderObject );
         delete javaVM;
     }
 }
@@ -338,6 +370,14 @@ Plugin& JavaPluginLoader::specificLoadPlugin ( const QString& pluginPath )
             QString e = javaVM->getAndClearPendingException();
             LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
             throw PluginLoadException();
+        }        
+        // Create global Java ref
+        plgLoaderObject = javaVM->newGlobalRef( plgLoaderObject );
+        if ( plgLoaderObject == 0 ) {
+            // Clears pending exception
+            javaVM->getAndClearPendingException();
+            LOG4CXX_ERROR(logger, "out of memory");
+            throw PluginLoadException();
         }
     }
 
@@ -348,27 +388,51 @@ Plugin& JavaPluginLoader::specificLoadPlugin ( const QString& pluginPath )
         LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
         throw PluginLoadException();
     }
+    loaderClass = (JClass)javaVM->newGlobalRef( loaderClass );
+    if ( loaderClass == 0 ) {
+        // Returns and clears pending exception
+        javaVM->getAndClearPendingException();
+        LOG4CXX_ERROR(logger, "out of memory");
+        throw PluginLoadException();
+    }
     
     JMethodID loadPluginMethod = javaVM->getMethodID( 
                    loaderClass,
                    "loadPlugin",
                    "(Ljava/lang/String;)Lfermanext/system/JavaPlugin;" );
     if ( loadPluginMethod == 0 ) {
+        javaVM->deleteGlobalRef( loaderClass );
         // Returns and clears pending exception
         QString e = javaVM->getAndClearPendingException();
         LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
         throw PluginLoadException();
     }
 
-
     // Create Java string
     JString pluginPathJStr = javaVM->newStringUTF( pluginPath.toUtf8().data() );
+    if ( pluginPathJStr == 0 ) {
+        javaVM->deleteGlobalRef( loaderClass );
+        // Returns and clears pending exception
+        javaVM->getAndClearPendingException();
+        LOG4CXX_ERROR(logger, "Can't create Java String");
+        throw PluginLoadException();
+    }
     
-    JValue jstrVal;
-    jstrVal.l = pluginPathJStr;
-    JObject javaPlgInst = javaVM->callObjectMethodA( plgLoaderObject, 
+    pluginPathJStr = (JString)javaVM->newGlobalRef( pluginPathJStr );
+    if ( pluginPathJStr == 0 ) {
+        javaVM->deleteGlobalRef( loaderClass );
+        // Returns and clears pending exception
+        javaVM->getAndClearPendingException();
+        LOG4CXX_ERROR(logger, "out of memory");
+        throw PluginLoadException();
+    }
+
+    JObject javaPlgInst = javaVM->callObjectMethod( plgLoaderObject, 
                                                     loadPluginMethod, 
-                                                    &jstrVal );
+                                                    pluginPathJStr );
+
+    javaVM->deleteGlobalRef( loaderClass );
+    javaVM->deleteGlobalRef( pluginPathJStr );
 
     if ( javaPlgInst == 0 ) {
         // Returns and clears pending exception
@@ -401,12 +465,20 @@ void JavaPluginLoader::specificUnloadPlugin ( Plugin& plugin )
         LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
         return;
     }
+    loaderClass = (JClass)javaVM->newGlobalRef( loaderClass );
+    if ( loaderClass == 0 ) {
+        // Returns and clears pending exception
+        javaVM->getAndClearPendingException();
+        LOG4CXX_ERROR(logger, "out of memory");
+        return;
+    }
 
     JMethodID unloadPluginMethod = javaVM->getMethodID( 
                                            loaderClass,
                                            "unloadPlugin",
                                            "(Lfermanext/system/JavaPlugin;)V" );
     if ( unloadPluginMethod == 0 ) {
+        javaVM->deleteGlobalRef( loaderClass );
         // Returns and clears pending exception
         QString e = javaVM->getAndClearPendingException();
         LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
@@ -415,6 +487,9 @@ void JavaPluginLoader::specificUnloadPlugin ( Plugin& plugin )
 
     javaVM->callVoidMethod( plgLoaderObject, unloadPluginMethod,
                             javaPlugin->javaPluginInstance() );
+
+    javaVM->deleteGlobalRef( loaderClass );
+
     if ( javaVM->exceptionCheck() ) {
         // Returns and clears pending exception
         QString e = javaVM->getAndClearPendingException();

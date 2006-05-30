@@ -505,6 +505,8 @@ public:
 
     JInt monitorExit ( JObject obj );
 
+    //JInt getJavaVM ( JavaVM **vm );
+
     void getStringRegion ( JString str, JSize start, JSize len, JChar *buf );
 
     void getStringUTFRegion ( JString str, JSize start, JSize len, char *buf );
