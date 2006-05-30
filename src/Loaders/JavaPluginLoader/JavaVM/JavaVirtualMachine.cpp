@@ -62,11 +62,21 @@ QString JavaVirtualMachine::getAndClearPendingException ( bool stackTrace )
         qWarning( "Exception exists but is zero!" );
         return QString();
     }
-
     // Clears pending exception
     exceptionClear();
 
+    // Create reference
+    excp = (JThrowable)newGlobalRef( excp );
+    if ( excp == 0 ) {
+        qWarning( "out of memory" );
+        return QString();
+    }
+
     JClass throwableClass = getObjectClass( excp );
+    Q_ASSERT( throwableClass );
+
+    // Create reference
+    throwableClass = (JClass)newGlobalRef( throwableClass );
     Q_ASSERT( throwableClass );
 
     JMethodID getMessageMethod = getMethodID( throwableClass, "toString",
@@ -80,12 +90,18 @@ QString JavaVirtualMachine::getAndClearPendingException ( bool stackTrace )
     Q_ASSERT( msgChars );
 
     QString excpDesc = QString::fromUtf8( msgChars );
+
+    // Clean
     releaseStringUTFChars( message, msgChars );
 
     // Append stack trace to the string
     if ( stackTrace ) {
         // Creating an 'ByteArrayOutputStream' instance
         JClass outputStreamClass = findClass( "java/io/ByteArrayOutputStream" );
+        Q_ASSERT( outputStreamClass );
+
+        // Create reference
+        outputStreamClass = (JClass)newGlobalRef( outputStreamClass );
         Q_ASSERT( outputStreamClass );
 
         JMethodID outputStreamCtor = getMethodID( outputStreamClass, 
@@ -96,8 +112,16 @@ QString JavaVirtualMachine::getAndClearPendingException ( bool stackTrace )
                                              outputStreamCtor );
         Q_ASSERT( outputStreamObj );
 
+        // Create reference
+        outputStreamObj = newGlobalRef( outputStreamObj );
+        Q_ASSERT( outputStreamObj );
+
         // Creating an 'PrintStream' instance
         JClass printStreamClass = findClass( "java/io/PrintStream" );
+        Q_ASSERT( printStreamClass );
+
+        // Create reference
+        printStreamClass = (JClass)newGlobalRef( printStreamClass );
         Q_ASSERT( printStreamClass );
 
         JMethodID printStreamCtor = getMethodID( printStreamClass, 
@@ -106,6 +130,10 @@ QString JavaVirtualMachine::getAndClearPendingException ( bool stackTrace )
 
         JObject printStreamObj = newObject( printStreamClass, printStreamCtor,
                                             outputStreamObj );
+        Q_ASSERT( printStreamObj );
+
+        // Create reference
+        printStreamObj = newGlobalRef( printStreamObj );
         Q_ASSERT( printStreamObj );
 
         // Printing stack trace into stream
@@ -129,9 +157,17 @@ QString JavaVirtualMachine::getAndClearPendingException ( bool stackTrace )
         const char* msgChars = getStringUTFChars( stackTraceJStr, 0 );
         Q_ASSERT( msgChars );
 
-        excpDesc += QString::fromUtf8( msgChars );
+        excpDesc += QString::fromUtf8( msgChars ) + "\n";
         releaseStringUTFChars( stackTraceJStr, msgChars );
+
+        deleteGlobalRef( outputStreamClass );
+        deleteGlobalRef( outputStreamObj );
+        deleteGlobalRef( printStreamClass );
+        deleteGlobalRef( printStreamObj );
     }
+
+    deleteGlobalRef( excp );
+    deleteGlobalRef( throwableClass );
 
     return excpDesc;
 }
@@ -351,7 +387,7 @@ JObject JavaVirtualMachine::newObject ( JClass clazz, JMethodID methodID, ... )
     va_list args;
     JObject res;
     va_start(args, methodID);
-    res = (JObject)pimpl_->env->NewObject( (jclass )clazz, (jmethodID )methodID, args );
+    res = (JObject)pimpl_->env->NewObjectV( (jclass )clazz, (jmethodID )methodID, args );
     va_end(args);
     return res;
 }
