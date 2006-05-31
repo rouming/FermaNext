@@ -350,6 +350,12 @@ void PluginManager::unloadPlugins ()
     // Unload all plugins regardless of their status
     PluginList loadedPlgs = loadedPlugins( false );
     int pluginsSize = loadedPlgs.size();
+    int sysLibsSize = systemLibs.size();
+
+    // Check if nothing to do
+    if ( pluginsSize == 0 && sysLibsSize == 0 )
+        return;
+
     emit onBeforePluginsUnload( pluginsSize );
 
     // Firstly unload all FN plugins
