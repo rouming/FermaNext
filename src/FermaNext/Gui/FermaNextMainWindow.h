@@ -52,6 +52,7 @@ protected:
     void setupViewActions ();
     void setupProjectActions ();
     void setupWindowActions ();
+    void setupPluginsActions ();
     void setupHelpActions ();
 
     bool eventFilter( QObject*, QEvent* );
