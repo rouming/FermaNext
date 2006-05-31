@@ -29,6 +29,12 @@ public slots:
 
     void createProject ();
     void reloadPlugins ();
+
+private slots:
+    void onReloadPluginsFromMainEventLoop ();
+
+signals: 
+    void reloadPluginsFromMainEventLoop ();
     
 protected:
     //Exceptions

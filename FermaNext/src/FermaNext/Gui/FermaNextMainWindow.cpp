@@ -49,7 +49,7 @@ FermaNextMainWindow::FermaNextMainWindow ( FermaNextWorkspace& wsp ) :
     setupWindowActions();
     setupHelpActions();
 
-        // Refresh plugins menu
+    // Refresh plugins menu
     PluginManager& plgManager = workspace.pluginManager();
     QObject::connect( &plgManager, SIGNAL(onAfterPluginsLoad(uint)), 
                                    SLOT(refreshPluginsActions()) );
@@ -96,6 +96,11 @@ void FermaNextMainWindow::init ()
 
     connect( &workspace, SIGNAL(onProjectActivated(FermaNextProject&)),
              materialEditor, SLOT(setCurrentProjectItem(FermaNextProject&)) );
+
+    // Clear and init plugins menu only from main event loop
+    connect( this, SIGNAL(reloadPluginsFromMainEventLoop()),
+                   SLOT(onReloadPluginsFromMainEventLoop()),
+             Qt::QueuedConnection );
 
     preferencesWidget = new PreferencesWidget( this );
 
@@ -483,6 +488,11 @@ void FermaNextMainWindow::setupHelpActions ()
 }
 
 void FermaNextMainWindow::reloadPlugins ()
+{
+    emit reloadPluginsFromMainEventLoop();
+}
+
+void FermaNextMainWindow::onReloadPluginsFromMainEventLoop ()
 {
     reloadPlugins( true );
 }
