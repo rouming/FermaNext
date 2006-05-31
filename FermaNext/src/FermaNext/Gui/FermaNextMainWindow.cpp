@@ -47,6 +47,7 @@ FermaNextMainWindow::FermaNextMainWindow ( FermaNextWorkspace& wsp ) :
     setupViewActions ();
     setupProjectActions();
     setupWindowActions();
+    setupPluginsActions();
     setupHelpActions();
 
     // Refresh plugins menu
@@ -467,6 +468,11 @@ void FermaNextMainWindow::setupWindowActions ()
 {
 }
 
+void FermaNextMainWindow::setupPluginsActions ()
+{
+    pluginsMenu = menuBar()->addMenu( tr( "&Plugins" ) );
+}
+
 void FermaNextMainWindow::setupHelpActions ()
 {
     QMenu* menu = menuBar()->addMenu( tr( "&Help" ) );
@@ -513,11 +519,7 @@ void FermaNextMainWindow::reloadPlugins ( bool reload )
     for ( ; plgIt != plugins.end(); ++plgIt )
         names.push_back( (*plgIt)->pluginInfo().name );
 
-    if ( pluginsMenu == 0 ) {
-        pluginsMenu = menuBar()->addMenu( tr( "&Plugins" ) );
-    }
-    else 
-        pluginsMenu->clear();
+    pluginsMenu->clear();
 
     QStringList::iterator i = names.begin();
     for ( ; i != names.end(); ++i ) {           
