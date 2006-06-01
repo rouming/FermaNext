@@ -5,8 +5,6 @@
 
 #include "Log4CXX.h"
 
-using log4cxx::NDC;
-
 /*
  * Class:     fermanext_logging_log4cxx_NDC
  * Method:    get
@@ -15,7 +13,7 @@ using log4cxx::NDC;
 jstring JNICALL Java_fermanext_logging_log4cxx_NDC_get
   (JNIEnv* env, jclass)
 {
-    std::basic_string<log4cxx::logchar> ndcStr = NDC::pop();
+    log4cxx::LogString ndcStr = log4cxx::NDC::get();
 #if LOG4CXX_LOGCHAR_IS_UTF8
     return env->NewStringUTF( ndcStr.data() );
 #else
@@ -31,7 +29,7 @@ jstring JNICALL Java_fermanext_logging_log4cxx_NDC_get
 jstring JNICALL Java_fermanext_logging_log4cxx_NDC_pop
   (JNIEnv* env, jclass)
 {
-    std::basic_string<log4cxx::logchar> ndcStr = NDC::pop();
+    log4cxx::LogString ndcStr = log4cxx::NDC::pop();
 #if LOG4CXX_LOGCHAR_IS_UTF8
     return env->NewStringUTF( ndcStr.data() );
 #else
@@ -49,7 +47,7 @@ void JNICALL Java_fermanext_logging_log4cxx_NDC_push
 {
     const char* strChars = env->GetStringUTFChars( jStr, 0 );
     Q_ASSERT( strChars );
-    NDC::push( std::string(strChars) );
+    log4cxx::NDC::push( std::string(strChars) );
     env->ReleaseStringUTFChars( jStr, strChars );
 }
 
@@ -61,5 +59,5 @@ void JNICALL Java_fermanext_logging_log4cxx_NDC_push
 void JNICALL Java_fermanext_logging_log4cxx_NDC_remove
   (JNIEnv*, jclass)
 {
-    NDC::remove();
+    log4cxx::NDC::remove();
 }
