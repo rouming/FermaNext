@@ -36,11 +36,10 @@ SUBDIRS = src/Common \
 
 # Generates commands for Win32 to generate VS project files
 win32 {
-  MY_SUBDIRS = $$SUBDIRS src/FermaNext
+  MY_SUBDIRS = $$SUBDIRS .
   VCPROJ_CMDS =
   for(sub, MY_SUBDIRS) {
     sub_pro = $$sub/$${basename(sub)}.pro
-    !exists($$sub_pro):next()
     VCPROJ_CMDS += pushd "$$sub" && qmake -tp vc && popd &&
   }
   # Dummy last command
