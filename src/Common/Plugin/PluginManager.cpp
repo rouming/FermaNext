@@ -104,16 +104,18 @@ void PluginManager::registerPluginLoader ( const QString& pathToLoaderLib )
                                            PLUGIN_LOADER_INSTANCE_INIT_CALL );
         loader = loaderInstanceInitCall( *this, pathToLoaderLib, &priority );
     }
-    catch ( DynaLoader::LibraryLoadException& ) {
+    catch ( DynaLoader::LibraryLoadException& e ) {
         LOG4CXX_WARN(logger, "loader can't be registered: " + 
-                     pathToLoaderLib.toStdString() + ", can't load library");
+                     pathToLoaderLib.toStdString() + ", can't load library: "+ 
+                     e.message().toStdString() );
 
         delete nativeLib;
         throw RegisterPluginLoaderException();
     }
-    catch ( DynaLoader::AddressException& ) {
+    catch ( DynaLoader::AddressException& e ) {
         LOG4CXX_WARN(logger, "loader can't be registered: " + 
-                     pathToLoaderLib.toStdString() + ", can't find address");
+                     pathToLoaderLib.toStdString() + ", can't find address: "+
+                     e.message().toStdString() );
 
         delete nativeLib;
         throw RegisterPluginLoaderException();

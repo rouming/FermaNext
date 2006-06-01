@@ -9,6 +9,7 @@
 #pragma warning(disable: 4250)
 #endif
 
+#include <log4cxx/logstring.h>
 #include <log4cxx/logger.h>
 #include <log4cxx/basicconfigurator.h>
 #include <log4cxx/propertyconfigurator.h>
@@ -35,6 +36,7 @@
 // Define dummy LOG4CXX classes
 namespace log4cxx {
     typedef char logchar;
+    typedef std::basic_string<logchar> LogString;
 
     class LoggerPtr 
     {
