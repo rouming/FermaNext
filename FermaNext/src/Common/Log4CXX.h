@@ -19,19 +19,25 @@
 #else //ENABLE_LOG4CXX
 
 #include <string>
+#include <QtGlobal>
+
+// Some simple sets of Qt Q_UNUSED macroses
+#define UNUSED2PARAMS(first, second) Q_UNUSED((first)); Q_UNUSED((second));
+#define UNUSED3PARAMS(first, second, third) UNUSED2PARAMS(first, second); \
+                                            Q_UNUSED((third));
 
 #define LOG4CXX_HAS_WCHAR_T 0
 #define LOG4CXX_LOGCHAR_IS_WCHAR 0
 #define LOG4CXX_LOGCHAR_IS_UTF8 1
 
 // Define dummy LOG4CXX  macroses
-#define LOG4CXX_LOG(logger, level, message)
-#define LOG4CXX_DEBUG(logger, message)
-#define LOG4CXX_INFO(logger, message)
-#define LOG4CXX_WARN(logger, message)
-#define LOG4CXX_ERROR(logger, message)
-#define LOG4CXX_ASSERT(logger, condition, message)
-#define LOG4CXX_FATAL(logger, message)
+#define LOG4CXX_ASSERT(logger, cond, msg) UNUSED3PARAMS(logger, cond, msg) 
+#define LOG4CXX_LOG(logger, level, msg) UNUSED3PARAMS(logger, level, msg)
+#define LOG4CXX_DEBUG(logger, msg) UNUSED2PARAMS(logger, msg)
+#define LOG4CXX_INFO(logger, msg)  UNUSED2PARAMS(logger, msg)
+#define LOG4CXX_WARN(logger, msg)  UNUSED2PARAMS(logger, msg)
+#define LOG4CXX_ERROR(logger, msg) UNUSED2PARAMS(logger, msg)
+#define LOG4CXX_FATAL(logger, msg) UNUSED2PARAMS(logger, msg)
 
 // Define dummy LOG4CXX classes
 namespace log4cxx {
