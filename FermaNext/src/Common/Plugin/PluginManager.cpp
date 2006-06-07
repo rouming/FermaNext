@@ -166,7 +166,7 @@ void PluginManager::unregisterPluginLoader ( PluginLoader& loader )
             continue;
 
         // Notify everyone
-        emit onPluginLoaderUnregistration( loader );
+        emit onBeforePluginLoaderUnregistration( loader );
 
         // Unload all plugins of plugin loader
         PluginList plugins = loader.loadedPlugins();
@@ -202,6 +202,8 @@ void PluginManager::unregisterPluginLoader ( PluginLoader& loader )
                      + loaderPath.toStdString());
 
         delete nativeLib;
+
+        emit onAfterPluginLoaderUnregistration( loaderPath );
 
         return;
     }    
@@ -383,9 +385,11 @@ void PluginManager::unloadPlugin ( Plugin& plg )
     if ( ! plugins.contains( &plg ) )
         return;
     PluginLoader* loader = plugins[&plg];
-    emit onPluginUnload( plg );
+    QString pluginPath = plg.pluginPath();
+    emit onBeforePluginUnload( plg );
     loader->unloadPlugin( plg );
     plugins.remove( &plg );
+    emit onAfterPluginUnload( pluginPath );
 
     //TODO: DO NOT FORGET DEPENDENCIES
 }
