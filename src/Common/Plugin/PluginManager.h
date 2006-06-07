@@ -197,7 +197,15 @@ signals:
      * BEWARE: slots should be thread safe and do not post any GUI events to
      * main event loop.
      */
-    void onPluginUnload ( Plugin& plg );
+    void onBeforePluginUnload ( Plugin& plg );
+
+    /** 
+     * Is emitted after plugin unload.
+     * @param path to unloaded plugin.
+     * BEWARE: slots should be thread safe and do not post any GUI events to
+     * main event loop.
+     */
+    void onAfterPluginUnload ( const QString& plgPath );
 
     ///////////////////////////////////////////////////////////////////////
     // Plugin Loader Signals
@@ -247,7 +255,15 @@ signals:
      * BEWARE: slots should be thread safe and do not post any GUI events to
      * main event loop.
      */
-    void onPluginLoaderUnregistration ( PluginLoader& plgLoader );
+    void onBeforePluginLoaderUnregistration ( PluginLoader& plgLoader );
+
+    /** 
+     * Is emitted after plugin loader unregistration.
+     * @param plgLoaderPath plugin loader path.
+     * BEWARE: slots should be thread safe and do not post any GUI events to
+     * main event loop.
+     */
+    void onAfterPluginLoaderUnregistration ( const QString& plgLoaderPath );
 
 private:
     // Exceptions
