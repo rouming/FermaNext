@@ -59,13 +59,13 @@ public:
 
     void reloadPlugins ()
     {
-        setCursor(Qt::WaitCursor);
+        QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
         show();
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        // Start
+        qApp->processEvents( QEventLoop::ExcludeUserInputEvents );
+        // Start unloading/loading
         plgMng.unloadPlugins();
         plgMng.loadPlugins( Global::pluginsPath() );
-        setCursor(Qt::ArrowCursor);
+        QApplication::restoreOverrideCursor();
     }
 
 private:
@@ -79,7 +79,7 @@ private:
         label->repaint();
     }
 
-    virtual void afterPluginsLoad ( uint plgNum ) 
+    virtual void afterPluginsLoad ( uint ) 
     {
         progressBar->setValue(100);
     }
@@ -89,7 +89,8 @@ private:
         label->setText( tr("Loading plugin: ") + QFileInfo(path).baseName() );
         label->repaint();
     }
-    virtual void afterPluginLoad ( Plugin& plg ) 
+
+    virtual void afterPluginLoad ( Plugin& ) 
     {
         progressBar->setValue( progressBar->value() + 1 );
     }
@@ -104,7 +105,7 @@ private:
         label->repaint();
     }
 
-    virtual void afterPluginsUnload ( uint plgNum ) 
+    virtual void afterPluginsUnload ( uint ) 
     {
         progressBar->setValue(100);
     }
@@ -116,7 +117,7 @@ private:
         label->repaint();
     }
 
-    virtual void afterPluginUnload ( const QString& path ) 
+    virtual void afterPluginUnload ( const QString& ) 
     {
         progressBar->setValue( progressBar->value() + 1 );
     }
