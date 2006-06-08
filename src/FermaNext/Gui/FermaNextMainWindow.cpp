@@ -28,6 +28,7 @@
 #include "TrussPropertyTabWidget.h"
 #include "TrussMaterialEditor.h"
 #include "PreferencesWidget.h"
+#include "PluginReloader.h"
 
 const QString fermaTitle( QObject::tr( "Educational CAD System 'Ferma'" ) );
 
@@ -507,9 +508,8 @@ void FermaNextMainWindow::reloadPlugins ( bool reload )
 {
     PluginManager& plgManager = workspace.pluginManager();
 
-    if ( reload ) {        
-        plgManager.unloadPlugins();
-        plgManager.loadPlugins( Global::pluginsPath() );
+    if ( reload ) {
+        PluginReloader::reloadPlugins( plgManager );
     }
 
     QStringList names;

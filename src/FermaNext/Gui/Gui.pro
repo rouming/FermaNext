@@ -33,6 +33,7 @@ SOURCES = \
 	  GuiSubsidiary.cpp \
           FermaNextMainWindow.cpp \
           GeometryTabWidget.cpp \
+          PluginReloader.cpp \
           PreferencesWidget.cpp \
           ProjectToolBox.cpp \
           Splash.cpp \
@@ -61,6 +62,7 @@ HEADERS = \
           CalcDataWidget.ui.h \
           FermaNextMainWindow.h \
           GeometryTabWidget.h \
+          PluginReloader.h \
           PreferencesWidget.h \
           ProjectToolBox.h \
           Splash.h \
