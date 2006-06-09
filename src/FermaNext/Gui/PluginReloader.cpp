@@ -4,6 +4,8 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <QVBoxLayout>
+#include <QRect>
+#include <QDesktopWidget>
 
 #include "PluginReloader.h"
 #include "PluginManager.h"
@@ -12,15 +14,16 @@
  * Reloader Dialog
  *****************************************************************************/
 
-class ReloaderDialog : protected ReloaderDialogPrivate
+class ReloaderWidget : protected ReloaderWidgetPrivate
 {
 public:
-    ReloaderDialog ( PluginManager& plgManager ) :
+    ReloaderWidget ( PluginManager& plgManager ) :
         plgMng( plgManager )
     {
-        QDialog::setWindowFlags( Qt::WindowTitleHint |
-                                 Qt::WindowStaysOnTopHint );
+        QWidget::setWindowFlags( Qt::Tool );
         resize( QSize(311, 60).expandedTo(minimumSizeHint()) );
+        QRect r( 0, 0, size().width(), size().height() );
+        move(QApplication::desktop()->screenGeometry().center() - r.center());
         setWindowTitle( QObject::tr("Reload plugins") );
 
         QVBoxLayout* vboxLayout = new QVBoxLayout(this);
@@ -135,9 +138,9 @@ private:
 
 void PluginReloader::reloadPlugins ( PluginManager& plgManager )
 {
-    ReloaderDialog* reloaderDialog = new ReloaderDialog( plgManager );    
-    reloaderDialog->reloadPlugins();    
-    delete reloaderDialog;
+    ReloaderWidget* reloaderWidget = new ReloaderWidget( plgManager );    
+    reloaderWidget->reloadPlugins();    
+    delete reloaderWidget;
 }
 
 /*****************************************************************************/

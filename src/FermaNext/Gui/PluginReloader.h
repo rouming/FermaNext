@@ -15,7 +15,7 @@ public:
 };
 
 // Subsidiary private dialog
-class ReloaderDialogPrivate : public QDialog
+class ReloaderWidgetPrivate : public QWidget
 {
     Q_OBJECT
 public slots:
