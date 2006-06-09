@@ -24,6 +24,9 @@ int main ( int argc, char* argv[] )
         // Set default style
         //QApplication::setStyle( QStyleFactory::create ("plastique") );
 
+        // Do some 'splash' job, so set wait cursor
+        QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+
         QPixmap pixmap( Global::imagesPath() + 
                         Global::pathSeparator() + "splash.png" );
         Splash* splash = new Splash( pixmap, 
@@ -51,6 +54,7 @@ int main ( int argc, char* argv[] )
         FermaNextMainWindow& fermaMainWindow = wsp.mainWindow();
         fermaMainWindow.showMaximized();
         splash->finish( &fermaMainWindow );
+        QApplication::restoreOverrideCursor();
         delete splash;
         return app.exec();
 
