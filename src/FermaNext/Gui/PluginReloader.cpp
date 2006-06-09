@@ -22,6 +22,7 @@ public:
     {
         QWidget::setWindowFlags( Qt::Tool );
         resize( QSize(311, 60).expandedTo(minimumSizeHint()) );
+        setMaximumSize( size() );
         QRect r( 0, 0, size().width(), size().height() );
         move(QApplication::desktop()->screenGeometry().center() - r.center());
         setWindowTitle( QObject::tr("Reload plugins") );
@@ -79,23 +80,29 @@ private:
         progressBar->setMinimum(0);
         progressBar->setMaximum(plgNum);
         label->setText("");
-        label->repaint();
+        repaint();
+        QApplication::flush();
     }
 
     virtual void afterPluginsLoad ( uint ) 
     {
         progressBar->setValue(100);
+        repaint();
+        QApplication::flush();
     }
 
     virtual void beforePluginLoad ( const QString& path ) 
     {
         label->setText( tr("Loading plugin: ") + QFileInfo(path).baseName() );
-        label->repaint();
+        repaint();
+        QApplication::flush();
     }
 
     virtual void afterPluginLoad ( Plugin& ) 
     {
         progressBar->setValue( progressBar->value() + 1 );
+        repaint();
+        QApplication::flush();
     }
 
     // Unload
@@ -105,24 +112,30 @@ private:
         progressBar->setMinimum(0);
         progressBar->setMaximum(plgNum);
         label->setText("");
-        label->repaint();
+        repaint();
+        QApplication::flush();
     }
 
     virtual void afterPluginsUnload ( uint ) 
     {
         progressBar->setValue(100);
+        repaint();
+        QApplication::flush();
     }
 
     virtual void beforePluginUnload ( Plugin& plg ) 
     {
         label->setText( tr("Unloading plugin: ") + 
                         QFileInfo(plg.pluginPath()).baseName() );
-        label->repaint();
+        repaint();
+        QApplication::flush();
     }
 
     virtual void afterPluginUnload ( const QString& ) 
     {
-        progressBar->setValue( progressBar->value() + 1 );
+        progressBar->setValue( progressBar->value() + 1 );        
+        repaint();
+        QApplication::flush();
     }
 
 private:
