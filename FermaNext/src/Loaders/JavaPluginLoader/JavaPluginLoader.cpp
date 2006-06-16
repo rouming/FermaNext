@@ -250,60 +250,6 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
         javaVM = 0;
         return;
     }
-
-
-//===========================================================================
-// Remove in the future! Only for debug purposes!
-//===========================================================================
-
-    JClass trussUnitCls = javaVM->findClass("fermanext/trussunit/TrussUnit");
-    if ( trussUnitCls == 0 ) {
-        javaVM->exceptionDescribe();
-        // Clears pending exception
-        javaVM->exceptionClear();
-        
-        qWarning("no class!");
-        return;
-    }
-
-    JMethodID trussUnitConstructor = 
-        javaVM->getMethodID( trussUnitCls, "<init>", "()V" );
-    if ( trussUnitConstructor == 0 ) {
-        javaVM->exceptionDescribe();
-        // Clears pending exception
-        javaVM->exceptionClear();
-        
-        qWarning("no constructor!");
-        return;
-    }
-
-    JObject trussUnit = 
-        javaVM->newObject( trussUnitCls, trussUnitConstructor );
-    if ( trussUnit == 0 ) {
-        javaVM->exceptionDescribe();
-        // Clears pending exception
-        javaVM->exceptionClear();
-        
-        qWarning("can't construct object!");
-        return;
-    }
-
-    JMethodID countNodes = 
-        javaVM->getMethodID( trussUnitCls, "countNodes", 
-                             "()I" );
-    if ( countNodes == 0 ) {
-        javaVM->exceptionDescribe();
-        // Clears pending exception
-        javaVM->exceptionClear();
-        
-        qWarning("can't find method!");
-        return;
-    }
-    
-    JInt nodesNum = javaVM->callIntMethod( trussUnit, countNodes  );
-    QString str = QString("This is return val: %1").arg(nodesNum);
-    qWarning( str.toAscii().data() );
-
 }
 
 JavaPluginLoader::~JavaPluginLoader ()

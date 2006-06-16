@@ -17,6 +17,8 @@ public:
     static void registerArgument ( UUIDObject* );
     /** Unregisters argument */
     static void unregisterArgument ( UUIDObject* );
+    /** Unregisters all arguments */
+    static void unregisterAllArguments ();
 
     /** Checks if registered */
     static bool isRegistered ( UUIDObject* );

@@ -112,14 +112,15 @@ void JavaPlugin::execute ( const QList<UUIDObject*>& args )
     jArray = (JObjectArray)javaVM.newGlobalRef( jArray );
     Q_ASSERT( jArray );
 
+    // Unregisters all
+    JavaPluginArgumentRegistrator::unregisterAllArguments();
+
     // Fill array with uuids as strings and register arguments
     for ( int i = 0; i < args.size(); ++i ) {
         UUIDObject* obj = args.at(i);
         JavaPluginArgumentRegistrator::registerArgument( obj );
         JString jStr = javaVM.newStringUTF( obj->getUUID().toAscii().data() );
         javaVM.setObjectArrayElement( jArray, i, jStr );
-        QString excp = javaVM.getAndClearPendingException();
-        qWarning( excp.toAscii().data() );
     }
     
     JClass plgInstCls = javaVM.getObjectClass( javaPluginInst );
@@ -140,9 +141,8 @@ void JavaPlugin::execute ( const QList<UUIDObject*>& args )
     javaVM.deleteGlobalRef( jArray );
     javaVM.deleteGlobalRef( plgArgCls );
 
-    // Unregister arguments
-    foreach ( UUIDObject* obj, args )
-        JavaPluginArgumentRegistrator::unregisterArgument( obj );
+    // Unregisters all
+    JavaPluginArgumentRegistrator::unregisterAllArguments();
 }
 
 const PluginInfo& JavaPlugin::pluginInfo () const

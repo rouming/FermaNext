@@ -37,6 +37,15 @@ void JavaPluginArgumentRegistrator::unregisterArgument ( UUIDObject* obj )
     }
 }
 
+void JavaPluginArgumentRegistrator::unregisterAllArguments ()
+{
+    if ( args == 0 )
+        return;
+    
+    delete args;
+    args = 0;
+}
+
 bool JavaPluginArgumentRegistrator::isRegistered ( UUIDObject* obj )
 {
     if ( obj == 0 || args == 0 )
