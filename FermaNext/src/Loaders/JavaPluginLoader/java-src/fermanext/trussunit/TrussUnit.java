@@ -11,7 +11,7 @@ class LoadCases {};
 class TrussMaterial {};
 class NodeIndexOutOfBoundException extends Exception {};
 
-public class TrussUnit
+public class TrussUnit extends fermanext.system.PluginArgument
 {
     public native TrussNode findNodeByCoord ( DoublePoint p );
     public native TrussNode findNodeByNumber ( int num );
@@ -33,6 +33,9 @@ public class TrussUnit
     public native LoadCases getLoadCases ();
     public native TrussMaterial getMaterial ();
     public native void setMaterial ( TrussMaterial mat );
+
+    // Checks if this plugin really wraps native TrussUnit class
+    public native boolean isValid ();
 
     static { 
         System.loadLibrary("JavaPluginLoader.ldr");

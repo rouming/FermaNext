@@ -15,6 +15,13 @@ DEFINES += QT_THREAD_SUPPORT
 INCLUDEPATH += ../../Common \
                ../../Common/Plugin \
                ../../Common/Loader \
+               ../../FermaNext/TrussUnit \
+#############################################
+# Remove this includes in future
+               ../../FermaNext/Gui/Agg \
+               $$(AGGDIR)/include \
+               $$(AGGDIR)/svg \
+#############################################
                $$(JAVA_HOME)/include
 
 
@@ -27,14 +34,18 @@ unix {
   INCLUDEPATH += $$(JAVA_HOME)/include/linux
 }
 
-HEADERS = JavaPluginLoader.h \
+HEADERS = \
           JavaPlugin.h \
+          JavaPluginArgumentRegistrator.h \
+          JavaPluginLoader.h \
           \
           JavaVM/JavaVirtualMachine.h \
           JavaVM/JNITypes.h
 
-SOURCES = JavaPluginLoader.cpp \
+SOURCES = \
           JavaPlugin.cpp \
+          JavaPluginArgumentRegistrator.cpp \
+          JavaPluginLoader.cpp \
           \
           JavaVM/JavaVirtualMachine.cpp \
           \
