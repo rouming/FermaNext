@@ -1,4 +1,14 @@
 
+major tasks for 0.2.0
+-----------------------------------------------
+- full Java plugin support with demo 
+  representation.
+
+- HTML data sheet for plugins output.
+
+- full GUI (creating/deleting/updating all 
+            trusses elements).
+
 tasks after 0.1.2
 -----------------------------------------------
 - port to Qt4
