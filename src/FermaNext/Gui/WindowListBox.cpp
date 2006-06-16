@@ -163,6 +163,20 @@ void TrussUnitWindowItem::unselectAllFromGroup ()
 
 void TrussUnitWindowItem::calculate ()
 { 
+
+    FermaNextWorkspace& wsp = project.getWorkspace();    
+    PluginManager& plgManager = wsp.pluginManager();
+    PluginList plugins = plgManager.loadedPluginsOfType( "demo.java" );
+    if ( plugins.size() == 0 ) {
+        QMessageBox::warning( 0, tr("Plugin manager warning"), 
+                                 tr("demo.java plugin was not found "
+                                    "in the plugin dir.") );
+        return;
+    }
+    Plugin* plugin = plugins[0];
+    plugin->execute( QList<UUIDObject*>() << &trussWindow );   
+
+
     // FIXME QT3TO4
     /*
 

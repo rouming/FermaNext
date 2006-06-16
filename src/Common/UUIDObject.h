@@ -11,8 +11,11 @@
 class UUIDObject
 {
 protected:
-    inline UUIDObject ()  
+    inline UUIDObject ()
     { uuid = UUIDGen::uuid(); }
+
+    virtual ~UUIDObject ()
+    {}
 
 public:
     // Exceptions

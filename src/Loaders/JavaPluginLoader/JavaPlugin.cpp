@@ -1,6 +1,8 @@
 
 #include "JavaPlugin.h"
 
+#include "JavaPluginArgumentRegistrator.h"
+
 /*****************************************************************************
  * Java Plugin
  *****************************************************************************/
@@ -93,10 +95,54 @@ JavaPlugin::~JavaPlugin ()
     javaVM.deleteGlobalRef( javaPluginInst );
 }
 
-void JavaPlugin::execute ( const QList<UUIDObject*>& )
+void JavaPlugin::execute ( const QList<UUIDObject*>& args )
     /*throw (WrongExecutionArgsException)*/
 {
-    //TODO
+    JClass plgArgCls = javaVM.findClass( "Ljava/lang/String;" );
+    Q_ASSERT( plgArgCls );
+
+    // Create reference
+    plgArgCls = (JClass)javaVM.newGlobalRef( plgArgCls );
+    Q_ASSERT( plgArgCls );
+
+    JObjectArray jArray = javaVM.newObjectArray( args.size(), plgArgCls, 0 );
+    Q_ASSERT( jArray );
+
+    // Create reference
+    jArray = (JObjectArray)javaVM.newGlobalRef( jArray );
+    Q_ASSERT( jArray );
+
+    // Fill array with uuids as strings and register arguments
+    for ( int i = 0; i < args.size(); ++i ) {
+        UUIDObject* obj = args.at(i);
+        JavaPluginArgumentRegistrator::registerArgument( obj );
+        JString jStr = javaVM.newStringUTF( obj->getUUID().toAscii().data() );
+        javaVM.setObjectArrayElement( jArray, i, jStr );
+        QString excp = javaVM.getAndClearPendingException();
+        qWarning( excp.toAscii().data() );
+    }
+    
+    JClass plgInstCls = javaVM.getObjectClass( javaPluginInst );
+    Q_ASSERT( plgInstCls );
+
+    // Create reference
+    plgInstCls = (JClass)javaVM.newGlobalRef( plgInstCls );
+    Q_ASSERT( plgInstCls );
+
+    JMethodID plgExecuteMethod = javaVM.getMethodID( plgInstCls, "execute",
+                                                   "([Ljava/lang/String;)V" );
+    Q_ASSERT( plgExecuteMethod );
+
+    javaVM.callVoidMethod( javaPluginInst, plgExecuteMethod, jArray );
+
+    // Clear all references
+    javaVM.deleteGlobalRef( plgInstCls );
+    javaVM.deleteGlobalRef( jArray );
+    javaVM.deleteGlobalRef( plgArgCls );
+
+    // Unregister arguments
+    foreach ( UUIDObject* obj, args )
+        JavaPluginArgumentRegistrator::unregisterArgument( obj );
 }
 
 const PluginInfo& JavaPlugin::pluginInfo () const
