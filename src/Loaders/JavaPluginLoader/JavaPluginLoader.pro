@@ -12,7 +12,8 @@ CONFIG += plugin warn_on thread
 
 DEFINES += QT_THREAD_SUPPORT
 
-INCLUDEPATH += ../../Common \
+INCLUDEPATH += . \
+               ../../Common \
                ../../Common/Plugin \
                ../../Common/Loader \
                ../../FermaNext/TrussUnit \
