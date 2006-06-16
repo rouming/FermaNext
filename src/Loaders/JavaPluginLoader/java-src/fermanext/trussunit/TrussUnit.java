@@ -3,22 +3,24 @@ package fermanext.trussunit;
 
 import java.util.Vector;
 
+import java.awt.geom.*;
+
+
 class TrussNode {};
 class TrussPivot {};
 class DoubleSize {};
-class DoublePoint {};
 class LoadCases {};
 class TrussMaterial {};
 class NodeIndexOutOfBoundException extends Exception {};
 
 public class TrussUnit extends fermanext.system.PluginArgument
 {
-    public native TrussNode findNodeByCoord ( DoublePoint p );
+    public native TrussNode findNodeByCoord ( Point2D p );
     public native TrussNode findNodeByNumber ( int num );
     public native TrussPivot findPivotByNumber ( int num );
     public native TrussPivot findPivotByNodes ( TrussNode n1, TrussNode n2 );
     public native Vector findAdjoiningPivots ( TrussNode node );
-    public native TrussNode createNode ( DoublePoint p );
+    public native TrussNode createNode ( Point2D p );
     public native TrussNode createNode ( double x, double y );
     public native TrussPivot createPivot ( int firstNodeIndex, 
                                            int lastNodeIndex ) 
