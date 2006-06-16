@@ -59,9 +59,13 @@ QVariant TrussUnitWindowItem::data ( int role ) const
         return disabledIcon;
 }
 
-void TrussUnitWindowItem::fillPopup ( QMenu* popup ) const
+void TrussUnitWindowItem::fillPopup ( QMenu* popup )
 {
     if ( isShown() ) {
+        FermaNextWorkspace& wsp = project.getWorkspace();    
+        PluginManager& plgManager = wsp.pluginManager();
+        PluginList plugins = plgManager.loadedPluginsOfType( "calculation.*" );
+
         if ( isSelectedInGroup() ) {
             popup->addAction( QIcon(Global::imagesPath() + "/unselect.png"),
                               "Unselect", this, SLOT(unselectFromGroup()) );
@@ -75,8 +79,28 @@ void TrussUnitWindowItem::fillPopup ( QMenu* popup ) const
         popup->addAction( QIcon(Global::imagesPath() + "/unselect.png"),
                           "Unselect All", this, SLOT(unselectAllFromGroup()));
         popup->addSeparator();
-        popup->addAction( QIcon(Global::imagesPath() + "/calculate.png"),
-                          "Calculate", this, SLOT(calculate()) );
+
+        if ( plugins.size() == 0 ) {
+            QAction* calcAction = popup->addAction( QIcon(Global::imagesPath()
+                                                          + "/calculate.png"),
+                                                    "Calculate" );
+            calcAction->setEnabled(false);
+        } else {
+            QMenu* calcMenu = popup->addMenu( QIcon(Global::imagesPath() + 
+                                                    "/calculate.png"),
+                                              "Calculate" );
+            foreach ( Plugin* plugin, plugins ) {
+                PluginActionReceiver* pluginAction =
+                    new PluginActionReceiver( plugin, this ); 
+                calcMenu->addAction(  QIcon(Global::imagesPath() + 
+                                            "/calculate.png"),
+                                      plugin->pluginInfo().name, 
+                                      pluginAction,
+                                      SLOT(execute()) );
+                pluginAction->deleteLater();
+            }
+        }
+
         popup->addSeparator();
         popup->addAction( QIcon(Global::imagesPath() + "/delete.png"),
                           "Remove", this, SLOT(remove()) );
@@ -161,21 +185,10 @@ void TrussUnitWindowItem::unselectAllFromGroup ()
     listBox.unselectAllFromGroup();
 }
 
-void TrussUnitWindowItem::calculate ()
+void TrussUnitWindowItem::executePlugin ( Plugin* plugin )
 { 
-
-    FermaNextWorkspace& wsp = project.getWorkspace();    
-    PluginManager& plgManager = wsp.pluginManager();
-    PluginList plugins = plgManager.loadedPluginsOfType( "demo.java" );
-    if ( plugins.size() == 0 ) {
-        QMessageBox::warning( 0, tr("Plugin manager warning"), 
-                                 tr("demo.java plugin was not found "
-                                    "in the plugin dir.") );
-        return;
-    }
-    Plugin* plugin = plugins[0];
-    plugin->execute( QList<UUIDObject*>() << &trussWindow );   
-
+    Q_ASSERT( plugin );
+    plugin->execute( QList<UUIDObject*>() << &trussWindow );
 
     // FIXME QT3TO4
     /*

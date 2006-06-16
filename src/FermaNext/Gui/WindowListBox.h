@@ -9,6 +9,10 @@
 #include "FermaNextProject.h"
 
 class WindowListBox;
+class TrussUnitWindowItem;
+class Plugin;
+
+/*****************************************************************************/
 
 class TrussUnitWindowItem : public QObject, public QListWidgetItem
 {
@@ -20,7 +24,7 @@ public:
 
     virtual QVariant data ( int role ) const;
 
-    virtual void fillPopup ( QMenu* ) const;
+    virtual void fillPopup ( QMenu* );
 
     virtual bool isSelectedInGroup () const;
     virtual bool isShown () const;
@@ -36,7 +40,7 @@ public slots:
     virtual void unselectFromGroup ();
     virtual void selectAllInGroup ();
     virtual void unselectAllFromGroup ();
-    virtual void calculate ();
+    virtual void executePlugin ( Plugin* );
     virtual void remove ();
 
 protected slots:
@@ -57,6 +61,30 @@ private:
     bool selected;    
 };
 
+/*****************************************************************************/
+
+class PluginActionReceiver : public QObject
+{
+    Q_OBJECT
+public:
+    PluginActionReceiver ( Plugin* plg, TrussUnitWindowItem* itm ) :
+        plugin(plg), item(itm)
+    {}
+
+public slots:
+    void execute ()
+    {
+        if ( item == 0 || plugin == 0 )
+            return;
+        item->executePlugin( plugin );
+    }
+
+private:
+    Plugin* plugin;
+    TrussUnitWindowItem* item;
+};
+
+/*****************************************************************************/
 
 class WindowListBox : public QListWidget
 {
