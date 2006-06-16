@@ -25,10 +25,12 @@ public class DemoJavaPlugin extends JavaPlugin
             (fermanext.trussunit.TrussUnit)args.get(0);
         logger.debug( "count nodes: " + truss.countNodes() );
 
-        JOptionPane.showMessageDialog(null,
-                                      "This is a pure demo Java plugin!\n" + 
-                                      "Truss unit has " + truss.countNodes() +
-                                      " nodes!" );
+        JOptionPane.showMessageDialog( null,
+                                       "This is a pure demo Java plugin!\n" + 
+                                       "Truss unit has " + truss.countNodes() +
+                                       " nodes!",
+                                       "Java plugin works great!",
+                                       JOptionPane.INFORMATION_MESSAGE );
     }
 
     public Vector<Class<? extends PluginArgument>> executionTypes ()
@@ -46,7 +48,7 @@ public class DemoJavaPlugin extends JavaPlugin
     { 
         return new PluginInfo( "DemoJavaPlugin", 
                                "Just a demo java plugin",
-                               "demo.java" );
+                               "calculation.demo.java" );
     }
                              
     public Status pluginStatusCode ()
