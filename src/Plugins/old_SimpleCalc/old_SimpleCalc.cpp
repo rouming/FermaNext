@@ -1,6 +1,7 @@
 
 #include <QFile>
 #include <QRegExp>
+#include <QMessageBox>
 
 #include "old_SimpleCalc.h"
 #include "NativePluginFrontEnd.h"
@@ -55,6 +56,10 @@ const PluginInfo& SimpleCalcPlugin::pluginInfo () const
 
 void SimpleCalcPlugin::execute ( const QList<UUIDObject*>& )
 {
+    QMessageBox::information( 0, "Qt4 native driver", 
+                              "This is a native driver.\n"
+                              "Will be implemented in the near future.",
+                              0 );
     /* //TODO
     QString frmFile( tempFileName() );    
     QString vyvFile( frmFile + fermaResExt );
