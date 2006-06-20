@@ -5,70 +5,90 @@
  * Java Plugin Argument Registrator
  *****************************************************************************/
 
-QHash<QString, UUIDObject*>* JavaPluginArgumentRegistrator::args = 0;
+JavaPluginArgumentRegistrator::UUIDObjectMapStack* 
+    JavaPluginArgumentRegistrator::argsStack = 0;
 
 /*****************************************************************************/
 
-void JavaPluginArgumentRegistrator::registerArgument ( UUIDObject* obj )
+void JavaPluginArgumentRegistrator::push ()
 {
-    if ( obj == 0 )
-        return;
-
-    if ( args == 0 )
-        args = new QHash<QString, UUIDObject*>;
-
-    args->insert( obj->getUUID(), obj );
+    if ( argsStack == 0 )
+        argsStack = new UUIDObjectMapStack;
+    argsStack->push( new UUIDObjectMap );
 }
 
-void JavaPluginArgumentRegistrator::unregisterArgument ( UUIDObject* obj )
+void JavaPluginArgumentRegistrator::pop ()
 {
-    if ( obj == 0 || args == 0 )
+    if ( top() == 0 )
         return;
+    delete argsStack->pop();
+    if ( argsStack->isEmpty() ) {
+        delete argsStack;
+        argsStack = 0;
+    }
+}
+
+JavaPluginArgumentRegistrator::UUIDObjectMap* 
+    JavaPluginArgumentRegistrator::top ()
+{
+    if ( argsStack == 0 || argsStack->isEmpty() )
+        return 0;
+    return argsStack->top();
+}
+
+bool JavaPluginArgumentRegistrator::registerArgument ( UUIDObject* obj )
+{
+    if ( obj == 0 || top() == 0 )
+        return false;
+
+    top()->insert( obj->getUUID(), obj );
+    return true;
+}
+
+bool JavaPluginArgumentRegistrator::unregisterArgument ( UUIDObject* obj )
+{
+    if ( obj == 0 || top() == 0 )
+        return false;
 
     const QString& uuid = obj->getUUID();
-    if ( ! args->contains(uuid) )
-        return;
+    if ( ! top()->contains(uuid) )
+        return false;
 
-    args->remove( uuid );
-
-    if ( args->size() == 0 ) {
-        delete args;
-        args = 0;
-    }
+    top()->remove( uuid );
+    return true;
 }
 
 void JavaPluginArgumentRegistrator::unregisterAllArguments ()
 {
-    if ( args == 0 )
+    if ( top() == 0 )
         return;
     
-    delete args;
-    args = 0;
+    top()->clear();
 }
 
 bool JavaPluginArgumentRegistrator::isRegistered ( UUIDObject* obj )
 {
-    if ( obj == 0 || args == 0 )
+    if ( obj == 0 || top() == 0 )
         return false;
 
-    return args->contains( obj->getUUID() );
+    return top()->contains( obj->getUUID() );
 }
 bool JavaPluginArgumentRegistrator::isRegistered ( const QString& uuid )
 {
-    if ( args == 0 )
+    if ( top() == 0 )
         return false;
-    return args->contains( uuid );
+    return top()->contains( uuid );
 }
 
 UUIDObject* JavaPluginArgumentRegistrator::getRegistered ( 
     const QString& uuid )
 {
-    if ( args == 0 )
+    if ( top() == 0 )
         return 0;
-    if ( !args->contains(uuid) )
+    if ( ! top()->contains(uuid) )
         return 0;
 
-    return args->value( uuid );
+    return top()->value( uuid );
 }
 
 /*****************************************************************************/

@@ -52,6 +52,16 @@ TrussUnit* getTrussUnitByUUID ( JNIEnv* env, jobject self )
 
 /*****************************************************************************/
 
+jboolean JNICALL Java_fermanext_trussunit_TrussUnit_isValid
+  (JNIEnv* env, jobject self )
+{
+    LOG4CXX_DEBUG( logger, "isValid" );
+    TrussUnit* truss = getTrussUnitByUUID( env, self );
+    return (truss == 0 ? false : true);
+}
+
+/*****************************************************************************/
+
 jint JNICALL Java_fermanext_trussunit_TrussUnit_countNodes
   (JNIEnv* env, jobject self)
 {
@@ -60,17 +70,72 @@ jint JNICALL Java_fermanext_trussunit_TrussUnit_countNodes
     if ( truss == 0 ) {
         LOG4CXX_WARN( logger, "TrussUnit instance is 0, maybe it was not "
                               "properly registered?" );
-        return 666;
+        return -1;
     }
     return truss->countNodes();
 }
 
-jboolean JNICALL Java_fermanext_trussunit_TrussUnit_isValid
-  (JNIEnv* env, jobject self )
+jint JNICALL Java_fermanext_trussunit_TrussUnit_countPivots
+  (JNIEnv* env, jobject self)
 {
-    LOG4CXX_DEBUG( logger, "isValid" );
+    LOG4CXX_DEBUG( logger, "countPivots" );
     TrussUnit* truss = getTrussUnitByUUID( env, self );
-    return (truss == 0 ? false : true);
+    if ( truss == 0 ) {
+        LOG4CXX_WARN( logger, "TrussUnit instance is 0, maybe it was not "
+                              "properly registered?" );
+        return -1;
+    }
+    return truss->countPivots();
+}
+
+/*
+ * Class:     fermanext_trussunit_TrussUnit
+ * Method:    createNode
+ * Signature: (DD)Lfermanext/trussunit/TrussNode;
+ */
+jobject JNICALL Java_fermanext_trussunit_TrussUnit_createNode__DD
+  (JNIEnv* env, jobject self, jdouble x, jdouble y)
+{
+    LOG4CXX_DEBUG( logger, "createNode(double, double)" );
+    TrussUnit* truss = getTrussUnitByUUID( env, self );
+    if ( truss == 0 ) {
+        LOG4CXX_WARN( logger, "TrussUnit instance is 0, maybe it was not "
+                              "properly registered?" );
+        return 0;
+    }
+
+    TrussNode& node = truss->createNode( x, y );
+    // Register argument
+    JavaPluginArgumentRegistrator::registerArgument( &node );
+
+    jclass nodeClass = env->FindClass("fermanext/trussunit/TrussNode");
+    Q_ASSERT( nodeClass );
+    // Create reference
+    nodeClass = (jclass)env->NewGlobalRef( nodeClass );
+    Q_ASSERT( nodeClass );
+
+    jmethodID nodeCtor = env->GetMethodID( nodeClass, "<init>", "()V" );
+    Q_ASSERT( nodeCtor );
+
+    jobject jNode = env->NewObject( nodeClass, nodeCtor );
+    Q_ASSERT( jNode );
+    // Create reference
+    jNode = env->NewGlobalRef( jNode );
+    Q_ASSERT( jNode );
+
+    jmethodID setUUIDMethod = env->GetMethodID( nodeClass, "setUUID", 
+                                                "(Ljava/lang/String;)V" );
+    Q_ASSERT( setUUIDMethod );
+
+    jstring jStrUUID = env->NewStringUTF( qPrintable(node.getUUID()) );
+    env->CallVoidMethod( jNode, setUUIDMethod, jStrUUID );
+
+    // Clear all references
+    env->DeleteGlobalRef( nodeClass );
+
+    env->NewLocalRef( jNode );
+
+    return jNode;
 }
 
 /*****************************************************************************/
