@@ -93,12 +93,16 @@ void JNICALL Java_fermanext_trussunit_TrussNode_setFixation
     switch ( order ) {
     case TrussNode::Unfixed:
         trussNode->setFixation( TrussNode::Unfixed );
+        break;
     case TrussNode::FixationByX:
         trussNode->setFixation( TrussNode::FixationByX );
+        break;
     case TrussNode::FixationByY:
         trussNode->setFixation( TrussNode::FixationByY );
+        break;
     case TrussNode::FixationByXY:
         trussNode->setFixation( TrussNode::FixationByXY );
+        break;
     default:
         LOG4CXX_WARN( logger, QString("Unknown fixation type %1").
                                 arg(order).toStdString() );
