@@ -3,6 +3,7 @@ package fermanext.demo;
 
 import java.util.Vector;
 import fermanext.system.*;
+import fermanext.trussunit.*;
 import fermanext.logging.log4cxx.*;
 
 import javax.swing.JOptionPane;
@@ -21,9 +22,12 @@ public class DemoJavaPlugin extends JavaPlugin
     public void specificExecute ( Vector<PluginArgument> args )
     {
         logger.debug( "specificExecute: " + args.size() );
-        fermanext.trussunit.TrussUnit truss = 
-            (fermanext.trussunit.TrussUnit)args.get(0);
+        TrussUnit truss = (TrussUnit)args.get(0);
         logger.debug( "count nodes: " + truss.countNodes() );
+
+        TrussNode node = truss.createNode( 12.3, 34.5 );
+        node.setPoint( 34.5, 12.3);
+        node.setFixation( TrussNode.Fixation.FixationByX );        
 
         JOptionPane.showMessageDialog( null,
                                        "This is a pure demo Java plugin!\n" + 

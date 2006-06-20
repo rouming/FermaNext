@@ -54,6 +54,7 @@ SOURCES = \
           stubs-src/fermanext_logging_log4cxx_Logger.cpp \
           stubs-src/fermanext_logging_log4cxx_NDC.cpp \
           stubs-src/fermanext_logging_log4cxx_PropertyConfigurator.cpp \
+          stubs-src/fermanext_trussunit_TrussNode.cpp \
           stubs-src/fermanext_trussunit_TrussUnit.cpp
 
 

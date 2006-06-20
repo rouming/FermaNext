@@ -112,8 +112,8 @@ void JavaPlugin::execute ( const QList<UUIDObject*>& args )
     jArray = (JObjectArray)javaVM.newGlobalRef( jArray );
     Q_ASSERT( jArray );
 
-    // Unregisters all
-    JavaPluginArgumentRegistrator::unregisterAllArguments();
+    // Push new argument context
+    JavaPluginArgumentRegistrator::push();
 
     // Fill array with uuids as strings and register arguments
     for ( int i = 0; i < args.size(); ++i ) {
@@ -141,8 +141,8 @@ void JavaPlugin::execute ( const QList<UUIDObject*>& args )
     javaVM.deleteGlobalRef( jArray );
     javaVM.deleteGlobalRef( plgArgCls );
 
-    // Unregisters all
-    JavaPluginArgumentRegistrator::unregisterAllArguments();
+    // Pop argument context, return to previous one
+    JavaPluginArgumentRegistrator::pop();
 }
 
 const PluginInfo& JavaPlugin::pluginInfo () const

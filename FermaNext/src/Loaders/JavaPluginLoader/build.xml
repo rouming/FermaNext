@@ -74,6 +74,12 @@
 
          <!-- fermanext.trussunit -->
          <class name="fermanext.trussunit.TrussUnit"/>
+         <class name="fermanext.trussunit.TrussNode"/>
+         <class name="fermanext.trussunit.TrussPivot"/>
+         <class name="fermanext.trussunit.TrussMaterial"/>
+         <class name="fermanext.trussunit.TrussLoad"/>
+         <class name="fermanext.trussunit.TrussLoadCase"/>
+         <class name="fermanext.trussunit.TrussLoadCaseArray"/>
       </javah>
     </target>
 
