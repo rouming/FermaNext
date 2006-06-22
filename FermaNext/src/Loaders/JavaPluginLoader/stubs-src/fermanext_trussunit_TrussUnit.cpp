@@ -23,10 +23,6 @@ TrussUnit* getTrussUnitByUUID ( JNIEnv* env, jobject self )
     jclass trussInstCls = env->GetObjectClass( self );
     Q_ASSERT( trussInstCls );
 
-    // Create reference
-    trussInstCls = (jclass)env->NewGlobalRef( trussInstCls );
-    Q_ASSERT( trussInstCls );
-
     jmethodID trussUUIDMethod = env->GetMethodID( trussInstCls, "getUUID",
                                                   "()Ljava/lang/String;" );
     Q_ASSERT( trussUUIDMethod );
@@ -42,9 +38,6 @@ TrussUnit* getTrussUnitByUUID ( JNIEnv* env, jobject self )
     // Free chars
     env->ReleaseStringUTFChars( jUuid, uuidChars );
     
-    // Clear all references
-    env->DeleteGlobalRef( trussInstCls );
-
     UUIDObject* truss = JavaPluginArgumentRegistrator::getRegistered( uuid );
     // Try to cast
     return dynamic_cast<TrussUnit*>(truss);
@@ -110,17 +103,11 @@ jobject JNICALL Java_fermanext_trussunit_TrussUnit_createNode__DD
 
     jclass nodeClass = env->FindClass("fermanext/trussunit/TrussNode");
     Q_ASSERT( nodeClass );
-    // Create reference
-    nodeClass = (jclass)env->NewGlobalRef( nodeClass );
-    Q_ASSERT( nodeClass );
 
     jmethodID nodeCtor = env->GetMethodID( nodeClass, "<init>", "()V" );
     Q_ASSERT( nodeCtor );
 
     jobject jNode = env->NewObject( nodeClass, nodeCtor );
-    Q_ASSERT( jNode );
-    // Create reference
-    jNode = env->NewGlobalRef( jNode );
     Q_ASSERT( jNode );
 
     jmethodID setUUIDMethod = env->GetMethodID( nodeClass, "setUUID", 
@@ -129,11 +116,6 @@ jobject JNICALL Java_fermanext_trussunit_TrussUnit_createNode__DD
 
     jstring jStrUUID = env->NewStringUTF( qPrintable(node.getUUID()) );
     env->CallVoidMethod( jNode, setUUIDMethod, jStrUUID );
-
-    // Clear all references
-    env->DeleteGlobalRef( nodeClass );
-
-    env->NewLocalRef( jNode );
 
     return jNode;
 }

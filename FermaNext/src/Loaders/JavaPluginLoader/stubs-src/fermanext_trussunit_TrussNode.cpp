@@ -23,10 +23,6 @@ TrussNode* getTrussNodeByUUID ( JNIEnv* env, jobject self )
     jclass trussInstCls = env->GetObjectClass( self );
     Q_ASSERT( trussInstCls );
 
-    // Create reference
-    trussInstCls = (jclass)env->NewGlobalRef( trussInstCls );
-    Q_ASSERT( trussInstCls );
-
     jmethodID trussUUIDMethod = env->GetMethodID( trussInstCls, "getUUID",
                                                   "()Ljava/lang/String;" );
     Q_ASSERT( trussUUIDMethod );
@@ -42,9 +38,6 @@ TrussNode* getTrussNodeByUUID ( JNIEnv* env, jobject self )
     // Free chars
     env->ReleaseStringUTFChars( jUuid, uuidChars );
     
-    // Clear all references
-    env->DeleteGlobalRef( trussInstCls );
-
     UUIDObject* truss = JavaPluginArgumentRegistrator::getRegistered( uuid );
     // Try to cast
     return dynamic_cast<TrussNode*>(truss);
@@ -80,15 +73,9 @@ void JNICALL Java_fermanext_trussunit_TrussNode_setFixation
 
     jclass fixClass = env->GetObjectClass( jFix );
     Q_ASSERT( fixClass );
-    // Create reference
-    fixClass = (jclass)env->NewGlobalRef( fixClass );
-    Q_ASSERT( fixClass );
 
     jmethodID ordinalMethod = env->GetMethodID( fixClass, "ordinal", "()I" );
     jint order = env->CallIntMethod( jFix, ordinalMethod );
-
-    // Free reference
-    env->DeleteGlobalRef( fixClass );
 
     switch ( order ) {
     case TrussNode::Unfixed:
@@ -127,9 +114,6 @@ jobject JNICALL Java_fermanext_trussunit_TrussNode_getFixation
 
     jclass fixClass = env->FindClass("fermanext/trussunit/TrussNode$Fixation");
     Q_ASSERT( fixClass );
-    // Create reference
-    fixClass = (jclass)env->NewGlobalRef( fixClass );
-    Q_ASSERT( fixClass );
 
     jmethodID getEnumConstMethod = 
         env->GetMethodID( fixClass, "getEnumConstants", 
@@ -138,9 +122,6 @@ jobject JNICALL Java_fermanext_trussunit_TrussNode_getFixation
 
     jobjectArray enumConstants = 
         (jobjectArray)env->CallObjectMethod( fixClass, getEnumConstMethod );
-    Q_ASSERT( enumConstants );
-    // Create reference
-    enumConstants = (jobjectArray)env->NewGlobalRef( enumConstants );
     Q_ASSERT( enumConstants );
 
     jsize enumConstSize = env->GetArrayLength( enumConstants );
@@ -155,14 +136,6 @@ jobject JNICALL Java_fermanext_trussunit_TrussNode_getFixation
                                                trussNode->getFixation() );
     Q_ASSERT( env->ExceptionCheck() == false );
     Q_ASSERT( jFix );
-
-    // Create local reference
-    jFix = env->NewLocalRef( jFix );
-    Q_ASSERT( jFix );
-
-    // Free reference
-    env->DeleteGlobalRef( fixClass );
-    env->DeleteGlobalRef( enumConstants );
 
     return jFix;    
 }
@@ -185,9 +158,6 @@ void JNICALL Java_fermanext_trussunit_TrussNode_setPoint__Lfermanext_trussunit_D
 
     jclass pointClass = env->GetObjectClass( jPoint );
     Q_ASSERT( pointClass );
-    // Create reference
-    pointClass = (jclass)env->NewGlobalRef( pointClass );
-    Q_ASSERT( pointClass );
 
     jmethodID getXMethod = env->GetMethodID( pointClass, "getX", "()D" );
     Q_ASSERT( getXMethod );
@@ -200,8 +170,6 @@ void JNICALL Java_fermanext_trussunit_TrussNode_setPoint__Lfermanext_trussunit_D
     
     trussNode->setPoint( x, y );
 
-    // Free reference
-    env->DeleteGlobalRef( pointClass );
 }
 
 /*
@@ -241,9 +209,6 @@ jobject JNICALL Java_fermanext_trussunit_TrussNode_getPoint
 
     jclass pointClass = env->FindClass("fermanext/trussunit/DoublePoint");
     Q_ASSERT( pointClass );
-    // Create reference
-    pointClass = (jclass)env->NewGlobalRef( pointClass );
-    Q_ASSERT( pointClass );
 
     jmethodID pointCtor = env->GetMethodID( pointClass, "<init>", "(DD)V" );
     Q_ASSERT( pointCtor );
@@ -253,15 +218,6 @@ jobject JNICALL Java_fermanext_trussunit_TrussNode_getPoint
 
     jobject jPoint = env->NewObject( pointClass, pointCtor, x, y );
     Q_ASSERT( jPoint );
-    // Create reference
-    jPoint = env->NewGlobalRef( jPoint );
-    Q_ASSERT( jPoint );
-
-    // Free reference
-    env->DeleteGlobalRef( pointClass );
-
-    // Create local ref
-    env->NewLocalRef( jPoint );
 
     return jPoint;
 }
