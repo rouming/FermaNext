@@ -56,4 +56,7 @@ isEmpty(DISABLE_LOGGING): DISABLE_LOGGING = $$(DISABLE_LOGGING)
 
 CONFIG(debug, debug|release) {
    CONFIG += console
+
+   # Define macros DEBUG for Unix
+   unix: !contains( DEFINES, DEBUG ): DEFINES += DEBUG
 }
