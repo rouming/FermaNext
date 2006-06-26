@@ -1,6 +1,8 @@
 package fermanext.trussunit;
 
-public class TrussNode extends fermanext.system.PluginArgument
+import java.util.UUID;
+
+public class TrussNode implements fermanext.system.NativeObject
 {
     public enum Fixation {
         Unfixed,
@@ -20,6 +22,17 @@ public class TrussNode extends fermanext.system.PluginArgument
     native public double getY ();
 
     native public int getNumber ();
+
+    // Random UUID
+    private String uuid = UUID.randomUUID().toString();
+
+    // UUID getter.
+    public final String getUUID ()
+    { return uuid; }
+
+    // UUID setter.
+    public final void setUUID ( String uuid )
+    { this.uuid = uuid; }
 
     // Checks if this plugin really wraps native class
     public native boolean isValid ();

@@ -1,6 +1,8 @@
 package fermanext.trussunit;
 
-public class TrussLoad extends fermanext.system.PluginArgument
+import java.util.UUID;
+
+public class TrussLoad implements fermanext.system.NativeObject
 {
     public native double getXForce ();
     public native double getYForce ();
@@ -11,6 +13,17 @@ public class TrussLoad extends fermanext.system.PluginArgument
 
     public native boolean isEnabled ();
     public native boolean isRemoved ();
+
+    // Random UUID
+    private String uuid = UUID.randomUUID().toString();
+
+    // UUID getter.
+    public final String getUUID ()
+    { return uuid; }
+
+    // UUID setter.
+    public final void setUUID ( String uuid )
+    { this.uuid = uuid; }
 
     // Checks if this plugin really wraps native class
     public native boolean isValid ();

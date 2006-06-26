@@ -1,6 +1,8 @@
 package fermanext.trussunit;
 
-public class TrussLoadCaseArray extends fermanext.system.PluginArgument
+import java.util.UUID;
+
+public class TrussLoadCaseArray implements fermanext.system.NativeObject
 {
     public native TrussLoadCase createLoadCase ();
 
@@ -16,6 +18,17 @@ public class TrussLoadCaseArray extends fermanext.system.PluginArgument
     public native TrussLoadCase findLoadCase ( int indx );
 
     public native int countLoadCases ();
+
+    // Random UUID
+    private String uuid = UUID.randomUUID().toString();
+
+    // UUID getter.
+    public final String getUUID ()
+    { return uuid; }
+
+    // UUID setter.
+    public final void setUUID ( String uuid )
+    { this.uuid = uuid; }
 
     // Checks if this plugin really wraps native class
     public native boolean isValid ();

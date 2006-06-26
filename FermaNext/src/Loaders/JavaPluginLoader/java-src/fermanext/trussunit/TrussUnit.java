@@ -1,6 +1,8 @@
 package fermanext.trussunit;
 
-public class TrussUnit extends fermanext.system.PluginArgument
+import java.util.UUID;
+
+public class TrussUnit implements fermanext.system.NativeObject
 {
     public native TrussNode findNodeByCoord ( DoublePoint p );
     public native TrussNode findNodeByNumber ( int num );
@@ -20,6 +22,17 @@ public class TrussUnit extends fermanext.system.PluginArgument
     public native TrussMaterial getMaterial ();
     public native void setMaterial ( TrussMaterial mat );
     public native int getNumber ();
+
+    // Random UUID
+    private String uuid = UUID.randomUUID().toString();
+
+    // UUID getter.
+    public final String getUUID ()
+    { return uuid; }
+
+    // UUID setter.
+    public final void setUUID ( String uuid )
+    { this.uuid = uuid; }
 
     // Checks if this plugin really wraps native class
     public native boolean isValid ();

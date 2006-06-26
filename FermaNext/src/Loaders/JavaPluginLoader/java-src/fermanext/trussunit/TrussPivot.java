@@ -1,6 +1,8 @@
 package fermanext.trussunit;
 
-public class TrussPivot extends fermanext.system.PluginArgument
+import java.util.UUID;
+
+public class TrussPivot implements fermanext.system.NativeObject
 {
     public native TrussNode getFirstNode ();
     public native TrussNode getLastNode ();
@@ -15,6 +17,17 @@ public class TrussPivot extends fermanext.system.PluginArgument
     public native void setThickness ( double th );
 
     public native int getNumber ();
+
+    // Random UUID
+    private String uuid = UUID.randomUUID().toString();
+
+    // UUID getter.
+    public final String getUUID ()
+    { return uuid; }
+
+    // UUID setter.
+    public final void setUUID ( String uuid )
+    { this.uuid = uuid; }
 
     // Checks if this plugin really wraps native class
     public native boolean isValid ();
