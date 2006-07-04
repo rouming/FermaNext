@@ -84,6 +84,7 @@ Plugin& NativePluginLoader::specificLoadPlugin ( const QString& pathToPlugin )
     catch ( ... ) {
         LOG4CXX_ERROR(logger, "plugin can't be loaded: " + 
                       pathToPlugin.toStdString() + ", unknown exception");
+        delete dynaLoader;
         throw PluginLoadException();
     }
 
