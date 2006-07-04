@@ -8,7 +8,7 @@ SOURCES = \
           ObjectState.cpp \
           ObjectStateManager.cpp \
           StatefulObject.cpp \
-          UUIDGen.cpp \
+          UUIDObject.cpp \
           XMLSerializableObject.cpp \
           \
           Plugin/Plugin.cpp \
@@ -27,7 +27,6 @@ HEADERS = \
           ObjectState.h \
           ObjectStateManager.h \
           StatefulObject.h \
-          UUIDGen.h \
           UUIDObject.h \
           XMLSerializableObject.h \
           \
