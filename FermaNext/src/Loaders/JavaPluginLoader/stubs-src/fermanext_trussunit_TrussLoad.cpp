@@ -20,7 +20,7 @@ jboolean JNICALL Java_fermanext_trussunit_TrussLoad_isValid
   (JNIEnv* env, jobject self )
 {
     LOG4CXX_DEBUG( logger, "isValid" );
-    TrussLoad* trussLoad = JavaPluginArgumentRegistrator::
+    TrussLoad* trussLoad = 
         getRegisteredByJavaObjAndCast<TrussLoad>( env, self );
     return (trussLoad == 0 ? false : true);
 }
@@ -36,7 +36,7 @@ jdouble JNICALL Java_fermanext_trussunit_TrussLoad_getXForce
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getXForce()" );
-    TrussLoad* trussLoad = JavaPluginArgumentRegistrator::
+    TrussLoad* trussLoad = 
         getRegisteredByJavaObjAndCast<TrussLoad>( env, self );
     if ( trussLoad == 0 ) {
         LOG4CXX_WARN( logger, "TrussLoad instance is 0, maybe it was not "
@@ -55,7 +55,7 @@ jdouble JNICALL Java_fermanext_trussunit_TrussLoad_getYForce
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getYForce()" );
-    TrussLoad* trussLoad = JavaPluginArgumentRegistrator::
+    TrussLoad* trussLoad = 
         getRegisteredByJavaObjAndCast<TrussLoad>( env, self );
     if ( trussLoad == 0 ) {
         LOG4CXX_WARN( logger, "TrussLoad instance is 0, maybe it was not "
@@ -75,7 +75,7 @@ void JNICALL Java_fermanext_trussunit_TrussLoad_setXForce
   (JNIEnv* env, jobject self, jdouble xForce)
 {
     LOG4CXX_DEBUG( logger, "setXForce(double)" );
-    TrussLoad* trussLoad = JavaPluginArgumentRegistrator::
+    TrussLoad* trussLoad = 
         getRegisteredByJavaObjAndCast<TrussLoad>( env, self );
     if ( trussLoad == 0 ) {
         LOG4CXX_WARN( logger, "TrussLoad instance is 0, maybe it was not "
@@ -94,7 +94,7 @@ void JNICALL Java_fermanext_trussunit_TrussLoad_setYForce
   (JNIEnv* env, jobject self, jdouble yForce)
 {
     LOG4CXX_DEBUG( logger, "setYForce(double)" );
-    TrussLoad* trussLoad = JavaPluginArgumentRegistrator::
+    TrussLoad* trussLoad = 
         getRegisteredByJavaObjAndCast<TrussLoad>( env, self );
      if ( trussLoad == 0 ) {
          LOG4CXX_WARN( logger, "TrussLoad instance is 0, maybe it was not "
@@ -113,7 +113,7 @@ void JNICALL Java_fermanext_trussunit_TrussLoad_setForces
   (JNIEnv* env, jobject self, jdouble xForce, jdouble yForce)
 {
     LOG4CXX_DEBUG( logger, "setForces(double, double)" );
-    TrussLoad* trussLoad = JavaPluginArgumentRegistrator::
+    TrussLoad* trussLoad = 
         getRegisteredByJavaObjAndCast<TrussLoad>( env, self );
     if ( trussLoad == 0 ) {
         LOG4CXX_WARN( logger, "TrussLoad instance is 0, maybe it was not "
@@ -132,7 +132,7 @@ jboolean JNICALL Java_fermanext_trussunit_TrussLoad_isEnabled
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "isEnabled()" );
-    TrussLoad* trussLoad = JavaPluginArgumentRegistrator::
+    TrussLoad* trussLoad = 
         getRegisteredByJavaObjAndCast<TrussLoad>( env, self );
     if ( trussLoad == 0 ) {
         LOG4CXX_WARN( logger, "TrussLoad instance is 0, maybe it was not "
@@ -151,7 +151,7 @@ jboolean JNICALL Java_fermanext_trussunit_TrussLoad_isRemoved
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "isRemoved()" );
-    TrussLoad* trussLoad = JavaPluginArgumentRegistrator::
+    TrussLoad* trussLoad = 
         getRegisteredByJavaObjAndCast<TrussLoad>( env, self );
     if ( trussLoad == 0 ) {
         LOG4CXX_WARN( logger, "TrussLoad instance is 0, maybe it was not "

@@ -20,7 +20,7 @@ jboolean JNICALL Java_fermanext_trussunit_TrussNode_isValid
   (JNIEnv* env, jobject self )
 {
     LOG4CXX_DEBUG( logger, "isValid" );
-    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+    TrussNode* trussNode =
         getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     return (trussNode == 0 ? false : true);
 }
@@ -36,7 +36,7 @@ void JNICALL Java_fermanext_trussunit_TrussNode_setFixation
   (JNIEnv* env, jobject self, jobject jFix)
 {
     LOG4CXX_DEBUG( logger, "setFixation" );
-    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+    TrussNode* trussNode =
         getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "
@@ -78,7 +78,7 @@ jobject JNICALL Java_fermanext_trussunit_TrussNode_getFixation
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getFixation" );
-    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+    TrussNode* trussNode =
         getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "
@@ -123,7 +123,7 @@ void JNICALL Java_fermanext_trussunit_TrussNode_setPoint__Lfermanext_trussunit_D
   (JNIEnv* env, jobject self, jobject jPoint)
 {
     LOG4CXX_DEBUG( logger, "setPoint(DoublePoint)" );
-    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+    TrussNode* trussNode =
         getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "
@@ -156,7 +156,7 @@ void JNICALL Java_fermanext_trussunit_TrussNode_setPoint__DD
   (JNIEnv* env, jobject self, jdouble x, jdouble y)
 {
     LOG4CXX_DEBUG( logger, "setPoint(double, double)" );
-    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+    TrussNode* trussNode =
         getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "
@@ -176,7 +176,7 @@ jobject JNICALL Java_fermanext_trussunit_TrussNode_getPoint
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getPoint" );
-    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+    TrussNode* trussNode =
         getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "
@@ -208,7 +208,7 @@ jdouble JNICALL Java_fermanext_trussunit_TrussNode_getX
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getX" );
-    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+    TrussNode* trussNode =
         getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "
@@ -227,7 +227,7 @@ jdouble JNICALL Java_fermanext_trussunit_TrussNode_getY
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getY" );
-    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+    TrussNode* trussNode =
         getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "
@@ -246,7 +246,7 @@ jint JNICALL Java_fermanext_trussunit_TrussNode_getNumber
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getNumber" );
-    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+    TrussNode* trussNode =
         getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "

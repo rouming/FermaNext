@@ -27,7 +27,7 @@ INCLUDEPATH += . \
 
 
 win32 {
-  LIBS += Common.lib
+  LIBS += Common.lib TrussUnit.lib
   INCLUDEPATH += $$(JAVA_HOME)/include/win32
 }
 unix {

@@ -20,7 +20,7 @@ jboolean JNICALL Java_fermanext_trussunit_TrussPivot_isValid
   (JNIEnv* env, jobject self )
 {
     LOG4CXX_DEBUG( logger, "isValid" );
-    TrussPivot* pivot = JavaPluginArgumentRegistrator::
+    TrussPivot* pivot =
         getRegisteredByJavaObjAndCast<TrussPivot>( env, self );
     return (pivot == 0 ? false : true);
 }
@@ -36,7 +36,7 @@ jobject JNICALL Java_fermanext_trussunit_TrussPivot_getFirstNode
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getFirstNode()" );
-    TrussPivot* pivot = JavaPluginArgumentRegistrator::
+    TrussPivot* pivot =
         getRegisteredByJavaObjAndCast<TrussPivot>( env, self );
     if ( pivot == 0 ) {
         LOG4CXX_WARN( logger, "TrussPivot instance is 0, maybe it was not "
@@ -59,7 +59,7 @@ jobject JNICALL Java_fermanext_trussunit_TrussPivot_getLastNode
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getLastNode()" );
-    TrussPivot* pivot = JavaPluginArgumentRegistrator::
+    TrussPivot* pivot =
         getRegisteredByJavaObjAndCast<TrussPivot>( env, self );
     if ( pivot == 0 ) {
         LOG4CXX_WARN( logger, "TrussPivot instance is 0, maybe it was not "
@@ -82,7 +82,7 @@ void JNICALL Java_fermanext_trussunit_TrussPivot_setFirstNode
   (JNIEnv* env, jobject self, jobject jNode)
 {
     LOG4CXX_DEBUG( logger, "setFirstNode()" );
-    TrussPivot* pivot = JavaPluginArgumentRegistrator::
+    TrussPivot* pivot =
         getRegisteredByJavaObjAndCast<TrussPivot>( env, self );
     if ( pivot == 0 ) {
         LOG4CXX_WARN( logger, "TrussPivot instance is 0, maybe it was not "
@@ -90,7 +90,7 @@ void JNICALL Java_fermanext_trussunit_TrussPivot_setFirstNode
         return;
     }
 
-    TrussNode* node = JavaPluginArgumentRegistrator::
+    TrussNode* node =
         getRegisteredByJavaObjAndCast<TrussNode>( env, jNode );
     if ( node == 0 ) {
         // Node is not valid
@@ -109,7 +109,7 @@ void JNICALL Java_fermanext_trussunit_TrussPivot_setLastNode
   (JNIEnv* env, jobject self, jobject jNode)
 {
     LOG4CXX_DEBUG( logger, "setLastNode()" );
-    TrussPivot* pivot = JavaPluginArgumentRegistrator::
+    TrussPivot* pivot =
         getRegisteredByJavaObjAndCast<TrussPivot>( env, self );
     if ( pivot == 0 ) {
         LOG4CXX_WARN( logger, "TrussPivot instance is 0, maybe it was not "
@@ -117,7 +117,7 @@ void JNICALL Java_fermanext_trussunit_TrussPivot_setLastNode
         return;
     }
 
-    TrussNode* node = JavaPluginArgumentRegistrator::
+    TrussNode* node =
         getRegisteredByJavaObjAndCast<TrussNode>( env, jNode );
     if ( node == 0 ) {
         // Node is not valid
@@ -136,7 +136,7 @@ jobject JNICALL Java_fermanext_trussunit_TrussPivot_getMaterial
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getMaterial()" );
-    TrussPivot* pivot = JavaPluginArgumentRegistrator::
+    TrussPivot* pivot =
         getRegisteredByJavaObjAndCast<TrussPivot>( env, self );
     if ( pivot == 0 ) {
         LOG4CXX_WARN( logger, "TrussPivot instance is 0, maybe it was not "
@@ -161,7 +161,7 @@ void JNICALL Java_fermanext_trussunit_TrussPivot_setMaterial
   (JNIEnv* env, jobject self, jobject jMat)
 {
     LOG4CXX_DEBUG( logger, "setMaterial(TrussMaterial)" );
-    TrussPivot* pivot = JavaPluginArgumentRegistrator::
+    TrussPivot* pivot =
         getRegisteredByJavaObjAndCast<TrussPivot>( env, self );
     if ( pivot == 0 ) {
         LOG4CXX_WARN( logger, "TrussPivot instance is 0, maybe it was not "
@@ -169,7 +169,7 @@ void JNICALL Java_fermanext_trussunit_TrussPivot_setMaterial
         return;
     }
 
-    TrussMaterial* mat = JavaPluginArgumentRegistrator::
+    TrussMaterial* mat =
         getRegisteredByJavaObjAndCast<TrussMaterial>( env, jMat );
     if ( mat == 0 ) {
         // TrussMaterial is not valid
@@ -188,7 +188,7 @@ jdouble JNICALL Java_fermanext_trussunit_TrussPivot_getThickness
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getThickness()" );
-    TrussPivot* pivot = JavaPluginArgumentRegistrator::
+    TrussPivot* pivot =
         getRegisteredByJavaObjAndCast<TrussPivot>( env, self );
     if ( pivot == 0 ) {
         LOG4CXX_WARN( logger, "TrussPivot instance is 0, maybe it was not "
@@ -207,7 +207,7 @@ void JNICALL Java_fermanext_trussunit_TrussPivot_setThickness
   (JNIEnv* env, jobject self, jdouble thickness)
 {
     LOG4CXX_DEBUG( logger, "setThickness(double)" );
-    TrussPivot* pivot = JavaPluginArgumentRegistrator::
+    TrussPivot* pivot =
         getRegisteredByJavaObjAndCast<TrussPivot>( env, self );
     if ( pivot == 0 ) {
         LOG4CXX_WARN( logger, "TrussPivot instance is 0, maybe it was not "
@@ -226,7 +226,7 @@ jint JNICALL Java_fermanext_trussunit_TrussPivot_getNumber
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getNumber()" );
-    TrussPivot* pivot = JavaPluginArgumentRegistrator::
+    TrussPivot* pivot =
         getRegisteredByJavaObjAndCast<TrussPivot>( env, self );
     if ( pivot == 0 ) {
         LOG4CXX_WARN( logger, "TrussPivot instance is 0, maybe it was not "
