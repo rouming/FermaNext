@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QMap>
 
+#include "UUIDObject.h"
 #include "StatefulObject.h"
 
 class Node;
@@ -14,14 +15,13 @@ class Node;
  * Truss Load
  *****************************************************************************/
 
-class TrussLoad : public QObject
+class TrussLoad : public QObject, 
+                  public UUIDObject
 {
     Q_OBJECT
 public:
     TrussLoad ();
     TrussLoad ( double x, double y );
-    TrussLoad ( const TrussLoad& );
-    TrussLoad& operator= ( const TrussLoad& );
 
     double getXForce () const ;
     double getYForce () const;
@@ -73,7 +73,8 @@ signals:
  *****************************************************************************/
 
 template <class N>
-class TrussLoadCase : public TrussLoadCaseEmitter
+class TrussLoadCase : public TrussLoadCaseEmitter,
+                      public UUIDObject
 {
 public:
     // Basic typedefs
@@ -237,7 +238,8 @@ signals:
  *****************************************************************************/
 
 template <class N>
-class TrussLoadCaseArray : public TrussLoadCaseArrayEmitter
+class TrussLoadCaseArray : public TrussLoadCaseArrayEmitter,
+                           public UUIDObject
 {
 public:
     TrussLoadCaseArray () :

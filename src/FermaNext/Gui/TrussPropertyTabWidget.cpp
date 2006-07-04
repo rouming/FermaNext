@@ -112,16 +112,18 @@ void LoadTable::setLoad ( int row, const TrussLoad& load )
     horizontalHeader()->resizeSection( 1, Global::loadColumnWidth );
 }
 
-TrussLoad LoadTable::getLoad ( int row ) const
+double LoadTable::getLoadXForce ( int row ) const
 {
     QTableWidgetItem* cellX = item( row, 0 );
     Q_ASSERT( cellX != 0 );
+    return cellX->text().toDouble();
+}
 
-    QTableWidgetItem* cellY = item( row, 1 );
+double LoadTable::getLoadYForce ( int row ) const
+{
+    QTableWidgetItem* cellY = item( row, 0 );
     Q_ASSERT( cellY != 0 );
-
-    TrussLoad load( cellX->text().toDouble(), cellY->text().toDouble() );
-    return load;
+    return cellY->text().toDouble();
 }
 
 int LoadTable::getLoadedNodesNumber () const
@@ -886,15 +888,16 @@ void TrussPropertyTabWidget::updateTrussLoad ( int row, int col )
         if ( ! node )
             return;
 
-        TrussLoad newLoad = loadTable->getLoad( row );
+        double newXForce = loadTable->getLoadXForce( row );
+        double newYForce = loadTable->getLoadYForce( row );
+
         TrussLoad* load = loadCase->findLoad( *node );
         if ( ! load )
-            loadCase->addLoad( *node, newLoad.getXForce(),
-                                      newLoad.getYForce() );        
+            loadCase->addLoad( *node, newXForce,newYForce );        
         else if ( col == 0 )
-            load->setXForce( newLoad.getXForce() );
+            load->setXForce( newXForce );
         else
-            load->setYForce( newLoad.getYForce() );
+            load->setYForce( newYForce );
     }
 }
 
