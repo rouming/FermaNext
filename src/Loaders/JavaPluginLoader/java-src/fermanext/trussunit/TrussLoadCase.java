@@ -13,8 +13,6 @@ public class TrussLoadCase implements fermanext.system.NativeObject
     // Returns load, null if fails
     public native TrussLoad findLoad ( TrussNode node );
 
-    public native Map<TrussNode, TrussLoad> getTrussLoadMap ();
-
     public native int countLoads ();
 
     // Random UUID

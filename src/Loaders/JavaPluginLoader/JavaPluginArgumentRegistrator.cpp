@@ -45,6 +45,30 @@ bool JavaPluginArgumentRegistrator::registerArgument ( UUIDObject* obj )
     return true;
 }
 
+jobject JavaPluginArgumentRegistrator::registerArgument ( 
+    UUIDObject* obj, JNIEnv* env, const char* javaClsName )
+{
+    if ( ! registerArgument(obj) )
+        return 0;
+
+    jclass instClass = env->FindClass( javaClsName );
+    Q_ASSERT( instClass );
+
+    jmethodID ctor = env->GetMethodID( instClass, "<init>", "()V" );
+    Q_ASSERT( ctor );
+
+    jobject jObj = env->NewObject( instClass, ctor );
+    Q_ASSERT( jObj );
+
+    jmethodID setUUIDMethod = env->GetMethodID( instClass, "setUUID", 
+                                                "(Ljava/lang/String;)V" );
+    Q_ASSERT( setUUIDMethod );
+
+    jstring jStrUUID = env->NewStringUTF( qPrintable(obj->getUUID()) );
+    env->CallVoidMethod( jObj, setUUIDMethod, jStrUUID );
+    return jObj;
+}
+
 bool JavaPluginArgumentRegistrator::unregisterArgument ( UUIDObject* obj )
 {
     if ( obj == 0 || top() == 0 )
@@ -89,6 +113,30 @@ UUIDObject* JavaPluginArgumentRegistrator::getRegistered (
         return 0;
 
     return top()->value( uuid );
+}
+
+UUIDObject* JavaPluginArgumentRegistrator::getRegisteredByJavaObj ( 
+    JNIEnv* env, jobject self )
+{
+    jclass instCls = env->GetObjectClass( self );
+    Q_ASSERT( instCls );
+
+    jmethodID getUUIDMethod = env->GetMethodID( instCls, "getUUID",
+                                                "()Ljava/lang/String;" );
+    Q_ASSERT( getUUIDMethod );
+
+    jstring jUuid = (jstring)env->CallObjectMethod( self, getUUIDMethod );
+    Q_ASSERT( jUuid );
+
+     // Get chars
+    const char* uuidChars = env->GetStringUTFChars( jUuid, 0 );
+
+    QString uuid = QString::fromUtf8( uuidChars );
+
+    // Free chars
+    env->ReleaseStringUTFChars( jUuid, uuidChars );
+    
+    return getRegistered( uuid );
 }
 
 /*****************************************************************************/
