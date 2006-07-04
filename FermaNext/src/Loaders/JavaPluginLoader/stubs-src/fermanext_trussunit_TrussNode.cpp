@@ -16,40 +16,12 @@ static LoggerPtr logger( Logger::getLogger(
 
 /*****************************************************************************/
 
-TrussNode* getTrussNodeByUUID ( JNIEnv* env, jobject self )
-{
-    LOG4CXX_DEBUG( logger, "getTrussNode" );
-
-    jclass trussInstCls = env->GetObjectClass( self );
-    Q_ASSERT( trussInstCls );
-
-    jmethodID trussUUIDMethod = env->GetMethodID( trussInstCls, "getUUID",
-                                                  "()Ljava/lang/String;" );
-    Q_ASSERT( trussUUIDMethod );
-
-    jstring jUuid = (jstring)env->CallObjectMethod( self, trussUUIDMethod );
-    Q_ASSERT( jUuid );
-
-     // Get chars
-    const char* uuidChars = env->GetStringUTFChars( jUuid, 0 );
-
-    QString uuid = QString::fromUtf8( uuidChars );
-
-    // Free chars
-    env->ReleaseStringUTFChars( jUuid, uuidChars );
-    
-    UUIDObject* truss = JavaPluginArgumentRegistrator::getRegistered( uuid );
-    // Try to cast
-    return dynamic_cast<TrussNode*>(truss);
-}
-
-/*****************************************************************************/
-
 jboolean JNICALL Java_fermanext_trussunit_TrussNode_isValid
   (JNIEnv* env, jobject self )
 {
     LOG4CXX_DEBUG( logger, "isValid" );
-    TrussNode* trussNode = getTrussNodeByUUID( env, self );
+    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+        getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     return (trussNode == 0 ? false : true);
 }
 
@@ -64,7 +36,8 @@ void JNICALL Java_fermanext_trussunit_TrussNode_setFixation
   (JNIEnv* env, jobject self, jobject jFix)
 {
     LOG4CXX_DEBUG( logger, "setFixation" );
-    TrussNode* trussNode = getTrussNodeByUUID( env, self );
+    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+        getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "
                               "properly registered?" );
@@ -105,7 +78,8 @@ jobject JNICALL Java_fermanext_trussunit_TrussNode_getFixation
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getFixation" );
-    TrussNode* trussNode = getTrussNodeByUUID( env, self );
+    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+        getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "
                               "properly registered?" );
@@ -149,7 +123,8 @@ void JNICALL Java_fermanext_trussunit_TrussNode_setPoint__Lfermanext_trussunit_D
   (JNIEnv* env, jobject self, jobject jPoint)
 {
     LOG4CXX_DEBUG( logger, "setPoint(DoublePoint)" );
-    TrussNode* trussNode = getTrussNodeByUUID( env, self );
+    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+        getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "
                               "properly registered?" );
@@ -181,7 +156,8 @@ void JNICALL Java_fermanext_trussunit_TrussNode_setPoint__DD
   (JNIEnv* env, jobject self, jdouble x, jdouble y)
 {
     LOG4CXX_DEBUG( logger, "setPoint(double, double)" );
-    TrussNode* trussNode = getTrussNodeByUUID( env, self );
+    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+        getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "
                               "properly registered?" );
@@ -200,7 +176,8 @@ jobject JNICALL Java_fermanext_trussunit_TrussNode_getPoint
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getPoint" );
-    TrussNode* trussNode = getTrussNodeByUUID( env, self );
+    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+        getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "
                               "properly registered?" );
@@ -231,7 +208,8 @@ jdouble JNICALL Java_fermanext_trussunit_TrussNode_getX
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getX" );
-    TrussNode* trussNode = getTrussNodeByUUID( env, self );
+    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+        getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "
                               "properly registered?" );
@@ -249,7 +227,8 @@ jdouble JNICALL Java_fermanext_trussunit_TrussNode_getY
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getY" );
-    TrussNode* trussNode = getTrussNodeByUUID( env, self );
+    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+        getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "
                               "properly registered?" );
@@ -267,7 +246,8 @@ jint JNICALL Java_fermanext_trussunit_TrussNode_getNumber
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getNumber" );
-    TrussNode* trussNode = getTrussNodeByUUID( env, self );
+    TrussNode* trussNode = JavaPluginArgumentRegistrator::
+        getRegisteredByJavaObjAndCast<TrussNode>( env, self );
     if ( trussNode == 0 ) {
         LOG4CXX_WARN( logger, "TrussNode instance is 0, maybe it was not "
                               "properly registered?" );

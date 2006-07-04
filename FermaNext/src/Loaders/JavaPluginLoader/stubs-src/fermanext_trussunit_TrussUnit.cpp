@@ -16,40 +16,12 @@ static LoggerPtr logger( Logger::getLogger(
 
 /*****************************************************************************/
 
-TrussUnit* getTrussUnitByUUID ( JNIEnv* env, jobject self )
-{
-    LOG4CXX_DEBUG( logger, "getTrussUnitByUUID" );
-
-    jclass trussInstCls = env->GetObjectClass( self );
-    Q_ASSERT( trussInstCls );
-
-    jmethodID trussUUIDMethod = env->GetMethodID( trussInstCls, "getUUID",
-                                                  "()Ljava/lang/String;" );
-    Q_ASSERT( trussUUIDMethod );
-
-    jstring jUuid = (jstring)env->CallObjectMethod( self, trussUUIDMethod );
-    Q_ASSERT( jUuid );
-
-     // Get chars
-    const char* uuidChars = env->GetStringUTFChars( jUuid, 0 );
-
-    QString uuid = QString::fromUtf8( uuidChars );
-
-    // Free chars
-    env->ReleaseStringUTFChars( jUuid, uuidChars );
-    
-    UUIDObject* truss = JavaPluginArgumentRegistrator::getRegistered( uuid );
-    // Try to cast
-    return dynamic_cast<TrussUnit*>(truss);
-}
-
-/*****************************************************************************/
-
 jboolean JNICALL Java_fermanext_trussunit_TrussUnit_isValid
   (JNIEnv* env, jobject self )
 {
     LOG4CXX_DEBUG( logger, "isValid" );
-    TrussUnit* truss = getTrussUnitByUUID( env, self );
+    TrussUnit* truss = JavaPluginArgumentRegistrator::
+        getRegisteredByJavaObjAndCast<TrussUnit>( env, self );
     return (truss == 0 ? false : true);
 }
 
@@ -59,7 +31,8 @@ jint JNICALL Java_fermanext_trussunit_TrussUnit_countNodes
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "countNodes" );
-    TrussUnit* truss = getTrussUnitByUUID( env, self );
+    TrussUnit* truss = JavaPluginArgumentRegistrator::
+        getRegisteredByJavaObjAndCast<TrussUnit>( env, self );
     if ( truss == 0 ) {
         LOG4CXX_WARN( logger, "TrussUnit instance is 0, maybe it was not "
                               "properly registered?" );
@@ -72,7 +45,8 @@ jint JNICALL Java_fermanext_trussunit_TrussUnit_countPivots
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "countPivots" );
-    TrussUnit* truss = getTrussUnitByUUID( env, self );
+    TrussUnit* truss = JavaPluginArgumentRegistrator::
+        getRegisteredByJavaObjAndCast<TrussUnit>( env, self );
     if ( truss == 0 ) {
         LOG4CXX_WARN( logger, "TrussUnit instance is 0, maybe it was not "
                               "properly registered?" );
@@ -90,7 +64,8 @@ jobject JNICALL Java_fermanext_trussunit_TrussUnit_createNode__DD
   (JNIEnv* env, jobject self, jdouble x, jdouble y)
 {
     LOG4CXX_DEBUG( logger, "createNode(double, double)" );
-    TrussUnit* truss = getTrussUnitByUUID( env, self );
+    TrussUnit* truss = JavaPluginArgumentRegistrator::
+        getRegisteredByJavaObjAndCast<TrussUnit>( env, self );
     if ( truss == 0 ) {
         LOG4CXX_WARN( logger, "TrussUnit instance is 0, maybe it was not "
                               "properly registered?" );
@@ -99,25 +74,8 @@ jobject JNICALL Java_fermanext_trussunit_TrussUnit_createNode__DD
 
     TrussNode& node = truss->createNode( x, y );
     // Register argument
-    JavaPluginArgumentRegistrator::registerArgument( &node );
-
-    jclass nodeClass = env->FindClass("fermanext/trussunit/TrussNode");
-    Q_ASSERT( nodeClass );
-
-    jmethodID nodeCtor = env->GetMethodID( nodeClass, "<init>", "()V" );
-    Q_ASSERT( nodeCtor );
-
-    jobject jNode = env->NewObject( nodeClass, nodeCtor );
-    Q_ASSERT( jNode );
-
-    jmethodID setUUIDMethod = env->GetMethodID( nodeClass, "setUUID", 
-                                                "(Ljava/lang/String;)V" );
-    Q_ASSERT( setUUIDMethod );
-
-    jstring jStrUUID = env->NewStringUTF( qPrintable(node.getUUID()) );
-    env->CallVoidMethod( jNode, setUUIDMethod, jStrUUID );
-
-    return jNode;
+    return JavaPluginArgumentRegistrator::registerArgument( 
+                                 &node, env, "fermanext/trussunit/TrussNode" );
 }
 
 /*****************************************************************************/
