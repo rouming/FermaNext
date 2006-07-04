@@ -20,7 +20,7 @@ jboolean JNICALL Java_fermanext_trussunit_TrussMaterial_isValid
   (JNIEnv* env, jobject self )
 {
     LOG4CXX_DEBUG( logger, "isValid" );
-    TrussMaterial* trussMat = JavaPluginArgumentRegistrator::
+    TrussMaterial* trussMat =
         getRegisteredByJavaObjAndCast<TrussMaterial>( env, self );
     return (trussMat == 0 ? false : true);
 }
@@ -36,7 +36,7 @@ void JNICALL Java_fermanext_trussunit_TrussMaterial_setMaterialName
   (JNIEnv* env, jobject self, jstring jMatName)
 {
     LOG4CXX_DEBUG( logger, "setMaterialName(String)" );
-    TrussMaterial* trussMat = JavaPluginArgumentRegistrator::
+    TrussMaterial* trussMat =
         getRegisteredByJavaObjAndCast<TrussMaterial>( env, self );
     if ( trussMat == 0 ) {
         LOG4CXX_WARN( logger, "TrussMaterial instance is 0, maybe it was not "
@@ -62,7 +62,7 @@ void JNICALL Java_fermanext_trussunit_TrussMaterial_setWorkingStress
   (JNIEnv* env, jobject self, jdouble stress)
 {
     LOG4CXX_DEBUG( logger, "setWorkingStress(double)" );
-    TrussMaterial* trussMat = JavaPluginArgumentRegistrator::
+    TrussMaterial* trussMat =
         getRegisteredByJavaObjAndCast<TrussMaterial>( env, self );
     if ( trussMat == 0 ) {
         LOG4CXX_WARN( logger, "TrussMaterial instance is 0, maybe it was not "
@@ -81,7 +81,7 @@ void JNICALL Java_fermanext_trussunit_TrussMaterial_setElasticityModule
   (JNIEnv* env, jobject self, jdouble elMod)
 {
     LOG4CXX_DEBUG( logger, "setElasticityModule(double)" );
-    TrussMaterial* trussMat = JavaPluginArgumentRegistrator::
+    TrussMaterial* trussMat =
         getRegisteredByJavaObjAndCast<TrussMaterial>( env, self );
     if ( trussMat == 0 ) {
         LOG4CXX_WARN( logger, "TrussMaterial instance is 0, maybe it was not "
@@ -100,7 +100,7 @@ void JNICALL Java_fermanext_trussunit_TrussMaterial_setDensity
   (JNIEnv* env, jobject self, jdouble dens)
 {
     LOG4CXX_DEBUG( logger, "setDensity(double)" );
-    TrussMaterial* trussMat = JavaPluginArgumentRegistrator::
+    TrussMaterial* trussMat =
         getRegisteredByJavaObjAndCast<TrussMaterial>( env, self );
     if ( trussMat == 0 ) {
         LOG4CXX_WARN( logger, "TrussMaterial instance is 0, maybe it was not "
@@ -120,7 +120,7 @@ jstring JNICALL Java_fermanext_trussunit_TrussMaterial_getMaterialName
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getMaterialName()" );
-    TrussMaterial* trussMat = JavaPluginArgumentRegistrator::
+    TrussMaterial* trussMat =
         getRegisteredByJavaObjAndCast<TrussMaterial>( env, self );
     if ( trussMat == 0 ) {
         LOG4CXX_WARN( logger, "TrussMaterial instance is 0, maybe it was not "
@@ -139,7 +139,7 @@ jdouble JNICALL Java_fermanext_trussunit_TrussMaterial_getWorkingStress
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getWorkingStress()" );
-    TrussMaterial* trussMat = JavaPluginArgumentRegistrator::
+    TrussMaterial* trussMat =
         getRegisteredByJavaObjAndCast<TrussMaterial>( env, self );
     if ( trussMat == 0 ) {
         LOG4CXX_WARN( logger, "TrussMaterial instance is 0, maybe it was not "
@@ -159,7 +159,7 @@ jdouble JNICALL Java_fermanext_trussunit_TrussMaterial_getElasticityModule
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getElasticityModule()" );
-    TrussMaterial* trussMat = JavaPluginArgumentRegistrator::
+    TrussMaterial* trussMat =
         getRegisteredByJavaObjAndCast<TrussMaterial>( env, self );
     if ( trussMat == 0 ) {
         LOG4CXX_WARN( logger, "TrussMaterial instance is 0, maybe it was not "
@@ -179,7 +179,7 @@ jdouble JNICALL Java_fermanext_trussunit_TrussMaterial_getDensity
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "getDensity()" );
-    TrussMaterial* trussMat = JavaPluginArgumentRegistrator::
+    TrussMaterial* trussMat =
         getRegisteredByJavaObjAndCast<TrussMaterial>( env, self );
     if ( trussMat == 0 ) {
         LOG4CXX_WARN( logger, "TrussMaterial instance is 0, maybe it was not "

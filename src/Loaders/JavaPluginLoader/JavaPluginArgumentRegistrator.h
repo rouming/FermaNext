@@ -11,7 +11,7 @@
 
 /** 
  * Class registers arguments for Java plugins.
- * JNI sideo uses this class to get objects by uuids.
+ * JNI side uses this class to get objects by uuids.
  */
 class JavaPluginArgumentRegistrator
 {
@@ -53,16 +53,6 @@ public:
      */
     static UUIDObject* getRegisteredByJavaObj ( JNIEnv* env, jobject self );
 
-// template static
-
-    /** Same as above, but tries to cast */
-    template <class T>
-    static T* getRegisteredByJavaObjAndCast ( JNIEnv* env, jobject self )
-    {
-        UUIDObject* uuidObj = getRegisteredByJavaObj( env, self );
-        return dynamic_cast<T*>( uuidObj );
-    }
-
 private:
     typedef QHash<QString, UUIDObject*> UUIDObjectMap;
     typedef QStack<UUIDObjectMap*> UUIDObjectMapStack;
@@ -76,5 +66,20 @@ private:
 private:
     static UUIDObjectMapStack* argsStack;
 };
+
+/** 
+ * Same as #JavaPluginArgumentRegistrator::getRegisteredByJavaObj, 
+ * but tries to cast to specified type
+ * NOTE: we can't move this function to #JavaPluginArgumentRegistrator class
+ *       and make it static method because of VC6.0 fatal internal compiler 
+ *       error C1001.
+ */
+template <class T>
+T* getRegisteredByJavaObjAndCast ( JNIEnv* env, jobject self )
+{
+    UUIDObject* uuidObj = 
+        JavaPluginArgumentRegistrator::getRegisteredByJavaObj( env, self );
+    return dynamic_cast<T*>( uuidObj );
+}
 
 #endif //JAVAPLUGINARGUMENTREGISTRATOR_H

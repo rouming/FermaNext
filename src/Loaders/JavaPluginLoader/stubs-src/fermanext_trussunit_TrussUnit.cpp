@@ -20,7 +20,7 @@ jboolean JNICALL Java_fermanext_trussunit_TrussUnit_isValid
   (JNIEnv* env, jobject self )
 {
     LOG4CXX_DEBUG( logger, "isValid" );
-    TrussUnit* truss = JavaPluginArgumentRegistrator::
+    TrussUnit* truss =
         getRegisteredByJavaObjAndCast<TrussUnit>( env, self );
     return (truss == 0 ? false : true);
 }
@@ -31,7 +31,7 @@ jint JNICALL Java_fermanext_trussunit_TrussUnit_countNodes
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "countNodes" );
-    TrussUnit* truss = JavaPluginArgumentRegistrator::
+    TrussUnit* truss =
         getRegisteredByJavaObjAndCast<TrussUnit>( env, self );
     if ( truss == 0 ) {
         LOG4CXX_WARN( logger, "TrussUnit instance is 0, maybe it was not "
@@ -45,7 +45,7 @@ jint JNICALL Java_fermanext_trussunit_TrussUnit_countPivots
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "countPivots" );
-    TrussUnit* truss = JavaPluginArgumentRegistrator::
+    TrussUnit* truss =
         getRegisteredByJavaObjAndCast<TrussUnit>( env, self );
     if ( truss == 0 ) {
         LOG4CXX_WARN( logger, "TrussUnit instance is 0, maybe it was not "
@@ -64,7 +64,7 @@ jobject JNICALL Java_fermanext_trussunit_TrussUnit_createNode__DD
   (JNIEnv* env, jobject self, jdouble x, jdouble y)
 {
     LOG4CXX_DEBUG( logger, "createNode(double, double)" );
-    TrussUnit* truss = JavaPluginArgumentRegistrator::
+    TrussUnit* truss =
         getRegisteredByJavaObjAndCast<TrussUnit>( env, self );
     if ( truss == 0 ) {
         LOG4CXX_WARN( logger, "TrussUnit instance is 0, maybe it was not "

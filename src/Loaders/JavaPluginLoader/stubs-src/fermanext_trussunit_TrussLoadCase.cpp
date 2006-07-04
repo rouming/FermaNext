@@ -20,7 +20,7 @@ jboolean JNICALL Java_fermanext_trussunit_TrussLoadCase_isValid
   (JNIEnv* env, jobject self )
 {
     LOG4CXX_DEBUG( logger, "isValid" );
-    TrussUnit::LoadCase* trussLoadCase = JavaPluginArgumentRegistrator::
+    TrussUnit::LoadCase* trussLoadCase =
         getRegisteredByJavaObjAndCast<TrussUnit::LoadCase>( env, self );
     return (trussLoadCase == 0 ? false : true);
 }
@@ -36,7 +36,7 @@ void JNICALL Java_fermanext_trussunit_TrussLoadCase_addLoad
   (JNIEnv* env, jobject self, jobject jNode, jdouble xForce, jdouble yForce)
 {
     LOG4CXX_DEBUG( logger, "addLoad(Node, double, double)" );
-    TrussUnit::LoadCase* trussLoadCase = JavaPluginArgumentRegistrator::
+    TrussUnit::LoadCase* trussLoadCase =
         getRegisteredByJavaObjAndCast<TrussUnit::LoadCase>( env, self );
     if ( trussLoadCase == 0 ) {
         LOG4CXX_WARN( logger, "TrussLoadCase instance is 0, maybe it was not "
@@ -44,7 +44,7 @@ void JNICALL Java_fermanext_trussunit_TrussLoadCase_addLoad
         return;
     }
 
-    TrussNode* node = JavaPluginArgumentRegistrator::
+    TrussNode* node =
         getRegisteredByJavaObjAndCast<TrussNode>( env, jNode );
 
     if ( node == 0 ) {
@@ -64,7 +64,7 @@ jboolean JNICALL Java_fermanext_trussunit_TrussLoadCase_removeLoad
   (JNIEnv* env, jobject self, jobject jNode)
 {
     LOG4CXX_DEBUG( logger, "removeLoad(Node)" );
-    TrussUnit::LoadCase* trussLoadCase = JavaPluginArgumentRegistrator::
+    TrussUnit::LoadCase* trussLoadCase =
         getRegisteredByJavaObjAndCast<TrussUnit::LoadCase>( env, self );
     if ( trussLoadCase == 0 ) {
         LOG4CXX_WARN( logger, "TrussLoadCase instance is 0, maybe it was not "
@@ -72,7 +72,7 @@ jboolean JNICALL Java_fermanext_trussunit_TrussLoadCase_removeLoad
         return false;
     }
 
-    TrussNode* node = JavaPluginArgumentRegistrator::
+    TrussNode* node =
         getRegisteredByJavaObjAndCast<TrussNode>( env, jNode );
     if ( node == 0 ) {
         // Node is not valid
@@ -91,7 +91,7 @@ jobject JNICALL Java_fermanext_trussunit_TrussLoadCase_findLoad
   (JNIEnv* env, jobject self, jobject jNode)
 {
     LOG4CXX_DEBUG( logger, "findLoad(Node)" );
-    TrussUnit::LoadCase* trussLoadCase = JavaPluginArgumentRegistrator::
+    TrussUnit::LoadCase* trussLoadCase =
         getRegisteredByJavaObjAndCast<TrussUnit::LoadCase>( env, self );
 
     if ( trussLoadCase == 0 ) {
@@ -100,7 +100,7 @@ jobject JNICALL Java_fermanext_trussunit_TrussLoadCase_findLoad
         return 0;
     }
 
-    TrussNode* node = JavaPluginArgumentRegistrator::
+    TrussNode* node =
         getRegisteredByJavaObjAndCast<TrussNode>( env, jNode );
     if ( node == 0 ) {
         // Node is not valid
@@ -127,7 +127,7 @@ jint JNICALL Java_fermanext_trussunit_TrussLoadCase_countLoads
   (JNIEnv* env, jobject self)
 {
     LOG4CXX_DEBUG( logger, "countLoads()" );
-    TrussUnit::LoadCase* trussLoadCase = JavaPluginArgumentRegistrator::
+    TrussUnit::LoadCase* trussLoadCase =
         getRegisteredByJavaObjAndCast<TrussUnit::LoadCase>( env, self );
     if ( trussLoadCase == 0 ) {
         LOG4CXX_WARN( logger, "TrussLoadCase instance is 0, maybe it was not "
