@@ -58,7 +58,8 @@ class LoadTable : public QTableWidget
 public:
     LoadTable ( QWidget* parent = 0 );
     virtual void setLoad ( int row, const TrussLoad& );
-    virtual TrussLoad getLoad ( int row ) const;
+    virtual double getLoadXForce ( int row ) const;
+    virtual double getLoadYForce ( int row ) const;
     virtual int getLoadedNodesNumber () const;
 };
 

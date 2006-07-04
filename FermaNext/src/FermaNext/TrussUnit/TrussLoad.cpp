@@ -18,22 +18,6 @@ TrussLoad::TrussLoad ( double x_, double y_ ) :
     x(x_), y(y_)
 {}
 
-TrussLoad::TrussLoad ( const TrussLoad& load ) :
-    QObject(),
-    enabled(load.enabled),
-    removed(load.removed),
-    x(load.x), y(load.y)
-{}
- 
-TrussLoad& TrussLoad::operator= ( const TrussLoad& load )
-{
-    enabled = load.enabled;
-    removed = load.removed;
-    x = load.x;
-    y = load.y;
-    return *this;
-}
-
 double TrussLoad::getXForce () const
 {
     return x;
