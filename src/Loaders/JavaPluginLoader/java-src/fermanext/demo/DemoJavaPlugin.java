@@ -25,9 +25,46 @@ public class DemoJavaPlugin extends JavaPlugin
 
         logger.debug( "count nodes: " + truss.countNodes() );
 
-        TrussNode node = truss.createNode( 12.3, 34.5 );
-        node.setPoint( 34.5, 12.3);
-        node.setFixation( TrussNode.Fixation.FixationByX );        
+        TrussNode newNode = truss.createNode( 12.3, 34.5 );
+        newNode.setPoint( 34.5, 12.3);
+        newNode.setFixation( TrussNode.Fixation.FixationByX );
+
+        TrussPivot[] pivots = truss.getPivotList();
+        System.out.println( "Pivots number: " + pivots.length );
+        for ( TrussPivot pivot : pivots ) {
+            TrussNode fNode = pivot.getFirstNode();
+            TrussNode lNode = pivot.getLastNode();
+            System.out.println( "   pivot " + pivot.getNumber() + 
+                            " (" + fNode.getX() + ", " + fNode.getY() + "),"+
+                            " (" + lNode.getX() + ", " + lNode.getY() + ")" );
+        }
+
+        TrussNode[] nodes = truss.getNodeList();
+        System.out.println( "\nNodes number: " + nodes.length );
+        for ( TrussNode node : nodes ) {            
+            System.out.println( "   node " + node.getNumber() + 
+                           " (" + node.getX() + ", " + node.getY() + ")" );
+        }
+
+        TrussLoadCaseArray loadCases = truss.getLoadCases();
+           
+        int loadCasesNum = loadCases.countLoadCases();
+        System.out.println( "\nLoad cases number: " + loadCasesNum );
+        for ( int i = 1; i <= loadCasesNum; ++i ) {
+            TrussLoadCase loadCase = loadCases.findLoadCase( i );
+
+            int loadsNum = loadCase.countLoads();
+            System.out.println( "  load case " + i + " has " + loadsNum + 
+                                " loads");
+            for ( TrussNode node : nodes ) {
+                TrussLoad load = loadCase.findLoad( node );
+                if ( load == null ) 
+                    continue;
+                System.out.println( "    load for node " + node.getNumber() +
+                                    " has X force=" +  load.getXForce() + 
+                                    " and Y Force=" +   load.getYForce() );
+            }
+        }
 
         JOptionPane.showMessageDialog( null,
                                        "This is a pure demo Java plugin!\n" + 
