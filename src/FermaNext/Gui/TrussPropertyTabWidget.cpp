@@ -121,7 +121,7 @@ double LoadTable::getLoadXForce ( int row ) const
 
 double LoadTable::getLoadYForce ( int row ) const
 {
-    QTableWidgetItem* cellY = item( row, 0 );
+    QTableWidgetItem* cellY = item( row, 1 );
     Q_ASSERT( cellY != 0 );
     return cellY->text().toDouble();
 }
