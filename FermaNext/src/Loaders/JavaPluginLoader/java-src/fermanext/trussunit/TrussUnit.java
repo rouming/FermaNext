@@ -19,9 +19,6 @@ public class TrussUnit implements fermanext.system.NativeObject
     public native TrussPivot[] getPivotList ();
     public native DoubleSize getTrussAreaSize ();
     public native TrussLoadCaseArray getLoadCases ();
-    public native TrussMaterial getMaterial ();
-    public native void setMaterial ( TrussMaterial mat );
-    public native int getNumber ();
 
     // Random UUID
     private String uuid = UUID.randomUUID().toString();

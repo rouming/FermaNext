@@ -1,5 +1,5 @@
 
-#include "include/fermanext_trussunit_TrussLoadCase.h"
+#include "include/fermanext_trussunit_TrussLoadCaseArray.h"
 
 #include "TrussUnit.h"
 #include "JavaPluginArgumentRegistrator.h"
@@ -164,7 +164,7 @@ jobject JNICALL Java_fermanext_trussunit_TrussLoadCaseArray_getCurrentLoadCase
         return 0;
 
     return JavaPluginArgumentRegistrator::registerArgument( 
-                      curLoadCase, env, "fermanext/system/TrussUnitLoadCase" );
+                  curLoadCase, env, "fermanext/trussunit/TrussLoadCase" );
 }
 
 /*
@@ -217,7 +217,7 @@ jobject JNICALL Java_fermanext_trussunit_TrussLoadCaseArray_findLoadCase
         return 0;
 
     return JavaPluginArgumentRegistrator::registerArgument( 
-                         loadCase, env, "fermanext/system/TrussUnitLoadCase" );
+                      loadCase, env, "fermanext/trussunit/TrussLoadCase" );
 }
 
 /*

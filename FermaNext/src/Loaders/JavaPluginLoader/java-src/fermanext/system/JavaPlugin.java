@@ -1,8 +1,8 @@
 
 package fermanext.system;
 
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
+import java.io.*;
 import java.lang.reflect.*;
 import fermanext.logging.log4cxx.*;
 
@@ -136,12 +136,15 @@ public abstract class JavaPlugin extends Plugin
             return;
         }
         catch ( InvocationTargetException e ) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace( new PrintWriter(sw) );
+            String stackTrace = sw.toString();
 
             // TODO: in future execution method can throw an exception.
 
             logger.warn( "Can't invoke method '" + 
                          specificExecuteMethod.getName() + "', method throws "+
-                         "exception." );
+                         "an exception:\n" + stackTrace );
             // TODO: throw exception
             return;
         }
