@@ -21,6 +21,24 @@ static LoggerPtr logger( Logger::getLogger("common.PluginManager") );
  * Plugin Manager
  *****************************************************************************/
 
+namespace SortHelper {
+
+// Plugin sorter by path
+bool sortPluginsByPath ( Plugin* plg1, Plugin* plg2 )
+{
+    return plg1->pluginPath() < plg2->pluginPath();
+}
+
+// Plugin loader sorter by path
+static bool sortPluginLoadersByPath ( PluginLoader* ldr1, PluginLoader* ldr2 )
+{
+    return ldr1->pluginLoaderPath() < ldr2->pluginLoaderPath();
+}
+
+} //namespace SortHelper
+
+/*****************************************************************************/
+
 const QString& PluginManager::systemPluginExtension ()
 {
     static QString extension = "plg";
@@ -403,6 +421,8 @@ PluginList PluginManager::loadedPlugins ( bool onlyOk ) const
         if ( !onlyOk || plg->pluginStatusCode() == Plugin::OkStatus )
             pluginList.push_back( plg );
     }
+    qSort( pluginList.begin(), pluginList.end(), 
+           SortHelper::sortPluginsByPath );
     return pluginList;
 }
 
@@ -425,6 +445,8 @@ PluginList PluginManager::loadedPluginsOfType ( const QString& plgType,
         if ( regExp.indexIn( plgInfo.type ) != -1 )
             pluginsOfType.push_back( plg );
     }
+    qSort( pluginsOfType.begin(), pluginsOfType.end(), 
+           SortHelper::sortPluginsByPath );
     return pluginsOfType;
 }
 
@@ -442,7 +464,9 @@ PluginLoaderList PluginManager::pluginLoaders ( bool onlyOk ) const
                  loader->pluginLoaderStatusCode() == PluginLoader::OkStatus )
                 loadersRes.push_back(loader);
         }
-    }    
+    }
+    qSort( loadersRes.begin(), loadersRes.end(), 
+           SortHelper::sortPluginLoadersByPath );
     return loadersRes;
 }
 

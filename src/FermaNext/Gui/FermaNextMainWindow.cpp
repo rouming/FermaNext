@@ -18,6 +18,7 @@
 #include <QDesktopWidget>
 #include <QMenu>
 #include <QToolBar>
+#include <QSignalMapper>
 
 #include "FermaNextMainWindow.h"
 #include "FermaNextWorkspace.h"
@@ -38,7 +39,8 @@ const QString fermaTitle( QObject::tr( "Educational CAD System 'Ferma'" ) );
 
 FermaNextMainWindow::FermaNextMainWindow ( FermaNextWorkspace& wsp ) :
     workspace(wsp),
-    pluginsMenu(0)
+    pluginsMenu(0),
+    pluginsSigMapper( new QSignalMapper(this) )
 {     
     init();
 
@@ -107,6 +109,11 @@ void FermaNextMainWindow::init ()
     preferencesWidget = new PreferencesWidget( this );
 
     addDockWidget( Qt::LeftDockWidgetArea, projectsDockWidget );
+
+    // Connect plugins signal mapper to show plugin info
+    QObject::connect( pluginsSigMapper, SIGNAL(mapped(const QString &)),
+                                        SLOT(showPluginInfo(const QString &)));
+
 }
 
 void FermaNextMainWindow::initUndoRedoWindow ()
@@ -504,6 +511,40 @@ void FermaNextMainWindow::onReloadPluginsFromMainEventLoop ()
     reloadPlugins( true );
 }
 
+void FermaNextMainWindow::showPluginInfo ( const QString& plgPath )
+{
+    Plugin* pluginToShow = 0;
+    PluginManager& plgManager = workspace.pluginManager();
+    PluginList plugins = plgManager.loadedPlugins();
+    foreach ( Plugin* plugin, plugins ) {
+        if ( plugin->pluginPath() == plgPath ) {
+            pluginToShow = plugin;
+            break;
+        }
+    }
+
+    if ( pluginToShow != 0 ) {
+        // Show plugin info
+        QString name = pluginToShow->pluginInfo().name;
+        QString desc = pluginToShow->pluginInfo().description;
+        QString type = pluginToShow->pluginInfo().type;
+
+        QString text = QString("<b>Name:</b> %2<br><b>Path:</b> %1<br>"
+                               "<b>Description:</b> %3<br><b>Type:</b> %4<br>")
+                         .arg(plgPath).arg(name).arg(desc).arg(type);
+
+        QMessageBox::information( this, "Plugin information", 
+                                  text, QMessageBox::Ok );
+    }
+    else {
+        // Was not found
+        QMessageBox::warning( this, "Plugin was not found", 
+                              QString("<b>Wrong plugin path:</b><br>%1")
+                                .arg(plgPath) );
+    }
+
+}
+
 void FermaNextMainWindow::reloadPlugins ( bool reload )
 {
     PluginManager& plgManager = workspace.pluginManager();
@@ -512,19 +553,20 @@ void FermaNextMainWindow::reloadPlugins ( bool reload )
         PluginReloader::reloadPlugins( plgManager );
     }
 
-    QStringList names;
-    PluginList plugins = plgManager.loadedPlugins();
-    PluginListConstIter plgIt = plugins.begin();
-
-    for ( ; plgIt != plugins.end(); ++plgIt )
-        names.push_back( (*plgIt)->pluginInfo().name );
-
     pluginsMenu->clear();
 
-    QStringList::iterator i = names.begin();
-    for ( ; i != names.end(); ++i ) {           
-        pluginsMenu->addAction( *i );
+    PluginList plugins = plgManager.loadedPlugins();
+    foreach ( Plugin* plugin, plugins ) {
+        QString plgName = plugin->pluginInfo().name;
+        QString plgPath = plugin->pluginPath();
+
+        QAction* act = pluginsMenu->addAction( QIcon(Global::imagesPath() + 
+                                                     "/calculate.png"),
+                                               plgName, pluginsSigMapper, 
+                                               SLOT(map()) );
+        pluginsSigMapper->setMapping( act, plgPath );
     }
+
     pluginsMenu->addSeparator();
 
     // Reload plugins
