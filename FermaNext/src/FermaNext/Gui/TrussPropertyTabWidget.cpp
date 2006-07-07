@@ -710,8 +710,10 @@ void TrussPropertyTabWidget::fillLoadTable (
         TrussLoad* load = loadCase->findLoad( node );
         if ( load )
             loadTable->setLoad( row, *load );
-        else
-            loadTable->setLoad( row, TrussLoad( 0, 0 ) );
+        else {
+            TrussLoad zeroLoad(0, 0);
+            loadTable->setLoad( row, zeroLoad );
+        }
     }
     
     loadedNodesLabel->setText( "Loaded nodes: " + 
@@ -763,8 +765,10 @@ void TrussPropertyTabWidget::addLoadTableRow ( const Node& node )
     TrussLoad* load = currentCase->findLoad( *trussNode );
     if ( load )
         loadTable->setLoad( row, *load );
-    else
-        loadTable->setLoad( row, TrussLoad( 0, 0 ) );
+    else {
+        TrussLoad zeroLoad(0, 0);
+        loadTable->setLoad( row, zeroLoad );
+    }
 
     nodesNumbLabel->setText( "Total nodes: " + 
                           QString::number(focusWindow->getNodeList().size()) );
@@ -866,8 +870,10 @@ void TrussPropertyTabWidget::updateTableLoad ( const Node& node )
         TrussLoad* load = currentCase->findLoad( trussNode );
         if ( load )
             loadTable->setLoad( row, *load );
-        else
-            loadTable->setLoad( row, TrussLoad( 0, 0 ) );
+        else {
+            TrussLoad zeroLoad(0, 0);
+            loadTable->setLoad( row, zeroLoad );
+        }
     }
     catch ( ... ) { return; }
 

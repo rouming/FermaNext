@@ -378,6 +378,11 @@ public:
         return *pivot;    
     }
 
+    /*
+    FIXME: gcc4 and VC2005 don't want to compile the code below
+           because of conflicting TrussToplogy class.
+           Some workaround should be implemented.
+
     virtual TrussTopology& createTopology ()
     {
         // Clean earlier desisted truss objects
@@ -441,6 +446,7 @@ public:
 
         return *topology;
     }
+    */
 
     // Momentary removing of an object. Nothing can revive it.
     virtual bool removePivot ( const P& pivot )
