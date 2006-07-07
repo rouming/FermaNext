@@ -16,6 +16,7 @@ class TrussMaterialEditor;
 class PreferencesWidget;
 class QFile;
 class QMenu;
+class QSignalMapper;
 
 class FermaNextMainWindow : public QMainWindow
 {
@@ -32,6 +33,9 @@ public slots:
 
 private slots:
     void onReloadPluginsFromMainEventLoop ();
+
+    // Show plugin info dialog by plugin path
+    void showPluginInfo ( const QString& plgPath );
 
 signals: 
     void reloadPluginsFromMainEventLoop ();
@@ -139,6 +143,9 @@ private:
 
     // Plugins menu
     QMenu* pluginsMenu;
+
+    // Plugins signal mapper for plugin info showing
+    QSignalMapper* pluginsSigMapper;
 };
 
 #endif //FERMANEXTMAINWINDOW_H
