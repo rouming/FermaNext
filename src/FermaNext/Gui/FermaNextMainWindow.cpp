@@ -529,8 +529,12 @@ void FermaNextMainWindow::showPluginInfo ( const QString& plgPath )
         QString desc = pluginToShow->pluginInfo().description;
         QString type = pluginToShow->pluginInfo().type;
 
-        QString text = QString("<b>Name:</b> %2<br><b>Path:</b> %1<br>"
-                               "<b>Description:</b> %3<br><b>Type:</b> %4<br>")
+        QString text = QString("<table><tr><td align=\"right\"><b>Name:</b>"
+                                "</td><td>%2</td></tr><tr><td align=\"right\">"
+                                "<b>Path:</b></td><td>%1</td></tr><tr>"
+                                "<td align=\"right\"><b>Type:</b></td>"
+                                "<td>%4</td></tr><tr><td align=\"right\">"
+                                "<b>Descr:</b></td><td>%3</td></tr></table>")
                          .arg(plgPath).arg(name).arg(desc).arg(type);
 
         QMessageBox::information( this, "Plugin information", 
