@@ -1,6 +1,7 @@
 
 #include <QFileInfo>
 #include <QPainter>
+#include <QApplication>
 
 #include "Splash.h"
 
@@ -32,6 +33,7 @@ void Splash::message ( const QString& msg )
 {
     QSplashScreen::showMessage( msg, Qt::AlignLeft | Qt::AlignTop,
                                 QColor("red") );
+    QApplication::processEvents();
 }
 
 void Splash::drawContents ( QPainter* painter )
