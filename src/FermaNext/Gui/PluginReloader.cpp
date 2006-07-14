@@ -82,6 +82,7 @@ private:
         label->setText("");
         repaint();
         QApplication::flush();
+        QApplication::processEvents();
     }
 
     virtual void afterPluginsLoad ( uint ) 
@@ -89,6 +90,7 @@ private:
         progressBar->setValue(100);
         repaint();
         QApplication::flush();
+        QApplication::processEvents();
     }
 
     virtual void beforePluginLoad ( const QString& path ) 
@@ -96,6 +98,7 @@ private:
         label->setText( tr("Loading plugin: ") + QFileInfo(path).baseName() );
         repaint();
         QApplication::flush();
+        QApplication::processEvents();
     }
 
     virtual void afterPluginLoad ( Plugin& ) 
@@ -103,6 +106,7 @@ private:
         progressBar->setValue( progressBar->value() + 1 );
         repaint();
         QApplication::flush();
+        QApplication::processEvents();
     }
 
     // Unload
@@ -114,6 +118,7 @@ private:
         label->setText("");
         repaint();
         QApplication::flush();
+        QApplication::processEvents();
     }
 
     virtual void afterPluginsUnload ( uint ) 
@@ -129,6 +134,7 @@ private:
                         QFileInfo(plg.pluginPath()).baseName() );
         repaint();
         QApplication::flush();
+        QApplication::processEvents();
     }
 
     virtual void afterPluginUnload ( const QString& ) 
@@ -136,6 +142,7 @@ private:
         progressBar->setValue( progressBar->value() + 1 );        
         repaint();
         QApplication::flush();
+        QApplication::processEvents();
     }
 
 private:
