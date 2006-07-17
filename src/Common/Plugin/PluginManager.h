@@ -4,20 +4,12 @@
 
 #include <vector>
 #include <QMap>
-#include <QThread>
 #include <QObject>
 
 #include "PluginLoader.h"
 
 class DynaLoader;
 class Config;
-
-/** Thread for load and unload plugins */
-class PluginLoaderThread : public QThread
-{
-public:
-    virtual void run () {}
-};
 
 /** 
  * Class for managing all plugins of FN system. All specific 
