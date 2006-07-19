@@ -95,7 +95,8 @@ JavaPlugin::~JavaPlugin ()
     javaVM.deleteGlobalRef( javaPluginInst );
 }
 
-void JavaPlugin::execute ( const QList<UUIDObject*>& args )
+JavaPlugin::ExecutionResult JavaPlugin::specificExecute ( 
+    const QList<UUIDObject*>& args )
     /*throw (WrongExecutionArgsException)*/
 {
     JClass plgArgCls = javaVM.findClass( "Ljava/lang/String;" );
@@ -131,18 +132,68 @@ void JavaPlugin::execute ( const QList<UUIDObject*>& args )
     Q_ASSERT( plgInstCls );
 
     JMethodID plgExecuteMethod = javaVM.getMethodID( plgInstCls, "execute",
-                                                   "([Ljava/lang/String;)V" );
+            "([Ljava/lang/String;)Lfermanext/system/Plugin$ExecutionResult;" );
     Q_ASSERT( plgExecuteMethod );
 
-    javaVM.callVoidMethod( javaPluginInst, plgExecuteMethod, jArray );
+    JObject execResObj = 
+        javaVM.callObjectMethod( javaPluginInst, plgExecuteMethod, jArray );
+
+    // Create reference
+    execResObj = javaVM.newGlobalRef( execResObj );
+    Q_ASSERT( execResObj );
+
+    JClass execResCls = javaVM.getObjectClass( execResObj );
+    Q_ASSERT( execResCls );
+
+    // Create reference
+    execResCls = (JClass)javaVM.newGlobalRef( execResCls );
+    Q_ASSERT( execResCls );
+
+    // Get field ids
+    JFieldID statusField = javaVM.getFieldID( execResCls, "status", 
+                                          "Lfermanext/system/Plugin$Status;" );
+    Q_ASSERT( statusField );
+
+    JFieldID dataField = javaVM.getFieldID( execResCls, "data", 
+                                          "Ljava/lang/String;" );
+    Q_ASSERT( dataField );
+
+    
+    // Get objects from fields
+    JObject statusObj = javaVM.getObjectField( execResObj, statusField );
+    Q_ASSERT( statusObj );
+
+    JString dataStr = (JString)javaVM.getObjectField( execResObj, dataField );
+    Q_ASSERT( dataStr );
+
+    JClass statusCls = javaVM.getObjectClass( statusObj );
+    Q_ASSERT( statusCls );
+
+    JMethodID ordinalMth = javaVM.getMethodID( statusCls, "ordinal", "()I" );
+    JInt order = javaVM.callIntMethod( statusObj, ordinalMth );
+
+    // Get chars
+    const char* dataChars = javaVM.getStringUTFChars( dataStr, 0 );
+
+    // Create QString
+    QString data( dataChars );
+
+    // Free chars
+    javaVM.releaseStringUTFChars( dataStr, dataChars );
 
     // Clear all references
     javaVM.deleteGlobalRef( plgInstCls );
     javaVM.deleteGlobalRef( jArray );
     javaVM.deleteGlobalRef( plgArgCls );
+    javaVM.deleteGlobalRef( execResCls );
+    javaVM.deleteGlobalRef( execResObj );
 
     // Pop argument context, return to previous one
     JavaPluginArgumentRegistrator::pop();
+
+    Plugin::Status status = (Plugin::Status)order;
+
+    return ExecutionResult( status, data );
 }
 
 const PluginInfo& JavaPlugin::pluginInfo () const
@@ -171,11 +222,6 @@ JavaPlugin::ResolvingMode JavaPlugin::resolvingMode () const
 {  
     // TODO
     return Immediately;
-}
-
-void JavaPlugin::startWizardSetup ()
-{
-    // TODO
 }
 
 JObject JavaPlugin::javaPluginInstance () const

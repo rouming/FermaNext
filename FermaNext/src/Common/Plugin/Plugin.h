@@ -7,9 +7,10 @@
 #include <QStringList>
 #include <QObject>
 
+#include "UUIDObject.h"
+
 class Plugin;
 class PluginManager;
-class UUIDObject;
 
 /** Plugin list */
 typedef std::vector<Plugin*> PluginList;
@@ -65,7 +66,8 @@ struct PluginInfo
  * Basic plugin class which should be
  * the parent of all real FN plugins.
  */
-class Plugin : public QObject
+class Plugin : public QObject,
+               public UUIDObject
 {
     Q_OBJECT
 public:
@@ -89,6 +91,20 @@ public:
                            *< on demand */
     };
 
+    /**
+     * Execution result.
+     */
+    class ExecutionResult
+    {
+    public:
+        ExecutionResult ( Status s, const QString& d ) :
+            status(s), data(d)
+        {}
+
+        Status status; /**< Status of the executed operation */
+        QString data;  /**< Execution result data in XML */
+    };    
+
     /** 
      * Plugin costructor.
      * @param mng plugin manager. It is used e.g. for resolving dependencies.
@@ -100,14 +116,19 @@ public:
     virtual ~Plugin ();
 
     /** 
-     * Main entry point to execute plugin. 
+     * Main entry point to execute plugin.
+     * This method emits some useful signals and then calls 
+     * #specificExecute method of your plugin, so you should 
+     * override #specificExecute in your successor class.
      * @param arguments to start execution
+     * @return result of executed operation
      * @throw WrongExecutionArgsException occurs when 
      *        contract (argument list) between calling side
      *        and plugin is wrong. 
+     * @see specificExecute
      */
-    virtual void execute ( const QList<UUIDObject*>& arguments ) 
-        /*throw (WrongExecutionArgsException)*/ = 0;
+    ExecutionResult execute ( const QList<UUIDObject*>& arguments ) 
+        /*throw (WrongExecutionArgsException)*/;
 
     /** 
      * Returns plugin manager.
@@ -180,16 +201,31 @@ public:
 
 protected:
     /** 
-     * Plugin setup method to init plugin variables with dialog widget or 
-     * smth like that.
-     */
-    virtual void startWizardSetup ();
-
-    /** 
      * Sets plugin status.
      * @param s plugin status
      */
     void setStatus ( Status s );
+
+private:
+    /** 
+     * Main entry point to execute plugin. This method is 
+     * private because it can be called only from #execute method. 
+     * You should override #specificExecute in child classes.
+     * @param args execution arguments
+     * @return result of executed operation
+     * @throw WrongExecutionArgsException occurs when 
+     *        contract (argument list) between calling side
+     *        and plugin is wrong. 
+     * @see execute
+     */    
+    virtual ExecutionResult specificExecute ( const QList<UUIDObject*>& args )
+        /*throw (WrongExecutionArgsException)*/ = 0;
+
+signals:
+    /** Is emitted before actual plugins execution */
+    void beforeExecution ( Plugin& );
+    /** Is emitted after actual plugins execution */
+    void afterExecution ( Plugin&, Plugin::ExecutionResult );
 
 private:
     Status status;

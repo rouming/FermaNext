@@ -54,7 +54,9 @@ const PluginInfo& SimpleCalcPlugin::pluginInfo () const
     return inf; 
 }
 
-void SimpleCalcPlugin::execute ( const QList<UUIDObject*>& )
+Plugin::ExecutionResult SimpleCalcPlugin::specificExecute ( 
+    const QList<UUIDObject*>& )
+    /*throw (WrongExecutionArgsException)*/
 {
     QMessageBox::information( 0, "Qt4 native driver", 
                               "This is a native driver.\n"
@@ -71,6 +73,9 @@ void SimpleCalcPlugin::execute ( const QList<UUIDObject*>& )
     vyv.read( vyvFile );
     QFile::remove( vyvFile );
     */
+
+    // FIXME: add real results
+    return ExecutionResult( OkStatus, "Nothing for now!" );
 }
 
 void SimpleCalcPlugin::createTempFile ()

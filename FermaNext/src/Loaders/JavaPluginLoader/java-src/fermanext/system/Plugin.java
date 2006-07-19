@@ -16,6 +16,16 @@ public abstract class Plugin
         OnDemand
     }
 
+    /** Execution result */
+    public class ExecutionResult 
+    {
+        public ExecutionResult ( Status s, String d )
+        { status = s; data = d; }
+
+        public Status status;
+        public String data;
+    }
+
     /** Path to JAR file */
     private String path = new String();
 
@@ -32,7 +42,7 @@ public abstract class Plugin
     /**
      * This is a main execute method.
      */
-    public abstract void execute ( UUIDObject[] args );
+    public abstract ExecutionResult execute ( UUIDObject[] args );
 
     /** 
      * Describes itself.

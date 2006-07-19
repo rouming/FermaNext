@@ -66,9 +66,8 @@ public:
         QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
         show();
         qApp->processEvents( QEventLoop::ExcludeUserInputEvents );
-        // Start unloading/loading
-        plgMng.unloadPlugins();
-        plgMng.loadPlugins( Global::pluginsPath() );
+        // Reload plugins
+        plgMng.reloadPlugins();
         QApplication::restoreOverrideCursor();
     }
 

@@ -13,6 +13,15 @@ Plugin::Plugin ( PluginManager& mng, const QString& path ) :
 Plugin::~Plugin ()
 {}
 
+Plugin::ExecutionResult Plugin::execute ( const QList<UUIDObject*>& args ) 
+    /*throw (WrongExecutionArgsException)*/
+{
+    emit beforeExecution( *this );
+    ExecutionResult result = specificExecute( args );
+    emit afterExecution( *this, result );
+    return result;
+}
+
 PluginManager& Plugin::pluginManager ()
 { return plgMng; }
 
@@ -34,9 +43,6 @@ void Plugin::resolveDependence ()
     requiredPluginsMap =
         pluginManager().resolveDependence( *this, requiredPluginTypes() ); 
 }
-
-void Plugin::startWizardSetup ()
-{}
 
 void Plugin::setStatus ( Status s )
 { status = s; }
