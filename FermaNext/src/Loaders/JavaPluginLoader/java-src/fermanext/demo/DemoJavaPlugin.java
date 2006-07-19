@@ -73,7 +73,7 @@ public class DemoJavaPlugin extends JavaPlugin
                                        "Java plugin works great!",
                                        JOptionPane.INFORMATION_MESSAGE );
 
-        return new ExecutionResult( Status.OkStatus, "Nothing" );
+        return new ExecutionResult( Status.OkStatus, "Nothing from Java" );
     }
 
     public PluginInfo pluginInfo ()
