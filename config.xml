@@ -1,6 +1,8 @@
 <?xml version='1.0'?>
 <FermaNextConfig>
     <JavaPluginLoader>
+       <JREPath path="%APPDIR%/jre" />
+
        <!-- <JVMOption option="-verbose:jni" /> -->
        <JVMOption option="-Xcheck:jni" />
        

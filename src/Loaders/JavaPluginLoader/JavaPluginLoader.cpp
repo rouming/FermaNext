@@ -41,41 +41,7 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
     fnObject(0),
     plgLoaderObject(0)
 {
-    const char* envJavaHome = getenv("JAVA_HOME");
-    QString jvmLibPath;
-    QString jvmLibDir;
-    QString jvmLibi386Dir;
-    if ( envJavaHome == 0 ) {
-        QMessageBox::warning( 
-                  0, QObject::tr("Can't find JAVA_HOME environment"), 
-                  QObject::tr("Please, specify JAVA_HOME environment\n"
-                              "if you want to use Java plugins\n\n"
-                              "Java loader has been disabled") );
-        return;
-    } else {
-        const QString envJavaHomeStr( envJavaHome );
-#if defined _WIN32 || defined WIN32
-        jvmLibi386Dir = envJavaHomeStr + "/jre/bin/client";
-        jvmLibDir     = jvmLibi386Dir;
-        jvmLibPath    = jvmLibDir + "/jvm.dll";
-#else
-        jvmLibi386Dir = envJavaHomeStr + "/jre/lib/i386";
-        jvmLibDir     = jvmLibi386Dir + "/client";
-        jvmLibPath    = jvmLibDir + "/libjvm.so";
-#endif
-        if ( ! QFile::exists( jvmLibPath ) ) {
-            QMessageBox::warning( 
-                     0, QObject::tr("Can't find JVM lib"),
-                     QObject::tr("JAVA_HOME environment is set to \"%1\"\n").
-                          arg(envJavaHomeStr) + 
-                     QObject::tr("but can't find JVM lib there: \"%1\"\n\n").
-                          arg(jvmLibPath) + 
-                     QObject::tr("Java loader has been disabled!") );
-            return;
-        }
-    }
-
-    
+    // Subsidiary stuff
     QString appPath(".");
     if ( qApp) 
         appPath = qApp->applicationDirPath();
@@ -86,21 +52,99 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
     QString pathDelim = ":";
 #endif
 
-    // Varibles for options
-    QStringList options;
-    QStringList classPaths;
-    QStringList libPaths;
+    // Main loader config node
+    ConfigNode javaLoaderCfgNode;
 
     // Read config
     Config& cfg = pluginManager().config();
     ConfigNode rootNode = cfg.rootNode();
     ConfigNodeList nodes = rootNode.findChildNodes( "JavaPluginLoader" );
     if ( nodes.size() != 0 ) {
-        ConfigNode javaLoaderNode = nodes.at(0);
+        javaLoaderCfgNode = nodes.at(0);
+    } else {
+        QMessageBox::warning( 
+                  0, QObject::tr("Config is wrong"), 
+                  QObject::tr("Please, use original Java loader configuration"
+                              "\n\nJava loader has been disabled") );
+        return;
+    }
 
+    QString jrePath;
+    QString jvmLibPath;
+    QString jvmLibDir;
+    QString jvmLibi386Dir;
+
+    // Try to find JRE path in JAVA_HOME env
+    if ( jrePath.isEmpty() ) {
+        const char* envJavaHome = getenv("JAVA_HOME");
+        if ( envJavaHome != 0 ) {
+            jrePath = QString(envJavaHome) + "/jre";
+        }
+    }
+    // Try to find JRE path in JRE_HOME env
+    if ( jrePath.isEmpty() ) {
+        jrePath = getenv("JRE_HOME");
+    }
+    // Try to find JRE path in config
+    if ( jrePath.isEmpty() ) {
+        ConfigNodeList jrePaths = 
+            javaLoaderCfgNode.findChildNodes( "JREPath" );
+        foreach ( ConfigNode path, jrePaths ) {
+            NodeAttributeList attrs = path.getAttributes();
+            if ( attrs.size() == 0 )
+                continue;
+            NodeAttribute attr = attrs.at(0);
+            if ( attr.first != "path" )
+                continue;
+            jrePath = attr.second;
+            // Replace special word '%APPDIR%'
+            jrePath.replace("%APPDIR%", appPath);
+            break;
+        }
+    }
+
+    // Check JRE path existence
+    if ( jrePath.isEmpty() ) {
+        QMessageBox::warning( 
+                  0, QObject::tr("JRE path is empty"), 
+                  QObject::tr("Please, specify JAVA_HOME environment\n"
+                              "JRE_HOME environment or "
+                              "<JREPath path=\"path_to_jre\"> in your "
+                              "config\nif you want to use Java plugins\n\n"
+                              "Java loader has been disabled") );
+        return;
+    } 
+
+#if defined _WIN32 || defined WIN32
+    jvmLibi386Dir = jrePath + "/bin/client";
+    jvmLibDir     = jvmLibi386Dir;
+    jvmLibPath    = jvmLibDir + "/jvm.dll";
+#else
+    jvmLibi386Dir = jrePath + "/lib/i386";
+    jvmLibDir     = jvmLibi386Dir + "/client";
+    jvmLibPath    = jvmLibDir + "/libjvm.so";
+#endif
+    if ( ! QFile::exists( jvmLibPath ) ) {
+        QMessageBox::warning( 
+                     0, QObject::tr("Can't find JVM lib"),
+                     QObject::tr("JRE path is set to \"%1\"\n").
+                          arg(jrePath) + 
+                     QObject::tr("but can't find JVM lib there: \"%1\"\n\n").
+                          arg(jvmLibPath) + 
+                     QObject::tr("Java loader has been disabled!") );
+        return;
+    }
+    
+    // Varibles for options
+    QStringList options;
+    QStringList classPaths;
+    QStringList libPaths;
+
+    // Read java config node
+    if ( ! javaLoaderCfgNode.isNull() ) {
         // Options setting
         ConfigNodeList jvmOptions = 
-            javaLoaderNode.findChildNodes( "JVMOption" );
+            javaLoaderCfgNode.findChildNodes( "JVMOption" );
 
         foreach ( ConfigNode jvmOption, jvmOptions ) {
             NodeAttributeList attrs = jvmOption.getAttributes();
@@ -114,7 +158,7 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
 
         // Class path setting
         ConfigNodeList jvmClassPaths = 
-            javaLoaderNode.findChildNodes( "JVMClassPath" );
+            javaLoaderCfgNode.findChildNodes( "JVMClassPath" );
 
         foreach ( ConfigNode jvmClassPath, jvmClassPaths ) {
             NodeAttributeList attrs = jvmClassPath.getAttributes();
@@ -132,7 +176,7 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
 
         // Class path setting
         ConfigNodeList jvmLibPaths = 
-            javaLoaderNode.findChildNodes( "JVMLibraryPath" );
+            javaLoaderCfgNode.findChildNodes( "JVMLibraryPath" );
 
         foreach ( ConfigNode jvmLibPath, jvmLibPaths ) {
             NodeAttributeList attrs = jvmLibPath.getAttributes();
@@ -178,11 +222,11 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
         javaVM->exceptionClear();
 
         QMessageBox::warning( 
-                      0, QObject::tr("Can't start JavaPluginLoader"), 
-                      QObject::tr("JavaPluginLoader can't be started\n"
-                                  "because subsidiary system class\n"
-                                  "'fermanext.system.FermaNext' doesn't exist")
-                              );
+                      0, QObject::tr("Wrong JavaPluginLoader package"), 
+                      QObject::tr("Subsidiary system class\n"
+                                   "'fermanext.system.FermaNext' doesn't exist"
+                                   "\n\nJava loader has been disabled!")
+                      );
         delete javaVM;
         javaVM = 0;
         return;
@@ -208,10 +252,11 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
         // Clears pending exception
         javaVM->exceptionClear();
 
-        QMessageBox::warning( 0, QObject::tr("Can't start JavaPluginLoader"), 
+        QMessageBox::warning( 0, QObject::tr("Wrong JavaPluginLoader package"),
                               QObject::tr("Method 'instance' doesn't "
-                                          "exist\nin system class "
-                                          "'fermanext.system.FermaNext'")
+                                          "exist in \nsystem class "
+                                          "'fermanext.system.FermaNext'"
+                                          "\n\nJava loader has been disabled!")
                               );
         javaVM->deleteGlobalRef( fnClass );
         fnClass = 0;
@@ -225,10 +270,11 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
         // Clears pending exception
         javaVM->exceptionClear();
 
-        QMessageBox::warning( 0, QObject::tr("Can't start JavaPluginLoader"), 
+        QMessageBox::warning( 0, QObject::tr("Wrong JavaPluginLoader package"),
                               QObject::tr("Error has occured while calling\n"
-                                          "'instance' method of 'fermanext."
-                                          "fermanext.system.FermaNext'")
+                                          "method 'instance' of "
+                                          "'fermanext.system.FermaNext'"
+                                          "\n\nJava loader has been disabled!")
                               );
         javaVM->deleteGlobalRef( fnClass );
         fnClass = 0;
