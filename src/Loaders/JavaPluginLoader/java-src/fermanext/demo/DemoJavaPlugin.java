@@ -19,7 +19,7 @@ public class DemoJavaPlugin extends JavaPlugin
         super( jarPath );
     }
     
-    public void specificExecute ( TrussUnit truss )
+    public ExecutionResult specificExecute ( TrussUnit truss )
     {        
         logger.debug( "specificExecute" );
 
@@ -73,6 +73,7 @@ public class DemoJavaPlugin extends JavaPlugin
                                        "Java plugin works great!",
                                        JOptionPane.INFORMATION_MESSAGE );
 
+        return new ExecutionResult( Status.OkStatus, "Nothing" );
     }
 
     public PluginInfo pluginInfo ()

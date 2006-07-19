@@ -275,8 +275,21 @@ void PluginManager::loadPlugins ( const QString& path )
 {
     LOG4CXX_DEBUG(logger, "loadPlugins: " + path.toStdString());
 
+    bool pluginsReload = false;
+    QHash<QString, QString> uuidsCache;
+
+    if ( pluginsPath == path && ! path.isEmpty() ) {
+        // If want to reload, save UUIDs. We should restore them.
+        pluginsReload = true;
+        foreach ( Plugin* plugin, plugins.keys() )
+            uuidsCache[ plugin->pluginPath() ] = plugin->getUUID();
+    }
+
     // Firstly unload all plugins
     unloadPlugins();
+
+    // Set new path
+    pluginsPath = path;
 
     // Preload all dynamic system libs before plugin loading. 
     // This should be done because some plugins can require 
@@ -344,6 +357,19 @@ void PluginManager::loadPlugins ( const QString& path )
             emit onBeforePluginLoad( path );
             PluginLoader* loader = pluginPathMap[ path ];
             Plugin& plg = loader->loadPlugin( path );
+            // Set UUID if plugins are reloading
+            if ( pluginsReload && uuidsCache.contains(path) )
+                plg.setUUID( uuidsCache[path] );
+
+            // Connect to deligate signals
+            QObject::connect( &plg, 
+                              SIGNAL(beforeExecution(Plugin&)), 
+                              SLOT(beforePluginExecution(Plugin&)) );
+            QObject::connect( &plg, 
+                              SIGNAL(afterExecution(Plugin&, 
+                                                     Plugin::ExecutionResult)),
+                              SLOT(beforePluginExecution(Plugin&)) );
+
             plugins[&plg] = loader;
             emit onAfterPluginLoad( plg );
             LOG4CXX_INFO(logger, "plugin loaded: " + path.toStdString());
@@ -374,6 +400,9 @@ void PluginManager::unloadPlugins ()
     int pluginsSize = loadedPlgs.size();
     int sysLibsSize = systemLibs.size();
 
+    // Clear plugins path
+    pluginsPath.clear();
+
     // Check if nothing to do
     if ( pluginsSize == 0 && sysLibsSize == 0 )
         return;
@@ -396,6 +425,13 @@ void PluginManager::unloadPlugins ()
     emit onAfterPluginsUnload( pluginsSize );
 }
 
+void PluginManager::reloadPlugins ()
+{
+    // Use copy
+    QString path = pluginsPath;
+    loadPlugins( path );
+}
+
 void PluginManager::unloadPlugin ( Plugin& plg )
 {
     LOG4CXX_DEBUG(logger, "unloadPlugin: " + plg.pluginPath().toStdString());
@@ -410,6 +446,16 @@ void PluginManager::unloadPlugin ( Plugin& plg )
     emit onAfterPluginUnload( pluginPath );
 
     //TODO: DO NOT FORGET DEPENDENCIES
+}
+
+Plugin* PluginManager::findPluginByUUID ( const QString& uuid, 
+                                          bool onlyOk ) const
+{
+    PluginList allPlugins = loadedPlugins( onlyOk );
+    foreach ( Plugin* plugin, allPlugins )
+        if ( plugin->getUUID() == uuid )
+            return plugin;
+    return 0;
 }
 
 PluginList PluginManager::loadedPlugins ( bool onlyOk ) const
@@ -468,6 +514,18 @@ PluginLoaderList PluginManager::pluginLoaders ( bool onlyOk ) const
     qSort( loadersRes.begin(), loadersRes.end(), 
            SortHelper::sortPluginLoadersByPath );
     return loadersRes;
+}
+
+
+void PluginManager::beforePluginExecution ( Plugin& plg )
+{
+    emit onBeforePluginExecution( plg );
+}
+
+void PluginManager::afterPluginExecution ( Plugin& plg, 
+                                           Plugin::ExecutionResult result )
+{
+    emit onAfterPluginExecution( plg, result );
 }
 
 /*****************************************************************************/

@@ -16,7 +16,7 @@ public:
     SimpleCalcPlugin ( PluginManager& mng, const QString& path );
     virtual ~SimpleCalcPlugin ();
 
-    virtual void execute ( const QList<UUIDObject*>& )
+    virtual ExecutionResult specificExecute ( const QList<UUIDObject*>& )
         /*throw (WrongExecutionArgsException)*/;
 
     virtual const PluginInfo& pluginInfo () const;

@@ -91,6 +91,10 @@ public:
     /**
      * Load all plugins from specified path by registered plugin loaders.
      * Plugins will be reloaded if they have been already loaded.
+     * NOTE: if plugins have been already loaded and now we call
+     *       #loadPlugins with the same dir, plugins UUIDs will be kept.
+     *       This is used for correct getting plugin by UUID.
+     * @see getPluginByUUID
      */
     void loadPlugins ( const QString& path );
 
@@ -100,10 +104,24 @@ public:
     void unloadPlugins ();
 
     /**
+     * Reload all plugins. 
+     * Just a wrapper on #loadPlugins call with the same directory.
+     * @see loadPlugins
+     */
+    void reloadPlugins ();
+
+    /**
      * Unload plugin.
      * @param plugin to be unloaded
      */
     void unloadPlugin ( Plugin& plugin );
+
+    /**
+     * Finds plugin by UUID.
+     * @param uuid of the plugin.
+     * @param onlyOk, if true returns plugin only with #Plugin::OkStatus.
+     */
+    Plugin* findPluginByUUID ( const QString& uuid, bool onlyOk = true ) const;
 
     /**
      * Returns loaded plugins.
@@ -134,19 +152,19 @@ protected:
     PluginLoaderList pluginLoaders ( bool onlyOk = true ) const;
 
 signals:    
+    ///////////////////////////////////////////////////////////////////////
+    // Plugin Signals
+    ///////////////////////////////////////////////////////////////////////
+
     /** 
      * Is emitted, when #loadPlugins has been called.
      * @param plgNum describes how many plugins are going to be loaded.
-     * BEWARE: slots should be thread safe and do not post any GUI events to
-     * main event loop.
      */
     void onBeforePluginsLoad ( uint plgNum );
 
     /** 
      * Is emitted, when #loadPlugins has been called.
      * @param plgNum describes how many plugins are already loaded.
-     * BEWARE: slots should be thread safe and do not post any GUI events to
-     * main event loop.
      */
     void onAfterPluginsLoad ( uint plgNum );
 
@@ -154,50 +172,49 @@ signals:
      * Is emitted before plugin load. If loading fails, #onAfterPluginLoad
      * will not be emitted.
      * @param path to plugin, which is going to be loaded.
-     * BEWARE: slots should be thread safe and do not post any GUI events to
-     * main event loop.
      */
     void onBeforePluginLoad ( const QString& path );
 
     /** 
      * Is emitted after successful plugin load.
      * @param plg plugin.
-     * BEWARE: slots should be thread safe and do not post any GUI events to
-     * main event loop.
      */
     void onAfterPluginLoad ( Plugin& plg );
 
     /** 
      * Is emitted, when #unloadPlugins has been called.
      * @param plgNum describes how many plugins are going to be unloaded.
-     * BEWARE: slots should be thread safe and do not post any GUI events to
-     * main event loop.
      */
     void onBeforePluginsUnload ( uint plgNum );
 
     /** 
      * Is emitted, when #unloadPlugins has been called.
      * @param plgNum describes how many plugins are already unloaded.
-     * BEWARE: slots should be thread safe and do not post any GUI events to
-     * main event loop.
      */
     void onAfterPluginsUnload ( uint plgNum );
 
     /** 
      * Is emitted before plugin unload.
      * @param plg plugin.
-     * BEWARE: slots should be thread safe and do not post any GUI events to
-     * main event loop.
      */
     void onBeforePluginUnload ( Plugin& plg );
 
     /** 
      * Is emitted after plugin unload.
      * @param path to unloaded plugin.
-     * BEWARE: slots should be thread safe and do not post any GUI events to
-     * main event loop.
      */
     void onAfterPluginUnload ( const QString& plgPath );
+
+    /** 
+     * Is emitted before some plugin execution.
+     */
+    void onBeforePluginExecution ( Plugin& );
+
+    /** 
+     * Is emitted after some plugin execution.
+     */
+    void onAfterPluginExecution ( Plugin&, Plugin::ExecutionResult );
+
 
     ///////////////////////////////////////////////////////////////////////
     // Plugin Loader Signals
@@ -206,8 +223,6 @@ signals:
     /** 
      * Is emitted, when #loadPlugins has been called.
      * @param num describes how many plugin loaders are going to be registered.
-     * BEWARE: slots should be thread safe and do not post any GUI events to
-     * main event loop.
      */
     void onPluginLoadersRegistration ( uint num );
 
@@ -215,8 +230,6 @@ signals:
      * Is emitted before loader registration. If registration fails, 
      * #onAfterPluginLoaderRegistration will not be emitted.
      * @param path to loader, which is going to be registered.
-     * BEWARE: slots should be thread safe and do not post any GUI events to
-     * main event loop.
      */
     void onBeforePluginLoaderRegistration ( const QString& path );
 
@@ -224,8 +237,6 @@ signals:
      * Is emitted after successful plugin loader registration.
      * @param plgLoader plugin loader.
      * @param priority of loading.
-     * BEWARE: slots should be thread safe and do not post any GUI events to
-     * main event loop.
      */
     void onAfterPluginLoaderRegistration ( 
                                      PluginLoader& plgLoader,
@@ -236,26 +247,27 @@ signals:
      * called.
      * @param num describes how many plugin loaders are going to be 
      * unregistered.
-     * BEWARE: slots should be thread safe and do not post any GUI events to
-     * main event loop.
      */
     void onPluginLoadersUnregistration ( uint num );
 
     /** 
      * Is emitted before plugin loader unregistration.
      * @param plgLoader plugin loader..
-     * BEWARE: slots should be thread safe and do not post any GUI events to
-     * main event loop.
      */
     void onBeforePluginLoaderUnregistration ( PluginLoader& plgLoader );
 
     /** 
      * Is emitted after plugin loader unregistration.
      * @param plgLoaderPath plugin loader path.
-     * BEWARE: slots should be thread safe and do not post any GUI events to
-     * main event loop.
      */
     void onAfterPluginLoaderUnregistration ( const QString& plgLoaderPath );
+
+private slots:
+    /** This slot emits #onBeforePluginExecution signal */
+    void beforePluginExecution ( Plugin& );
+
+    /** This slot emits #onAfterPluginExecution signal */
+    void afterPluginExecution ( Plugin&, Plugin::ExecutionResult );
 
 private:
     // Exceptions
@@ -316,7 +328,8 @@ private:
     PluginLoadersMap loadersMap;       /**< loaders in loading order */
     PluginLoadersLibMap loadersLibMap; /**< loaders and their libs */
     PluginsMap plugins;                /**< plugins and their loaders */
-    Config& cfg;
+    QString pluginsPath;               /**< plugins path */
+    Config& cfg;                       /**< global app config */
     
 };
 

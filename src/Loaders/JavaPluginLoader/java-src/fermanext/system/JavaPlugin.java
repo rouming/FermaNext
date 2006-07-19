@@ -21,14 +21,15 @@ public abstract class JavaPlugin extends Plugin
      * be declated in derived class, then takes formal parameters of 
      * found method and invokes it with created args.
      */
-    public final void execute ( String[] uuids )
+    public final ExecutionResult execute ( String[] uuids )
     {
         logger.debug( "execute" );
 
         if ( uuids == null || uuids.length == 0 ) {
-            // TODO: throw exception
+            // FIXME: throw exception instead returning smth
             logger.warn( "Uuids array is null or empty." );
-            return;
+            
+            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
         }
 
         Method[] methods = getClass().getDeclaredMethods();
@@ -39,26 +40,44 @@ public abstract class JavaPlugin extends Plugin
                 if ( specificExecuteMethod == null )
                     specificExecuteMethod = method;
                 else {
-                    // TODO: throw exception
+                    // FIXME: throw exception instead returning smth
                     logger.warn( "'specificExecute' method is declared " + 
                                  "several times, should be declared once." );
-                    return;
+                    
+                    return new ExecutionResult( 
+                                         Plugin.Status.InternalErrStatus, "" );
                 }
             }
         }
 
         if ( specificExecuteMethod == null ) {
-            // TODO: throw exception
+            // FIXME: throw exception instead returning smth
             logger.warn( "'specificExecute' is not declared." );
-            return;        
+
+            
+            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
+        }
+
+        Class<?> retType = specificExecuteMethod.getReturnType();
+        if ( Plugin.ExecutionResult.class != retType ) {
+            logger.warn( "Return type '" + 
+                         retType.getName() +
+                         "' of 'specificExecute' is wrong. Must be '" +
+                         Plugin.ExecutionResult.class.getName() + "'" );
+            // FIXME: throw exception instead returning smth
+
+            
+            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
         }
 
         Class<?>[] classes = specificExecuteMethod.getParameterTypes();
         if ( uuids.length != classes.length ) {
             logger.warn( "Parameters number " + classes.length + 
                          " doesn't equal to number of uuids " + uuids.length );
-            // TODO: throw exception
-            return;
+            // FIXME: throw exception instead returning smth
+
+            
+            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
         }
 
         Class<fermanext.system.NativeObject> nativeObjClass = 
@@ -69,8 +88,11 @@ public abstract class JavaPlugin extends Plugin
                 logger.warn( "Parameter class '" + paramClass.getName() + 
                              "' doesn't extend '" +  
                              nativeObjClass.getName() + "'" );
-                // TODO: throw exception
-                return;
+                // FIXME: throw exception instead returning smth
+
+                
+                return new ExecutionResult( Plugin.Status.InternalErrStatus, 
+                                            "" );
             }
         }
             
@@ -85,8 +107,10 @@ public abstract class JavaPlugin extends Plugin
                                  "type '" +  classes[i].getName() + 
                                  "' to '" + nativeObjClass.getName() +
                                  "'" );
-                    // TODO: throw exception
-                    return;                    
+
+                    // FIXME: throw exception instead returning smth
+                    return new ExecutionResult( 
+                                         Plugin.Status.InternalErrStatus, "" );
                 }
 
                 obj.setUUID( uuids[i] );
@@ -94,8 +118,10 @@ public abstract class JavaPlugin extends Plugin
                     logger.warn( "Can't create argument [" + i + "] of " +
                                  "class '"+  classes[i].getName() + 
                                  "', object "+ "is not valid: " + uuids[i] );
-                    // TODO: throw exception
-                    return;
+                    // FIXME: throw exception instead returning smth
+                    return new ExecutionResult( 
+                                         Plugin.Status.InternalErrStatus, "" );
+
                 }
                 // Save newly created wrapper to args array
                 args[i] = obj;
@@ -106,34 +132,50 @@ public abstract class JavaPlugin extends Plugin
                 logger.warn( "Can't create argument [" + i + "] of class '" +
                              classes[i].getName() + "', argument type " +
                              "is abstract: " + uuids[i] );
-                // TODO: throw exception
-                return;
+                // FIXME: throw exception instead returning smth
+
+                
+                return new ExecutionResult( 
+                                         Plugin.Status.InternalErrStatus, "" );
+
             } 
             catch ( java.lang.IllegalAccessException e ) {
                 logger.warn( "Can't create argument [" + i + "] of class '" +
                              classes[i].getName() + "', constructor is " +
                              "inaccessible: " + uuids[i] );
-                // TODO: throw exception
-                return;
+                // FIXME: throw exception instead returning smth
+
+                
+                return new ExecutionResult( 
+                                         Plugin.Status.InternalErrStatus, "" );
             }
 
         }
+
+        Plugin.ExecutionResult execResults = null;
         
         // Invoke execution method
-        try { specificExecuteMethod.invoke(this, args); }
+        try { 
+            Object objRes = specificExecuteMethod.invoke(this, args);
+            execResults = Plugin.ExecutionResult.class.cast( objRes );  
+        }
         catch (  IllegalAccessException e  ) {
             logger.warn( "Can't invoke method '" + 
                          specificExecuteMethod.getName() + "', method is " +
                          "inaccessible." );
-            // TODO: throw exception
-            return;
+            // FIXME: throw exception instead returning smth
+
+            
+            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
         }
         catch ( IllegalArgumentException e ) {
             logger.warn( "Can't invoke method '" + 
                          specificExecuteMethod.getName() + "', parameters " +
                          "differ." );
-            // TODO: throw exception
-            return;
+            // FIXME: throw exception instead returning smth
+
+            
+            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
         }
         catch ( InvocationTargetException e ) {
             StringWriter sw = new StringWriter();
@@ -145,21 +187,30 @@ public abstract class JavaPlugin extends Plugin
             logger.warn( "Can't invoke method '" + 
                          specificExecuteMethod.getName() + "', method throws "+
                          "an exception:\n" + stackTrace );
-            // TODO: throw exception
-            return;
+            // FIXME: throw exception instead returning smth
+
+            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
         }
+        catch ( ClassCastException e ) {
+            logger.warn( "Can't cast return object to execution result" );
+            // FIXME: throw exception instead returning smth
+
+            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
+        }
+
+        return execResults;
     }
 
     /**
      * This is a main execute method.
      * @see execute
      */
-    public final void execute ( UUIDObject[] args )
+    public final ExecutionResult execute ( UUIDObject[] args )
     {
         String[] uuids = new String[args.length];
         for ( int i = 0; i < uuids.length; ++i )
             uuids[i] = args[i].getUUID();
-        execute( uuids );
+        return execute( uuids );
     }
 
     /**

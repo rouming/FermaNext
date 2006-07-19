@@ -12,7 +12,7 @@ public class NativePlugin extends Plugin
     /**
      * This is a main execute method.
      */
-    public native void execute ( UUIDObject[] uuids );
+    public native ExecutionResult execute ( UUIDObject[] uuids );
 
     /** 
      * Describes itself.

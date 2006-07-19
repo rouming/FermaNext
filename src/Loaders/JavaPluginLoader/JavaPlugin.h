@@ -20,7 +20,7 @@ public:
                  const QString& path );
     virtual ~JavaPlugin ();
 
-    virtual void execute ( const QList<UUIDObject*>& ) 
+    virtual ExecutionResult specificExecute ( const QList<UUIDObject*>& ) 
         /*throw (WrongExecutionArgsException)*/;
 
     virtual const PluginInfo& pluginInfo () const;
@@ -31,8 +31,6 @@ public:
     virtual ResolvingMode resolvingMode () const;
 
     JObject javaPluginInstance () const;
-protected:
-    virtual void startWizardSetup ();
 
 private:
     /** JVM instance */
