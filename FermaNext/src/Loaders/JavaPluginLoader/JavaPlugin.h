@@ -28,7 +28,6 @@ public:
     virtual QString pluginStatusMsg () const;
 
     virtual const QStringList& requiredPluginTypes () const;
-    virtual ResolvingMode resolvingMode () const;
 
     JObject javaPluginInstance () const;
 

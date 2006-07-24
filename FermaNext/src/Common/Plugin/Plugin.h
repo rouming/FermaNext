@@ -2,7 +2,6 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
-#include <vector>
 #include <QMap>
 #include <QStringList>
 #include <QObject>
@@ -13,9 +12,9 @@ class Plugin;
 class PluginManager;
 
 /** Plugin list */
-typedef std::vector<Plugin*> PluginList;
-typedef PluginList::iterator PluginListIter;
-typedef PluginList::const_iterator PluginListConstIter;
+typedef QList<Plugin*> PluginList;
+typedef PluginList::Iterator PluginListIter;
+typedef PluginList::ConstIterator PluginListConstIter;
 
 /** Map of required plugins according to plugin type */
 typedef QMap<QString, PluginList>  RequiredPluginsMap;
@@ -78,18 +77,15 @@ public:
         UnresolvedDependStatus /**< Unresolved dependencies. */
     };
 
-    /** 
-     * Resolving mode. Plugin manager #PluginManager should know in what mode 
-     * it should resolve plugin dependencies. The thing is that for some 
-     * plugins dependencies should be resolved immediately, i.e. after loading,
-     * but for others this resolving should be made on demand.
-     */
-    enum ResolvingMode {
-        Immediately = 0, /**< Dependence resolving is made by plugin manager 
-                           *< immediately after all plugins have been loaded.*/
-        OnDemand         /**< Dependence resolving is made by plugin itself 
-                           *< on demand */
+    /** Dependence mode. */
+    enum DependenceMode {
+        Independent = 0,      /**< Plugin is independent */
+        SingleDependent,      /**< Plugin depends on a single plugin
+                                   from #requiredPluginTypes list */
+        MultiDependent        /**< Plugin depends on all plugins from
+                                   from #requiredPluginTypes list */
     };
+
 
     /**
      * Execution result.
@@ -164,40 +160,18 @@ public:
     virtual QString pluginStatusMsg () const = 0;
 
     /**
+     * Returns #Plugin::DependenceMode of this plugin.
+     * @see requiredPluginTypes
+     */
+    virtual Plugin::DependenceMode dependenceMode () const;
+
+    /**
      * Other plugins which are requried for properly use.
      * @see dependsOnPluginType
      * @see resolveDependence
      * @return list of plugin types. List is empty if nothing is required
      */
     virtual const QStringList& requiredPluginTypes () const;
-
-    /**
-     * Returns dependence resolving mode. Default behaviour is to resolve
-     * dependencies immediately, i.e. after loading.
-     * @return dependence resolving mode.
-     * @see requiredPluginTypes
-     * @see resolveDependence
-     */
-    virtual ResolvingMode resolvingMode () const;
-
-    /**
-     * Checks plugin dependence
-     * @see requiredPluginTypes
-     * @see resolveDependence
-     * @param type of the requried plugin
-     * @return true if plugin depends on this plugin, false otherwise.
-     */
-    bool dependsOnPluginType ( const QString& type ) const;
-
-    /**
-     * Resolves plugin dependence.
-     * @see requiredPluginTypes
-     * @see dependsOnPluginType
-     * @throw RequiredPluginIsNotResolvedException some plugin dependence 
-     * can't be resolved
-     */
-    void resolveDependence () 
-        /*throw (RequiredPluginIsNotResolvedException)*/;
 
 protected:
     /** 
