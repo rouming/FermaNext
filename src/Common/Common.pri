@@ -12,6 +12,7 @@ SOURCES = \
           XMLSerializableObject.cpp \
           \
           Plugin/Plugin.cpp \
+          Plugin/PluginExecutionTree.cpp \
           Plugin/PluginManager.cpp \
           \
           Loader/DynaLoader.cpp \
@@ -31,6 +32,7 @@ HEADERS = \
           XMLSerializableObject.h \
           \
           Plugin/Plugin.h \
+          Plugin/PluginExecutionTree.h \
           Plugin/PluginManager.h \
           \
           Loader/DynaLoader.h \

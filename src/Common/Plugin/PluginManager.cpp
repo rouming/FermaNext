@@ -54,7 +54,8 @@ const QString& PluginManager::systemPluginLoaderExtension ()
 /*****************************************************************************/
 
 PluginManager::PluginManager ( Config& config ) :
-    cfg(config)
+    cfg(config),
+    execTree( *this )
 {}
 
 PluginManager::~PluginManager ()
@@ -64,6 +65,12 @@ PluginManager::~PluginManager ()
 
 Config& PluginManager::config ()
 { return cfg; }
+
+const PluginExecutionTree& PluginManager::buildExecutionTree ( Plugin& plugin )
+{
+    execTree.buildExecutionTree( &plugin );
+    return execTree;
+}
 
 void PluginManager::registerPluginLoaders ( const QString& path )
 {

@@ -218,12 +218,6 @@ const QStringList& JavaPlugin::requiredPluginTypes () const
     static QStringList list; return list; 
 }
 
-JavaPlugin::ResolvingMode JavaPlugin::resolvingMode () const
-{  
-    // TODO
-    return Immediately;
-}
-
 JObject JavaPlugin::javaPluginInstance () const
 { return javaPluginInst; }
 

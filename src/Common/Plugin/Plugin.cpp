@@ -28,21 +28,11 @@ PluginManager& Plugin::pluginManager ()
 const QString& Plugin::pluginPath () const
 { return plgPath; }
 
+Plugin::DependenceMode Plugin::dependenceMode () const
+{ return Independent; }
+
 const QStringList& Plugin::requiredPluginTypes () const
 { static QStringList emptyList; return emptyList; }
-
-Plugin::ResolvingMode Plugin::resolvingMode () const
-{ return Immediately; }
-
-bool Plugin::dependsOnPluginType ( const QString& type ) const
-{ return requiredPluginTypes().contains( type ); }
-
-void Plugin::resolveDependence () 
-    /*throw (RequiredPluginIsNotResolvedException)*/
-{  
-    requiredPluginsMap =
-        pluginManager().resolveDependence( *this, requiredPluginTypes() ); 
-}
 
 void Plugin::setStatus ( Status s )
 { status = s; }

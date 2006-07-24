@@ -7,6 +7,7 @@
 #include <QObject>
 
 #include "PluginLoader.h"
+#include "PluginExecutionTree.h"
 
 class DynaLoader;
 class Config;
@@ -59,6 +60,12 @@ public:
 
     /** Returns config */
     Config& config ();
+
+    /** 
+     * Builds execution tree for specified plugin.  
+     * @see PluginExecutionTree
+     */
+    const PluginExecutionTree& buildExecutionTree ( Plugin& plugin );
 
     /**
      * Resolves dependencies.
@@ -330,7 +337,7 @@ private:
     PluginsMap plugins;                /**< plugins and their loaders */
     QString pluginsPath;               /**< plugins path */
     Config& cfg;                       /**< global app config */
-    
+    PluginExecutionTree execTree;
 };
 
 #endif //PLUGINMANAGER_H

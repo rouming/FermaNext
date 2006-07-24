@@ -7,14 +7,15 @@
 
 #include <QString>
 #include <QMap>
+#include <QList>
 
 class PluginLoader;
 class PluginManager;
 
 /** Plugin loaders list */
-typedef std::vector<PluginLoader*> PluginLoaderList;
-typedef PluginLoaderList::iterator PluginLoaderListIter;
-typedef PluginLoaderList::const_iterator PluginLoaderListConstIter;
+typedef QList<PluginLoader*> PluginLoaderList;
+typedef PluginLoaderList::Iterator PluginLoaderListIter;
+typedef PluginLoaderList::ConstIterator PluginLoaderListConstIter;
 
 /**
  * Pure virtual base class for plugin loading. 
