@@ -47,7 +47,11 @@ public:
         ~Node ();
         /** Parses root configuration xml node  */
         Node ( Config&, const QDomElement& rootNode );
-
+        /** Constructs configuration xml node with parent */
+        Node ( Node& parent, const QString& tagName );
+        /** Parses xml node  */
+        Node ( Node& parent, const QDomElement& );
+        
         /** Just a copy constructor */
         Node ( const Node& );
         /** Just an assignment operator */
@@ -138,11 +142,6 @@ public:
         /** Constructs with new data */
         Node ( ConfigNodePrivate<Node>* );
 
-        /** Constructs configuration xml node with parent */
-        Node ( Node& parent, const QString& tagName );
-        /** Parses xml node  */
-        Node ( Node& parent, const QDomElement& );
-
         /**
          * Parse childs for node
          * Sure, this method is not a const one, but it can be called
@@ -160,6 +159,10 @@ public:
     private:
         ConfigNodePrivate<Node>* data;
     };
+
+    // Inner Node class should be a friend of Config to have possibility 
+    // to notify directly about data changes
+    friend class Node;
 
     //Exceptions
     /** Can't open file for read/write */
