@@ -72,6 +72,7 @@ signals:
     void onTrussUnitWindowRevive ( TrussUnitWindow& );
     void onTrussUnitWindowDesist ( TrussUnitWindow& );
     void beforeMaterialRemove ( const TrussMaterial& );
+    void onTrussWindowVisibilityChange ( bool );
 
 private:
     // Every truss has it's own state manager.

@@ -79,11 +79,13 @@ public:
     virtual void removeNodesHighlight ( const TrussNode* node1 = 0, 
                                         const TrussNode* node2 = 0 );
     virtual void removePivotsHighlight ( const TrussPivot* pivot = 0 );
+    virtual const TrussNode* getFocusedNode () const;
+    virtual const TrussPivot* getFocusedPivot () const;
 
     virtual DoublePoint getTrussCoordFromWidgetPos ( int x, int y ) const;
     virtual DoublePoint getTrussCoordFromWidgetPos ( QPoint pos ) const;
-    virtual QPoint getWidgetPosFromTrussCoord ( double x, double y ) const;
-    virtual QPoint getWidgetPosFromTrussCoord ( const DoublePoint& ) const;
+    virtual DoublePoint getWidgetPosFromTrussCoord ( double x, double y ) const;
+    virtual DoublePoint getWidgetPosFromTrussCoord ( const DoublePoint& ) const;
 
     virtual DoubleSize getTrussSize () const;
 
@@ -141,6 +143,7 @@ protected slots:
 
 signals:
     void onTrussNameChange ( const QString& );
+    void onCalculationStatusChange ( bool );
 // Paintable signals
     void onVisibleChange ( bool );
     void onHighlightChange ( bool );
@@ -173,7 +176,7 @@ protected:
                                       bool fixationCheck );
 
     void drawLoad ( ren_dynarow& baseRend, const TrussLoad& load, 
-                    const QPoint& tailPos ) const;
+                    const DoublePoint& tailPos ) const;
 
     virtual void drawNodeNumber ( TrussNode* node, 
                                   ren_dynarow& baseRend, 
@@ -218,8 +221,8 @@ public:
     virtual QDomElement saveToXML ( QDomDocument& );
 
     void drawFixation ( scanline_rasterizer& ras, solidRenderer& solidRend, 
-                        agg::scanline_p8& sl, const QPoint& nodePos,
-                        int lineWidth, color_type color ) const;
+                        agg::scanline_p8& sl, const DoublePoint& nodePos,
+                        double lineWidth, color_type color ) const;
 
     void paint ( ren_dynarow& baseRend,  const DoublePoint& scaleMult,
                  double trussAreaHeight ) const;

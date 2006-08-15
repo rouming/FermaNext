@@ -3,8 +3,11 @@
 #define GUISUBSIDIARY_H
 
 #include <QComboBox>
+#include <QDockWidget>
 #include <QStringList>
 #include <QValidator>
+
+#include "Global.h"
 
 class QString;
 class TrussMaterial;
@@ -51,6 +54,16 @@ public:
     RangeValidator ( double bottom, double top, int decimals, 
                      QObject* parent );
     virtual QValidator::State validate ( QString& input, int& ) const;
+};
+
+/*****************************************************************************/
+
+class DockedWidget: public QDockWidget 
+{ 
+    Q_OBJECT 
+public: 
+    DockedWidget ( const QString& title, QWidget* parent = 0, Qt::WFlags flags = 0); 
+    QSize sizeHint() const; 
 };
 
 #endif //GUISUBSIDIARY_H

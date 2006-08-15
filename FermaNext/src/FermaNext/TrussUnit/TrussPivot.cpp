@@ -115,34 +115,31 @@ void TrussPivot::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
     if ( !isVisible() )
         return;
 
-    bool flipY = true;
-    solidRenderer solidRend ( baseRend );
-    scanline_rasterizer   ras;
-    agg::scanline_p8     sl;
+    solidRenderer solidRend( baseRend );
+    scanline_rasterizer ras;
+    agg::scanline_p8 sl;
     agg::ellipse ell;
 
-    QPoint pos1, pos2;
+    DoublePoint pos1, pos2;
     const DoublePoint& coord1 = getFirstNode().getPoint();
     const DoublePoint& coord2 = getLastNode().getPoint();
-    pos1.setX( int(coord1.x() * scaleMult.x() + Global::trussBufIndent) );
-    pos1.setY( flipY ? int(( trussAreaHeight - coord1.y() ) * 
-                             scaleMult.y() + Global::trussBufIndent ) :
-                       int( coord1.y() * scaleMult.y() + 
-                            Global::trussBufIndent ) );
-    pos2.setX( int(coord2.x() * scaleMult.x() + Global::trussBufIndent) );
-    pos2.setY( flipY ? int(( trussAreaHeight - coord2.y() ) * 
-                             scaleMult.y() + Global::trussBufIndent ):
-                       int(coord2.y() * scaleMult.y() + 
-                           Global::trussBufIndent ) );
+    pos1.setX( coord1.x() * scaleMult.x() + Global::trussBufIndent);
+    pos1.setY( Global::flipY ? ( trussAreaHeight - coord1.y() ) * 
+               scaleMult.y() + Global::trussBufIndent :
+               coord1.y() * scaleMult.y() + Global::trussBufIndent );
+    pos2.setX( coord2.x() * scaleMult.x() + Global::trussBufIndent );
+    pos2.setY( Global::flipY ? ( trussAreaHeight - coord2.y() ) * 
+               scaleMult.y() + Global::trussBufIndent:
+               coord2.y() * scaleMult.y() + Global::trussBufIndent );
     if ( isHighlighted () )
-        drawLine ( ras, solidRend, sl, pos1, pos2, Global::pivotsWidth + 5, 
+        drawLine( ras, solidRend, sl, pos1, pos2, Global::pivotsWidth + 5, 
                   agg::rgba(200, 135, 15, 0.6) );
     if ( drawingStatus )
-        drawLine ( ras, solidRend, sl, pos1, pos2, 
-                   Global::pivotsWidth, agg::rgba(0, 0, 0) );
+        drawLine( ras, solidRend, sl, pos1, pos2, 
+                  Global::pivotsWidth, agg::rgba(0, 0, 0) );
     else 
-        drawLine ( ras, solidRend, sl, pos1, pos2, 
-                   Global::pivotsWidth - 1, agg::rgba(0, 0, 0) );
+        drawLine( ras, solidRend, sl, pos1, pos2, 
+                  Global::pivotsWidth - 1, agg::rgba(0, 0, 0) );
 }
 
 /****************************************************************************/

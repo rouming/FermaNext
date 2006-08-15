@@ -11,7 +11,8 @@ DESTDIR = ../..
 LIBPATH += ../.. $$(EXPATDIR)/Libs
 
 win32 {
-  LIBS += Common.lib Gui.lib TrussUnit.lib LibAgg.lib LibSVG.lib libexpat.lib
+  LIBS += Common.lib Gui.lib TrussUnit.lib \
+          LibAgg.lib LibSVG.lib libexpat.lib
 }
 unix {
   QMAKE_LFLAGS += -export-dynamic

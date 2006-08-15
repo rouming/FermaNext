@@ -107,6 +107,10 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow (
                       SIGNAL(beforeMaterialRemove(const TrussMaterial&)), 
                       trussWindow, 
                       SLOT(removePivotMaterial(const TrussMaterial&)) );
+    QObject::connect( trussWindow, 
+                      SIGNAL(onVisibleChange(bool)), 
+                      SIGNAL(onTrussWindowVisibilityChange(bool)) );
+    
     trussWindows.push_back(trussWindow);
 
     if ( ! silence )

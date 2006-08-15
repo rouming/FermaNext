@@ -69,6 +69,16 @@ extern const int defaultWidth,
 extern const bool flipY;
 
 /************************************
+ * Truss Deform Picture Consts
+ ************************************/
+
+extern const int defaultCanvasWidth,
+                 defaultCanvasHeight,
+                 canvasHorIndent,
+                 canvasVertIndent,
+                 areaBufferIndent;
+
+/************************************
  * Truss Unit Tool Bar Consts
  ************************************/
 
@@ -91,6 +101,17 @@ extern const int tableRowHeight,
                  materialColumnWidth,
                  checkBoxLen,
                  checkBoxIndent;
+
+/************************************
+ * HTML Consts
+ ************************************/
+extern const int htmlRowHeight, 
+                 htmlColWidth;
+
+extern const QString htmlTitleBgColor,
+                     htmlHeaderBgColor,
+                     htmlSubHeaderBgColor,
+                     htmlBorderColor;
 
 /************************************
  * Main subs

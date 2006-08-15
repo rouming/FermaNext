@@ -3,8 +3,8 @@
 #define FERMANEXTMAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStatusBar>
 
-class QDockWidget;
 class ProjectToolBox;
 class FermaNextProject;
 class TrussUnitWindow;
@@ -14,15 +14,22 @@ class GeometryTabWidget;
 class TrussPropertyTabWidget;
 class TrussMaterialEditor;
 class PreferencesWidget;
+class ResultsTabWidget;
 class QFile;
+class QLabel;
 class QMenu;
 class QSignalMapper;
+
+class TrussSolutionResults;
+
+/*****************************************************************************/
 
 class FermaNextMainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
     FermaNextMainWindow ( FermaNextWorkspace& );
+    ~FermaNextMainWindow ();
 
 public slots:
     void someProjectRemoved ( FermaNextProject& );
@@ -39,6 +46,7 @@ private slots:
 
 signals: 
     void reloadPluginsFromMainEventLoop ();
+    void calculateTrussUnit ( const TrussUnitWindow& );
     
 protected:
     //Exceptions
@@ -51,6 +59,7 @@ protected:
     void initUndoRedoWindow ();
     void initGeometryWindow ();
     void initTrussPropertyWindow ();
+    void createStatusBar ();
     void setupFileActions ();
     void setupEditActions ();
     void setupViewActions ();
@@ -88,6 +97,8 @@ protected slots:
     void editMaterials ();
     void editPreferences ();
 
+    void showResultsWindow ( const TrussUnitWindow& );
+
     void helpContents ();
     void helpAbout ();
 
@@ -97,8 +108,13 @@ protected slots:
     void refreshProjectActions ();
 	// Refresh plugins actions
 	void refreshPluginsActions ();
-
+    // Refresh truss geometry and property windows
     void refreshGeometryAndPropertyWindows ();
+
+    // Methods for status bar update
+    void updateStatusBar ();
+    void setStatusBarHint ( const QString& );
+    void projectModified ();
 
     // Catch designer widget focus change
     void trussWindowLostFocus ( TrussUnitWindow& );
@@ -128,6 +144,9 @@ private:
     // Material editor
     TrussMaterialEditor* materialEditor;
 
+    QDialog* resultsWindow;
+    ResultsTabWidget* resultsTabWidget;
+
     // Some actions
     QAction* undoAction;
     QAction* redoAction;
@@ -139,10 +158,14 @@ private:
     QAction* showUndoRedoAction;
     QAction* showGeometryWindowAction;
     QAction* showTrussPropWindowAction;
+    QAction* showResultsWindowAction;
     QAction* materialEditorAction;
 
     // Plugins menu
     QMenu* pluginsMenu;
+    // Status bar labels
+    
+    QLabel *coordLabel, *elementLabel, *hintLabel, *modLabel;
 
     // Plugins signal mapper for plugin info showing
     QSignalMapper* pluginsSigMapper;

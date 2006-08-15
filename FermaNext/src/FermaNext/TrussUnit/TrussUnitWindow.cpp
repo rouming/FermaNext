@@ -50,6 +50,9 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name,
     QObject::connect( this, SIGNAL( onAreaChange(const DoubleSize&) ),
                             SLOT( clearWindowRenderedFlag() ) );
 
+    QObject::connect( this, SIGNAL( onCalculationStatusChange(bool) ),
+                            SLOT( clearWindowRenderedFlag() ) );
+
     QObject::connect( hideButton, SIGNAL( onChangeButtonState() ),
                                   SLOT( clearButtonBufRenderedFlag() ) );
 
@@ -589,7 +592,7 @@ bool TrussUnitWindow::inFDiagResizeRect ( int x, int y )
 bool TrussUnitWindow::inHideButtonRect ( int x, int y ) const
 {
     QPoint widgetPos( x, y );
-    // inner buffer cordinates
+    // inner buffer coordinates
     QPoint pos = widgetPos - getButtonBufPos();    
     if ( hideButton->inButtonRect( pos.x(), pos.y() ) )
         return true;
@@ -599,7 +602,7 @@ bool TrussUnitWindow::inHideButtonRect ( int x, int y ) const
 bool TrussUnitWindow::inRollUpButtonRect ( int x, int y ) const
 {
     QPoint widgetPos( x, y );
-    // inner buffer cordinates
+    // inner buffer coordinates
     QPoint pos = widgetPos - getButtonBufPos();    
     if ( rollUpButton->inButtonRect( pos.x(), pos.y() ) )
         return true;
@@ -856,33 +859,36 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
                                       agg::scanline_p8& sl ) const
 {
     // Draw coordinate lines with arrow heads
-    QPoint leftTopAreaPos( Global::leftWindowIndent, Global::topWindowIndent );
-    QPoint rightBottomAreaPos( windowSize.width() - Global::rigthWindowIndent, 
-                               windowSize.height()-Global::bottomWindowIndent);
-    QPoint p1, p2;
+    DoublePoint leftTopAreaPos( Global::leftWindowIndent, 
+                                Global::topWindowIndent );
+    DoublePoint rightBottomAreaPos( windowSize.width() - 
+                                    Global::rigthWindowIndent, 
+                                    windowSize.height() - 
+                                    Global::bottomWindowIndent);
+    DoublePoint p1, p2;
     p2 = leftTopAreaPos;
     p1 = rightBottomAreaPos;
     baseRend.copy_bar ( p2.x(), p2.y(), p1.x(), p1.y(), agg::rgba(1,1,1) );
-    p2.setY ( p2.y() - Global::arrowHeadIndent );
-    p1.setX ( p2.x() );
-    p1.setY ( p1.y() + Global::arrowTailIndent );
-    drawArrow ( ras, solidRend, sl, p1, p2 );
+    p2.setY( p2.y() - Global::arrowHeadIndent );
+    p1.setX( p2.x() );
+    p1.setY( p1.y() + Global::arrowTailIndent );
+    drawArrow( ras, solidRend, sl, p1, p2 );
     p1 = rightBottomAreaPos;
-    p1.setX ( p2.x() - Global::arrowTailIndent );
+    p1.setX( p2.x() - Global::arrowTailIndent );
     p2 = rightBottomAreaPos;
-    p2.setX (p2.x() + Global::arrowHeadIndent );
-    drawArrow ( ras, solidRend, sl, p1, p2 );
+    p2.setX(p2.x() + Global::arrowHeadIndent );
+    drawArrow( ras, solidRend, sl, p1, p2 );
 
     p1 = leftTopAreaPos;
     p2 = rightBottomAreaPos;
-    p1.setX ( p1.x() - Global::scalePieceLength );
-    p1.setY ( p1.y() );
-    p2.setY ( p1.y() );
-    drawLine ( ras, solidRend, sl, p1, p2 );
+    p1.setX( p1.x() - Global::scalePieceLength );
+    p1.setY( p1.y() );
+    p2.setY( p1.y() );
+    drawLine( ras, solidRend, sl, p1, p2 );
 
     p1 = rightBottomAreaPos;
-    p1.setY ( p1.y() + Global::scalePieceLength );
-    drawLine ( ras, solidRend, sl, p1, p2 );
+    p1.setY( p1.y() + Global::scalePieceLength );
+    drawLine( ras, solidRend, sl, p1, p2 );
 
     // Draw scale strokes and figure it
     double areaLenInPix = rightBottomAreaPos.x() - leftTopAreaPos.x();
@@ -899,17 +905,16 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
 
     // sign Y-axis
     // left point of the scale stroke
-    QPoint strokePnt1( int(leftTopAreaPos.x() - Global::scalePieceLength),
-                       int(leftTopAreaPos.y() + scaleFactorYInPix) );
+    DoublePoint strokePnt1( leftTopAreaPos.x() - Global::scalePieceLength,
+                            leftTopAreaPos.y() + scaleFactorYInPix );
     // right point of the scale stroke
-    QPoint strokePnt2( leftTopAreaPos.x(),
-                       strokePnt1.y() );
-    QPoint textPos ( Global::bordWidth + 3, strokePnt1.y() + 3 );
+    DoublePoint strokePnt2( leftTopAreaPos.x(), strokePnt1.y() );
+    DoublePoint textPos( Global::bordWidth + 3, strokePnt1.y() + 3 );
     QString str;
     int i;
     for (i = 1; i < strokeNumbY; i++ )
     {
-        strokePnt1.setY( int(leftTopAreaPos.y() + i * scaleFactorYInPix) );
+        strokePnt1.setY( leftTopAreaPos.y() + i * scaleFactorYInPix );
         strokePnt2.setY( strokePnt1.y() );
         drawLine ( ras, solidRend, sl, strokePnt1, strokePnt2 );
         textPos.setY( strokePnt1.y() + 3 );
@@ -920,7 +925,7 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
 
     // sign X-axis
     // top point of the scale stroke
-    strokePnt1.setX( int(leftTopAreaPos.x() + scaleFactorXInPix) );
+    strokePnt1.setX( leftTopAreaPos.x() + scaleFactorXInPix );
     strokePnt1.setY( rightBottomAreaPos.y() );
     // bottom point of the scale stroke
     strokePnt2.setX( strokePnt1.x() );
@@ -929,7 +934,7 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
     textPos.setY ( strokePnt2.y() + 10 );
     for (i = 1; i < strokeNumbX; i++ )
     {
-        strokePnt1.setX( int(rightBottomAreaPos.x() - i * scaleFactorXInPix) );
+        strokePnt1.setX( rightBottomAreaPos.x() - i * scaleFactorXInPix );
         strokePnt2.setX( strokePnt1.x() );
         drawLine( ras, solidRend, sl, strokePnt1, strokePnt2 );
         textPos.setX( strokePnt1.x() - 12 );
@@ -1000,7 +1005,7 @@ void TrussUnitWindow::drawCursorCoordinatesField ( ren_dynarow& baseRend,
     else
         baseRend.clear( agg::rgba( 40,65,60 ) );
     
-    QPoint textPos( 0, 9 );
+    DoublePoint textPos( 0.0, 9.0 );
     color_type textColor = agg::rgba( 0, 0, 0 );
 
     if ( cursorCoord.x() == -1.0 )
@@ -1059,12 +1064,12 @@ void TrussUnitWindow::drawNumbersField ( ren_dynarow& baseRend,
     if ( ! nodeNumb && ! pivotNumb )
         return;
 
-    QPoint textPos ( 0, 9 );
-    color_type textColor = agg::rgba(0, 0, 0);
+    DoublePoint textPos( 0.0, 9.0 );
+    color_type textColor = agg::rgba( 0, 0, 0 );
 
     if ( pivotNumb )
     {
-        drawText ( textRend, "Pivot #", textColor, textPos );
+        drawText( textRend, "Pivot #", textColor, textPos );
 
         QString str;
         str = QString("%1").arg( pivotNumb );
@@ -1193,11 +1198,11 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
                                      windowSize.height(), borderColor );
         else
         {
-            QPoint borderLeftTop( 0, -1 );
-            QPoint borderRightBottom( windowSize.width(), 
-                                   windowSize.height() );
-            QPoint shadowLeftTop( borderLeftTop.x() + 1, 
-                                  borderLeftTop.y() + 1 );
+            DoublePoint borderLeftTop( 0, -1 );
+            DoublePoint borderRightBottom( windowSize.width(), 
+                                           windowSize.height() );
+            DoublePoint shadowLeftTop( borderLeftTop.x() + 1, 
+                                       borderLeftTop.y() + 1 );
 
             color_type shadowColor = agg::rgba( 0, 0, 0 );
             if ( isHighlighted() )
@@ -1231,11 +1236,11 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         solidRend.color ( shadowColor );
         agg::render_scanlines ( ras, sl, solidRend );
 
-        QPoint lineLeftPnt( canvasLeftTop.x() + Global::winCornerRadius / 3, 
-                            canvasRightBottom.y() + 1 ),
-               lineRightPnt( canvasRightBottom.x() - 
-                             Global::winCornerRadius / 3, 
-                             canvasRightBottom.y() + 1 );
+        DoublePoint lineLeftPnt( canvasLeftTop.x() + Global::winCornerRadius / 3, 
+                                 canvasRightBottom.y() + 1 ),
+                    lineRightPnt( canvasRightBottom.x() - 
+                                  Global::winCornerRadius / 3, 
+                                  canvasRightBottom.y() + 1 );
         drawLine( ras, solidRend, sl, lineLeftPnt, lineRightPnt, 
                   1, agg::rgba( 1, 1, 1, 0.7 ) );
 
@@ -1261,16 +1266,16 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 
         /*------draw window title text and background rounded rectangle------*/
         glyph.font ( headFont );
-        int lengthLimit = windowSize.width() / 2 - 20;
+        double lengthLimit = windowSize.width() / 2 - 20;
         QString title = fitTextToWindowSize ( getTrussName (), lengthLimit, 
                                               glyph );
         int titleLength = (int)glyph.width( title.toAscii().data() );
-        QPoint titlePos( ( windowSize.width() - 2 * Global::bordWidth - 
-                           titleLength ) / 2, 14 );
+        DoublePoint titlePos( ( windowSize.width() - 2 * Global::bordWidth - 
+                                titleLength ) / 2, 14 );
 
-        QPoint rectPos1( titlePos.x() - 15, Global::bordWidth / 2 ),
-               rectPos2( titlePos.x() + titleLength + 15, 
-                         rectPos1.y() + Global::headWidth -1 );
+        DoublePoint rectPos1( titlePos.x() - 15, Global::bordWidth / 2 ),
+                    rectPos2( titlePos.x() + titleLength + 15, 
+                              rectPos1.y() + Global::headWidth -1 );
 
         color_type firstColor ( agg::rgba( 0, 0, 0 ) );
         color_type middleColor ( agg::rgba8( 180, 130, 100 ) );
@@ -1299,7 +1304,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
     ren_dynarow baseRend( trussPixf );
     TrussUnit::paint ( baseRend );
 
-    /*------draw truss elements numbers field------*/
+    /*------draw truss elements numbers field------*
     baseRend = numbersPixf;
     textRenderer textRend ( baseRend, glyph );
     glyph.font ( numbersFont );
@@ -1307,14 +1312,14 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 
     if ( ! coordFieldRendered )
     {
-        /*------draw coordinates field------*/
+        /*------draw coordinates field------*
         baseRend = coordPixf;
         textRenderer textRend ( baseRend, glyph );
         glyph.font ( numbersFont );
         drawCursorCoordinatesField ( baseRend, textRend, glyph );
         coordFieldRendered = true;
     }
-
+*/
     if ( ! buttonBufRendered )
     {
         /*------draw buttons------*/
@@ -1336,7 +1341,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
                               areaLeftTop.x() - Global::trussBufIndent,
                               areaLeftTop.y() - Global::trussBufIndent, 
                               uint(1.0 * 255) );
-
+/*
     baseRenderer.blend_from ( coordPixf, 0, 
                               windowLeftTopPos.x() + Global::winCornerRadius, 
                               windowRightBottomPos.y() - coordBuf->height() -3,
@@ -1345,7 +1350,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
     baseRenderer.blend_from ( numbersPixf, 0, windowRightBottomPos.x() - 80, 
                               windowRightBottomPos.y() - coordBuf->height() -3,
                               uint(1.0 * 255) );
-
+*/
     baseRenderer.blend_from ( buttonPixf, 0, getButtonBufPos().x(), 
                               getButtonBufPos().y(), uint(1.0 * 255) );
 }

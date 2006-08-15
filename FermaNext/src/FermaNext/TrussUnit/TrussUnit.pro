@@ -26,7 +26,9 @@ SOURCES = \
           TrussMaterial.cpp \
           TrussNode.cpp \
           TrussPivot.cpp \
+          TrussSolutionResults.cpp \
           TrussUnit.cpp \
+          TrussUnitCopy.cpp \
           TrussUnitActions.cpp \
           TrussUnitWindow.cpp \
           TrussUnitWindowManager.cpp
@@ -35,7 +37,9 @@ HEADERS = \
           Truss.h \
           TrussLoad.h \
           TrussMaterial.h \
+          TrussSolutionResults.h \
           TrussUnit.h \
+          TrussUnitCopy.h \
           TrussUnitActions.h \
           TrussUnitWindow.h \
           TrussUnitWindowManager.h

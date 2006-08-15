@@ -4,6 +4,9 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QGroupBox>
+#include <QFrame>
+#include <QGridLayout>
 
 #include "ProjectToolBox.h"
 #include "WindowListBox.h"
@@ -51,6 +54,18 @@ int ProjectToolBox::addProject ( FermaNextProject& prj )
     // Catch name changing
     QObject::connect( &prj, SIGNAL(onNameChange(const QString&)),
                             SLOT(projectRename(const QString&)) );
+
+    // Catch truss count and visibility changing
+    TrussUnitWindowManager& mng =  prj.getTrussUnitWindowManager();
+    QObject::connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)),
+                            SLOT(afterTrussCountChange()) );
+    QObject::connect( &mng, SIGNAL(onTrussUnitWindowRevive(TrussUnitWindow&)),
+                            SLOT(afterTrussCountChange()) );
+    QObject::connect( &mng, SIGNAL(onTrussUnitWindowDesist(TrussUnitWindow&)),
+                            SLOT(afterTrussCountChange()) );
+    QObject::connect( &mng, SIGNAL(onTrussWindowVisibilityChange(bool)),
+                            SLOT(afterTrussVisibilityChange()) );
+    
 
     QIcon iconSet( Global::imagesPath() + "/project_toolbox.png"  );
     int result = addItem( page, iconSet, prj.getName() );    
@@ -104,21 +119,41 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
     // Main widget
     QWidget* page = new QWidget;
     QVBoxLayout* pageLayout = new QVBoxLayout;
-    pageLayout->setMargin(0);
+    pageLayout->setMargin(3);
     pageLayout->setSpacing(0);
     page->setLayout( pageLayout );
 
+    QGroupBox* propertyBox = new QGroupBox( tr( "Project Info" ), page );
+    pageLayout->addWidget( propertyBox );
+    
+    QGridLayout* propertyLayout = new QGridLayout( propertyBox );
+    tokLabel = new QLabel( "", propertyBox );
+    trussNumberLabel = new QLabel( "0", propertyBox );
+    trussHiddenLabel = new QLabel( "0", propertyBox );
+    propertyLayout->addWidget( new QLabel( tr( "TOK: ") ), 0, 0 );
+    propertyLayout->addWidget( new QLabel( tr( "Total trusses: ") ), 1, 0 );
+    propertyLayout->addWidget( new QLabel( tr( "Hidden trusses: ") ), 2, 0 );
+    propertyLayout->addWidget( tokLabel, 0, 1 );
+    propertyLayout->addWidget( trussNumberLabel, 1, 1 );
+    propertyLayout->addWidget( trussHiddenLabel, 2, 1 );
+
     // Truss units group box
-    QWidget* groupBoxTrussUnits = new QWidget;
-    QVBoxLayout* trussUnitsLayout = new QVBoxLayout;
-    trussUnitsLayout->setMargin(0);
+    QGroupBox* groupBoxTrussUnits = new QGroupBox( tr( "Trusses" ), page );
+
+    QVBoxLayout* trussUnitsLayout = new QVBoxLayout( groupBoxTrussUnits );
+    trussUnitsLayout->setMargin(3);
     trussUnitsLayout->setSpacing(0);
-    groupBoxTrussUnits->setLayout( trussUnitsLayout );
     pageLayout->addWidget( groupBoxTrussUnits );
 
-    WindowListBox * listBox = new WindowListBox( prj );
+    WindowListBox * listBox = new WindowListBox( prj, groupBoxTrussUnits );
     trussUnitsLayout->addWidget( listBox );
-
+    QObject::connect( listBox, 
+                      SIGNAL(onShowTrussResults(const TrussUnitWindow&)),
+                      SIGNAL(onShowTrussResults(const TrussUnitWindow&)) );
+    QObject::connect( this, 
+                      SIGNAL(calculateTrussUnit(const TrussUnitWindow&)),
+                      listBox,
+                      SLOT(solveTrussUnit(const TrussUnitWindow&)) );
     // Buttons
     QPushButton* calculateAllButton = new QPushButton;    
     trussUnitsLayout->addSpacing(10);
@@ -137,24 +172,27 @@ QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
     connect( calculationAllAction, SIGNAL(triggered()) , 
              SLOT(calculateAllIsPressed()) );
 
-    QWidget* buttonsGroupBox = new QWidget;
+    QFrame* buttonsGroupBox = new QFrame;
+    buttonsGroupBox->setFrameStyle( QFrame::Plain | QFrame::NoFrame );
+    buttonsGroupBox->setMidLineWidth( 3 );
     QHBoxLayout* buttonsLayout = new QHBoxLayout;
     buttonsLayout->setSpacing(0);
     buttonsLayout->setMargin(0);
     buttonsGroupBox->setLayout( buttonsLayout );
-    pageLayout->addWidget( buttonsGroupBox );
-
+    trussUnitsLayout->addWidget( buttonsGroupBox );
 
     QPushButton* buttonImport = new QPushButton;    
     buttonsLayout->addWidget( buttonImport );
     buttonImport->setFlat( true );
-    buttonImport->setText( tr("Import truss") );
+    buttonImport->setText( tr("Import") );
+    buttonImport->setMinimumWidth( 60 );
     connect( buttonImport, SIGNAL(clicked()), SLOT(importIsPressed()) ); 
 
     QPushButton* buttonNewTruss = new QPushButton;
     buttonsLayout->addWidget( buttonNewTruss );
     buttonNewTruss->setFlat( true );
-    buttonNewTruss->setText( tr("Create truss") );
+    buttonNewTruss->setText( tr("New") );
+    buttonNewTruss->setMinimumWidth( 60 );
     connect( buttonNewTruss, SIGNAL(clicked()), SLOT(newTrussIsPressed()) ); 
 
     return page;
@@ -307,6 +345,32 @@ void ProjectToolBox::calculateAllIsPressed ()
                                   "' has violated type contract.") );
     }
     */
+}
+
+void ProjectToolBox::afterTrussCountChange ()
+{
+    TrussUnitWindowManager& mng = currentProject()->getTrussUnitWindowManager();
+    if ( sender() != &mng )
+        return;
+
+    int numb = mng.getTrussUnitWindowList().size();
+    trussNumberLabel->setText( QString::number(numb) );
+}
+
+void ProjectToolBox::afterTrussVisibilityChange ()
+{
+    TrussUnitWindowManager& mng = currentProject()->getTrussUnitWindowManager();
+    if ( sender() != &mng )
+        return;
+
+    int numb = 0;
+    WindowList trussWindows = mng.getTrussUnitWindowList();
+    WindowListIter iter = trussWindows.begin();
+    for ( ; iter != trussWindows.end(); ++iter )
+        if ( ! (*iter)->isVisible() )
+            ++numb;
+
+    trussHiddenLabel->setText( QString::number(numb) );
 }
 
 bool ProjectToolBox::eventFilter( QObject*, QEvent* event )

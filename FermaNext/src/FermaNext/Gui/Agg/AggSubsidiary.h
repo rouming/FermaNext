@@ -10,28 +10,34 @@
 #include "agg_conv_concat.h"
 #include "agg_conv_curve.h"
 #include "agg_conv_contour.h"
+#include "agg_conv_dash.h"
 #include "agg_conv_smooth_poly1.h"
+#include "agg_conv_stroke.h"
 #include "agg_path_storage.h"
 #include "agg_vertex_sequence.h"
 #include "agg_vcgen_markers_term.h"
 #include "agg_vcgen_smooth_poly1.h"
 #include "agg_arrowhead.h"
 #include "agg_glyph_raster_bin.h"
+#include "agg_gsv_text.h"
 #include "agg_renderer_raster_text.h"
 #include "agg_embedded_raster_fonts.h"
 #include "agg_rounded_rect.h"
 #include "agg_rasterizer_scanline_aa.h"
+#include "agg_rasterizer_outline_aa.h"
 #include "agg_scanline_p.h"
 #include "agg_renderer_scanline.h"
 #include "agg_pixfmt_rgb.h"
 #include "agg_pixfmt_rgba.h"
 #include "agg_ellipse.h"
-#include "agg_conv_stroke.h"
 #include "agg_span_gradient.h"
 #include "agg_span_interpolator_linear.h"
 #include "agg_rendering_buffer_dynarow.h"
 #include "agg_svg_parser.h"
 #include "agg_renderer_primitives.h"
+#include "ctrl/agg_slider_ctrl.h"
+#include "ctrl/agg_rbox_ctrl.h"
+#include "ctrl/agg_cbox_ctrl.h"
 
 /*****************************************************************************/
 
@@ -40,11 +46,17 @@ typedef agg::pixfmt_custom_rbuf_rgba<agg::blender_rgba32,
                                           rbuf_dynarow>    pixf_dynarow;
 typedef agg::renderer_base<pixf_dynarow>                   ren_dynarow;
 typedef agg::renderer_scanline_aa_solid<ren_dynarow>       solidRenderer;
+typedef agg::renderer_scanline_bin_solid<ren_dynarow>      draft_renderer;
+typedef agg::renderer_primitives<ren_dynarow>              primitivesRenderer;
 typedef agg::rasterizer_scanline_aa<>                      scanline_rasterizer;
+typedef agg::rasterizer_outline_aa<primitivesRenderer>     outline_rasterizer;
 typedef agg::pixfmt_rgb24                                  pixfmt;
 typedef pixfmt::color_type                                 color_type;
 typedef agg::renderer_base<pixfmt>                         base_renderer;
 typedef agg::renderer_scanline_aa_solid<base_renderer>     solid_renderer;
+typedef agg::glyph_raster_bin<agg::rgba8>                   glyph_gen;
+typedef agg::renderer_raster_htext_solid<base_renderer, 
+                                         glyph_gen>        text_renderer;
 typedef agg::gradient_circle                               radial_gradient;
 typedef agg::gradient_y                                    linear_gradient;
 typedef agg::span_interpolator_linear<>                    interpolator;
@@ -62,17 +74,21 @@ typedef agg::renderer_scanline_aa<ren_dynarow,
                                   radial_gradient_span_gen> radial_gradient_renderer;
 typedef agg::renderer_scanline_aa<ren_dynarow, 
                                   linear_gradient_span_gen> linear_gradient_renderer;
+typedef agg::renderer_scanline_aa<base_renderer, 
+                                  linear_gradient_span_gen> GradientRenderer;
 
-typedef agg::glyph_raster_bin<agg::rgba8>                   glyph_gen;
 typedef agg::renderer_raster_htext_solid<ren_dynarow, 
                                          glyph_gen>         textRenderer;
 typedef const agg::int8u*                                   textFont;
 typedef agg::svg::path_renderer                             pathRenderer;
-typedef agg::renderer_primitives<ren_dynarow>               primitivesRenderer;
+typedef agg::conv_stroke<agg::gsv_text>                     TextPoly;
+typedef agg::slider_ctrl<agg::rgba>                         AggSlider;
+typedef agg::cbox_ctrl<agg::rgba>                           AggCheckBox;
 
 /*****************************************************************************/
 
 class QString;
+class DoublePoint;
 class QPoint;
 class QSize;
 
@@ -102,8 +118,8 @@ struct arrow
     concat_type    c;
 
     arrow( line& l, double w );
-    arrow( line& l, double w, int downLen, 
-           int upLen, int sideWid, int sideLen );
+    arrow( line& l, double w, double downLen, double upLen, 
+           double sideWid, double sideLen );
     void rewind ( unsigned id );
     unsigned vertex ( double* x, double* y );
 };
@@ -111,29 +127,34 @@ struct arrow
 /*****************************************************************************/
 
 void drawText ( textRenderer& textRend, const QString& str, 
-                color_type c, const QPoint& point );
+                color_type c, const DoublePoint& point );
 
 void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                agg::scanline_p8& sl, const QPoint& point1, 
-                const QPoint& point2, int width, color_type col );
+                agg::scanline_p8& sl, const DoublePoint& point1, 
+                const DoublePoint& point2, double width, color_type col );
 
 void drawLine ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                agg::scanline_p8& sl, const QPoint& point1, 
-                const QPoint& point2 );
+                agg::scanline_p8& sl, const DoublePoint& point1, 
+                const DoublePoint& point2 );
+
+void drawDashLine ( ren_dynarow& base, DoublePoint point1, DoublePoint point2,
+                    color_type col, double width, double dashLen, 
+                    double dashGap, bool draft = false );
 
 void drawCurve ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                 agg::scanline_p8& sl, const QPoint& point1, 
-                 const QPoint& point2, const QPoint& point3, 
-                 int width, color_type col );
+                 agg::scanline_p8& sl, const DoublePoint& point1, 
+                 const DoublePoint& point2, const DoublePoint& point3, 
+                 double width, color_type col );
 
 void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                 agg::scanline_p8& sl, const QPoint& tail, 
-                 const QPoint& head, color_type color,
-                 int downLen, int upLen, int sideWid, int sideLen );
+                 agg::scanline_p8& sl, const DoublePoint& tail, 
+                 const DoublePoint& head, color_type color,
+                 double downLen, double upLen, double sideWid, 
+                 double sideLen );
 
 void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
-                 agg::scanline_p8& sl, const QPoint& point1, 
-                 const QPoint& point2 );
+                 agg::scanline_p8& sl, const DoublePoint& point1, 
+                 const DoublePoint& point2 );
 
 void fillColorArray ( color_array_type& colArray, color_type first, 
                       color_type middle, color_type last );
@@ -144,22 +165,22 @@ void drawOutlineRoundedRect ( ren_dynarow& baseRend,
                               agg::scanline_p8& sl,
                               color_array_type& gradColors,
                               agg::trans_affine& mtx,
-                              const QPoint& point1, 
-                              const QPoint& point2, 
+                              const DoublePoint& point1, 
+                              const DoublePoint& point2, 
                               color_type outlineCol, 
-                              int cornerRadius, 
-                              int lineWidth, 
-                              int bound1, int bound2 );
+                              double cornerRadius, 
+                              double lineWidth, 
+                              double bound1, double bound2 );
 
 void drawOutlineRoundedRect ( solidRenderer& solidRend, 
                               scanline_rasterizer& ras,
                               agg::scanline_p8& sl,
-                              const QPoint& point1, 
-                              const QPoint& point2, 
+                              const DoublePoint& point1, 
+                              const DoublePoint& point2, 
                               color_type outlineCol,
                               color_type rectCol,  
-                              int cornerRadius, 
-                              int lineWidth );
+                              double cornerRadius, 
+                              double lineWidth );
 
 void drawGradientEllipse ( ren_dynarow& baseRend, 
                            scanline_rasterizer& ras,
@@ -167,8 +188,8 @@ void drawGradientEllipse ( ren_dynarow& baseRend,
                            radial_gradient& gradFunc,
                            color_array_type gradColors,
                            agg::trans_affine& mtx, 
-                           int x, int y, int radius, 
-                           int bound1, int bound2 );
+                           double x, double y, double radius, 
+                           double bound1, double bound2 );
 
 void drawGradientEllipse ( ren_dynarow& baseRend, 
                            scanline_rasterizer& ras,
@@ -176,15 +197,18 @@ void drawGradientEllipse ( ren_dynarow& baseRend,
                            linear_gradient& gradFunc,
                            color_array_type gradColors,
                            agg::trans_affine& mtx, 
-                           int x, int y, int radius, 
-                           int bound1, int bound2 );
+                           double x, double y, double radius, 
+                           double bound1, double bound2 );
 
 void parseSvg ( pathRenderer& pathRend, const char* fname );
 
 void drawSvg ( ren_dynarow& baseRend, scanline_rasterizer& ras, 
                agg::scanline_p8& sl,  pathRenderer& pathRend, 
                solidRenderer& solidRend, agg::trans_affine mtx, 
-               int dx, int dy, double scaleX, double scaleY, double expand, 
-               double gamma );
+               double dx, double dy, double scaleX, double scaleY, 
+               double expand, double gamma );
+
+void blendBuffer ( base_renderer& baseRenderer, 
+                   pixf_dynarow& pixf, QPoint p );
 
 #endif //AGGSUBSIDIARY_H

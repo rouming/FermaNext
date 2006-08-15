@@ -58,6 +58,7 @@ public:
 
 protected:
     virtual rendering_buffer& getAggRenderingBuffer ();
+    virtual AggCtrlContainer& getAggCntrlContainer ();
 
 // Hide QT events, override AGG events instead.
 private:

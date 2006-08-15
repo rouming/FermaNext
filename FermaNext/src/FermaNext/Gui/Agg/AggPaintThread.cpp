@@ -1,6 +1,7 @@
 
 #include "AggPaintThread.h"
 #include <QDateTime>
+#include <QApplication>
 
 /*****************************************************************************
  * Agg Paint Thread
@@ -70,6 +71,7 @@ void AggPaintThread::run ()
             }
         }
         widgetToRepaint.update();
+        QApplication::processEvents( QEventLoop::ExcludeUserInputEvents );
         emit onAnimationRun();
         time.addMSecs ( frameDelay );
         

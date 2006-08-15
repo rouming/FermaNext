@@ -2,9 +2,12 @@
 #include <QTabWidget>
 #include <QStackedWidget>
 #include <QTextStream>
+#include <QVBoxLayout>
+#include <QFrame>
 
 #include "FermaNextProject.h"
 #include "Global.h"
+#include "TrussSolutionResults.h"
 
 /*****************************************************************************
  * FermaNext Project
@@ -26,8 +29,7 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
     stackedWidget(stack),
     // FIXME QT3TO4:
     //calcDataToolBar( new CalcDataToolBar(projectMainWidget) ),
-    projectTab( new QTabWidget(stackedWidget) ),
-    justStrengthAnalisysWidget( new QWidget ),
+    projectWidget( new QFrame(stackedWidget) ),
     designerWidget( new TrussDesignerWidget ),
     materialLibrary( new TrussMaterialLibrary ),
     trussWindowManager( new TrussUnitWindowManager( *materialLibrary ) )
@@ -37,23 +39,24 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
              trussWindowManager, 
              SIGNAL(beforeMaterialRemove(const TrussMaterial&)) );
 
+    QVBoxLayout* designerLayout = new QVBoxLayout( projectWidget );
+    designerLayout->addWidget( designerWidget );
+    designerLayout->setMargin(0);
+
     // Should be hidden while creating other widgets
     // Only for aesthetic purposes 
-    projectTab->setVisible(false);
-    designerWidget->setVisible(false);
+    projectWidget->setVisible(false);
+    designerWidget->setVisible(true);
 
+    projectWidget->setFrameStyle( QFrame::Raised | QFrame::Panel );
     /*
       // FIXME QT3TO4:
     projectMainWidget->setRightJustification( true );
     projectMainWidget->setDockEnabled( DockLeft, false );
     projectMainWidget->setDockEnabled( DockRight, false );
     */
-    
-    projectTab->setTabPosition( QTabWidget::South );
-    projectTab->addTab( designerWidget, tr("Designer") );
-    projectTab->addTab( justStrengthAnalisysWidget, tr("Strength Analysis") );
-    stackedWidget->addWidget(projectTab);
-      
+    stackedWidget->addWidget(projectWidget);
+
     // Catch trusses creation or deletion.
     connect( trussWindowManager, 
              SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
@@ -61,6 +64,10 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
     connect( trussWindowManager, 
              SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
              designerWidget, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
+    connect( trussWindowManager, 
+             SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
+             SLOT(removeSolutionResults(TrussUnitWindow&)) );
+
     // FIXME QT3TO4: 
     /*
     connect( trussWindowManager, 
@@ -75,9 +82,9 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
 FermaNextProject::~FermaNextProject ()
 {
     if ( stackedWidget )
-        stackedWidget->removeWidget( projectTab );
+        stackedWidget->removeWidget( projectWidget );
     delete trussWindowManager;
-    delete projectTab;
+    delete projectWidget;
     delete materialLibrary;
 }
 
@@ -265,8 +272,8 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
 void FermaNextProject::activate ()
 {
     if ( stackedWidget && 
-         stackedWidget->currentWidget() != projectTab ) {
-        stackedWidget->setCurrentWidget( projectTab );
+         stackedWidget->currentWidget() != projectWidget ) {
+        stackedWidget->setCurrentWidget( projectWidget );
         emit onActivate( *this );
     }
 }
@@ -274,7 +281,7 @@ void FermaNextProject::activate ()
 bool FermaNextProject::isActivated () const
 {
     return (stackedWidget && stackedWidget->currentWidget() == 
-            projectTab);
+            projectWidget);
 }
 
 const QString& FermaNextProject::getName () const
@@ -312,6 +319,34 @@ FermaNextWorkspace& FermaNextProject::getWorkspace()
 TrussMaterialLibrary& FermaNextProject::getMaterialLibrary () const
 {
     return *materialLibrary;
+}
+
+void FermaNextProject::addSolutionResults ( TrussSolutionResults& res )
+{
+    TrussSolutionResults* oldResults = 
+        getResultsForTrussUnit( res.getTrussUnit() );
+    if ( oldResults )
+        delete oldResults;
+    trussResults.push_back( &res ); 
+}
+
+void FermaNextProject::removeSolutionResults ( TrussUnitWindow& truss )
+{
+    TrussSolutionResults* oldResults = getResultsForTrussUnit( truss );
+    if ( oldResults )
+        delete oldResults;
+}
+
+TrussSolutionResults* FermaNextProject::getResultsForTrussUnit ( 
+                                          const TrussUnit& truss ) const
+{
+    TrussResultsListConstIter iter = trussResults.begin();
+    for ( ; iter < trussResults.end(); ++iter ) {
+        TrussSolutionResults* res = *iter;
+        if ( &res->getTrussUnit() == &truss )
+            return res;
+    }
+    return 0;
 }
 
 /*****************************************************************************/

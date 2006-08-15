@@ -17,7 +17,7 @@ unix {
 INCLUDEPATH += $$(AGGDIR)/include \
                $$(AGGDIR)/svg \
                . \
-               Agg \             
+               Agg \
                ../../Common \
                ../../Common/Plugin \
                ../../Common/Loader \
@@ -30,12 +30,17 @@ INCLUDEPATH += $$(AGGDIR)/include \
 SOURCES = \
 #FIXME QT3TO4
 #          CalcDataToolBar.cpp \
+          ColorRangeControl.cpp \
 	  GuiSubsidiary.cpp \
           FermaNextMainWindow.cpp \
           GeometryTabWidget.cpp \
+          HtmlTable.cpp \
           PluginReloader.cpp \
           PreferencesWidget.cpp \
           ProjectToolBox.cpp \
+          ResultsControlWidget.cpp \
+          ResultsTabWidget.cpp \
+          TrussDeformPicture.cpp \
           Splash.cpp \
 #FIXME QT3TO4 
 #          ToolBarManager.cpp \
@@ -54,17 +59,21 @@ SOURCES = \
           Agg/AggTrussWindowButton.cpp \
           Agg/AggWidget.cpp
 
-
 HEADERS = \
 #FIXME QT3TO4 
 #          CalcDataToolBar.h \
+          ColorRangeControl.h \
 	  GuiSubsidiary.h \
           CalcDataWidget.ui.h \
           FermaNextMainWindow.h \
           GeometryTabWidget.h \
+          HtmlTable.h \
           PluginReloader.h \
           PreferencesWidget.h \
           ProjectToolBox.h \
+          ResultsControlWidget.h \
+          ResultsTabWidget.h \
+          TrussDeformPicture.h \
           Splash.h \
 #FIXME QT3TO4 
 #          ToolBarManager.h \
@@ -81,5 +90,4 @@ HEADERS = \
           Agg/AggToolBar.h \
           Agg/AggTrussToolBar.h \
           Agg/AggTrussWindowButton.h \
-          Agg/AggWidget.h
-
+          Agg/AggWidget.h 

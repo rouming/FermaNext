@@ -360,7 +360,8 @@ public:
         // Just subsidiary catches
         QObject::connect( pivot, SIGNAL(onThicknessChange(double)),
                                  SLOT(stateIsChanged()) );
-
+        QObject::connect( pivot, SIGNAL(onMaterialChange()),
+                                 SLOT(stateIsChanged()) );
         QObject::connect( pivot, SIGNAL(onFirstNodeChange()),
                                  SLOT(stateIsChanged()) );
         QObject::connect( pivot, SIGNAL(onLastNodeChange()),
@@ -502,10 +503,10 @@ public:
         return false;
     }
 
-    virtual uint countNodes ()
+    virtual uint countNodes () const
     {
         uint nodesNum = 0;
-        NodeListIter nIter = nodes.begin();
+        NodeListConstIter nIter = nodes.begin();
         for ( ; nIter != nodes.end(); ++nIter ) {
             N* node = *nIter;
             if ( node->isAlive() )
@@ -514,10 +515,10 @@ public:
         return nodesNum;
     }
 
-    virtual uint countPivots ()
+    virtual uint countPivots () const
     {
         uint pivotsNum = 0;
-        PivotListIter pIter = pivots.begin();
+        PivotListConstIter pIter = pivots.begin();
         for ( ; pIter != pivots.end(); ++pIter ) {
             P* pivot = *pIter;
             if ( pivot->isAlive() )
@@ -526,16 +527,33 @@ public:
         return pivotsNum;
     }
 
-    virtual uint countTopologies ()
+    virtual uint countTopologies () const
     {
         uint topologiesNum = 0;
-        TopologyListIter tIter = topologies.begin();
+        TopologyListConstIter tIter = topologies.begin();
         for ( ; tIter != topologies.end(); ++tIter ) {
             TrussTopology* topology = *tIter;
             if ( topology->isAlive() )
                 ++topologiesNum;
         }
         return topologiesNum;
+    }
+
+    virtual uint countMaterials () const
+    {
+        QList<const TrussMaterial*> materials;
+        const TrussMaterial* material = 0;
+        PivotListConstIter pIter = pivots.begin();
+        for ( ; pIter != pivots.end(); ++pIter ) {
+            P* pivot = *pIter;
+            material = pivot->getMaterial();
+            QList<const TrussMaterial*>::const_iterator mIter = 
+                std::find( materials.begin(), materials.end(),
+                                              material );
+            if ( mIter == materials.end() )
+                materials.push_back( material );
+        }
+        return materials.size();
     }
 
     // Returns alive nodes
