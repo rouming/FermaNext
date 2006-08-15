@@ -18,6 +18,7 @@ unix {
 INCLUDEPATH += $$(AGGDIR)/include \
                $$(AGGDIR)/svg \
                ../../Common \
+               ../../Common/Plugin \
                ../Gui/Agg
 
 SOURCES = \

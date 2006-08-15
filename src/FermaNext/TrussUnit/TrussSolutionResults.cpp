@@ -1,7 +1,7 @@
 
 #include "TrussSolutionResults.h"
 #include "TrussUnitCopy.h"
-#include "Plugin\Plugin.h"
+#include "Plugin.h"
 
 /*****************************************************************************
  * Load Case Results
