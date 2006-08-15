@@ -472,7 +472,7 @@ void TrussDeformPicture::drawNode ( const TrussCopyNode& node,
                                     ren_dynarow& baseRend ) const
 {
     const DoublePoint& nodeCoord = node.getCurrentCoord();
-    DoublePoint nodePos, originPos = paintAreaRect.bottomLeft().toPoint();
+    DoublePoint nodePos, originPos = paintAreaRect.bottomLeft();
     nodePos.setX( nodeCoord.x() * currentScaleMult + 
                   Global::areaBufferIndent );
     nodePos.setY( Global::flipY ? originPos.y() - 
@@ -591,7 +591,7 @@ void TrussDeformPicture::drawPivot ( const TrussCopyPivot& pivot,
     TrussCopyNode& first = pivot.getFirstNode(),
                    last = pivot.getLastNode();
     DoublePoint pos1, pos2, base1, base2,
-                originPos = paintAreaRect.bottomLeft().toPoint();
+                originPos = paintAreaRect.bottomLeft();
     const DoublePoint& coord1 = first.getCurrentCoord();
     const DoublePoint& coord2 = last.getCurrentCoord();
     const DoublePoint& baseCoord1 = first.getBaseCoord();
