@@ -29,6 +29,8 @@
 #include "TrussPropertyTabWidget.h"
 #include "TrussMaterialEditor.h"
 #include "PreferencesWidget.h"
+#include "ResultsTabWidget.h"
+#include "GuiSubsidiary.h"
 #include "PluginReloader.h"
 
 const QString fermaTitle( QObject::tr( "Educational CAD System 'Ferma'" ) );
@@ -61,20 +63,18 @@ FermaNextMainWindow::FermaNextMainWindow ( FermaNextWorkspace& wsp ) :
                                    SLOT(refreshPluginsActions()) );
 }
 
+FermaNextMainWindow::~FermaNextMainWindow ()
+{}
+
 void FermaNextMainWindow::init ()
 {
     setWindowTitle( fermaTitle);
     setMinimumSize( 640, 480 );
-    statusBar()->addWidget(new QLabel( tr("Ready"), statusBar() ));
 
-    initUndoRedoWindow();
-    initGeometryWindow();
-    initTrussPropertyWindow();
-    
-    projectsDockWidget = new QDockWidget( tr("Projects"), this );
+    projectsDockWidget = new DockedWidget( tr("Projects"), this );
     projectsDockWidget->setVisible(false);
     projectsDockWidget->setAllowedAreas( Qt::LeftDockWidgetArea );
-    projectsDockWidget->setFixedWidth( 150 );
+    projectsDockWidget->setMinimumWidth( 145 );
     projectsDockWidget->setWindowTitle( tr("Projects") );
 
     projectToolBox = new ProjectToolBox( workspace, projectsDockWidget );
@@ -88,6 +88,13 @@ void FermaNextMainWindow::init ()
                              SLOT(refreshProjectActions()) );
     connect( projectToolBox, SIGNAL(currentChanged(int)), 
                              SLOT(refreshGeometryAndPropertyWindows()) );
+    connect( projectToolBox, SIGNAL(onShowTrussResults(const TrussUnitWindow&)),
+                             SLOT(showResultsWindow(const TrussUnitWindow&)) );
+    connect( this, 
+                SIGNAL(calculateTrussUnit(const TrussUnitWindow&)),
+             projectToolBox, 
+                SIGNAL(calculateTrussUnit(const TrussUnitWindow&)) );
+
     projectsDockWidget->setWidget( projectToolBox );    
 
     materialEditor = new TrussMaterialEditor( this );
@@ -107,13 +114,25 @@ void FermaNextMainWindow::init ()
              Qt::QueuedConnection );
 
     preferencesWidget = new PreferencesWidget( this );
+    
+    resultsWindow = new QDialog( this );
+    resultsWindow->setWindowTitle( "Calculation Results" );
+    resultsWindow->setFixedSize( 750, 600 );
+    QHBoxLayout* resultsLayout = new QHBoxLayout( resultsWindow );
+    resultsTabWidget = new ResultsTabWidget;
+    resultsLayout->addWidget( resultsTabWidget );
+    resultsLayout->setMargin( 1 );
 
     addDockWidget( Qt::LeftDockWidgetArea, projectsDockWidget );
+
+    initUndoRedoWindow();
+    initGeometryWindow();
+    initTrussPropertyWindow();
+    createStatusBar();
 
     // Connect plugins signal mapper to show plugin info
     QObject::connect( pluginsSigMapper, SIGNAL(mapped(const QString &)),
                                         SLOT(showPluginInfo(const QString &)));
-
 }
 
 void FermaNextMainWindow::initUndoRedoWindow ()
@@ -122,7 +141,7 @@ void FermaNextMainWindow::initUndoRedoWindow ()
 
     undoRedoHistoryWidget->setFixedSize( 195, 120 );
     // Pretty history widget offset from the end point of the screen
-    undoRedoHistoryWidget->move( QApplication::desktop()->width() - 225, 75 );
+    undoRedoHistoryWidget->move( QApplication::desktop()->width() - 215, 105 );
     undoRedoHistoryWidget->setWindowTitle( tr("History") );
     undoRedoListBox = new UndoRedoListBox( undoRedoHistoryWidget );
     undoRedoHistoryWidget->installEventFilter( this );
@@ -140,7 +159,7 @@ void FermaNextMainWindow::initGeometryWindow ()
     geometryWindow->setFixedSize( 195, 174 );
     geometryWindow->setWindowTitle( tr("Truss Geometry") );
     geometryTabWidget = new GeometryTabWidget( geometryWindow );
-    geometryWindow->move( QApplication::desktop()->width() - 225, 220 );
+    geometryWindow->move( QApplication::desktop()->width() - 215, 250 );
     geometryWindow->installEventFilter( this );
 
     QVBoxLayout* tabLayout = new QVBoxLayout;
@@ -159,7 +178,7 @@ void FermaNextMainWindow::initTrussPropertyWindow ()
     trussPropertyWindow->setFixedSize( 195, 228 );
     trussPropertyWindow->setWindowTitle( tr("Truss Properties") );
     trussPropTabWidget = new TrussPropertyTabWidget( trussPropertyWindow );
-    trussPropertyWindow->move( QApplication::desktop()->width() - 225, 420 );
+    trussPropertyWindow->move( QApplication::desktop()->width() - 215, 450 );
     trussPropertyWindow->installEventFilter( this );
 
     QVBoxLayout* tabLayout = new QVBoxLayout;
@@ -170,6 +189,45 @@ void FermaNextMainWindow::initTrussPropertyWindow ()
     tabLayout->setSpacing( 1 );
     parentLayout->setMargin( 2 );
     parentLayout->setSpacing( 2 );
+}
+
+void FermaNextMainWindow::createStatusBar ()
+{
+    QWidget* statusBarWidget = new QWidget;
+    QHBoxLayout* statusBarLayout = new QHBoxLayout( statusBarWidget );
+    statusBarLayout->setMargin(2);
+    statusBarLayout->setSpacing(2);
+
+    hintLabel = new QLabel( "  Ready" );
+    // statusBar()->addWidget( hintLabel, 1 );
+
+    coordLabel = new QLabel( "  999.99 : 999.99  " );
+    coordLabel->setAlignment( Qt::AlignCenter );
+    coordLabel->setMinimumSize( coordLabel->sizeHint() );
+    coordLabel->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
+    //statusBar()->addPermanentWidget( coordLabel );
+
+    elementLabel = new QLabel( " pivot #999 " );
+    elementLabel->setAlignment( Qt::AlignCenter );
+    elementLabel->setMinimumSize( elementLabel->sizeHint() );
+    elementLabel->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
+    //statusBar()->addPermanentWidget( elementLabel );
+
+    modLabel = new QLabel( " MOD " );
+    modLabel->setEnabled( false );
+    modLabel->setAlignment( Qt::AlignCenter );
+    modLabel->setMinimumSize( modLabel->sizeHint() );
+    modLabel->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
+    // statusBar()->addWidget( modLabel );
+
+    statusBarLayout->addWidget( hintLabel, 1 );
+    statusBarLayout->addWidget( coordLabel );
+    statusBarLayout->addWidget( elementLabel );
+    statusBarLayout->addWidget( modLabel );
+
+    statusBar()->addPermanentWidget( statusBarWidget, 1 );
+
+    updateStatusBar();
 }
 
 void FermaNextMainWindow::someProjectRemoved ( FermaNextProject& prj )
@@ -202,13 +260,18 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
         if ( showGeometryWindowAction->isChecked() )
             trussPropertyWindow->show();
     }
+
     TrussDesignerWidget& designerWidget = prj.getDesignerWidget();
 
     connect( &designerWidget, SIGNAL(onFocusLose(TrussUnitWindow&)),
                             SLOT(trussWindowLostFocus(TrussUnitWindow&)) );
     connect( &designerWidget, SIGNAL(onFocusReceive(TrussUnitWindow&)),
                             SLOT(trussWindowReceivedFocus(TrussUnitWindow&)) );
-
+    connect( &designerWidget, SIGNAL(cursorMoved()),
+                            SLOT(updateStatusBar()) );
+    connect( &designerWidget, SIGNAL(onHintChange(const QString&)),
+                              SLOT(setStatusBarHint(const QString&)) );
+    
     TrussUnitWindowManager& mng = prj.getTrussUnitWindowManager();
     connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
              geometryTabWidget, 
@@ -245,21 +308,44 @@ void FermaNextMainWindow::createProject ()
         trussWindow.createPivot( node2, node3 ).setMaterial( m );
 
         TrussNode& node4 = trussWindow.createNode( 250, 300 );
-        trussWindow.createPivot ( node4, node3 ).setMaterial( m );
+        trussWindow.createPivot( node4, node3 ).setMaterial( m );
 
         TrussNode& node5 = trussWindow.createNode( 0, 300 );
-        trussWindow.createPivot ( node5, node3 ).setMaterial( m );
-        trussWindow.createPivot ( node5, node4 ).setMaterial( m );
-        trussWindow.createPivot ( node5, node2 ).setMaterial( m );
+        trussWindow.createPivot( node5, node3 ).setMaterial( m );
+        trussWindow.createPivot( node5, node4 ).setMaterial( m );
+        trussWindow.createPivot( node5, node2 ).setMaterial( m );
 
         node1.setFixation( Node::FixationByX );
         node2.setFixation( Node::FixationByY );
         node3.setFixation( Node::FixationByXY );
 
+        trussWindow.getLoadCases().createLoadCase();
+        trussWindow.getLoadCases().createLoadCase();
         TrussUnit::LoadCase* currentCase = 
             trussWindow.getLoadCases().getCurrentLoadCase();
+        
         if ( currentCase )
             currentCase->addLoad( node4, 300, 100 );
+
+        TrussSolutionResults* trussResults = new TrussSolutionResults( trussWindow );
+        PluginResults* pluginResults = new PluginResults( "SimpleCalcPlugin" );
+        LoadCaseResults* loadCaseResults = new LoadCaseResults( 1 );
+        loadCaseResults->addDisplacement( 0, 0.5, 1 );
+        loadCaseResults->addDisplacement( 0, 0.3, 2 );
+        loadCaseResults->addDisplacement( 0, 0, 3 );
+        loadCaseResults->addDisplacement( 0.7, 0.5, 4 );
+        loadCaseResults->addDisplacement( 0.3, 0.3, 5 );
+        loadCaseResults->addStress( 25000, 1 );
+        loadCaseResults->addStress( 15000, 2 );
+        loadCaseResults->addStress( 5000, 3 );
+        loadCaseResults->addStress( -5000, 4 );
+        loadCaseResults->addStress( -15000, 5 );
+        pluginResults->addLoadCaseResults( *loadCaseResults );
+        pluginResults->addLoadCaseResults( *new LoadCaseResults( 2 ) );
+        pluginResults->addLoadCaseResults( *new LoadCaseResults( 3 ) );
+        trussResults->addPluginResults( *pluginResults );
+        prj.addSolutionResults( *trussResults );
+        trussWindow.setCalculatedStatus( true );
 
 #endif
 /*********** TEMP TRUSS UNIT **************************/
@@ -563,14 +649,13 @@ void FermaNextMainWindow::reloadPlugins ( bool reload )
     foreach ( Plugin* plugin, plugins ) {
         QString plgName = plugin->pluginInfo().name;
         QString plgPath = plugin->pluginPath();
-
+    
         QAction* act = pluginsMenu->addAction( QIcon(Global::imagesPath() + 
                                                      "/calculate.png"),
                                                plgName, pluginsSigMapper, 
                                                SLOT(map()) );
         pluginsSigMapper->setMapping( act, plgPath );
     }
-
     pluginsMenu->addSeparator();
 
     // Reload plugins
@@ -634,6 +719,58 @@ void FermaNextMainWindow::refreshGeometryAndPropertyWindows ()
     trussPropTabWidget->changeFocusWindow( window );
     trussPropTabWidget->changeMaterialLibrary( prj->getMaterialLibrary() );
 }
+
+void FermaNextMainWindow::updateStatusBar ()
+{
+    FermaNextProject* prj = projectToolBox->currentProject();
+    if ( ! prj ) {
+        coordLabel->setText( " " );
+        elementLabel->setText( " " );
+        return;
+    }
+
+    TrussUnitWindow* window = 0;
+    WindowList windows = prj->getDesignerWidget().getTrussUnitWindowList();
+    WindowListConstIter wIter = windows.begin();
+    for ( ; wIter != windows.end(); ++wIter ) {
+        if ( (*wIter)->getCursorCoord().x() != -1.0 ) {
+            window = *wIter;
+            break;
+        }
+    }
+
+    if ( ! window ) {
+        coordLabel->setText( " " );
+        elementLabel->setText( " " );
+        return;
+    }
+
+    DoublePoint cursorCoord = window->getCursorCoord();
+    QString str;
+    str = QString( "%1" ).arg( cursorCoord.x(),0,'f',2 );
+    str.append(" : ");
+    str.append( QString( "%1" ).arg( cursorCoord.y(),0,'f',2 ) );  
+    coordLabel->setText( str );
+
+    const TrussNode* node = window->getFocusedNode();
+    const TrussPivot* pivot = window->getFocusedPivot();
+    if ( node && ! pivot )
+        elementLabel->setText( tr( "Node #" ) + 
+                               QString::number(node->getNumber()) );
+    else if ( pivot )
+        elementLabel->setText( tr( "Pivot #" ) + 
+                               QString::number(pivot->getNumber()) );
+    else
+        elementLabel->setText( " " );
+}
+
+void FermaNextMainWindow::setStatusBarHint ( const QString& text )
+{
+    hintLabel->setText( " " + text );
+}
+
+void FermaNextMainWindow::projectModified ()
+{}
 
 void FermaNextMainWindow::trussWindowLostFocus ( TrussUnitWindow& window )
 {
@@ -1033,6 +1170,45 @@ void FermaNextMainWindow::editPreferences ()
     preferencesWidget->resize( 300, 300 );
     preferencesWidget->setWindowTitle( "Preferences" );
     preferencesWidget->exec();    
+}
+
+void FermaNextMainWindow::showResultsWindow ( const TrussUnitWindow& w )
+{
+    FermaNextProject* prj = projectToolBox->currentProject();
+    if ( prj == 0 )
+        return;
+
+    TrussSolutionResults* trussResults = prj->getResultsForTrussUnit( w );
+    if ( ! trussResults ) {
+        if ( ! QMessageBox::question( 0, tr("Calculate truss unit"),
+                                      tr("Calculate truss \"%1\"?").
+                                      arg(w.getTrussName()),
+                                      tr("&Yes"), tr("&No"),
+                                      QString::null, 0, 1 ) )
+            emit calculateTrussUnit( w );
+        else
+            QMessageBox::information( 0, tr( "Calculate truss unit" ), 
+                            tr( "There are no results for current truss" ), 
+                            QMessageBox::Ok );
+    }
+    else {
+        if ( ! w.isCalculated() ) {
+            if ( ! QMessageBox::question( 0, tr("Recalculate truss"),
+                                          tr("Truss \"%1\" was changed.\n"
+                                             "Recalculate truss?").
+                                          arg(w.getTrussName()),
+                                          tr("&Yes"), tr("&No"),
+                                          QString::null, 0, 1 ) )
+                emit calculateTrussUnit( w );
+            else {
+                resultsTabWidget->setTrussSolutionResults( *trussResults );
+                resultsWindow->exec();
+            }
+        } else {
+            resultsTabWidget->setTrussSolutionResults( *trussResults );
+            resultsWindow->exec();
+        }
+    }
 }
 
 void FermaNextMainWindow::helpContents ()

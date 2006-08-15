@@ -1,7 +1,9 @@
 
+#include <QWidget>
+
 #include "AggPopupHint.h"
 #include "AggPaintThread.h"
-#include <QWidget>
+#include "Geometry.h"
 
 /*****************************************************************************
  * Agg Popup Hint
@@ -129,8 +131,8 @@ void AggPopupHint::paint ( base_renderer& baseRenderer ) const
                    last( agg::rgba( 1, 1, 1, 0.9 * alphaCoeff ) );
         fillColorArray( gradColors, first, middle, last );
 
-        QPoint leftTop( 0, 0 ),
-               rightBottom ( size_.width(), size_.height() );
+        DoublePoint leftTop( 0, 0 ),
+                    rightBottom( size_.width(), size_.height() );
 
         drawOutlineRoundedRect( baseRend, solidRend, ras, sl, 
                                 gradColors, mtx, leftTop, rightBottom, 
@@ -138,7 +140,7 @@ void AggPopupHint::paint ( base_renderer& baseRenderer ) const
                                 size_.height()/2 - 1, 1, leftTop.y(), 
                                 rightBottom.y() );
 
-        QPoint textPos( leftTop.x() + 6, rightBottom.y() - 6 );
+        DoublePoint textPos( leftTop.x() + 6, rightBottom.y() - 6 );
         color_type textCol( agg::rgba(0, 0, 0, 1.0 * alphaCoeff) );
         textRenderer textRend ( baseRend, glyph );
         drawText( textRend, text_, textCol, textPos );

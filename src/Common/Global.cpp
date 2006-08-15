@@ -54,6 +54,16 @@ const int defaultWidth = 250,
 const bool flipY = true;
 
 /************************************
+ * Truss Deform Picture Consts
+ ************************************/
+
+const int defaultCanvasWidth = 400,
+          defaultCanvasHeight = 400,
+          canvasHorIndent = 0,
+          canvasVertIndent = 0,
+          areaBufferIndent = 60;
+
+/************************************
  * Truss Unit Tool Bar Consts
  ************************************/
 
@@ -80,6 +90,17 @@ const int checkBoxLen = 12;
 
 // fixation check box indent from the cell border
 const int checkBoxIndent = 1;
+
+/************************************
+ * HTML Consts
+ ************************************/
+const int htmlRowHeight = 25, 
+          htmlColWidth = 54;
+
+const QString htmlTitleBgColor = "#C1D2EC",
+              htmlHeaderBgColor = "#EFF0F5",
+              htmlSubHeaderBgColor = "#EBEBEB",
+              htmlBorderColor = "#BCC6DE";
 
  /************************************
  * Main subs

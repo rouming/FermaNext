@@ -35,6 +35,7 @@ bool AggCtrlContainer::removeCtrl ( agg::ctrl& c )
 
 bool AggCtrlContainer::inRect ( double x, double y )
 {
+
     const agg::ctrl* ctrl = whoIsInRect( x, y );
     if ( ctrl != 0 ) return true;
     return false;
@@ -50,7 +51,7 @@ const agg::ctrl* AggCtrlContainer::whoIsInRect ( double x, double y )
 }
 
 bool AggCtrlContainer::currentCtrl ( double x, double y )
-{ 
+{
     for ( uint i = 0; i < ctrls.size(); ++i ) {
         if( ctrls[i]->in_rect(x, y) ) {
             if ( current != ctrls[i] ) {
@@ -71,7 +72,6 @@ const agg::ctrl& AggCtrlContainer::currentCtrl ()
 {
     return *current;
 }
-
 
 const agg::ctrl* AggCtrlContainer::mousePressEvent ( double x, double y )
 {
@@ -132,6 +132,11 @@ AggWidget::~AggWidget ()
 agg::rendering_buffer& AggWidget::getAggRenderingBuffer ()
 {
     return aggBuffer;
+}
+
+AggCtrlContainer& AggWidget::getAggCntrlContainer ()
+{
+    return ctrlContainer;
 }
 
 void AggWidget::print ()
@@ -306,10 +311,10 @@ void AggWidget::mousePressEvent ( QMouseEvent* me )
 
     if ( flags & agg::mouse_left )
     {
-        const agg::ctrl* ctrl = ctrlContainer.mousePressEvent(curX, curY);
+        const agg::ctrl* ctrl = ctrlContainer.mousePressEvent(curX, me->pos().y() );
         if( ctrl != 0 )
         {
-            ctrlContainer.currentCtrl(curX, curY);
+            ctrlContainer.currentCtrl(curX, me->pos().y() );
             aggCtrlChangedEvent( ctrl );            
             // Force repaint
             QWidget::update();

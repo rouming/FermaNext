@@ -655,6 +655,11 @@ void TrussPropertyTabWidget::changeMaterialLibrary (
     const TrussMaterialLibrary& lib )
 {
     materialComboBox->setMaterialLibrary( lib );
+    if ( ! lib.countMaterials() )
+        updateLevelButtonState( true );
+    else
+        updateLevelButtonState( false );
+    
     emit onMaterialLibraryChanged( lib );
 }
 

@@ -3,6 +3,7 @@
 #define GEOMETRY_H
 
 #include <math.h>
+#include <QPointF>
 
 class DoublePoint;
 class DoubleSize;
@@ -47,6 +48,7 @@ public:
     DoublePoint ();
     DoublePoint ( double x, double y );
     DoublePoint ( const DoublePoint& );
+    DoublePoint ( const QPointF& );
 
     double x () const;
     double y () const;
@@ -98,6 +100,10 @@ inline DoublePoint::DoublePoint ( double x, double y ) :
 
 inline DoublePoint::DoublePoint ( const DoublePoint& p ) :
     xp(p.xp), yp(p.yp)
+{}
+
+inline DoublePoint::DoublePoint ( const QPointF& p ) :
+    xp(p.x()), yp(p.y())
 {}
 
 inline double DoublePoint::x () const

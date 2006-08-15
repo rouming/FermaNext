@@ -42,6 +42,7 @@ public slots:
     virtual void unselectAllFromGroup ();
     virtual void executePlugin ( Plugin* );
     virtual void remove ();
+    virtual void showResults ();
 
 protected slots:
     // Life-time changes
@@ -52,6 +53,7 @@ signals:
     // Emits when item changes its visibility status
     void onWindowItemShow ( TrussUnitWindowItem& );
     void onWindowItemHide ( TrussUnitWindowItem& );
+    void onShowTrussResults ( const TrussUnitWindow& );
 
 private:
     WindowListBox& listBox;
@@ -115,6 +117,11 @@ public slots:
 
 protected slots:
     virtual void raiseSelectedWindowItem ();
+    virtual void checkAfterDoubleClick ( QListWidgetItem* );
+    virtual void solveTrussUnit ( const TrussUnitWindow& );
+
+signals:
+    void onShowTrussResults ( const TrussUnitWindow& );
 
 private:
     struct IndexedItem 

@@ -108,9 +108,9 @@ QWidget* NodeTableDelegate::createEditor ( QWidget *parent,
         validator->setRange( 0.0, areaSize.width() );
     else
         validator->setRange( 0.0, areaSize.height() );
-    validator->setDecimals( 2 );
+    validator->setDecimals( 4 );
     editor->setValidator( validator );
-    editor->setMaxLength( 6 );
+    editor->setMaxLength( 8 );
     return editor;
 }
 
@@ -300,7 +300,7 @@ void NodeTable::setCoord ( int row, int col, double coord )
         new QTableWidgetItem( QString("%1").arg( coord,0,'f',2 ) );
     coordCell->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter );
     setItem( row, col, coordCell );
-    resizeColumnToContents( col );
+    horizontalHeader()->resizeSection( col, Global::nodeColumnWidth );
 }
 
 double NodeTable::getCoord ( int row, int col ) const
@@ -347,7 +347,6 @@ void NodeTable::addNode ( const Node& node )
     setCoord( row, 0, node.getX() );
     setCoord( row, 1, node.getY() );
     setFixationItem( row, node.getFixation() );
-    updateMaximumHeight();
 }
 
 void NodeTable::updateMaximumHeight ( int /*numRows*/ /*= -1 */ )

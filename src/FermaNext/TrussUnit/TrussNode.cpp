@@ -104,83 +104,83 @@ void TrussNode::removeNodeHighlight ()
     setHighlighted ( false );
 }
 
-void TrussNode::drawFixation ( scanline_rasterizer& ras, 
-                               solidRenderer& solidRend, 
-                               agg::scanline_p8& sl, 
-                               const QPoint& nodePos,
-                               int lineWidth, 
-                               color_type color ) const
+void TrussNode::drawFixation( scanline_rasterizer& ras, 
+                              solidRenderer& solidRend, 
+                              agg::scanline_p8& sl, 
+                              const DoublePoint& nodePos,
+                              double lineWidth, 
+                              color_type color ) const
 {
-    QPoint leftPnt, rightPnt;
+    DoublePoint leftPnt, rightPnt;
 
     if ( getFixation() == FixationByX )
     {
-        leftPnt.setX ( nodePos.x() - 4 );
-        leftPnt.setY ( nodePos.y() - 8 );
-        rightPnt.setX ( nodePos.x() - 4 );
-        rightPnt.setY ( nodePos.y() + 8 );
-        drawLine ( ras, solidRend, sl, leftPnt, rightPnt, lineWidth, color );
+        leftPnt.setX( nodePos.x() - 4 );
+        leftPnt.setY( nodePos.y() - 8 );
+        rightPnt.setX( nodePos.x() - 4 );
+        rightPnt.setY( nodePos.y() + 8 );
+        drawLine( ras, solidRend, sl, leftPnt, rightPnt, lineWidth, color );
     
-        leftPnt.setX ( leftPnt.x() - 4 );
-        leftPnt.setY ( leftPnt.y() - 4 );
-        rightPnt.setX ( rightPnt.x() - 1 );
-        rightPnt.setY ( leftPnt.y() + 3 );
+        leftPnt.setX( leftPnt.x() - 4 );
+        leftPnt.setY( leftPnt.y() - 4 );
+        rightPnt.setX( rightPnt.x() - 1 );
+        rightPnt.setY( leftPnt.y() + 3 );
         uint i;
         for ( i = 0; i < 4; i++ )
         {
-            rightPnt.setY ( rightPnt.y() + 4 );
-            leftPnt.setY ( leftPnt.y() + 4 );
-            drawLine ( ras, solidRend, sl, leftPnt, rightPnt, 
-                       lineWidth - 1, color );
+            rightPnt.setY( rightPnt.y() + 4 );
+            leftPnt.setY( leftPnt.y() + 4 );
+            drawLine( ras, solidRend, sl, leftPnt, rightPnt, 
+                      lineWidth - 1, color );
         }
     }
 
     if ( getFixation() == FixationByY )
     {
-        leftPnt.setX ( nodePos.x() - 8 );
-        leftPnt.setY ( nodePos.y() + 4 );
-        rightPnt.setX ( nodePos.x() + 9 );
-        rightPnt.setY ( nodePos.y() + 4 );
-        drawLine ( ras, solidRend, sl, leftPnt, rightPnt, lineWidth, color );
+        leftPnt.setX( nodePos.x() - 8 );
+        leftPnt.setY( nodePos.y() + 4 );
+        rightPnt.setX( nodePos.x() + 9 );
+        rightPnt.setY( nodePos.y() + 4 );
+        drawLine( ras, solidRend, sl, leftPnt, rightPnt, lineWidth, color );
     
-        leftPnt.setX ( nodePos.x() - 11 );
-        leftPnt.setY ( nodePos.y() + 8 );
-        rightPnt.setX ( nodePos.x() - 8 );
-        rightPnt.setY ( nodePos.y() + 5 );
+        leftPnt.setX( nodePos.x() - 11 );
+        leftPnt.setY( nodePos.y() + 8 );
+        rightPnt.setX( nodePos.x() - 8 );
+        rightPnt.setY( nodePos.y() + 5 );
         uint i;
         for ( i = 0; i < 4; i++ )
         {
-            rightPnt.setX ( rightPnt.x() + 4 );
-            leftPnt.setX ( leftPnt.x() + 4 );
-            drawLine ( ras, solidRend, sl, leftPnt, 
-                       rightPnt, lineWidth - 1, color );
+            rightPnt.setX( rightPnt.x() + 4 );
+            leftPnt.setX( leftPnt.x() + 4 );
+            drawLine( ras, solidRend, sl, leftPnt, 
+                      rightPnt, lineWidth - 1, color );
         }
     }
 
     if ( getFixation() == FixationByXY )
     {
-        leftPnt.setX ( nodePos.x() - 4 );
-        leftPnt.setY ( nodePos.y() + 9 );
-        rightPnt.setX ( nodePos.x() + 4 );
-        rightPnt.setY ( nodePos.y() + 9 );
-        drawLine ( ras, solidRend, sl, nodePos, leftPnt, lineWidth, color );
-        drawLine ( ras, solidRend, sl, nodePos, rightPnt, lineWidth, color );
+        leftPnt.setX( nodePos.x() - 4 );
+        leftPnt.setY( nodePos.y() + 9 );
+        rightPnt.setX( nodePos.x() + 4 );
+        rightPnt.setY( nodePos.y() + 9 );
+        drawLine( ras, solidRend, sl, nodePos, leftPnt, lineWidth, color );
+        drawLine( ras, solidRend, sl, nodePos, rightPnt, lineWidth, color );
     
-        leftPnt.setX ( leftPnt.x() - 4 );
-        rightPnt.setX ( rightPnt.x() + 5 );
-        drawLine ( ras, solidRend, sl, leftPnt, rightPnt, lineWidth, color );
+        leftPnt.setX( leftPnt.x() - 4 );
+        rightPnt.setX( rightPnt.x() + 5 );
+        drawLine( ras, solidRend, sl, leftPnt, rightPnt, lineWidth, color );
 
-        rightPnt.setX ( leftPnt.x() );
-        rightPnt.setY ( leftPnt.y() );
-        leftPnt.setX ( leftPnt.x() - 4 );
-        leftPnt.setY ( leftPnt.y() + 4 );
+        rightPnt.setX( leftPnt.x() );
+        rightPnt.setY( leftPnt.y() );
+        leftPnt.setX( leftPnt.x() - 4 );
+        leftPnt.setY( leftPnt.y() + 4 );
         uint i;
         for ( i = 0; i < 4; i++ )
         {
-            rightPnt.setX ( rightPnt.x() + 4 );
-            leftPnt.setX ( leftPnt.x() + 4 );
-            drawLine ( ras, solidRend, sl, leftPnt, 
-                       rightPnt, lineWidth - 1, color );
+            rightPnt.setX( rightPnt.x() + 4 );
+            leftPnt.setX( leftPnt.x() + 4 );
+            drawLine( ras, solidRend, sl, leftPnt, 
+                      rightPnt, lineWidth - 1, color );
         }
     }
 }
@@ -192,21 +192,18 @@ void TrussNode::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
         return;
 
     const DoublePoint& nodeCoord = getPoint();
-    QPoint nodePos;
-    nodePos.setX( int( nodeCoord.x() * scaleMult.x() ) + 
-                  Global::trussBufIndent );
-    nodePos.setY( Global::flipY ? 
-                     int( ( trussAreaHeight - nodeCoord.y() ) * 
-                          scaleMult.y() ) + Global::trussBufIndent : 
-                     int( nodeCoord.y() * 
-                          scaleMult.y() + Global::trussBufIndent ) );
+    DoublePoint nodePos;
+    nodePos.setX( nodeCoord.x() * scaleMult.x() + Global::trussBufIndent );
+    nodePos.setY( Global::flipY ? ( trussAreaHeight - nodeCoord.y() ) * 
+                  scaleMult.y() + Global::trussBufIndent : nodeCoord.y() * 
+                  scaleMult.y() + Global::trussBufIndent );
 
     solidRenderer solidRend ( baseRend );
     scanline_rasterizer ras;
     agg::scanline_p8 sl;
     agg::ellipse ell;
 
-    int highlightKoeff = 0;
+    double highlightKoeff = 0;
     if ( isHighlighted () )
     {
         highlightKoeff = 1;
@@ -214,11 +211,11 @@ void TrussNode::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
 
     //  draw node' outline
     solidRend.color ( agg::rgba(10, 10, 10) );
-    ell.init ( nodePos.x(), nodePos.y(), 
-               Global::nodesRadius + highlightKoeff + 1, 
-               Global::nodesRadius + highlightKoeff + 1, 16 );
-    ras.add_path ( ell );
-    agg::render_scanlines ( ras, sl, solidRend );
+    ell.init( nodePos.x(), nodePos.y(), 
+              Global::nodesRadius + highlightKoeff + 1.0, 
+              Global::nodesRadius + highlightKoeff + 1.0, 16 );
+    ras.add_path( ell );
+    agg::render_scanlines( ras, sl, solidRend );
 
     //  draw fixation
     if ( getFixation () )
@@ -227,26 +224,26 @@ void TrussNode::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
     if ( isHighlighted () )
     {
         // draw translucent highlight
-        solidRend.color ( agg::rgba(200, 135, 15, 0.6) );
-        ell.init ( nodePos.x(), nodePos.y(), Global::nodesRadius + 5, 
-                                             Global::nodesRadius + 5, 16 );
-        ras.add_path ( ell );
-        agg::render_scanlines ( ras, sl, solidRend );
+        solidRend.color( agg::rgba(200, 135, 15, 0.6) );
+        ell.init( nodePos.x(), nodePos.y(), Global::nodesRadius + 5, 
+                                            Global::nodesRadius + 5, 16 );
+        ras.add_path( ell );
+        agg::render_scanlines( ras, sl, solidRend );
     }
 
     //  draw node
     agg::trans_affine mtx;
-    mtx *= agg::trans_affine_scaling ( 1 / 2.0 );
-    mtx *= agg::trans_affine_translation ( nodePos.x(), nodePos.y() );
-    mtx.invert ();
+    mtx *= agg::trans_affine_scaling( 1 / 2.0 );
+    mtx *= agg::trans_affine_translation( nodePos.x(), nodePos.y() );
+    mtx.invert();
     color_array_type gradColors;
     radial_gradient gradFunc;
 
     if ( getFixation() == Unfixed )
     {
-        color_type begin ( 255, 255, 255 ); 
-        color_type middle ( 230, 200, 195 ); 
-        color_type end ( 130 - highlightKoeff * 100, 
+        color_type begin( 255, 255, 255 ); 
+        color_type middle( 230, 200, 195 ); 
+        color_type end( 130 - highlightKoeff * 100, 
                         90 - highlightKoeff * 60, 
                         70 - highlightKoeff * 50 );
         fillColorArray( gradColors, begin, middle, end );
@@ -256,9 +253,9 @@ void TrussNode::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
     }
     else 
     {
-        color_type begin ( 255, 255, 255 ); 
-        color_type middle ( 80, 100, 195 ); 
-        color_type end ( 0, 0, 80 );
+        color_type begin( 255, 255, 255 ); 
+        color_type middle( 80, 100, 195 ); 
+        color_type end( 0, 0, 80 );
         fillColorArray( gradColors, begin, middle, end );
         drawGradientEllipse( baseRend, ras, sl, gradFunc, gradColors, 
                              mtx, nodePos.x(), nodePos.y(), 

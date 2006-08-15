@@ -65,7 +65,7 @@ void TrussUnitWindowItem::fillPopup ( QMenu* popup )
         FermaNextWorkspace& wsp = project.getWorkspace();    
         PluginManager& plgManager = wsp.pluginManager();
         PluginList plugins = plgManager.loadedPluginsOfType( "calculation.*" );
-
+/*
         if ( isSelectedInGroup() ) {
             popup->addAction( QIcon(Global::imagesPath() + "/unselect.png"),
                               "Unselect", this, SLOT(unselectFromGroup()) );
@@ -73,13 +73,15 @@ void TrussUnitWindowItem::fillPopup ( QMenu* popup )
             popup->addAction( QIcon(Global::imagesPath() + "/select.png"),
                               "Select", this, SLOT(selectInGroup()) );
         }
+        
         popup->addSeparator();
         popup->addAction( QIcon(Global::imagesPath() + "/select.png"),
                           "Select All", this, SLOT(selectAllInGroup()) );
         popup->addAction( QIcon(Global::imagesPath() + "/unselect.png"),
                           "Unselect All", this, SLOT(unselectAllFromGroup()));
+                          
         popup->addSeparator();
-
+*/
         if ( plugins.size() == 0 ) {
             QAction* calcAction = popup->addAction( QIcon(Global::imagesPath()
                                                           + "/calculate.png"),
@@ -102,9 +104,12 @@ void TrussUnitWindowItem::fillPopup ( QMenu* popup )
         }
 
         popup->addSeparator();
+        popup->addAction( QIcon(Global::imagesPath() + "/show_results.png"),
+                          "Show results", this, SLOT(showResults()) );
+
+        popup->addSeparator();
         popup->addAction( QIcon(Global::imagesPath() + "/delete.png"),
                           "Remove", this, SLOT(remove()) );
-        popup->addSeparator();
 
         popup->addAction( QIcon(Global::imagesPath() + "/hide.png"),
                           "Hide", this, SLOT(hide()) );
@@ -247,15 +252,20 @@ void TrussUnitWindowItem::executePlugin ( Plugin* plugin )
 
 void TrussUnitWindowItem::remove ()
 {
-    if ( QMessageBox::question( 0, tr("Truss unit deleting - \"%1\"").
-                                  arg(trussWindow.getTrussName()),
-                                tr("Delete truss window?"),
+    if ( QMessageBox::question( 0, tr("Truss unit deleting"),
+                                tr("Delete truss \"%1\"?").
+                                arg(trussWindow.getTrussName()),
                                 tr("&Yes"), tr("&No"),
                                 QString::null, 0, 1 ) ) {
         return;
     }
     // Remove truss window
     trussWindow.desist();
+}
+
+void TrussUnitWindowItem::showResults ()
+{
+    emit onShowTrussResults( trussWindow );
 }
 
 /*****************************************************************************
@@ -266,9 +276,13 @@ WindowListBox::WindowListBox ( FermaNextProject& prj, QWidget* parent ) :
     QListWidget( parent ),
     project(prj)
 {
-    // Catch double click on item
+    // Catch single click on item
     QObject::connect( this, SIGNAL(itemSelectionChanged()),
-                      SLOT(raiseSelectedWindowItem()) );
+                              SLOT(raiseSelectedWindowItem()) );
+
+    // Catch double click on item
+    QObject::connect( this, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
+                              SLOT(checkAfterDoubleClick(QListWidgetItem*)) );
 
     // Catch focus changes
     TrussDesignerWidget& w = prj.getDesignerWidget();
@@ -324,6 +338,9 @@ void WindowListBox::addTrussUnitWindow ( TrussUnitWindow& truss )
     windowItems[&truss] = iitem;
     // Set selected newbie
     setItemSelected( item, true );
+
+    QObject::connect( item, SIGNAL(onShowTrussResults(const TrussUnitWindow&)),
+                            SIGNAL(onShowTrussResults(const TrussUnitWindow&)) );
 }
 
 void WindowListBox::removeTrussUnitWindow ( TrussUnitWindow& truss )
@@ -360,6 +377,25 @@ void WindowListBox::raiseSelectedWindowItem ()
         item.raise();
     }
     catch ( ... ) { return; }
+}
+
+void WindowListBox::checkAfterDoubleClick ( QListWidgetItem* i )
+{
+    TrussUnitWindowItem* item = dynamic_cast<TrussUnitWindowItem*>( i );
+    if ( item )
+        item->showResults();
+}
+
+void WindowListBox::solveTrussUnit ( const TrussUnitWindow& truss )
+{
+    TrussUnitWindowItem* item = findByTrussUnitWindow( truss );
+    if ( ! item )
+        return;
+    
+    PluginManager& plgManager = project.getWorkspace().pluginManager();
+    PluginList plugins = plgManager.loadedPluginsOfType( "calculation.*" );
+    foreach ( Plugin* plugin, plugins )
+        item->executePlugin( plugin );
 }
 
 void WindowListBox::trussWindowDesisted ( const TrussUnitWindow& truss )

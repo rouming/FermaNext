@@ -762,6 +762,23 @@ void TrussDesignerWidget::aggPaintEvent ( QPaintEvent* )
     base_renderer baseRend ( pixf );
     solid_renderer solidRend ( baseRend );
     baseRend.clear ( agg::rgba( 10, 10, 10 ) );
+    /*
+    color_array_type gradColors;
+    scanline_rasterizer ras;
+    agg::scanline_p8 sl;
+    fillColorArray ( gradColors, agg::rgba( 1, 1, 1 ), 
+                     agg::rgba( 10, 10, 10 ), agg::rgba( 30, 30, 30 ) );
+    gradient_span_alloc gradSpan;
+    linear_gradient gradFunc;
+    agg::trans_affine mtx;
+    interpolator inter ( mtx );
+    linear_gradient_span_gen gradSpanGen( gradSpan, inter, gradFunc, 
+                                          gradColors, 0, height() );
+    GradientRenderer gradRend( baseRend, gradSpanGen );
+    agg::rounded_rect background( 0, 0, width(), height(), 0 );
+    ras.add_path( background );
+    agg::render_scanlines( ras, sl, gradRend );
+    */
     WindowListIter iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter ) {
         TrussUnitWindow* w = *iter;
@@ -781,7 +798,7 @@ void TrussDesignerWidget::aggResizeEvent ( QResizeEvent* )
         if ( w->isAlive() && w->isMaximized() )
             w->maximize( false );
     }
-    toolBar->changeCenterPosition ( QPoint( width()/2, height() ) );
+    toolBar->changeCenterPosition ( QPoint( width()/2, height() + 2 ) );
     aggHint->renewWidgetSize ( size() );
 }
 
@@ -994,21 +1011,23 @@ void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         int bottom = top + selectedWindow->getWindowSize().height();
 
 	    // snap window to screen edges
+        int vertOffset = 0,
+            horOffset = 1;
+
 	    if ( top < Global::snapPixels && top > -Global::snapPixels )
 		    leftTop.setY( 0 );
 
 	    if ( left < Global::snapPixels && left > -Global::snapPixels)
-		    leftTop.setX( 0 );
+		    leftTop.setX( 0 - horOffset );
 
-        int widgetOffset = 4;
-	    if ( right < width() - widgetOffset + Global::snapPixels && 
-             right > width() - widgetOffset - Global::snapPixels )
-		    leftTop.setX( width() - 4 - 
+	    if ( right < width() - horOffset + Global::snapPixels && 
+             right > width() - horOffset - Global::snapPixels )
+		    leftTop.setX( width() - horOffset - 
                           selectedWindow->getWindowSize().width() );
 
-	    if ( bottom < height() - widgetOffset + Global::snapPixels && 
-             bottom > height() - widgetOffset - Global::snapPixels )
-		    leftTop.setY( height() - widgetOffset - 
+	    if ( bottom < height() - vertOffset + Global::snapPixels && 
+             bottom > height() - vertOffset - Global::snapPixels )
+		    leftTop.setY( height() - vertOffset - 
                           selectedWindow->getWindowSize().width() );
 
         selectedWindow->setWindowPosition( leftTop );
@@ -1171,6 +1190,7 @@ void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
             }
         }
     }
+    emit cursorMoved();
 }
 
 void TrussDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )

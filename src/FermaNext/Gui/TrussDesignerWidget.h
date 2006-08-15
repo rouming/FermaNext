@@ -133,6 +133,10 @@ public:
     void aggCtrlChangedEvent ( const agg::ctrl* );
 
 signals:
+    void cursorMoved ();
+    void onHintChange ( const QString& );
+
+    // Tool bar signals
     void pressSelectButton ();
     void pressNodeDrawButton ();
     void pressPivotDrawButton ();

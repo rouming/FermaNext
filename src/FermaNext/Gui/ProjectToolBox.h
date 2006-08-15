@@ -38,13 +38,23 @@ public slots:
     virtual void newTrussIsPressed ();
     virtual void calculateAllIsPressed ();
 
+    virtual void afterTrussCountChange ();
+    virtual void afterTrussVisibilityChange ();
+
+signals:
+    void onShowTrussResults ( const TrussUnitWindow& );
+    void calculateTrussUnit ( const TrussUnitWindow& );
+
 private:
     typedef QMap<FermaNextProject*, QWidget*> ProjectMap;
     typedef QMap<FermaNextProject*, QWidget*>::iterator ProjectMapIter;
 
     ProjectMap projects;
     FermaNextProject* currentPrj;
-    FermaNextWorkspace& workspace;    
+    FermaNextWorkspace& workspace;
+    
+    // project info labels
+    QLabel *tokLabel, *trussNumberLabel, *trussHiddenLabel;
 };
 
 #endif //PROJECTTOOLBOX_H

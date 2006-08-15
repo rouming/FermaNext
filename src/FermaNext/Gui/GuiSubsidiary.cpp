@@ -152,4 +152,21 @@ QValidator::State RangeValidator::validate ( QString& input, int& pos ) const
     return s;
 }
 
+/*****************************************************************************
+ * Docked Widget
+ *****************************************************************************/
+
+DockedWidget::DockedWidget( const QString& title, 
+                            QWidget* parent /* = 0 */, 
+                            Qt::WFlags flags /* = 0 */ ) :
+    QDockWidget( title, parent, flags )
+{}
+
+QSize DockedWidget::sizeHint () const
+{
+    QSize size = QDockWidget::sizeHint(); 
+    size.setWidth( 145 ); 
+    return size;
+}
+
 /***************************************************************************/

@@ -12,8 +12,12 @@
 //#include "CalcDataToolBar.h"
 
 class FermaNextWorkspace;
+class TrussSolutionResults;
+class TrussUnitWindow;
+class TrussUnitCopy;
 class QStackedWidget;
 class QTabWidget;
+class QFrame;
 
 class FermaNextProject : public QObject, public XMLSerializableObject
 {
@@ -54,6 +58,9 @@ public:
 
     virtual TrussMaterialLibrary& getMaterialLibrary () const;
 
+    virtual TrussSolutionResults* getResultsForTrussUnit ( 
+                                         const TrussUnit& ) const;
+
 protected:
     // XML serialization
     virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
@@ -61,10 +68,18 @@ protected:
 
     virtual void setProjectFileName ( const QString& );
 
+public slots:
+    virtual void addSolutionResults ( TrussSolutionResults& );
+    virtual void removeSolutionResults ( TrussUnitWindow& );
+
 signals:
     void onActivate ( FermaNextProject& );
     void onNameChange ( const QString& );
     void onProjectFileNameChange ( const QString& );
+
+    void tabWasChanged ( int );
+    void afterTrussCreation ();
+    void afterTrussRemoval ();
   
 private:
     friend class FermaNextWorkspace;
@@ -74,17 +89,20 @@ private:
                        QStackedWidget* parent = 0 );
 
 private:
+    typedef QList<TrussSolutionResults*> TrussResultsList;
+    typedef TrussResultsList::const_iterator TrussResultsListConstIter;
+
     FermaNextWorkspace& currentWorkspace;
     QString name;
     QString projectFileName;
     QStackedWidget* stackedWidget;
 // FIXME QT3TO4:
 //    CalcDataToolBar* calcDataToolBar;
-    QTabWidget* projectTab;
-    QWidget* justStrengthAnalisysWidget;
+    QFrame* projectWidget;
     TrussDesignerWidget* designerWidget;
     TrussMaterialLibrary* materialLibrary;
     TrussUnitWindowManager* trussWindowManager;
+    TrussResultsList trussResults;
 };
 
 #endif //FERMANEXTPROJECT_H
