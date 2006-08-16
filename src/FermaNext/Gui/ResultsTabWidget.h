@@ -11,6 +11,7 @@
 #include "TrussDeformPicture.h"
 #include "TrussSolutionResults.h"
 
+class QWheelEvent;
 class QScrollArea;
 class HtmlPropertyTable;
 class HtmlStressTable;
@@ -18,7 +19,7 @@ class HtmlDisplacementTable;
 
 /*****************************************************************************/
 
-class ResultsTab : public QFrame
+class ResultsTab : public QWidget
 {
 public:
     ResultsTab ( QWidget* parent = 0, Qt::WFlags f = 0 );

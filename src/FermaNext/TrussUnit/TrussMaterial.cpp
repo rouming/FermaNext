@@ -329,7 +329,7 @@ void TrussMaterialLibrary::clean ()
 {
     TrussMaterialListIter iter = materials.begin();
     for ( ; iter != materials.end(); ++iter )
-        materials.erase(iter);
+        delete *iter;
     materials.clear();
 }
 

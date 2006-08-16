@@ -9,6 +9,7 @@
 #include "TrussUnitCopy.h"
 
 class PluginResults;
+class QWheelEvent;
 
 /*****************************************************************************/
 
@@ -52,6 +53,7 @@ protected:
     virtual void addRow ( const HtmlTableCellList& );
     virtual void fillTable () = 0;
     virtual void resizeRootTable ( int width, int height = -1 );
+    virtual void wheelEvent( QWheelEvent * );
 
 private:
     QDomDocument htmlDoc;
