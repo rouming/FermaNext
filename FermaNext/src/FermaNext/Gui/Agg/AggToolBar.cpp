@@ -180,7 +180,7 @@ void AggToolBar::removeButton ( AggToolBarButton& btn )
 
 void AggToolBar::removeButton ( int indx )
 {
-    if ( indx > buttons.size() )
+    if ( indx >= buttons.size() )
         return;
 
     removeButton( *buttons.at( indx ) );
@@ -188,7 +188,7 @@ void AggToolBar::removeButton ( int indx )
 
 AggToolBarButton* AggToolBar::getButton ( int indx ) const
 {
-    if ( indx > buttons.size() )
+    if ( indx >= buttons.size() )
         return 0;
 
     ButtonListConstIter iter = std::find( buttons.begin(),

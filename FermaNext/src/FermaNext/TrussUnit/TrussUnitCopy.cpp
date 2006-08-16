@@ -123,21 +123,17 @@ TrussUnitCopy::~TrussUnitCopy ()
 void TrussUnitCopy::clearNodes ()
 {
     TrussCopyNodeListIter iter = nodes.begin();
-    for ( ; iter != nodes.end(); ++iter ) {
-        TrussCopyNode* node = *iter;
-        nodes.erase( iter );
-        delete( node );
-    }        
+    for ( ; iter != nodes.end(); ++iter )
+        delete *iter;
+    nodes.clear();
 }
 
 void TrussUnitCopy::clearPivots ()
 {
     TrussCopyPivotListIter iter = pivots.begin();
-    for ( ; iter != pivots.end(); ++iter ) {
-        TrussCopyPivot* pivot = *iter;
-        pivots.erase( iter );
-        delete( pivot );
-    }        
+    for ( ; iter != pivots.end(); ++iter )
+        delete *iter;
+    pivots.clear();
 }
 
 DoubleSize TrussUnitCopy::getTrussAreaSize () const
@@ -230,6 +226,7 @@ void TrussUnitCopy::loadResults ( const LoadCaseResults& res )
     else
         emit stressLoaded( false );
     loadStresses( res );
+    emit stateIsChanged();
 }
 
 void TrussUnitCopy::loadDisplacements ( const LoadCaseResults& res )
@@ -287,6 +284,7 @@ void TrussUnitCopy::restoreNodesBasePosition ()
         TrussCopyNode* node = *iter;
         node->setCurrentCoord( node->getBaseCoord() );
     }
+    emit stateIsChanged();
 }
 
 /*****************************************************************************/

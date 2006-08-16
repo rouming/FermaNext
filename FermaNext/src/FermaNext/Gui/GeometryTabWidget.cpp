@@ -108,9 +108,9 @@ QWidget* NodeTableDelegate::createEditor ( QWidget *parent,
         validator->setRange( 0.0, areaSize.width() );
     else
         validator->setRange( 0.0, areaSize.height() );
-    validator->setDecimals( 4 );
+    validator->setDecimals( 2 );
     editor->setValidator( validator );
-    editor->setMaxLength( 8 );
+    editor->setMaxLength( 6 );
     return editor;
 }
 

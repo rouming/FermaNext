@@ -18,7 +18,7 @@ LoadCaseResults::~LoadCaseResults ()
 
 DoublePoint LoadCaseResults::getDisplacement( int indx, bool* valid ) const
 {
-    if ( displacements.empty() || indx < 0 || indx > displacements.size() ) {
+    if ( displacements.empty() || indx < 0 || indx >= displacements.size() ) {
         *valid = false;
         return DoublePoint( 0, 0 );
     }
@@ -28,7 +28,7 @@ DoublePoint LoadCaseResults::getDisplacement( int indx, bool* valid ) const
 
 double LoadCaseResults::getStress( int indx, bool* valid ) const
 {
-    if ( stresses.empty() || indx < 0 || indx > displacements.size() ) {
+    if ( stresses.empty() || indx < 0 || indx >= displacements.size() ) {
         *valid = false;
         return 0;
     }
@@ -48,7 +48,7 @@ void LoadCaseResults::addStress ( double stress, int indx )
 
 void LoadCaseResults::removeDisplacement ( int indx )
 {
-    if ( displacements.empty() || indx < 0 || indx > displacements.size() )
+    if ( displacements.empty() || indx < 0 || indx >= displacements.size() )
         return;
 
     displacements.removeAt( indx );
@@ -56,7 +56,7 @@ void LoadCaseResults::removeDisplacement ( int indx )
 
 void LoadCaseResults::removeStress ( int indx )
 {
-    if ( stresses.empty() || indx < 0 || indx > stresses.size() )
+    if ( stresses.empty() || indx < 0 || indx >= stresses.size() )
         return;
 
     stresses.removeAt( indx );
@@ -76,7 +76,7 @@ void LoadCaseResults::clean ()
 {
     DispListIter iter = displacements.begin();
     for ( ; iter != displacements.end(); ++iter )
-        displacements.erase(iter);
+        delete *iter;
     displacements.clear();
 }
 
@@ -136,7 +136,7 @@ void PluginResults::clean ()
 {
     LoadCaseResultsListIter iter = loadCaseResults.begin();
     for ( ; iter != loadCaseResults.end(); ++iter )
-        loadCaseResults.erase(iter);
+        delete *iter;
     loadCaseResults.clear();
 }
 
@@ -191,7 +191,7 @@ TrussUnitCopy& TrussSolutionResults::getTrussUnitCopy () const
 
 const PluginResults* TrussSolutionResults::getPluginResults( int indx ) const
 {
-    if ( indx > pluginResults.size() )
+    if ( indx >= pluginResults.size() )
         return 0;
 
     try {
@@ -211,7 +211,7 @@ void TrussSolutionResults::clean ()
 {
     PluginResultsListIter iter = pluginResults.begin();
     for ( ; iter != pluginResults.end(); ++iter )
-        pluginResults.erase( iter );
+        delete *iter;
     pluginResults.clear();
 }
 

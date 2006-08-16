@@ -2,6 +2,7 @@
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QScrollArea>
+#include <QWheelEvent>
 
 #include "ResultsTabWidget.h"
 #include "HtmlTable.h"
@@ -13,7 +14,7 @@
  *****************************************************************************/
 
 ResultsTab::ResultsTab ( QWidget* parent /* = 0 */, Qt::WFlags f /* = 0 */ ) :
-    QFrame( parent, f ),
+    QWidget( parent, f ),
     parentWidget( 0 ),
     deformWidget( 0 ),
     propertyTable( 0 ),
@@ -25,7 +26,6 @@ ResultsTab::ResultsTab ( QWidget* parent /* = 0 */, Qt::WFlags f /* = 0 */ ) :
 
 void ResultsTab::init ()
 {
-    setFrameStyle( QFrame::NoFrame );
     ctrlWidget.setFixedHeight( 140 );
     colorCtrl.setFixedWidth( 70 );
 
@@ -94,7 +94,7 @@ void ResultsTab::fillTab( const PluginResults& pluginResults,
                              arg( trussCopy.countNodes() ).
                              arg( trussCopy.countPivots() ).
                              arg( trussCopy.countLoadCases() ).
-                             arg( 1 ).
+                             arg( trussCopy.countMaterials() ).
                              arg( "unknown" ).
                              arg( "unknown" ).
                              arg( "unknown" ).
@@ -109,7 +109,7 @@ void ResultsTab::fillTab( const PluginResults& pluginResults,
     ctrlWidget.fillLoadCaseComboBox( trussCopy.countLoadCases() );
     ctrlWidget.initControlsState();
 }
-
+    
 /*****************************************************************************
  * Results Tab Widget
  *****************************************************************************/

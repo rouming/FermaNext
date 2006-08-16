@@ -1,5 +1,6 @@
 
 #include <QStringList>
+#include <QWheelEvent>
 
 #include "Geometry.h"
 #include "HtmlTable.h"
@@ -98,10 +99,11 @@ void HtmlTable::clearData ()
     for ( uint i = 0; i < numb; ++i ) {
         QDomNode elem = childTable.firstChild();
         childTable.removeChild( elem );
-        // for some reason next line doesn't work
-        // childTable.removeChild( rows.item( i ) );
     }
 }
+
+void HtmlTable::wheelEvent ( QWheelEvent* )
+{}
 
 /*****************************************************************************
  * HTML Property Table
