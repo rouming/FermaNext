@@ -161,7 +161,8 @@ public slots:
     virtual void changeBehaviourToFixDraw ();
     virtual void changeBehaviourToLoadDraw ();
     virtual void changeBehaviourToErase ();
-
+    virtual void setToolBarAnimStatus ( bool );
+    
 protected slots:
     // Life-time and visibility changes
     virtual void trussWindowChangedVisibility ( bool );
@@ -204,7 +205,7 @@ private:
     TrussPivotBehaviour pivotBehaviour;
     DesignerBehaviour designerBehaviour;
     // Subsidiary vars
-    bool buttonPressed;
+    bool buttonPressed, animationPlays;
     int xPos, yPos;
     QPoint firstNodeClickDist, lastNodeClickDist, mouseOffset;
     // Undo/Redo

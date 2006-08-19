@@ -283,7 +283,7 @@ void AggToolBar::setPosition ( QPoint newPos )
     if ( toolBarLeftTopPos == newPos )
         return;
     toolBarLeftTopPos = newPos;
-   // emit onChangeToolBarState ();
+    emit onChangeToolBarState ();
 }
 
 void AggToolBar::changeCenterPosition ( QPoint pos )

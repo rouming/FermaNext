@@ -1,5 +1,7 @@
 
+#include <QBasicTimer>
 #include <QTimer>
+#include <QApplication>
 
 #include "AggTrussToolBar.h"
 
@@ -64,7 +66,9 @@ AggTrussToolBar::AggTrussToolBar  ( QPoint pos, int bordLeft, int bordRight,
     currentHintedButton( 0 ),
     hideButton( 0 ),
     thread( new AggPaintThread( *widget ) ),
-    timer( new QTimer( this ) ),
+    hintTimer( new QTimer( this ) ),
+    animTimer( new QBasicTimer ),
+    designerWidget( *widget ),
     // gradient colors
     barFirstColor( agg::rgba( 35, 50, 60, 0.8 ) ),
     barMiddleColor( agg::rgba( 20, 60, 80, 0.8 ) ),
@@ -74,13 +78,10 @@ AggTrussToolBar::AggTrussToolBar  ( QPoint pos, int bordLeft, int bordRight,
     thread->setFrameDelayMsec( 1 );
     thread->setFrameRate( Global::pixHideNumb );
 
-    QObject::connect( thread, SIGNAL( onAnimationRun() ),
-                      SLOT( moveToolBar() ) );
-
-    QObject::connect( timer, SIGNAL( timeout() ),
+    QObject::connect( hintTimer, SIGNAL( timeout() ),
                       SLOT( setToolBarHinted() ) );
 
-    QObject::connect( timer, SIGNAL( timeout() ),
+    QObject::connect( hintTimer, SIGNAL( timeout() ),
                       widget, SLOT( update() ) );
 }
 
@@ -89,7 +90,8 @@ AggTrussToolBar::~AggTrussToolBar ()
     if ( thread->isRunning() )
         thread->wait();
     delete thread;
-    delete timer;
+    delete hintTimer;
+    delete animTimer;
     delete hideButton;
 }
 
@@ -137,44 +139,58 @@ void AggTrussToolBar::initHideButton ()
 
 void AggTrussToolBar::showToolBar ()
 {
+    if ( animTimer->isActive() )
+        animTimer->stop(); 
     removeButtonHighlight();
     enabled = false;
     pixNumb = getHeight() - hideButton->getHeight();
-    thread->setFramesNumber( pixNumb );
     setVisible ( true );
-    thread->start();
+    animTimer->start( 1, this );
+    emit onAnimationPlays( true );
 }
 
 void AggTrussToolBar::hideToolBar ()
 {
+    if ( animTimer->isActive() )
+        animTimer->stop();
     removeButtonHighlight();
     pixNumb = getHeight() - hideButton->getHeight();
-    thread->setFramesNumber( pixNumb );
     enabled = false;
-    thread->start();
+    animTimer->start( 1, this );
+    emit onAnimationPlays( true );
 }
 
-void AggTrussToolBar::moveToolBar ()
+void AggTrussToolBar::timerEvent ( QTimerEvent* )
 {
+    int indent = 2;
     QPoint pos = getPosition();
     if ( hideButton->isPressed() )
     {
         pixNumb -= Global::pixHideNumb;
-        pos.setY ( pos.y() + Global::pixHideNumb );
-        if ( pixNumb == Global::pixHideNumb )
+        pos.setY( pos.y() + Global::pixHideNumb );
+        if ( pixNumb <= 0 )
         {
-            setVisible ( false );
+            pos.setY( designerWidget.height() - 
+                      hideButton->getHeight() + indent );
+            animTimer->stop(); 
+            setVisible( false );
             enabled = true;
+            emit onAnimationPlays( false );
         }
     }
     else
     {
         pixNumb -= Global::pixHideNumb;
-        pos.setY ( pos.y() - Global::pixHideNumb );
-        if ( pixNumb == hideButton->getHeight() )
+        pos.setY( pos.y() - Global::pixHideNumb );
+        if ( pixNumb <= 0 ) {
+            pos.setY( designerWidget.height() - 
+                      getHeight() + indent );
+            animTimer->stop(); 
             enabled = true;
+            emit onAnimationPlays( false );
+        }
     }
-    setPosition ( pos );
+    setPosition( pos );
 }
 
 void AggTrussToolBar::setToolBarHinted ()
@@ -201,8 +217,8 @@ void AggTrussToolBar::removeButtonHighlight ()
 
 void AggTrussToolBar::clearButtonHint ()
 {
-    if ( timer->isActive() )
-        timer->stop();
+    if ( hintTimer->isActive() )
+        hintTimer->stop();
 
     if ( isHinted() )
     {
@@ -253,8 +269,8 @@ bool AggTrussToolBar::inToolBarRect ( int x, int y, bool bordCheck ) const
 
 void AggTrussToolBar::checkMouseMoveEvent ( int x, int y )
 {
-    if ( timer->isActive() )
-        timer->stop();
+    if ( hintTimer->isActive() )
+        hintTimer->stop();
 
     if ( ! enabled )
         return;
@@ -280,7 +296,7 @@ void AggTrussToolBar::checkMouseMoveEvent ( int x, int y )
         {
             currentHintedButton = button;
             hintCurrentPos = QPoint( x, y );
-            timer->start( 1000 );
+            hintTimer->start( 1000 );
         }
     }
     else

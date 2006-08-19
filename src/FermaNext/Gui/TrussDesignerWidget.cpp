@@ -226,6 +226,7 @@ TrussDesignerWidget::TrussDesignerWidget ( QWidget* p ) :
     nodeBehaviour(nodeIdle),
     pivotBehaviour(pivotIdle),
     buttonPressed(false),
+    animationPlays(false),
     xPos(0), yPos(0), 
     firstNodeClickDist(0,0), 
     lastNodeClickDist(0,0),
@@ -242,6 +243,9 @@ TrussDesignerWidget::TrussDesignerWidget ( QWidget* p ) :
 
     QObject::connect( toolBar, SIGNAL( onHintHides(bool) ),
                       aggHint, SLOT( hide(bool) ) );
+    
+    QObject::connect( toolBar, SIGNAL( onAnimationPlays(bool) ),
+                                 SLOT( setToolBarAnimStatus(bool) ) );
 
     QWidget::setFocus();
     QWidget::setMouseTracking( true );
@@ -402,6 +406,15 @@ void TrussDesignerWidget::changeBehaviourToLoadDraw ()
 void TrussDesignerWidget::changeBehaviourToErase ()
 {
     designerBehaviour = onErase;
+}
+
+void TrussDesignerWidget::setToolBarAnimStatus ( bool status )
+{
+    animationPlays = status;
+    if ( status )
+        QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+    else
+        QApplication::restoreOverrideCursor();
 }
 
 void TrussDesignerWidget::trussWindowChangedVisibility ( bool visible )
@@ -762,23 +775,6 @@ void TrussDesignerWidget::aggPaintEvent ( QPaintEvent* )
     base_renderer baseRend ( pixf );
     solid_renderer solidRend ( baseRend );
     baseRend.clear ( agg::rgba( 10, 10, 10 ) );
-    /*
-    color_array_type gradColors;
-    scanline_rasterizer ras;
-    agg::scanline_p8 sl;
-    fillColorArray ( gradColors, agg::rgba( 1, 1, 1 ), 
-                     agg::rgba( 10, 10, 10 ), agg::rgba( 30, 30, 30 ) );
-    gradient_span_alloc gradSpan;
-    linear_gradient gradFunc;
-    agg::trans_affine mtx;
-    interpolator inter ( mtx );
-    linear_gradient_span_gen gradSpanGen( gradSpan, inter, gradFunc, 
-                                          gradColors, 0, height() );
-    GradientRenderer gradRend( baseRend, gradSpanGen );
-    agg::rounded_rect background( 0, 0, width(), height(), 0 );
-    ras.add_path( background );
-    agg::render_scanlines( ras, sl, gradRend );
-    */
     WindowListIter iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter ) {
         TrussUnitWindow* w = *iter;
@@ -863,6 +859,9 @@ void TrussDesignerWidget::aggKeyPressEvent ( QKeyEvent* ke )
 
 void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
 {
+    if ( animationPlays )
+        qApp->processEvents( QEventLoop::ExcludeUserInputEvents );
+    
     int x = me->x();
     int y = Global::flipY ? height() - me->y() : me->y();
     /*  

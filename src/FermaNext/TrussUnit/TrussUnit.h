@@ -79,8 +79,8 @@ public:
     virtual void removeNodesHighlight ( const TrussNode* node1 = 0, 
                                         const TrussNode* node2 = 0 );
     virtual void removePivotsHighlight ( const TrussPivot* pivot = 0 );
-    virtual const TrussNode* getFocusedNode () const;
-    virtual const TrussPivot* getFocusedPivot () const;
+    virtual TrussNode* getFocusedNode () const;
+    virtual TrussPivot* getFocusedPivot () const;
 
     virtual DoublePoint getTrussCoordFromWidgetPos ( int x, int y ) const;
     virtual DoublePoint getTrussCoordFromWidgetPos ( QPoint pos ) const;

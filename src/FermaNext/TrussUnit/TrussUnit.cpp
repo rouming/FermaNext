@@ -432,7 +432,7 @@ void TrussUnit::removePivotsHighlight ( const TrussPivot* excPivot )
     }
 }
 
-const TrussNode* TrussUnit::getFocusedNode () const
+TrussNode* TrussUnit::getFocusedNode () const
 {
     NodeList nodeList = getNodeList();
     NodeListIter iter = nodeList.begin();
@@ -445,7 +445,7 @@ const TrussNode* TrussUnit::getFocusedNode () const
     return 0;
 }
 
-const TrussPivot* TrussUnit::getFocusedPivot () const
+TrussPivot* TrussUnit::getFocusedPivot () const
 {
     PivotList pivotList = getPivotList ();
     PivotListIter iter = pivotList.begin();

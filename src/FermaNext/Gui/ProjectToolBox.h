@@ -38,7 +38,7 @@ public slots:
     virtual void newTrussIsPressed ();
     virtual void calculateAllIsPressed ();
 
-    virtual void afterTrussCountChange ();
+    virtual void afterTrussCountChange ( TrussUnitWindow& );
     virtual void afterTrussVisibilityChange ();
 
 signals:

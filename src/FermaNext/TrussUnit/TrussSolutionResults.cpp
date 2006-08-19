@@ -16,34 +16,19 @@ LoadCaseResults::~LoadCaseResults ()
     clean();
 }
 
-DoublePoint LoadCaseResults::getDisplacement( int indx, bool* valid ) const
-{
-    if ( displacements.empty() || indx < 0 || indx >= displacements.size() ) {
-        *valid = false;
-        return DoublePoint( 0, 0 );
-    }
-    *valid = true;
-    return *displacements.at( indx );
-}
-
-double LoadCaseResults::getStress( int indx, bool* valid ) const
-{
-    if ( stresses.empty() || indx < 0 || indx >= displacements.size() ) {
-        *valid = false;
-        return 0;
-    }
-    *valid = true;
-    return stresses.at( indx );
-}
-
 void LoadCaseResults::addDisplacement ( double xDisp, double yDisp, int indx )
 {
     displacements.insert( indx, new DoublePoint( xDisp, yDisp) );
 }
 
-void LoadCaseResults::addStress ( double stress, int indx )
+DoublePoint LoadCaseResults::getDisplacement( int indx, bool& valid ) const
 {
-    stresses.insert( indx, stress );
+    if ( displacements.empty() || indx < 0 || indx >= displacements.size() ) {
+        valid = false;
+        return DoublePoint( 0, 0 );
+    }
+    valid = true;
+    return *displacements.at( indx );
 }
 
 void LoadCaseResults::removeDisplacement ( int indx )
@@ -54,12 +39,37 @@ void LoadCaseResults::removeDisplacement ( int indx )
     displacements.removeAt( indx );
 }
 
+void LoadCaseResults::addStress ( double stress, int indx )
+{
+    stresses.insert( indx, stress );
+}
+
+double LoadCaseResults::getStress( int indx, bool& valid ) const
+{
+    if ( stresses.empty() || indx < 0 || indx >= displacements.size() ) {
+        valid = false;
+        return 0;
+    }
+    valid = true;
+    return stresses.at( indx );
+}
+
 void LoadCaseResults::removeStress ( int indx )
 {
     if ( stresses.empty() || indx < 0 || indx >= stresses.size() )
         return;
 
     stresses.removeAt( indx );
+}
+
+void LoadCaseResults::setForceWeight ( double value )
+{
+    forceWeight = value;
+}
+
+double LoadCaseResults::getForceWeight () const
+{
+    return forceWeight;
 }
 
 int LoadCaseResults::countDisplacements () const
