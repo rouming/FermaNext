@@ -214,7 +214,7 @@ void HtmlStressTable::fillTable ()
                 cells.push_back( HtmlTableCell() );
             else {
                 bool valid;
-                double stress = res->getStress( i, &valid );
+                double stress = res->getStress( i, valid );
                 if ( valid )
                     cells.push_back( HtmlTableCell( 
                         QString::number( stress, 'e', 2 ), "", "right") );
@@ -305,7 +305,7 @@ void HtmlDisplacementTable::fillTable ()
                 cells.push_back( HtmlTableCell() );
             else {
                 bool valid;
-                DoublePoint disp = res->getDisplacement( i, &valid );
+                DoublePoint disp = res->getDisplacement( i, valid );
                 if ( valid ) 
                     cells.push_back( HtmlTableCell( 
                         QString::number( disp.x(), 'e', 2 ), "", "right") );
@@ -319,7 +319,7 @@ void HtmlDisplacementTable::fillTable ()
                 cells.push_back( HtmlTableCell() );
             else {
                 bool valid;
-                DoublePoint disp = res->getDisplacement( i, &valid );
+                DoublePoint disp = res->getDisplacement( i, valid );
                 if ( valid )
                     cells.push_back( HtmlTableCell( 
                         QString::number( disp.y(), 'e', 2 ), "", "right") );

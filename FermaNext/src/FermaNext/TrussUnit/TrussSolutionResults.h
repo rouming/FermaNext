@@ -25,14 +25,16 @@ public:
     LoadCaseResults ( int );
     ~LoadCaseResults ();
 
-    DoublePoint getDisplacement ( int, bool* ) const;
-    double getStress ( int, bool* ) const;
-
     void addDisplacement ( double, double, int );
-    void addStress ( double, int );
-    
+    DoublePoint getDisplacement ( int, bool& ) const;
     void removeDisplacement ( int );
+
+    void addStress ( double, int );
+    double getStress ( int, bool& ) const;
     void removeStress ( int );
+
+    void setForceWeight ( double );
+    double getForceWeight () const;
 
     int countDisplacements () const;
     int countStresses () const;
@@ -48,6 +50,7 @@ public:
 private:
     DispList displacements;
     StressList stresses;
+    double forceWeight;
     int loadCaseNumb;
 };
 

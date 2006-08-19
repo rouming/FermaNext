@@ -210,7 +210,6 @@ void TrussDeformPicture::switchLoadCaseResults ( int indx )
 
     trussCopy->loadResults( *loadCaseRes );
     emit loadCaseSwitched( *loadCaseRes );
-    update();
 }
 
 /*---------------------------- paint methods --------------------------------*/

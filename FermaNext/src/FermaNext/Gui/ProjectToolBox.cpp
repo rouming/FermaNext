@@ -58,11 +58,11 @@ int ProjectToolBox::addProject ( FermaNextProject& prj )
     // Catch truss count and visibility changing
     TrussUnitWindowManager& mng =  prj.getTrussUnitWindowManager();
     QObject::connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)),
-                            SLOT(afterTrussCountChange()) );
+                            SLOT(afterTrussCountChange(TrussUnitWindow&)) );
     QObject::connect( &mng, SIGNAL(onTrussUnitWindowRevive(TrussUnitWindow&)),
-                            SLOT(afterTrussCountChange()) );
+                            SLOT(afterTrussCountChange(TrussUnitWindow&)) );
     QObject::connect( &mng, SIGNAL(onTrussUnitWindowDesist(TrussUnitWindow&)),
-                            SLOT(afterTrussCountChange()) );
+                            SLOT(afterTrussCountChange(TrussUnitWindow&)) );
     QObject::connect( &mng, SIGNAL(onTrussWindowVisibilityChange(bool)),
                             SLOT(afterTrussVisibilityChange()) );
     
@@ -347,7 +347,7 @@ void ProjectToolBox::calculateAllIsPressed ()
     */
 }
 
-void ProjectToolBox::afterTrussCountChange ()
+void ProjectToolBox::afterTrussCountChange ( TrussUnitWindow& w)
 {
     TrussUnitWindowManager& mng = currentProject()->getTrussUnitWindowManager();
     if ( sender() != &mng )
@@ -355,6 +355,9 @@ void ProjectToolBox::afterTrussCountChange ()
 
     int numb = mng.getTrussUnitWindowList().size();
     trussNumberLabel->setText( QString::number(numb) );
+    if ( ! w.isVisible() )
+        afterTrussVisibilityChange();
+
 }
 
 void ProjectToolBox::afterTrussVisibilityChange ()

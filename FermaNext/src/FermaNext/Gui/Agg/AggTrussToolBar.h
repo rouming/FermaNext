@@ -5,6 +5,10 @@
 #include "AggToolBar.h"
 #include <QWidget>
 
+class QBasicTimer;
+
+/*****************************************************************************/
+
 class AggToolBarHideButton : public AggButton
 {
 public:
@@ -48,11 +52,11 @@ public:
 signals:
     void onHintShowsUp ( const QString& hint, const QPoint pos, bool smooth );
     void onHintHides ( bool smooth );
+    void onAnimationPlays ( bool );
 
 protected slots:
     void hideToolBar ();
     void showToolBar ();
-    void moveToolBar ();
     void setToolBarHinted ();
 
 protected:
@@ -62,6 +66,7 @@ protected:
     virtual void removeButtonHighlight ();
     virtual AggButton* getSelectedButton ( int x, int y ) const;
     virtual void clearButtonHint ();
+    virtual void timerEvent ( QTimerEvent* );
     virtual void drawButtons ( ren_dynarow& baseRend, 
                                scanline_rasterizer& ras,
                                agg::scanline_p8& sl, 
@@ -74,7 +79,9 @@ private:
     AggButton* currentHintedButton;
     AggToolBarHideButton* hideButton;
     AggPaintThread* thread;
-    QTimer* timer;
+    QTimer *hintTimer;
+    QBasicTimer *animTimer;
+    const QWidget& designerWidget;
     color_type barFirstColor, barMiddleColor, 
                barLastColor, selectionColor;
 };

@@ -137,6 +137,8 @@ void ResultsControlWidget::aggCtrlChangedEvent ( const agg::ctrl* aggCtrl )
 
 void ResultsControlWidget::setDeformSliderEnabled ( bool status )
 {
+    if ( ! deformAllowed && status )
+        deformSlider.value( 1 );
     deformAllowed = status;
     deformCbState = deformCheckBox.status();
     update();

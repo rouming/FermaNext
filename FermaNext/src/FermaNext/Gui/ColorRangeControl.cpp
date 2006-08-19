@@ -154,7 +154,7 @@ void ColorRangeControl::updateStressRange ( const LoadCaseResults& res )
 
     for ( uint i = 0; i < res.countStresses(); ++i ) {
         bool valid;
-        double stress = res.getStress( i, &valid );
+        double stress = res.getStress( i, valid );
         if ( ! valid )
             continue;
         if ( stress > maxStress )

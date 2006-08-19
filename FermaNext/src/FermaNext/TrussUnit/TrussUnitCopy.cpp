@@ -237,7 +237,7 @@ void TrussUnitCopy::loadDisplacements ( const LoadCaseResults& res )
         node = *nIter;
         bool valid;
         DoublePoint disp = res.getDisplacement( node->getNumber() - 1, 
-                                                &valid );
+                                                valid );
         if ( ! valid ) {
             node->setDisplacement( DoublePoint( 0, 0 ) );
             node->setCurrentCoord( node->getBaseCoord() );
@@ -254,7 +254,7 @@ void TrussUnitCopy::loadStresses ( const LoadCaseResults& res )
     for ( ; pIter != pivots.end(); ++pIter ) {
         pivot = *pIter;
         bool valid;
-        double stress = res.getStress( pivot->getNumber() - 1, &valid );
+        double stress = res.getStress( pivot->getNumber() - 1, valid );
         if ( ! valid ) {
             pivot->setStress( 0 );
             continue;
