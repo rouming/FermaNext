@@ -79,14 +79,14 @@ void ColorControlButton::paint ( base_renderer& baseRend,
 
 ColorRangeControl::ColorRangeControl ( QWidget* parent ) :
     AggWidget( parent, Global::flipY ),
+    maxStress( 0 ),
+    minStress( 0 ),
     levelsNumb( 10 ),
     plusButton( new ColorControlButton( QPoint( width() - 18, 20 ), 
                                         15, 15 ) ),
     minusButton( new ColorControlButton( QPoint( width() - 18, 
                                          height() - 20 ), 15, 15 ) ),
     pressedButton( 0 ),
-    maxStress( 0 ),
-    minStress( 0 ),
     mousePressed( false )
 {
     setMouseTracking( true );
@@ -120,14 +120,14 @@ agg::rgba8 ColorRangeControl::getColorForStress ( double stress ) const
         dg = int( ( endColor.g - beginColor.g ) / ( levelsNumb / 2 ) ),
         db = int( ( endColor.b - beginColor.b ) / ( levelsNumb / 2 ) );
     double n = stress / stressInc;
-    n < 1.0 ? n = 0 : n = ceil( n );
+    int i = n < 1.0 ? 0 : (int)ceil(n);
     if ( stress > 0 )
-        return agg::rgba8( endColor.r - dr * n, 
-                           endColor.g - dg * n, 
-                           endColor.b - db * n );
-    return agg::rgba8( beginColor.r + dr * n, 
-                       beginColor.g + dg * n, 
-                       beginColor.b + db * n );
+        return agg::rgba8( endColor.r - dr * i, 
+                           endColor.g - dg * i, 
+                           endColor.b - db * i );
+    return agg::rgba8( beginColor.r + dr * i, 
+                       beginColor.g + dg * i, 
+                       beginColor.b + db * i );
 }
 
 void ColorRangeControl::changeLevelsNumber ( bool inc )
@@ -152,7 +152,7 @@ void ColorRangeControl::updateStressRange ( const LoadCaseResults& res )
     plusButton->setEnabled( true );
     minusButton->setEnabled( true );
 
-    for ( uint i = 0; i < res.countStresses(); ++i ) {
+    for ( int i = 0; i < res.countStresses(); ++i ) {
         bool valid;
         double stress = res.getStress( i, valid );
         if ( ! valid )
@@ -165,7 +165,7 @@ void ColorRangeControl::updateStressRange ( const LoadCaseResults& res )
     update();
 }
 
-void ColorRangeControl::aggPaintEvent ( QPaintEvent* event )
+void ColorRangeControl::aggPaintEvent ( QPaintEvent* )
 {
     pixfmt pixf( getAggRenderingBuffer() );
     base_renderer baseRend( pixf );
@@ -269,11 +269,12 @@ double ColorRangeControl::drawAHalfLine ( base_renderer& baseRend,
         g = beginColor.g,
         b = beginColor.b;
     
-    for ( uint i = 0; i < levelsNumb / 2; ++i ) {
+    for ( int i = 0; i < levelsNumb / 2; ++i ) {
         primRend.fill_color( agg::rgba8( b, g, r ) );
-        primRend.outlined_rectangle( colorLineGeometry.left(), 
-                                     y, colorLineGeometry.right(),
-                                     y + dy );
+        primRend.outlined_rectangle( (int)colorLineGeometry.left(), 
+                                     (int)y, 
+                                     (int)colorLineGeometry.right(),
+                                     int(y + dy) );
         y += dy;
         r += dr;
         g += dg;
@@ -306,7 +307,7 @@ void ColorRangeControl::signColorLine ( base_renderer& baseRend ) const
     
     double stressInc = -maxStress / ( levelsNumb / 2 ),
            currStress = maxStress;
-    for ( uint i = 0; i < levelsNumb / 2; ++i ) {
+    for ( int i = 0; i < levelsNumb / 2; ++i ) {
         drawStrokeNumber( textRend, glyph, currStress , y );
         currStress += stressInc;
         y += dy;
@@ -317,7 +318,7 @@ void ColorRangeControl::signColorLine ( base_renderer& baseRend ) const
 
     stressInc = minStress / ( levelsNumb / 2 );
     currStress = stressInc;
-    for ( uint i = 0; i < levelsNumb / 2; ++i ) {
+    for ( int i = 0; i < levelsNumb / 2; ++i ) {
         drawStrokeNumber( textRend, glyph, currStress , y );
         y += dy;
         currStress += stressInc;

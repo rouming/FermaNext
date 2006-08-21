@@ -14,9 +14,11 @@ TrussDeformPicture::TrussDeformPicture ( const ColorRangeControl& colCtrl,
     trussCopy( 0 ),
     canvasBuf( new rbuf_dynarow( Global::defaultCanvasWidth, 
                                  Global::defaultCanvasHeight ) ),
+    scaleMult(0), 
+    currentScaleMult(0),
     numbersDrawing( true ),
-    colorCtrl( colCtrl ),
-    pluginResults( 0 )
+    pluginResults( 0 ),
+    colorCtrl( colCtrl )
 {
     canvasBufRect.setCoords( Global::canvasHorIndent, Global::canvasVertIndent, 
                              Global::canvasHorIndent + canvasBuf->width(),
@@ -74,7 +76,8 @@ void TrussDeformPicture::resizeCanvas ( const QSize &size )
                             2 * Global::areaBufferIndent );
     paintAreaRect.setHeight( canvasBufRect.height() - 
                              2 * Global::areaBufferIndent );
-    canvasBuf->init( canvasBufRect.width(), canvasBufRect.height() );
+    canvasBuf->init( (uint)canvasBufRect.width(), 
+                     (uint)canvasBufRect.height() );
     updateScaleMultiplier();
     update();
 }
@@ -148,7 +151,7 @@ void TrussDeformPicture::showElementNumbers ( bool status )
 
 /*-------------------------- Handlers on events -----------------------------*/
 
-void TrussDeformPicture::aggPaintEvent ( QPaintEvent* event )
+void TrussDeformPicture::aggPaintEvent ( QPaintEvent* )
 {
     pixfmt pixf ( getAggRenderingBuffer() );
     base_renderer baseRend ( pixf );
@@ -171,7 +174,7 @@ void TrussDeformPicture::aggMouseReleaseEvent ( QMouseEvent* )
 void TrussDeformPicture::aggMousePressEvent ( QMouseEvent* )
 {}
 
-void TrussDeformPicture::aggCtrlChangedEvent ( const agg::ctrl* slider )
+void TrussDeformPicture::aggCtrlChangedEvent ( const agg::ctrl* )
 {}
 
 void TrussDeformPicture::changeScale ( double sliderValue )
@@ -302,7 +305,7 @@ void TrussDeformPicture::drawTrussAreaBoundaries ( ren_dynarow& baseRend ) const
     DoublePoint strokePnt2( paintAreaRect.left(),strokePnt1.y() );
     DoublePoint textPos;
     QString str;
-    for ( uint i = 0; i < strokeNumbY; i++ )
+    for ( int i = 0; i < strokeNumbY; i++ )
     {
         strokePnt1.setY( paintAreaRect.top() + i * scaleFactorYInPix );
         strokePnt2.setY( strokePnt1.y() );
@@ -324,7 +327,7 @@ void TrussDeformPicture::drawTrussAreaBoundaries ( ren_dynarow& baseRend ) const
     strokePnt2.setY( paintAreaRect.bottom() + Global::scalePieceLength );
 
     textPos.setY( strokePnt2.y() + 10 );
-    for ( uint i = 0; i < strokeNumbX; i++ )
+    for ( int i = 0; i < strokeNumbX; i++ )
     {
         strokePnt1.setX( paintAreaRect.right() - i * scaleFactorXInPix );
         strokePnt2.setX( strokePnt1.x() );
@@ -505,9 +508,9 @@ void TrussDeformPicture::drawNode ( const TrussCopyNode& node,
     {
         color_type begin( 255, 255, 255 ); 
         color_type middle( 230, 200, 195 ); 
-        color_type end( 130 - highlightKoeff * 100, 
-                        90 - highlightKoeff * 60, 
-                        70 - highlightKoeff * 50 );
+        color_type end( uint(130 - highlightKoeff * 100), 
+                        uint(90 - highlightKoeff * 60), 
+                        uint(70 - highlightKoeff * 50) );
         fillColorArray( gradColors, begin, middle, end );
         drawGradientEllipse( baseRend, ras, sl, gradFunc, gradColors, 
                              mtx, nodePos.x(), nodePos.y(), 

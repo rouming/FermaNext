@@ -158,12 +158,11 @@ void ResultsTabWidget::setTrussSolutionResults(
 {
     // remove unnecessary plugin tabs
     if ( trussResults.countResults() < count() )
-        for ( uint i = trussResults.countResults(); 
-                   i < count(); ++i )
+        for ( int i = trussResults.countResults(); i < count(); ++i )
             removePluginTab( i );
     
     // update other plugin tabs
-    for ( uint i = 0; i < trussResults.countResults(); ++i ) {
+    for ( int i = 0; i < trussResults.countResults(); ++i ) {
         const PluginResults* res = trussResults.getPluginResults( i );
         if ( ! res )
             continue;

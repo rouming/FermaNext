@@ -496,8 +496,9 @@ DoublePoint TrussUnit::getTrussCoordFromWidgetPos ( QPoint pos ) const
 DoublePoint TrussUnit::getWidgetPosFromTrussCoord ( double x, double y ) const
 {
     DoublePoint scaleMult = getTrussScaleMultiplier ();
-    int widgetX = x * scaleMult.x() + Global::trussBufIndent + leftTopPos.x();
-    int widgetY = ( Global::flipY ? ( getTrussAreaSize().height() - y ) * 
+    double widgetX = x * scaleMult.x() + Global::trussBufIndent + 
+                     leftTopPos.x();
+    double widgetY = ( Global::flipY ? ( getTrussAreaSize().height() - y ) * 
                  scaleMult.y() + Global::trussBufIndent + leftTopPos.y() : 
                  y * scaleMult.y() + Global::trussBufIndent + leftTopPos.y() );
     return DoublePoint( widgetX, widgetY );

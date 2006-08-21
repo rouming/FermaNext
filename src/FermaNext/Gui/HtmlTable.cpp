@@ -96,7 +96,7 @@ void HtmlTable::clearData ()
 {
     QDomNodeList rows = childTable.elementsByTagName( "tr" );
     int numb = rows.count();
-    for ( uint i = 0; i < numb; ++i ) {
+    for ( int i = 0; i < numb; ++i ) {
         QDomNode elem = childTable.firstChild();
         childTable.removeChild( elem );
     }
@@ -190,8 +190,8 @@ void HtmlStressTable::fillTable ()
     cells.push_back( HtmlTableCell( tr( "Thick." ), col ) );
 
     // load case columns 
-    for ( uint i = 0; i < 3; ++i )
-        for ( uint j = 1; j <= loadCaseNumb; ++j )
+    for ( int i = 0; i < 3; ++i )
+        for ( int j = 1; j <= loadCaseNumb; ++j )
             cells.push_back( HtmlTableCell( tr( "Case" ) + " " + 
                              QString::number(j), col) );
     addRow( cells );
@@ -208,7 +208,7 @@ void HtmlStressTable::fillTable ()
         cells.push_back( HtmlTableCell( 
                          QString::number( p->getThickness(), 'e', 2 ), 
                          "", "right") );
-        for ( uint j = 1; j <= loadCaseNumb; ++j ) {
+        for ( int j = 1; j <= loadCaseNumb; ++j ) {
             const LoadCaseResults* res = pluginResults->getLoadCaseResults( j );
             if ( ! res )
                 cells.push_back( HtmlTableCell() );
@@ -275,8 +275,8 @@ void HtmlDisplacementTable::fillTable ()
     cells.push_back( HtmlTableCell( "Y", col ) );
 
     // load case columns 
-    for ( uint i = 0; i < 2; ++i )
-        for ( uint j = 1; j <= loadCaseNumb; ++j )
+    for ( int i = 0; i < 2; ++i )
+        for ( int j = 1; j <= loadCaseNumb; ++j )
             cells.push_back( HtmlTableCell("Case " + QString::number(j), col) );
     addRow( cells );
     
@@ -299,7 +299,7 @@ void HtmlDisplacementTable::fillTable ()
                          'e', 2 ), "", "right") );
 
         // fill table with X-displacements
-        for ( uint j = 1; j <= loadCaseNumb; ++j ) {
+        for ( int j = 1; j <= loadCaseNumb; ++j ) {
             const LoadCaseResults* res = pluginResults->getLoadCaseResults( j );
             if ( ! res )
                 cells.push_back( HtmlTableCell() );
@@ -313,7 +313,7 @@ void HtmlDisplacementTable::fillTable ()
                     cells.push_back( HtmlTableCell() );
             }
         }
-        for ( uint j = 1; j <= loadCaseNumb; ++j ) {
+        for ( int j = 1; j <= loadCaseNumb; ++j ) {
             const LoadCaseResults* res = pluginResults->getLoadCaseResults( j );
             if ( ! res )
                 cells.push_back( HtmlTableCell() );

@@ -95,7 +95,7 @@ int LoadCaseResults::getLoadCaseNumber() const
     return loadCaseNumb;
 }
 
-void LoadCaseResults::loadFromXML ( const QDomElement& trussResultsElem ) 
+void LoadCaseResults::loadFromXML ( const QDomElement& ) 
     /*throw (LoadException)*/
 {}
 
@@ -155,7 +155,7 @@ const QString& PluginResults::getPluginName () const
     return pluginName;
 }
 
-void PluginResults::loadFromXML ( const QDomElement& trussResultsElem ) 
+void PluginResults::loadFromXML ( const QDomElement& ) 
     /*throw (LoadException)*/
 {}
 
@@ -171,8 +171,8 @@ QDomElement PluginResults::saveToXML ( QDomDocument& doc )
  *****************************************************************************/
 
 TrussSolutionResults::TrussSolutionResults ( const TrussUnit& truss ) :
-    trussUnit( truss ),
-    trussCopy( new TrussUnitCopy )
+    trussCopy( new TrussUnitCopy ),
+    trussUnit( truss )
 {
     trussCopy->loadTrussUnitData( truss ); 
 }
@@ -180,6 +180,7 @@ TrussSolutionResults::TrussSolutionResults ( const TrussUnit& truss ) :
 TrussSolutionResults::~TrussSolutionResults ()
 {
     clean();
+    delete trussCopy;
 }
 
 void TrussSolutionResults::addPluginResults ( const PluginResults& results )
@@ -225,7 +226,7 @@ void TrussSolutionResults::clean ()
     pluginResults.clear();
 }
 
-void TrussSolutionResults::loadFromXML ( const QDomElement& trussResultsElem ) 
+void TrussSolutionResults::loadFromXML ( const QDomElement& ) 
     /*throw (LoadException)*/
 {}
 

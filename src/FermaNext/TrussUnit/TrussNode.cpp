@@ -243,9 +243,9 @@ void TrussNode::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
     {
         color_type begin( 255, 255, 255 ); 
         color_type middle( 230, 200, 195 ); 
-        color_type end( 130 - highlightKoeff * 100, 
-                        90 - highlightKoeff * 60, 
-                        70 - highlightKoeff * 50 );
+        color_type end( uint(130 - highlightKoeff * 100), 
+                        uint(90 - highlightKoeff * 60), 
+                        uint(70 - highlightKoeff * 50) );
         fillColorArray( gradColors, begin, middle, end );
         drawGradientEllipse( baseRend, ras, sl, gradFunc, gradColors, 
                              mtx, nodePos.x(), nodePos.y(), 

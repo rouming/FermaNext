@@ -868,7 +868,8 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
     DoublePoint p1, p2;
     p2 = leftTopAreaPos;
     p1 = rightBottomAreaPos;
-    baseRend.copy_bar ( p2.x(), p2.y(), p1.x(), p1.y(), agg::rgba(1,1,1) );
+    baseRend.copy_bar( (int)p2.x(), (int)p2.y(), 
+                       (int)p1.x(), (int)p1.y(), agg::rgba(1,1,1) );
     p2.setY( p2.y() - Global::arrowHeadIndent );
     p1.setX( p2.x() );
     p1.setY( p1.y() + Global::arrowTailIndent );
@@ -1267,8 +1268,8 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         /*------draw window title text and background rounded rectangle------*/
         glyph.font ( headFont );
         double lengthLimit = windowSize.width() / 2 - 20;
-        QString title = fitTextToWindowSize ( getTrussName (), lengthLimit, 
-                                              glyph );
+        QString title = fitTextToWindowSize ( getTrussName (), 
+                                              (int)lengthLimit, glyph );
         int titleLength = (int)glyph.width( title.toAscii().data() );
         DoublePoint titlePos( ( windowSize.width() - 2 * Global::bordWidth - 
                                 titleLength ) / 2, 14 );
@@ -1303,8 +1304,8 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
     /*------draw truss unit------*/
     ren_dynarow baseRend( trussPixf );
     TrussUnit::paint ( baseRend );
-
-    /*------draw truss elements numbers field------*
+/*
+    //------draw truss elements numbers field------
     baseRend = numbersPixf;
     textRenderer textRend ( baseRend, glyph );
     glyph.font ( numbersFont );
@@ -1312,7 +1313,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 
     if ( ! coordFieldRendered )
     {
-        /*------draw coordinates field------*
+        //------draw coordinates field------
         baseRend = coordPixf;
         textRenderer textRend ( baseRend, glyph );
         glyph.font ( numbersFont );
