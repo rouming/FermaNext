@@ -70,7 +70,7 @@ void ResultsControlWidget::init ()
     textPoly.width( textThickness );
 
     loadCaseComboBox = new QComboBox( this );
-    loadCaseComboBox->setGeometry( ctrlLeft + 125, 0, 65, 20 );
+    loadCaseComboBox->setGeometry( (int)ctrlLeft + 125, 0, 65, 20 );
 
     connect( loadCaseComboBox, SIGNAL(currentIndexChanged(int)),
                                SIGNAL(onSwitchLoadCase(int)) );
@@ -79,7 +79,7 @@ void ResultsControlWidget::init ()
 void ResultsControlWidget::fillLoadCaseComboBox ( int loadCaseNumb )
 {
     loadCaseComboBox->clear();
-    for ( uint i = 1; i <= loadCaseNumb; ++i )
+    for ( int i = 1; i <= loadCaseNumb; ++i )
         loadCaseComboBox->addItem( "Case " + QString::number( i ) );
 }
 
@@ -97,7 +97,7 @@ void ResultsControlWidget::initControlsState ()
                                            deformSlider.value() );
 }
 
-void ResultsControlWidget::aggPaintEvent ( QPaintEvent* event )
+void ResultsControlWidget::aggPaintEvent ( QPaintEvent* )
 {
     pixfmt pixf ( getAggRenderingBuffer() );
     base_renderer baseRend ( pixf );
