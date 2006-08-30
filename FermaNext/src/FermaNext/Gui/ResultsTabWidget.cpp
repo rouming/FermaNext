@@ -97,7 +97,7 @@ void ResultsTab::fillTab( const PluginResults& pluginResults,
                              arg( trussCopy.countMaterials() ).
                              arg( "unknown" ).
                              arg( "unknown" ).
-                             arg( "unknown" ).
+                             arg( pluginResults.getForceWeight() ).
                              arg( "unknown" ).
                              arg( "unknown" ).
                              arg( "unknown" ).
@@ -160,7 +160,7 @@ void ResultsTabWidget::setTrussSolutionResults(
     if ( trussResults.countResults() < count() )
         for ( int i = trussResults.countResults(); i < count(); ++i )
             removePluginTab( i );
-    
+    int cr = trussResults.countResults();
     // update other plugin tabs
     for ( int i = 0; i < trussResults.countResults(); ++i ) {
         const PluginResults* res = trussResults.getPluginResults( i );

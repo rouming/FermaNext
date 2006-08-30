@@ -19,6 +19,7 @@ INCLUDEPATH += $$(AGGDIR)/include \
                $$(AGGDIR)/svg \
                ../../Common \
                ../../Common/Plugin \
+               ../../Common/Loader \
                ../Gui/Agg
 
 SOURCES = \
@@ -27,6 +28,7 @@ SOURCES = \
           TrussMaterial.cpp \
           TrussNode.cpp \
           TrussPivot.cpp \
+          TrussResultsManager.cpp \
           TrussSolutionResults.cpp \
           TrussUnit.cpp \
           TrussUnitCopy.cpp \
@@ -38,6 +40,7 @@ HEADERS = \
           Truss.h \
           TrussLoad.h \
           TrussMaterial.h \
+          TrussResultsManager.h \
           TrussSolutionResults.h \
           TrussUnit.h \
           TrussUnitCopy.h \

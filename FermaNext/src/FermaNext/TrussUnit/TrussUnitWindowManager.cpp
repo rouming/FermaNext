@@ -190,10 +190,10 @@ WindowListIter TrussUnitWindowManager::removeTrussUnitWindow (
     return iter;
 }
 
-WindowList TrussUnitWindowManager::getTrussUnitWindowList ()
+WindowList TrussUnitWindowManager::getTrussUnitWindowList () const
 {
     WindowList aliveTrussWindows;
-    WindowListIter iter = trussWindows.begin();
+    WindowListConstIter iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter )
         if ( (*iter)->isAlive() )
             aliveTrussWindows.push_back( *iter );
