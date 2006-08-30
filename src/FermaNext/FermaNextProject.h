@@ -12,7 +12,7 @@
 //#include "CalcDataToolBar.h"
 
 class FermaNextWorkspace;
-class TrussSolutionResults;
+class TrussResultsManager;
 class TrussUnitWindow;
 class TrussUnitCopy;
 class QStackedWidget;
@@ -50,7 +50,8 @@ public:
     virtual void activate ();
     virtual bool isActivated () const;
 
-    virtual TrussUnitWindowManager& getTrussUnitWindowManager ();    
+    virtual TrussUnitWindowManager& getTrussUnitWindowManager ();
+    virtual TrussResultsManager& getTrussResultsManager ();  
     virtual TrussDesignerWidget& getDesignerWidget ();
 // FIXME QT3TO4:
 //    virtual CalcDataToolBar& getCalcDataToolBar ();
@@ -58,19 +59,12 @@ public:
 
     virtual TrussMaterialLibrary& getMaterialLibrary () const;
 
-    virtual TrussSolutionResults* getResultsForTrussUnit ( 
-                                         const TrussUnit& ) const;
-
 protected:
     // XML serialization
     virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
     virtual QDomElement saveToXML ( QDomDocument& );
 
     virtual void setProjectFileName ( const QString& );
-
-public slots:
-    virtual void addSolutionResults ( TrussSolutionResults& );
-    virtual void removeSolutionResults ( TrussUnitWindow& );
 
 signals:
     void onActivate ( FermaNextProject& );
@@ -89,9 +83,6 @@ private:
                        QStackedWidget* parent = 0 );
 
 private:
-    typedef QList<TrussSolutionResults*> TrussResultsList;
-    typedef TrussResultsList::const_iterator TrussResultsListConstIter;
-
     FermaNextWorkspace& currentWorkspace;
     QString name;
     QString projectFileName;
@@ -102,7 +93,7 @@ private:
     TrussDesignerWidget* designerWidget;
     TrussMaterialLibrary* materialLibrary;
     TrussUnitWindowManager* trussWindowManager;
-    TrussResultsList trussResults;
+    TrussResultsManager* trussResultsManager;
 };
 
 #endif //FERMANEXTPROJECT_H

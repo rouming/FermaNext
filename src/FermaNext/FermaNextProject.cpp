@@ -7,7 +7,8 @@
 
 #include "FermaNextProject.h"
 #include "Global.h"
-#include "TrussSolutionResults.h"
+#include "TrussResultsManager.h"
+#include "FermaNextWorkspace.h"
 
 /*****************************************************************************
  * FermaNext Project
@@ -32,7 +33,9 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
     projectWidget( new QFrame(stackedWidget) ),
     designerWidget( new TrussDesignerWidget ),
     materialLibrary( new TrussMaterialLibrary ),
-    trussWindowManager( new TrussUnitWindowManager( *materialLibrary ) )
+    trussWindowManager( new TrussUnitWindowManager( *materialLibrary ) ),
+    trussResultsManager( new TrussResultsManager( wsp.pluginManager(), 
+                                                  *trussWindowManager ) )
 {
     connect( materialLibrary, 
              SIGNAL(onBeforeMaterialRemoval(const TrussMaterial&)), 
@@ -64,9 +67,6 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
     connect( trussWindowManager, 
              SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
              designerWidget, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
-    connect( trussWindowManager, 
-             SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
-             SLOT(removeSolutionResults(TrussUnitWindow&)) );
 
     // FIXME QT3TO4: 
     /*
@@ -205,6 +205,27 @@ QDomElement FermaNextProject::saveToXML ( QDomDocument& doc )
     QDomElement materialLibElem = doc.createElement( "TrussMaterialLibrary" );
     prjElem.appendChild( materialLibrary->saveToXML( doc ) );
 
+    /**
+     * Save truss solution results
+     ******************************/
+    TrussResultsList resultsList = 
+        getTrussResultsManager().getResultsList();
+
+    TrussSolutionResults* results = 0;
+    foreach ( results, resultsList ) {
+        WindowList windows = 
+            getTrussUnitWindowManager().getTrussUnitWindowList();
+        // save only actual results
+        foreach ( TrussUnitWindow* w, windows )
+            if ( w->getUUID() == results->getTrussUnitUUID() ) {
+                if ( ! w->isCalculated() )
+                    continue;
+                else {
+                    QDomElement resultsElem = results->saveToXML( doc );
+                    prjElem.appendChild( resultsElem );
+                }
+            }
+    }
     return prjElem;
 }
 
@@ -267,6 +288,22 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
         TrussUnitWindow* trussWindow = *itOrder;
         designerWidget->focusOnWindow( *trussWindow );
     }
+
+    /**
+     * Create truss solution results
+     *********************************/
+    TrussResultsManager& resMng = getTrussResultsManager();
+    QDomNodeList trussResultsList = 
+        prjElem.elementsByTagName( "TrussSolutionResults" );
+
+    for ( int i = 0; i < trussResultsList.count(); ++i ) {
+        QDomNode trussResultsNode = trussResultsList.item( i );
+        if ( ! trussResultsNode.isElement() )
+            throw LoadException();
+        QDomElement trussResultsElem = trussResultsNode.toElement();
+        TrussSolutionResults& res = resMng.createTrussSolutionResults();
+        res.loadFromXML( trussResultsElem );
+    }
 }
 
 void FermaNextProject::activate ()
@@ -300,6 +337,11 @@ TrussUnitWindowManager& FermaNextProject::getTrussUnitWindowManager ()
     return *trussWindowManager;
 }
 
+TrussResultsManager& FermaNextProject::getTrussResultsManager ()
+{
+    return *trussResultsManager;
+}
+
 TrussDesignerWidget& FermaNextProject::getDesignerWidget ()
 {
     return *designerWidget;
@@ -319,34 +361,6 @@ FermaNextWorkspace& FermaNextProject::getWorkspace()
 TrussMaterialLibrary& FermaNextProject::getMaterialLibrary () const
 {
     return *materialLibrary;
-}
-
-void FermaNextProject::addSolutionResults ( TrussSolutionResults& res )
-{
-    TrussSolutionResults* oldResults = 
-        getResultsForTrussUnit( res.getTrussUnit() );
-    if ( oldResults )
-        delete oldResults;
-    trussResults.push_back( &res ); 
-}
-
-void FermaNextProject::removeSolutionResults ( TrussUnitWindow& truss )
-{
-    TrussSolutionResults* oldResults = getResultsForTrussUnit( truss );
-    if ( oldResults )
-        delete oldResults;
-}
-
-TrussSolutionResults* FermaNextProject::getResultsForTrussUnit ( 
-                                          const TrussUnit& truss ) const
-{
-    TrussResultsListConstIter iter = trussResults.begin();
-    for ( ; iter < trussResults.end(); ++iter ) {
-        TrussSolutionResults* res = *iter;
-        if ( &res->getTrussUnit() == &truss )
-            return res;
-    }
-    return 0;
 }
 
 /*****************************************************************************/

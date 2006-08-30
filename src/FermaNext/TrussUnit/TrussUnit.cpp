@@ -261,6 +261,17 @@ void TrussUnit::loadFromXML ( const QDomElement& elem )
         pivot.setMaterialUUIDMap( *materialUUIDMap );
         pivot.loadFromXML( pivotElem );
     }
+
+    /**
+     * Set calculation status
+     *************************/
+    if ( ! elem.hasAttribute( "calcStatus" ) )
+        throw LoadException();
+    QString calcStatus = elem.attribute( "calcStatus" );
+    if ( calcStatus == "Yes" )
+        setCalculatedStatus( true );
+    else
+        setCalculatedStatus( false );
 }
 
 void TrussUnit::setMaterialUUIDMap ( const QMap<QString, TrussMaterial*>& m )
@@ -338,6 +349,14 @@ QDomElement TrussUnit::saveToXML ( QDomDocument& doc )
         }
         trussElem.appendChild( loadCaseElem );        
     }
+
+    /** 
+     * Save calculation status
+     **************************/
+    if ( isCalculated() )
+        trussElem.setAttribute( "calcStatus", "Yes" );
+    else 
+        trussElem.setAttribute( "calcStatus", "No" );
 
     return trussElem;
 }

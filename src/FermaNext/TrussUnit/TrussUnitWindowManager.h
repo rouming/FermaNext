@@ -35,7 +35,7 @@ public:
          const QString& fileName ) /*throw (ReadFileException,
                                             WrongFormatException)*/;
 
-    virtual WindowList getTrussUnitWindowList ();
+    virtual WindowList getTrussUnitWindowList () const;
 
     virtual TrussUnitWindow& createTrussUnitWindow ( const QString& name );    
     virtual bool removeTrussUnitWindow ( TrussUnitWindow& );

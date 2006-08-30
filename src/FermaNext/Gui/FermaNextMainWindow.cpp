@@ -22,16 +22,20 @@
 
 #include "FermaNextMainWindow.h"
 #include "FermaNextWorkspace.h"
-#include "ProjectToolBox.h"
-#include "Global.h"
-#include "UndoRedoListBox.h"
 #include "GeometryTabWidget.h"
+#include "Global.h"
+#include "GuiSubsidiary.h"
+#include "PreferencesWidget.h"
+#include "ProjectToolBox.h"
+#include "PluginReloader.h"
+#include "ResultsTabWidget.h"
 #include "TrussPropertyTabWidget.h"
 #include "TrussMaterialEditor.h"
-#include "PreferencesWidget.h"
-#include "ResultsTabWidget.h"
-#include "GuiSubsidiary.h"
-#include "PluginReloader.h"
+#include "TrussResultsManager.h"
+#include "UndoRedoListBox.h"
+
+#include "Plugin.h"
+#include <QTextStream>
 
 const QString fermaTitle( QObject::tr( "Educational CAD System 'Ferma'" ) );
 
@@ -326,26 +330,21 @@ void FermaNextMainWindow::createProject ()
         
         if ( currentCase )
             currentCase->addLoad( node4, 300, 100 );
-
-        TrussSolutionResults* trussResults = new TrussSolutionResults( trussWindow );
-        PluginResults* pluginResults = new PluginResults( "SimpleCalcPlugin" );
-        LoadCaseResults* loadCaseResults = new LoadCaseResults( 1 );
-        loadCaseResults->addDisplacement( 0, 0.5, 1 );
-        loadCaseResults->addDisplacement( 0, 0.3, 2 );
-        loadCaseResults->addDisplacement( 0, 0, 3 );
-        loadCaseResults->addDisplacement( 0.7, 0.5, 4 );
-        loadCaseResults->addDisplacement( 0.3, 0.3, 5 );
-        loadCaseResults->addStress( 25000, 1 );
-        loadCaseResults->addStress( 15000, 2 );
-        loadCaseResults->addStress( 5000, 3 );
-        loadCaseResults->addStress( -5000, 4 );
-        loadCaseResults->addStress( -15000, 5 );
-        pluginResults->addLoadCaseResults( *loadCaseResults );
-        pluginResults->addLoadCaseResults( *new LoadCaseResults( 2 ) );
-        pluginResults->addLoadCaseResults( *new LoadCaseResults( 3 ) );
-        trussResults->addPluginResults( *pluginResults );
-        prj.addSolutionResults( *trussResults );
-        trussWindow.setCalculatedStatus( true );
+/*
+        PluginManager& plgMng = workspace.pluginManager();
+        PluginList plgList = plgMng.loadedPlugins();
+        Plugin* plg = plgList[0];
+        QFile xmlFile( "test.xml" );
+        xmlFile.open( QIODevice::ReadWrite );
+        QIODevice* xmlIODev = &xmlFile;
+        QDomDocument doc;
+        doc.setContent( xmlIODev );
+        QDomElement docElem = doc.firstChild().toElement();
+        docElem.setAttribute( "trussUUID", trussWindow.getUUID() );
+        QString plgResStr = doc.toString();
+        Plugin::ExecutionResult exRes( Plugin::OkStatus, plgResStr );
+        TrussResultsManager& resMng = prj.getTrussResultsManager();
+        resMng.parseExecutionResults( *plg, exRes );*/
 
 #endif
 /*********** TEMP TRUSS UNIT **************************/
@@ -1178,7 +1177,9 @@ void FermaNextMainWindow::showResultsWindow ( const TrussUnitWindow& w )
     if ( prj == 0 )
         return;
 
-    TrussSolutionResults* trussResults = prj->getResultsForTrussUnit( w );
+    TrussResultsManager& resMng = prj->getTrussResultsManager();
+    TrussSolutionResults* trussResults = 
+        resMng.getResultsForTrussUnit( w.getUUID() );
     if ( ! trussResults ) {
         if ( ! QMessageBox::question( 0, tr("Calculate truss unit"),
                                       tr("Calculate truss \"%1\"?").

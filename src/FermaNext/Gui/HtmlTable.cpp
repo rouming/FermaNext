@@ -175,7 +175,7 @@ void HtmlStressTable::fillTable ()
     cells.push_back( HtmlTableCell( "", col, "center", 2 ) );
     cells.push_back( HtmlTableCell( tr( "Stresses" ), col, 
                                     "center", loadCaseNumb ) );
-    cells.push_back( HtmlTableCell( tr( "Margin of safety koeff." ), col, 
+    cells.push_back( HtmlTableCell( tr( "Margin of safety coeff." ), col, 
                                     "center", loadCaseNumb ) );
     cells.push_back( HtmlTableCell( tr( "Required thickness" ), col, 
                                     "center", loadCaseNumb ) );
@@ -198,7 +198,7 @@ void HtmlStressTable::fillTable ()
     
     resizeRootTable( w * loadCaseNumb * 3 + w * 2 + loadCaseNumb * 6 + 10 );
     
-    //******* fill table with stress values
+    //******* fill table
     uint i = 0;
     TrussUnitCopy::TrussCopyPivotListIter pIter = pivots.begin();
     for ( ; pIter < pivots.end(); ++pIter ) {
@@ -208,16 +208,41 @@ void HtmlStressTable::fillTable ()
         cells.push_back( HtmlTableCell( 
                          QString::number( p->getThickness(), 'e', 2 ), 
                          "", "right") );
+
+        //------ fill with stresses
+        for ( int j = 1; j <= loadCaseNumb; ++j ) {
+            const LoadCaseResults* res = pluginResults->getLoadCaseResults( j );
+            if ( ! res )
+                cells.push_back( HtmlTableCell() );
+            else {
+                
+                bool valid;
+                double stress = res->getStress( i, valid );
+                if ( valid )
+                    cells.push_back( HtmlTableCell( 
+                        QString::number( stress, 'e', 2 ), "", "right") );
+                else
+                    cells.push_back( HtmlTableCell() );
+            }
+        }
+
+        //------ fill with margin of safety coefficient
+        // will be added soon
+        for ( int j = 1; j <= loadCaseNumb; ++j ) {
+                cells.push_back( HtmlTableCell() );
+        }
+
+        //------ fill with required thickness values
         for ( int j = 1; j <= loadCaseNumb; ++j ) {
             const LoadCaseResults* res = pluginResults->getLoadCaseResults( j );
             if ( ! res )
                 cells.push_back( HtmlTableCell() );
             else {
                 bool valid;
-                double stress = res->getStress( i, valid );
+                double reqThick = res->getRequiredThickness( i, valid );
                 if ( valid )
                     cells.push_back( HtmlTableCell( 
-                        QString::number( stress, 'e', 2 ), "", "right") );
+                        QString::number( reqThick, 'e', 2 ), "", "right") );
                 else
                     cells.push_back( HtmlTableCell() );
             }
