@@ -169,10 +169,10 @@ protected:
     void clean ();
 
 private:
+    const TrussUnitWindowManager& windowMng;
     PluginResultsList pluginResults;
     QString trussUUID;
     TrussUnitCopy* trussCopy;
-    const TrussUnitWindowManager& windowMng;
 };  
 
 #endif // TRUSSSOLUTIONRESULTS_H
