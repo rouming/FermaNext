@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 TrussResultsManager::TrussResultsManager ( const PluginManager& pMng,
-                                           const TrussUnitWindowManager& wMng) :
+                                           const TrussUnitWindowManager& wMng):
     plgMng( pMng ),
     windowMng( wMng )
 {
@@ -49,7 +49,7 @@ TrussSolutionResults& TrussResultsManager::createTrussSolutionResults ()
 }
 
 TrussSolutionResults& TrussResultsManager::parseExecutionResults ( 
-                                                Plugin& plg, 
+                                                Plugin&,
                                                 Plugin::ExecutionResult exRes )
                                             /*throw (ResultsReadingException)*/
 {

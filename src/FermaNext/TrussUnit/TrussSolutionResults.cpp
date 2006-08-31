@@ -226,7 +226,7 @@ void LoadCaseResults::loadAttributesFromXML ( const QDomElement& loadCaseResElem
         throw LoadException();
     QString valueStr = loadCaseResElem.attribute( "loadCaseNumber" );
     bool valid;
-    int loadCaseNumb = valueStr.toDouble( &valid );
+    int loadCaseNumb = valueStr.toInt( &valid );
     if ( ! valid )
         throw LoadException();
     setLoadCaseNumber( loadCaseNumb );
@@ -323,11 +323,9 @@ const LoadCaseResults* PluginResults::getLoadCaseResults ( int numb ) const
     if ( numb <= 0 )
         return 0;
 
-    int size = loadCaseResults.size();
     LoadCaseResultsList::const_iterator iter = loadCaseResults.begin();
     for ( ; iter != loadCaseResults.end(); ++iter ) {
         LoadCaseResults* res = *iter;
-        int n = res->getLoadCaseNumber();
         if ( res->getLoadCaseNumber() == numb )
             return res;
     }
@@ -449,8 +447,8 @@ QDomElement PluginResults::saveToXML ( QDomDocument& doc )
  *****************************************************************************/
 
 TrussSolutionResults::TrussSolutionResults ( const TrussUnitWindowManager& mng ) :
-    trussUUID( QString() ),
     windowMng( mng ),
+    trussUUID( QString() ),
     trussCopy( new TrussUnitCopy )
 {}
 
