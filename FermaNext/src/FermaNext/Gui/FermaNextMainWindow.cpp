@@ -330,7 +330,7 @@ void FermaNextMainWindow::createProject ()
         
         if ( currentCase )
             currentCase->addLoad( node4, 300, 100 );
-/*
+
         PluginManager& plgMng = workspace.pluginManager();
         PluginList plgList = plgMng.loadedPlugins();
         Plugin* plg = plgList[0];
@@ -344,7 +344,7 @@ void FermaNextMainWindow::createProject ()
         QString plgResStr = doc.toString();
         Plugin::ExecutionResult exRes( Plugin::OkStatus, plgResStr );
         TrussResultsManager& resMng = prj.getTrussResultsManager();
-        resMng.parseExecutionResults( *plg, exRes );*/
+        resMng.pluginWasExecuted( *plg, exRes );
 
 #endif
 /*********** TEMP TRUSS UNIT **************************/

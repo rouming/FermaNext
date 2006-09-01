@@ -122,8 +122,7 @@ LoadCaseResults::NodeResults& LoadCaseResults::addNodeResults ( double dispX,
                                                                 int numb )
 {
     NodeResults* nodeRes = new NodeResults( dispX, dispY, numb );
-    int indx = numb - 1;
-    nodeResultsList.insert( indx, nodeRes );
+    nodeResultsList.push_back( nodeRes );
     return *nodeRes;
 }
 
@@ -132,8 +131,7 @@ LoadCaseResults::PivotResults& LoadCaseResults::addPivotResults ( double stress,
                                                                 int numb )
 {
     PivotResults* pivotRes = new PivotResults( stress, reqThick, numb );
-    int indx = numb - 1;
-    pivotResultsList.insert( indx, pivotRes );
+    pivotResultsList.push_back( pivotRes );
     return *pivotRes;
 }
 
@@ -144,9 +142,14 @@ DoublePoint LoadCaseResults::getDisplacement ( int indx, bool& valid ) const
         valid = false;
         return DoublePoint( 0, 0 );
     }
-    NodeResults* nodeRes = nodeResultsList.at( indx );
-    valid = true;
-    return DoublePoint( nodeRes->dispX, nodeRes->dispY );
+    NodeResults* nodeRes = 0;
+    foreach ( nodeRes, nodeResultsList )
+        if ( nodeRes->nodeNumb == indx + 1 ) {
+            valid = true;
+            return DoublePoint( nodeRes->dispX, nodeRes->dispY );
+        }
+    valid = false;
+    return DoublePoint( 0, 0 );
 }
 
 double LoadCaseResults::getStress ( int indx, bool& valid ) const
@@ -156,9 +159,14 @@ double LoadCaseResults::getStress ( int indx, bool& valid ) const
         valid = false;
         return 0;
     }
-    valid = true;
-    PivotResults* pivotRes =  pivotResultsList.at( indx );
-    return pivotRes->stress;
+    PivotResults* pivotRes = 0;
+    foreach ( pivotRes, pivotResultsList )
+        if ( pivotRes->pivotNumb == indx + 1 ) {
+            valid = true;
+            return pivotRes->stress;
+        }
+    valid = false;
+    return 0;
 }
 
 double LoadCaseResults::getRequiredThickness ( int indx, bool& valid ) const
@@ -168,9 +176,14 @@ double LoadCaseResults::getRequiredThickness ( int indx, bool& valid ) const
         valid = false;
         return 0;
     }
-    valid = true;
-    PivotResults* pivotRes =  pivotResultsList.at( indx );
-    return pivotRes->requiredThick;
+    PivotResults* pivotRes = 0;
+    foreach ( pivotRes, pivotResultsList )
+        if ( pivotRes->pivotNumb == indx + 1 ) {
+            valid = true;
+            return pivotRes->requiredThick;
+        }
+    valid = false;
+    return 0;
 }
 
 int LoadCaseResults::countDisplacements () const
