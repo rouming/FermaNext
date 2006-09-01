@@ -30,15 +30,15 @@ TrussResultsManager::~TrussResultsManager ()
 void TrussResultsManager::afterPluginWasLoaded ( Plugin& plg )
 {
     connect( &plg, SIGNAL(afterExecution(Plugin&, Plugin::ExecutionResult)),
-                     SLOT(parseExecutionResults(Plugin&, 
-                                                Plugin::ExecutionResult)) );
+                     SLOT(pluginWasExecuted(Plugin&, 
+                                            Plugin::ExecutionResult)) );
 }
 
 void TrussResultsManager::beforePluginWasUnloaded ( Plugin& plg )
 {
     disconnect( &plg, SIGNAL(afterExecution(Plugin&, Plugin::ExecutionResult)),
-                  this, SLOT(parseExecutionResults(Plugin&, 
-                                                   Plugin::ExecutionResult)) );
+                  this, SLOT(pluginWasExecuted(Plugin&, 
+                                               Plugin::ExecutionResult)) );
 }
 
 TrussSolutionResults& TrussResultsManager::createTrussSolutionResults ()
@@ -49,8 +49,7 @@ TrussSolutionResults& TrussResultsManager::createTrussSolutionResults ()
 }
 
 TrussSolutionResults& TrussResultsManager::parseExecutionResults ( 
-                                                Plugin&,
-                                                Plugin::ExecutionResult exRes )
+                                              Plugin::ExecutionResult exRes )
                                             /*throw (ResultsReadingException)*/
 {
     QDomDocument doc;
@@ -94,6 +93,12 @@ TrussSolutionResults& TrussResultsManager::parseExecutionResults (
     }
     w->setCalculatedStatus( true );
     return *trussResults;
+}
+
+void TrussResultsManager::pluginWasExecuted ( Plugin&, 
+                                              Plugin::ExecutionResult exRes )
+{
+    parseExecutionResults( exRes );
 }
 
 TrussSolutionResults* TrussResultsManager::getResultsForTrussUnit ( 

@@ -32,13 +32,13 @@ public:
     TrussSolutionResults* getResultsForTrussUnit ( 
                                            const QString& trussUUID ) const;
 protected:
+    TrussSolutionResults& parseExecutionResults ( Plugin::ExecutionResult );
+                                       /*throw (ResultsReadingException)*/;
     void clean ();
 
 public slots:
-    TrussSolutionResults& parseExecutionResults ( Plugin&, 
-                                                  Plugin::ExecutionResult );
-                                       /*throw (ResultsReadingException)*/;
-
+    void pluginWasExecuted ( Plugin&, Plugin::ExecutionResult );
+    
 protected slots:
     void removeSolutionResults ( TrussUnitWindow& );
     void afterPluginWasLoaded ( Plugin& );
