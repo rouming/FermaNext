@@ -420,6 +420,11 @@ void TrussPropertyTabWidget::initLoadTab ()
     nodesNumbLabel = new QLabel( tr( "Total nodes: " ), parentFrame );
     loadedNodesLabel = new QLabel( tr( "Nodes loaded: " ), parentFrame );
     loadTable = new LoadTable( parentFrame );
+    TableHeader *horHeader = new TableHeader( Qt::Horizontal ),
+                *vertHeader = new TableHeader( Qt::Vertical );
+    loadTable->setHorizontalHeader( horHeader );
+    loadTable->setVerticalHeader( vertHeader );
+    
     LoadTableDelegate* delegate = new LoadTableDelegate;
     loadTable->setItemDelegate( delegate );
     
@@ -471,13 +476,14 @@ void TrussPropertyTabWidget::initLoadTab ()
     // init load table
     loadTable->setColumnCount( 2 );
     loadTable->setSelectionMode( QAbstractItemView::NoSelection );
-    QHeaderView *horHeader = loadTable->horizontalHeader(),
-                *vertHeader = loadTable->verticalHeader();
+    //TableHeader *horHeader = loadTable->horizontalHeader(),
+    //            *vertHeader = loadTable->verticalHeader();
     horHeader->setClickable( false );
     horHeader->setResizeMode( QHeaderView::Custom );
     vertHeader->setDefaultSectionSize( Global::tableRowHeight );
     vertHeader->setClickable( false );
     vertHeader->setResizeMode( QHeaderView::Custom );
+    vertHeader->setDefaultAlignment( Qt::AlignRight | Qt::AlignVCenter );
     loadTable->setShowGrid( true );
 
     QStringList headerList;
@@ -495,6 +501,11 @@ void TrussPropertyTabWidget::initPivotPropertyTab ()
     
     pivotsNumbLabel = new QLabel( tr( "Total pivots: " ), parentFrame );
     pivotPropTable = new PivotPropertyTable( parentFrame );
+    TableHeader *horHeader = new TableHeader( Qt::Horizontal ),
+                *vertHeader = new TableHeader( Qt::Vertical );
+    pivotPropTable->setHorizontalHeader( horHeader );
+    pivotPropTable->setVerticalHeader( vertHeader );
+    
     PivotPropertyTableDelegate* delegate = new PivotPropertyTableDelegate;
     pivotPropTable->setItemDelegate( delegate );
 
@@ -559,13 +570,12 @@ void TrussPropertyTabWidget::initPivotPropertyTab ()
     // init pivot table
     pivotPropTable->setColumnCount( 2 );
     pivotPropTable->setSelectionMode( QAbstractItemView::NoSelection );
-    QHeaderView *horHeader = pivotPropTable->horizontalHeader(),
-                *vertHeader = pivotPropTable->verticalHeader();
     horHeader->setClickable( false );
     horHeader->setResizeMode( QHeaderView::Custom );
     vertHeader->setDefaultSectionSize( Global::tableRowHeight );
     vertHeader->setClickable( false );
     vertHeader->setResizeMode( QHeaderView::Custom );
+    vertHeader->setDefaultAlignment( Qt::AlignRight | Qt::AlignVCenter );
     pivotPropTable->setShowGrid( true );
 
     QStringList headerList;

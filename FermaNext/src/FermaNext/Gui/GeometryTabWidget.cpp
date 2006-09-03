@@ -563,6 +563,10 @@ void GeometryTabWidget::initNodesTab ()
     nodesNumbLabel = new QLabel( tr( "Total nodes: " ), parentFrame );
     fixedNodesLabel = new QLabel( tr( "Nodes fixed: " ), parentFrame );
     nodeTable = new NodeTable( parentFrame );
+    TableHeader *horHeader = new TableHeader( Qt::Horizontal ),
+                *vertHeader = new TableHeader( Qt::Vertical );
+    nodeTable->setHorizontalHeader( horHeader );
+    nodeTable->setVerticalHeader( vertHeader );
     NodeTableDelegate* delegate = new NodeTableDelegate;
     nodeTable->setItemDelegate( delegate );
     connect( delegate, SIGNAL(cellWasChanged(int, int)),
@@ -589,13 +593,12 @@ void GeometryTabWidget::initNodesTab ()
     nodeTable->setColumnCount( 3 );
     nodeTable->setSelectionMode( QAbstractItemView::NoSelection );
     
-    QHeaderView *horHeader = nodeTable->horizontalHeader(),
-                *vertHeader = nodeTable->verticalHeader();
     horHeader->setClickable( false );
     horHeader->setResizeMode( QHeaderView::Custom );
     vertHeader->setDefaultSectionSize( Global::tableRowHeight );
     vertHeader->setClickable( false );
     vertHeader->setResizeMode( QHeaderView::Custom );
+    vertHeader->setDefaultAlignment( Qt::AlignRight | Qt::AlignVCenter );
     nodeTable->setShowGrid( true );
 
     QStringList headerList;
@@ -613,6 +616,10 @@ void GeometryTabWidget::initPivotsTab ()
     pivotsNumbLabel = new QLabel( tr( "Total pivots: " ), parentFrame );
     pivotTable = new PivotTable( parentFrame );
     PivotTableDelegate* delegate = new PivotTableDelegate;
+    TableHeader *horHeader = new TableHeader( Qt::Horizontal ),
+                *vertHeader = new TableHeader( Qt::Vertical );
+    pivotTable->setHorizontalHeader( horHeader );
+    pivotTable->setVerticalHeader( vertHeader );
     pivotTable->setItemDelegate( delegate );
     connect( delegate, SIGNAL(cellWasChanged(int, int)),
                        SLOT(updatePivotState(int, int)) );
@@ -637,13 +644,12 @@ void GeometryTabWidget::initPivotsTab ()
     pivotTable->setColumnCount( 3 );
     pivotTable->setSelectionMode( QAbstractItemView::NoSelection );
 
-    QHeaderView *horHeader = pivotTable->horizontalHeader(),
-                *vertHeader = pivotTable->verticalHeader();
     horHeader->setClickable( false );
     horHeader->setResizeMode( QHeaderView::Custom );
     vertHeader->setDefaultSectionSize( Global::tableRowHeight );
     vertHeader->setClickable( false );
     vertHeader->setResizeMode( QHeaderView::Custom );
+    vertHeader->setDefaultAlignment( Qt::AlignRight | Qt::AlignVCenter );
     pivotTable->setShowGrid( true );
 
     QStringList headerList;

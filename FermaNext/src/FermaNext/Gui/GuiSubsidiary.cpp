@@ -169,4 +169,18 @@ QSize DockedWidget::sizeHint () const
     return size;
 }
 
+/*****************************************************************************
+ * Table Header
+ *****************************************************************************/
+
+TableHeader::TableHeader ( Qt::Orientation orientation, 
+                           QWidget * parent /* = 0 */ ) :
+    QHeaderView( orientation, parent )
+{}
+
+QSize TableHeader::sizeHint () const
+{
+    return QSize( 20, 20 );
+}
+
 /***************************************************************************/
