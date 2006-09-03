@@ -794,7 +794,9 @@ void TrussDesignerWidget::aggResizeEvent ( QResizeEvent* )
         if ( w->isAlive() && w->isMaximized() )
             w->maximize( false );
     }
-    toolBar->changeCenterPosition ( QPoint( width()/2, height() + 2 ) );
+    int width = getAggRenderingBuffer().width(),
+        height = getAggRenderingBuffer().height();
+    toolBar->changeCenterPosition ( QPoint( width/2, height + 2 ) );
     aggHint->renewWidgetSize ( size() );
 }
 
@@ -1019,15 +1021,17 @@ void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
 	    if ( left < Global::snapPixels && left > -Global::snapPixels)
 		    leftTop.setX( 0 - horOffset );
 
-	    if ( right < width() - horOffset + Global::snapPixels && 
-             right > width() - horOffset - Global::snapPixels )
-		    leftTop.setX( width() - horOffset - 
+        int w = getAggRenderingBuffer().width(),
+            h = getAggRenderingBuffer().height();
+	    if ( right < w - horOffset + Global::snapPixels && 
+             right > w - horOffset - Global::snapPixels )
+		    leftTop.setX( w - horOffset - 
                           selectedWindow->getWindowSize().width() );
 
-	    if ( bottom < height() - vertOffset + Global::snapPixels && 
-             bottom > height() - vertOffset - Global::snapPixels )
-		    leftTop.setY( height() - vertOffset - 
-                          selectedWindow->getWindowSize().width() );
+	    if ( bottom < h - vertOffset + Global::snapPixels && 
+             bottom > h - vertOffset - Global::snapPixels )
+		    leftTop.setY( h - vertOffset - 
+                          selectedWindow->getWindowSize().height() );
 
         selectedWindow->setWindowPosition( leftTop );
         update();

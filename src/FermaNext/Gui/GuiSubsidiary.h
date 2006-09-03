@@ -4,6 +4,7 @@
 
 #include <QComboBox>
 #include <QDockWidget>
+#include <QHeaderView>
 #include <QStringList>
 #include <QValidator>
 
@@ -64,6 +65,15 @@ class DockedWidget: public QDockWidget
 public: 
     DockedWidget ( const QString& title, QWidget* parent = 0, Qt::WFlags flags = 0); 
     QSize sizeHint() const; 
+};
+
+/*****************************************************************************/
+
+class TableHeader : public QHeaderView
+{
+public:
+    TableHeader ( Qt::Orientation orientation, QWidget * parent = 0 );
+    QSize sizeHint () const;
 };
 
 #endif //GUISUBSIDIARY_H

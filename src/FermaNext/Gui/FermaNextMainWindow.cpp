@@ -143,9 +143,9 @@ void FermaNextMainWindow::initUndoRedoWindow ()
 {
     undoRedoHistoryWidget = new QWidget( this, Qt::Window | Qt::Tool );
 
-    undoRedoHistoryWidget->setFixedSize( 195, 120 );
+    undoRedoHistoryWidget->setFixedSize( 196, 120 );
     // Pretty history widget offset from the end point of the screen
-    undoRedoHistoryWidget->move( QApplication::desktop()->width() - 215, 105 );
+    undoRedoHistoryWidget->move( QApplication::desktop()->width() - 215, 100 );
     undoRedoHistoryWidget->setWindowTitle( tr("History") );
     undoRedoListBox = new UndoRedoListBox( undoRedoHistoryWidget );
     undoRedoHistoryWidget->installEventFilter( this );
@@ -160,7 +160,7 @@ void FermaNextMainWindow::initUndoRedoWindow ()
 void FermaNextMainWindow::initGeometryWindow ()
 {
     geometryWindow = new QWidget( this, Qt::Window | Qt::Tool );
-    geometryWindow->setFixedSize( 195, 174 );
+    geometryWindow->setFixedSize( 196, 170 );
     geometryWindow->setWindowTitle( tr("Truss Geometry") );
     geometryTabWidget = new GeometryTabWidget( geometryWindow );
     geometryWindow->move( QApplication::desktop()->width() - 215, 250 );
@@ -179,7 +179,7 @@ void FermaNextMainWindow::initGeometryWindow ()
 void FermaNextMainWindow::initTrussPropertyWindow ()
 {
     trussPropertyWindow = new QWidget( this, Qt::Window | Qt::Tool );
-    trussPropertyWindow->setFixedSize( 195, 228 );
+    trussPropertyWindow->setFixedSize( 196, 224 );
     trussPropertyWindow->setWindowTitle( tr("Truss Properties") );
     trussPropTabWidget = new TrussPropertyTabWidget( trussPropertyWindow );
     trussPropertyWindow->move( QApplication::desktop()->width() - 215, 450 );
