@@ -21,22 +21,34 @@
 #include "GuiSubsidiary.h"
 
 /*****************************************************************************
+ * Material Properties
+ *****************************************************************************/
+
+class MaterialProperties
+{
+public:
+    MaterialProperties ( const QString& n, double w, double e, double d ) :
+        name( n ), wStress( w ), eModule( e ), density( d ) {}
+
+    QString name;
+    double wStress, eModule, density;
+};
+
+/*****************************************************************************
  * Material Tree Widget Item
  *****************************************************************************/
 
 MaterialTreeWidgetItem::MaterialTreeWidgetItem ( const TrussMaterial& m, 
                                                  int type /* = Type */) :
     QTreeWidgetItem( type ),
-    material( m )
+    material( m ),
+    tempProps( *(new MaterialProperties( m.getMaterialName(), 
+                                         m.getWorkingStress(), 
+                                         m.getElasticityModule(), 
+                                         m.getDensity() )) )
 {
-    setText( 0, m.getMaterialName() );
+    setText( 0, tempProps.name );
     setTextAlignment( 0, Qt::AlignLeft );
-    setText( 1, QString::number( m.getWorkingStress() ) );
-    setTextAlignment( 1, Qt::AlignRight );
-    setText( 2, QString::number( m.getElasticityModule() ) );
-    setTextAlignment( 2, Qt::AlignRight );
-    setText( 3, QString::number( m.getDensity() ) );
-    setTextAlignment( 3, Qt::AlignRight );
     
     connect( &m, SIGNAL(onAfterNameChange(const QString&)) ,
                  SLOT(updateName(const QString&)) );
@@ -55,22 +67,37 @@ const TrussMaterial& MaterialTreeWidgetItem::getItemMaterial () const
 
 void MaterialTreeWidgetItem::updateName ( const QString& name )
 {
+    tempProps.name = name;
     setText( 0, name );
 }
 
 void MaterialTreeWidgetItem::updateWorkingStress ( double ws )
 {
-    setText( 1, QString::number( ws ) );
+    tempProps.wStress = ws;
 }
 
 void MaterialTreeWidgetItem::updateElasticityModule ( double em )
 {
-    setText( 2, QString::number( em ) );
+    tempProps.eModule = em;
 }
 
 void MaterialTreeWidgetItem::updateDensity ( double d )
 {
-    setText( 3, QString::number( d ) );
+    tempProps.density = d;
+}
+
+const MaterialProperties& MaterialTreeWidgetItem::getMaterialProperties () const
+{
+    return tempProps;
+}
+
+void MaterialTreeWidgetItem::clearMaterialProperties ()
+{
+    tempProps.name = material.getMaterialName();
+    setText( 0, tempProps.name );
+    tempProps.wStress = material.getWorkingStress();
+    tempProps.eModule = material.getElasticityModule();
+    tempProps.density = material.getDensity();
 }
 
 /*****************************************************************************
@@ -121,42 +148,31 @@ void ProjectTreeWidgetItem::updateName ( const QString& name )
 }
 
 /*****************************************************************************
- * Truss Material Edit Dialog
+ * Material Edit Widget
  *****************************************************************************/
 
-TrussMaterialEditDialog::TrussMaterialEditDialog ( QWidget* parent /* = 0 */, 
-                                                   Qt::WFlags f /* = 0 */ ) :
-    QDialog( parent, f ),
-    material( 0 ),
-    onMaterialCreate( false )
+MaterialEditWidget::MaterialEditWidget ( QWidget* parent /* = 0 */, 
+                                         Qt::WFlags f /* = 0 */ ) :
+    QWidget( parent, f ),
+    material( 0 )
 {
     init();
 }
 
-void TrussMaterialEditDialog::init ()
+void MaterialEditWidget::init ()
 {
-    int maxElasticityModule = int(999999999.99);
-    int maxWorkingStress = int(9999999.99);
-    int maxMaterialDensity = int(999.99);
-
     QGroupBox* materialPropBox = new QGroupBox( tr( "Material Properties" ) );
     nameLineEdit = new QLineEdit( materialPropBox );
     stressSpinBox = new QDoubleSpinBox( materialPropBox );
-    stressSpinBox->setRange( 0, maxWorkingStress );
+    stressSpinBox->setRange( 0, Global::maxWorkingStress );
     stressSpinBox->setSingleStep( 1000 );
     elasticitySpinBox = new QDoubleSpinBox( materialPropBox );
-    elasticitySpinBox->setRange( 0, maxElasticityModule );
+    elasticitySpinBox->setRange( 0, Global::maxElasticityModule );
     elasticitySpinBox->setSingleStep( 100000 );
     densitySpinBox = new QDoubleSpinBox( materialPropBox );
-    densitySpinBox->setRange( 0, maxMaterialDensity );
+    densitySpinBox->setRange( 0, Global::maxMaterialDensity );
     densitySpinBox->setDecimals( 3 );
     densitySpinBox->setSingleStep( 0.001 );
-    QPushButton* okButton = new QPushButton( tr( "OK" ) );
-    connect( okButton, SIGNAL(clicked()),
-                       SLOT(applyChanges()) );
-    QPushButton* cancelButton = new QPushButton( tr( "Cancel" ) );
-    connect( cancelButton, SIGNAL(clicked()),
-                           SLOT(cancelChanges()) );
 
     // init material property group box layouts
     QVBoxLayout* parentLayout = new QVBoxLayout( materialPropBox );
@@ -179,39 +195,153 @@ void TrussMaterialEditDialog::init ()
     parentLayout->addLayout( nameLayout);
     parentLayout->addLayout( materialPropLayout);
 
-    // init layout for buttons
+    QVBoxLayout* mainLayout = new QVBoxLayout( this );
+    mainLayout->addWidget( materialPropBox );
+}
+
+void MaterialEditWidget::setMaterial ( const MaterialProperties& props, 
+                                       bool clearEditors /* = false */ )
+{
+    if ( ! clearEditors ) {
+        nameLineEdit->setText( props.name );
+        elasticitySpinBox->setValue( props.eModule );
+        stressSpinBox->setValue( props.wStress );
+        densitySpinBox->setValue( props.density );
+    }
+    else {
+        nameLineEdit->clear();
+        elasticitySpinBox->setValue(0);
+        stressSpinBox->setValue(0);
+        densitySpinBox->setValue(0);
+    }
+}
+
+void MaterialEditWidget::setMaterial ( const TrussMaterial& m, 
+                                       bool clearEditors /* = false */ )
+{
+    if ( ! clearEditors ) {
+        nameLineEdit->setText( m.getMaterialName() );
+        elasticitySpinBox->setValue( m.getElasticityModule() );
+        stressSpinBox->setValue( m.getWorkingStress() );
+        densitySpinBox->setValue( m.getDensity() );
+    }
+    else {
+        nameLineEdit->clear();
+        elasticitySpinBox->setValue(0);
+        stressSpinBox->setValue(0);
+        densitySpinBox->setValue(0);
+    }
+}
+
+void MaterialEditWidget::verifyChanges ()
+{
+    /*
+    if ( sender == nameLineEdit ) {
+        if ( nameLineEdit->text().isEmpty() ) 
+        {
+            ( QMessageBox::critical( this, tr("Material creation"),
+                                     tr("Material name wasn't entered.") ) );
+            return;
+        } 
+        else 
+        {
+            try {
+                material->setMaterialName( nameLineEdit->text() );
+            } 
+            catch ( TrussMaterialLibrary::WrongMaterialNameException& ) {
+                ( QMessageBox::critical( this, tr("Material creation"),
+                  tr("There is another material with name %1.").arg(
+                                                nameLineEdit->text()) ) );
+                return;
+            }
+        }
+        nameLineEdit->setFocus
+    }
+
+
+
+    try {
+        material->setWorkingStress( stressSpinBox->value() );
+    } 
+    catch ( TrussMaterialLibrary::WrongWorkingStressException& ) {
+        ( QMessageBox::critical( this, tr("Material creation"),
+          tr("Wrong working stress was entered.") ) );
+        return;
+    }
+
+    try {
+        material->setElasticityModule( elasticitySpinBox->value() );
+    } 
+    catch ( TrussMaterialLibrary::WrongElasticityModuleException& ) {
+        ( QMessageBox::critical( this, tr("Material creation"),
+          tr("Wrong elasticity module was entered.") ) );
+        return;
+    }
+
+    try {
+        material->setDensity( densitySpinBox->value() );
+    } 
+    catch ( TrussMaterialLibrary::WrongDensityException& ) {
+        ( QMessageBox::critical( this, tr("Material creation"),
+          tr("Wrong density was entered.") ) );
+        return;
+    }
+    
+    if ( onMaterialCreate )
+        emit onMaterialCreationApply( *material );
+    
+*/
+}
+
+/*****************************************************************************
+ * Truss Material Edit Dialog
+ *****************************************************************************/
+
+MaterialCreationDialog::MaterialCreationDialog ( QWidget* parent /* = 0 */, 
+                                                 Qt::WFlags f /* = 0 */ ) :
+    QDialog( parent, f ),
+    material( 0 )
+{
+    init();
+}
+
+void MaterialCreationDialog::init ()
+{
+    materialEditWidget = new MaterialEditWidget;
+    
+    QPushButton* okButton = new QPushButton( tr( "OK" ) );
+    connect( okButton, SIGNAL(clicked()),
+                       SLOT(applyChanges()) );
+
+    QPushButton* cancelButton = new QPushButton( tr( "Cancel" ) );
+    connect( cancelButton, SIGNAL(clicked()),
+                           SLOT(cancelChanges()) );
+
+    QVBoxLayout* editLayout = new QVBoxLayout;
+    editLayout->addWidget( materialEditWidget );
+   
     QHBoxLayout* buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch( 1 );
     buttonLayout->addWidget( okButton );
     buttonLayout->addWidget( cancelButton );
 
     QVBoxLayout* mainLayout = new QVBoxLayout( this );
-    mainLayout->addWidget( materialPropBox );
+    mainLayout->addLayout( editLayout );
     mainLayout->addLayout( buttonLayout );
 
-    setWindowTitle( "Edit Material" );
+    setWindowTitle( "Material Creation" );
     setFixedSize( 250, 200 ); 
 }
 
-void TrussMaterialEditDialog::setMaterial ( TrussMaterial& m, bool newMaterial )
+void MaterialCreationDialog::setMaterial ( TrussMaterial& m )
 {
+    materialEditWidget->setMaterial( m, true );
     material = &m;
-    onMaterialCreate = newMaterial;
-    if ( newMaterial ) {
-        nameLineEdit->clear();
-        elasticitySpinBox->setValue(0);
-        stressSpinBox->setValue(0);
-        densitySpinBox->setValue(0);
-    } else {
-        nameLineEdit->setText( material->getMaterialName() );
-        elasticitySpinBox->setValue( material->getElasticityModule() );
-        stressSpinBox->setValue( material->getWorkingStress() );
-        densitySpinBox->setValue( material->getDensity() );
-    }
 }
 
-void TrussMaterialEditDialog::applyChanges ()
+void MaterialCreationDialog::applyChanges ()
 {
+    /*
     if ( nameLineEdit->text().isEmpty() ) 
     {
         ( QMessageBox::critical( this, tr("Material creation"),
@@ -257,18 +387,14 @@ void TrussMaterialEditDialog::applyChanges ()
           tr("Wrong density was entered.") ) );
         return;
     }
-    
-    if ( onMaterialCreate )
-        emit onMaterialCreationApply( *material );
-    
+    */
+    emit onMaterialCreationApply( *material );
     hide();
 }
 
-void TrussMaterialEditDialog::cancelChanges ()
+void MaterialCreationDialog::cancelChanges ()
 { 
-    if ( onMaterialCreate )
-        emit onMaterialCreationCancel( *material );
-    
+    emit onMaterialCreationCancel( *material );
     hide();
 }
 
@@ -281,75 +407,83 @@ TrussMaterialEditor::TrussMaterialEditor ( QWidget* parent /* = 0 */,
     QDialog( parent, f ),
     materialLibTreeList( new QTreeWidget ),
     addButton( 0 ),
-    editButton( 0 ),
-    removeButton( 0 )
+    removeButton( 0 ),
+    applyButton( 0 )
 {
     init();
 }
 
 void TrussMaterialEditor::init ()
 {
-    materialLibTreeList->setColumnCount(4);
     materialLibTreeList->setEditTriggers( QAbstractItemView::NoEditTriggers );
 
     QHeaderView *header = materialLibTreeList->header();
     header->setClickable( false );
-    header->setMovable( false );
     QStringList labels;
-    labels << tr("Project/Material") << tr("Stress") << 
-              tr("Elasticity") << tr("Density");
+    labels << tr("Project/Material");
     materialLibTreeList->setHeaderLabels( labels );
-    header->resizeSection( 0, 150 );
-    header->resizeSection( 1, 60 );
-    header->resizeSection( 2, 60 );
-    header->resizeSection( 3, 60 );
-    //header->setResizeMode( QHeaderView::Custom );
+
+    editWidget = new MaterialEditWidget;
+    
+    createDialog = new MaterialCreationDialog( this );
+    createDialog->hide();
+
     QPushButton* okButton = new QPushButton( tr( "OK" ) );
     connect( okButton, SIGNAL(clicked()),
-                       SLOT(hide()) );
+                          SLOT(hide()) );
     QPushButton* cancelButton = new QPushButton( tr( "Cancel" ) );
     connect( cancelButton, SIGNAL(clicked()),
-                           SLOT(hide()) );
+                             SLOT(hide()) );
+    applyButton = new QPushButton( tr( "Apply" ) );
+    connect( applyButton, SIGNAL(clicked()),
+                            SLOT(hide()) );
+    applyButton->setEnabled( false );
     addButton = new QPushButton( tr( "Add" ) );
     connect( addButton, SIGNAL(clicked()),
                         SLOT(addMaterial()) );
-    editButton = new QPushButton( tr( "Edit" ) );
-    connect( editButton, SIGNAL(clicked()),
-                         SLOT(editMaterial()) );
-    editButton->setEnabled( false );
     removeButton = new QPushButton( tr( "Remove" ) );
     connect( removeButton, SIGNAL(clicked()),
                            SLOT(removeMaterial()) );
     removeButton->setEnabled( false );
     
     // init layouts
-    QVBoxLayout* leftLayout = new QVBoxLayout;
-    leftLayout->addWidget( materialLibTreeList );
-    QVBoxLayout* rigthLayout = new QVBoxLayout;
-    rigthLayout->addWidget( addButton );
-    rigthLayout->addWidget( editButton );    
-    rigthLayout->addWidget( removeButton );
-    rigthLayout->addStretch( 1 );
-    rigthLayout->addWidget( okButton );
-    rigthLayout->addWidget( cancelButton );
-    QHBoxLayout* mainLayout = new QHBoxLayout( this );
-    mainLayout->addLayout( leftLayout );
-    mainLayout->addLayout( rigthLayout );
+    QVBoxLayout* treeLayout = new QVBoxLayout;
+    treeLayout->addWidget( materialLibTreeList );
 
-    editDialog = new TrussMaterialEditDialog( this );
-    editDialog->hide();
+    QVBoxLayout* editLayout = new QVBoxLayout;
+    editLayout->addWidget( editWidget );
+
+    QHBoxLayout* buttonLayout = new QHBoxLayout;
+    buttonLayout->addWidget( addButton );
+    buttonLayout->addWidget( removeButton );
+    buttonLayout->addStretch( 1 );
+    buttonLayout->addWidget( okButton );
+    buttonLayout->addWidget( cancelButton );
+    buttonLayout->addWidget( applyButton );
+
+    QHBoxLayout* topLayout = new QHBoxLayout;
+    topLayout->addLayout( treeLayout );
+    topLayout->addLayout( editLayout );
+
+    QVBoxLayout* mainLayout = new QVBoxLayout( this );
+    mainLayout->addLayout( topLayout );
+    mainLayout->addLayout( buttonLayout );
 
     connect( materialLibTreeList, SIGNAL(itemSelectionChanged()),
                                   SLOT(checkButtons()) );
     
-    connect( editDialog, SIGNAL(onMaterialCreationApply(const TrussMaterial&)),
+    connect( createDialog, SIGNAL(onMaterialCreationApply(const TrussMaterial&)),
                          SLOT(applyMaterialCreation(const TrussMaterial&)) );
 
-    connect( editDialog, SIGNAL(onMaterialCreationCancel(TrussMaterial&)),
+    connect( createDialog, SIGNAL(onMaterialCreationCancel(TrussMaterial&)),
                          SLOT(cancelMaterialCreation(TrussMaterial&)) );
+    
+    connect( materialLibTreeList, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
+                                    SLOT(initEditorFields(QTreeWidgetItem*, int)));
+
 
     setWindowTitle( "Material Editor" );
-    setFixedSize( 445, 250 );    
+    setFixedSize( 500, 250 );    
 }
 
 QTreeWidgetItem* TrussMaterialEditor::getSelectedItem( 
@@ -534,16 +668,8 @@ void TrussMaterialEditor::addMaterial ()
     if ( materialItem )
         materialLibTreeList->setItemHidden( materialItem, true );
 
-    editDialog->setMaterial( *m, true );
-    editDialog->exec();
-}
-
-void TrussMaterialEditor::editMaterial ()
-{
-    TrussMaterial* m = getSelectedMaterial();
-    if ( m )
-        editDialog->setMaterial( *m, false );
-    editDialog->exec();
+    createDialog->setMaterial( *m );
+    createDialog->exec();
 }
 
 void TrussMaterialEditor::removeMaterial ()
@@ -585,15 +711,25 @@ void TrussMaterialEditor::cancelMaterialCreation ( TrussMaterial& m )
     projItem->getMaterialLibrary().removeMaterial( m );
 }
 
+void TrussMaterialEditor::initEditorFields ( QTreeWidgetItem* item, int )
+{
+    MaterialTreeWidgetItem* materialItem = 
+        dynamic_cast<MaterialTreeWidgetItem*>( item );
+    if ( ! materialItem )
+        return;
+
+    const MaterialProperties& materialProps = 
+        materialItem->getMaterialProperties();
+
+    editWidget->setMaterial( materialProps );    
+}
+
 void TrussMaterialEditor::checkButtons ()
 {
-    if ( getSelectedMaterialItem() ) {
-        editButton->setEnabled( true );
+    if ( getSelectedMaterialItem() )
         removeButton->setEnabled( true );
-    } else {
-        editButton->setEnabled( false );
+    else
         removeButton->setEnabled( false );
-    }
 }
 
 /***************************************************************************/

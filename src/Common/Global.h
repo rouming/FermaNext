@@ -45,6 +45,14 @@ extern const double areaMaxDimension,
                     defaultThickness;
 
 /************************************
+ * Truss Material Consts
+ ************************************/
+
+extern const double maxElasticityModule,
+                    maxWorkingStress,
+                    maxMaterialDensity;
+
+/************************************
  * Truss Unit Window Consts
  ************************************/
 

@@ -14,6 +14,8 @@ class QDoubleSpinBox;
 class QLineEdit;
 class QTreeWidget;
 
+class MaterialProperties;
+
 /*****************************************************************************/
 
 class MaterialTreeWidgetItem : public QObject, public QTreeWidgetItem
@@ -22,15 +24,21 @@ class MaterialTreeWidgetItem : public QObject, public QTreeWidgetItem
 public:
     MaterialTreeWidgetItem ( const TrussMaterial&, int type = Type );
     const TrussMaterial& getItemMaterial () const;
+    const MaterialProperties& getMaterialProperties () const;
 
 protected slots:
+    // Update temporary values
     void updateName ( const QString& );
     void updateWorkingStress ( double );
     void updateElasticityModule ( double );
     void updateDensity ( double );
 
+    // Set temporary properties to current material properties
+    void clearMaterialProperties (); 
+
 private:
     const TrussMaterial& material;
+    MaterialProperties& tempProps;
 };
 
 /*****************************************************************************/
@@ -55,12 +63,42 @@ private:
 
 /*****************************************************************************/
 
-class TrussMaterialEditDialog : public QDialog
+class MaterialEditWidget : public QWidget
 {
     Q_OBJECT
 public:
-    TrussMaterialEditDialog ( QWidget* parent = 0, Qt::WFlags f = 0 );
-    void setMaterial ( TrussMaterial& m, bool newMaterial );
+    MaterialEditWidget ( QWidget* parent = 0, Qt::WFlags f = 0 );
+    void setMaterial ( const MaterialProperties& props, 
+                       bool clearEditors = false );
+    void setMaterial ( const TrussMaterial& m, 
+                       bool clearEditors = false );
+    
+protected:
+    void init ();
+
+protected slots:
+    void verifyChanges ();
+
+signals:
+    void onNameChange ( const QString& );
+    void onWorkingStressChange ( double );
+    void onElasticityModuleChange ( double );
+    void onDensityChange ( double );
+    
+private:
+    QLineEdit* nameLineEdit;
+    QDoubleSpinBox *elasticitySpinBox, *stressSpinBox, *densitySpinBox;    
+    const TrussMaterial* material;
+};
+
+/*****************************************************************************/
+
+class MaterialCreationDialog : public QDialog
+{
+    Q_OBJECT
+public:
+    MaterialCreationDialog ( QWidget* parent = 0, Qt::WFlags f = 0 );
+    void setMaterial ( TrussMaterial& m );
 
 protected:
     void init ();
@@ -68,16 +106,14 @@ protected:
 protected slots:
     void applyChanges ();
     void cancelChanges ();
-
+    
 signals:
     void onMaterialCreationApply ( const TrussMaterial& );
     void onMaterialCreationCancel ( TrussMaterial& );
 
 private:
-    QLineEdit* nameLineEdit;
-    QDoubleSpinBox *elasticitySpinBox, *stressSpinBox, *densitySpinBox;    
+    MaterialEditWidget* materialEditWidget;
     TrussMaterial* material;
-    bool onMaterialCreate;
 };
 
 /*****************************************************************************/
@@ -110,18 +146,20 @@ protected slots:
     void removeProjectItem ( FermaNextProject& );
     
     void addMaterial ();
-    void editMaterial ();
     void removeMaterial ();
 
     void applyMaterialCreation ( const TrussMaterial& );
     void cancelMaterialCreation ( TrussMaterial& );
+    
+    void initEditorFields ( QTreeWidgetItem*, int );
 
     void checkButtons ();
 
 private:
-    TrussMaterialEditDialog* editDialog;
+    MaterialCreationDialog* createDialog;
+    MaterialEditWidget* editWidget;
     QTreeWidget* materialLibTreeList;
-    QPushButton *addButton, *editButton, *removeButton;
+    QPushButton *addButton, *removeButton, *applyButton;
 };
 
 #endif //TRUSSMATERIALEDITOR_H

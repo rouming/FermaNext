@@ -30,6 +30,14 @@ const double areaMaxDimension = 999.99,
              defaultThickness = 0.1;
 
 /************************************
+ * Truss Material Consts
+ ************************************/
+
+const double maxElasticityModule = 999999999.99,
+             maxWorkingStress = 9999999.99,
+             maxMaterialDensity = 999.99;
+
+/************************************
  * Truss Unit Window Consts
  ************************************/
 
