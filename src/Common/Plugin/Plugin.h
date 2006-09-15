@@ -21,10 +21,6 @@ typedef QMap<QString, PluginList>  RequiredPluginsMap;
 typedef RequiredPluginsMap::Iterator RequiredPluginsMapIter;
 typedef RequiredPluginsMap::ConstIterator RequiredPluginsMapIterConst;
 
-// Exceptions
-/** Occurs when required plugin types can't be resolved */
-struct RequiredPluginIsNotResolvedException { QStringList unresolvedTypes; };
-
 /** 
  * Occurs when #Plugin::execute called with wrong arguments.
  * Calling side should know correct order and type of arguments.

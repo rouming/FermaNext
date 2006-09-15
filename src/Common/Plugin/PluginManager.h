@@ -68,16 +68,13 @@ public:
     const PluginExecutionTree& buildExecutionTree ( Plugin& plugin );
 
     /**
-     * Resolves dependencies.
-     * @param plugin which dependencies should be resolved.
-     * @param types of required plugins.
+     * Returns dependencies for specified plugin.
+     * Note: returned map may contain empty lists as values,
+     *       if manager could not find any plugin as dependence.
+     * @param plugin.
      * @return map of required plugins.
-     * @throw RequiredPluginIsNotResolvedException occurs when plugin 
-     * dependencies can't be resolved.
      */
-    RequiredPluginsMap resolveDependence ( Plugin& plugin, 
-                                           const QStringList& types )
-        /*throw (RequiredPluginIsNotResolvedException)*/;
+    RequiredPluginsMap getDependencies ( Plugin* plugin );
 
     /**
      * Register all plugin loaders from specified path.
@@ -269,16 +266,8 @@ signals:
      */
     void onAfterPluginLoaderUnregistration ( const QString& plgLoaderPath );
 
-private slots:
-    /** This slot emits #onBeforePluginExecution signal */
-    void beforePluginExecution ( Plugin& );
-
-    /** This slot emits #onAfterPluginExecution signal */
-    void afterPluginExecution ( Plugin&, Plugin::ExecutionResult );
-
 private:
     // Exceptions
-    class PluginListIsEmptyException {};
     class RegisterPluginLoaderException {};
 
     /**
@@ -296,19 +285,6 @@ private:
      * @see registerPluginLoader
      */
     void unregisterPluginLoader ( PluginLoader& loader );
-
-    /**
-     * Delegates the choice of required plugin to the user (e.g. creates 
-     * GUI dialog window with special combobox).
-     * @param plugin for which user should choose required plugin.
-     * @param type of required plugin.
-     * @param plugins list from which user should decide what required plugin 
-     * is better.
-     */
-    Plugin& chooseRequiredPlugin ( Plugin& plugin, 
-                                   const QString& type,
-                                   const PluginList& plugins )
-        /*throw (PluginListIsEmptyException)*/;
 
     /** Hidden copy constructor. */
     PluginManager ( const PluginManager& );
