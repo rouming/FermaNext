@@ -1,6 +1,15 @@
 
 #include "PluginManager.h"
 #include "Plugin.h"
+#include "Log4CXX.h"
+
+/*****************************************************************************
+ * Logger
+ *****************************************************************************/
+
+using log4cxx::LoggerPtr;
+using log4cxx::Logger;
+static LoggerPtr logger( Logger::getLogger("common.Plugin") );
 
 /*****************************************************************************
  * Plugin
@@ -16,6 +25,7 @@ Plugin::~Plugin ()
 Plugin::ExecutionResult Plugin::execute ( const QList<UUIDObject*>& args ) 
     /*throw (WrongExecutionArgsException)*/
 {
+    LOG4CXX_DEBUG(logger, "execute");
     emit beforeExecution( *this );
     ExecutionResult result = specificExecute( args );
     emit afterExecution( *this, result );

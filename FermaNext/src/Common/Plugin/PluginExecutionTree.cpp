@@ -203,19 +203,21 @@ void PluginExecutionTree::getParents (
 PluginExecutionNodeList PluginExecutionTree::getDependentPlugins ( 
     PluginExecutionNode& parent )
 {
-    //TODO:
-    PluginList pluginDependencies ;//= plgMng->getDependencies( parent.getPlugin() );
+    RequiredPluginsMap pluginsMap = 
+        plgMng.getDependencies( parent.getPlugin() );
 
     PluginList parents;
     getParents( parent, parents );
 
     PluginExecutionNodeList dependencies;
-    
-    foreach ( Plugin* plugin, pluginDependencies ) {
-        // Get plugins which were not mentioned before
-        if ( ! parents.contains(plugin) ) {
-            PluginExecutionNode n = parent.createChildNode( plugin );
-            dependencies.append(n);
+
+    foreach ( PluginList plugins, pluginsMap.values() ) {    
+        foreach ( Plugin* plugin, plugins ) {
+            // Get plugins which were not mentioned before
+            if ( ! parents.contains(plugin) ) {
+                PluginExecutionNode n = parent.createChildNode( plugin );
+                dependencies.append(n);
+            }
         }
     }
     return dependencies;

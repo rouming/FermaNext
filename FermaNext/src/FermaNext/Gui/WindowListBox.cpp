@@ -199,55 +199,7 @@ void TrussUnitWindowItem::executePlugin ( Plugin* plugin )
     QMessageBox::information( 0, "Plugin result", 
                               QString("Status: %1\nResult data: %2\n").
                                 arg(res.status).arg(res.data),
-                              0 );    
-
-    // FIXME QT3TO4
-    /*
-
-    FermaNextWorkspace& wsp = project.getWorkspace();    
-    PluginManager& plgManager = wsp.pluginManager();
-    PluginList plugins = plgManager.loadedPluginsOfType( CALCULATION_TYPE );
-    if ( plugins.size() == 0 ) {
-        QMessageBox::warning( 0, tr("Plugin manager warning"), 
-                                 tr("Calculation plugin was not found "
-                                    "in the plugin dir.") );
-        return;
-    }
-
-    // Find first calculation plugin. 
-    // TODO: plural calculation plugin support
-    Plugin* plugin = plugins[0];
-
-    try {
-        CalculationInterface& calcPlugin = 
-            dynamic_cast<CalculationInterface&>(*plugin);
-
-        // Try to find truss calc data widget
-        CalcDataToolBar& calcToolBar = project.getCalcDataToolBar();        
-        CalcDataWidget* calcForm = 
-            calcToolBar.findCalcDataWidget( trussWindow );
-
-        // Do calculation with new topology and calc data
-        TrussCalcData calcData;
-        TrussTopology& topology = trussWindow.createTopology();
-        calcPlugin.calculate( topology, calcData );
-        calcForm->initCalc( calcData );
-        calcForm->show();
-
-        // TODO: toplogy manager
-        topology.desist();
-    }
-    catch ( std::exception& ) {
-        QMessageBox::critical( 0, tr("Plugin manager error"),
-                               tr("Plugin '") + plugin->pluginInfo().name + 
-                                  "' has violated type contract." );
-    }
-    catch ( ... ) {
-        QMessageBox::critical( 0, tr("Plugin manager error"),
-                                  tr("Internal plugin error. \n"
-                                     "Please, inform plugin developer.") );
-    }
-    */
+                              0 );
 }
 
 void TrussUnitWindowItem::remove ()

@@ -26,12 +26,16 @@ namespace SortHelper {
 // Plugin sorter by path
 bool sortPluginsByPath ( Plugin* plg1, Plugin* plg2 )
 {
+    Q_ASSERT(plg1);
+    Q_ASSERT(plg2);
     return plg1->pluginPath() < plg2->pluginPath();
 }
 
 // Plugin loader sorter by path
 static bool sortPluginLoadersByPath ( PluginLoader* ldr1, PluginLoader* ldr2 )
 {
+    Q_ASSERT(ldr1);
+    Q_ASSERT(ldr2);
     return ldr1->pluginLoaderPath() < ldr2->pluginLoaderPath();
 }
 
@@ -234,48 +238,16 @@ void PluginManager::unregisterPluginLoader ( PluginLoader& loader )
     }    
 }
 
-RequiredPluginsMap PluginManager::resolveDependence ( 
-    Plugin& plugin, 
-    const QStringList& types )
-    /*throw (RequiredPluginIsNotResolvedException)*/
+RequiredPluginsMap PluginManager::getDependencies ( Plugin* plugin )
 {
-    QStringList unresolvedTypes;
+    Q_ASSERT(plugin);
     RequiredPluginsMap requiredPlugins;
-    QStringList::ConstIterator it = types.begin();
-    for ( ; it != types.end(); ++it ) {
-        QString requiredType = *it;
+    const QStringList& types = plugin->requiredPluginTypes();
+    foreach ( QString requiredType, types ) {
         PluginList plugins = loadedPluginsOfType( requiredType );
-        if ( plugins.size() == 0 )
-            unresolvedTypes.push_back( requiredType );
-        else if ( plugins.size() == 1 )
-            requiredPlugins[requiredType].push_back( plugins[0] );
-        else {
-            try {
-                Plugin& plg = 
-                    chooseRequiredPlugin( plugin, requiredType, plugins );
-                requiredPlugins[requiredType].push_back( &plg );
-            } catch ( PluginListIsEmptyException& ) {}
-        }
+        requiredPlugins[requiredType] = plugins;
     }
-    if ( unresolvedTypes.size() > 0 ) {
-        RequiredPluginIsNotResolvedException excp;
-        excp.unresolvedTypes = unresolvedTypes;
-        throw excp;
-    }
-    
     return requiredPlugins;
-}
-
-Plugin& PluginManager::chooseRequiredPlugin ( Plugin& /*plugin*/, 
-                                              const QString& /*type*/,
-                                              const PluginList& plugins ) 
-    /*throw (PluginListIsEmptyException)*/
-{
-    if ( plugins.size() == 0 )
-        throw PluginListIsEmptyException();    
-
-    // TODO: create GUI dialog for extended shoice.
-    return *plugins[0];
 }
 
 void PluginManager::loadPlugins ( const QString& path )
@@ -326,8 +298,8 @@ void PluginManager::loadPlugins ( const QString& path )
         }
     }
 
-    typedef std::vector<QString> PluginPathList;
-    typedef PluginPathList::const_iterator PluginPathListConstIter;
+    typedef QList<QString> PluginPathList;
+    typedef PluginPathList::ConstIterator PluginPathListConstIter;
     typedef QMap<QString, PluginLoader*> PluginPathMap;
 
     // Save all paths of plugins
@@ -371,11 +343,13 @@ void PluginManager::loadPlugins ( const QString& path )
             // Connect to deligate signals
             QObject::connect( &plg, 
                               SIGNAL(beforeExecution(Plugin&)), 
-                              SLOT(beforePluginExecution(Plugin&)) );
+                              SIGNAL(onBeforePluginExecution(Plugin&)) );
+
             QObject::connect( &plg, 
                               SIGNAL(afterExecution(Plugin&, 
-                                                     Plugin::ExecutionResult)),
-                              SLOT(beforePluginExecution(Plugin&)) );
+                                                    Plugin::ExecutionResult)),
+                              SIGNAL(onAfterPluginExecution(Plugin&,
+                                                    Plugin::ExecutionResult)));
 
             plugins[&plg] = loader;
             emit onAfterPluginLoad( plg );
@@ -521,18 +495,6 @@ PluginLoaderList PluginManager::pluginLoaders ( bool onlyOk ) const
     qSort( loadersRes.begin(), loadersRes.end(), 
            SortHelper::sortPluginLoadersByPath );
     return loadersRes;
-}
-
-
-void PluginManager::beforePluginExecution ( Plugin& plg )
-{
-    emit onBeforePluginExecution( plg );
-}
-
-void PluginManager::afterPluginExecution ( Plugin& plg, 
-                                           Plugin::ExecutionResult result )
-{
-    emit onAfterPluginExecution( plg, result );
 }
 
 /*****************************************************************************/
