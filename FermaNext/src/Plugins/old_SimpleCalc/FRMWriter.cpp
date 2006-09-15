@@ -4,12 +4,13 @@
 #include <QTextCodec>
 
 #include "FRMWriter.h"
+#include "TrussUnit.h"
 
 /*****************************************************************************
  * FRM Writer
  *****************************************************************************/
 
-FRMWriter::FRMWriter ( const TrussTopology& truss_ ) :
+FRMWriter::FRMWriter ( const TrussUnit* truss_ ) :
     truss(truss_)
 {}
 
@@ -23,15 +24,15 @@ void FRMWriter::write ( const QString& name )
     QTextStream out( &file );
     out.setCodec( QTextCodec::codecForName("ISO 8859-1") );
 
-    TrussTopology::NodeList nodes = truss.getNodeList();
-    TrussTopology::PivotList pivots = truss.getPivotList();
+    TrussUnit::NodeList nodes = truss->getNodeList();
+    TrussUnit::PivotList pivots = truss->getPivotList();
     
-    TrussTopology::NodeListIter nIter;
-    TrussTopology::PivotListIter pIter;
+    TrussUnit::NodeListIter nIter;
+    TrussUnit::PivotListIter pIter;
 
     // FIXME: use material lib instead
-    /*const TrussMaterial& mat = truss.getMaterial();*/
-    const TrussTopology::LoadCases& loadCases = truss.getLoadCases();
+    /*const TrussMaterial& mat = truss->getMaterial();*/
+    const TrussUnit::LoadCases& loadCases = truss->getLoadCases();
 
     uint fixNum = 0;
     for ( nIter = nodes.begin(); nIter != nodes.end(); ++nIter )
@@ -49,9 +50,9 @@ void FRMWriter::write ( const QString& name )
 
     for ( pIter = pivots.begin(); pIter != pivots.end(); ++pIter ) {
         uint firstInd = 1, lastInd = 1;
-        Pivot<Node>* p = *pIter;
-        Node& firstNode = p->getFirstNode();
-        Node& lastNode = p->getLastNode();
+        TrussPivot* p = *pIter;
+        TrussNode& firstNode = p->getFirstNode();
+        TrussNode& lastNode = p->getLastNode();
         for ( nIter = nodes.begin(); nIter != nodes.end();
               ++nIter, ++firstInd ) {
             if ( *nIter == &firstNode ) {
@@ -69,18 +70,18 @@ void FRMWriter::write ( const QString& name )
     }
 
     for ( nIter = nodes.begin(); nIter != nodes.end(); ++nIter ) {
-        Node* n = *nIter;
+        TrussNode* n = *nIter;
         out << QString::number(n->getX(), 'E', 14) << "\n" << 
                QString::number(n->getY(), 'E', 14) << "\n";
     }
 
     for ( pIter = pivots.begin(); pIter != pivots.end(); ++pIter ) {
-        Pivot<Node>* p = *pIter;
+        TrussPivot* p = *pIter;
         out << QString::number(p->getThickness(),'E', 14) << "\n";
     }
 
     for ( nIter = nodes.begin(); nIter != nodes.end(); ++nIter ) {
-        Node* n = *nIter;
+        TrussNode* n = *nIter;
         Node::Fixation fix = n->getFixation();
         if ( fix == Node::FixationByX )
             out << 0 << "\n" << 1 << "\n";
@@ -94,11 +95,11 @@ void FRMWriter::write ( const QString& name )
 
     for ( int loadInd = 1; loadInd <= loadCases.countLoadCases(); 
           ++loadInd ) {
-        TrussTopology::LoadCase* loadCase = loadCases.findLoadCase( loadInd );
+        TrussUnit::LoadCase* loadCase = loadCases.findLoadCase( loadInd );
         if ( loadCase == 0 )
             continue;
         for ( nIter = nodes.begin(); nIter != nodes.end(); ++nIter ) {
-            Node* n = *nIter;
+            TrussNode* n = *nIter;
             TrussLoad* l = loadCase->findLoad( *n );
             if ( l )
                 out << QString::number(l->getXForce(), 'E', 14)<< "\n"
@@ -109,7 +110,7 @@ void FRMWriter::write ( const QString& name )
         }
     }
 
-    const TrussDimension& dim = truss.getDimension();
+    const TrussDimension& dim = truss->getDimension();
 
     QString length;
     if ( dim.getLengthMeasure() == TrussDimension::mm )
@@ -125,7 +126,7 @@ void FRMWriter::write ( const QString& name )
     else 
         force = "êÃ";
 
-    const DoubleSize& ar = truss.getTrussAreaSize();
+    const DoubleSize& ar = truss->getTrussAreaSize();
     out << length << "\n"
         << force << "\n"
         << QString::number(ar.width(), 'E', 14) << "\n"

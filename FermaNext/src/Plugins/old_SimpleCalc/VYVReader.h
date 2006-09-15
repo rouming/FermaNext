@@ -2,18 +2,34 @@
 #ifndef VYVREADER_H
 #define VYVREADER_H
 
-class QString;
-class TrussCalcData;
+#include <QString>
+#include <QDomElement>
+
+#include "TrussCalcData.h"
 
 class VYVReader
 {
 public:
-    VYVReader ( TrussCalcData& );
+    VYVReader ();
+
+    /** Reads from *.vyv file to inner data buffer */
     bool read ( const QString& fileName );
-    bool write ( const QString& fileName ) const;
+
+    /**
+     * Writes inner data buffer to file in vyv format,
+     * or in xml format.
+     */
+    bool write ( const QString& fileName, bool inXML = true ) const;
+
+    /** Returns inner data in xml string */
+    QString toXMLString () const;
 
 private:
-    TrussCalcData& Data;
+    /** Returns inner data in xml */
+    QDomElement toXML ( QDomDocument& ) const;
+
+private:
+    TrussCalcData Data;
 };
 
 #endif //VYVREADER_H

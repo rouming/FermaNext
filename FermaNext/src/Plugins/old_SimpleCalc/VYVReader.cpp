@@ -13,11 +13,11 @@
  * VYV Reader
  *****************************************************************************/
 
-VYVReader::VYVReader ( TrussCalcData& data_ ) :
-    Data(data_)
+VYVReader::VYVReader ()
 {} 
 
-bool VYVReader::write ( const QString& fileName ) const
+bool VYVReader::write ( const QString& fileName,
+                        bool inXML ) const
 {
     QFile OutFile(fileName);
     QString Message;
@@ -26,6 +26,20 @@ bool VYVReader::write ( const QString& fileName ) const
 
     if ( ! OutFile.open(QIODevice::WriteOnly) )
         return false;
+
+    if ( inXML ) {
+        QTextStream stream( &OutFile );
+
+        QDomDocument doc;
+        QDomNode xmlInstr = 
+            doc.createProcessingInstruction(
+                        "xml", QString("version=\"1.0\" encoding=\"UTF-8\"") );
+        doc.insertBefore( xmlInstr, doc.firstChild() );
+
+        doc.appendChild( toXML(doc) );
+        doc.save( stream, 4 );
+        return true;
+    }
 
     Message = "Чтение из файла : " + fileName + "\n";
     OutFile.write(Message.toAscii().data(), Message.length());
@@ -284,5 +298,62 @@ bool VYVReader::read ( const QString& fileName )
 //---------------------------------------------------------------------------//
     return true;
 }
+
+QDomElement VYVReader::toXML ( QDomDocument& doc ) const
+{
+    QDomElement elem = doc.createElement("CalculationResults");
+
+    elem.setAttribute( "nodesNum", Data.nodesNum );
+    elem.setAttribute( "pivotNum", Data.pivotsNum );
+    elem.setAttribute( "loadsNum", Data.loadsNum );
+    elem.setAttribute( "volume",   Data.v );
+    elem.setAttribute( "stressLimit",   Data.stressLimit );
+    elem.setAttribute( "forceWeight",   Data.forceWeight );
+
+    QDomElement inner;
+    uint i = 0;
+
+    // Pivots
+    inner = doc.createElement("Pivots");
+    elem.appendChild(inner);
+
+    for ( i = 0; i < Data.pivotsFirstNodes.size(); ++i ) {
+        QDomElement pivot = doc.createElement("Pivot");
+        inner.appendChild(pivot);
+        pivot.setAttribute( "firstNodeInd", Data.pivotsFirstNodes[i] );
+        pivot.setAttribute( "lastNodeInd", Data.pivotsLastNodes[i] );
+        /*
+        pivot.setAttribute( "stress", Data.stress[i] );
+        pivot.setAttribute( "safetyFactor", Data.safetyFactor[i] );
+        */
+        pivot.setAttribute( "square", Data.pivotSquare[i] );
+        pivot.setAttribute( "length", Data.pivotLength[i] );
+    }
+
+    // Nodes
+    inner = doc.createElement("Nodes");
+    elem.appendChild(inner);
+
+    for ( i = 0; i < Data.x.size(); ++i ) {
+        QDomElement node = doc.createElement("Node");
+        inner.appendChild(node);
+
+        node.setAttribute( "x", Data.x[i] );
+        node.setAttribute( "y", Data.y[i] );
+        /*
+        node.setAttribute( "xTrans", Data.xTrans[i] );
+        node.setAttribute( "yTrans", Data.yTrans[i] );
+        */
+    }
+
+    return elem;
+}
+
+QString VYVReader::toXMLString () const
+{ 
+    QDomDocument doc;
+    doc.appendChild( toXML(doc) );
+    return doc.toString(4);
+} 
 
 /*****************************************************************************/

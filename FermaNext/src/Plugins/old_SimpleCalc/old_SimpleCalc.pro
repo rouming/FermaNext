@@ -23,9 +23,14 @@ unix {
   LIBS += -lTrussUnit -lCommon
 }
 
-INCLUDEPATH += ../../Common \
-               ../../Common/Plugin \
+INCLUDEPATH += \
+               $$(AGGDIR)/include \
+               $$(AGGDIR)/svg \
+               \
+               ../../Common \
                ../../Common/Loader \
+               ../../Common/Plugin \
+               ../../FermaNext/Gui/Agg \
                ../../FermaNext/TrussUnit \
                ../../Loaders/NativePluginLoader
 

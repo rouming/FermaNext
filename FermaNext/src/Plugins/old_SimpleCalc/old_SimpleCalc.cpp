@@ -5,7 +5,7 @@
 
 #include "old_SimpleCalc.h"
 #include "NativePluginFrontEnd.h"
-#include "Truss.h"
+#include "TrussUnit.h"
 #include "TrussCalcData.h"
 #include "FRMWriter.h"
 #include "VYVReader.h"
@@ -55,27 +55,35 @@ const PluginInfo& SimpleCalcPlugin::pluginInfo () const
 }
 
 Plugin::ExecutionResult SimpleCalcPlugin::specificExecute ( 
-    const QList<UUIDObject*>& )
+    const QList<UUIDObject*>& argsList )
     /*throw (WrongExecutionArgsException)*/
 {
-    QMessageBox::information( 0, "Qt4 native driver", 
-                              "This is a native driver.\n"
-                              "Will be implemented in the near future.",
-                              0 );
-    /* //TODO
+    if ( argsList.size() != 1 )
+        throw WrongExecutionArgsException();
+    
+    TrussUnit* truss = dynamic_cast<TrussUnit*>(argsList[0]);
+    if ( truss == 0 )
+        throw WrongExecutionArgsException();
+        
     QString frmFile( tempFileName() );    
     QString vyvFile( frmFile + fermaResExt );
+
+    // To be sure
+    QFile::remove( frmFile );
+    QFile::remove( vyvFile );
+
     FRMWriter frm(truss);
     frm.write( frmFile );
-    QFile::remove( vyvFile );
     startCalculation( frmFile );
-    VYVReader vyv(data);
+    VYVReader vyv;
     vyv.read( vyvFile );
-    QFile::remove( vyvFile );
-    */
 
-    // FIXME: add real results
-    return ExecutionResult( OkStatus, "Nothing for now!" );
+    // Last clean
+    QFile::remove( frmFile );
+    QFile::remove( vyvFile );
+
+    // FIXME: add real status
+    return ExecutionResult( OkStatus, vyv.toXMLString() );
 }
 
 void SimpleCalcPlugin::createTempFile ()
