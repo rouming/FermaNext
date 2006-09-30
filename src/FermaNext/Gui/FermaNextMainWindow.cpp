@@ -333,18 +333,20 @@ void FermaNextMainWindow::createProject ()
 
         PluginManager& plgMng = workspace.pluginManager();
         PluginList plgList = plgMng.loadedPlugins();
-        Plugin* plg = plgList[0];
-        QFile xmlFile( "test.xml" );
-        xmlFile.open( QIODevice::ReadWrite );
-        QIODevice* xmlIODev = &xmlFile;
-        QDomDocument doc;
-        doc.setContent( xmlIODev );
-        QDomElement docElem = doc.firstChild().toElement();
-        docElem.setAttribute( "trussUUID", trussWindow.getUUID() );
-        QString plgResStr = doc.toString();
-        Plugin::ExecutionResult exRes( Plugin::OkStatus, plgResStr );
-        TrussResultsManager& resMng = prj.getTrussResultsManager();
-        resMng.pluginWasExecuted( *plg, exRes );
+        if ( ! plgList.isEmpty() ) {
+            Plugin* plg = plgList[0];
+            QFile xmlFile( Global::applicationDirPath() + "/testResults.xml" );
+            xmlFile.open( QIODevice::ReadOnly );
+            QIODevice* xmlIODev = &xmlFile;
+            QDomDocument doc;
+            doc.setContent( xmlIODev );
+            QDomElement docElem = doc.firstChild().toElement();
+            docElem.setAttribute( "trussUUID", trussWindow.getUUID() );
+            QString plgResStr = doc.toString();
+            Plugin::ExecutionResult exRes( Plugin::OkStatus, plgResStr );
+            TrussResultsManager& resMng = prj.getTrussResultsManager();
+            resMng.pluginWasExecuted( *plg, exRes );
+        }
 
 #endif
 /*********** TEMP TRUSS UNIT **************************/

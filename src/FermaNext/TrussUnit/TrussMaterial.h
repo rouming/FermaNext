@@ -96,11 +96,9 @@ public:
     virtual TrussMaterial* getMaterial ( const QString& name ) const;
 
     virtual int countMaterials () const;
+    virtual void clean ();
 
     virtual const TrussMaterialUUIDMap& getMaterialUUIDMap () const;
-
-protected:
-    virtual void clean ();
 
 protected slots:
     virtual void checkMaterialName ( const QString& ); 

@@ -21,43 +21,19 @@
 #include "GuiSubsidiary.h"
 
 /*****************************************************************************
- * Material Properties
- *****************************************************************************/
-
-class MaterialProperties
-{
-public:
-    MaterialProperties ( const QString& n, double w, double e, double d ) :
-        name( n ), wStress( w ), eModule( e ), density( d ) {}
-
-    QString name;
-    double wStress, eModule, density;
-};
-
-/*****************************************************************************
  * Material Tree Widget Item
  *****************************************************************************/
 
 MaterialTreeWidgetItem::MaterialTreeWidgetItem ( const TrussMaterial& m, 
-                                                 int type /* = Type */) :
+                                                 int type /* = Type */ ) :
     QTreeWidgetItem( type ),
-    material( m ),
-    tempProps( *(new MaterialProperties( m.getMaterialName(), 
-                                         m.getWorkingStress(), 
-                                         m.getElasticityModule(), 
-                                         m.getDensity() )) )
+    material( m )
 {
-    setText( 0, tempProps.name );
+    setText( 0, m.getMaterialName() );
     setTextAlignment( 0, Qt::AlignLeft );
     
     connect( &m, SIGNAL(onAfterNameChange(const QString&)) ,
                  SLOT(updateName(const QString&)) );
-    connect( &m, SIGNAL(onAfterWorkingStressChange(double)) ,
-                 SLOT(updateWorkingStress(double)) );
-    connect( &m, SIGNAL(onAfterElasticityModuleChange(double)) ,
-                 SLOT(updateElasticityModule(double)) );
-    connect( &m, SIGNAL(onAfterDensityChange(double)) ,
-                 SLOT(updateDensity(double)) );
 }
 
 const TrussMaterial& MaterialTreeWidgetItem::getItemMaterial () const
@@ -67,37 +43,7 @@ const TrussMaterial& MaterialTreeWidgetItem::getItemMaterial () const
 
 void MaterialTreeWidgetItem::updateName ( const QString& name )
 {
-    tempProps.name = name;
     setText( 0, name );
-}
-
-void MaterialTreeWidgetItem::updateWorkingStress ( double ws )
-{
-    tempProps.wStress = ws;
-}
-
-void MaterialTreeWidgetItem::updateElasticityModule ( double em )
-{
-    tempProps.eModule = em;
-}
-
-void MaterialTreeWidgetItem::updateDensity ( double d )
-{
-    tempProps.density = d;
-}
-
-const MaterialProperties& MaterialTreeWidgetItem::getMaterialProperties () const
-{
-    return tempProps;
-}
-
-void MaterialTreeWidgetItem::clearMaterialProperties ()
-{
-    tempProps.name = material.getMaterialName();
-    setText( 0, tempProps.name );
-    tempProps.wStress = material.getWorkingStress();
-    tempProps.eModule = material.getElasticityModule();
-    tempProps.density = material.getDensity();
 }
 
 /*****************************************************************************
@@ -197,28 +143,31 @@ void MaterialEditWidget::init ()
 
     QVBoxLayout* mainLayout = new QVBoxLayout( this );
     mainLayout->addWidget( materialPropBox );
+
+    connect( nameLineEdit, SIGNAL( editingFinished() ),
+                             SLOT( updateName() ) );
+
+    connect( elasticitySpinBox, SIGNAL( editingFinished() ),
+                                  SLOT( updateElasticityModule() ) );
+
+    connect( stressSpinBox, SIGNAL( editingFinished() ),
+                              SLOT( updateWorkingStress() ) );
+
+    connect( densitySpinBox, SIGNAL( editingFinished() ),
+                               SLOT( updateDensity() ) );
+
+    showEditors( false );
+
+    nameLineEdit->installEventFilter( this );
+    elasticitySpinBox->installEventFilter( this );
+    stressSpinBox->installEventFilter( this );
+    densitySpinBox->installEventFilter( this );
 }
 
-void MaterialEditWidget::setMaterial ( const MaterialProperties& props, 
+void MaterialEditWidget::setMaterial ( TrussMaterial& m, 
                                        bool clearEditors /* = false */ )
 {
-    if ( ! clearEditors ) {
-        nameLineEdit->setText( props.name );
-        elasticitySpinBox->setValue( props.eModule );
-        stressSpinBox->setValue( props.wStress );
-        densitySpinBox->setValue( props.density );
-    }
-    else {
-        nameLineEdit->clear();
-        elasticitySpinBox->setValue(0);
-        stressSpinBox->setValue(0);
-        densitySpinBox->setValue(0);
-    }
-}
-
-void MaterialEditWidget::setMaterial ( const TrussMaterial& m, 
-                                       bool clearEditors /* = false */ )
-{
+    showEditors( true );
     if ( ! clearEditors ) {
         nameLineEdit->setText( m.getMaterialName() );
         elasticitySpinBox->setValue( m.getElasticityModule() );
@@ -227,74 +176,116 @@ void MaterialEditWidget::setMaterial ( const TrussMaterial& m,
     }
     else {
         nameLineEdit->clear();
-        elasticitySpinBox->setValue(0);
-        stressSpinBox->setValue(0);
-        densitySpinBox->setValue(0);
+        elasticitySpinBox->clear();
+        stressSpinBox->clear();
+        densitySpinBox->clear();
+    }
+    material = &m;
+}
+
+void MaterialEditWidget::updateName ()
+{
+    if ( ! material )
+        return;
+    
+    try {
+        material->setMaterialName( nameLineEdit->text() );
+    } 
+    catch ( TrussMaterialLibrary::WrongMaterialNameException& ) {
+        ( QMessageBox::critical( this, tr("Material creation"),
+          tr("There is another material with name %1.").arg(
+                                        nameLineEdit->text()) ) );
+        nameLineEdit->setFocus();
+        return;
     }
 }
 
-void MaterialEditWidget::verifyChanges ()
+void MaterialEditWidget::updateWorkingStress ()
 {
-    /*
-    if ( sender == nameLineEdit ) {
-        if ( nameLineEdit->text().isEmpty() ) 
-        {
-            ( QMessageBox::critical( this, tr("Material creation"),
-                                     tr("Material name wasn't entered.") ) );
-            return;
-        } 
-        else 
-        {
-            try {
-                material->setMaterialName( nameLineEdit->text() );
-            } 
-            catch ( TrussMaterialLibrary::WrongMaterialNameException& ) {
-                ( QMessageBox::critical( this, tr("Material creation"),
-                  tr("There is another material with name %1.").arg(
-                                                nameLineEdit->text()) ) );
-                return;
+    if ( ! material )
+        return;
+
+    material->setWorkingStress( stressSpinBox->value() );
+}
+
+void MaterialEditWidget::updateElasticityModule ()
+{
+    if ( ! material )
+        return;
+
+    material->setElasticityModule( elasticitySpinBox->value() );
+}
+
+void MaterialEditWidget::updateDensity ()
+{
+    if ( ! material )
+        return;
+
+    material->setDensity( densitySpinBox->value() );
+}
+
+void MaterialEditWidget::showEditors ( bool showStatus )
+{
+    nameLineEdit->clear();
+    elasticitySpinBox->clear();
+    stressSpinBox->clear();
+    densitySpinBox->clear();   
+    
+    nameLineEdit->setEnabled( showStatus );
+    elasticitySpinBox->setEnabled( showStatus );
+    stressSpinBox->setEnabled( showStatus );
+    densitySpinBox->setEnabled( showStatus );
+}
+
+bool MaterialEditWidget::eventFilter ( QObject* targetObj, QEvent* event )
+{
+    if ( event->type() == QEvent::MouseButtonRelease ||
+         event->type() == QEvent::KeyRelease ) {
+        if ( targetObj ) 
+            return true;
+        return QWidget::eventFilter( targetObj, event );
+    }
+    if ( event->type() == QEvent::FocusOut ) {
+        if ( targetObj == nameLineEdit ) {
+            if ( nameLineEdit->text().isEmpty() ) {
+                QMessageBox::critical( this, tr("Material creation"),
+                                 tr("Material name wasn't entered.") );
+                nameLineEdit->setFocus( Qt::OtherFocusReason );
+                return true;
             }
         }
-        nameLineEdit->setFocus
+        else if ( targetObj == elasticitySpinBox ) {
+            if ( elasticitySpinBox->value() <= 0 ) {
+                QMessageBox::critical( this, tr("Material creation"),
+                          tr("Wrong working stress was entered.") );
+                elasticitySpinBox->setFocus( Qt::OtherFocusReason );
+                return true;
+            }
+        }
+        else if ( targetObj == stressSpinBox ) {
+            if ( stressSpinBox->value() <= 0 ) {
+                QMessageBox::critical( this, tr("Material creation"),
+                                tr("Wrong elasticity module was entered.") );
+                stressSpinBox->setFocus( Qt::OtherFocusReason );
+                return true;
+            }
+        }
+        else if ( targetObj == densitySpinBox ) {
+            if ( densitySpinBox->value() <= 0 ) {
+                QMessageBox::critical( this, tr("Material creation"),
+                                 tr("Wrong density was entered.") );
+                densitySpinBox->setFocus( Qt::OtherFocusReason );
+                return true;
+            }
+        }
+        return false;
     }
-
-
-
-    try {
-        material->setWorkingStress( stressSpinBox->value() );
-    } 
-    catch ( TrussMaterialLibrary::WrongWorkingStressException& ) {
-        ( QMessageBox::critical( this, tr("Material creation"),
-          tr("Wrong working stress was entered.") ) );
-        return;
-    }
-
-    try {
-        material->setElasticityModule( elasticitySpinBox->value() );
-    } 
-    catch ( TrussMaterialLibrary::WrongElasticityModuleException& ) {
-        ( QMessageBox::critical( this, tr("Material creation"),
-          tr("Wrong elasticity module was entered.") ) );
-        return;
-    }
-
-    try {
-        material->setDensity( densitySpinBox->value() );
-    } 
-    catch ( TrussMaterialLibrary::WrongDensityException& ) {
-        ( QMessageBox::critical( this, tr("Material creation"),
-          tr("Wrong density was entered.") ) );
-        return;
-    }
-    
-    if ( onMaterialCreate )
-        emit onMaterialCreationApply( *material );
-    
-*/
+    else
+        return QWidget::eventFilter( targetObj, event );
 }
 
 /*****************************************************************************
- * Truss Material Edit Dialog
+ * Truss Material Creation Dialog
  *****************************************************************************/
 
 MaterialCreationDialog::MaterialCreationDialog ( QWidget* parent /* = 0 */, 
@@ -341,53 +332,6 @@ void MaterialCreationDialog::setMaterial ( TrussMaterial& m )
 
 void MaterialCreationDialog::applyChanges ()
 {
-    /*
-    if ( nameLineEdit->text().isEmpty() ) 
-    {
-        ( QMessageBox::critical( this, tr("Material creation"),
-                                 tr("Material name wasn't entered.") ) );
-        return;
-    } 
-    else 
-    {
-        try {
-            material->setMaterialName( nameLineEdit->text() );
-        } 
-        catch ( TrussMaterialLibrary::WrongMaterialNameException& ) {
-            ( QMessageBox::critical( this, tr("Material creation"),
-              tr("There is another material with name %1.").arg(
-                                            nameLineEdit->text()) ) );
-            return;
-        }
-    }
-
-    try {
-        material->setWorkingStress( stressSpinBox->value() );
-    } 
-    catch ( TrussMaterialLibrary::WrongWorkingStressException& ) {
-        ( QMessageBox::critical( this, tr("Material creation"),
-          tr("Wrong working stress was entered.") ) );
-        return;
-    }
-
-    try {
-        material->setElasticityModule( elasticitySpinBox->value() );
-    } 
-    catch ( TrussMaterialLibrary::WrongElasticityModuleException& ) {
-        ( QMessageBox::critical( this, tr("Material creation"),
-          tr("Wrong elasticity module was entered.") ) );
-        return;
-    }
-
-    try {
-        material->setDensity( densitySpinBox->value() );
-    } 
-    catch ( TrussMaterialLibrary::WrongDensityException& ) {
-        ( QMessageBox::critical( this, tr("Material creation"),
-          tr("Wrong density was entered.") ) );
-        return;
-    }
-    */
     emit onMaterialCreationApply( *material );
     hide();
 }
@@ -433,10 +377,10 @@ void TrussMaterialEditor::init ()
                           SLOT(hide()) );
     QPushButton* cancelButton = new QPushButton( tr( "Cancel" ) );
     connect( cancelButton, SIGNAL(clicked()),
-                             SLOT(hide()) );
+                             SLOT(cancelChanges()) );
     applyButton = new QPushButton( tr( "Apply" ) );
     connect( applyButton, SIGNAL(clicked()),
-                            SLOT(hide()) );
+                            SLOT(applyChanges()) );
     applyButton->setEnabled( false );
     addButton = new QPushButton( tr( "Add" ) );
     connect( addButton, SIGNAL(clicked()),
@@ -479,8 +423,7 @@ void TrussMaterialEditor::init ()
                          SLOT(cancelMaterialCreation(TrussMaterial&)) );
     
     connect( materialLibTreeList, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
-                                    SLOT(initEditorFields(QTreeWidgetItem*, int)));
-
+                                    SLOT(fillEditorFields(QTreeWidgetItem*, int)));
 
     setWindowTitle( "Material Editor" );
     setFixedSize( 500, 250 );    
@@ -631,8 +574,6 @@ void TrussMaterialEditor::setCurrentProjectItem ( FermaNextProject& proj )
 {
     for ( int i = 0; i < materialLibTreeList->topLevelItemCount(); ++i ) {
         QTreeWidgetItem* item = materialLibTreeList->topLevelItem( i );
-        if ( ! item )
-            return;
 
         ProjectTreeWidgetItem* projItem = 
             dynamic_cast<ProjectTreeWidgetItem*>(item);
@@ -644,6 +585,77 @@ void TrussMaterialEditor::setCurrentProjectItem ( FermaNextProject& proj )
         else
             projItem->setCurrent( false );
     }
+}
+
+void TrussMaterialEditor::fillEditorFields ( QTreeWidgetItem* item, int )
+{
+    MaterialTreeWidgetItem* materialItem = 
+        dynamic_cast<MaterialTreeWidgetItem*>( item );
+    if ( ! materialItem )
+        return;
+
+    // since we need to edit it in future
+    TrussMaterial& material = 
+        const_cast<TrussMaterial&>( materialItem->getItemMaterial() );
+    
+    editWidget->setMaterial( material );
+}
+
+void TrussMaterialEditor::saveMaterialProperties ()
+{
+    materialProperties.clear();
+    
+    for ( int i = 0; i < materialLibTreeList->topLevelItemCount(); ++i ) {
+        QTreeWidgetItem* item = materialLibTreeList->topLevelItem( i );
+
+        ProjectTreeWidgetItem* projItem = 
+            dynamic_cast<ProjectTreeWidgetItem*>(item);
+        if ( ! projItem )
+            return;
+
+        const FermaNextProject& proj = projItem->getItemProject();
+        TrussMaterialLibrary& mLib = proj.getMaterialLibrary();
+        QDomNode oldData = materialPropDoc.firstChild();
+        if ( ! oldData.isNull() )
+            materialPropDoc.removeChild( oldData );
+        QDomElement xmlProps = mLib.saveToXML( materialPropDoc );
+        materialProperties.insert( &proj, xmlProps );
+    }    
+}
+
+void TrussMaterialEditor::loadMaterialProperties ()
+{
+    for ( int i = 0; i < materialLibTreeList->topLevelItemCount(); ++i ) {
+        QTreeWidgetItem* item = materialLibTreeList->topLevelItem( i );
+
+        ProjectTreeWidgetItem* projItem = 
+            dynamic_cast<ProjectTreeWidgetItem*>(item);
+        if ( ! projItem )
+            return;
+
+        const FermaNextProject& proj = projItem->getItemProject();
+        TrussMaterialLibrary& mLib = proj.getMaterialLibrary();
+        mLib.clean();
+        mLib.loadFromXML( materialProperties.value( &proj ) );
+    }    
+}
+
+void TrussMaterialEditor::exec ()
+{
+    saveMaterialProperties();
+    QDialog::exec();
+}
+
+void TrussMaterialEditor::cancelChanges ()
+{
+    loadMaterialProperties();
+    hide();
+}
+
+void TrussMaterialEditor::applyChanges ()
+{
+    saveMaterialProperties();
+    hide();
 }
 
 void TrussMaterialEditor::addMaterial ()
@@ -711,25 +723,16 @@ void TrussMaterialEditor::cancelMaterialCreation ( TrussMaterial& m )
     projItem->getMaterialLibrary().removeMaterial( m );
 }
 
-void TrussMaterialEditor::initEditorFields ( QTreeWidgetItem* item, int )
-{
-    MaterialTreeWidgetItem* materialItem = 
-        dynamic_cast<MaterialTreeWidgetItem*>( item );
-    if ( ! materialItem )
-        return;
-
-    const MaterialProperties& materialProps = 
-        materialItem->getMaterialProperties();
-
-    editWidget->setMaterial( materialProps );    
-}
-
 void TrussMaterialEditor::checkButtons ()
 {
-    if ( getSelectedMaterialItem() )
+    if ( getSelectedMaterialItem() ) {
+        editWidget->showEditors( true );
         removeButton->setEnabled( true );
-    else
+    }
+    else {
+        editWidget->showEditors( false );
         removeButton->setEnabled( false );
+    }
 }
 
 /***************************************************************************/

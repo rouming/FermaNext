@@ -3,6 +3,7 @@
 #define TRUSSMATERIALEDITOR_H
 
 #include <QDialog>
+#include <QDomDocument>
 #include <QMap>
 #include <QStringList>
 #include <QTreeWidgetItem>
@@ -14,8 +15,6 @@ class QDoubleSpinBox;
 class QLineEdit;
 class QTreeWidget;
 
-class MaterialProperties;
-
 /*****************************************************************************/
 
 class MaterialTreeWidgetItem : public QObject, public QTreeWidgetItem
@@ -24,21 +23,12 @@ class MaterialTreeWidgetItem : public QObject, public QTreeWidgetItem
 public:
     MaterialTreeWidgetItem ( const TrussMaterial&, int type = Type );
     const TrussMaterial& getItemMaterial () const;
-    const MaterialProperties& getMaterialProperties () const;
 
 protected slots:
-    // Update temporary values
     void updateName ( const QString& );
-    void updateWorkingStress ( double );
-    void updateElasticityModule ( double );
-    void updateDensity ( double );
-
-    // Set temporary properties to current material properties
-    void clearMaterialProperties (); 
 
 private:
     const TrussMaterial& material;
-    MaterialProperties& tempProps;
 };
 
 /*****************************************************************************/
@@ -68,27 +58,24 @@ class MaterialEditWidget : public QWidget
     Q_OBJECT
 public:
     MaterialEditWidget ( QWidget* parent = 0, Qt::WFlags f = 0 );
-    void setMaterial ( const MaterialProperties& props, 
+    void setMaterial ( TrussMaterial& m, 
                        bool clearEditors = false );
-    void setMaterial ( const TrussMaterial& m, 
-                       bool clearEditors = false );
+    void showEditors ( bool );
     
 protected:
     void init ();
+    bool eventFilter ( QObject*, QEvent* );
 
 protected slots:
-    void verifyChanges ();
-
-signals:
-    void onNameChange ( const QString& );
-    void onWorkingStressChange ( double );
-    void onElasticityModuleChange ( double );
-    void onDensityChange ( double );
+    void updateName ();
+    void updateWorkingStress ();
+    void updateElasticityModule ();
+    void updateDensity ();
     
 private:
     QLineEdit* nameLineEdit;
     QDoubleSpinBox *elasticitySpinBox, *stressSpinBox, *densitySpinBox;    
-    const TrussMaterial* material;
+    TrussMaterial* material;
 };
 
 /*****************************************************************************/
@@ -134,9 +121,16 @@ protected:
     MaterialTreeWidgetItem* getMaterialItem ( const TrussMaterial&,
                                         const ProjectTreeWidgetItem& ) const;
     ProjectTreeWidgetItem* getProjectItem ( const FermaNextProject& ) const;
+
+    void saveMaterialProperties ();
+    void loadMaterialProperties ();
     
 public slots:
     void setCurrentProjectItem ( FermaNextProject& );
+    void fillEditorFields ( QTreeWidgetItem*, int );
+    void exec ();
+    void cancelChanges ();
+    void applyChanges ();
 
 protected slots:
     void addMaterialItem ( const TrussMaterial& );
@@ -150,16 +144,18 @@ protected slots:
 
     void applyMaterialCreation ( const TrussMaterial& );
     void cancelMaterialCreation ( TrussMaterial& );
-    
-    void initEditorFields ( QTreeWidgetItem*, int );
 
     void checkButtons ();
 
 private:
+    typedef QMap<const FermaNextProject*, QDomElement> MaterialPropMap;
+
+    MaterialPropMap materialProperties;
     MaterialCreationDialog* createDialog;
     MaterialEditWidget* editWidget;
     QTreeWidget* materialLibTreeList;
     QPushButton *addButton, *removeButton, *applyButton;
+    QDomDocument materialPropDoc;
 };
 
 #endif //TRUSSMATERIALEDITOR_H
