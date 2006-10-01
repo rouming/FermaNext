@@ -681,7 +681,7 @@ void TrussDesignerWidget::removeLoadsFromNode ( const TrussNode& node )
         return;
 
     const TrussUnit::LoadCases& loadCases = focusedWindow->getLoadCases();
-    for ( int i = 0; i < loadCases.countLoadCases(); ++i ) {
+    for ( int i = 1; i <= loadCases.countLoadCases(); ++i ) {
         TrussUnit::LoadCase* loadCase = loadCases.findLoadCase( i );
         if ( loadCase )
             loadCase->removeLoad( node );
