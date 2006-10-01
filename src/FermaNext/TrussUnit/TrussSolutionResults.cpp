@@ -86,6 +86,13 @@ void LoadCaseResults::PivotResults::loadAttributesFromXML (
     if ( ! valid )
         throw LoadException();
 
+    if ( ! pivotResElem.hasAttribute("safetyMargin") )
+        throw LoadException();
+    valueStr = pivotResElem.attribute( "safetyMargin" );
+    safetyMargin = valueStr.toDouble( &valid );
+    if ( ! valid )
+        throw LoadException();
+
     if ( ! pivotResElem.hasAttribute("pivotNumber") )
         throw LoadException();
     valueStr = pivotResElem.attribute( "pivotNumber" );
@@ -100,6 +107,7 @@ QDomElement LoadCaseResults::PivotResults::saveToXML ( QDomDocument& doc )
     pivotResElem.setTagName( "PivotResults" );
     pivotResElem.setAttribute( "stress", stress );
     pivotResElem.setAttribute( "requiredThickness", requiredThick );
+    pivotResElem.setAttribute( "safetyMargin", safetyMargin );
     pivotResElem.setAttribute( "pivotNumber", pivotNumb );
     return pivotResElem;
 }
@@ -127,10 +135,11 @@ LoadCaseResults::NodeResults& LoadCaseResults::addNodeResults ( double dispX,
 }
 
 LoadCaseResults::PivotResults& LoadCaseResults::addPivotResults ( double stress, 
-                                                                double reqThick, 
+                                                                double reqThick,
+                                                                double sMargin,
                                                                 int numb )
 {
-    PivotResults* pivotRes = new PivotResults( stress, reqThick, numb );
+    PivotResults* pivotRes = new PivotResults( stress, reqThick, sMargin, numb );
     pivotResultsList.push_back( pivotRes );
     return *pivotRes;
 }
@@ -181,6 +190,23 @@ double LoadCaseResults::getRequiredThickness ( int indx, bool& valid ) const
         if ( pivotRes->pivotNumb == indx + 1 ) {
             valid = true;
             return pivotRes->requiredThick;
+        }
+    valid = false;
+    return 0;
+}
+
+double LoadCaseResults::getSafetyMargin ( int indx, bool& valid ) const
+{
+    if ( pivotResultsList.empty() || indx < 0 || 
+         indx >= pivotResultsList.size() ) {
+        valid = false;
+        return 0;
+    }
+    PivotResults* pivotRes = 0;
+    foreach ( pivotRes, pivotResultsList )
+        if ( pivotRes->pivotNumb == indx + 1 ) {
+            valid = true;
+            return pivotRes->safetyMargin;
         }
     valid = false;
     return 0;
@@ -275,7 +301,7 @@ void LoadCaseResults::loadAttributesFromXML ( const QDomElement& loadCaseResElem
         QDomElement pivotResElem = pivot.toElement();
 
         // fill with default zero values
-        PivotResults& pRes = addPivotResults( 0, 0, 0 );
+        PivotResults& pRes = addPivotResults( 0, 0, 0, 0 );
         if ( uuidLoad )
             pRes.loadFromXML( pivotResElem );
         else
@@ -315,7 +341,9 @@ QDomElement LoadCaseResults::saveToXML ( QDomDocument& doc )
  *****************************************************************************/
 
 PluginResults::PluginResults () :
-    forceWeight( 0 )
+    forceWeight( 0 ),
+    materialVolume( 0 ),
+    maxTension( 0 )
 {}
 
 PluginResults::~PluginResults ()
@@ -365,6 +393,26 @@ double PluginResults::getForceWeight () const
     return forceWeight;
 }
 
+void PluginResults::setMaterialVolume ( double value )
+{
+    materialVolume = value;
+}
+
+double PluginResults::getMaterialVolume () const
+{
+    return materialVolume;
+}
+
+void PluginResults::setMaxTensionStress ( double value )
+{
+    maxTension = value;
+}
+
+double PluginResults::getMaxTensionStress () const
+{
+    return maxTension;
+}
+
 int PluginResults::countLoadCaseResults () const
 {
     return loadCaseResults.size();
@@ -409,6 +457,28 @@ void PluginResults::loadAttributesFromXML ( const QDomElement& plgResElem,
     if ( ! valid )
         throw LoadException();
     setForceWeight( fWeight );
+
+    /** 
+     * Set material volume value 
+     *************************/
+    if ( ! plgResElem.hasAttribute("materialVolume") )
+        throw LoadException();
+    valueStr = plgResElem.attribute( "materialVolume" );
+    double volume = valueStr.toDouble( &valid );
+    if ( ! valid )
+        throw LoadException();
+    setMaterialVolume( volume );
+
+    /** 
+     * Set max. tension stress value 
+     ********************************/
+    if ( ! plgResElem.hasAttribute("maxTensionStress") )
+        throw LoadException();
+    valueStr = plgResElem.attribute( "maxTensionStress" );
+    double tension = valueStr.toDouble( &valid );
+    if ( ! valid )
+        throw LoadException();
+    setMaxTensionStress( tension );
     
     /** 
      * Create load cases results
@@ -444,6 +514,16 @@ QDomElement PluginResults::saveToXML ( QDomDocument& doc )
      * Save force weight
      ********************/
     pluginResultsElem.setAttribute( "forceWeight", getForceWeight() );
+
+    /**
+     * Save material volume
+     ***********************/
+    pluginResultsElem.setAttribute( "materialVolume", getMaterialVolume() );
+
+    /**
+     * Save max tension stress
+     ***************************/
+    pluginResultsElem.setAttribute( "maxTensionStress", getMaxTensionStress() );
 
     /**
      * Save load case results

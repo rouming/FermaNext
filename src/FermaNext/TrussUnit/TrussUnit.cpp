@@ -99,6 +99,8 @@ TrussUnit::TrussUnit ( const QString& name, ObjectStateManager* mng ) :
                                                      const Node& )),
                             SLOT(clearFrontPivotPointer( const Node&, 
                                                          const Node& )) );
+    QObject::connect( this, SIGNAL(onSwitchLoadCase()), 
+                            SLOT(clearRenderedFlag()) );
 }
 
 TrussUnit::~TrussUnit ()
@@ -364,6 +366,11 @@ QDomElement TrussUnit::saveToXML ( QDomDocument& doc )
 void TrussUnit::trussUnitStateIsChanged ()
 {
     setCalculatedStatus(false);
+    setTrussRenderedStatus(false);
+}
+
+void TrussUnit::clearRenderedFlag ()
+{
     setTrussRenderedStatus(false);
 }
 

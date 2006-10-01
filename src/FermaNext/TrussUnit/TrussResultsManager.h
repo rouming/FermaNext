@@ -24,25 +24,27 @@ public:
                           const TrussUnitWindowManager& );
     ~TrussResultsManager ();
 
-    class ResultsReadingException {};
-    class WrongResultsFormat {};
-
-    TrussSolutionResults& createTrussSolutionResults ();
+    TrussSolutionResults& createSolutionResults ();
     TrussResultsList getResultsList () const;
     TrussSolutionResults* getResultsForTrussUnit ( 
                                            const QString& trussUUID ) const;
 protected:
-    TrussSolutionResults& parseExecutionResults ( Plugin::ExecutionResult );
-                                       /*throw (ResultsReadingException)*/;
+    bool parseExecutionResults ( Plugin::ExecutionResult, QString& errMsg );
+                                       
     void clean ();
 
 public slots:
     void pluginWasExecuted ( Plugin&, Plugin::ExecutionResult );
     
 protected slots:
+    void removeSolutionResults ( TrussSolutionResults& );
     void removeSolutionResults ( TrussUnitWindow& );
     void afterPluginWasLoaded ( Plugin& );
     void beforePluginWasUnloaded ( Plugin& );
+
+signals:
+    void onPluginExecutionError ( const PluginInfo&, const QString& );
+    void onShowTrussResults ( const TrussSolutionResults& );
 
 private:
     TrussResultsList trussResultsList;

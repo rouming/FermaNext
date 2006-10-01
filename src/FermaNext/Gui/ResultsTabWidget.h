@@ -36,6 +36,8 @@ private:
     HtmlDisplacementTable* dispTable;
     ColorRangeControl colorCtrl;
     ResultsControlWidget ctrlWidget;
+
+    QScrollArea* parentArea;
 };
 
 /*****************************************************************************/

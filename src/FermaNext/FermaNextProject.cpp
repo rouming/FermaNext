@@ -301,7 +301,7 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
         if ( ! trussResultsNode.isElement() )
             throw LoadException();
         QDomElement trussResultsElem = trussResultsNode.toElement();
-        TrussSolutionResults& res = resMng.createTrussSolutionResults();
+        TrussSolutionResults& res = resMng.createSolutionResults();
         res.loadFromXML( trussResultsElem );
     }
 }

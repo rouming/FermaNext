@@ -44,7 +44,7 @@ public:
     virtual ~HtmlTable ();
     const QDomDocument& getDomDocument () const;
     virtual void clearData ();
-    
+    virtual QSize sizeHint ();    
 protected:
     virtual void init ( const QString& );
     virtual void fillCell ( QDomElement& elem, const QString& text, 
