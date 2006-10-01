@@ -54,6 +54,7 @@ void FixationPopupMenu::fixNodeByX ()
 {
     if ( node ) {
         node->setFixation( TrussNode::FixationByX );
+        emit nodeWasFixed( *node );
     }
 }
 
@@ -61,6 +62,7 @@ void FixationPopupMenu::fixNodeByY ()
 {
     if ( node ) {
         node->setFixation( TrussNode::FixationByY );
+        emit nodeWasFixed( *node );
     }
 }
 
@@ -68,14 +70,14 @@ void FixationPopupMenu::fixNodeByXY ()
 {
     if ( node ) {
         node->setFixation( TrussNode::FixationByXY );
+        emit nodeWasFixed( *node );
     }
 }
 
 void FixationPopupMenu::unfixNode ()
 {
-    if ( node ){ 
+    if ( node )
         node->setFixation( TrussNode::Unfixed );
-    }
 }
 
 /*****************************************************************************
@@ -189,14 +191,17 @@ void LoadPopupMenu::okClicked()
                      loadYLine->text().toDouble() != 0 ) {
                     load->setXForce( loadXLine->text().toDouble() );
                     load->setYForce( loadYLine->text().toDouble() );
+                    node->setFixation( Node::Unfixed );
                 }
                 else {
                     loadCase->removeLoad( *node );
                 }
             }
-            else {
+            else if ( loadXLine->text().toDouble() != 0 ||
+                      loadYLine->text().toDouble() != 0 ) {
                 loadCase->addLoad( *node, loadXLine->text().toDouble(),
                                           loadYLine->text().toDouble() );
+                node->setFixation( Node::Unfixed );
             }
         }
         else {
@@ -246,6 +251,9 @@ TrussDesignerWidget::TrussDesignerWidget ( QWidget* p ) :
     
     QObject::connect( toolBar, SIGNAL( onAnimationPlays(bool) ),
                                  SLOT( setToolBarAnimStatus(bool) ) );
+
+    QObject::connect( fixationPopup, SIGNAL(nodeWasFixed(const TrussNode&)),
+                                SLOT(removeLoadsFromNode(const TrussNode&)) );
 
     QWidget::setFocus();
     QWidget::setMouseTracking( true );
@@ -665,6 +673,19 @@ bool TrussDesignerWidget::nodeCanBeDrawn ( int x, int y )
         }
     }
     return false;
+}
+
+void TrussDesignerWidget::removeLoadsFromNode ( const TrussNode& node )
+{
+    if ( ! focusedWindow )
+        return;
+
+    const TrussUnit::LoadCases& loadCases = focusedWindow->getLoadCases();
+    for ( int i = 0; i < loadCases.countLoadCases(); ++i ) {
+        TrussUnit::LoadCase* loadCase = loadCases.findLoadCase( i );
+        if ( loadCase )
+            loadCase->removeLoad( node );
+    }
 }
 
 void TrussDesignerWidget::saveNodeStateAfterDrag ( TrussNode& node,
@@ -1411,14 +1432,16 @@ void TrussDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
                     selectedWindow->nodeToFront ( *selectedNode );
 
                     if ( designerBehaviour == onFixDraw ) {
-                        fixationPopup->showFixationPopup( me, selectedNode );
-                        emit onFixationSet( *selectedNode );
+                         {
+                            fixationPopup->showFixationPopup( me, selectedNode );
+                            emit onFixationSet( *selectedNode );
+                        }
                     }
                     else if ( designerBehaviour == onLoadDraw ) {
                         loadPopup->showLoadPopup( me, selectedNode, 
                                                   selectedWindow );
                         emit onLoadSet( *selectedNode ); 
-                    }               
+                    }
                     else
                     {
                         // Save pos for Undo/Redo
