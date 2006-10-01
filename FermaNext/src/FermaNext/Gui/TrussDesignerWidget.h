@@ -32,6 +32,9 @@ protected slots:
     void fixNodeByXY ();
     void unfixNode ();
 
+signals:
+    void nodeWasFixed ( const TrussNode& );
+
 private:
     TrussNode* node;
 };
@@ -167,6 +170,8 @@ protected slots:
     // Life-time and visibility changes
     virtual void trussWindowChangedVisibility ( bool );
     virtual void trussWindowDesisted ( StatefulObject& );
+
+    virtual void removeLoadsFromNode ( const TrussNode& );
 
 private:
     enum TrussWindowBehaviour { windowIdle = 0, onWindowDrag, 

@@ -267,8 +267,11 @@ bool VYVReader::read ( const QString& fileName )
                 ++it; if ( it == lines.end() ) break; str = *it;
 
                 Data.stress[Data.pivotsNum*i+j] = str.toDouble();;
-                Data.safetyFactor[Data.pivotsNum*i+j] = 
-                    Data.stressLimit/Data.stress[Data.pivotsNum*i+j];
+                if ( Data.stress[Data.pivotsNum*i+j] == 0 )
+                    Data.safetyFactor[Data.pivotsNum*i+j] = 0;
+                else
+                    Data.safetyFactor[Data.pivotsNum*i+j] = 
+                        Data.stressLimit/Data.stress[Data.pivotsNum*i+j];
             }
             ++it; if ( it == lines.end() ) break; str = *it;
         }
