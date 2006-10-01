@@ -66,8 +66,18 @@ void ResultsTab::init ()
     propertyLayout->addWidget( propertyTable );
     ctrlLayout->addWidget( &ctrlWidget );
     topRightLayout->setSizeConstraint( QLayout::SetMaximumSize );
-    bottomLayout->addWidget( stressTable );
-    bottomLayout->addWidget( dispTable );
+
+    QVBoxLayout* stressLayout = new QVBoxLayout;
+    QVBoxLayout* dispLayout = new QVBoxLayout;
+
+    stressLayout->addWidget( stressTable );
+    dispLayout->addWidget( dispTable );
+    bottomLayout->addLayout( stressLayout );
+    bottomLayout->addSpacing( 20 );
+    bottomLayout->addLayout( dispLayout );
+    
+
+    //bottomLayout->setSizeConstraint( QLayout::SetFixedSize );
     setLayout( parentLayout );
 
     deformWidget->setMinimumSize( Global::defaultCanvasWidth,
@@ -96,11 +106,14 @@ void ResultsTab::fillTab( const PluginResults& pluginResults,
                              arg( trussCopy.countLoadCases() ).
                              arg( trussCopy.countMaterials() ).
                              arg( "unknown" ).
+                             arg( QString::number( 
+                                  pluginResults.getMaxTensionStress(), 'e', 2 ) ).
+                             arg( QString::number( 
+                                  pluginResults.getForceWeight(), 'e', 2 ) ).
                              arg( "unknown" ).
-                             arg( pluginResults.getForceWeight() ).
                              arg( "unknown" ).
-                             arg( "unknown" ).
-                             arg( "unknown" ).
+                             arg( QString::number( 
+                                  pluginResults.getMaterialVolume(), 'e', 2 ) ).
                              arg( "unknown" ) );
     stressTable->clear();
     stressTable->updateTable( pluginResults, trussCopy.getPivotList() );
@@ -108,6 +121,17 @@ void ResultsTab::fillTab( const PluginResults& pluginResults,
     deformWidget->fill( trussCopy, pluginResults );
     ctrlWidget.fillLoadCaseComboBox( trussCopy.countLoadCases() );
     ctrlWidget.initControlsState();
+
+    // TODO: later to remove
+    stressTable->setMinimumHeight( stressTable->height() );
+    dispTable->setMinimumHeight( dispTable->height() );
+    int dispTableHeight = 
+        Global::htmlRowHeight * ( trussCopy.countNodes() + 2 ) + 25;
+    int stressTableHeight = 
+        Global::htmlRowHeight * ( trussCopy.countPivots() + 2 ) + 25;
+
+    setMinimumHeight( stressTableHeight + dispTableHeight + 140 + 250 +
+                      20 + 10 + 10 + 15 * 2 );
 }
     
 /*****************************************************************************

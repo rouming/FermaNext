@@ -301,52 +301,46 @@ bool VYVReader::read ( const QString& fileName )
 
 QDomElement VYVReader::toXML ( QDomDocument& doc ) const
 {
-    QDomElement elem = doc.createElement("CalculationResults");
+    QDomElement plugRes = doc.createElement("PluginResults");
+    
+    plugRes.setAttribute( "forceWeight", Data.forceWeight );
 
-    elem.setAttribute( "nodesNum", Data.nodesNum );
-    elem.setAttribute( "pivotNum", Data.pivotsNum );
-    elem.setAttribute( "loadsNum", Data.loadsNum );
-    elem.setAttribute( "volume",   Data.v );
-    elem.setAttribute( "stressLimit",   Data.stressLimit );
-    elem.setAttribute( "forceWeight",   Data.forceWeight );
+    // Fill load case results data
+    int i;
+    for ( i = 0; i < Data.loadsNum; ++i ) {
+        QDomElement loadCase = doc.createElement("LoadCaseResults");
+        loadCase.setAttribute( "loadCaseNumber", i + 1 );
+        plugRes.appendChild( loadCase );
 
-    QDomElement inner;
-    uint i = 0;
+        // Fill node results data
+        for ( int j = 0; j < Data.x.size(); ++j ) {
+            QDomElement nodeRes = doc.createElement("NodeResults");
+            nodeRes.setAttribute( "dispX", Data.xTrans[Data.nodesNum * i + j] );
+            nodeRes.setAttribute( "dispY", Data.yTrans[Data.nodesNum * i + j] );
+            nodeRes.setAttribute( "nodeNumber", j + 1 );
+            loadCase.appendChild( nodeRes );
+        }
 
-    // Pivots
-    inner = doc.createElement("Pivots");
-    elem.appendChild(inner);
-
-    for ( i = 0; i < Data.pivotsFirstNodes.size(); ++i ) {
-        QDomElement pivot = doc.createElement("Pivot");
-        inner.appendChild(pivot);
-        pivot.setAttribute( "firstNodeInd", Data.pivotsFirstNodes[i] );
-        pivot.setAttribute( "lastNodeInd", Data.pivotsLastNodes[i] );
-        /*
-        pivot.setAttribute( "stress", Data.stress[i] );
-        pivot.setAttribute( "safetyFactor", Data.safetyFactor[i] );
-        */
-        pivot.setAttribute( "square", Data.pivotSquare[i] );
-        pivot.setAttribute( "length", Data.pivotLength[i] );
+        for ( int k = 0; k < Data.pivotsFirstNodes.size(); ++k ) {
+            QDomElement pivotRes = doc.createElement("PivotResults");
+            pivotRes.setAttribute( "stress", Data.stress[Data.pivotsNum * i + k] );
+            pivotRes.setAttribute( "requiredThickness", Data.pivotSquare[k] );
+            double hui = fabs( Data.safetyFactor[Data.pivotsNum * i + k] );
+            pivotRes.setAttribute( "safetyMargin", 
+                          fabs( Data.safetyFactor[Data.pivotsNum * i + k] ) );
+            pivotRes.setAttribute( "pivotNumber", k + 1 );
+            loadCase.appendChild( pivotRes );
+        }
     }
 
-    // Nodes
-    inner = doc.createElement("Nodes");
-    elem.appendChild(inner);
+    //plugRes.setAttribute( "nodesNum", Data.nodesNum );
+    //plugRes.setAttribute( "pivotNum", Data.pivotsNum );
+    //plugRes.setAttribute( "loadsNum", Data.loadsNum );
 
-    for ( i = 0; i < Data.x.size(); ++i ) {
-        QDomElement node = doc.createElement("Node");
-        inner.appendChild(node);
+    plugRes.setAttribute( "materialVolume", Data.v );
+    plugRes.setAttribute( "maxTensionStress", Data.stressLimit );
 
-        node.setAttribute( "x", Data.x[i] );
-        node.setAttribute( "y", Data.y[i] );
-        /*
-        node.setAttribute( "xTrans", Data.xTrans[i] );
-        node.setAttribute( "yTrans", Data.yTrans[i] );
-        */
-    }
-
-    return elem;
+    return plugRes;
 }
 
 QString VYVReader::toXMLString () const

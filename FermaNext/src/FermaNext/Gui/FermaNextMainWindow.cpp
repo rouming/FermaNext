@@ -94,6 +94,7 @@ void FermaNextMainWindow::init ()
                              SLOT(refreshGeometryAndPropertyWindows()) );
     connect( projectToolBox, SIGNAL(onShowTrussResults(const TrussUnitWindow&)),
                              SLOT(showResultsWindow(const TrussUnitWindow&)) );
+
     connect( this, 
                 SIGNAL(calculateTrussUnit(const TrussUnitWindow&)),
              projectToolBox, 
@@ -283,6 +284,15 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
     connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
              trussPropTabWidget, 
                     SLOT(trussUnitWindowWasCreated(TrussUnitWindow&)) );
+
+    TrussResultsManager& resMng = prj.getTrussResultsManager();
+    connect ( &resMng, 
+             SIGNAL(onPluginExecutionError(const PluginInfo&, const QString&)),
+             SLOT(showPluginErrorMessageBox(const PluginInfo&, const QString&)) );
+    
+    connect ( &resMng, 
+             SIGNAL(onShowTrussResults(const TrussSolutionResults&)),
+             SLOT(showResultsWindow(const TrussSolutionResults&)) );
 }
 
 void FermaNextMainWindow::createProject ()
@@ -330,7 +340,7 @@ void FermaNextMainWindow::createProject ()
         
         if ( currentCase )
             currentCase->addLoad( node4, 300, 100 );
-
+/*
         PluginManager& plgMng = workspace.pluginManager();
         PluginList plgList = plgMng.loadedPlugins();
         if ( ! plgList.isEmpty() ) {
@@ -347,7 +357,7 @@ void FermaNextMainWindow::createProject ()
             TrussResultsManager& resMng = prj.getTrussResultsManager();
             resMng.pluginWasExecuted( *plg, exRes );
         }
-
+*/
 #endif
 /*********** TEMP TRUSS UNIT **************************/
 
@@ -1173,6 +1183,13 @@ void FermaNextMainWindow::editPreferences ()
     preferencesWidget->exec();    
 }
 
+void FermaNextMainWindow::showResultsWindow ( 
+                              const TrussSolutionResults& trussResults )
+{
+    resultsTabWidget->setTrussSolutionResults( trussResults );
+    resultsWindow->exec();
+}
+
 void FermaNextMainWindow::showResultsWindow ( const TrussUnitWindow& w )
 {
     FermaNextProject* prj = projectToolBox->currentProject();
@@ -1203,15 +1220,20 @@ void FermaNextMainWindow::showResultsWindow ( const TrussUnitWindow& w )
                                           tr("&Yes"), tr("&No"),
                                           QString::null, 0, 1 ) )
                 emit calculateTrussUnit( w );
-            else {
-                resultsTabWidget->setTrussSolutionResults( *trussResults );
-                resultsWindow->exec();
-            }
-        } else {
-            resultsTabWidget->setTrussSolutionResults( *trussResults );
-            resultsWindow->exec();
-        }
+            else
+                showResultsWindow( *trussResults );
+
+        } 
+        else
+            showResultsWindow( *trussResults );
     }
+}
+
+void FermaNextMainWindow::showPluginErrorMessageBox ( const PluginInfo& plgInfo,
+                                                      const QString& errMsg )
+{
+    QMessageBox::critical( this, tr( "Internal plugin error" ), 
+                           plgInfo.name + ": " + errMsg );
 }
 
 void FermaNextMainWindow::helpContents ()

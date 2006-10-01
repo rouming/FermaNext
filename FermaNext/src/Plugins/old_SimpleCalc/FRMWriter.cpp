@@ -30,8 +30,6 @@ void FRMWriter::write ( const QString& name )
     TrussUnit::NodeListIter nIter;
     TrussUnit::PivotListIter pIter;
 
-    // FIXME: use material lib instead
-    /*const TrussMaterial& mat = truss->getMaterial();*/
     const TrussUnit::LoadCases& loadCases = truss->getLoadCases();
 
     uint fixNum = 0;
@@ -43,10 +41,12 @@ void FRMWriter::write ( const QString& name )
     out << nodes.size() << "\n";
     out << fixNum  << "\n";
 
-    // FIXME: use material lib instead
-    out << QString::number( 0/*mat.getElasticityModule()*/, 'E', 14) << "\n";
+    // Since we have the same type of materials for all pivots
+    const TrussMaterial& mat = *pivots[0]->getMaterial();
+    
+    out << QString::number( mat.getElasticityModule(), 'E', 14) << "\n";
     out << loadCases.countLoadCases() << "\n";
-    out << QString::number( 0/*mat.getWorkingStress()*/, 'E', 14)  << "\n";
+    out << QString::number( mat.getWorkingStress(), 'E', 14)  << "\n";
 
     for ( pIter = pivots.begin(); pIter != pivots.end(); ++pIter ) {
         uint firstInd = 1, lastInd = 1;

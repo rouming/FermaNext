@@ -195,11 +195,11 @@ void TrussUnitWindowItem::executePlugin ( Plugin* plugin )
     Q_ASSERT( plugin );
     Plugin::ExecutionResult res = 
         plugin->execute( QList<UUIDObject*>() << &trussWindow );
-
+/*
     QMessageBox::information( 0, "Plugin result", 
                               QString("Status: %1\nResult data: %2\n").
                                 arg(res.status).arg(res.data),
-                              0 );
+                              0 ); */
 }
 
 void TrussUnitWindowItem::remove ()
