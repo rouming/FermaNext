@@ -121,6 +121,7 @@ public:
     double getForceWeight () const;
     double getMaterialVolume () const;
     double getMaxTensionStress () const;
+    double getTrussMass () const;
 
     int countLoadCaseResults () const;
 
@@ -138,12 +139,13 @@ protected:
     void setForceWeight ( double );
     void setMaterialVolume ( double );
     void setMaxTensionStress ( double );
+    void setTrussMass ( double );
     void clean ();
 
 private:
     LoadCaseResultsList loadCaseResults;
     QString pluginName;
-    double forceWeight, materialVolume, maxTension;
+    double forceWeight, materialVolume, maxTension, trussMass;
 };
 
 /*****************************************************************************/

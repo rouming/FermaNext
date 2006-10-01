@@ -343,7 +343,8 @@ QDomElement LoadCaseResults::saveToXML ( QDomDocument& doc )
 PluginResults::PluginResults () :
     forceWeight( 0 ),
     materialVolume( 0 ),
-    maxTension( 0 )
+    maxTension( 0 ),
+    trussMass( 0 )
 {}
 
 PluginResults::~PluginResults ()
@@ -413,6 +414,16 @@ double PluginResults::getMaxTensionStress () const
     return maxTension;
 }
 
+void PluginResults::setTrussMass ( double value )
+{
+    trussMass = value;
+}
+
+double PluginResults::getTrussMass () const
+{
+    return trussMass;
+}
+
 int PluginResults::countLoadCaseResults () const
 {
     return loadCaseResults.size();
@@ -479,6 +490,20 @@ void PluginResults::loadAttributesFromXML ( const QDomElement& plgResElem,
     if ( ! valid )
         throw LoadException();
     setMaxTensionStress( tension );
+ 
+    /** 
+     * Set truss mass
+     ******************/
+    // Unnecessary attribute
+    if ( plgResElem.hasAttribute("trussMass") ) {
+        valueStr = plgResElem.attribute( "trussMass" );
+        double mass = valueStr.toDouble( &valid );
+        if ( ! valid )
+            throw LoadException();
+        setTrussMass( mass );
+    }
+    else 
+        trussMass = -1;
     
     /** 
      * Create load cases results
@@ -524,6 +549,14 @@ QDomElement PluginResults::saveToXML ( QDomDocument& doc )
      * Save max tension stress
      ***************************/
     pluginResultsElem.setAttribute( "maxTensionStress", getMaxTensionStress() );
+
+    /**
+     * Save truss mass
+     *******************/
+    if ( trussMass == -1 )
+        pluginResultsElem.setAttribute( "trussMass", "unknown" );
+    else 
+        pluginResultsElem.setAttribute( "trussMass", getTrussMass() );
 
     /**
      * Save load case results

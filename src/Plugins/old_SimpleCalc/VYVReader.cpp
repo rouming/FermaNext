@@ -235,6 +235,7 @@ bool VYVReader::read ( const QString& fileName )
         Data.pivotLength[i] = length;
         Data.v = Data.v + length * Data.pivotSquare[i];
     }
+
 //---------------------------------------------------------------------------//
     for ( it = lines.begin(); it != lines.end(); ++it ) {
         QString str = *it;
@@ -307,7 +308,9 @@ QDomElement VYVReader::toXML ( QDomDocument& doc ) const
     QDomElement plugRes = doc.createElement("PluginResults");
     
     plugRes.setAttribute( "forceWeight", Data.forceWeight );
-
+    plugRes.setAttribute( "materialVolume", Data.v );
+    plugRes.setAttribute( "maxTensionStress", Data.stressLimit );
+    
     // Fill load case results data
     int i;
     for ( i = 0; i < Data.loadsNum; ++i ) {
@@ -339,9 +342,6 @@ QDomElement VYVReader::toXML ( QDomDocument& doc ) const
     //plugRes.setAttribute( "nodesNum", Data.nodesNum );
     //plugRes.setAttribute( "pivotNum", Data.pivotsNum );
     //plugRes.setAttribute( "loadsNum", Data.loadsNum );
-
-    plugRes.setAttribute( "materialVolume", Data.v );
-    plugRes.setAttribute( "maxTensionStress", Data.stressLimit );
 
     return plugRes;
 }

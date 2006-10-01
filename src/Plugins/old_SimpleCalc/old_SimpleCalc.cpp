@@ -159,6 +159,15 @@ Plugin::ExecutionResult SimpleCalcPlugin::specificExecute (
     resultsElem.setAttribute( "trussUUID", truss->getUUID() );
     resultsElem.setAttribute( "pluginName", pluginInfo().name );
 
+    if ( resultsElem.hasAttribute("materialVolume") ) {
+        QString valueStr = resultsElem.attribute( "materialVolume" );
+        const TrussMaterial* material = pivotList[0]->getMaterial();
+        double mass = valueStr.toDouble() * material->getDensity();
+        resultsElem.setAttribute( "trussMass", mass );
+    }
+    else 
+        resultsElem.setAttribute( "trussMass", "unknown" );
+
     return ExecutionResult( OkStatus, doc.toString() );
 }
 

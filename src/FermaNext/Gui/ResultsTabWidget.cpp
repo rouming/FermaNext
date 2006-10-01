@@ -114,7 +114,8 @@ void ResultsTab::fillTab( const PluginResults& pluginResults,
                              arg( "unknown" ).
                              arg( QString::number( 
                                   pluginResults.getMaterialVolume(), 'e', 2 ) ).
-                             arg( "unknown" ) );
+                             arg( QString::number( 
+                                  pluginResults.getTrussMass(), 'e', 2 ) ) );
     stressTable->clear();
     stressTable->updateTable( pluginResults, trussCopy.getPivotList() );
     dispTable->updateTable( pluginResults, trussCopy.getNodeList() );
