@@ -639,6 +639,22 @@ void TrussPropertyTabWidget::trussUnitWindowWasCreated (
                     
     connect( &window, SIGNAL(beforePivotDesist(const Node&, const Node&)),
                       SLOT(removePivotFromTable(const Node&, const Node&)) );
+
+
+    // Check if truss was created in 'silence' mode 
+    // (see TrussUnitWindowManager.cpp)
+    TrussUnit::PivotList pivots = window.getPivotList();
+    if ( ! pivots.empty() ) {
+        TrussPivot* pivot = 0;
+        foreach ( pivot, pivots ) {
+            connect( pivot, SIGNAL(onDrawingStatusChange(bool)),
+                            SLOT(showPivotPropertyTableRow(bool)) );
+            connect( pivot, SIGNAL(onThicknessChange(double)),
+                            SLOT(updateTableThickness()) );
+            connect( pivot, SIGNAL(onMaterialChange()),
+                            SLOT(updateTableMaterial()) );            
+        }
+    }
 }
 
 void TrussPropertyTabWidget::changeFocusWindow ( 
