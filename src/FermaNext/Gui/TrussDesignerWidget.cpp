@@ -287,6 +287,11 @@ void TrussDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow )
     QObject::connect( &trussWindow, 
                       SIGNAL(onStateChange()),
                       SLOT(update()) );
+    
+    QObject::connect( &trussWindow, 
+                      SIGNAL(onSwitchLoadCase()),
+                      SLOT(update()) );
+
     QObject::connect( &trussWindow, 
                       SIGNAL(onBeforeDesist(StatefulObject&)), 
                       SLOT(trussWindowDesisted(StatefulObject&)));
