@@ -307,9 +307,10 @@ void FermaNextMainWindow::createProject ()
 
 //TODO: remove this in future
 /*********** TEMP TRUSS UNIT **************************/
-#ifndef NDEBUG
+//#ifdef DEBUG
+#if 1
         // Create truss
-        TrussUnitWindow& trussWindow = mng.createTrussUnitWindow("Truss unit");
+        TrussUnitWindow& trussWindow = mng.createTrussUnitWindow("demo Truss unit");
         // Set area size
         trussWindow.setTrussAreaSize( DoubleSize( 200.0, 300.0 ) );
 
