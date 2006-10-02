@@ -308,38 +308,56 @@ void FermaNextMainWindow::createProject ()
 //TODO: remove this in future
 /*********** TEMP TRUSS UNIT **************************/
 #ifndef NDEBUG
+        // Create truss
         TrussUnitWindow& trussWindow = mng.createTrussUnitWindow("Truss unit");
-        trussWindow.setTrussAreaSize( DoubleSize( 300, 300 ) );
+        // Set area size
+        trussWindow.setTrussAreaSize( DoubleSize( 200.0, 300.0 ) );
 
+        // Create material
         TrussMaterialLibrary& materialLib = prj.getMaterialLibrary();
         TrussMaterial* m = &materialLib.createMaterial( tr( "Aluminum Alloy" ), 
                                                        30000, 7000000, 0.028 );
         materialLib.createMaterial( tr( "Steel" ), 70000, 20000000, 0.078 );
-    
-        TrussNode& node1 = trussWindow.createNode ( 280, 30 );
-        TrussNode& node2 = trussWindow.createNode( 0, 0 );
-        TrussNode& node3 = trussWindow.createNode( 130, 130 );
-        trussWindow.createPivot( node2, node3 ).setMaterial( m );
 
-        TrussNode& node4 = trussWindow.createNode( 250, 300 );
-        trussWindow.createPivot( node4, node3 ).setMaterial( m );
+        // Create nodes
+        TrussNode& node1 = trussWindow.createNode ( 100.0, 0.0 );
+        TrussNode& node2 = trussWindow.createNode ( 200.0, 150.0 );
+        TrussNode& node3 = trussWindow.createNode ( 200.0, 300.0 );
+        TrussNode& node4 = trussWindow.createNode ( 0.0, 0.0 );
+        TrussNode& node5 = trussWindow.createNode ( 0.0, 300.0 );
+        TrussNode& node6 = trussWindow.createNode ( 108.77, 50.55 );
+        TrussNode& node7 = trussWindow.createNode ( 168.25, 169.81 );
+        TrussNode& node8 = trussWindow.createNode ( 104.0, 85.0 );
 
-        TrussNode& node5 = trussWindow.createNode( 0, 300 );
+        // Create pivots
         trussWindow.createPivot( node5, node3 ).setMaterial( m );
-        trussWindow.createPivot( node5, node4 ).setMaterial( m );
-        trussWindow.createPivot( node5, node2 ).setMaterial( m );
+        trussWindow.createPivot( node3, node2 ).setMaterial( m );
+        trussWindow.createPivot( node4, node1 ).setMaterial( m );
+        trussWindow.createPivot( node6, node1 ).setMaterial( m );
+        trussWindow.createPivot( node4, node6 ).setMaterial( m );
+        trussWindow.createPivot( node6, node2 ).setMaterial( m );
+        trussWindow.createPivot( node3, node7 ).setMaterial( m );
+        trussWindow.createPivot( node5, node7 ).setMaterial( m );
+        trussWindow.createPivot( node7, node2 ).setMaterial( m );
+        trussWindow.createPivot( node4, node8 ).setMaterial( m );
+        trussWindow.createPivot( node8, node6 ).setMaterial( m );
+        trussWindow.createPivot( node5, node8 ).setMaterial( m );
+        trussWindow.createPivot( node8, node7 ).setMaterial( m );
 
-        node1.setFixation( Node::FixationByX );
-        node2.setFixation( Node::FixationByY );
-        node3.setFixation( Node::FixationByXY );
+        // Set fixation
+        node4.setFixation( Node::FixationByXY );
+        node5.setFixation( Node::FixationByXY );
 
-        trussWindow.getLoadCases().createLoadCase();
-        trussWindow.getLoadCases().createLoadCase();
-        TrussUnit::LoadCase* currentCase = 
-            trussWindow.getLoadCases().getCurrentLoadCase();
-        
-        if ( currentCase )
-            currentCase->addLoad( node4, 300, 100 );
+        // Create 3 load cases
+        TrussUnit::LoadCase& lc1 = trussWindow.getLoadCases().createLoadCase();
+        TrussUnit::LoadCase& lc2 = trussWindow.getLoadCases().createLoadCase();
+        TrussUnit::LoadCase& lc3 = trussWindow.getLoadCases().createLoadCase();
+
+        // Add loads       
+        lc1.addLoad( node1, 0.0, -10000.0 );
+        lc2.addLoad( node2, 0.0,  20000.0 );
+        lc3.addLoad( node2, 0.0,  30000.0 );
+
 /*
         PluginManager& plgMng = workspace.pluginManager();
         PluginList plgList = plgMng.loadedPlugins();

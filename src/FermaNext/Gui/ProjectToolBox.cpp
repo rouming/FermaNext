@@ -242,8 +242,8 @@ void ProjectToolBox::importIsPressed ()
         this,
         tr( "Import trusses" ),
         QString(),
-        "Ferma (*" + TrussUnitWindowManager::newFormatExtension()  +
-        " );;Ferma old (*" + TrussUnitWindowManager::oldFormatExtension() +")"
+        "FermaNext, Ferma old (*" + TrussUnitWindowManager::newFormatExtension()  +
+        " *" + TrussUnitWindowManager::oldFormatExtension() +")"
          );
 
     if ( fileName.isEmpty() ) 
