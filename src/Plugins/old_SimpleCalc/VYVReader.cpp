@@ -319,7 +319,7 @@ QDomElement VYVReader::toXML ( QDomDocument& doc ) const
         plugRes.appendChild( loadCase );
 
         // Fill node results data
-        for ( int j = 0; j < Data.x.size(); ++j ) {
+        for ( uint j = 0; j < Data.x.size(); ++j ) {
             QDomElement nodeRes = doc.createElement("NodeResults");
             nodeRes.setAttribute( "dispX", Data.xTrans[Data.nodesNum * i + j] );
             nodeRes.setAttribute( "dispY", Data.yTrans[Data.nodesNum * i + j] );
@@ -327,11 +327,10 @@ QDomElement VYVReader::toXML ( QDomDocument& doc ) const
             loadCase.appendChild( nodeRes );
         }
 
-        for ( int k = 0; k < Data.pivotsFirstNodes.size(); ++k ) {
+        for ( uint k = 0; k < Data.pivotsFirstNodes.size(); ++k ) {
             QDomElement pivotRes = doc.createElement("PivotResults");
             pivotRes.setAttribute( "stress", Data.stress[Data.pivotsNum * i + k] );
             pivotRes.setAttribute( "requiredThickness", Data.pivotSquare[k] );
-            double hui = fabs( Data.safetyFactor[Data.pivotsNum * i + k] );
             pivotRes.setAttribute( "safetyMargin", 
                           fabs( Data.safetyFactor[Data.pivotsNum * i + k] ) );
             pivotRes.setAttribute( "pivotNumber", k + 1 );
