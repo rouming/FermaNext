@@ -102,13 +102,102 @@ void HtmlTable::clearData ()
     }
 }
 
+QDomElement HtmlTable::getRowElement ( int row ) const
+{
+    QDomNodeList rows = childTable.elementsByTagName( "tr" );
+    QDomNode rowNode;
+    for ( int i = 0; i < rows.count(); ++i ) {
+        rowNode = rows.item( i );
+        if ( i == row )
+            break;
+    }
+
+    return rowNode.toElement();
+}
+
+QDomElement HtmlTable::getColumnElement ( int col, const QDomElement& rowElem ) const
+{
+    QDomNode colNode;
+    QDomNodeList cols = rowElem.elementsByTagName( "td" );
+    for ( int i = 0; i < cols.count(); ++i ) {
+        colNode = cols.item( i );
+        if ( i == col )
+            break;
+    }
+
+    return colNode.toElement();
+}
+
+void HtmlTable::setCellHighlight ( int row, int col, const QString& color )
+{
+    QDomElement colElem = getColumnElement( col, getRowElement( row ) );
+
+    colElem.setAttribute( "bgcolor", color );
+}
+
+void HtmlTable::setColumnHighlight ( int col, const QString& color )
+{
+    QDomNodeList rows = childTable.elementsByTagName( "tr" );
+    // Start with 2 to ignore table headers
+    for ( int i = 2; i < rows.count(); ++i ) {
+        QDomElement colElem = 
+                getColumnElement( col, getRowElement( i ) );
+        colElem.setAttribute( "bgcolor", color );
+    }
+}
+
+void HtmlTable::removeHighlight ()
+{
+    QDomNodeList rows = childTable.elementsByTagName( "tr" );
+    // Start with 2 to ignore table headers
+    for ( int i = 2; i < rows.count(); ++i ) {
+        QDomNode rowNode = rows.item( i );
+        if ( ! rowNode.isElement() )
+            continue;
+        QDomElement rowElem = rowNode.toElement();
+        QDomNodeList cols = rowElem.elementsByTagName( "td" );
+        for ( int j = 0; j < cols.count(); ++j ) {
+            QDomNode colNode = cols.item( j );
+            if ( ! colNode.isElement() )
+                continue;
+            QDomElement colElem = colNode.toElement();
+            colElem.setAttribute( "bgcolor", "" );
+        }
+    }
+
+}
+
+int HtmlTable::getHeight () const
+{
+    int height = 0;
+    QDomNodeList rows = childTable.elementsByTagName( "tr" );
+    int num = rows.count();
+    for ( int i = 0; i < rows.count(); ++i ) {
+        QDomNode rowNode = rows.item( i );
+        if ( ! rowNode.isElement() )
+            continue;
+        
+        QDomElement rowElem = rowNode.toElement();
+        QDomElement colElem = getColumnElement( 0, rowElem );
+
+        if ( ! colElem.hasAttribute( "height" ) )
+            continue;
+
+        height += colElem.attribute( "height" ).toInt();
+    }
+
+    // Increase by top level header width
+    height += 20;
+    return height; 
+}
+
+void HtmlTable::updateHtml ()
+{
+    setHtml( htmlDoc.toString() );
+}
+
 void HtmlTable::wheelEvent ( QWheelEvent* )
 {}
-
-QSize HtmlTable::sizeHint ()
-{
-    return QSize( width(), 300 );
-}
 
 /*****************************************************************************
  * HTML Property Table
@@ -176,7 +265,7 @@ void HtmlStressTable::fillTable ()
 
     //******* create first level headers
     HtmlTableCellList cells;
-    int loadCaseNumb = pluginResults->countLoadCaseResults();
+    loadCaseNumb = pluginResults->countLoadCaseResults();
     cells.push_back( HtmlTableCell( "", col, "center", 2 ) );
     cells.push_back( HtmlTableCell( tr( "Stresses" ), col, 
                                     "center", loadCaseNumb ) );
@@ -267,6 +356,20 @@ void HtmlStressTable::fillTable ()
     }
 }
 
+void HtmlStressTable::changeLoadCaseHighlight ( int currLoadCase )
+{
+    if ( loadCaseNumb == 1 )
+        return;
+
+    QString col = Global::htmlCellHighlightColor;
+    int firstLoadCaseColNum = currLoadCase + 2;
+    removeHighlight();
+    setColumnHighlight( firstLoadCaseColNum, col );
+    setColumnHighlight( firstLoadCaseColNum + loadCaseNumb, col );
+    setColumnHighlight( firstLoadCaseColNum + loadCaseNumb * 2, col );
+    updateHtml();
+}
+
 /*****************************************************************************
  * HTML Displacement Table
  *****************************************************************************/
@@ -295,7 +398,7 @@ void HtmlDisplacementTable::fillTable ()
 
     //******* create first level headers
     HtmlTableCellList cells;
-    int loadCaseNumb = pluginResults->countLoadCaseResults();
+    loadCaseNumb = pluginResults->countLoadCaseResults();
     QString dispXTitle, dispYTitle;
     if ( loadCaseNumb == 1 ) {
         dispXTitle = QString( tr("X-Disp.") );
@@ -381,4 +484,18 @@ void HtmlDisplacementTable::fillTable ()
         ++i;
     }
 }
+
+void HtmlDisplacementTable::changeLoadCaseHighlight ( int currLoadCase )
+{
+    if ( loadCaseNumb == 1 )
+        return;
+    
+    QString col = Global::htmlCellHighlightColor;
+    int firstLoadCaseColNum = currLoadCase + 3;
+    removeHighlight();
+    setColumnHighlight( firstLoadCaseColNum, col );
+    setColumnHighlight( firstLoadCaseColNum + loadCaseNumb, col );
+    updateHtml();
+}
+
 

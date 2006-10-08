@@ -95,6 +95,12 @@ void ResultsTab::init ()
               deformWidget, SLOT(switchLoadCaseResults(int)) );
     connect( deformWidget, SIGNAL(displacementLoaded(bool)),
                 &ctrlWidget, SLOT(setDeformSliderEnabled(bool)) );
+
+    connect( &ctrlWidget, SIGNAL(onSwitchLoadCase(int)),
+              stressTable, SLOT(changeLoadCaseHighlight(int)) );
+
+    connect( &ctrlWidget, SIGNAL(onSwitchLoadCase(int)),
+              dispTable, SLOT(changeLoadCaseHighlight(int)) );
 }
 
 void ResultsTab::fillTab( const PluginResults& pluginResults,
@@ -123,16 +129,11 @@ void ResultsTab::fillTab( const PluginResults& pluginResults,
     ctrlWidget.fillLoadCaseComboBox( trussCopy.countLoadCases() );
     ctrlWidget.initControlsState();
 
-    // TODO: later to remove
     stressTable->setMinimumHeight( stressTable->height() );
     dispTable->setMinimumHeight( dispTable->height() );
-    int dispTableHeight = 
-        Global::htmlRowHeight * ( trussCopy.countNodes() + 2 ) + 25;
-    int stressTableHeight = 
-        Global::htmlRowHeight * ( trussCopy.countPivots() + 2 ) + 25;
 
-    setMinimumHeight( stressTableHeight + dispTableHeight + 140 + 250 +
-                      20 + 10 + 10 + 15 * 2 );
+    setMinimumHeight( stressTable->getHeight() + dispTable->getHeight() 
+                      + 140 + 250 + 20 + 10 + 10 + 15 * 2 );
 }
     
 /*****************************************************************************
