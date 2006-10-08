@@ -86,8 +86,8 @@ private:
     TrussUnitCopy* trussCopy;
     rbuf_dynarow *canvasBuf;
     QRectF canvasBufRect, paintAreaRect;
-    double scaleMult, currentScaleMult;
-    bool numbersDrawing;
+    double scaleMult, currentScaleMult, nodesDeformCoeff;
+    bool numbersDrawing, deformDrawing;
     const PluginResults* pluginResults;
     const ColorRangeControl& colorCtrl;
 };

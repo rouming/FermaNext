@@ -111,8 +111,7 @@ int TrussCopyPivot::getNumber () const
 
 TrussUnitCopy::TrussUnitCopy () :
     loadCaseNumb( 0 ),
-    materialNumb( 0 ),
-    nodesDeformCoeff( 0 )
+    materialNumb( 0 )
 {}
 
 TrussUnitCopy::~TrussUnitCopy ()
@@ -221,8 +220,6 @@ void TrussUnitCopy::loadResults ( const LoadCaseResults& res )
     else
         emit displacementLoaded( false );
     loadDisplacements( res );
-    restoreNodesBasePosition();
-    displaceNodes( nodesDeformCoeff );
     
     if ( res.countStresses() != 0 )
         emit stressLoaded( true );
@@ -268,9 +265,6 @@ void TrussUnitCopy::loadStresses ( const LoadCaseResults& res )
 
 void TrussUnitCopy::displaceNodes ( double coeff )
 {
-    // save deform coefficient for switch load case purposes
-    nodesDeformCoeff = coeff;
-    
     double dx = 0, dy = 0;
     TrussCopyNode* node = 0;
     TrussCopyNodeListIter iter = nodes.begin();
