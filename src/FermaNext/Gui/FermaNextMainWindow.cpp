@@ -138,6 +138,19 @@ void FermaNextMainWindow::init ()
     initTrussPropertyWindow();
     createStatusBar();
 
+    PluginManager& plgMng = workspace.pluginManager();
+    PluginList plgList = plgMng.loadedPlugins();
+    Plugin* plg = 0;
+    foreach ( plg, plgList )
+        connect( plg, SIGNAL(afterExecution(Plugin&, Plugin::ExecutionResult)),
+                      SLOT(pluginWasExecuted(Plugin&, 
+                                             Plugin::ExecutionResult)) );
+
+    connect( &plgMng, SIGNAL(onAfterPluginLoad(Plugin&)),
+                        SLOT(afterPluginWasLoaded(Plugin&)) );
+    connect( &plgMng, SIGNAL(onBeforePluginUnload(Plugin&)),
+                        SLOT(beforePluginWasUnloaded(Plugin&)) );
+
     // Connect plugins signal mapper to show plugin info
     QObject::connect( pluginsSigMapper, SIGNAL(mapped(const QString &)),
                                         SLOT(showPluginInfo(const QString &)));
@@ -287,15 +300,6 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
     connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
              trussPropTabWidget, 
                     SLOT(trussUnitWindowWasCreated(TrussUnitWindow&)) );
-
-    TrussResultsManager& resMng = prj.getTrussResultsManager();
-    connect ( &resMng, 
-             SIGNAL(onPluginExecutionError(const PluginInfo&, const QString&)),
-             SLOT(showPluginErrorMessageBox(const PluginInfo&, const QString&)) );
-    
-    connect ( &resMng, 
-             SIGNAL(onShowTrussResults(const TrussSolutionResults&)),
-             SLOT(showResultsWindow(const TrussSolutionResults&)) );
 }
 
 void FermaNextMainWindow::createProject ()
@@ -839,6 +843,36 @@ void FermaNextMainWindow::trussWindowReceivedFocus ( TrussUnitWindow& window )
     
     geometryTabWidget->changeFocusWindow( &window );
     trussPropTabWidget->changeFocusWindow( &window );
+}
+
+void FermaNextMainWindow::afterPluginWasLoaded ( Plugin& plg )
+{
+    connect( &plg, SIGNAL(afterExecution(Plugin&, Plugin::ExecutionResult)),
+                     SLOT(pluginWasExecuted(Plugin&, 
+                                            Plugin::ExecutionResult)) );
+}
+
+void FermaNextMainWindow::beforePluginWasUnloaded ( Plugin& plg )
+{
+    disconnect( &plg, SIGNAL(afterExecution(Plugin&, Plugin::ExecutionResult)),
+                  this, SLOT(pluginWasExecuted(Plugin&, 
+                                               Plugin::ExecutionResult)) );
+}
+
+void FermaNextMainWindow::pluginWasExecuted ( Plugin& plg, 
+                                              Plugin::ExecutionResult exRes )
+{
+    FermaNextProject* currentPrj = projectToolBox->currentProject();
+    TrussResultsManager& resMng = currentPrj->getTrussResultsManager();
+    
+    QString errMsg;
+
+    if ( ! resMng.parseExecutionResults( exRes, errMsg ) )
+        showPluginErrorMessageBox( plg.pluginInfo(), errMsg );
+    else {
+        const TrussSolutionResults& res = *resMng.getResultsList().back();
+        showResultsWindow( res );
+    }
 }
 
 /*****************************************************************************

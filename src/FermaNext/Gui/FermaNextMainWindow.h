@@ -5,6 +5,8 @@
 #include <QMainWindow>
 #include <QStatusBar>
 
+#include "Plugin.h"
+
 class ProjectToolBox;
 class FermaNextProject;
 class TrussUnitWindow;
@@ -122,6 +124,10 @@ protected slots:
     // Catch designer widget focus change
     void trussWindowLostFocus ( TrussUnitWindow& );
     void trussWindowReceivedFocus ( TrussUnitWindow& );
+
+    void afterPluginWasLoaded ( Plugin& );
+    void beforePluginWasUnloaded ( Plugin& );
+    void pluginWasExecuted ( Plugin&, Plugin::ExecutionResult );
 
 private:
     // Current system workspace

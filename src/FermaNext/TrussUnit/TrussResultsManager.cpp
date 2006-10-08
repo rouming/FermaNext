@@ -15,17 +15,6 @@ TrussResultsManager::TrussResultsManager ( const PluginManager& pMng,
     plgMng( pMng ),
     windowMng( wMng )
 {
-    PluginList plgList = plgMng.loadedPlugins();
-    Plugin* plg = 0;
-    foreach ( plg, plgList )
-        connect( plg, SIGNAL(afterExecution(Plugin&, Plugin::ExecutionResult)),
-                      SLOT(pluginWasExecuted(Plugin&, 
-                                             Plugin::ExecutionResult)) );
-
-    connect( &plgMng, SIGNAL(onAfterPluginLoad(Plugin&)),
-                        SLOT(afterPluginWasLoaded(Plugin&)) );
-    connect( &plgMng, SIGNAL(onBeforePluginUnload(Plugin&)),
-                        SLOT(beforePluginWasUnloaded(Plugin&)) );
     connect( &windowMng, SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
                            SLOT(removeSolutionResults(TrussUnitWindow&)) );
 }
@@ -33,20 +22,6 @@ TrussResultsManager::TrussResultsManager ( const PluginManager& pMng,
 TrussResultsManager::~TrussResultsManager ()
 {
     clean();
-}
-
-void TrussResultsManager::afterPluginWasLoaded ( Plugin& plg )
-{
-    connect( &plg, SIGNAL(afterExecution(Plugin&, Plugin::ExecutionResult)),
-                     SLOT(pluginWasExecuted(Plugin&, 
-                                            Plugin::ExecutionResult)) );
-}
-
-void TrussResultsManager::beforePluginWasUnloaded ( Plugin& plg )
-{
-    disconnect( &plg, SIGNAL(afterExecution(Plugin&, Plugin::ExecutionResult)),
-                  this, SLOT(pluginWasExecuted(Plugin&, 
-                                               Plugin::ExecutionResult)) );
 }
 
 TrussSolutionResults& TrussResultsManager::createSolutionResults ()
@@ -119,19 +94,6 @@ bool TrussResultsManager::parseExecutionResults (
     w->setCalculatedStatus( true );
     
     return true;
-}
-
-void TrussResultsManager::pluginWasExecuted ( Plugin& plg, 
-                                              Plugin::ExecutionResult exRes )
-{
-    QString errMsg;
-
-    if ( ! parseExecutionResults( exRes, errMsg ) )
-        emit onPluginExecutionError( plg.pluginInfo(), errMsg );
-    else {
-        const TrussSolutionResults& res = *trussResultsList.back();
-        emit onShowTrussResults( res );
-    }
 }
 
 TrussSolutionResults* TrussResultsManager::getResultsForTrussUnit ( 

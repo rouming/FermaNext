@@ -14,9 +14,11 @@ TrussDeformPicture::TrussDeformPicture ( const ColorRangeControl& colCtrl,
     trussCopy( 0 ),
     canvasBuf( new rbuf_dynarow( Global::defaultCanvasWidth, 
                                  Global::defaultCanvasHeight ) ),
-    scaleMult(0), 
-    currentScaleMult(0),
+    scaleMult( 0 ), 
+    currentScaleMult( 0 ),
+    nodesDeformCoeff( 0 ),
     numbersDrawing( true ),
+    deformDrawing( true ),
     pluginResults( 0 ),
     colorCtrl( colCtrl )
 {
@@ -184,6 +186,8 @@ void TrussDeformPicture::changeScale ( double sliderValue )
 
 void TrussDeformPicture::changeDeform ( double sliderValue )
 {
+    nodesDeformCoeff = sliderValue;
+    deformDrawing = true;
     trussCopy->displaceNodes( sliderValue );
 }
 
@@ -194,10 +198,15 @@ void TrussDeformPicture::showNumbers ( bool checkBoxValue )
 
 void TrussDeformPicture::showDeform ( bool status, double sliderValue )
 {
+    // save deform showing for switch load case purposes
+    nodesDeformCoeff = sliderValue;
+    deformDrawing = status;
+
     if ( ! status ) {
         trussCopy->restoreNodesBasePosition();
         return;
     }
+    
     trussCopy->displaceNodes( sliderValue );
 }
 
@@ -212,6 +221,12 @@ void TrussDeformPicture::switchLoadCaseResults ( int indx )
         return;
 
     trussCopy->loadResults( *loadCaseRes );
+
+    if ( ! deformDrawing )
+        trussCopy->restoreNodesBasePosition();
+    else
+        trussCopy->displaceNodes( nodesDeformCoeff );
+    
     emit loadCaseSwitched( *loadCaseRes );
 }
 
