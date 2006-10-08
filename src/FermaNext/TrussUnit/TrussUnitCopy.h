@@ -100,6 +100,7 @@ private:
     TrussCopyNodeList nodes;
     TrussCopyPivotList pivots;
     DoubleSize trussAreaSize;
+    double nodesDeformCoeff;
     int loadCaseNumb, materialNumb;
 };
 

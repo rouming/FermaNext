@@ -23,7 +23,8 @@ const int nodesRadius = 4,
           pivotsWidth = 2,
           trussBufIndent = 24,
           defaultBufWidth = 204 + trussBufIndent,
-          defaultBufHeight = 188 + trussBufIndent;
+          defaultBufHeight = 188 + trussBufIndent,
+          maxLoadCaseNumber = 3;
 
 const double areaMaxDimension = 999.99,
              pivotThickLimit = 999.99,
@@ -100,7 +101,8 @@ const int htmlRowHeight = 25,
 const QString htmlTitleBgColor = "#C1D2EC",
               htmlHeaderBgColor = "#EFF0F5",
               htmlSubHeaderBgColor = "#EBEBEB",
-              htmlBorderColor = "#BCC6DE";
+              htmlBorderColor = "#BCC6DE",
+              htmlCellHighlightColor = "#FFCECE";
 
  /************************************
  * Main subs

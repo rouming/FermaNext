@@ -122,7 +122,10 @@ void FermaNextMainWindow::init ()
     
     resultsWindow = new QDialog( this );
     resultsWindow->setWindowTitle( "Calculation Results" );
-    resultsWindow->setFixedSize( 750, 600 );
+    resultsWindow->setFixedWidth( 760 );
+    QRect wGeometry = resultsWindow->geometry();
+    wGeometry.setHeight( 600 );
+    resultsWindow->setGeometry( wGeometry );
     QHBoxLayout* resultsLayout = new QHBoxLayout( resultsWindow );
     resultsTabWidget = new ResultsTabWidget;
     resultsLayout->addWidget( resultsTabWidget );
@@ -349,10 +352,12 @@ void FermaNextMainWindow::createProject ()
         node4.setFixation( Node::FixationByXY );
         node5.setFixation( Node::FixationByXY );
 
-        // Create 3 load cases
-        TrussUnit::LoadCase& lc1 = trussWindow.getLoadCases().createLoadCase();
+        TrussUnit::LoadCase& lc1 = *trussWindow.getLoadCases().findLoadCase( 1 );
+
+        // Create 2 additional cases
         TrussUnit::LoadCase& lc2 = trussWindow.getLoadCases().createLoadCase();
         TrussUnit::LoadCase& lc3 = trussWindow.getLoadCases().createLoadCase();
+       
 
         // Add loads       
         lc1.addLoad( node1, 0.0, -10000.0 );
