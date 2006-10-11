@@ -108,6 +108,17 @@ TrussSolutionResults* TrussResultsManager::getResultsForTrussUnit (
     return 0;
 }
 
+TrussUnitWindow* TrussResultsManager::findTrussByResults ( 
+                                           const TrussSolutionResults& res ) const
+{
+    WindowList wList = windowMng.getTrussUnitWindowList();
+    foreach ( TrussUnitWindow* w, wList )
+        if ( w->getUUID() == res.getTrussUnitUUID() )
+            return w;
+
+    return 0;
+}
+
 TrussResultsList TrussResultsManager::getResultsList () const
 {
     return trussResultsList;

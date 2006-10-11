@@ -565,8 +565,8 @@ void TrussDeformPicture::drawPivotNumber( const TrussCopyPivot& pivot,
     textColor = agg::rgba( 30, 0, 0 );
     if ( pivot.getNumber() < 10 )
     {
-        textPos.setX( fabs( p1.x() + p2.x() ) / 2 - 2 );
-        textPos.setY( fabs( p1.y() + p2.y() ) / 2 + 4 );
+        textPos.setX( ( p1.x() + p2.x() ) / 2 - 2 );
+        textPos.setY( ( p1.y() + p2.y() ) / 2 + 4 );
         backLeftTopPos.setX( textPos.x() - 2 );
         backLeftTopPos.setY( textPos.y() );
         backRightBottomPos.setX( textPos.x() + 6 );
@@ -574,8 +574,8 @@ void TrussDeformPicture::drawPivotNumber( const TrussCopyPivot& pivot,
     }
     else
     {
-        textPos.setX( fabs( p1.x() + p2.x() ) / 2 - 4 );
-        textPos.setY( fabs( p1.y() + p2.y() ) / 2 + 4 );
+        textPos.setX( ( p1.x() + p2.x() ) / 2 - 4 );
+        textPos.setY( ( p1.y() + p2.y() ) / 2 + 4 );
         backLeftTopPos.setX( textPos.x() - 1 );
         backLeftTopPos.setY( textPos.y() );
         backRightBottomPos.setX( textPos.x() + 11 );

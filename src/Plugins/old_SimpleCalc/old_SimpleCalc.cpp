@@ -65,7 +65,29 @@ Plugin::ExecutionResult SimpleCalcPlugin::specificExecute (
     if ( truss == 0 )
         throw WrongExecutionArgsException();
 
+    //---------------- Check if truss has no nodes
 
+    if ( ! truss->countNodes() ) {
+        QString errStr = tr("Can't solve empty truss");
+        return ExecutionResult( InternalErrStatus , errStr ); 
+    }
+    
+
+    //---------------- Check node/pivot limits
+
+    if ( truss->countNodes() > 9 ) {
+        QString errStr = tr( "Node number exceeds permissible limit.\n"
+                             "Maximum number of nodes = 9");
+        return ExecutionResult( InternalErrStatus , errStr ); 
+    }
+
+    else if ( truss->countNodes() > 15 ) {
+        QString errStr = tr( "Pivot number exceeds permissible limit.\n"
+                             "Maximum number of pivots = 15");
+        return ExecutionResult( InternalErrStatus , errStr ); 
+    }
+
+    
     //---------------- Check free nodes 
 
     TrussNode* node = 0;
