@@ -871,7 +871,9 @@ void FermaNextMainWindow::pluginWasExecuted ( Plugin& plg,
         showPluginErrorMessageBox( plg.pluginInfo(), errMsg );
     else {
         const TrussSolutionResults& res = *resMng.getResultsList().back();
-        showResultsWindow( res );
+        TrussUnitWindow* w = resMng.findTrussByResults( res );
+        if ( w )
+            showResultsWindow( *w );
     }
 }
 
@@ -1237,15 +1239,8 @@ void FermaNextMainWindow::editMaterials ()
 void FermaNextMainWindow::editPreferences ()
 {   
     preferencesWidget->resize( 300, 300 );
-    preferencesWidget->setWindowTitle( "Preferences" );
+    preferencesWidget->setWindowTitle( tr("Preferences") );
     preferencesWidget->exec();    
-}
-
-void FermaNextMainWindow::showResultsWindow ( 
-                              const TrussSolutionResults& trussResults )
-{
-    resultsTabWidget->setTrussSolutionResults( trussResults );
-    resultsWindow->exec();
 }
 
 void FermaNextMainWindow::showResultsWindow ( const TrussUnitWindow& w )
@@ -1278,20 +1273,29 @@ void FermaNextMainWindow::showResultsWindow ( const TrussUnitWindow& w )
                                           tr("&Yes"), tr("&No"),
                                           QString::null, 0, 1 ) )
                 emit calculateTrussUnit( w );
-            else
-                showResultsWindow( *trussResults );
+            else {
+                resultsWindow->setWindowTitle( tr( "Solve results for" ) + 
+                               w.getTrussName() );
+                resultsTabWidget->setTrussSolutionResults( *trussResults );
+                resultsWindow->exec();
+            }
 
         } 
-        else
-            showResultsWindow( *trussResults );
+        else {
+            resultsWindow->setWindowTitle( tr( "Results for \"%1\"" ). 
+                           arg( w.getTrussName() ) );
+            resultsTabWidget->setTrussSolutionResults( *trussResults );
+            resultsWindow->exec();
+        }
     }
 }
 
 void FermaNextMainWindow::showPluginErrorMessageBox ( const PluginInfo& plgInfo,
                                                       const QString& errMsg )
 {
-    QMessageBox::critical( this, tr( "Internal plugin error" ), 
-                           plgInfo.name + ": " + errMsg );
+    QMessageBox::critical( this, tr( "Plugin internal error" ), 
+                           tr( "%1: %2" ).
+                           arg( plgInfo.name ).arg( errMsg ) );
 }
 
 void FermaNextMainWindow::helpContents ()

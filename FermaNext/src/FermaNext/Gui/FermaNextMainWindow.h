@@ -100,7 +100,6 @@ protected slots:
     void editMaterials ();
     void editPreferences ();
 
-    void showResultsWindow ( const TrussSolutionResults& );
     void showResultsWindow ( const TrussUnitWindow& );
     void showPluginErrorMessageBox ( const PluginInfo&, const QString& );
 

@@ -28,6 +28,7 @@ public:
     TrussResultsList getResultsList () const;
     TrussSolutionResults* getResultsForTrussUnit ( 
                                            const QString& trussUUID ) const;
+    TrussUnitWindow* findTrussByResults ( const TrussSolutionResults& ) const;
     bool parseExecutionResults ( Plugin::ExecutionResult, QString& errMsg );
     
 protected:

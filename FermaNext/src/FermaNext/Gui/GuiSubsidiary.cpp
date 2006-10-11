@@ -147,6 +147,8 @@ RangeValidator::RangeValidator ( double bottom, double top, int decimals,
 QValidator::State RangeValidator::validate ( QString& input, int& pos ) const
 {
     State s = QDoubleValidator::validate( input, pos );
+    if ( s == Intermediate && input == "-" )
+        return Intermediate;
     if ( s != Acceptable )
        return Invalid;
     return s;
