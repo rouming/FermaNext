@@ -38,6 +38,12 @@ public:
     void throwStatusAsException () 
         //throw (Plugin::Status)
     { throw OkStatus; }
+
+private:
+    ExecutionResult specificExecute ( const QList<UUIDObject*>&  )
+        /*throw (WrongExecutionArgsException)*/
+    { return ExecutionResult( OkStatus, QString() ); }
+
 };
 
 // plugin export
