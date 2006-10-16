@@ -12,7 +12,8 @@ class NodePrivate
 public:
     NodePrivate () :
         ref(1), parent(0), 
-        plugin(0), inUse(false)
+        plugin(0), inUse(false),
+        canBeResolved(false)
     {}
 
     ~NodePrivate ()
@@ -27,6 +28,7 @@ public:
     QList<N> childs;
     Plugin* plugin;
     bool inUse;
+    bool canBeResolved;
     PluginParams pluginParams;
 };
 
@@ -155,6 +157,20 @@ bool PluginExecutionTree::Node::isDependent () const
     return true;
 }
 
+bool PluginExecutionTree::Node::canBeResolved () const
+{
+    if ( isNull() || data->plugin == 0 )
+        return false;
+    return data->canBeResolved;
+}
+
+void PluginExecutionTree::Node::canBeResolved ( bool canBeResolved_ )
+{
+    if ( isNull() || data->plugin == 0 )
+        return;
+    data->canBeResolved = canBeResolved_;
+}
+
 bool PluginExecutionTree::Node::arePluginParamsValid () const
 {
     // TODO:
@@ -183,20 +199,28 @@ PluginExecutionTree::PluginExecutionTree ( PluginManager& mng ) :
     plgMng(mng)
 {}
 
-void PluginExecutionTree::buildExecutionTree ( Plugin* plugin )
+PluginExecutionTree::Node PluginExecutionTree::buildExecutionTree ( 
+    Plugin* plugin )
 {
+    Q_ASSERT(plugin);
     treeTop = PluginExecutionTree::Node( plugin );
     buildExecutionTree( treeTop );
+    return treeTop;
 }
+
+PluginExecutionTree::Node PluginExecutionTree::getTreeTop () const
+{ return treeTop; }
 
 void PluginExecutionTree::getParents ( 
     PluginExecutionTree::Node& child, PluginList& parents ) 
 {
-    if ( child.parentNode().isNull() )
+    if ( child.parentNode().isNull() ) {
         // Top
+        parents.append( child.getPlugin() );
         return;
+    }
     PluginExecutionTree::Node parent = child.parentNode();
-    getParents( parent, parents );
+    getParents( parent, parents );    
     parents.append( child.getPlugin() );
 }
 
@@ -213,8 +237,9 @@ PluginExecutionNodeList PluginExecutionTree::getDependentPlugins (
 
     foreach ( PluginList plugins, pluginsMap.values() ) {    
         foreach ( Plugin* plugin, plugins ) {
-            // Get plugins which were not mentioned before
-            if ( ! parents.contains(plugin) ) {
+            // Pick up plugins which were not mentioned before
+            // and which are not equal to the parent plugin.
+            if ( ! parents.contains(plugin) && plugin != parent.getPlugin() ) {
                 PluginExecutionNode n = parent.createChildNode( plugin );
                 dependencies.append(n);
             }
@@ -226,24 +251,30 @@ PluginExecutionNodeList PluginExecutionTree::getDependentPlugins (
 bool PluginExecutionTree::buildExecutionTree ( 
     PluginExecutionTree::Node& parent )
 {
-    if ( ! parent.isDependent() )
-        // Nothing to resolve
+    if ( ! parent.isDependent() ) {
+        // Nothing to resolve, so of cource true
+        parent.canBeResolved(true);
         return true;
+    }
 
     PluginExecutionNodeList dependencies = getDependentPlugins( parent );
-    if ( dependencies.size() == 0 )
-        // Can't get dependencies, so return
+    if ( dependencies.size() == 0 ) {
+        // Can't get dependencies, so can't be resolved
+        parent.canBeResolved(false);
         return false;
+    }
     
     bool validDependence = false;
     foreach ( PluginExecutionNode depNode, dependencies ) {
         bool ok = buildExecutionTree( depNode );
         if ( ! ok ) {
-            // Remove child (dependence)
-            parent.removeChildNode( depNode );
+            // Nothing to do
         } else
             validDependence = true;
     }
+
+    // We can resolve this node if at least we can resolve one dependence branch :)
+    parent.canBeResolved( validDependence );
 
     return validDependence;
 }

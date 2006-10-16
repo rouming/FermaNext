@@ -66,6 +66,12 @@ public:
         /** Returns true if this plugin depends on other */
         bool isDependent () const;
 
+        /** 
+         * Returns true if this plugin (whith all its dependencies)
+         * can be resolved.
+         */
+        bool canBeResolved () const;
+
         /** Checks if plugin params are valid */
         bool arePluginParamsValid () const;
 
@@ -97,6 +103,9 @@ public:
          */
         void removeChildNode ( Node& );
 
+        /** Set if this plugin can be resolved or not */
+        void canBeResolved ( bool );
+
     private:
         NodePrivate<Node>* data;
     };
@@ -105,8 +114,15 @@ public:
     /** Constructor */
     PluginExecutionTree ( PluginManager& );
 
-    /** Builds execution tree for specified plugin */
-    void buildExecutionTree ( Plugin* );
+    /** 
+     * Builds execution tree for specified plugin 
+     * @return top node of the execution tree, actually, 
+     *         top node always contains argument plugin.
+     */
+     PluginExecutionTree::Node buildExecutionTree ( Plugin* plg );
+
+     /** Return last top of the execution tree */
+     PluginExecutionTree::Node getTreeTop () const;
 
 private:
     /** Recursively gather parents from bottom to top */
