@@ -56,7 +56,7 @@ public:
     /**
      * Correctly unload all plugins.
      */
-    ~PluginManager ();
+    virtual ~PluginManager ();
 
     /** Returns config */
     Config& config ();
@@ -82,7 +82,7 @@ public:
      * @param path to directory with plugin loaders
      * @see unregisterPluginLoaders
      */
-    void registerPluginLoaders ( const QString& path );
+    virtual void registerPluginLoaders ( const QString& path );
 
     /**
      * Unregister all plugin loaders. It is evident, that all plugins will be 
@@ -90,7 +90,7 @@ public:
      * @see registerPluginLoaders
      * @see unloadPlugins
      */
-    void unregisterPluginLoaders ();
+    virtual void unregisterPluginLoaders ();
 
     /**
      * Load all plugins from specified path by registered plugin loaders.
@@ -100,25 +100,25 @@ public:
      *       This is used for correct getting plugin by UUID.
      * @see getPluginByUUID
      */
-    void loadPlugins ( const QString& path );
+    virtual void loadPlugins ( const QString& path );
 
     /**
      * Unload all plugins.
      */
-    void unloadPlugins ();
+    virtual void unloadPlugins ();
 
     /**
      * Reload all plugins. 
      * Just a wrapper on #loadPlugins call with the same directory.
      * @see loadPlugins
      */
-    void reloadPlugins ();
+    virtual void reloadPlugins ();
 
     /**
      * Unload plugin.
      * @param plugin to be unloaded
      */
-    void unloadPlugin ( Plugin& plugin );
+    virtual void unloadPlugin ( Plugin& plugin );
 
     /**
      * Finds plugin by UUID.
@@ -133,7 +133,7 @@ public:
      * #Plugin::OkStatus, or returns all otherwise.
      * @return loaded plugins
      */
-    PluginList loadedPlugins ( bool onlyOk = true ) const;
+    virtual PluginList loadedPlugins ( bool onlyOk = true ) const;
 
     /**
      * Returns loaded plugins by specified plugin type.
@@ -153,7 +153,7 @@ protected:
      * @return plugin loaders
      * @see PluginLoader::pluginLoaderStatusCode
      */
-    PluginLoaderList pluginLoaders ( bool onlyOk = true ) const;
+    virtual PluginLoaderList pluginLoaders ( bool onlyOk = true ) const;
 
 signals:    
     ///////////////////////////////////////////////////////////////////////
@@ -276,7 +276,7 @@ private:
      * @throw RegisterPluginLoaderException occurs when plugin loader 
      * has not been registered
      */
-    void registerPluginLoader ( const QString& pathToLoaderLib )
+    virtual void registerPluginLoader ( const QString& pathToLoaderLib )
         /*throw (RegisterPluginLoaderException)*/;
 
     /**
@@ -284,7 +284,7 @@ private:
      * @param loader to be unregistered.
      * @see registerPluginLoader
      */
-    void unregisterPluginLoader ( PluginLoader& loader );
+    virtual void unregisterPluginLoader ( PluginLoader& loader );
 
     /** Hidden copy constructor. */
     PluginManager ( const PluginManager& );

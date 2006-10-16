@@ -469,8 +469,9 @@ PluginList PluginManager::loadedPluginsOfType ( const QString& plgType,
     for ( ; it != plugins.end(); ++it ) {
         Plugin* plg = *it;
         const PluginInfo& plgInfo = plg->pluginInfo();
-        if ( regExp.indexIn( plgInfo.type ) != -1 )
+        if ( regExp.indexIn( plgInfo.type ) != -1 ) {
             pluginsOfType.push_back( plg );
+        }
     }
     qSort( pluginsOfType.begin(), pluginsOfType.end(), 
            SortHelper::sortPluginsByPath );

@@ -22,8 +22,6 @@ public:
 
     virtual ~CommonNativePluginTest () {}
 
-    virtual void execute ( const QList<UUIDObject*>& ) {}
-
     virtual PrivateSingleInstance& getPrivateSingleInstance () const = 0;
     virtual void throwStatusAsException () = 0;
         //throw(Plugin::Status)
