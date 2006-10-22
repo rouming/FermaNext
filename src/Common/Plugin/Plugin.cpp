@@ -23,13 +23,64 @@ Plugin::~Plugin ()
 {}
 
 Plugin::ExecutionResult Plugin::execute ( const QList<UUIDObject*>& args ) 
-    /*throw (WrongExecutionArgsException)*/
+    /*throw (ContextIsNotValidException,
+             ParamsAreNotAcceptedException,
+             DependenciesAreNotResolvedException,
+             WrongExecutionArgsException)*/
 {
     LOG4CXX_DEBUG(logger, "execute");
-    emit beforeExecution( *this );
-    ExecutionResult result = specificExecute( args );
+    emit beforeExecution( *this );    
+
+    PluginExecutionContext& context = plgMng.currentExecutionContext();
+    // Step to next context
+    context.nextContext();
+
+    if ( !context.isValid() ) {
+        LOG4CXX_WARN(logger, "plugin context is not valid");
+        emit afterExecution( *this, ExecutionResult(UnknownStatus) );
+        throw ContextIsNotValidException();
+    }
+
+    QHash< QString, QList<Plugin*> > dependencies = 
+        context.getCallerDependencies(this);
+    PluginExecutionParams execParams = context.getCallerParams(this);
+
+    try { tryToAcceptParams(execParams); }
+    catch ( ParamsAreNotAcceptedException& ) {
+        LOG4CXX_WARN(logger, "plugin params are not accepted");
+        // Step to previous context
+        context.previousContext();
+        emit afterExecution( *this, ExecutionResult(UnknownStatus) );
+        throw;
+    }
+
+    ExecutionResult result;
+    try { result = specificExecute( execParams, args, dependencies ); }
+    catch ( WrongExecutionArgsException& ) {
+        LOG4CXX_WARN(logger, "plugin execution args are wrong");
+        // Step to previous context
+        context.previousContext();
+        emit afterExecution( *this, ExecutionResult(UnknownStatus) );
+        throw;        
+    }
+    catch ( DependenciesAreNotResolvedException& ) {
+        LOG4CXX_WARN(logger, "plugin dependencies are not resolved");
+        // Step to previous context
+        context.previousContext();
+        emit afterExecution( *this, ExecutionResult(UnknownStatus) );
+        throw;
+    }
+    catch ( ... ) {
+        // If unsupported exception has been thrown, do nothing.
+
+        LOG4CXX_ERROR(logger, "plugin has thrown unsupported exception");
+    }
+
+    // Step to previous context
+    context.previousContext();
+
     emit afterExecution( *this, result );
-    return result;
+    return result; 
 }
 
 PluginManager& Plugin::pluginManager ()

@@ -12,6 +12,8 @@ SOURCES = \
           XMLSerializableObject.cpp \
           \
           Plugin/Plugin.cpp \
+          Plugin/PluginExecutionContext.cpp \
+          Plugin/PluginExecutionParams.cpp \
           Plugin/PluginExecutionTree.cpp \
           Plugin/PluginManager.cpp \
           \
@@ -32,6 +34,8 @@ HEADERS = \
           XMLSerializableObject.h \
           \
           Plugin/Plugin.h \
+          Plugin/PluginExecutionContext.h \
+          Plugin/PluginExecutionParams.h \
           Plugin/PluginExecutionTree.h \
           Plugin/PluginManager.h \
           \

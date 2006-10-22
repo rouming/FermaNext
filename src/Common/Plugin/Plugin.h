@@ -7,6 +7,7 @@
 #include <QObject>
 
 #include "UUIDObject.h"
+#include "PluginExecutionParams.h"
 
 class Plugin;
 class PluginManager;
@@ -21,11 +22,6 @@ typedef QMap<QString, PluginList>  RequiredPluginsMap;
 typedef RequiredPluginsMap::Iterator RequiredPluginsMapIter;
 typedef RequiredPluginsMap::ConstIterator RequiredPluginsMapIterConst;
 
-/** 
- * Occurs when #Plugin::execute called with wrong arguments.
- * Calling side should know correct order and type of arguments.
- */
-class WrongExecutionArgsException {};
 
 /**
  * Plugin info, which provides basic knowledge about plugin: type and name.
@@ -68,6 +64,7 @@ class Plugin : public QObject,
 public:
     /** Status codes */
     enum Status {
+        UnknownStatus = -1,    /**< Unknown status. */
         OkStatus = 0,          /**< Evrth is ok. Successfully loaded. */
         InternalErrStatus,     /**< Internal error. */
         UnresolvedDependStatus /**< Unresolved dependencies. */
@@ -83,14 +80,54 @@ public:
     };
 
 
+    // Exceptions 
+
+    /** Occurs when context is not valid. */
+    class ContextIsNotValidException {};
+
+    /** Occurs when dependencies of the plugin are not resolved. */
+    class DependenciesAreNotResolvedException 
+    {
+    public:
+        QStringList unresolvedTypes; /**< Contains required 
+                                           but unresolved types */
+    };
+
+    /** Occurs when plugin does not want to accept params. */
+    class ParamsAreNotAcceptedException
+    {
+    public:
+        /** 
+         * Contains varible name (which describes what variable is wrong)
+         * and reason (why plugin does not want to accept this variable)
+         */
+        typedef QPair<QString, QString> ParamsProblem;
+
+        QList<ParamsProblem> problemList; /**< List of problems */
+    };
+
+    /** 
+     * Occurs when #Plugin::execute called with wrong arguments.
+     * Calling side should know correct order and type of arguments.
+     */
+    class WrongExecutionArgsException {};
+
+
+
     /**
      * Execution result.
      */
     class ExecutionResult
     {
     public:
+        ExecutionResult () :
+            status(UnknownStatus)
+        {}
         ExecutionResult ( Status s, const QString& d ) :
             status(s), data(d)
+        {}
+        ExecutionResult ( Status s ) :
+            status(s)
         {}
 
         Status status; /**< Status of the executed operation */
@@ -120,7 +157,10 @@ public:
      * @see specificExecute
      */
     ExecutionResult execute ( const QList<UUIDObject*>& arguments ) 
-        /*throw (WrongExecutionArgsException)*/;
+        /*throw (ContextIsNotValidException,
+                 ParamsAreNotAcceptedException,
+                 DependenciesAreNotResolvedException,
+                 WrongExecutionArgsException)*/;
 
     /** 
      * Returns plugin manager.
@@ -156,6 +196,12 @@ public:
     virtual QString pluginStatusMsg () const = 0;
 
     /**
+     * Every plugin should
+     */
+    virtual void tryToAcceptParams ( const PluginExecutionParams& ) const 
+        /*throw (ParamsAreNotAcceptedException)*/ = 0;
+
+    /**
      * Returns #Plugin::DependenceMode of this plugin.
      * @see requiredPluginTypes
      */
@@ -181,15 +227,23 @@ private:
      * Main entry point to execute plugin. This method is 
      * private because it can be called only from #execute method. 
      * You should override #specificExecute in child classes.
-     * @param args execution arguments
+     * @param params of plugin.
+     * @param args execution arguments.
+     * @param deps plugin dependencies.
      * @return result of executed operation
-     * @throw WrongExecutionArgsException occurs when 
-     *        contract (argument list) between calling side
+     * @throw WrongExecutionArgsException, 
+     *        occurs when contract (argument list) between calling side
      *        and plugin is wrong. 
+     * @throw DependenciesAreNotResolvedException, 
+     *        occurs when dependencies are not resolved.
      * @see execute
      */    
-    virtual ExecutionResult specificExecute ( const QList<UUIDObject*>& args )
-        /*throw (WrongExecutionArgsException)*/ = 0;
+    virtual ExecutionResult specificExecute ( 
+                              const PluginExecutionParams& params,
+                              const QList<UUIDObject*>& args,
+                              const QHash< QString, QList<Plugin*> >& deps  )
+        /*throw (WrongExecutionArgsException,
+                 DependenciesAreNotResolvedException)*/ = 0;
 
 signals:
     /** Is emitted before actual plugins execution */

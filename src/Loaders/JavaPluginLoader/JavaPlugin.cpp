@@ -95,10 +95,17 @@ JavaPlugin::~JavaPlugin ()
     javaVM.deleteGlobalRef( javaPluginInst );
 }
 
-JavaPlugin::ExecutionResult JavaPlugin::specificExecute ( 
-    const QList<UUIDObject*>& args )
-    /*throw (WrongExecutionArgsException)*/
+Plugin::ExecutionResult JavaPlugin::specificExecute ( 
+    const PluginExecutionParams& params,
+    const QList<UUIDObject*>& args,
+    const QHash< QString, QList<Plugin*> >& deps  )
+    /*throw (WrongExecutionArgsException,
+             DependenciesAreNotResolvedException)*/
 {
+    // TOOD: in future this two should be used
+    Q_UNUSED(params);
+    Q_UNUSED(deps);
+
     JClass plgArgCls = javaVM.findClass( "Ljava/lang/String;" );
     Q_ASSERT( plgArgCls );
 
@@ -210,6 +217,12 @@ QString JavaPlugin::pluginStatusMsg () const
 { 
     // TODO
     return "";
+}
+
+void JavaPlugin::tryToAcceptParams ( const PluginExecutionParams& ) const
+    /*throw(Plugin::ParamsAreNotAcceptedException)*/
+{
+    // TODO
 }
 
 const QStringList& JavaPlugin::requiredPluginTypes () const

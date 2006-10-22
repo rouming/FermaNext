@@ -44,13 +44,17 @@ class CommonPlugin : public Plugin
 public:
     CommonPlugin () : Plugin( plgManagerInstance(), "nothing" ) {}
 
-    virtual ExecutionResult specificExecute ( const QList<UUIDObject*>& args )
-        /*throw (WrongExecutionArgsException)*/ 
+    virtual ExecutionResult specificExecute ( 
+                              const PluginExecutionParams&,
+                              const QList<UUIDObject*>&,
+                              const QHash< QString, QList<Plugin*> >& )
     { return ExecutionResult(OkStatus, QString()); }
     virtual Status pluginStatusCode () const
     { return OkStatus; }
     virtual QString pluginStatusMsg () const
     { return QString(); }
+    virtual void tryToAcceptParams ( const PluginExecutionParams& ) const
+    { /* nothing */ }
     virtual Plugin::DependenceMode dependenceMode () const
     { return MultiDependent; }
 };
@@ -190,9 +194,9 @@ QList<Plugin*>& pluginList ()
 
 void printNode ( PluginExecutionTree::Node& node, int tabs = 0 )
 {
-    std::cerr  << "Node: ";
+    std::cout  << "Node: ";
      for ( int i = 0; i < tabs; ++i )
-         std::cerr << "\t";
+         std::cout << "\t";
 
     qWarning( "%s, can be resolved: %s", 
               qPrintable(node.getPlugin()->pluginInfo().name),
@@ -220,7 +224,6 @@ int main ()
         printNode( node );
     }
     return 0;
-
 }
 
 /*****************************************************************************/

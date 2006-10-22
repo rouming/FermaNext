@@ -46,6 +46,10 @@ QString SimpleCalcPlugin::pluginStatusMsg () const
     return QString();
 }
 
+void SimpleCalcPlugin::tryToAcceptParams ( 
+    const PluginExecutionParams& ) const
+{ /* nothing */ }
+
 const PluginInfo& SimpleCalcPlugin::pluginInfo () const
 { 
     static PluginInfo inf( "SimpleOldCalcPlugin",
@@ -55,9 +59,15 @@ const PluginInfo& SimpleCalcPlugin::pluginInfo () const
 }
 
 Plugin::ExecutionResult SimpleCalcPlugin::specificExecute ( 
-    const QList<UUIDObject*>& argsList )
-    /*throw (WrongExecutionArgsException)*/
+    const PluginExecutionParams& params,
+    const QList<UUIDObject*>& argsList,
+    const QHash< QString, QList<Plugin*> >& deps  )
+    /*throw (Plugin::WrongExecutionArgsException,
+             Plugin::DependenciesAreNotResolvedException)*/
 {
+    Q_UNUSED(params);
+    Q_UNUSED(deps);
+
     if ( argsList.size() != 1 )
         throw WrongExecutionArgsException();
     

@@ -13,7 +13,8 @@ public:
     NodePrivate () :
         ref(1), parent(0), 
         plugin(0), inUse(false),
-        canBeResolved(false)
+        canBeResolved(false),
+        paramsAreAccepted(false)
     {}
 
     ~NodePrivate ()
@@ -21,6 +22,8 @@ public:
         parent = 0;
         plugin = 0;
         inUse = false;
+        canBeResolved = false;
+        paramsAreAccepted = false;
     }
 
     QAtomic ref;
@@ -29,7 +32,8 @@ public:
     Plugin* plugin;
     bool inUse;
     bool canBeResolved;
-    PluginParams pluginParams;
+    bool paramsAreAccepted;
+    PluginExecutionParams pluginParams;
 };
 
 /*****************************************************************************
@@ -171,10 +175,38 @@ void PluginExecutionTree::Node::canBeResolved ( bool canBeResolved_ )
     data->canBeResolved = canBeResolved_;
 }
 
-bool PluginExecutionTree::Node::arePluginParamsValid () const
+void PluginExecutionTree::Node::setPluginParams ( 
+    const PluginExecutionParams& params )
+    /*throw (Plugin::ParamsAreNotAcceptedException)*/
 {
-    // TODO:
-    return true;
+    if ( isNull() || data->plugin == 0 )
+        return;
+
+    // Firstly save params
+    data->pluginParams = params;
+
+    try { data->plugin->tryToAcceptParams( params ); }
+    catch ( Plugin::ParamsAreNotAcceptedException& ) {
+        data->paramsAreAccepted = false;
+        throw;
+    }
+    // Ok, params are accepted
+    data->paramsAreAccepted = true;
+}
+ 
+
+PluginExecutionParams PluginExecutionTree::Node::getPluginParams () const
+{
+    if ( isNull() || data->plugin == 0 )
+        return PluginExecutionParams();
+    return data->pluginParams;
+}
+
+bool PluginExecutionTree::Node::areParamsAccepted () const
+{
+    if ( isNull() || data->plugin == 0 )
+        return false;
+    return data->paramsAreAccepted;
 }
 
 void PluginExecutionTree::Node::use ( bool useFlag )
@@ -273,7 +305,8 @@ bool PluginExecutionTree::buildExecutionTree (
             validDependence = true;
     }
 
-    // We can resolve this node if at least we can resolve one dependence branch :)
+    // We can resolve this node if at least 
+    // we can resolve one dependence branch :)
     parent.canBeResolved( validDependence );
 
     return validDependence;
