@@ -16,12 +16,17 @@ public:
     SimpleCalcPlugin ( PluginManager& mng, const QString& path );
     virtual ~SimpleCalcPlugin ();
 
-    virtual ExecutionResult specificExecute ( const QList<UUIDObject*>& )
-        /*throw (WrongExecutionArgsException)*/;
+    virtual ExecutionResult specificExecute ( 
+                              const PluginExecutionParams& params,
+                              const QList<UUIDObject*>& args,
+                              const QHash< QString, QList<Plugin*> >& deps  )
+        /*throw (WrongExecutionArgsException,
+                 DependenciesAreNotResolvedException)*/;
 
     virtual const PluginInfo& pluginInfo () const;
     virtual Status pluginStatusCode () const;
     virtual QString pluginStatusMsg () const;
+    virtual void tryToAcceptParams ( const PluginExecutionParams& ) const;
 
     virtual void startCalculation ( const QString& fileName ) const = 0;
 

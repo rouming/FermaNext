@@ -8,6 +8,7 @@
 
 #include "PluginLoader.h"
 #include "PluginExecutionTree.h"
+#include "PluginExecutionContext.h"
 
 class DynaLoader;
 class Config;
@@ -66,6 +67,21 @@ public:
      * @see PluginExecutionTree
      */
     const PluginExecutionTree& buildExecutionTree ( Plugin& plugin );
+
+    /** 
+     * Prepares execution context for the specified execution tree. 
+     * @throw PluginExecutionContext::ContextIsEmptyException,
+     *        occurs when plugins from execution tree are not properly 
+     *        prepared for execution (i.e. params are not valid, etc)
+     */
+    void preparePluginExecutionContext ( const PluginExecutionTree& )
+        /*throw (PluginExecutionContext::ContextIsEmptyException)*/;
+
+    /** Returns current plugin execution context */
+    PluginExecutionContext& currentExecutionContext ();
+
+    /** Returns current plugin execution context (const variant)*/
+    const PluginExecutionContext& currentExecutionContext () const;
 
     /**
      * Returns dependencies for specified plugin.
@@ -314,6 +330,7 @@ private:
     QString pluginsPath;               /**< plugins path */
     Config& cfg;                       /**< global app config */
     PluginExecutionTree execTree;
+    PluginExecutionContext execContext;
 };
 
 #endif //PLUGINMANAGER_H

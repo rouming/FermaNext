@@ -26,6 +26,9 @@ public:
     virtual QString pluginStatusMsg () const 
     { return "";  }
 
+    virtual void tryToAcceptParams ( const PluginExecutionParams& ) const
+    { /* nothing */ }
+
 ///////////////////////////////////////////////////////////////////////////////
 //  inherited from CommonNativePluginTest
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,10 +43,11 @@ public:
     { throw OkStatus; }
 
 private:
-    ExecutionResult specificExecute ( const QList<UUIDObject*>&  )
-        /*throw (WrongExecutionArgsException)*/
+    ExecutionResult specificExecute ( 
+                              const PluginExecutionParams&,
+                              const QList<UUIDObject*>&,
+                              const QHash< QString, QList<Plugin*> >& )
     { return ExecutionResult( OkStatus, QString() ); }
-
 };
 
 // plugin export

@@ -3,12 +3,7 @@
 #define PLUGINEXECUTIONTREE_H
 
 #include "Plugin.h"
-
-// Temp class
-class PluginParams
-{
-};
-
+#include "PluginExecutionParams.h"
 
 class PluginManager;
 
@@ -72,8 +67,25 @@ public:
          */
         bool canBeResolved () const;
 
-        /** Checks if plugin params are valid */
-        bool arePluginParamsValid () const;
+        /** 
+         * Sets plugin params. 
+         * @throw PluginExecutionParams::ParamsAreNotAcceptedException,
+         *        occurs when plugin does not want to accept params.
+         *        Note: params are set to this node, even plugin does
+         *              not want to accept them.
+         */
+        void setPluginParams ( const PluginExecutionParams& )
+            /*throw (Plugin::ParamsAreNotAcceptedException)*/;
+
+        /** 
+         * Returns current plugin params.
+         * Params can be not accepted (#areParamsAccepted), 
+         * so check them first.
+         */
+        PluginExecutionParams getPluginParams () const;
+
+        /** Returns true if params are accepted by plugin */
+        bool areParamsAccepted () const;
 
         /** Should we use plugin in execution or not */
         void use ( bool );

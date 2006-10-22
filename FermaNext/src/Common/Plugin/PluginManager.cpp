@@ -76,6 +76,17 @@ const PluginExecutionTree& PluginManager::buildExecutionTree ( Plugin& plugin )
     return execTree;
 }
 
+void PluginManager::preparePluginExecutionContext ( 
+    const PluginExecutionTree& tree )
+    /*throw (PluginExecutionContext::ContextIsEmptyException)*/
+{ execContext = PluginExecutionContext( tree ); }
+
+PluginExecutionContext& PluginManager::currentExecutionContext ()
+{ return execContext; }
+
+const PluginExecutionContext& PluginManager::currentExecutionContext () const
+{ return execContext; }
+
 void PluginManager::registerPluginLoaders ( const QString& path )
 {
     LOG4CXX_DEBUG(logger, "registerPluginLoaders");
