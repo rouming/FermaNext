@@ -3,6 +3,11 @@ TARGET = JavaPluginLoader.ldr
 
 LEVEL = ../../..
 include($$LEVEL/FermaNext.pri)
+include(../../FermaNext/Gui/Agg/Agg.pri)
+include(../../FermaNext/TrussUnit/TrussUnit.pri)
+include(../../Common/Common.pri)
+include(../../3rdparty/agg23/agg23.pri)
+
 
 DESTDIR = $$LEVEL/plugins/loaders/
 QT += core gui xml
@@ -12,26 +17,12 @@ CONFIG += plugin warn_on thread
 
 DEFINES += QT_THREAD_SUPPORT
 
-INCLUDEPATH += . \
-               ../../Common \
-               ../../Common/Plugin \
-               ../../Common/Loader \
-               ../../FermaNext/TrussUnit \
-#############################################
-# Remove this includes in future
-               ../../FermaNext/Gui/Agg \
-               $$(AGGDIR)/include \
-               $$(AGGDIR)/svg \
-#############################################
-               $$(JAVA_HOME)/include
-
+INCLUDEPATH += $$(JAVA_HOME)/include
 
 win32 {
-  LIBS += Common.lib TrussUnit.lib
   INCLUDEPATH += $$(JAVA_HOME)/include/win32
 }
 unix {
-  LIBS += -lCommon
   INCLUDEPATH += $$(JAVA_HOME)/include/linux
 }
 

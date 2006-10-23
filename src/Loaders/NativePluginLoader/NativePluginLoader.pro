@@ -3,29 +3,20 @@ TARGET = NativePluginLoader.ldr
 
 LEVEL = ../../..
 include($$LEVEL/FermaNext.pri)
+include(NativePluginLoader.pri)
+include(../../Common/Common.pri)
 
 DESTDIR = $$LEVEL/plugins/loaders/
 QT += core
+QT -= gui
 
 TEMPLATE = lib
 CONFIG += plugin warn_on thread
 
 DEFINES += QT_THREAD_SUPPORT
 
-win32 {
-  LIBS += Common.lib
-}
-unix {
-  LIBS += -lCommon
-}
-
-INCLUDEPATH += ../../Common \
-               ../../Common/Plugin \
-               ../../Common/Loader
-
 HEADERS = NativePluginLoader.h \
           NativePluginFrontEnd.h \
           NativePlugin.h
 
 SOURCES = NativePluginLoader.cpp
-
