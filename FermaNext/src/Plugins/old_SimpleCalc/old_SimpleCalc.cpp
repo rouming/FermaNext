@@ -3,7 +3,6 @@
 #include <QRegExp>
 #include <QMessageBox>
 
-#include "old_SimpleCalc.h"
 #include "NativePluginFrontEnd.h"
 #include "TrussUnit.h"
 #include "TrussCalcData.h"

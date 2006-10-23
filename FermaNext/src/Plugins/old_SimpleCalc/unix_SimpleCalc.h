@@ -6,72 +6,126 @@
 #include <QTcpSocket>
 #include <QHostAddress>
 #include <QThread>
+#include <QMutex>
+#include <QProcess>
+#include <QMutexLocker>
+#include <QWaitCondition>
+#include <QQueue>
 #include <QDateTime>
+
+#include "old_SimpleCalc.h"
+
+// Calculation thread
+class CalcThread : public QThread 
+{
+    Q_OBJECT
+public:
+    CalcThread () :
+        m_calculating(true)
+    {}
+
+    ~CalcThread ()
+    {
+        stopCalculating();
+    }
+    
+    virtual void run()
+    {
+        // Wine call. Assuming wine is installed
+        QProcess::startDetached("wine plugins/Simple_f.exe 1212");
+          //> /dev/null 2>&1
+        
+        // Wait for server is up
+        sleep(3);
+
+        QTcpSocket socket;
+
+        socket.connectToHost( QHostAddress("127.0.0.1"), 1212 );
+        socket.waitForConnected();
+        
+        QString okMsg("OK\n");
+            
+        while ( m_calculating ) {
+            
+            QDataStream out( &socket );
+            out.setVersion( QDataStream::Qt_4_0 );
+            QString fileName = nextToCalculate();
+            
+            if ( fileName.isEmpty() )
+                continue;
+            
+            out.writeRawData( qPrintable(fileName), fileName.length() );
+            socket.waitForBytesWritten();
+                
+            while ( socket.bytesAvailable() < okMsg.length() )
+                socket.waitForReadyRead();
+            
+            // Ok!
+            socket.readAll();
+            
+            m_sync.wakeAll();
+        }
+
+        QString quitMsg("quit\n");
+        
+        QDataStream out( &socket );
+        out.setVersion( QDataStream::Qt_4_0 );            
+        out.writeRawData( qPrintable(quitMsg), quitMsg.length() );
+        socket.flush();
+
+        // Wait for server is down
+        sleep(3);
+    }
+
+    void calculate ( const QString& fileName ) const
+    {
+        if ( fileName.isEmpty() )
+            return;
+        QMutexLocker locker(&m_mutex);
+        m_calculateQueue.append(fileName);
+        m_sync.wait(&m_mutex);
+    }
+
+public slots:
+    void stopCalculating ()
+    {
+        m_calculating = false;
+        while ( isRunning() )
+            usleep(200);
+    }
+    
+private:
+    QString nextToCalculate () 
+    {
+        if ( m_calculateQueue.isEmpty() )
+            return QString();
+        return m_calculateQueue.dequeue();
+    }
+
+private:
+    volatile bool m_calculating;
+    mutable QMutex m_mutex;
+    mutable QWaitCondition m_sync;
+    mutable QQueue<QString> m_calculateQueue;    
+};
 
 class os_dependent_SimpleCalcPlugin : public SimpleCalcPlugin
 {
-private:
-    // Calculation thread
-    class CalcThread : public QThread 
-    {
-    public:
-        virtual void run()
-        {
-            // Wine call. Assuming wine is installed
-            system("wine plugins/Simple_f.exe 1212 "); //> /dev/null 2>&1
-        }
-    };
-
 public:    
     os_dependent_SimpleCalcPlugin ( PluginManager& mng, const QString& path ) :
         SimpleCalcPlugin( mng, path )
     {
         calcThread.start();
-        // Should wait a little to be sure server is started
-        sleep(3);        
-        socket.connectToHost( QHostAddress("127.0.0.1"), 1212 );
-        socket.waitForConnected();
-    }
-
-    ~os_dependent_SimpleCalcPlugin ()
-    {
-        QString msg("quit\n");
-        socket.write( msg.toAscii() );
-        socket.close();
-
-        // Workaround of vague segmentation fault after direct call
-        // of wait of calculation thread.
-        class Waiter : public QThread 
-        {
-        public:
-            Waiter ( QThread& t_ ) : t(t_) {}
-            virtual void run()
-            { t.wait(); }                
-        private:
-            QThread& t;
-        };
-        Waiter w(calcThread);
-        w.start();
-        w.wait();
     }
 
     void startCalculation ( const QString& fileName ) const
     {
         // Send file name to calculation server
         QString fileToCalc( fileName + "\n" );
-        socket.write( fileToCalc.toAscii() );
-        socket.flush();
-
-        QString vyvFile( tempFileName() + fermaResExt );
-        // Wait file appearance. 
-        // 'Wine' should spend some time to flush the file.
-        uint curr = QDateTime::currentDateTime().toTime_t();
-        while ( ! QFile::exists( vyvFile ) && 
-                5 > QDateTime::currentDateTime().toTime_t() - curr );
+        calcThread.calculate( fileToCalc );
     }
     
 private:
-    mutable QTcpSocket socket;
     CalcThread calcThread;
 };
 

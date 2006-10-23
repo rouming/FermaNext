@@ -3,6 +3,10 @@ TARGET = TrussUnit
 
 LEVEL = ../../..
 include($$LEVEL/FermaNext.pri)
+include(../../Common/Common.pri)
+include(../Gui/Agg/Agg.pri)
+include(../../3rdparty/agg23/agg23.pri)
+include(TrussUnit.pri)
 
 QT += core xml
 
@@ -14,13 +18,6 @@ win32 {
 }
 unix {
 }
-
-INCLUDEPATH += $$(AGGDIR)/include \
-               $$(AGGDIR)/svg \
-               ../../Common \
-               ../../Common/Plugin \
-               ../../Common/Loader \
-               ../Gui/Agg
 
 SOURCES = \
           Truss.cpp \

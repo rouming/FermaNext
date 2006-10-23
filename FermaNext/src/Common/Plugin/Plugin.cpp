@@ -31,6 +31,14 @@ Plugin::ExecutionResult Plugin::execute ( const QList<UUIDObject*>& args )
     LOG4CXX_DEBUG(logger, "execute");
     emit beforeExecution( *this );    
 
+    //// REMOVE THIS THREE LINES ASAP!
+    PluginExecutionParams params;
+    QHash< QString, QList<Plugin*> > dependencies;
+    ExecutionResult result = specificExecute( params, args, dependencies );
+
+
+    /* Turned off for now.
+
     PluginExecutionContext& context = plgMng.currentExecutionContext();
     // Step to next context
     context.nextContext();
@@ -78,6 +86,8 @@ Plugin::ExecutionResult Plugin::execute ( const QList<UUIDObject*>& args )
 
     // Step to previous context
     context.previousContext();
+
+    */
 
     emit afterExecution( *this, result );
     return result; 

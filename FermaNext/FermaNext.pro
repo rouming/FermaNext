@@ -24,7 +24,10 @@ isEmpty(ANT_HOME) {
 
 TEMPLATE = subdirs
 
-SUBDIRS = src/Common \
+SUBDIRS = \
+          src/3rdparty/agg23 \
+          \
+          src/Common \
           src/FermaNext/Gui \
           src/FermaNext/TrussUnit \
           src/FermaNext \
