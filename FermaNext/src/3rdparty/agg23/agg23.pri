@@ -2,7 +2,22 @@
 INCLUDEPATH += $$PWD/include \
                $$PWD/svg
 
-win32:INCLUDEPATH += $$(EXPATDIR)/Source/lib
+win32 {
+  EXPAT = $$(EXPATDIR)
+  isEmpty( EXPAT ) {
+    error("Expat lib should be installed, to build agg23 source on Win32. \
+           Do not forget to set 'EXPATDIR' environment, which should point \
+           to expat headers.")
+  }
+
+  !exists( $$EXPAT/Source/lib/expat.h ) {
+    error("Expat lib should be installed, to build agg23 source on Win32. \
+           Do not forget to set 'EXPATDIR' environment, which should point \
+           to expat headers.")
+  }
+
+  INCLUDEPATH += $$(EXPATDIR)/Source/lib
+}
 
 !contains ( TARGET, agg23 ) {
   win32:LIBS += agg23.lib
