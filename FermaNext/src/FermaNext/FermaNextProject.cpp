@@ -28,8 +28,6 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
     currentWorkspace(wsp),
     name(name_),
     stackedWidget(stack),
-    // FIXME QT3TO4:
-    //calcDataToolBar( new CalcDataToolBar(projectMainWidget) ),
     projectWidget( new QFrame(stackedWidget) ),
     designerWidget( new TrussDesignerWidget ),
     materialLibrary( new TrussMaterialLibrary ),
@@ -52,12 +50,6 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
     designerWidget->setVisible(true);
 
     projectWidget->setFrameStyle( QFrame::Raised | QFrame::Panel );
-    /*
-      // FIXME QT3TO4:
-    projectMainWidget->setRightJustification( true );
-    projectMainWidget->setDockEnabled( DockLeft, false );
-    projectMainWidget->setDockEnabled( DockRight, false );
-    */
     stackedWidget->addWidget(projectWidget);
 
     // Catch trusses creation or deletion.
@@ -67,16 +59,6 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
     connect( trussWindowManager, 
              SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
              designerWidget, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
-
-    // FIXME QT3TO4: 
-    /*
-    connect( trussWindowManager, 
-             SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)),     
-             calcDataToolBar, SLOT(addTrussUnitWindow(TrussUnitWindow&)) );
-    connect( trussWindowManager, 
-             SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
-             calcDataToolBar, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
-     */
 }
 
 FermaNextProject::~FermaNextProject ()
@@ -346,13 +328,7 @@ TrussDesignerWidget& FermaNextProject::getDesignerWidget ()
 {
     return *designerWidget;
 }
-//FIXME QT3TO4
-/*
-CalcDataToolBar& FermaNextProject::getCalcDataToolBar ()
-{
-    return *calcDataToolBar;
-}
-*/
+
 FermaNextWorkspace& FermaNextProject::getWorkspace()
 {
     return currentWorkspace;

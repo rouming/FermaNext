@@ -19,14 +19,9 @@ win32 {
 unix {
 }
 
-#FIXME QT3TO4
-#FORMS = ../gui/CalcDataWidget.ui
-
 SOURCES = \
-#FIXME QT3TO4
-#          CalcDataToolBar.cpp \
           ColorRangeControl.cpp \
-	  GuiSubsidiary.cpp \
+          GuiSubsidiary.cpp \
           FermaNextMainWindow.cpp \
           GeometryTabWidget.cpp \
           HtmlTable.cpp \
@@ -37,8 +32,6 @@ SOURCES = \
           ResultsTabWidget.cpp \
           TrussDeformPicture.cpp \
           Splash.cpp \
-#FIXME QT3TO4 
-#          ToolBarManager.cpp \
           TrussDesignerWidget.cpp \
           TrussPropertyTabWidget.cpp \
           TrussMaterialEditor.cpp \
@@ -55,11 +48,8 @@ SOURCES = \
           Agg/AggWidget.cpp
 
 HEADERS = \
-#FIXME QT3TO4 
-#          CalcDataToolBar.h \
           ColorRangeControl.h \
-	  GuiSubsidiary.h \
-          CalcDataWidget.ui.h \
+          GuiSubsidiary.h \
           FermaNextMainWindow.h \
           GeometryTabWidget.h \
           HtmlTable.h \
@@ -70,8 +60,6 @@ HEADERS = \
           ResultsTabWidget.h \
           TrussDeformPicture.h \
           Splash.h \
-#FIXME QT3TO4 
-#          ToolBarManager.h \
           TrussDesignerWidget.h \
           TrussPropertyTabWidget.h \
           TrussMaterialEditor.h \

@@ -8,8 +8,6 @@
 #include "TrussDesignerWidget.h"
 #include "TrussUnitWindowManager.h"
 #include "ObjectStateManager.h"
-// FIXME QT3TO4:
-//#include "CalcDataToolBar.h"
 
 class FermaNextWorkspace;
 class TrussResultsManager;
@@ -53,8 +51,6 @@ public:
     virtual TrussUnitWindowManager& getTrussUnitWindowManager ();
     virtual TrussResultsManager& getTrussResultsManager ();  
     virtual TrussDesignerWidget& getDesignerWidget ();
-// FIXME QT3TO4:
-//    virtual CalcDataToolBar& getCalcDataToolBar ();
     virtual FermaNextWorkspace& getWorkspace();
 
     virtual TrussMaterialLibrary& getMaterialLibrary () const;
@@ -87,8 +83,6 @@ private:
     QString name;
     QString projectFileName;
     QStackedWidget* stackedWidget;
-// FIXME QT3TO4:
-//    CalcDataToolBar* calcDataToolBar;
     QFrame* projectWidget;
     TrussDesignerWidget* designerWidget;
     TrussMaterialLibrary* materialLibrary;

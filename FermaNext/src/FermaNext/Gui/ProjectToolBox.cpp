@@ -13,9 +13,6 @@
 #include "Global.h"
 #include "TrussUnitActions.h"
 #include "TrussCalcData.h"
-//FIXME QT3TO4
-//#include "CalcDataWidget.h"
-//#include "CalculationInterface.h"
 
 /*****************************************************************************
  * Project ToolBox
@@ -292,59 +289,7 @@ void ProjectToolBox::calculateAllIsPressed ()
     if ( currPrj == 0 )
         return;
 
-    // FIXME QT3TO4:
-    /*
-    PluginManager& plgManager = workspace.pluginManager();
-    PluginList plugins = plgManager.loadedPluginsOfType( CALCULATION_TYPE );
-    if ( plugins.size() == 0 ) {
-        QMessageBox::warning( 0, tr("Plugin manager warning"), 
-                                 tr("Calculation plugin was not found "
-                                    "in the plugin dir.") );
-        return;
-    }
-
-    CalcDataToolBar& calcToolBar = currPrj->getCalcDataToolBar();
-    TrussUnitWindowManager& trussMng = currPrj->getTrussUnitWindowManager();
-    WindowList trussWindows = trussMng.getTrussUnitWindowList();
-    WindowListIter iter = trussWindows.begin();
-
-    // Find first calculation plugin. 
-    // TODO: plural calculation plugin support
-    Plugin* plugin = plugins[0];
-
-    try {
-        CalculationInterface& calcPlugin = 
-            dynamic_cast<CalculationInterface&>(*plugin);
-
-        for ( ; iter != trussWindows.end(); ++iter ) {
-            TrussUnitWindow* trussWindow = *iter;
-            try {
-                // Try to find truss calc data widget
-                CalcDataWidget* calcForm = 
-                    calcToolBar.findCalcDataWidget( *trussWindow );
-            
-                // Do calculation with new topology and calc data
-                TrussCalcData calcData;
-                TrussTopology& topology = trussWindow->createTopology();
-                calcPlugin.calculate( topology, calcData );
-                calcForm->initCalc( calcData );
-                
-                // TODO: toplogy manager
-                topology.desist();
-            }
-            catch ( ... ) {
-               QMessageBox::critical( 0, tr("Plugin manager error"),
-                                      tr("Internal plugin error. \n"
-                                      "Please, inform plugin developer.") );
-            }
-        }
-    }
-    catch ( std::exception& ) {
-        QMessageBox::critical( 0, tr("Plugin manager error"),
-                               tr("Plugin '"+  plugin->pluginInfo().name + 
-                                  "' has violated type contract.") );
-    }
-    */
+    QMessageBox::warning( this, "Not implemented", "Not implemented" );
 }
 
 void ProjectToolBox::afterTrussCountChange ( TrussUnitWindow& w)

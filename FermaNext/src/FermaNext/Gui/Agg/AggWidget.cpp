@@ -3,6 +3,7 @@
 #include <QPrinter>
 #include <QSize>
 #include <QResizeEvent>
+#include <QMessageBox>
 
 #include <platform/agg_platform_support.h>
 
@@ -141,13 +142,7 @@ AggCtrlContainer& AggWidget::getAggCntrlContainer ()
 
 void AggWidget::print ()
 {
-    /*FIXME QT3TO4
-    QPrinter printer;
-    if ( printer.setup(this) ) {
-	    QPainter p( &printer );
-	    p.drawImage( mainQImage->rect(), *mainQImage );
-    }
-    */
+    QMessageBox::warning ( this, "Not implemented", "Not implemented" );
 }
 
 /*****************************************************************************

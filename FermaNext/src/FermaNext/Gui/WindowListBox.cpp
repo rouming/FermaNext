@@ -8,9 +8,6 @@
 #include "TrussUnitActions.h"
 #include "FermaNextWorkspace.h"
 #include "TrussCalcData.h"
-//FIXME QT3TO4
-//#include "CalcDataWidget.h"
-//#include "CalculationInterface.h"
 
 /*****************************************************************************
  * Truss Unit Window Item
