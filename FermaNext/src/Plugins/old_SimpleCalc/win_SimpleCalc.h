@@ -3,6 +3,7 @@
 #define WIN_SIMPLECALC_H
 
 #include "DynaLoader.h"
+#include "old_SimpleCalc.h"
 
 const QString calcDLLName = "plugins/win_Simple_f.dll";
 const QString calcProcName = "SimpleFerma";

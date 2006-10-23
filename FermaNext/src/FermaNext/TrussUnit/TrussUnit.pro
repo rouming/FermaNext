@@ -3,10 +3,10 @@ TARGET = TrussUnit
 
 LEVEL = ../../..
 include($$LEVEL/FermaNext.pri)
+include(TrussUnit.pri)
 include(../../Common/Common.pri)
 include(../Gui/Agg/Agg.pri)
 include(../../3rdparty/agg23/agg23.pri)
-include(TrussUnit.pri)
 
 QT += core xml
 

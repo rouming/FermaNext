@@ -14,6 +14,7 @@ QT += core network xml
 
 TEMPLATE = lib
 CONFIG += plugin warn_on thread
+INCLUDEPATH += ./
 
 win32 {
   HEADERS += win_SimpleCalc.h

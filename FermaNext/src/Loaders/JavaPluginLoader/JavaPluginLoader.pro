@@ -17,7 +17,7 @@ CONFIG += plugin warn_on thread
 
 DEFINES += QT_THREAD_SUPPORT
 
-INCLUDEPATH += $$(JAVA_HOME)/include
+INCLUDEPATH += ./ $$(JAVA_HOME)/include
 
 win32 {
   INCLUDEPATH += $$(JAVA_HOME)/include/win32

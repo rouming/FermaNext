@@ -3,6 +3,7 @@ TARGET = agg23
 
 LEVEL = ../../..
 include($$LEVEL/FermaNext.pri)
+include(agg23.pri)
 
 TEMPLATE = lib
 CONFIG += staticlib
