@@ -52,7 +52,6 @@ isEmpty(DISABLE_LOGGING): DISABLE_LOGGING = $$(DISABLE_LOGGING)
      LIBPATH += $$DESTDIR
      MOC_DIR = $$join(TARGET, "", $$DESTDIR/mocs/)
      OBJECTS_DIR = $$join(TARGET, "", $$DESTDIR/obj/)
-     UI_DIR = $$join(TARGET, "", $$DESTDIR/ui/)
 }			
 
 CONFIG(debug, debug|release) {

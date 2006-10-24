@@ -12,6 +12,7 @@
 #include "Config.h"
 #include "FermaNextProject.h"
 #include "FermaNextMainWindow.h"
+#include "PluginExecutorDialog.h"
 #include "PluginManager.h"
 
 class QStackedWidget;
@@ -39,7 +40,7 @@ public:
     // Entry point to workspace instance
     static FermaNextWorkspace& workspace ();
 
-    virtual ProjectList getProjectList () const;
+    ProjectList getProjectList () const;
 
     virtual void loadFromFile ( const QString& ) /*throw (IOException, 
                                                           WrongXMLDocException,
@@ -51,42 +52,44 @@ public:
     virtual void saveToFile ( const QString& ) 
         /*throw (IOException, ProjectFileNameIsNotDefinedException)*/;
 
-    virtual const QString& getWorkspaceFileName () const;
-    virtual bool isFileNameDefined () const;
+    const QString& getWorkspaceFileName () const;
+    bool isFileNameDefined () const;
     
-    virtual void reset ();
+    void reset ();
 
     /**
      * Clean, shutdown everything and exit.
      */
-    virtual void quitFermaNextApplication ();
+    void quitFermaNextApplication ();
 
-    virtual FermaNextProject& createProject ( const QString& name );
-    virtual FermaNextProject& createProjectFromFile ( const QString& ) 
+    FermaNextProject& createProject ( const QString& name );
+    FermaNextProject& createProjectFromFile ( const QString& ) 
         /*throw(LoadException)*/;
 
-    virtual bool removeProject ( FermaNextProject& );
-    virtual bool removeProject ( const QString& name );
-    virtual void activateProject ( const QString& prjName );
-    virtual FermaNextProject* currentActivatedProject () const;
+    bool removeProject ( FermaNextProject& );
+    bool removeProject ( const QString& name );
+    void activateProject ( const QString& prjName );
+    FermaNextProject* currentActivatedProject () const;
 
-    virtual FermaNextProject* findProjectByName ( const QString& name ) const;
+    FermaNextProject* findProjectByName ( const QString& name ) const;
 
-    virtual int countProjects () const;
-    virtual FermaNextProject& getProject ( int index );
+    int countProjects () const;
+    FermaNextProject& getProject ( int index );
 
-    virtual const QString& getName () const;
-    virtual void setName ( const QString& );
+    const QString& getName () const;
+    void setName ( const QString& );
 
-    virtual Config& config ();
-    virtual PluginManager& pluginManager ();
-    virtual FermaNextMainWindow& mainWindow ();
+    Config& config ();
+    PluginManager& pluginManager ();
+
+    FermaNextMainWindow* mainWindow () const;
+    PluginExecutorDialog* pluginExecutor () const;
 
 public slots:
-    virtual void clearProjects ();
+    void clearProjects ();
 
 protected slots:
-    virtual void projectIsActivated ( FermaNextProject& );
+    void projectIsActivated ( FermaNextProject& );
 
 protected:
     // XML serialization
@@ -95,7 +98,7 @@ protected:
 
     virtual QDomElement saveToXML ( QDomDocument& );
 
-    virtual void setWorkspaceFileName ( const QString& );
+    void setWorkspaceFileName ( const QString& );
 
     /** Removed project and returns next iterator. */
     ProjectListIter removeProject ( ProjectListIter );
@@ -129,6 +132,7 @@ private:
     Config& fermaConfig;
     PluginManager pluginMng;
     FermaNextMainWindow* fermaMainWindow;
+    PluginExecutorDialog* plgExecutorDialog;
     QStackedWidget* stackedWidget;
 };
 

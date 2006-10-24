@@ -30,10 +30,12 @@ FermaNextWorkspace::FermaNextWorkspace () :
     fermaConfig( Global::config() ),
     pluginMng( fermaConfig ),
     fermaMainWindow(0),
+    plgExecutorDialog(0),
     stackedWidget(0)
 {
     fermaMainWindow = new FermaNextMainWindow( *this );
     stackedWidget = new QStackedWidget( fermaMainWindow );
+    plgExecutorDialog = new PluginExecutorDialog( pluginMng, fermaMainWindow );
     fermaMainWindow->setCentralWidget( stackedWidget );
 }
 
@@ -368,9 +370,14 @@ PluginManager& FermaNextWorkspace::pluginManager ()
     return pluginMng;
 }
 
-FermaNextMainWindow& FermaNextWorkspace::mainWindow ()
+FermaNextMainWindow* FermaNextWorkspace::mainWindow () const
 {
-    return *fermaMainWindow;
+    return fermaMainWindow;
+}
+
+PluginExecutorDialog* FermaNextWorkspace::pluginExecutor () const
+{
+    return plgExecutorDialog;
 }
 
 /*****************************************************************************/

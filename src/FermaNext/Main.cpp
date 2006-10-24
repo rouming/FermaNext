@@ -33,6 +33,8 @@ int main ( int argc, char* argv[] )
                                      Global::applicationName(),
                                      Global::applicationVersion() );
         splash->show();
+
+        splash->message( "Creating main components .." );
         
         FermaNextWorkspace& wsp = FermaNextWorkspace::workspace();
 
@@ -51,9 +53,9 @@ int main ( int argc, char* argv[] )
 
         splash->message( "Setting up GUI .." );
         
-        FermaNextMainWindow& fermaMainWindow = wsp.mainWindow();
-        fermaMainWindow.showMaximized();
-        splash->finish( &fermaMainWindow );
+        FermaNextMainWindow* fermaMainWindow = wsp.mainWindow();
+        fermaMainWindow->showMaximized();
+        splash->finish( fermaMainWindow );
         QApplication::restoreOverrideCursor();
         delete splash;
         return app.exec();
