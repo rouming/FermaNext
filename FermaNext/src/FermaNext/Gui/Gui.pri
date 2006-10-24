@@ -3,6 +3,8 @@ INCLUDEPATH += $$PWD/.. \
                $$PWD \
                $$PWD/Agg 
 
+UI_DIR = $$PWD/ui
+
 !contains ( TARGET, Gui ) {
   win32:LIBS += Gui.lib
   unix:LIBS += -lGui

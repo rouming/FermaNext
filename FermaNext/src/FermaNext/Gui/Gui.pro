@@ -21,20 +21,21 @@ unix {
 
 SOURCES = \
           ColorRangeControl.cpp \
-          GuiSubsidiary.cpp \
           FermaNextMainWindow.cpp \
           GeometryTabWidget.cpp \
+          GuiSubsidiary.cpp \
           HtmlTable.cpp \
+          PluginExecutorDialog.cpp \
           PluginReloader.cpp \
           PreferencesWidget.cpp \
           ProjectToolBox.cpp \
           ResultsControlWidget.cpp \
           ResultsTabWidget.cpp \
-          TrussDeformPicture.cpp \
           Splash.cpp \
+          TrussDeformPicture.cpp \
           TrussDesignerWidget.cpp \
-          TrussPropertyTabWidget.cpp \
           TrussMaterialEditor.cpp \
+          TrussPropertyTabWidget.cpp \
           UndoRedoListBox.cpp \
           WindowListBox.cpp \
           \
@@ -49,20 +50,21 @@ SOURCES = \
 
 HEADERS = \
           ColorRangeControl.h \
-          GuiSubsidiary.h \
           FermaNextMainWindow.h \
           GeometryTabWidget.h \
+          GuiSubsidiary.h \
           HtmlTable.h \
+          PluginExecutorDialog.h \
           PluginReloader.h \
           PreferencesWidget.h \
           ProjectToolBox.h \
           ResultsControlWidget.h \
           ResultsTabWidget.h \
-          TrussDeformPicture.h \
           Splash.h \
+          TrussDeformPicture.h \
           TrussDesignerWidget.h \
-          TrussPropertyTabWidget.h \
           TrussMaterialEditor.h \
+          TrussPropertyTabWidget.h \
           UndoRedoListBox.h \
           WindowListBox.h \
           \
@@ -74,3 +76,7 @@ HEADERS = \
           Agg/AggTrussToolBar.h \
           Agg/AggTrussWindowButton.h \
           Agg/AggWidget.h 
+
+
+FORMS += \
+         PluginExecutorDialog.ui
