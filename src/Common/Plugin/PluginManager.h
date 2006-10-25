@@ -329,7 +329,6 @@ private:
     PluginsMap plugins;                /**< plugins and their loaders */
     QString pluginsPath;               /**< plugins path */
     Config& cfg;                       /**< global app config */
-    PluginExecutionTree execTree;
     PluginExecutionContext execContext;
 };
 
