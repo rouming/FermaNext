@@ -7,7 +7,9 @@
 
 PluginExecutorDialog::PluginExecutorDialog ( PluginManager& mng, QWidget* p ) :
     QDialog(p),
-    plgMng(mng)    
+    plgMng(mng),
+    execTree(mng),
+    plugin(0)
 {
     setupUi(this);
 }
@@ -15,7 +17,10 @@ PluginExecutorDialog::PluginExecutorDialog ( PluginManager& mng, QWidget* p ) :
 void PluginExecutorDialog::executePlugin ( Plugin* plg, 
                                            const QList<UUIDObject*>& params )
 {
-    const PluginExecutionTree& execTree = plgMng.buildExecutionTree(plg);
+    // Save plugin, params and build execution tree for future use
+    execParams = params;
+    execTree.buildExecutionTree(plg);
+    plugin = plg;
 
     // If top node is alone (i.e. plugin does not have dependencies), 
     // just silently execute plugin.
@@ -65,11 +70,24 @@ void PluginExecutorDialog::execute ( Plugin* plg,
 
 void PluginExecutorDialog::showExecutionTree ()
 {
+    Q_ASSERT(plugin);
+
+
     //TODO: show tree dependencies representation
-
     show();
+    
+    // TODO: temp usage
+    {
+        execTree.getTreeTop().use(true);
+        QList<PluginExecutionTree::Node> l = 
+            execTree.getTreeTop().childNodes();
+    
+        foreach ( PluginExecutionTree::Node n, l )
+            n.use(true);
+    
+        execute( plugin, execTree, execParams );
+    }
 
-    qWarning("Not implemented yet");
 }
 
 /*****************************************************************************/

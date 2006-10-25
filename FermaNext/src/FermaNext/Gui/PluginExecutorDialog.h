@@ -26,7 +26,10 @@ private:
 
     
 private:
-    PluginManager& plgMng;    
+    PluginManager& plgMng;
+    PluginExecutionTree execTree;
+    QList<UUIDObject*> execParams;
+    Plugin* plugin;
 };
 
 #endif //PLUGINEXECUTORDIALOG_H
