@@ -190,7 +190,10 @@ void TrussUnitWindowItem::unselectAllFromGroup ()
 void TrussUnitWindowItem::executePlugin ( Plugin* plugin )
 { 
     Q_ASSERT( plugin );
-    plugin->execute( QList<UUIDObject*>() << &trussWindow );
+    FermaNextWorkspace& fnWsp = FermaNextWorkspace::workspace();
+    QList<UUIDObject*> params;
+    params << &trussWindow;
+    fnWsp.pluginExecutor()->executePlugin( plugin, params );
 }
 
 void TrussUnitWindowItem::remove ()

@@ -16,6 +16,14 @@ class PluginExecutorDialog : public QDialog,
 public:
     PluginExecutorDialog ( PluginManager&, QWidget* parent = 0 );
 
+    void executePlugin ( Plugin*, const QList<UUIDObject*>& );
+
+private:
+    void showExecutionTree ();
+
+    void execute ( Plugin*, const PluginExecutionTree&, 
+                   const QList<UUIDObject*>& );
+
     
 private:
     PluginManager& plgMng;    
