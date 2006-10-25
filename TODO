@@ -1,4 +1,10 @@
 
+major tasks for 0.2.2
+-----------------------------------------------
+- full plugin dependence resolving: 
+     executor dialog, dependence tree, etc.
+  
+
 major tasks for 0.2.0
 -----------------------------------------------
 - full Java plugin support with demo 
