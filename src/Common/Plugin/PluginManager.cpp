@@ -70,9 +70,9 @@ PluginManager::~PluginManager ()
 Config& PluginManager::config ()
 { return cfg; }
 
-const PluginExecutionTree& PluginManager::buildExecutionTree ( Plugin& plugin )
+const PluginExecutionTree& PluginManager::buildExecutionTree ( Plugin* plugin )
 {
-    execTree.buildExecutionTree( &plugin );
+    execTree.buildExecutionTree( plugin );
     return execTree;
 }
 

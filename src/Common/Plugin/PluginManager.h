@@ -66,7 +66,7 @@ public:
      * Builds execution tree for specified plugin.  
      * @see PluginExecutionTree
      */
-    const PluginExecutionTree& buildExecutionTree ( Plugin& plugin );
+    const PluginExecutionTree& buildExecutionTree ( Plugin* plugin );
 
     /** 
      * Prepares execution context for the specified execution tree. 
