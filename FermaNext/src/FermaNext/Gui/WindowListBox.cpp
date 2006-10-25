@@ -61,7 +61,7 @@ void TrussUnitWindowItem::fillPopup ( QMenu* popup )
     if ( isShown() ) {
         FermaNextWorkspace& wsp = project.getWorkspace();    
         PluginManager& plgManager = wsp.pluginManager();
-        PluginList plugins = plgManager.loadedPluginsOfType( "calculation.*" );
+        PluginList plugins = plgManager.loadedPlugins();
 /*
         if ( isSelectedInGroup() ) {
             popup->addAction( QIcon(Global::imagesPath() + "/unselect.png"),
@@ -339,7 +339,7 @@ void WindowListBox::solveTrussUnit ( const TrussUnitWindow& truss )
         return;
     
     PluginManager& plgManager = project.getWorkspace().pluginManager();
-    PluginList plugins = plgManager.loadedPluginsOfType( "calculation.*" );
+    PluginList plugins = plgManager.loadedPlugins();
     foreach ( Plugin* plugin, plugins )
         item->executePlugin( plugin );
 }
