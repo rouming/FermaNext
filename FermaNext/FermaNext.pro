@@ -35,7 +35,8 @@ SUBDIRS = \
           src/Loaders/JavaPluginLoader \
           src/Loaders/NativePluginLoader \
           \
-          src/Plugins/old_SimpleCalc
+          src/Plugins/old_SimpleCalc \
+          src/Plugins/Optimization.GA
 
 # Generates commands for Win32 to generate VS project files
 win32 {

@@ -243,6 +243,31 @@ PluginExecutionTree::Node PluginExecutionTree::buildExecutionTree (
 PluginExecutionTree::Node PluginExecutionTree::getTreeTop () const
 { return treeTop; }
 
+PluginExecutionTree::Node PluginExecutionTree::findNodeByPluginUUID ( 
+    const QString& uuid ) const
+{
+    return findNodeByPluginUUID(treeTop, uuid);
+}
+
+PluginExecutionTree::Node PluginExecutionTree::findNodeByPluginUUID ( 
+    const PluginExecutionTree::Node& node,
+    const QString& uuid ) const
+{
+    if ( node.isNull() || node.getPlugin() == 0 )
+        return PluginExecutionTree::Node();
+
+    if ( node.getPlugin()->getUUID() == uuid )
+        return node;
+
+    QList<PluginExecutionTree::Node> nodes = node.childNodes();
+    foreach ( PluginExecutionTree::Node n, nodes ) {
+        PluginExecutionTree::Node retNode = findNodeByPluginUUID(n, uuid);
+        if ( ! retNode.isNull() )
+            return retNode;
+    }
+    return PluginExecutionTree::Node();
+}
+
 void PluginExecutionTree::getParents ( 
     PluginExecutionTree::Node& child, PluginList& parents ) 
 {
