@@ -245,11 +245,16 @@ void PluginManager::unregisterPluginLoader ( PluginLoader& loader )
 RequiredPluginsMap PluginManager::getDependencies ( Plugin* plugin )
 {
     Q_ASSERT(plugin);
+    LOG4CXX_DEBUG(logger, "getDependencies ");
+
     RequiredPluginsMap requiredPlugins;
     const QStringList& types = plugin->requiredPluginTypes();
     foreach ( QString requiredType, types ) {
         PluginList plugins = loadedPluginsOfType( requiredType );
         requiredPlugins[requiredType] = plugins;
+        LOG4CXX_DEBUG(logger, "    getDependencies: for type '" + 
+                      requiredType.toStdString() + "' found " + 
+                      QString("%1").arg(plugins.size()).toStdString() );
     }
     return requiredPlugins;
 }
@@ -372,8 +377,6 @@ void PluginManager::loadPlugins ( const QString& path )
     // Emit signal about number of plugins 
     // which are sucessfuly loaded.
     emit onAfterPluginsLoad( plugins.size() );
-
-    //TODO: DO NOT FORGET TO RESOLVE DEPENDENCIES
 }
 
 void PluginManager::unloadPlugins ()
@@ -429,8 +432,6 @@ void PluginManager::unloadPlugin ( Plugin& plg )
     loader->unloadPlugin( plg );
     plugins.remove( &plg );
     emit onAfterPluginUnload( pluginPath );
-
-    //TODO: DO NOT FORGET DEPENDENCIES
 }
 
 Plugin* PluginManager::findPluginByUUID ( const QString& uuid, 

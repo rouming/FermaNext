@@ -18,8 +18,16 @@ public:
 
     void executePlugin ( Plugin*, const QList<UUIDObject*>& );
 
+private slots:
+    void includeIsPressed ();
+    void excludeIsPressed ();
+    void executeIsPressed ();
+
 private:
     void showExecutionTree ();
+    void addNodesToExecutionTree ( const QList<PluginExecutionTree::Node>& );
+    void addNodesToExecutionTreeItem ( QTreeWidgetItem*,
+                const QList<PluginExecutionTree::Node>& );
 
     void execute ( Plugin*, const PluginExecutionTree&, 
                    const QList<UUIDObject*>& );

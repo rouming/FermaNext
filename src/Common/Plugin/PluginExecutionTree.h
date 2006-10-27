@@ -136,7 +136,19 @@ public:
      /** Return last top of the execution tree */
      PluginExecutionTree::Node getTreeTop () const;
 
+    /** 
+     * Tries to find node by plugin uuid. 
+     * If node is not found, returns null node.
+     * @see PluginExecutionTree::Node::isNull
+     */
+    PluginExecutionTree::Node findNodeByPluginUUID ( const QString& ) const;
+
 private:
+    /** Recursively finds node by specified plugin uuid */
+    PluginExecutionTree::Node findNodeByPluginUUID ( 
+                                     const PluginExecutionTree::Node&,
+                                     const QString& uuid ) const;
+
     /** Recursively gather parents from bottom to top */
     void getParents ( Node& child, PluginList& parents );
     /** Returns plugin dependencies for the specified plugin node */

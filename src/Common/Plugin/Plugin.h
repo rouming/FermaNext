@@ -156,7 +156,7 @@ public:
      *        and plugin is wrong. 
      * @see specificExecute
      */
-    ExecutionResult execute ( const QList<UUIDObject*>& arguments ) 
+    Plugin::ExecutionResult execute ( const QList<UUIDObject*>& arguments ) 
         /*throw (ContextIsNotValidException,
                  ParamsAreNotAcceptedException,
                  DependenciesAreNotResolvedException,
@@ -185,7 +185,7 @@ public:
      * @return plugin status code
      * @see pluginStatusMsg for detailed information about status.
      */
-    virtual Status pluginStatusCode () const = 0;
+    virtual Plugin::Status pluginStatusCode () const = 0;
 
     /** 
      * Describes plugin state by status msg. 
