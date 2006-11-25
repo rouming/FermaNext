@@ -25,6 +25,7 @@ isEmpty(ANT_HOME) {
 TEMPLATE = subdirs
 
 SUBDIRS = \
+          src/3rdparty/expat \
           src/3rdparty/agg23 \
           \
           src/Common \

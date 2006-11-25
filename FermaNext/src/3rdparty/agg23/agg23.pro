@@ -9,6 +9,9 @@ TEMPLATE = lib
 CONFIG += staticlib
 QT -= core xml gui
 
+# For static linking with expat
+DEFINES += XML_STATIC
+
 INCLUDEPATH += include
 
 SOURCES = \
