@@ -1,4 +1,6 @@
 
 TEMPLATE = subdirs
 
-SUBDIRS = agg23
+SUBDIRS = \
+          expat \
+          agg23
