@@ -3,6 +3,16 @@ major tasks for 0.2.2
 -----------------------------------------------
 - full plugin dependence resolving: 
      executor dialog, dependence tree, etc.
+
+- add flag to basic class of all plugins 'Plugin.h'
+  to determine which plugin can be executed directly
+  from main menu and which is a node of the execution tree.
+  e.g.: 
+    1. 'SimpleCalculation' plugin can be executed directly
+       and can be a node of the execution tree.
+
+    2. 'Optimization.GA.criteria' plugin can be a node of 
+       the execution tree and can't be executed directly.
   
 
 major tasks for 0.2.0

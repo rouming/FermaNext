@@ -37,7 +37,10 @@ SUBDIRS = \
           src/Loaders/NativePluginLoader \
           \
           src/Plugins/old_SimpleCalc \
-          src/Plugins/Optimization.GA
+          # GA optimization
+          src\Plugins\Optimization.GA\GA.algorithm\cpp.GAlib \
+          src\Plugins\Optimization.GA\GA.fitness.function\cpp.NodePosition \
+          src\Plugins\Optimization.GA\GA.criteria\cpp.Force
 
 # Generates commands for Win32 to generate VS project files
 win32 {

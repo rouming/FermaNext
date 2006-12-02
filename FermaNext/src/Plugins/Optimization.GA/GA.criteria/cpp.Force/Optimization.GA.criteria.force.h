@@ -1,14 +1,14 @@
 
-#ifndef OPTIMIZATION_GA_H
-#define OPTIMIZATION_GA_H
+#ifndef OPTIMIZATION_GA_CRITERIA_FORCE_H
+#define OPTIMIZATION_GA_CRITERIA_FORCE_H
 
 #include "NativePlugin.h"
 
-class GAOptimization : public NativePlugin
+class GAOptimizationCriteriaForce : public NativePlugin
 {
 public:
-    GAOptimization ( PluginManager& mng, const QString& path );
-    virtual ~GAOptimization ();
+    GAOptimizationCriteriaForce ( PluginManager& mng, const QString& path );
+    virtual ~GAOptimizationCriteriaForce ();
 
     virtual Plugin::ExecutionResult specificExecute ( 
                               const PluginExecutionParams& params,
@@ -25,4 +25,4 @@ public:
     virtual const QStringList& requiredPluginTypes () const;
 };
 
-#endif //OPTIMIZATION_GA_H
+#endif //OPTIMIZATION_GA_CRITERIA_FORCE_H
