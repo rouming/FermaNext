@@ -1,0 +1,18 @@
+
+1) GA.algorithm -- Any implementation of GA. Should contain generic 
+                   API for passing chromosomes to fitness function
+                   and getting fitness value from it.
+
+2) GA.fitness.function -- Changes truss unit parameters (e.g. node position
+                          or pivot thickness) by GA.algorithm chromosomes.
+                          Changed truss unit is passed to GA.criteria plugin.
+
+3) GA.criteria -- Criteria comparision. Firstly solves truss unit with any
+                  appropriate calculation plugin (e.g. 'SimpleCalculation'),
+                  then transforms calctulation data to fitness value and 
+                  returns it to caller plugin.
+
+GA.algorithm
+           |_ GA.fitness.function
+                                |_ GA.criteria
+                                             |_ simple_calculation or others

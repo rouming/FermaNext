@@ -1,30 +1,31 @@
 
 #include "NativePluginFrontEnd.h"
-#include "Optimization.GA.h"
+#include "Optimization.GA.criteria.force.h"
 
 /*****************************************************************************
- * Old Simple Calculation plugin (main export routines)
+ * GA criteria force plugin (main export routines)
  *****************************************************************************/
 
-FERMA_NEXT_PLUGIN(GAOptimization)
+FERMA_NEXT_PLUGIN(GAOptimizationCriteriaForce)
 
 /*****************************************************************************/
 
-GAOptimization::GAOptimization ( PluginManager& mng, const QString& path ) :
+GAOptimizationCriteriaForce::GAOptimizationCriteriaForce ( 
+    PluginManager& mng, const QString& path ) :
     NativePlugin(mng, path)
 {}
 
-GAOptimization::~GAOptimization ()
+GAOptimizationCriteriaForce::~GAOptimizationCriteriaForce ()
 {}
 
-Plugin::ExecutionResult GAOptimization::specificExecute ( 
+Plugin::ExecutionResult GAOptimizationCriteriaForce::specificExecute ( 
     const PluginExecutionParams& params,
     const QList<UUIDObject*>& args,
     const QHash< QString, QList<Plugin*> >& deps  )
     /*throw (WrongExecutionArgsException,
              DependenciesAreNotResolvedException)*/
 {
-    qWarning("Optimization.GA::execute");
+    qWarning("Optimization.GA.criteria.force::execute");
 
     if ( deps.size() == 0 ) {
         DependenciesAreNotResolvedException e;
@@ -44,27 +45,27 @@ Plugin::ExecutionResult GAOptimization::specificExecute (
     return Plugin::ExecutionResult( OkStatus, QString() );
 }
 
-const PluginInfo& GAOptimization::pluginInfo () const
+const PluginInfo& GAOptimizationCriteriaForce::pluginInfo () const
 {
-    static PluginInfo inf( "Optimization.GA",
-                           "Genetic optimization algorithm",
-                           "optimization.ga" );
+    static PluginInfo inf( "Optimization.GA.criteria.force",
+                           "Genetic optimization force criteria.",
+                           "optimization.ga.criteria.force" );
     return inf;
 }
 
-Plugin::Status GAOptimization::pluginStatusCode () const
+Plugin::Status GAOptimizationCriteriaForce::pluginStatusCode () const
 { return OkStatus; }
 
-QString GAOptimization::pluginStatusMsg () const
+QString GAOptimizationCriteriaForce::pluginStatusMsg () const
 { return QString(); }
 
-void GAOptimization::tryToAcceptParams ( const PluginExecutionParams& ) const
+void GAOptimizationCriteriaForce::tryToAcceptParams ( const PluginExecutionParams& ) const
 { /* nothing */ }
 
-Plugin::DependenceMode GAOptimization::dependenceMode () const
+Plugin::DependenceMode GAOptimizationCriteriaForce::dependenceMode () const
 { return MultiDependent; }
 
-const QStringList& GAOptimization::requiredPluginTypes () const
+const QStringList& GAOptimizationCriteriaForce::requiredPluginTypes () const
 { 
     static QStringList types( QStringList() << "calculation.*" );
     return types;
