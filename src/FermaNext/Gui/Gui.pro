@@ -50,6 +50,7 @@ SOURCES = \
           UndoRedoListBox.cpp \
           WindowListBox.cpp \
           \
+          Agg/AggAbstractMenu.cpp \
           Agg/AggButton.cpp \
           Agg/AggPaintThread.cpp \
           Agg/AggPopupHint.cpp \
@@ -57,7 +58,7 @@ SOURCES = \
           Agg/AggToolBar.cpp \
           Agg/AggTrussToolBar.cpp \
           Agg/AggTrussWindowButton.cpp \
-          Agg/AggWidget.cpp
+          Agg/AggWidget.cpp 
 
 HEADERS = \
 #FIXME QT3TO4 
@@ -83,6 +84,7 @@ HEADERS = \
           UndoRedoListBox.h \
           WindowListBox.h \
           \
+          Agg/AggAbstractMenu.h \
           Agg/AggButton.h \
           Agg/AggPaintThread.h \
           Agg/AggPopupHint.h \

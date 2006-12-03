@@ -38,7 +38,8 @@ extern const int nodesRadius,
                  pivotsWidth,
                  defaultBufWidth,
                  defaultBufHeight,
-                 trussBufIndent;
+                 trussBufIndent,
+                 maxLoadCaseNumber;
 
 extern const double areaMaxDimension,
                     pivotThickLimit,
@@ -119,7 +120,8 @@ extern const int htmlRowHeight,
 extern const QString htmlTitleBgColor,
                      htmlHeaderBgColor,
                      htmlSubHeaderBgColor,
-                     htmlBorderColor;
+                     htmlBorderColor,
+                     htmlCellHighlightColor;
 
 /************************************
  * Main subs

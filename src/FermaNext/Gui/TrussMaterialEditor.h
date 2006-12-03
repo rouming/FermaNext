@@ -4,28 +4,32 @@
 
 #include <QDialog>
 #include <QDomDocument>
-#include <QMap>
 #include <QStringList>
 #include <QTreeWidgetItem>
+#include <QLabel>
 
 class FermaNextProject;
 class TrussMaterial;
 class TrussMaterialLibrary;
 class QDoubleSpinBox;
+class QLabel;
 class QLineEdit;
+class QStackedWidget;
 class QTreeWidget;
+class QtColorComboBox;
 
 /*****************************************************************************/
 
 class MaterialTreeWidgetItem : public QObject, public QTreeWidgetItem
 {
     Q_OBJECT
+
 public:
     MaterialTreeWidgetItem ( const TrussMaterial&, int type = Type );
     const TrussMaterial& getItemMaterial () const;
 
 protected slots:
-    void updateName ( const QString& );
+    void updateName ();
 
 private:
     const TrussMaterial& material;
@@ -33,22 +37,57 @@ private:
 
 /*****************************************************************************/
 
-class ProjectTreeWidgetItem : public QObject, public QTreeWidgetItem
+class ProjectTreeWidgetItem : public QTreeWidgetItem
 {
-    Q_OBJECT
 public:
-    ProjectTreeWidgetItem ( const FermaNextProject&, int type = Type );
+    ProjectTreeWidgetItem ( const QString& projName,
+                            TrussMaterialLibrary& mLib,
+                            bool current = false, 
+                            int type = Type );
     TrussMaterialLibrary& getMaterialLibrary () const;
-    const FermaNextProject& getItemProject () const;
+
+protected:
     void setCurrent ( bool );
 
-protected slots:
-    void updateName ( const QString& );
+private:
+    TrussMaterialLibrary& lib;
+    bool isCurrent;
+};
+
+/*****************************************************************************/
+
+class MaterialTreeWidget : public QTreeWidget
+{
+    Q_OBJECT
+
+public:
+    MaterialTreeWidget ( QWidget* parent = 0 );
+        
+    ProjectTreeWidgetItem* getSelectedProjectItem () const;
+    MaterialTreeWidgetItem* getSelectedMaterialItem () const;
+    MaterialTreeWidgetItem* getMaterialItem ( const TrussMaterial&,
+                                        const ProjectTreeWidgetItem& ) const;
+
+    void addMaterialItem ( const TrussMaterial& );
+    void removeMaterialItem ( const TrussMaterial& );
+    void removeItemWithMaterial ( QTreeWidgetItem& );
+
+protected:
+    QTreeWidgetItem* getSelectedItem ( bool& materialSelected ) const;
+
+    void mousePressEvent ( QMouseEvent* );
+    void mouseMoveEvent ( QMouseEvent* );
+    void dragEnterEvent( QDragEnterEvent* event );
+    void dragMoveEvent( QDragMoveEvent *event );
+    bool dropMimeData ( QTreeWidgetItem* parent, int index, 
+                        const QMimeData* data, Qt::DropAction action );
+    QStringList mimeTypes () const;
+    Qt::DropActions supportedDropActions () const;
+    void startDrag ();
 
 private:
-    const FermaNextProject& project;
-    TrussMaterialLibrary* lib;
-    bool isCurrent;
+    QPoint dragPos;
+    bool acceptDrag;;
 };
 
 /*****************************************************************************/
@@ -58,49 +97,24 @@ class MaterialEditWidget : public QWidget
     Q_OBJECT
 public:
     MaterialEditWidget ( QWidget* parent = 0, Qt::WFlags f = 0 );
-    void setMaterial ( TrussMaterial& m, 
-                       bool clearEditors = false );
-    void showEditors ( bool );
+    void setMaterial ( TrussMaterial& m );
+    void clearPage ();
     
 protected:
     void init ();
-    bool eventFilter ( QObject*, QEvent* );
-
+    
 protected slots:
     void updateName ();
     void updateWorkingStress ();
     void updateElasticityModule ();
     void updateDensity ();
-    
+
 private:
     QLineEdit* nameLineEdit;
     QDoubleSpinBox *elasticitySpinBox, *stressSpinBox, *densitySpinBox;    
     TrussMaterial* material;
-};
-
-/*****************************************************************************/
-
-class MaterialCreationDialog : public QDialog
-{
-    Q_OBJECT
-public:
-    MaterialCreationDialog ( QWidget* parent = 0, Qt::WFlags f = 0 );
-    void setMaterial ( TrussMaterial& m );
-
-protected:
-    void init ();
-
-protected slots:
-    void applyChanges ();
-    void cancelChanges ();
-    
-signals:
-    void onMaterialCreationApply ( const TrussMaterial& );
-    void onMaterialCreationCancel ( TrussMaterial& );
-
-private:
-    MaterialEditWidget* materialEditWidget;
-    TrussMaterial* material;
+    QtColorComboBox* materialColorCmb;
+    QStackedWidget* widgetStack;
 };
 
 /*****************************************************************************/
@@ -109,53 +123,39 @@ class TrussMaterialEditor : public QDialog
 {
     Q_OBJECT
 public:
-    TrussMaterialEditor ( QWidget* parent = 0, Qt::WFlags f = 0 );
+    TrussMaterialEditor ( QString& startPage, QWidget* parent = 0, 
+                          Qt::WFlags f = 0 );
+    ~TrussMaterialEditor ();
+
+    void addProject ( FermaNextProject& project, bool current = false );
 
 protected:
     void init ();
     
-    QTreeWidgetItem* getSelectedItem ( bool& materialSelected ) const;
-    ProjectTreeWidgetItem* getSelectedProjectItem () const;
-    MaterialTreeWidgetItem* getSelectedMaterialItem () const;
-    TrussMaterial* getSelectedMaterial () const;
-    MaterialTreeWidgetItem* getMaterialItem ( const TrussMaterial&,
-                                        const ProjectTreeWidgetItem& ) const;
-    ProjectTreeWidgetItem* getProjectItem ( const FermaNextProject& ) const;
+    void copyLib ( TrussMaterialLibrary& libFrom, TrussMaterialLibrary& libTo );
+    void clearCopyLibs ();
 
-    void saveMaterialProperties ();
-    void loadMaterialProperties ();
-    
 public slots:
-    void setCurrentProjectItem ( FermaNextProject& );
-    void fillEditorFields ( QTreeWidgetItem*, int );
     void exec ();
-    void cancelChanges ();
-    void applyChanges ();
-
-protected slots:
-    void addMaterialItem ( const TrussMaterial& );
-    void removeMaterialItem ( const TrussMaterial& );
-
-    void addProjectItem ( FermaNextProject& );
-    void removeProjectItem ( FermaNextProject& );
     
+protected slots:
     void addMaterial ();
-    void removeMaterial ();
+    void removeSelectedMaterial ();
 
-    void applyMaterialCreation ( const TrussMaterial& );
-    void cancelMaterialCreation ( TrussMaterial& );
+    void applyChanges ();
+    void cancelChanges ();
 
-    void checkButtons ();
+    void fillEditorFields ();
 
 private:
-    typedef QMap<const FermaNextProject*, QDomElement> MaterialPropMap;
+    typedef QMap<FermaNextProject*, TrussMaterialLibrary*> MaterialLibMap;
 
-    MaterialPropMap materialProperties;
-    MaterialCreationDialog* createDialog;
+    MaterialLibMap originalMaterialLibs;
     MaterialEditWidget* editWidget;
-    QTreeWidget* materialLibTreeList;
-    QPushButton *addButton, *removeButton, *applyButton;
-    QDomDocument materialPropDoc;
+    MaterialTreeWidget* materialLibTreeList;
+    QPushButton *addButton, *removeButton;
+    QAction *actAddMaterial, *actRemoveMaterial;
+    QString& startPageUUID;
 };
 
 #endif //TRUSSMATERIALEDITOR_H

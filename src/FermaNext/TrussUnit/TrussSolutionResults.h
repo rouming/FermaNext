@@ -28,6 +28,7 @@ public:
     DoublePoint getDisplacement ( int indx, bool& valid ) const;
     double getStress ( int indx, bool& valid ) const;
     double getRequiredThickness ( int indx, bool& valid ) const;
+    double getSafetyMargin ( int indx, bool& valid ) const;
     int getLoadCaseNumber () const;
     
     int countDisplacements () const;
@@ -66,9 +67,10 @@ private:
     class PivotResults : public XMLSerializableObject
     {
     public:
-        PivotResults ( double stress_, double thick_, int numb ) :
+        PivotResults ( double stress_, double thick_, double margin_, int numb ) :
             stress( stress_ ), 
             requiredThick( thick_ ), 
+            safetyMargin( margin_ ),
             pivotNumb( numb )
         {}
 
@@ -80,7 +82,7 @@ private:
         void loadAttributesFromXML ( const QDomElement&, bool uuidLoad ) 
                                                 /*throw (LoadException)*/;
 
-        double stress, requiredThick;
+        double stress, requiredThick, safetyMargin;
         int pivotNumb;
     };
 
@@ -92,7 +94,8 @@ private:
 
 protected:
     NodeResults& addNodeResults ( double dispX, double dispY, int numb );
-    PivotResults& addPivotResults ( double stress, double reqThick, int numb );
+    PivotResults& addPivotResults ( double stress, double reqThick, 
+                                    double sMargin, int numb );
     void setLoadCaseNumber ( int numb );
     void clean ();
 
@@ -116,6 +119,10 @@ public:
     const LoadCaseResults* getLoadCaseResults ( int numb ) const;
     const QString& getPluginName () const;
     double getForceWeight () const;
+    double getMaterialVolume () const;
+    double getMaxTensionStress () const;
+    double getTrussMass () const;
+
     int countLoadCaseResults () const;
 
     // XML serialization
@@ -130,12 +137,15 @@ protected:
     LoadCaseResults& createLoadCaseResults ();
     void setPluginName ( const QString& );
     void setForceWeight ( double );
+    void setMaterialVolume ( double );
+    void setMaxTensionStress ( double );
+    void setTrussMass ( double );
     void clean ();
 
 private:
     LoadCaseResultsList loadCaseResults;
     QString pluginName;
-    double forceWeight;
+    double forceWeight, materialVolume, maxTension, trussMass;
 };
 
 /*****************************************************************************/

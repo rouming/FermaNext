@@ -40,27 +40,39 @@ void MaterialComboBox::setMaterialLibrary ( const TrussMaterialLibrary& mLib )
     setArgList();
 }
 
-const TrussMaterial* MaterialComboBox::getCurrentMaterial () const
+const TrussMaterial* MaterialComboBox::getMaterialByIndex ( int idx ) const
 {
-    QString materialName = currentText();
-    TrussMaterial* m = materialLib->getMaterial( materialName );
+    if ( idx < 0 || idx >= count() )
+        return 0;
+    
+    QVariant material = itemData( idx );
+    Q_ASSERT( qVariantCanConvert<const TrussMaterial*>(material) );
+    const TrussMaterial* m = qVariantValue<const TrussMaterial*>(material);
     if ( ! m )
         return 0;
     return m;
 }
 
-void MaterialComboBox::setCurrentMaterial( const QString& name )
+const TrussMaterial* MaterialComboBox::getCurrentMaterial () const
 {
-    if ( ! materialLib )
-        return;
-
-    int indx = findText( name );
-    setCurrentIndex( indx );
+    return getMaterialByIndex( currentIndex() );
 }
 
-void MaterialComboBox::setCurrentMaterial( const TrussMaterial& m )
+void MaterialComboBox::setCurrentMaterial ( const TrussMaterial& m )
 {
-    setCurrentMaterial( m.getMaterialName() );
+    int idx = getMaterialIndex( m );
+    if ( idx >= 0 )
+        setCurrentIndex( idx );
+}
+
+int MaterialComboBox::getMaterialIndex ( const TrussMaterial& material ) const
+{
+    for ( int i = 0; i < count(); ++i ) {
+        const TrussMaterial* m = getMaterialByIndex( i );
+        if ( m == &material )
+            return i;
+    }
+    return -1;
 }
 
 void MaterialComboBox::setArgList ()
@@ -69,14 +81,12 @@ void MaterialComboBox::setArgList ()
         return;
 
     clear();
-    QStringList argList;
+
     for ( int i = 0; i < materialLib->countMaterials(); ++i ) {
         TrussMaterial* m = materialLib->getMaterial( i );
         if ( m )
             addMaterialItem( *m );
     }
-    
-    addItems( argList );
 }
 
 void MaterialComboBox::addMaterialItem ( const TrussMaterial& m )
@@ -100,14 +110,9 @@ void MaterialComboBox::addMaterialItem ( const TrussMaterial& m )
 
 void MaterialComboBox::removeMaterialItem ( const TrussMaterial& m )
 {
-    const TrussMaterialLibrary* lib = 
-        dynamic_cast<const TrussMaterialLibrary*>(sender());
-
-    if ( materialLib != lib )
-        return;
-
-    int indx = findText( m.getMaterialName() );
-    removeItem( indx );
+    int idx = getMaterialIndex( m );
+    if ( idx >= 0 )
+        removeItem( idx );
 
     if ( ! count() )
         emit comboBoxIsEmpty ( true );
@@ -115,21 +120,84 @@ void MaterialComboBox::removeMaterialItem ( const TrussMaterial& m )
 
 void MaterialComboBox::updateMaterialItemName( const QString& name )
 {
-    for ( int i = 0; i < count(); ++i ) {
-        QVariant material = itemData( i );
-        Q_ASSERT( qVariantCanConvert<const TrussMaterial*>(material) );
-        const TrussMaterial* m = qVariantValue<const TrussMaterial*>(material);
-        const TrussMaterial* senderMaterial = 
-            dynamic_cast<const TrussMaterial*>(sender());
-        if ( m == senderMaterial )
-            setItemText( i, name );
-    }
+    const TrussMaterial* senderMaterial = 
+        dynamic_cast<const TrussMaterial*>( sender() );
+
+    if ( ! senderMaterial )
+        return;
+    
+    int idx = getMaterialIndex( *senderMaterial );
+    if ( idx >= 0 )
+        setItemText( idx, name );
 }
 
 void MaterialComboBox::clearMaterialLibrary ()
 {
     materialLib = 0;
 }
+
+/*****************************************************************************
+ * Material Model
+ *****************************************************************************/
+
+MaterialModel::MaterialModel ( const TrussMaterialLibrary& lib )
+{
+	materialLib = &lib;
+}
+
+int MaterialModel::rowCount ( const QModelIndex& idx ) const
+{
+	if( ! idx.isValid() )
+		return materialLib->countMaterials();
+	return 0;
+}
+
+int MaterialModel::columnCount(const QModelIndex& idx) const
+{
+	return 1;
+}
+
+QVariant MaterialModel::data ( const QModelIndex &idx, int role ) const
+{
+    if ( ! idx.isValid( ))
+        return QVariant();
+
+    TrussMaterial* m = materialLib->getMaterial( idx.row() );
+
+    if ( role == Qt::DisplayRole )
+		return m->getMaterialName();
+
+    if ( role == MaterialDataId::Elasticity )
+		return m->getElasticityModule();
+
+    if ( role == MaterialDataId::WorkingStress )
+		return m->getWorkingStress();
+
+    if ( role == MaterialDataId::Density )
+		return m->getDensity();
+
+    if ( role == MaterialDataId::Uuid )
+		return m->getUUID();
+
+/*
+	if( role == Qt::DecorationRole )
+		return m->getColor();
+*/
+    
+    return QVariant();
+}
+
+void MaterialModel::synchronize()
+{
+	beginInsertRows(QModelIndex(), 0, 0);
+	endInsertRows();
+}
+
+void MaterialModel::reset ()
+{
+    QAbstractTableModel::reset();
+}
+
 
 /*****************************************************************************
  * Range Validator
@@ -147,6 +215,8 @@ RangeValidator::RangeValidator ( double bottom, double top, int decimals,
 QValidator::State RangeValidator::validate ( QString& input, int& pos ) const
 {
     State s = QDoubleValidator::validate( input, pos );
+    if ( s == Intermediate && input == "-" )
+        return Intermediate;
     if ( s != Acceptable )
        return Invalid;
     return s;

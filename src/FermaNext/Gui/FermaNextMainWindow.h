@@ -5,6 +5,8 @@
 #include <QMainWindow>
 #include <QStatusBar>
 
+#include "Plugin.h"
+
 class ProjectToolBox;
 class FermaNextProject;
 class TrussUnitWindow;
@@ -12,7 +14,6 @@ class FermaNextWorkspace;
 class UndoRedoListBox;
 class GeometryTabWidget;
 class TrussPropertyTabWidget;
-class TrussMaterialEditor;
 class PreferencesWidget;
 class ResultsTabWidget;
 class QFile;
@@ -21,6 +22,7 @@ class QMenu;
 class QSignalMapper;
 
 class TrussSolutionResults;
+struct PluginInfo;
 
 /*****************************************************************************/
 
@@ -98,6 +100,7 @@ protected slots:
     void editPreferences ();
 
     void showResultsWindow ( const TrussUnitWindow& );
+    void showPluginErrorMessageBox ( const PluginInfo&, const QString& );
 
     void helpContents ();
     void helpAbout ();
@@ -120,6 +123,10 @@ protected slots:
     void trussWindowLostFocus ( TrussUnitWindow& );
     void trussWindowReceivedFocus ( TrussUnitWindow& );
 
+    void afterPluginWasLoaded ( Plugin& );
+    void beforePluginWasUnloaded ( Plugin& );
+    void pluginWasExecuted ( Plugin&, Plugin::ExecutionResult );
+
 private:
     // Current system workspace
     FermaNextWorkspace& workspace;
@@ -141,8 +148,6 @@ private:
     TrussPropertyTabWidget* trussPropTabWidget;
     // Preferences widget
     PreferencesWidget* preferencesWidget;
-    // Material editor
-    TrussMaterialEditor* materialEditor;
 
     QDialog* resultsWindow;
     ResultsTabWidget* resultsTabWidget;
@@ -169,6 +174,10 @@ private:
 
     // Plugins signal mapper for plugin info showing
     QSignalMapper* pluginsSigMapper;
+
+    // UUID of the material, which properties should be shown 
+    // after dialog appearance
+    QString materialEditorStartPage;
 };
 
 #endif //FERMANEXTMAINWINDOW_H

@@ -29,6 +29,7 @@ INCLUDEPATH += $$(AGGDIR)/include \
                ../Common/Plugin \
                ../Common/Loader \
 
+
 SOURCES = \
           Main.cpp \
           FermaNextProject.cpp \

@@ -12,9 +12,11 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QStackedWidget>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
+//#include "../../3rdparty/QtSolutions/qtcolorcombobox.h"
 #include "TrussMaterialEditor.h"
 #include "TrussMaterial.h"
 #include "FermaNextProject.h"
@@ -31,9 +33,9 @@ MaterialTreeWidgetItem::MaterialTreeWidgetItem ( const TrussMaterial& m,
 {
     setText( 0, m.getMaterialName() );
     setTextAlignment( 0, Qt::AlignLeft );
-    
-    connect( &m, SIGNAL(onAfterNameChange(const QString&)) ,
-                 SLOT(updateName(const QString&)) );
+
+    connect( &material, SIGNAL( onAfterNameChange( const QString& ) ),
+                          SLOT( updateName() ) );
 }
 
 const TrussMaterial& MaterialTreeWidgetItem::getItemMaterial () const
@@ -41,56 +43,277 @@ const TrussMaterial& MaterialTreeWidgetItem::getItemMaterial () const
     return material;
 }
 
-void MaterialTreeWidgetItem::updateName ( const QString& name )
+void MaterialTreeWidgetItem::updateName ()
 {
-    setText( 0, name );
+    setText( 0, material.getMaterialName() );
 }
 
 /*****************************************************************************
  * Project Tree Widget Item
  *****************************************************************************/
 
-ProjectTreeWidgetItem::ProjectTreeWidgetItem ( const FermaNextProject& p, 
+ProjectTreeWidgetItem::ProjectTreeWidgetItem ( const QString& projName,
+                                               TrussMaterialLibrary& mLib,
+                                               bool current /* = false */,
                                                int type /* = Type */) :
     QTreeWidgetItem( type ),
-    project( p )
+    lib( mLib )
 {
-    lib = &p.getMaterialLibrary();
-    setText( 0, p.getName() );
-
-    connect( &p, SIGNAL(onNameChange(const QString&)),
-                 SLOT(updateName(const QString&)) );
+    setText( 0, "Project: " + projName );
+    setCurrent( current );
 }
 
-const FermaNextProject& ProjectTreeWidgetItem::getItemProject () const
-{
-    return project;
-}
 
 TrussMaterialLibrary& ProjectTreeWidgetItem::getMaterialLibrary() const
 {
-    return *lib;
+    return lib;
 }
 
 void ProjectTreeWidgetItem::setCurrent ( bool status )
 {
     isCurrent = status;
 
-    QFont currentFont = font( 0 );
+    QFont currentFont = QTreeWidgetItem::font( 0 );
     if ( isCurrent ) {
         currentFont.setBold( true );
         currentFont.setPixelSize( 13 );
+        setIcon( 0, QIcon( Global::imagesPath() + "/project_des.png" ) );
     } else {
         currentFont.setBold( false );
         currentFont.setPixelSize( 12 );
+        setIcon( 0, QIcon( Global::imagesPath() + "/project_d.png" ) );
     }
 
     setFont( 0, currentFont );
 }
 
-void ProjectTreeWidgetItem::updateName ( const QString& name )
+/*****************************************************************************
+ * Material Tree Widget
+ *****************************************************************************/
+
+MaterialTreeWidget::MaterialTreeWidget ( QWidget* parent /* = 0 */ ) :
+    QTreeWidget( parent )
 {
-    setText( 0, name );
+    setAcceptDrops( true );
+}
+
+QTreeWidgetItem* MaterialTreeWidget::getSelectedItem( bool& materialSelected ) const
+{
+    QList<QTreeWidgetItem*> selItems = selectedItems();
+
+    if ( selItems.size() != 1 )
+        return 0;
+
+    QTreeWidgetItem* item = selItems[0];
+    if ( ! item )
+        return 0;
+
+    if ( item->parent() )
+        materialSelected = true;
+    else
+        materialSelected = false;
+    
+    return item;
+}
+
+ProjectTreeWidgetItem* MaterialTreeWidget::getSelectedProjectItem () const
+{
+    bool materialSelected;
+    QTreeWidgetItem* item = getSelectedItem( materialSelected );
+    if ( ! item )
+        return 0;
+
+    if ( materialSelected ) {
+        QTreeWidgetItem* projectItem = item->parent();
+        if ( ! projectItem )
+            return 0;
+
+        return dynamic_cast<ProjectTreeWidgetItem*>(projectItem);;
+    }
+    return dynamic_cast<ProjectTreeWidgetItem*>(item);
+}
+
+MaterialTreeWidgetItem* MaterialTreeWidget::getSelectedMaterialItem () const
+{
+    bool materialSelected;
+    QTreeWidgetItem* item = getSelectedItem( materialSelected );
+    if ( ! item || ! materialSelected )
+        return 0;
+
+    return dynamic_cast<MaterialTreeWidgetItem*>(item);;
+}
+
+MaterialTreeWidgetItem* MaterialTreeWidget::getMaterialItem ( 
+                                const TrussMaterial& m,
+                                const ProjectTreeWidgetItem& projItem ) const
+{
+    for ( int i = 0; i < projItem.childCount(); ++i ) {
+        MaterialTreeWidgetItem* materialItem = 
+            dynamic_cast<MaterialTreeWidgetItem*>( projItem.child( i ) );
+        if ( ! materialItem )
+            continue;
+
+        if ( &materialItem->getItemMaterial() == &m )
+            return materialItem;
+    }
+    return 0;
+}
+
+void MaterialTreeWidget::addMaterialItem ( const TrussMaterial& m )
+{
+    ProjectTreeWidgetItem* projItem = getSelectedProjectItem();
+    if ( ! projItem )
+        return;
+
+    MaterialTreeWidgetItem* mItem = new MaterialTreeWidgetItem( m );
+    projItem->addChild( mItem );
+    setCurrentItem( mItem );
+}
+
+void MaterialTreeWidget::removeMaterialItem ( const TrussMaterial& m )
+{
+    ProjectTreeWidgetItem* projItem = getSelectedProjectItem();
+    if ( ! projItem )
+        return;
+
+    MaterialTreeWidgetItem* materialItem = getMaterialItem( m, *projItem );
+    int indx = projItem->indexOfChild( materialItem );
+    delete projItem->takeChild( indx );
+}
+
+void MaterialTreeWidget::removeItemWithMaterial ( QTreeWidgetItem& item )
+{
+    ProjectTreeWidgetItem* projItem = 
+        dynamic_cast<ProjectTreeWidgetItem*>( item.parent() );
+    if ( ! projItem )
+        return;
+
+    MaterialTreeWidgetItem* mItem = 
+        dynamic_cast<MaterialTreeWidgetItem*>( &item );
+    if ( ! mItem )
+        return;
+    
+    TrussMaterialLibrary& mLib = projItem->getMaterialLibrary();
+    mLib.removeMaterial( mItem->getItemMaterial().getUUID() );
+
+    int indx = projItem->indexOfChild( mItem );
+    delete projItem->takeChild( indx );
+}
+
+void MaterialTreeWidget::mousePressEvent ( QMouseEvent* mEvent )
+{
+    if ( mEvent->button() == Qt::LeftButton ) 
+        dragPos = mEvent->pos();
+    QTreeWidget::mousePressEvent( mEvent );
+}
+
+void MaterialTreeWidget::mouseMoveEvent ( QMouseEvent* mEvent )
+{
+    if ( mEvent->buttons() & Qt::LeftButton ) {
+        int dist = ( mEvent->pos() - dragPos ).manhattanLength();
+        if ( dist > QApplication::startDragDistance() )
+            startDrag();
+    }
+    QTreeWidget::mouseMoveEvent( mEvent );
+}
+
+void MaterialTreeWidget::startDrag ()
+{
+    MaterialTreeWidgetItem* mItem = getSelectedMaterialItem();
+    if ( ! mItem )
+        return;
+    
+    acceptDrag = true;
+
+    QDomDocument doc;
+    TrussMaterial& m = const_cast<TrussMaterial&>( mItem->getItemMaterial() );
+    QDomElement mProps = m.saveToXML( doc );
+    doc.appendChild( mProps );
+
+    QDrag* materialDrag = new QDrag( this );
+    QMimeData* mimeData = new QMimeData;
+    mimeData->setText( doc.toString() );
+    materialDrag->setHotSpot( visualItemRect( currentItem() ).topLeft() );
+    materialDrag->setMimeData( mimeData );
+
+    if ( materialDrag->start( Qt::MoveAction ) == 
+                Qt::MoveAction | Qt::CopyAction && acceptDrag )
+        removeItemWithMaterial( *mItem );
+}
+
+void MaterialTreeWidget::dragEnterEvent( QDragEnterEvent* event )
+{
+    if ( event->mimeData()->hasText() )
+        event->accept();
+    else
+        event->ignore();
+}
+
+void MaterialTreeWidget::dragMoveEvent( QDragMoveEvent *event )
+{
+    if ( event->mimeData()->hasText() ) {
+        event->setDropAction( Qt::MoveAction );
+        event->accept();
+    } else
+        event->ignore();
+}
+
+bool MaterialTreeWidget::dropMimeData ( QTreeWidgetItem* parent, int index, 
+                                        const QMimeData* data, 
+                                        Qt::DropAction action )
+{
+    QDomDocument doc;
+    if ( ! doc.setContent( data->text() ) )
+        return false;
+    
+    ProjectTreeWidgetItem* pItem = 0;
+
+    MaterialTreeWidgetItem* mItem = 
+        dynamic_cast<MaterialTreeWidgetItem*>( parent );
+
+    if ( mItem )
+        pItem = dynamic_cast<ProjectTreeWidgetItem*>( parent->parent() );
+    else
+        pItem = dynamic_cast<ProjectTreeWidgetItem*>( parent );
+
+    if ( ! pItem ) {
+        acceptDrag = false;
+        return false;
+    }
+
+    TrussMaterialLibrary& mLib = pItem->getMaterialLibrary();
+    TrussMaterial& m = mLib.createMaterial();
+    QDomNodeList nodeList = doc.elementsByTagName( "TrussMaterial" );
+    if ( nodeList.isEmpty() )
+        return false;
+
+    QDomElement mProps = nodeList.at( 0 ).toElement();
+    m.loadFromXML( mProps );
+
+    MaterialTreeWidgetItem* newItem = new MaterialTreeWidgetItem( m );
+    pItem->addChild( newItem );
+    //setCurrentItem( newItem );
+
+    return true;
+}
+
+QStringList MaterialTreeWidget::mimeTypes () const
+{
+    QStringList strList;
+
+    strList.append( "application/x-qabstractitemmodeldatalist" );
+    strList.append( "text/html" );
+    strList.append( "text/plain" );
+    strList.append( "text/uri-list" );
+    strList.append( "text/directory" );
+    strList.append("text/xml" );
+
+    return strList;
+}
+
+Qt::DropActions MaterialTreeWidget::supportedDropActions () const
+{
+    return Qt::MoveAction | Qt::CopyAction;
 }
 
 /*****************************************************************************
@@ -100,14 +323,18 @@ void ProjectTreeWidgetItem::updateName ( const QString& name )
 MaterialEditWidget::MaterialEditWidget ( QWidget* parent /* = 0 */, 
                                          Qt::WFlags f /* = 0 */ ) :
     QWidget( parent, f ),
-    material( 0 )
+    material( 0 ),
+    widgetStack( new QStackedWidget( this ) )
 {
     init();
 }
 
 void MaterialEditWidget::init ()
 {
-    QGroupBox* materialPropBox = new QGroupBox( tr( "Material Properties" ) );
+    // Init material page
+    QWidget* materialPage = new QWidget;
+    QGroupBox* materialPropBox =
+            new QGroupBox( tr( "Material properties" ), materialPage );
     nameLineEdit = new QLineEdit( materialPropBox );
     stressSpinBox = new QDoubleSpinBox( materialPropBox );
     stressSpinBox->setRange( 0, Global::maxWorkingStress );
@@ -119,12 +346,14 @@ void MaterialEditWidget::init ()
     densitySpinBox->setRange( 0, Global::maxMaterialDensity );
     densitySpinBox->setDecimals( 3 );
     densitySpinBox->setSingleStep( 0.001 );
+    //materialColorCmb = new QtColorComboBox( materialPropBox );
+    //materialColorCmb->addColor( QColor( 0, 0, 0 ), tr( "Black" ) );
 
     // init material property group box layouts
     QVBoxLayout* parentLayout = new QVBoxLayout( materialPropBox );
    
     QHBoxLayout* nameLayout = new QHBoxLayout;
-    nameLayout->addWidget( new QLabel(tr("Name: "), materialPropBox) );
+    nameLayout->addWidget( new QLabel(tr("Name: "), materialPropBox ) );
     nameLayout->addWidget( nameLineEdit );
 
     QGridLayout* materialPropLayout = new QGridLayout;
@@ -138,11 +367,15 @@ void MaterialEditWidget::init ()
                                                materialPropBox ), 3, 0 );
     materialPropLayout->addWidget( densitySpinBox, 3, 1 );
 
+    //materialPropLayout->addWidget( new QLabel( tr("Material Color: "),
+    //                                           materialPropBox), 4, 0 );
+    //materialPropLayout->addWidget( materialColorCmb );
+
     parentLayout->addLayout( nameLayout);
     parentLayout->addLayout( materialPropLayout);
 
-    QVBoxLayout* mainLayout = new QVBoxLayout( this );
-    mainLayout->addWidget( materialPropBox );
+    QVBoxLayout* materialPageLayout = new QVBoxLayout( materialPage );
+    materialPageLayout->addWidget( materialPropBox );
 
     connect( nameLineEdit, SIGNAL( editingFinished() ),
                              SLOT( updateName() ) );
@@ -156,48 +389,35 @@ void MaterialEditWidget::init ()
     connect( densitySpinBox, SIGNAL( editingFinished() ),
                                SLOT( updateDensity() ) );
 
-    showEditors( false );
+    widgetStack->addWidget( materialPage );
 
-    nameLineEdit->installEventFilter( this );
-    elasticitySpinBox->installEventFilter( this );
-    stressSpinBox->installEventFilter( this );
-    densitySpinBox->installEventFilter( this );
+    // Init empty page
+    QWidget* emptyPage = new QWidget;
+    QVBoxLayout* emptyPageLayout = new QVBoxLayout( emptyPage );
+    widgetStack->addWidget( emptyPage );
+
+    QVBoxLayout* mainLayout = new QVBoxLayout( this );
+    mainLayout->addWidget( widgetStack );
 }
 
-void MaterialEditWidget::setMaterial ( TrussMaterial& m, 
-                                       bool clearEditors /* = false */ )
+void MaterialEditWidget::setMaterial ( TrussMaterial& m )
 {
-    showEditors( true );
-    if ( ! clearEditors ) {
-        nameLineEdit->setText( m.getMaterialName() );
-        elasticitySpinBox->setValue( m.getElasticityModule() );
-        stressSpinBox->setValue( m.getWorkingStress() );
-        densitySpinBox->setValue( m.getDensity() );
-    }
-    else {
-        nameLineEdit->clear();
-        elasticitySpinBox->clear();
-        stressSpinBox->clear();
-        densitySpinBox->clear();
-    }
+    nameLineEdit->setText( m.getMaterialName() );
+    elasticitySpinBox->setValue( m.getElasticityModule() );
+    stressSpinBox->setValue( m.getWorkingStress() );
+    densitySpinBox->setValue( m.getDensity() );
+
     material = &m;
+
+    widgetStack->setCurrentIndex( 0 );
 }
 
 void MaterialEditWidget::updateName ()
 {
-    if ( ! material )
+    if ( ! material || nameLineEdit->text().isEmpty() )
         return;
     
-    try {
-        material->setMaterialName( nameLineEdit->text() );
-    } 
-    catch ( TrussMaterialLibrary::WrongMaterialNameException& ) {
-        ( QMessageBox::critical( this, tr("Material creation"),
-          tr("There is another material with name %1.").arg(
-                                        nameLineEdit->text()) ) );
-        nameLineEdit->setFocus();
-        return;
-    }
+    material->setMaterialName( nameLineEdit->text() );
 }
 
 void MaterialEditWidget::updateWorkingStress ()
@@ -224,135 +444,23 @@ void MaterialEditWidget::updateDensity ()
     material->setDensity( densitySpinBox->value() );
 }
 
-void MaterialEditWidget::showEditors ( bool showStatus )
+void MaterialEditWidget::clearPage ()
 {
-    nameLineEdit->clear();
-    elasticitySpinBox->clear();
-    stressSpinBox->clear();
-    densitySpinBox->clear();   
-    
-    nameLineEdit->setEnabled( showStatus );
-    elasticitySpinBox->setEnabled( showStatus );
-    stressSpinBox->setEnabled( showStatus );
-    densitySpinBox->setEnabled( showStatus );
-}
-
-bool MaterialEditWidget::eventFilter ( QObject* targetObj, QEvent* event )
-{
-    if ( event->type() == QEvent::MouseButtonRelease ||
-         event->type() == QEvent::KeyRelease ) {
-        if ( targetObj ) 
-            return true;
-        return QWidget::eventFilter( targetObj, event );
-    }
-    if ( event->type() == QEvent::FocusOut ) {
-        if ( targetObj == nameLineEdit ) {
-            if ( nameLineEdit->text().isEmpty() ) {
-                QMessageBox::critical( this, tr("Material creation"),
-                                 tr("Material name wasn't entered.") );
-                nameLineEdit->setFocus( Qt::OtherFocusReason );
-                return true;
-            }
-        }
-        else if ( targetObj == elasticitySpinBox ) {
-            if ( elasticitySpinBox->value() <= 0 ) {
-                QMessageBox::critical( this, tr("Material creation"),
-                          tr("Wrong working stress was entered.") );
-                elasticitySpinBox->setFocus( Qt::OtherFocusReason );
-                return true;
-            }
-        }
-        else if ( targetObj == stressSpinBox ) {
-            if ( stressSpinBox->value() <= 0 ) {
-                QMessageBox::critical( this, tr("Material creation"),
-                                tr("Wrong elasticity module was entered.") );
-                stressSpinBox->setFocus( Qt::OtherFocusReason );
-                return true;
-            }
-        }
-        else if ( targetObj == densitySpinBox ) {
-            if ( densitySpinBox->value() <= 0 ) {
-                QMessageBox::critical( this, tr("Material creation"),
-                                 tr("Wrong density was entered.") );
-                densitySpinBox->setFocus( Qt::OtherFocusReason );
-                return true;
-            }
-        }
-        return false;
-    }
-    else
-        return QWidget::eventFilter( targetObj, event );
-}
-
-/*****************************************************************************
- * Truss Material Creation Dialog
- *****************************************************************************/
-
-MaterialCreationDialog::MaterialCreationDialog ( QWidget* parent /* = 0 */, 
-                                                 Qt::WFlags f /* = 0 */ ) :
-    QDialog( parent, f ),
-    material( 0 )
-{
-    init();
-}
-
-void MaterialCreationDialog::init ()
-{
-    materialEditWidget = new MaterialEditWidget;
-    
-    QPushButton* okButton = new QPushButton( tr( "OK" ) );
-    connect( okButton, SIGNAL(clicked()),
-                       SLOT(applyChanges()) );
-
-    QPushButton* cancelButton = new QPushButton( tr( "Cancel" ) );
-    connect( cancelButton, SIGNAL(clicked()),
-                           SLOT(cancelChanges()) );
-
-    QVBoxLayout* editLayout = new QVBoxLayout;
-    editLayout->addWidget( materialEditWidget );
-   
-    QHBoxLayout* buttonLayout = new QHBoxLayout;
-    buttonLayout->addStretch( 1 );
-    buttonLayout->addWidget( okButton );
-    buttonLayout->addWidget( cancelButton );
-
-    QVBoxLayout* mainLayout = new QVBoxLayout( this );
-    mainLayout->addLayout( editLayout );
-    mainLayout->addLayout( buttonLayout );
-
-    setWindowTitle( "Material Creation" );
-    setFixedSize( 250, 200 ); 
-}
-
-void MaterialCreationDialog::setMaterial ( TrussMaterial& m )
-{
-    materialEditWidget->setMaterial( m, true );
-    material = &m;
-}
-
-void MaterialCreationDialog::applyChanges ()
-{
-    emit onMaterialCreationApply( *material );
-    hide();
-}
-
-void MaterialCreationDialog::cancelChanges ()
-{ 
-    emit onMaterialCreationCancel( *material );
-    hide();
+    widgetStack->setCurrentIndex( 1 );
 }
 
 /*****************************************************************************
  * Truss Material Editor
  *****************************************************************************/
 
-TrussMaterialEditor::TrussMaterialEditor ( QWidget* parent /* = 0 */, 
+TrussMaterialEditor::TrussMaterialEditor ( QString& startPage,
+                                           QWidget* parent /* = 0 */, 
                                            Qt::WFlags f /* = 0 */ ) :
     QDialog( parent, f ),
-    materialLibTreeList( new QTreeWidget ),
+    materialLibTreeList( new MaterialTreeWidget ),
     addButton( 0 ),
     removeButton( 0 ),
-    applyButton( 0 )
+    startPageUUID( startPage )
 {
     init();
 }
@@ -362,33 +470,28 @@ void TrussMaterialEditor::init ()
     materialLibTreeList->setEditTriggers( QAbstractItemView::NoEditTriggers );
 
     QHeaderView *header = materialLibTreeList->header();
-    header->setClickable( false );
+    header->hide();
     QStringList labels;
     labels << tr("Project/Material");
     materialLibTreeList->setHeaderLabels( labels );
 
     editWidget = new MaterialEditWidget;
-    
-    createDialog = new MaterialCreationDialog( this );
-    createDialog->hide();
 
     QPushButton* okButton = new QPushButton( tr( "OK" ) );
     connect( okButton, SIGNAL(clicked()),
-                          SLOT(hide()) );
+                          SLOT(applyChanges()) );
+
     QPushButton* cancelButton = new QPushButton( tr( "Cancel" ) );
     connect( cancelButton, SIGNAL(clicked()),
                              SLOT(cancelChanges()) );
-    applyButton = new QPushButton( tr( "Apply" ) );
-    connect( applyButton, SIGNAL(clicked()),
-                            SLOT(applyChanges()) );
-    applyButton->setEnabled( false );
+
     addButton = new QPushButton( tr( "Add" ) );
     connect( addButton, SIGNAL(clicked()),
                         SLOT(addMaterial()) );
+
     removeButton = new QPushButton( tr( "Remove" ) );
     connect( removeButton, SIGNAL(clicked()),
-                           SLOT(removeMaterial()) );
-    removeButton->setEnabled( false );
+                           SLOT(removeSelectedMaterial()) );
     
     // init layouts
     QVBoxLayout* treeLayout = new QVBoxLayout;
@@ -403,7 +506,6 @@ void TrussMaterialEditor::init ()
     buttonLayout->addStretch( 1 );
     buttonLayout->addWidget( okButton );
     buttonLayout->addWidget( cancelButton );
-    buttonLayout->addWidget( applyButton );
 
     QHBoxLayout* topLayout = new QHBoxLayout;
     topLayout->addLayout( treeLayout );
@@ -413,326 +515,230 @@ void TrussMaterialEditor::init ()
     mainLayout->addLayout( topLayout );
     mainLayout->addLayout( buttonLayout );
 
-    connect( materialLibTreeList, SIGNAL(itemSelectionChanged()),
-                                  SLOT(checkButtons()) );
-    
-    connect( createDialog, SIGNAL(onMaterialCreationApply(const TrussMaterial&)),
-                         SLOT(applyMaterialCreation(const TrussMaterial&)) );
-
-    connect( createDialog, SIGNAL(onMaterialCreationCancel(TrussMaterial&)),
-                         SLOT(cancelMaterialCreation(TrussMaterial&)) );
-    
-    connect( materialLibTreeList, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
-                                    SLOT(fillEditorFields(QTreeWidgetItem*, int)));
-
     setWindowTitle( "Material Editor" );
-    setFixedSize( 500, 250 );    
-}
+    setFixedSize( 500, 250 );
+    setAttribute( Qt::WA_DeleteOnClose );
 
-QTreeWidgetItem* TrussMaterialEditor::getSelectedItem( 
-                                                bool& materialSelected ) const
-{
-    QList<QTreeWidgetItem*> selItems = materialLibTreeList->selectedItems();
-
-    if ( selItems.size() != 1 )
-        return 0;
-
-    QTreeWidgetItem* item = selItems[0];
-    if ( ! item )
-        return 0;
-
-    if ( item->parent() )
-        materialSelected = true;
-    else
-        materialSelected = false;
+    connect( materialLibTreeList, SIGNAL(itemSelectionChanged()),
+                                    SLOT(fillEditorFields()) );
     
-    return item;
+    // Setup context menu
+    materialLibTreeList->setContextMenuPolicy( Qt::ActionsContextMenu );
+
+    actAddMaterial = new QAction( tr( "Add material" ), this );
+    connect( actAddMaterial, SIGNAL(triggered()), this, SLOT(addMaterial()) );
+
+    actRemoveMaterial = new QAction( tr( "Remove material" ), this );
+    connect( actRemoveMaterial, SIGNAL(triggered()), 
+                          this, SLOT(removeSelectedMaterial()) );
+
+    materialLibTreeList->addAction( actAddMaterial );
+    materialLibTreeList->addAction( actRemoveMaterial );
 }
 
-ProjectTreeWidgetItem* TrussMaterialEditor::getSelectedProjectItem () const
+TrussMaterialEditor::~TrussMaterialEditor ()
 {
-    bool materialSelected;
-    QTreeWidgetItem* item = getSelectedItem( materialSelected );
-    if ( ! item )
-        return 0;
-
-    if ( materialSelected ) {
-        QTreeWidgetItem* projectItem = item->parent();
-        if ( ! projectItem )
-            return 0;
-
-        return dynamic_cast<ProjectTreeWidgetItem*>(projectItem);;
-    }
-    return dynamic_cast<ProjectTreeWidgetItem*>(item);
+    clearCopyLibs();
 }
 
-MaterialTreeWidgetItem* TrussMaterialEditor::getSelectedMaterialItem () const
+void TrussMaterialEditor::clearCopyLibs ()
 {
-    bool materialSelected;
-    QTreeWidgetItem* item = getSelectedItem( materialSelected );
-    if ( ! item || ! materialSelected )
-        return 0;
-
-    return dynamic_cast<MaterialTreeWidgetItem*>(item);;
-}
-
-TrussMaterial* TrussMaterialEditor::getSelectedMaterial () const
-{
-    ProjectTreeWidgetItem* projItem = getSelectedProjectItem();
-    MaterialTreeWidgetItem* materialItem = getSelectedMaterialItem();
-    if ( ! projItem || ! materialItem )
-        return 0;
-    
-    TrussMaterialLibrary& lib = projItem->getMaterialLibrary();
-    return lib.getMaterial( materialItem->text(0) );
-}
-
-MaterialTreeWidgetItem* TrussMaterialEditor::getMaterialItem ( 
-                                const TrussMaterial& m,
-                                const ProjectTreeWidgetItem& projItem ) const
-{
-    for ( int i = 0; i < projItem.childCount(); ++i ) {
-        MaterialTreeWidgetItem* materialItem = 
-            dynamic_cast<MaterialTreeWidgetItem*>( projItem.child( i ) );
-        if ( ! materialItem )
-            continue;
-
-        if ( &materialItem->getItemMaterial() == &m ) {
-            materialLibTreeList->setItemHidden( materialItem, false );
-            return materialItem;
-        }
-    }
-    return 0;
-}
-
-ProjectTreeWidgetItem* TrussMaterialEditor::getProjectItem ( 
-                                    const FermaNextProject& proj ) const
-{
-    for ( int i = 0; i < materialLibTreeList->topLevelItemCount(); ++i ) {
-        QTreeWidgetItem* item = materialLibTreeList->topLevelItem( i );
-        ProjectTreeWidgetItem* projItem =
-            dynamic_cast<ProjectTreeWidgetItem*>( item );
-        if ( ! projItem )
-            continue;
-
-        if ( &projItem->getItemProject() == &proj )
-            return projItem;
-    }
-    return 0;
-}
-
-void TrussMaterialEditor::addMaterialItem ( const TrussMaterial& m )
-{
-    ProjectTreeWidgetItem* projItem = getSelectedProjectItem();
-    if ( ! projItem )
-        return;
-
-    projItem->addChild( new MaterialTreeWidgetItem( m ) );
-}
-
-void TrussMaterialEditor::removeMaterialItem ( const TrussMaterial& m )
-{
-    ProjectTreeWidgetItem* projItem = getSelectedProjectItem();
-    if ( ! projItem )
-        return;
-
-    MaterialTreeWidgetItem* materialItem = getMaterialItem( m, *projItem );
-    int indx = projItem->indexOfChild( materialItem );
-    delete projItem->takeChild( indx );
-}
-
-void TrussMaterialEditor::addProjectItem ( FermaNextProject& proj )
-{
-    ProjectTreeWidgetItem* projItem = new ProjectTreeWidgetItem( proj );
-    materialLibTreeList->addTopLevelItem( projItem );
-    materialLibTreeList->setCurrentItem( projItem );
-    setCurrentProjectItem( proj );
-    
-    TrussMaterialLibrary& lib = projItem->getMaterialLibrary();
-    for ( int i = 0; i < lib.countMaterials(); ++i ) {
-        TrussMaterial* m = lib.getMaterial( i );
-        if ( m )
-            addMaterialItem( *m );
-    }
-    connect( &lib, SIGNAL(onAfterMaterialCreation(const TrussMaterial&)),
-                   SLOT(addMaterialItem(const TrussMaterial&)) );
-    connect( &lib, SIGNAL(onBeforeMaterialRemoval(const TrussMaterial&)),
-                   SLOT(removeMaterialItem(const TrussMaterial&)) );
-}
-
-void TrussMaterialEditor::removeProjectItem ( FermaNextProject& proj )
-{
-    ProjectTreeWidgetItem* projItem = getProjectItem( proj );
-    if ( ! projItem )
-        return;
-    
-    int indx = materialLibTreeList->indexOfTopLevelItem( projItem );
-    delete materialLibTreeList->takeTopLevelItem( indx );
-}
-
-void TrussMaterialEditor::setCurrentProjectItem ( FermaNextProject& proj )
-{
+    // Delete all material library copies
     for ( int i = 0; i < materialLibTreeList->topLevelItemCount(); ++i ) {
         QTreeWidgetItem* item = materialLibTreeList->topLevelItem( i );
 
         ProjectTreeWidgetItem* projItem = 
-            dynamic_cast<ProjectTreeWidgetItem*>(item);
+            dynamic_cast<ProjectTreeWidgetItem*>( item );
         if ( ! projItem )
             return;
 
-        if ( &projItem->getItemProject() == &proj )
-            projItem->setCurrent( true );
-        else
-            projItem->setCurrent( false );
+        TrussMaterialLibrary* mLib = &projItem->getMaterialLibrary();
+
+        delete mLib;
+    }  
+}
+
+void TrussMaterialEditor::addProject ( FermaNextProject& proj, 
+                                       bool current /* = false */ )
+{
+    TrussMaterialLibrary& mLib = proj.getMaterialLibrary();
+    originalMaterialLibs.insert( &proj, &mLib );
+
+    QDomDocument materialDoc;
+    QDomElement xmlProps = mLib.saveToXML( materialDoc );
+    materialDoc.appendChild( xmlProps );
+
+    TrussMaterialLibrary* copyLib = new TrussMaterialLibrary();
+    copyLib->loadFromXML( xmlProps );
+
+    ProjectTreeWidgetItem* projItem = 
+            new ProjectTreeWidgetItem( proj.getName(), *copyLib, current );
+
+    materialLibTreeList->addTopLevelItem( projItem );
+    materialLibTreeList->setCurrentItem( projItem );
+
+    for ( int i = 0; i < copyLib->countMaterials(); ++i ) {
+        TrussMaterial* m = copyLib->getMaterial( i );
+        if ( m )
+            materialLibTreeList->addMaterialItem( *m );
     }
 }
 
-void TrussMaterialEditor::fillEditorFields ( QTreeWidgetItem* item, int )
+void TrussMaterialEditor::fillEditorFields ()
 {
+    QList<QTreeWidgetItem*> selItems = materialLibTreeList->selectedItems();
+    if ( selItems.size() != 1 )
+        return;
+
+    QTreeWidgetItem* selItem = selItems[0];
+    ProjectTreeWidgetItem* projItem = 
+        materialLibTreeList->getSelectedProjectItem();
+
+    if ( projItem && projItem == selItem ) {
+        editWidget->clearPage();
+        removeButton->setEnabled( false );
+        actRemoveMaterial->setEnabled( false );
+        return;
+    }
+
+    removeButton->setEnabled( true );
+    actRemoveMaterial->setEnabled( true );
+    
     MaterialTreeWidgetItem* materialItem = 
-        dynamic_cast<MaterialTreeWidgetItem*>( item );
+        materialLibTreeList->getSelectedMaterialItem();
     if ( ! materialItem )
         return;
 
-    // since we need to edit it in future
     TrussMaterial& material = 
         const_cast<TrussMaterial&>( materialItem->getItemMaterial() );
-    
     editWidget->setMaterial( material );
 }
 
-void TrussMaterialEditor::saveMaterialProperties ()
+void TrussMaterialEditor::copyLib ( TrussMaterialLibrary& libFrom, 
+                                    TrussMaterialLibrary& libTo )
 {
-    materialProperties.clear();
-    
-    for ( int i = 0; i < materialLibTreeList->topLevelItemCount(); ++i ) {
-        QTreeWidgetItem* item = materialLibTreeList->topLevelItem( i );
+    for ( int i = 0; i < libFrom.countMaterials(); ++i ) {
+        TrussMaterial* mFrom = libFrom.getMaterial( i );
+        if ( ! mFrom )
+            continue;
 
-        ProjectTreeWidgetItem* projItem = 
-            dynamic_cast<ProjectTreeWidgetItem*>(item);
-        if ( ! projItem )
-            return;
+        QDomDocument materialDoc;
+        QDomElement copyProps = mFrom->saveToXML( materialDoc );
+        materialDoc.appendChild( copyProps );
 
-        const FermaNextProject& proj = projItem->getItemProject();
-        TrussMaterialLibrary& mLib = proj.getMaterialLibrary();
-        QDomNode oldData = materialPropDoc.firstChild();
-        if ( ! oldData.isNull() )
-            materialPropDoc.removeChild( oldData );
-        QDomElement xmlProps = mLib.saveToXML( materialPropDoc );
-        materialProperties.insert( &proj, xmlProps );
-    }    
-}
+        TrussMaterial* mTo = libTo.getMaterial( mFrom->getUUID() );
+        if ( ! mTo )
+            mTo = &libTo.createMaterial();
+        mTo->loadFromXML( copyProps );
+    }
 
-void TrussMaterialEditor::loadMaterialProperties ()
-{
-    for ( int i = 0; i < materialLibTreeList->topLevelItemCount(); ++i ) {
-        QTreeWidgetItem* item = materialLibTreeList->topLevelItem( i );
+    // Take removed materials from the original library
+    QList<TrussMaterial*> materialToRemoveList;
 
-        ProjectTreeWidgetItem* projItem = 
-            dynamic_cast<ProjectTreeWidgetItem*>(item);
-        if ( ! projItem )
-            return;
+    for ( int i = 0; i < libTo.countMaterials(); ++i ) {
+        TrussMaterial* mTo = libTo.getMaterial( i );
+        if ( ! mTo )
+            continue;
 
-        const FermaNextProject& proj = projItem->getItemProject();
-        TrussMaterialLibrary& mLib = proj.getMaterialLibrary();
-        mLib.clean();
-        mLib.loadFromXML( materialProperties.value( &proj ) );
-    }    
-}
+        TrussMaterial* mFrom = libFrom.getMaterial( mTo->getUUID() );
 
-void TrussMaterialEditor::exec ()
-{
-    saveMaterialProperties();
-    QDialog::exec();
-}
+        if ( ! mFrom ) 
+            materialToRemoveList.append( mTo );            
+    }
 
-void TrussMaterialEditor::cancelChanges ()
-{
-    loadMaterialProperties();
-    hide();
+    foreach ( TrussMaterial* m, materialToRemoveList )
+        libTo.removeMaterial( *m );
 }
 
 void TrussMaterialEditor::applyChanges ()
 {
-    saveMaterialProperties();
-    hide();
+    for ( int i = 0; i < materialLibTreeList->topLevelItemCount(); ++i ) {
+        QTreeWidgetItem* item = materialLibTreeList->topLevelItem( i );
+
+        ProjectTreeWidgetItem* projItem = 
+            dynamic_cast<ProjectTreeWidgetItem*>(item);
+        if ( ! projItem )
+            return;
+
+        TrussMaterialLibrary& mLib = projItem->getMaterialLibrary();
+
+        QList<TrussMaterialLibrary*> originalMaterialLibList =
+            originalMaterialLibs.values();
+        foreach ( TrussMaterialLibrary* originalLib, originalMaterialLibList )
+            if ( originalLib->getUUID() == mLib.getUUID() )
+                copyLib( mLib, *originalLib );
+    }  
+
+    MaterialTreeWidgetItem* mItem = 
+        materialLibTreeList->getSelectedMaterialItem();
+    if ( mItem )
+        startPageUUID =  mItem->getItemMaterial().getUUID();
+
+    done( 1 );
+}
+
+void TrussMaterialEditor::cancelChanges ()
+{
+    done( 0 );
 }
 
 void TrussMaterialEditor::addMaterial ()
-{
-    ProjectTreeWidgetItem* projItem = getSelectedProjectItem();
+{ 
+    ProjectTreeWidgetItem* projItem = 
+        materialLibTreeList->getSelectedProjectItem();
     if ( ! projItem )
         return;
 
-    TrussMaterial* m = 0;
     TrussMaterialLibrary& lib = projItem->getMaterialLibrary();
-    
-    try {
-        m = &lib.createMaterial( "", 1.0, 1.0, 1.0 );
-    } 
-    catch ( TrussMaterialLibrary::WrongMaterialNameException& ) {
-        ( QMessageBox::critical( this, tr("Error"),
-                                 tr("Can't create material.") ) );
-        return;
-    }
+  
+    TrussMaterial& m = lib.createMaterial();
 
-    MaterialTreeWidgetItem* materialItem = getMaterialItem( *m, *projItem);
-    if ( materialItem )
-        materialLibTreeList->setItemHidden( materialItem, true );
-
-    createDialog->setMaterial( *m );
-    createDialog->exec();
+    materialLibTreeList->addMaterialItem( m );
 }
 
-void TrussMaterialEditor::removeMaterial ()
+void TrussMaterialEditor::removeSelectedMaterial ()
 {
-    QTreeWidgetItem* materialItem = getSelectedMaterialItem();
-    ProjectTreeWidgetItem* projItem = getSelectedProjectItem();
-    if ( ! materialItem || ! projItem )
+    MaterialTreeWidgetItem* materialItem = 
+        materialLibTreeList->getSelectedMaterialItem();
+    if ( ! materialItem )
         return;
     
-    QString name = materialItem->text(0);
+    QString name = materialItem->getItemMaterial().getMaterialName();
 
     if ( QMessageBox::question( this, tr("Material remove confirmation"),
-                                tr("Remove material %1?").arg(name),
+                                tr("Remove material %1?").arg( name ),
                                 tr("&Yes"), tr("&No"), QString::null, 0, 1 ) )
         return;
     
-    projItem->getMaterialLibrary().removeMaterial( name );
-    int indx = projItem->indexOfChild( materialItem );
-    delete projItem->takeChild( indx );
+    materialLibTreeList->removeItemWithMaterial( *materialItem );
 }
 
-void TrussMaterialEditor::applyMaterialCreation ( const TrussMaterial& m )
+void TrussMaterialEditor::exec ()
 {
-    ProjectTreeWidgetItem* projItem = getSelectedProjectItem();
-    if ( ! projItem )
-        return;
+    // Set start page
+    for ( int i = 0; i < materialLibTreeList->topLevelItemCount(); ++i ) {
+        QTreeWidgetItem* item = materialLibTreeList->topLevelItem( i );
 
-    MaterialTreeWidgetItem* materialItem = getMaterialItem( m, *projItem);
-    if ( materialItem )
-        materialLibTreeList->setItemHidden( materialItem, false );
-}
+        ProjectTreeWidgetItem* projItem = 
+            dynamic_cast<ProjectTreeWidgetItem*>(item);
+        if ( ! projItem )
+            return;
 
-void TrussMaterialEditor::cancelMaterialCreation ( TrussMaterial& m )
-{
-    ProjectTreeWidgetItem* projItem = getSelectedProjectItem();
-    if ( ! projItem )
-        return;
+        TrussMaterialLibrary& mLib = projItem->getMaterialLibrary();
+        TrussMaterial* m = mLib.getMaterial( startPageUUID );
+        if ( ! m )
+            continue;
 
-    projItem->getMaterialLibrary().removeMaterial( m );
-}
+        MaterialTreeWidgetItem* mItem = 
+            materialLibTreeList->getMaterialItem( *m, *projItem );
+        if ( mItem )
+            materialLibTreeList->setCurrentItem( mItem, 0 );
 
-void TrussMaterialEditor::checkButtons ()
-{
-    if ( getSelectedMaterialItem() ) {
-        editWidget->showEditors( true );
-        removeButton->setEnabled( true );
-    }
-    else {
-        editWidget->showEditors( false );
-        removeButton->setEnabled( false );
-    }
+    } 
+    
+    fillEditorFields();
+    
+    QDialog::exec();
 }
 
 /***************************************************************************/

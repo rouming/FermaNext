@@ -98,7 +98,7 @@ signals:
     // Truss signals
     void onStateChange ();
     void onAreaChange ( const DoubleSize& );
-    void onDefaultMaterialChange ( const TrussMaterial& );
+    void onSwitchLoadCase ();
 
     // Nodes create/remove signals
     void beforeNodeCreation ();
@@ -179,7 +179,7 @@ public:
         QObject::connect( &loadCases, SIGNAL(afterLoadCaseRemoval()),
                                       SIGNAL(onStateChange()) );
         QObject::connect( &loadCases, SIGNAL(currentLoadCaseChanged(int)),
-                                      SIGNAL(onStateChange()) );
+                                      SIGNAL(onSwitchLoadCase()) );
 
         QObject::connect( &loadCases, SIGNAL(onTrussLoadCreate(const Node&)),
                                       SIGNAL(onStateChange()) );
@@ -547,6 +547,9 @@ public:
         for ( ; pIter != pivots.end(); ++pIter ) {
             P* pivot = *pIter;
             material = pivot->getMaterial();
+            if ( ! material )
+                continue;
+            
             QList<const TrussMaterial*>::const_iterator mIter = 
                 std::find( materials.begin(), materials.end(),
                                               material );

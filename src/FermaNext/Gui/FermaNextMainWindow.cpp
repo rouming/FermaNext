@@ -46,7 +46,8 @@ const QString fermaTitle( QObject::tr( "Educational CAD System 'Ferma'" ) );
 FermaNextMainWindow::FermaNextMainWindow ( FermaNextWorkspace& wsp ) :
     workspace(wsp),
     pluginsMenu(0),
-    pluginsSigMapper( new QSignalMapper(this) )
+    pluginsSigMapper( new QSignalMapper(this) ),
+    materialEditorStartPage( QString() )
 {     
     init();
 
@@ -94,23 +95,13 @@ void FermaNextMainWindow::init ()
                              SLOT(refreshGeometryAndPropertyWindows()) );
     connect( projectToolBox, SIGNAL(onShowTrussResults(const TrussUnitWindow&)),
                              SLOT(showResultsWindow(const TrussUnitWindow&)) );
+
     connect( this, 
                 SIGNAL(calculateTrussUnit(const TrussUnitWindow&)),
              projectToolBox, 
                 SIGNAL(calculateTrussUnit(const TrussUnitWindow&)) );
 
     projectsDockWidget->setWidget( projectToolBox );    
-
-    materialEditor = new TrussMaterialEditor( this );
-
-    connect( &workspace, SIGNAL(onProjectCreate(FermaNextProject&)),
-             materialEditor, SLOT(addProjectItem(FermaNextProject&)) );
-
-    connect( &workspace, SIGNAL(onBeforeProjectRemove(FermaNextProject&)),
-             materialEditor, SLOT(removeProjectItem(FermaNextProject&)) );
-
-    connect( &workspace, SIGNAL(onProjectActivated(FermaNextProject&)),
-             materialEditor, SLOT(setCurrentProjectItem(FermaNextProject&)) );
 
     // Clear and init plugins menu only from main event loop
     connect( this, SIGNAL(reloadPluginsFromMainEventLoop()),
@@ -121,7 +112,10 @@ void FermaNextMainWindow::init ()
     
     resultsWindow = new QDialog( this );
     resultsWindow->setWindowTitle( "Calculation Results" );
-    resultsWindow->setFixedSize( 750, 600 );
+    resultsWindow->setFixedWidth( 760 );
+    QRect wGeometry = resultsWindow->geometry();
+    wGeometry.setHeight( 600 );
+    resultsWindow->setGeometry( wGeometry );
     QHBoxLayout* resultsLayout = new QHBoxLayout( resultsWindow );
     resultsTabWidget = new ResultsTabWidget;
     resultsLayout->addWidget( resultsTabWidget );
@@ -133,6 +127,19 @@ void FermaNextMainWindow::init ()
     initGeometryWindow();
     initTrussPropertyWindow();
     createStatusBar();
+
+    PluginManager& plgMng = workspace.pluginManager();
+    PluginList plgList = plgMng.loadedPlugins();
+    Plugin* plg = 0;
+    foreach ( plg, plgList )
+        connect( plg, SIGNAL(afterExecution(Plugin&, Plugin::ExecutionResult)),
+                      SLOT(pluginWasExecuted(Plugin&, 
+                                             Plugin::ExecutionResult)) );
+
+    connect( &plgMng, SIGNAL(onAfterPluginLoad(Plugin&)),
+                        SLOT(afterPluginWasLoaded(Plugin&)) );
+    connect( &plgMng, SIGNAL(onBeforePluginUnload(Plugin&)),
+                        SLOT(beforePluginWasUnloaded(Plugin&)) );
 
     // Connect plugins signal mapper to show plugin info
     QObject::connect( pluginsSigMapper, SIGNAL(mapped(const QString &)),
@@ -297,40 +304,61 @@ void FermaNextMainWindow::createProject ()
 
 //TODO: remove this in future
 /*********** TEMP TRUSS UNIT **************************/
-#ifndef NDEBUG
-        TrussUnitWindow& trussWindow = mng.createTrussUnitWindow("Truss unit");
-        trussWindow.setTrussAreaSize( DoubleSize( 300, 300 ) );
+//#ifdef DEBUG
+#if 1
+        // Create truss
+        TrussUnitWindow& trussWindow = mng.createTrussUnitWindow("demo Truss unit");
+        // Set area size
+        trussWindow.setTrussAreaSize( DoubleSize( 200.0, 300.0 ) );
 
+        // Create material
         TrussMaterialLibrary& materialLib = prj.getMaterialLibrary();
         TrussMaterial* m = &materialLib.createMaterial( tr( "Aluminum Alloy" ), 
                                                        30000, 7000000, 0.028 );
         materialLib.createMaterial( tr( "Steel" ), 70000, 20000000, 0.078 );
-    
-        TrussNode& node1 = trussWindow.createNode ( 280, 30 );
-        TrussNode& node2 = trussWindow.createNode( 0, 0 );
-        TrussNode& node3 = trussWindow.createNode( 130, 130 );
-        trussWindow.createPivot( node2, node3 ).setMaterial( m );
 
-        TrussNode& node4 = trussWindow.createNode( 250, 300 );
-        trussWindow.createPivot( node4, node3 ).setMaterial( m );
+        // Create nodes
+        TrussNode& node1 = trussWindow.createNode ( 100.0, 0.0 );
+        TrussNode& node2 = trussWindow.createNode ( 200.0, 150.0 );
+        TrussNode& node3 = trussWindow.createNode ( 200.0, 300.0 );
+        TrussNode& node4 = trussWindow.createNode ( 0.0, 0.0 );
+        TrussNode& node5 = trussWindow.createNode ( 0.0, 300.0 );
+        TrussNode& node6 = trussWindow.createNode ( 108.77, 50.55 );
+        TrussNode& node7 = trussWindow.createNode ( 168.25, 169.81 );
+        TrussNode& node8 = trussWindow.createNode ( 104.0, 85.0 );
 
-        TrussNode& node5 = trussWindow.createNode( 0, 300 );
+        // Create pivots
         trussWindow.createPivot( node5, node3 ).setMaterial( m );
-        trussWindow.createPivot( node5, node4 ).setMaterial( m );
-        trussWindow.createPivot( node5, node2 ).setMaterial( m );
+        trussWindow.createPivot( node3, node2 ).setMaterial( m );
+        trussWindow.createPivot( node4, node1 ).setMaterial( m );
+        trussWindow.createPivot( node6, node1 ).setMaterial( m );
+        trussWindow.createPivot( node4, node6 ).setMaterial( m );
+        trussWindow.createPivot( node6, node2 ).setMaterial( m );
+        trussWindow.createPivot( node3, node7 ).setMaterial( m );
+        trussWindow.createPivot( node5, node7 ).setMaterial( m );
+        trussWindow.createPivot( node7, node2 ).setMaterial( m );
+        trussWindow.createPivot( node4, node8 ).setMaterial( m );
+        trussWindow.createPivot( node8, node6 ).setMaterial( m );
+        trussWindow.createPivot( node5, node8 ).setMaterial( m );
+        trussWindow.createPivot( node8, node7 ).setMaterial( m );
 
-        node1.setFixation( Node::FixationByX );
-        node2.setFixation( Node::FixationByY );
-        node3.setFixation( Node::FixationByXY );
+        // Set fixation
+        node4.setFixation( Node::FixationByXY );
+        node5.setFixation( Node::FixationByXY );
 
-        trussWindow.getLoadCases().createLoadCase();
-        trussWindow.getLoadCases().createLoadCase();
-        TrussUnit::LoadCase* currentCase = 
-            trussWindow.getLoadCases().getCurrentLoadCase();
-        
-        if ( currentCase )
-            currentCase->addLoad( node4, 300, 100 );
+        TrussUnit::LoadCase& lc1 = *trussWindow.getLoadCases().findLoadCase( 1 );
 
+        // Create 2 additional cases
+        TrussUnit::LoadCase& lc2 = trussWindow.getLoadCases().createLoadCase();
+        TrussUnit::LoadCase& lc3 = trussWindow.getLoadCases().createLoadCase();
+       
+
+        // Add loads       
+        lc1.addLoad( node1, 0.0, -10000.0 );
+        lc2.addLoad( node2, 0.0,  20000.0 );
+        lc3.addLoad( node2, 0.0,  30000.0 );
+
+/*
         PluginManager& plgMng = workspace.pluginManager();
         PluginList plgList = plgMng.loadedPlugins();
         if ( ! plgList.isEmpty() ) {
@@ -347,7 +375,7 @@ void FermaNextMainWindow::createProject ()
             TrussResultsManager& resMng = prj.getTrussResultsManager();
             resMng.pluginWasExecuted( *plg, exRes );
         }
-
+*/
 #endif
 /*********** TEMP TRUSS UNIT **************************/
 
@@ -807,6 +835,38 @@ void FermaNextMainWindow::trussWindowReceivedFocus ( TrussUnitWindow& window )
     trussPropTabWidget->changeFocusWindow( &window );
 }
 
+void FermaNextMainWindow::afterPluginWasLoaded ( Plugin& plg )
+{
+    connect( &plg, SIGNAL(afterExecution(Plugin&, Plugin::ExecutionResult)),
+                     SLOT(pluginWasExecuted(Plugin&, 
+                                            Plugin::ExecutionResult)) );
+}
+
+void FermaNextMainWindow::beforePluginWasUnloaded ( Plugin& plg )
+{
+    disconnect( &plg, SIGNAL(afterExecution(Plugin&, Plugin::ExecutionResult)),
+                  this, SLOT(pluginWasExecuted(Plugin&, 
+                                               Plugin::ExecutionResult)) );
+}
+
+void FermaNextMainWindow::pluginWasExecuted ( Plugin& plg, 
+                                              Plugin::ExecutionResult exRes )
+{
+    FermaNextProject* currentPrj = projectToolBox->currentProject();
+    TrussResultsManager& resMng = currentPrj->getTrussResultsManager();
+    
+    QString errMsg;
+
+    if ( ! resMng.parseExecutionResults( exRes, errMsg ) )
+        showPluginErrorMessageBox( plg.pluginInfo(), errMsg );
+    else {
+        const TrussSolutionResults& res = *resMng.getResultsList().back();
+        TrussUnitWindow* w = resMng.findTrussByResults( res );
+        if ( w )
+            showResultsWindow( *w );
+    }
+}
+
 /*****************************************************************************
  * Actions
  *****************************************************************************/
@@ -1163,13 +1223,23 @@ void FermaNextMainWindow::editSelectAll ()
 
 void FermaNextMainWindow::editMaterials ()
 {
+    TrussMaterialEditor* materialEditor = 
+        new TrussMaterialEditor( materialEditorStartPage, this );
+    FermaNextProject* currProject = workspace.currentActivatedProject();
+
+    foreach ( FermaNextProject* project, workspace.getProjectList() )
+        if ( project == currProject )
+            materialEditor->addProject( *project, true );
+        else
+            materialEditor->addProject( *project, false );
+
     materialEditor->exec();
 }
 
 void FermaNextMainWindow::editPreferences ()
 {   
     preferencesWidget->resize( 300, 300 );
-    preferencesWidget->setWindowTitle( "Preferences" );
+    preferencesWidget->setWindowTitle( tr("Preferences") );
     preferencesWidget->exec();    
 }
 
@@ -1204,14 +1274,28 @@ void FermaNextMainWindow::showResultsWindow ( const TrussUnitWindow& w )
                                           QString::null, 0, 1 ) )
                 emit calculateTrussUnit( w );
             else {
+                resultsWindow->setWindowTitle( tr( "Solve results for" ) + 
+                               w.getTrussName() );
                 resultsTabWidget->setTrussSolutionResults( *trussResults );
                 resultsWindow->exec();
             }
-        } else {
+
+        } 
+        else {
+            resultsWindow->setWindowTitle( tr( "Results for \"%1\"" ). 
+                           arg( w.getTrussName() ) );
             resultsTabWidget->setTrussSolutionResults( *trussResults );
             resultsWindow->exec();
         }
     }
+}
+
+void FermaNextMainWindow::showPluginErrorMessageBox ( const PluginInfo& plgInfo,
+                                                      const QString& errMsg )
+{
+    QMessageBox::critical( this, tr( "Plugin internal error" ), 
+                           tr( "%1: %2" ).
+                           arg( plgInfo.name ).arg( errMsg ) );
 }
 
 void FermaNextMainWindow::helpContents ()

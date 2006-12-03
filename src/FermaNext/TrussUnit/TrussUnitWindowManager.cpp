@@ -233,14 +233,26 @@ void TrussUnitWindowManager::loadOldVersion ( TrussUnit& truss, QFile& file )
     //material.setElasticityModule( elasticityModule );
     //material.setWorkingStress( workingStress );
 
+
+    // Support for old-new format, which contains odd double
+    //   if this line represents double -- assuming old-new format
+    //   if integer -- old-old format
+    QString str( file.readLine() );
+    bool oldOldFormat = false;
+    str.toInt( &oldOldFormat );
+    
+
     uint i;
     PivotNodesList pivots;
 
     for ( i = 0; i < pivotsNum; ++i )
     {
         uint firstNodeInd, lastNodeInd;
-        file.readLine( line, 256 );
-        firstNodeInd = strtol( line,  NULL, 10 );
+        if ( ! oldOldFormat || i > 0 ) {
+            file.readLine( line, 256 );
+            firstNodeInd = strtol( line,  NULL, 10 );
+        } else
+            firstNodeInd = str.toInt();
     
         file.readLine( line, 256 );
         lastNodeInd = strtol( line,  NULL, 10 );

@@ -198,6 +198,7 @@ void TrussMaterialLibrary::loadFromXML ( const QDomElement& projElem )
             throw LoadException();
         QDomElement materialElem = material.toElement();
         TrussMaterial& newMaterial = createMaterial( "new", 1, 1, 1 );
+        qWarning("create material with UUID: %s", newMaterial.getUUID().toAscii().data() );
         newMaterial.loadFromXML( materialElem );
         materialUUIDMap[newMaterial.getUUID()] = &newMaterial;
     }
@@ -219,33 +220,13 @@ QDomElement TrussMaterialLibrary::saveToXML ( QDomDocument& doc )
 }
 
 TrussMaterial& TrussMaterialLibrary::createMaterial ( const QString& name, 
-                                                  double ws, double em,
-                                                  double d ) /*throw 
-                                               (WrongMaterialNameException, 
-                                                WrongElasticityModuleException,
-                                                WrongWorkingStressException,
-                                                WrongDensityException)*/
+                                                      double ws, 
+                                                      double em,
+                                                      double d )
 {
-    checkMaterialName( name );
-    checkWorkingStress( ws );
-    checkElasticityModule( em );
-    checkDensity( d );
-    
     TrussMaterial* material = new TrussMaterial( name, ws, em, d );
     materials.push_back( material );
 
-    connect( material, SIGNAL(onBeforeNameChange(const QString&)),
-                       SLOT(checkMaterialName(const QString&)));
-
-    connect( material, SIGNAL(onBeforeWorkingStressChange(double)),
-                       SLOT(checkWorkingStress(double)));
-
-    connect( material, SIGNAL(onBeforeElasticityModuleChange(double)),
-                       SLOT(checkElasticityModule(double)));
-
-    connect( material, SIGNAL(onBeforeDensityChange(double)),
-                       SLOT(checkDensity(double)));
-    
     emit onAfterMaterialCreation( *material );
 
     return *material;
@@ -259,19 +240,21 @@ bool TrussMaterialLibrary::removeMaterial ( TrussMaterial& material )
     if ( iter == materials.end() )
         return false;
 
-    emit onBeforeMaterialRemoval( **iter );
+    TrussMaterial* m = *iter;
+    emit onBeforeMaterialRemoval( *m );
     materials.erase( iter );
+    delete m;
     emit onAfterMaterialRemoval();
 
     return true;
 }
 
-bool TrussMaterialLibrary::removeMaterial ( const QString& name )
+bool TrussMaterialLibrary::removeMaterial ( const QString& uuid )
 {
     TrussMaterialListConstIter iter = materials.begin();
     for ( ; iter != materials.end(); ++iter ) {
         TrussMaterial* material = *iter;
-        if ( material->getMaterialName() == name )
+        if ( material->getUUID() == uuid )
             return removeMaterial( *material );
     }
     return false;
@@ -303,12 +286,12 @@ TrussMaterial* TrussMaterialLibrary::getMaterial ( int indx ) const
     }
 }
 
-TrussMaterial* TrussMaterialLibrary::getMaterial ( const QString& name ) const
+TrussMaterial* TrussMaterialLibrary::getMaterial ( const QString& uuid ) const
 {
     TrussMaterialListConstIter iter = materials.begin();
     for ( ; iter != materials.end(); ++iter ) {
         TrussMaterial* material = *iter;
-        if ( material->getMaterialName() == name )
+        if ( material->getUUID() == uuid )
             return material;
     }
     return 0;
@@ -331,40 +314,6 @@ void TrussMaterialLibrary::clean ()
     for ( ; iter != materials.end(); ++iter )
         removeMaterial( **iter );
     materials.clear();
-}
-
-void TrussMaterialLibrary::checkMaterialName ( const QString& name )
-/*throw (WrongMaterialNameException)*/
-{
-    TrussMaterial* material = 0;
-    TrussMaterialListConstIter iter = materials.begin();
-    for ( ; iter != materials.end(); ++iter ) {
-        material = *iter;
-        if ( material->getMaterialName() == name &&
-             material != sender() )
-            throw WrongMaterialNameException();
-    }
-}
-
-void TrussMaterialLibrary::checkWorkingStress ( double ws )
-/*throw (WrongWorkingStressException)*/
-{
-    if ( ws <= 0 )
-        throw WrongWorkingStressException();
-}
-
-void TrussMaterialLibrary::checkElasticityModule ( double em )
-/*throw (WrongElasticityModuleException)*/
-{
-    if ( em <= 0 )
-        throw WrongElasticityModuleException();
-}
-
-void TrussMaterialLibrary::checkDensity ( double d )
-/*throw (WrongDensityException)*/
-{
-    if ( d <= 0 )
-        throw WrongDensityException();
 }
 
 /****************************************************************************/

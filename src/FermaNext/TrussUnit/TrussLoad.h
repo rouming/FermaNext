@@ -8,6 +8,7 @@
 
 #include "UUIDObject.h"
 #include "StatefulObject.h"
+#include "Global.h"
 
 class Node;
 
@@ -226,6 +227,7 @@ signals:
     void afterLoadCaseCreation ( int );
     void afterLoadCaseRemoval ();
     void currentLoadCaseChanged ( int );
+    void loadCaseCanBeAdded ( bool );
     void loadCaseCanBeRemoved ( bool );
     void onTrussLoadChange ( const Node& );
     void onTrussLoadCreate ( const Node& );
@@ -268,10 +270,15 @@ public:
 
         setCurrentLoadCase( *loadCase );
 
-        if ( countLoadCases() == 2 )
-            emit loadCaseCanBeRemoved( true );
-        else if ( countLoadCases() == 1 )
+        if ( countLoadCases() == 1 )
             emit loadCaseCanBeRemoved( false );
+        else
+            emit loadCaseCanBeRemoved( true );
+
+        if ( countLoadCases() >= Global::maxLoadCaseNumber )
+            emit loadCaseCanBeAdded( false );
+        else
+            emit loadCaseCanBeAdded( true );
 
         return *loadCase;
     }
@@ -309,6 +316,9 @@ public:
         
         if ( countLoadCases() == 1 )
             emit loadCaseCanBeRemoved( false );
+
+        if ( countLoadCases() < Global::maxLoadCaseNumber )
+            emit loadCaseCanBeAdded( true );
         
         return true;
     }

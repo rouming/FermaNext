@@ -37,13 +37,15 @@ struct HtmlTableCell
 
 class HtmlTable : public QTextBrowser
 {
+    Q_OBJECT
+
 public:
     typedef QList<HtmlTableCell> HtmlTableCellList;
 
     HtmlTable ( const QString& title, QWidget* parent = 0 );
     virtual ~HtmlTable ();
     const QDomDocument& getDomDocument () const;
-    virtual void clearData ();
+    int getHeight () const;
     
 protected:
     virtual void init ( const QString& );
@@ -53,7 +55,17 @@ protected:
     virtual void addRow ( const HtmlTableCellList& );
     virtual void fillTable () = 0;
     virtual void resizeRootTable ( int width, int height = -1 );
+    virtual QDomElement getRowElement ( int row ) const;
+    virtual QDomElement getColumnElement ( int col, 
+                                           const QDomElement& rowElem ) const;
     virtual void wheelEvent( QWheelEvent * );
+
+public slots:
+    virtual void clearData ();
+    virtual void updateHtml();
+    virtual void setCellHighlight( int row, int col, const QString& color ); 
+    virtual void setColumnHighlight( int col, const QString& color );
+    virtual void removeHighlight ();
 
 private:
     QDomDocument htmlDoc;
@@ -76,6 +88,8 @@ protected:
 
 class HtmlStressTable : public HtmlTable
 {
+    Q_OBJECT
+
 public:
     HtmlStressTable ( const QString& title, QWidget* parent = 0 );
     void updateTable ( const PluginResults&, 
@@ -84,15 +98,21 @@ public:
 protected:
     void fillTable ();
 
+protected slots:
+    void changeLoadCaseHighlight ( int );
+
 private:
     const PluginResults* pluginResults;
     TrussUnitCopy::TrussCopyPivotList pivots;
+    int loadCaseNumb;
 };
 
 /*****************************************************************************/
 
 class HtmlDisplacementTable : public HtmlTable
 {
+    Q_OBJECT
+        
 public:
     HtmlDisplacementTable ( const QString& title, QWidget* parent = 0 );
     void updateTable ( const PluginResults&, 
@@ -100,10 +120,14 @@ public:
     
 protected:
     void fillTable ();
+    
+protected slots:
+    void changeLoadCaseHighlight ( int );
 
 private:
     const PluginResults* pluginResults;
     TrussUnitCopy::TrussCopyNodeList nodes;
+    int loadCaseNumb;
 };
 
 #endif // HTMLTABLE_H_

@@ -141,6 +141,10 @@ protected slots:
     void clearFrontNodePointer ( const Node& node );
     void clearFrontPivotPointer ( const Node& first, const Node& last );
 
+    // Additional slot to clear truss render flag. 
+    // The same as the setTrussRenderedStatus( false ) call
+    void clearRenderedFlag ();
+
 signals:
     void onTrussNameChange ( const QString& );
     void onCalculationStatusChange ( bool );

@@ -439,6 +439,7 @@ void TrussPropertyTabWidget::initLoadTab ()
     createLoadCaseBtn = new QPushButton( loadCaseGroupBox );
     createLoadCaseBtn->setIcon( QIcon( Global::imagesPath() + "/plus.png" ) );
     createLoadCaseBtn->setFixedSize( QSize( 22, 22 ) );
+    createLoadCaseBtn->setEnabled( false );
     removeLoadCaseBtn = new QPushButton( loadCaseGroupBox );
     removeLoadCaseBtn->setIcon( QIcon( Global::imagesPath() + "/minus.png" ) );
     removeLoadCaseBtn->setFixedSize( QSize( 22, 22 ) );
@@ -627,6 +628,9 @@ void TrussPropertyTabWidget::trussUnitWindowWasCreated (
     connect( &loadCases, SIGNAL(loadCaseCanBeRemoved(bool)),
              removeLoadCaseBtn, SLOT(setEnabled(bool)) );
 
+    connect( &loadCases, SIGNAL(loadCaseCanBeAdded(bool)),
+             createLoadCaseBtn, SLOT(setEnabled(bool)) );
+
     connect( loadCaseComboBox, SIGNAL(currentIndexChanged(int)),
                                SLOT(setCurrentLoadCase(int)) );
 
@@ -639,6 +643,22 @@ void TrussPropertyTabWidget::trussUnitWindowWasCreated (
                     
     connect( &window, SIGNAL(beforePivotDesist(const Node&, const Node&)),
                       SLOT(removePivotFromTable(const Node&, const Node&)) );
+
+
+    // Check if truss was created in 'silence' mode 
+    // (see TrussUnitWindowManager.cpp)
+    TrussUnit::PivotList pivots = window.getPivotList();
+    if ( ! pivots.empty() ) {
+        TrussPivot* pivot = 0;
+        foreach ( pivot, pivots ) {
+            connect( pivot, SIGNAL(onDrawingStatusChange(bool)),
+                            SLOT(showPivotPropertyTableRow(bool)) );
+            connect( pivot, SIGNAL(onThicknessChange(double)),
+                            SLOT(updateTableThickness()) );
+            connect( pivot, SIGNAL(onMaterialChange()),
+                            SLOT(updateTableMaterial()) );            
+        }
+    }
 }
 
 void TrussPropertyTabWidget::changeFocusWindow ( 
@@ -687,7 +707,12 @@ void TrussPropertyTabWidget::fillLoadTab ()
         removeLoadCaseBtn->setEnabled( false );
     else
         removeLoadCaseBtn->setEnabled( true );
-    createLoadCaseBtn->setEnabled( true );
+    
+    if ( loadCases.countLoadCases() >= Global::maxLoadCaseNumber )
+        createLoadCaseBtn->setEnabled( false );
+    else
+        createLoadCaseBtn->setEnabled( true );
+
 
     fillLoadCaseComboBox();
 

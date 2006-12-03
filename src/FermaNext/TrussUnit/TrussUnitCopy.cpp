@@ -219,7 +219,7 @@ void TrussUnitCopy::loadResults ( const LoadCaseResults& res )
         emit displacementLoaded( true );
     else
         emit displacementLoaded( false );
-    loadDisplacements( res ); 
+    loadDisplacements( res );
     
     if ( res.countStresses() != 0 )
         emit stressLoaded( true );
@@ -263,15 +263,15 @@ void TrussUnitCopy::loadStresses ( const LoadCaseResults& res )
     }
 }
 
-void TrussUnitCopy::displaceNodes ( double koeff )
+void TrussUnitCopy::displaceNodes ( double coeff )
 {
     double dx = 0, dy = 0;
     TrussCopyNode* node = 0;
     TrussCopyNodeListIter iter = nodes.begin();
     for ( ; iter != nodes.end(); ++iter ) {
         node = *iter;
-        dx = node->getDisplacement().x() * koeff;
-        dy = node->getDisplacement().y() * koeff;
+        dx = node->getDisplacement().x() * coeff;
+        dy = node->getDisplacement().y() * coeff;
         node->setCurrentCoord( node->getBaseCoord() + DoublePoint( dx, dy ) );       
     }
     emit stateIsChanged();

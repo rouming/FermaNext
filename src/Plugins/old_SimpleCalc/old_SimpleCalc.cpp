@@ -64,6 +64,94 @@ Plugin::ExecutionResult SimpleCalcPlugin::specificExecute (
     TrussUnit* truss = dynamic_cast<TrussUnit*>(argsList[0]);
     if ( truss == 0 )
         throw WrongExecutionArgsException();
+
+    //---------------- Check if truss has no nodes
+
+    if ( ! truss->countNodes() ) {
+        QString errStr = tr("Can't solve empty truss");
+        return ExecutionResult( InternalErrStatus , errStr ); 
+    }
+    
+
+    //---------------- Check node/pivot limits
+
+    if ( truss->countNodes() > 9 ) {
+        QString errStr = tr( "Node number exceeds permissible limit.\n"
+                             "Maximum number of nodes = 9");
+        return ExecutionResult( InternalErrStatus , errStr ); 
+    }
+
+    else if ( truss->countNodes() > 15 ) {
+        QString errStr = tr( "Pivot number exceeds permissible limit.\n"
+                             "Maximum number of pivots = 15");
+        return ExecutionResult( InternalErrStatus , errStr ); 
+    }
+
+    
+    //---------------- Check free nodes 
+
+    TrussNode* node = 0;
+    TrussUnit::NodeList nodeList = truss->getNodeList();
+    foreach ( node, nodeList ) {
+        TrussUnit::PivotList adjPivots = truss->findAdjoiningPivots( *node );
+        if ( adjPivots.empty() ) {
+            QString errStr = tr("Truss contains free nodes");
+            return ExecutionResult( InternalErrStatus , errStr );
+        }
+    }
+
+
+    //---------------- Check if truss is a mechanism
+
+    // k - number of ties
+    int k = 0; 
+    foreach ( node, nodeList ) {
+        if ( node->getFixation() == Node::FixationByX ||
+             node->getFixation() == Node::FixationByY )
+            ++k;
+        else if ( node->getFixation() == Node::FixationByXY )
+            k += 2;
+    }
+
+    int w = 2 * truss->countNodes() - truss->countPivots() - k;
+    
+    if ( w > 0 ) {
+        // the line below causes 28 unresolved externals =) 
+        //QString trussName( truss->getTrussName() );
+
+        QString errStr = tr("Construction is a mechanism");
+        return ExecutionResult( InternalErrStatus , errStr );
+    }
+
+    //---------------- Check materials
+    
+    TrussPivot* pivot = 0;
+    const TrussMaterial* cmpMaterial = 0;
+    TrussUnit::PivotList pivotList = truss->getPivotList();
+    foreach ( pivot, pivotList ) {
+        const TrussMaterial* material = pivot->getMaterial();
+        if ( ! material ){
+            QString errStr( tr("Material was'n set for pivot %1").arg( 
+                                pivot->getNumber() ) );
+            return ExecutionResult( InternalErrStatus , errStr );
+        } 
+        else if ( cmpMaterial && cmpMaterial != material ) {
+            QString errStr( tr("Plugin doesn't calculate trusses with the different types of materials") );
+            return ExecutionResult( InternalErrStatus , errStr );
+        }
+        else
+            cmpMaterial = material;
+    }
+
+
+    /*
+    TODO: find out what's the reason of wrong countMaterials() result
+    
+    if ( truss->countMaterials() != 1 ) {
+        QString errStr(  
+         tr("Plugin doesn't calculate trusses with the different types of materials") );
+        return ExecutionResult( InternalErrStatus , errStr );
+    }*/
         
     QString frmFile( tempFileName() );    
     QString vyvFile( frmFile + fermaResExt );
@@ -82,8 +170,27 @@ Plugin::ExecutionResult SimpleCalcPlugin::specificExecute (
     QFile::remove( frmFile );
     QFile::remove( vyvFile );
 
-    // FIXME: add real status
-    return ExecutionResult( OkStatus, vyv.toXMLString() );
+    QString resultsStr = vyv.toXMLString();
+    QDomDocument doc;
+    if ( ! doc.setContent( resultsStr ) ) {
+        QString errStr( tr("Wrong results format") );
+        return ExecutionResult( InternalErrStatus , errStr );
+    }
+
+    QDomElement resultsElem = doc.firstChild().toElement();
+    resultsElem.setAttribute( "trussUUID", truss->getUUID() );
+    resultsElem.setAttribute( "pluginName", pluginInfo().name );
+
+    if ( resultsElem.hasAttribute("materialVolume") ) {
+        QString valueStr = resultsElem.attribute( "materialVolume" );
+        const TrussMaterial* material = pivotList[0]->getMaterial();
+        double mass = valueStr.toDouble() * material->getDensity();
+        resultsElem.setAttribute( "trussMass", mass );
+    }
+    else 
+        resultsElem.setAttribute( "trussMass", "unknown" );
+
+    return ExecutionResult( OkStatus, doc.toString() );
 }
 
 void SimpleCalcPlugin::createTempFile ()
