@@ -89,6 +89,24 @@ template<class Source> struct DashStroke
 
 /*****************************************************************************/
 
+QString fitTextToWidth ( QString str, int pixWidth, glyph_gen& glyph )
+{
+    int strLength = str.length();
+    for ( uint i = 0; i < strLength; ++i )
+    {
+        int textLength = (int)glyph.width( str.toAscii().data() ); 
+
+        if ( textLength <= pixWidth )
+            break;
+
+        else {
+            str.replace (  str.length() - 3, 3, "..." );
+            str.remove ( str.length() - 4, 1 );
+        }
+    }
+    return str;
+}
+
 void drawText ( textRenderer& textRend, const QString& str, color_type col, 
                 const DoublePoint& point )
 {

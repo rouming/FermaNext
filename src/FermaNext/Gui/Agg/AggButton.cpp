@@ -1,39 +1,39 @@
 
 #include "AggButton.h"
-#include "AggSubsidiary.h"
 
 /*****************************************************************************
  * Agg Button
  *****************************************************************************/
 
-AggButton::AggButton ( const QString& l, const QPoint& p, int w, int h ) :
-    width(w), height(h),
+AggButton::AggButton ( const QString& text ) :
+    width(0), height(0),
+    buttonText( text ),
     pressed(false),
     enabled(true),
     highlighted(false),
-    leftTopPos(p),
-    label(l)
-{}   
+    leftTopPos(QPoint(0,0))
+{}
 
-AggButton::AggButton ( QPoint p, int w, int h ) :
-    width(w), height(h),
+AggButton::AggButton () :
+    width(0), height(0),
     pressed(false),
     enabled(true),
     highlighted(false),
-    leftTopPos(p)
+    leftTopPos(QPoint(0,0))
 {}
 
 AggButton::~AggButton ()
 {}
 
-const QPoint& AggButton::getPosition () const
+QPoint AggButton::getPosition () const
 {
     return leftTopPos;
 }
 
-void AggButton::setPosition ( const QPoint& newPos )
+void AggButton::setPosition ( QPoint newPos )
 {
     leftTopPos = newPos;
+    emit onChangeButtonState();
 }
 
 int AggButton::getWidth () const
@@ -44,6 +44,7 @@ int AggButton::getWidth () const
 void AggButton::setWidth ( int w )
 {
     width = w;
+    emit onChangeButtonState();
 }
 
 int AggButton::getHeight () const
@@ -54,16 +55,18 @@ int AggButton::getHeight () const
 void AggButton::setHeight ( int h )
 {
     height = h;
+    emit onChangeButtonState();
 }
 
-const QString& AggButton::getLabel () const
+QString AggButton::text () const
 {
-    return label;
+    return buttonText;
 }
 
-void AggButton::setLabel ( const QString& l )
+void AggButton::setText ( const QString& text )
 {
-    label = l;
+    buttonText = text;
+    emit onChangeButtonState();
 }
 
 const QString& AggButton::getHint () const
@@ -74,6 +77,7 @@ const QString& AggButton::getHint () const
 void AggButton::setHint ( const QString& hint_ )
 {
     hint = hint_;
+    emit onChangeButtonState();
 }
 
 bool AggButton::isPressed () const
@@ -105,7 +109,7 @@ void AggButton::setEnabled ( bool e_ )
     if ( enabled == e_ )
         return;
     enabled = e_;
-    emit onChangeButtonState ();
+    emit onChangeButtonState();
 }
 
 bool AggButton::isHighlighted () const
@@ -118,7 +122,7 @@ void AggButton::setHighlighted ( bool h_ )
     if ( highlighted == h_ )
         return;
     highlighted = h_;
-    emit onChangeButtonState ();
+    emit onChangeButtonState();
 }
 
 bool AggButton::inButtonRect ( int x, int y ) const
@@ -131,7 +135,12 @@ bool AggButton::inButtonRect ( int x, int y ) const
 
 void AggButton::pressButton ()
 {
-    setPressed ( true );
+    setPressed( true );
+}
+
+void AggButton::paint ( ren_dynarow& ) const
+{
+    // Reimplement this function in child classes
 }
 
 /****************************************************************************/

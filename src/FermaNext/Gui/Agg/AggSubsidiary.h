@@ -126,6 +126,8 @@ struct arrow
 
 /*****************************************************************************/
 
+QString fitTextToWidth ( QString str, int pixWidth, glyph_gen& glyph );
+
 void drawText ( textRenderer& textRend, const QString& str, 
                 color_type c, const DoublePoint& point );
 
@@ -158,6 +160,7 @@ void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
 
 void fillColorArray ( color_array_type& colArray, color_type first, 
                       color_type middle, color_type last );
+
 
 void drawOutlineRoundedRect ( ren_dynarow& baseRend,
                               solidRenderer& solidRend, 

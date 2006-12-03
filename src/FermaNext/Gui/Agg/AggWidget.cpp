@@ -160,10 +160,9 @@ void AggWidget::paintEvent ( QPaintEvent* event )
     // Notice other agg paintable elements 
     aggPaintEvent( event );
 
-
     // This conversion was taken from the original agg_plarform_support.cpp
     QImage tmpImg( mainQImage.width(), mainQImage.height(), 
-                   QImage::Format_RGB32 );
+                   QImage::Format_ARGB32 );
 					
     agg::rendering_buffer rbufTmp;
     rbufTmp.attach( tmpImg.bits(), tmpImg.width(), tmpImg.height(), 
@@ -191,6 +190,7 @@ void AggWidget::resizeEvent ( QResizeEvent* event )
                       mainQImage.height(), 
                       aggFlipY ?  mainQImage.bytesPerLine() : 
                                  -mainQImage.bytesPerLine() );
+
 
     // Notice other agg paintable elements 
     aggResizeEvent( event ); 

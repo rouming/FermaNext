@@ -7,7 +7,6 @@
 
 AggTrussWindowButton::AggTrussWindowButton ( const QPoint& pos, 
                                              const QString& fname ) :
-    AggButton ( pos, Global::headWidth - 6, Global::headWidth - 6 ),
     windowHighlighted( true ),
     edgingCol( agg::rgba( 0, 0, 0, 0.7 ) ),
     normalCol( agg::rgba( 20, 60, 80, 0.5 ) ),
@@ -15,7 +14,10 @@ AggTrussWindowButton::AggTrussWindowButton ( const QPoint& pos,
     pressedCol( agg::rgba( 65, 90, 110, 0.7 ) ),
     lineCol( agg::rgba( 10, 10, 10 ) )
 {
-    parseSvg( pathRend, fname.toLocal8Bit() );    
+    parseSvg( pathRend, fname.toLocal8Bit() );
+    setPosition( pos );
+    setWidth( Global::headWidth - 6 );
+    setHeight( Global::headWidth - 6 );
 }
 
 AggTrussWindowButton::~AggTrussWindowButton ()
@@ -31,11 +33,12 @@ void AggTrussWindowButton::setButtonHighlightType ( bool type )
     windowHighlighted = type;
 }
 
-void AggTrussWindowButton::paint ( ren_dynarow& baseRend, 
-                                    scanline_rasterizer& ras,
-                                    agg::scanline_p8& sl, 
-                                    solidRenderer& solidRend ) const
+void AggTrussWindowButton::paint ( ren_dynarow& baseRend ) const
 {
+    scanline_rasterizer ras;
+    agg::scanline_p8 sl; 
+    solidRenderer solidRend( baseRend );
+
     double scaleX = 0.13, scaleY = 0.13;
     int width = getWidth ();
     int height = getHeight ();
