@@ -94,7 +94,8 @@ private:
 
     virtual void beforePluginLoad ( const QString& path ) 
     {
-        label->setText( tr("Loading plugin: ") + QFileInfo(path).baseName() );
+        label->setText( tr("Loading plugin: ") + 
+                        QFileInfo(path).completeBaseName() );
         repaint();
         QApplication::flush();
         QApplication::processEvents();
@@ -130,7 +131,7 @@ private:
     virtual void beforePluginUnload ( Plugin& plg ) 
     {
         label->setText( tr("Unloading plugin: ") + 
-                        QFileInfo(plg.pluginPath()).baseName() );
+                        QFileInfo(plg.pluginPath()).completeBaseName() );
         repaint();
         QApplication::flush();
         QApplication::processEvents();

@@ -21,12 +21,14 @@ Splash::Splash ( const QPixmap& p, const QString& appName_,
 
 void Splash::pluginLoaderMessage ( const QString& path )
 {
-    message( "Registering loader: '" + QFileInfo(path).baseName() + "'" );
+    message( "Registering loader: '" + 
+             QFileInfo(path).completeBaseName() + "'" );
 }
 
 void Splash::pluginMessage ( const QString& path )
 {
-    message( "Loading plugin: '" + QFileInfo(path).baseName() + "'" );
+    message( "Loading plugin: '" + 
+             QFileInfo(path).completeBaseName() + "'" );
 }
 
 void Splash::message ( const QString& msg )
