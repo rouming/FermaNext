@@ -58,5 +58,28 @@ SOURCES = \
 PRE_TARGETDEPS = JavaBuild
 QMAKE_EXTRA_TARGETS += JavaBuild
 
-win32::JavaBuild.commands = $$(ANT_HOME)\bin\ant
-unix::JavaBuild.commands = $$(ANT_HOME)/bin/ant
+HAS_ANT = TRUE
+ANT = ant
+ant_version = $$system( $$ANT -version )
+isEmpty( ant_version ) {
+    # Command does not exist. May be ANT_HOME is defined?!
+    ANT_HOME = $$(ANT_HOME)
+
+    # Check ANT_HOME environment
+    ANT_HOME = $$(ANT_HOME)
+    isEmpty(ANT_HOME) {
+        HAS_ANT = FALSE
+        ANT =
+    }
+    else {
+        ANT = $$ANT_HOME/bin/ant
+        ant_version = $$system( $$ANT -version )
+        isEmpty( ant_version ) {
+            HAS_ANT = FALSE
+            ANT =
+        }
+    }
+}
+
+contains( HAS_ANT, TRUE): JavaBuild.commands = "$$ANT"
+else: error( "'Apache Ant' is not installed, but should be." )
