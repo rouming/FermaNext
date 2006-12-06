@@ -162,7 +162,7 @@ QString applicationVersion ()
 #if (defined DEBUG || defined _DEBUG)
     version = QObject::tr("debug ");
 #endif
-    version += QString("%1, %2").arg( FERMA_VERSION ).arg("" __DATE__ "");
+    version += QString("%1, %2").arg(TO_STR(FERMA_VERSION)).arg(__DATE__);
     return version;
 }
 

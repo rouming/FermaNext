@@ -16,6 +16,9 @@
   #define StandardCall
 #endif
 
+#define TO_STR2(t) #t
+#define TO_STR(t) TO_STR2(t)
+
 /*****************************************************************************/
 
 #include <QString>
