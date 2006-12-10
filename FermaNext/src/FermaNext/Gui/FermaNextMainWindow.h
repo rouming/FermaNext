@@ -14,7 +14,6 @@ class FermaNextWorkspace;
 class UndoRedoListBox;
 class GeometryTabWidget;
 class TrussPropertyTabWidget;
-class TrussMaterialEditor;
 class PreferencesWidget;
 class ResultsTabWidget;
 class QFile;
@@ -149,8 +148,6 @@ private:
     TrussPropertyTabWidget* trussPropTabWidget;
     // Preferences widget
     PreferencesWidget* preferencesWidget;
-    // Material editor
-    TrussMaterialEditor* materialEditor;
 
     QDialog* resultsWindow;
     ResultsTabWidget* resultsTabWidget;
@@ -177,6 +174,11 @@ private:
 
     // Plugins signal mapper for plugin info showing
     QSignalMapper* pluginsSigMapper;
+
+    // UUID of the material, which properties should be shown 
+    // after dialog appearance
+    QString materialEditorStartPage;
+
 };
 
 #endif //FERMANEXTMAINWINDOW_H

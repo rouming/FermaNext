@@ -89,6 +89,24 @@ template<class Source> struct DashStroke
 
 /*****************************************************************************/
 
+QString fitTextToWidth ( QString str, int pixWidth, glyph_gen& glyph )
+{
+    int strLength = str.length();
+    for ( uint i = 0; i < strLength; ++i )
+    {
+        int textLength = (int)glyph.width( str.toAscii().data() ); 
+
+        if ( textLength <= pixWidth )
+            break;
+
+        else {
+            str.replace (  str.length() - 3, 3, "..." );
+            str.remove ( str.length() - 4, 1 );
+        }
+    }
+    return str;
+}
+
 void drawText ( textRenderer& textRend, const QString& str, color_type col, 
                 const DoublePoint& point )
 {
@@ -284,6 +302,34 @@ void drawGradientEllipse ( ren_dynarow& baseRend,
     agg::render_scanlines( ras, sl, gradRend );
 }
 
+void drawTriangle ( ren_dynarow& baseRend, DoublePoint p1, DoublePoint p2, 
+                    DoublePoint p3, color_type fillCol, color_type lineCol )
+{
+    solidRenderer solidRend( baseRend );
+    scanline_rasterizer ras;
+    agg::scanline_p8 sl;
+    agg::trans_affine mtx;
+    agg::path_storage path;
+
+    path.move_to( p1.x(), p1.y() );
+    path.line_to( p2.x(), p2.y() );
+    path.line_to( p3.x(), p3.y() );
+    path.close_polygon();
+
+    solidRend.color( fillCol );
+    ras.add_path( path );
+    agg::render_scanlines( ras, sl, solidRend );
+
+    drawLine( ras, solidRend, sl, p1, p2, 1.0, lineCol );
+    drawLine( ras, solidRend, sl, p1, p2, 1.0, lineCol );
+    drawLine( ras, solidRend, sl, p2, p3, 1.0, lineCol );
+    
+    //primitivesRenderer primRend( baseRend );
+    //outline_rasterizer rasOutline( primRend );
+    //primRend.line_color( lineCol );
+    //rasOutline.add_path( path );    
+}
+
 void parseSvg ( pathRenderer& pathRend, const char* fname )
 {
     agg::svg::parser svgParcer( pathRend );
@@ -308,6 +354,11 @@ void blendBuffer ( base_renderer& baseRenderer,
                    pixf_dynarow& pixf, QPoint p )
 {
     baseRenderer.blend_from( pixf, 0, p.x(), p.y(), uint(1.0 * 255) );
+}
+
+agg::rgba8 aggColor ( uint r, uint g, uint b, uint a )
+{
+    return agg::rgba8( b, g, r, a );
 }
 
 /*****************************************************************************/

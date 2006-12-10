@@ -1325,10 +1325,10 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
     {
         /*------draw buttons------*/
         baseRend = buttonPixf;
-        baseRend.clear ( agg::rgba (10, 10, 10, 0) );
-        solidRenderer solidRend ( baseRend );   
-        hideButton->paint ( baseRend, ras, sl, solidRend );
-        rollUpButton->paint ( baseRend, ras, sl, solidRend );
+        baseRend.clear( agg::rgba (10, 10, 10, 0) );
+        solidRenderer solidRend( baseRend );   
+        hideButton->paint( baseRend );
+        rollUpButton->paint( baseRend );
         buttonBufRendered = true;
     }
 

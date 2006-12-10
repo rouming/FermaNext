@@ -8,9 +8,11 @@
  * Color Control Button
  *****************************************************************************/
 
-ColorControlButton::ColorControlButton ( QPoint pos, int w, int h ) :
-    AggButton( pos, w, h )
-{}
+ColorControlButton::ColorControlButton ()
+{
+    setWidth( 15 );
+    setHeight( 15 );
+}
 
 void ColorControlButton::paint ( base_renderer& baseRend, 
                                  bool plusButton ) const
@@ -82,14 +84,16 @@ ColorRangeControl::ColorRangeControl ( QWidget* parent ) :
     maxStress( 0 ),
     minStress( 0 ),
     levelsNumb( 10 ),
-    plusButton( new ColorControlButton( QPoint( width() - 18, 20 ), 
-                                        15, 15 ) ),
-    minusButton( new ColorControlButton( QPoint( width() - 18, 
-                                         height() - 20 ), 15, 15 ) ),
+    plusButton( new ColorControlButton() ),
+    minusButton( new ColorControlButton() ),
     pressedButton( 0 ),
     mousePressed( false )
 {
     setMouseTracking( true );
+
+    plusButton->setPosition( QPoint( width() - 18, 20 ) );
+    minusButton->setPosition( QPoint( width() - 18, height() - 20 ) );
+
     QObject::connect( plusButton, SIGNAL( onChangeButtonState() ),
                                   SLOT( update() ) );
 

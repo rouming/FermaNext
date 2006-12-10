@@ -11,10 +11,7 @@ class AggTrussWindowButton : public AggButton
 public:
     AggTrussWindowButton ( const QPoint& pos, const QString& fname );
     virtual ~AggTrussWindowButton ();
-    virtual void paint ( ren_dynarow& baseRend, 
-                         scanline_rasterizer& ras,
-                         agg::scanline_p8& sl, 
-                         solidRenderer& solidRend  ) const;
+    virtual void paint ( ren_dynarow& baseRend ) const;
 
 protected slots:
     void setButtonHighlightType ( bool );

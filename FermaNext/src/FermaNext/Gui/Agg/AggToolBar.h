@@ -2,27 +2,21 @@
 #ifndef AGGTOOLBAR_H
 #define AGGTOOLBAR_H
 
-#include <QList>
-
 #include "AggButton.h"
-#include "AggSubsidiary.h"
 #include "AggPaintThread.h"
+
+class AggComboBox;
+class QBasicTimer;
 
 /*****************************************************************************/
 
 class AggToolBarButton : public AggButton
 {
 public:
-    AggToolBarButton ( const QString& fname, const QString& label, 
-                       QPoint leftTopPos, int width, int height );
+    AggToolBarButton ( const QString& iconPath );
     virtual ~AggToolBarButton ();
 
-    virtual void paint ( ren_dynarow& baseRend, 
-                         scanline_rasterizer& ras,
-                         agg::scanline_p8& sl, 
-                         solidRenderer& solidRend,
-                         agg::trans_affine& mtx, 
-                         double scaleX, double scaleY  ) const;
+    virtual void paint ( ren_dynarow& baseRend ) const;
 
 private:
     mutable pathRenderer pathRend;
@@ -31,90 +25,139 @@ private:
 
 /*****************************************************************************/
 
+class AggToolBarHideButton : public AggButton
+{
+public:
+    AggToolBarHideButton ();
+    virtual ~AggToolBarHideButton ();
+
+    virtual void paint ( ren_dynarow& baseRend ) const;
+    
+private:
+    color_type fillCol, lineCol, highlightFill;
+};
+
+/*****************************************************************************/
+
 class AggToolBar : public QObject
 {
     Q_OBJECT
 public:
-    AggToolBar ( QPoint pos, int bordLeft, int bordRight, int bordTop, 
-                 int bordBottom, int separation_ );
+    AggToolBar ( QWidget* parentWidget );
     virtual ~AggToolBar ();
+    
+    void addButton ( AggButton& );
+    void removeButton ( AggButton& );
+    void removeButton ( int indx );
 
-    virtual AggToolBarButton& addButton ( const QString& fname, 
-                                          const QString& label, 
-                                          QPoint leftTopPos, 
-                                          uint width, uint height, 
-                                          QWidget* widget, 
-                                          const char* signal, 
-                                          const char* slot );
-    virtual void removeButton ( AggToolBarButton& );
-    virtual void removeButton ( int indx );
-    virtual AggToolBarButton* getButton ( int indx ) const;
-    virtual AggToolBarButton* getButton ( const QString& label ) const;
-    virtual void clearToolBar ();
+    AggButton* getButton ( int indx ) const;
+    AggButton* getButton ( int x, int y ) const;
 
-    void changeCenterPosition ( QPoint );
+    void addComboBox ( AggComboBox& );
+    AggComboBox* getComboBox ( int ) const;
 
-    virtual void setButtonSeparation ( int );
-    virtual int getButtonSeparation () const;
+    int getWidth () const;
+    int getHeight () const;
 
-    virtual void setBorderLeft ( int width );
-    virtual int getBorderLeft () const;
+    QPoint getPosition () const;
+    void setPosition ( QPoint );
 
-    virtual void setBorderRight ( int width );
-    virtual int getBorderRight () const;
+    bool isVisible () const;
+    void setVisible ( bool );
 
-    virtual void setBorderBottom ( int width );
-    virtual int getBorderBottom () const;
+    bool isEnabled () const;
+    void setEnabled ( bool );
 
-    virtual void setBorderTop ( int width );
-    virtual int getBorderTop () const;
+    bool isRendered () const;
 
-    virtual int getWidth () const;
-    virtual int getHeight () const;
+    bool inToolBarRect ( int x, int y, bool bordCheck = false ) const;
 
-    virtual bool isHinted () const;
-    virtual void setHinted ( bool );
+    QWidget* parentWidget () const;
+  
+    virtual void mouseMove ( int x, int y );
+    virtual void mousePress ( int x, int y );
+    virtual void mouseRelease ( int x, int y );
+    
+    virtual void paint ( base_renderer &baseRenderer ) const;
 
-    virtual bool isVisible () const;
-    virtual void setVisible ( bool );
-    virtual bool isRendered () const;
+protected:
+    typedef QList<AggButton*> ButtonList;
+    typedef ButtonList::Iterator ButtonListIter;
+    typedef ButtonList::ConstIterator ButtonListConstIter;
+    typedef QList<AggComboBox*> ComboBoxList;
 
-    virtual void paint ( base_renderer &baseRenderer ) const = 0;
+protected:
+    void resize ( int, int );
 
-signals:
-    void onRenderingStatusCleared ();
-    void onChangeToolBarState ();
+    QPoint fromGlobalPos ( int, int ) const;
+    QPoint fromLocalPos (int, int ) const;
+
+    ButtonList getButtonList () const;
+
+    virtual void timerEvent ( QTimerEvent* );
 
 protected slots:
     void releaseButtons ();
+    void removeButtonHighlight ();
+
+    void setToolBarHinted ();
+    void clearButtonHint ();
+
     void clearToolBarRenderedFlag ();
 
-protected:
-    typedef QList<AggToolBarButton*> ButtonList;
-    typedef ButtonList::Iterator ButtonListIter;
-    typedef ButtonList::ConstIterator ButtonListConstIter;
+    void hideToolBar ();
+    void showToolBar ();
 
-    virtual void clean ();
+    void updateToolBarGeometry ();
 
-    virtual QPoint getPosition () const;
-    virtual void setPosition ( QPoint );
+private:
+    void clean ();
+    void drawButtons ( ren_dynarow& baseRend ) const;
 
-    virtual ButtonList getButtonList () const;
-
-    virtual void removeButtonHighlight ();
-    virtual int findMaxButtonHeight () const;
-    virtual rbuf_dynarow& getRenderingBuffer () const;
-    virtual void setRendered ( bool ) const;
+signals:
+    void onRenderingStatusCleared ();
+    void onHintShowsUp ( const QString& hint, const QPoint pos, bool smooth );
+    void onHintHides ( bool smooth );
+    void onAnimationPlays ( bool );
 
 private:
     ButtonList buttons;
-    // tool bar main geometry
-    QPoint toolBarLeftTopPos, centerPos;
-    int borderLeft, borderRight, borderTop, borderBottom, separation; 
-    uint toolBarWidth, toolBarHeight;
+    ComboBoxList comboBoxes;
+
     mutable rbuf_dynarow* toolBarBuf;
-    mutable bool renderedFlag;
-    bool visible, hinted;
+
+    // parent widget
+    QWidget* designerWidget;
+    
+    // current left top position of the status tip
+    QPoint hintCurrentPos;
+
+    AggButton* currentHintedButton;
+
+    AggToolBarHideButton* hideButton;
+
+    // timer fot the tool tips
+    QTimer *hintTimer;
+    
+    // tool bar hide animation timer
+    QBasicTimer *animTimer;
+    
+    // current number of visible pixels of the tool bar
+    int pixNumb;
+
+    // global position of the tool bar left top corner   
+    QPoint toolBarLeftTopPos;
+
+    // tool bar geometry
+    int toolBarWidth, toolBarHeight;
+    int borderLeft, borderRight, borderTop, borderBottom; 
+    int separator;
+    int cornerRadius; 
+    
+    // tool bar flags
+    mutable bool rendered;
+    bool visible, enabled;
+    bool toolBarIsHinted;
 };
 
 #endif //AGGTOOLBAR_H

@@ -17,7 +17,7 @@ typedef agg::renderer_primitives<base_renderer> PrimRenderer;
 class ColorControlButton : public AggButton
 {
 public:
-    ColorControlButton ( QPoint, int, int );
+    ColorControlButton ();
     void paint ( base_renderer&, bool ) const;
 };
 

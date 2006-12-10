@@ -7,17 +7,18 @@
 #include <QSize>
 #include <QObject>
 
+#include "AggSubsidiary.h"
+
 class AggButton : public QObject
 {
     Q_OBJECT
 public:
-    AggButton ( const QString&, const QPoint& leftTopPos, 
-                int width, int height );
-    AggButton ( QPoint leftTopPos, int width, int height );
+    AggButton ( const QString& );
+    AggButton ();
     virtual ~AggButton ();
 
-    virtual const QPoint& getPosition () const;
-    virtual void setPosition ( const QPoint& newPos );
+    virtual QPoint getPosition () const;
+    virtual void setPosition ( QPoint newPos );
 
     virtual int getWidth () const;
     virtual void setWidth ( int w );
@@ -25,8 +26,8 @@ public:
     virtual int getHeight () const;
     virtual void setHeight ( int h );
 
-    virtual const QString& getLabel () const;
-    virtual void setLabel ( const QString& );
+    virtual void setText ( const QString& );
+    virtual QString text () const;
 
     virtual const QString& getHint () const;    
     virtual void setHint ( const QString& );
@@ -42,6 +43,8 @@ public:
 
     virtual bool inButtonRect ( int x, int y ) const;
 
+    virtual void paint ( ren_dynarow& baseRend ) const;
+
 signals:
     void onButtonPress();
     void onButtonRelease();
@@ -56,7 +59,7 @@ private:
     bool pressed, enabled, highlighted;
     // leftTopPos - button position in inner dynarow buffer coords
     QPoint leftTopPos;
-    QString label, hint;
+    QString buttonText, hint;
 };
 
 #endif //AGGBUTTON_H

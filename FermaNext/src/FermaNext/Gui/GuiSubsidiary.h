@@ -16,6 +16,21 @@ class TrussMaterialLibrary;
 
 /*****************************************************************************/
 
+class MaterialDataId
+{
+public:
+	enum MaterialItemData
+	{
+		Name =		        Qt::DisplayRole,
+		Elasticity =		Qt::UserRole,
+		WorkingStress =	    Qt::UserRole + 1,
+		Density =		    Qt::UserRole + 2,
+		Uuid =		        Qt::UserRole + 3,
+	};
+};
+
+/*****************************************************************************/
+
 class MaterialComboBox : public QComboBox
 {
     Q_OBJECT
@@ -23,13 +38,14 @@ public:
     MaterialComboBox ( QWidget* parent = 0, 
                        const TrussMaterialLibrary* mLib = 0 );
     const TrussMaterialLibrary& getMaterialLibrary () const;
+    const TrussMaterial* getMaterialByIndex ( int ) const;
     const TrussMaterial* getCurrentMaterial () const;
+    int getMaterialIndex ( const TrussMaterial& ) const;
     void clearMaterialLibrary ();
 
 public slots:
     void setMaterialLibrary ( const TrussMaterialLibrary& );
     void setCurrentMaterial ( const TrussMaterial& );
-    void setCurrentMaterial ( const QString& );
 
 protected:
     void setArgList ();
@@ -44,6 +60,23 @@ signals:
 
 private:
     const TrussMaterialLibrary* materialLib;
+};
+
+/*****************************************************************************/
+
+class MaterialModel : public QAbstractTableModel
+{
+public:
+	MaterialModel ( const TrussMaterialLibrary& );	
+ 
+	int rowCount ( const QModelIndex& ) const;
+	int columnCount ( const QModelIndex& ) const;
+	QVariant data ( const class QModelIndex &, int ) const;
+	void synchronize ();
+	void reset ();
+	
+protected:
+	const TrussMaterialLibrary* materialLib;
 };
 
 /*****************************************************************************/

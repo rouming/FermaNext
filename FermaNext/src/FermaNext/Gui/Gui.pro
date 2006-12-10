@@ -40,8 +40,10 @@ SOURCES = \
           WindowListBox.cpp \
           \
           Agg/AggButton.cpp \
+          Agg/AggComboBox.cpp \
           Agg/AggPaintThread.cpp \
           Agg/AggPopupHint.cpp \
+          Agg/AggPopupMenu.cpp \
           Agg/AggSubsidiary.cpp \
           Agg/AggToolBar.cpp \
           Agg/AggTrussToolBar.cpp \
@@ -69,8 +71,10 @@ HEADERS = \
           WindowListBox.h \
           \
           Agg/AggButton.h \
+          Agg/AggComboBox.h \
           Agg/AggPaintThread.h \
           Agg/AggPopupHint.h \
+          Agg/AggPopupMenu.h \
           Agg/AggSubsidiary.h \
           Agg/AggToolBar.h \
           Agg/AggTrussToolBar.h \

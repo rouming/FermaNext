@@ -46,7 +46,8 @@ const QString fermaTitle( QObject::tr( "Educational CAD System 'Ferma'" ) );
 FermaNextMainWindow::FermaNextMainWindow ( FermaNextWorkspace& wsp ) :
     workspace(wsp),
     pluginsMenu(0),
-    pluginsSigMapper( new QSignalMapper(this) )
+    pluginsSigMapper( new QSignalMapper(this) ),
+    materialEditorStartPage( QString() )
 {     
     init();
 
@@ -101,17 +102,6 @@ void FermaNextMainWindow::init ()
                 SIGNAL(calculateTrussUnit(const TrussUnitWindow&)) );
 
     projectsDockWidget->setWidget( projectToolBox );    
-
-    materialEditor = new TrussMaterialEditor( this );
-
-    connect( &workspace, SIGNAL(onProjectCreate(FermaNextProject&)),
-             materialEditor, SLOT(addProjectItem(FermaNextProject&)) );
-
-    connect( &workspace, SIGNAL(onBeforeProjectRemove(FermaNextProject&)),
-             materialEditor, SLOT(removeProjectItem(FermaNextProject&)) );
-
-    connect( &workspace, SIGNAL(onProjectActivated(FermaNextProject&)),
-             materialEditor, SLOT(setCurrentProjectItem(FermaNextProject&)) );
 
     // Clear and init plugins menu only from main event loop
     connect( this, SIGNAL(reloadPluginsFromMainEventLoop()),
@@ -292,7 +282,7 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
                             SLOT(updateStatusBar()) );
     connect( &designerWidget, SIGNAL(onHintChange(const QString&)),
                               SLOT(setStatusBarHint(const QString&)) );
-    
+
     TrussUnitWindowManager& mng = prj.getTrussUnitWindowManager();
     connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
              geometryTabWidget, 
@@ -1215,7 +1205,18 @@ void FermaNextMainWindow::editSelectAll ()
 
 void FermaNextMainWindow::editMaterials ()
 {
+    TrussMaterialEditor* materialEditor = 
+        new TrussMaterialEditor( materialEditorStartPage, this );
+    FermaNextProject* currProject = workspace.currentActivatedProject();
+
+    foreach ( FermaNextProject* project, workspace.getProjectList() )
+        if ( project == currProject )
+            materialEditor->addProject( *project, true );
+        else
+            materialEditor->addProject( *project, false );
+
     materialEditor->exec();
+
 }
 
 void FermaNextMainWindow::editPreferences ()

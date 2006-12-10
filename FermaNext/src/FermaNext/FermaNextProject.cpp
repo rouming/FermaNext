@@ -5,10 +5,11 @@
 #include <QVBoxLayout>
 #include <QFrame>
 
+#include "AggTrussToolBar.h"
 #include "FermaNextProject.h"
+#include "FermaNextWorkspace.h"
 #include "Global.h"
 #include "TrussResultsManager.h"
-#include "FermaNextWorkspace.h"
 
 /*****************************************************************************
  * FermaNext Project
@@ -59,6 +60,8 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
     connect( trussWindowManager, 
              SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
              designerWidget, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
+
+    designerWidget->getToolBar().setMaterialLibrary( *materialLibrary );
 }
 
 FermaNextProject::~FermaNextProject ()
