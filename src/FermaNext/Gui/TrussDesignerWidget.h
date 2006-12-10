@@ -94,9 +94,10 @@ public:
     // Returns window stack.
     virtual WindowList getTrussUnitWindowList () const;
 
+    virtual AggTrussToolBar& getToolBar () const;
+
 protected:
     virtual void clearTrussUnitWindows ();
-    virtual void initToolBar ();    
 
     virtual void clearWindowFocus ();
     virtual TrussUnitWindow* findWindowByWidgetPos ( int x, int y );

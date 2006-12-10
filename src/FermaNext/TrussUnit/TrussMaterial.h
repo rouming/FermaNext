@@ -77,43 +77,26 @@ public:
     TrussMaterialLibrary ();
     virtual ~TrussMaterialLibrary ();
 
-    virtual TrussMaterial& createMaterial ( const QString&, 
-                                            double, double, double ); 
-                                           /*throw (WrongMaterialNameException, 
-                                            WrongElasticityModuleException,
-                                            WrongWorkingStressException,
-                                            WrongDensityException)*/
+    virtual TrussMaterial& createMaterial ( const QString& name = "Unnamed material", 
+                                            double ws = 0.0, 
+                                            double em = 0.0, 
+                                            double d = 0.0 ); 
 
     // XML serialization
     virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
     virtual QDomElement saveToXML ( QDomDocument& );
 
     virtual bool removeMaterial ( TrussMaterial& );
-    virtual bool removeMaterial ( const QString& name );
+    virtual bool removeMaterial ( const QString& uuid );
     virtual bool removeMaterial ( int indx );
     
     virtual TrussMaterial* getMaterial ( int indx ) const;
-    virtual TrussMaterial* getMaterial ( const QString& name ) const;
+    virtual TrussMaterial* getMaterial ( const QString& uuid ) const;
 
     virtual int countMaterials () const;
-
-    virtual const TrussMaterialUUIDMap& getMaterialUUIDMap () const;
-
-protected:
     virtual void clean ();
 
-protected slots:
-    virtual void checkMaterialName ( const QString& ); 
-    /*throw (WrongMaterialNameException)*/
-
-    virtual void checkElasticityModule ( double );
-    /*throw (WrongElasticityModuleException)*/
-
-    virtual void checkWorkingStress ( double );
-    /*throw (WrongWorkingStressException)*/
-    
-    virtual void checkDensity ( double );
-    /*throw (WrongDensityException)*/
+    virtual const TrussMaterialUUIDMap& getMaterialUUIDMap () const;
 
 signals:
     void onAfterMaterialCreation ( const TrussMaterial& );

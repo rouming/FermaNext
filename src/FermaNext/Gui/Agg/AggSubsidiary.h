@@ -126,6 +126,8 @@ struct arrow
 
 /*****************************************************************************/
 
+QString fitTextToWidth ( QString str, int pixWidth, glyph_gen& glyph );
+
 void drawText ( textRenderer& textRend, const QString& str, 
                 color_type c, const DoublePoint& point );
 
@@ -158,6 +160,7 @@ void drawArrow ( scanline_rasterizer& ras, solidRenderer& solidRend,
 
 void fillColorArray ( color_array_type& colArray, color_type first, 
                       color_type middle, color_type last );
+
 
 void drawOutlineRoundedRect ( ren_dynarow& baseRend,
                               solidRenderer& solidRend, 
@@ -200,6 +203,9 @@ void drawGradientEllipse ( ren_dynarow& baseRend,
                            double x, double y, double radius, 
                            double bound1, double bound2 );
 
+void drawTriangle ( ren_dynarow& baseRend, DoublePoint p1, DoublePoint p2, 
+                    DoublePoint p3, color_type fillCol, color_type lineCol );
+
 void parseSvg ( pathRenderer& pathRend, const char* fname );
 
 void drawSvg ( ren_dynarow& baseRend, scanline_rasterizer& ras, 
@@ -210,5 +216,7 @@ void drawSvg ( ren_dynarow& baseRend, scanline_rasterizer& ras,
 
 void blendBuffer ( base_renderer& baseRenderer, 
                    pixf_dynarow& pixf, QPoint p );
+
+agg::rgba8 aggColor ( uint r, uint g, uint b, uint a = 255 );
 
 #endif //AGGSUBSIDIARY_H
