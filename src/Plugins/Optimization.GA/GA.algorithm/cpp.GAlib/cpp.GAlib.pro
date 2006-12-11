@@ -4,6 +4,8 @@ TARGET = Optimization.GA.GAlib.plg
 LEVEL = ../../../../..
 include($$LEVEL/FermaNext.pri)
 include(../../../../Common/Common.pri)
+include(../../../../FermaNext/Gui/Agg/Agg.pri)
+include(../../../../3rdparty/agg23/agg23.pri)
 include(../../../../FermaNext/TrussUnit/TrussUnit.pri)
 include(../../../../Loaders/NativePluginLoader/NativePluginLoader.pri)
 
@@ -48,7 +50,7 @@ SOURCES += \
            galib/ga/GAListGenome.C \
            galib/ga/GAParameter.C \
            galib/ga/GAPopulation.C \
-           galib/ga/GARealGenome.C \
+#           galib/ga/GARealGenome.C \
            galib/ga/GASStateGA.C \
            galib/ga/GAScaling.C \
            galib/ga/GASelector.C \
