@@ -58,6 +58,20 @@ SOURCES = \
 PRE_TARGETDEPS = JavaBuild
 QMAKE_EXTRA_TARGETS += JavaBuild
 
+# Check 'JAVA_HOME' environment existence
+HAS_JAVA_HOME = TRUE
+JAVA_HOME = $$(JAVA_HOME)
+isEmpty( JAVA_HOME ) {
+    HAS_JAVA_HOME = FALSE
+}
+else {
+    # Check Jni existance
+    !exists( $$(JAVA_HOME)/include/jni.h ) {
+        HAS_JAVA_HOME = FALSE
+    }
+}
+
+# Check 'Apache Ant' existence
 HAS_ANT = TRUE
 ANT = ant
 ant_version = $$system( $$ANT -version )
@@ -81,5 +95,12 @@ isEmpty( ant_version ) {
     }
 }
 
+# JAVA_HOME environment check
+contains( HAS_JAVA_HOME, FALSE ) {
+    error(JAVA_HOME environment is not found or JAVA_HOME/include/jni.h \
+          does not exist)
+}
+
+# 'Apache Ant' check
 contains( HAS_ANT, TRUE): JavaBuild.commands = "$$ANT"
 else: error( "'Apache Ant' is not installed, but should be." )
