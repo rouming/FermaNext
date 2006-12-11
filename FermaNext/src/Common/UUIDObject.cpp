@@ -23,4 +23,19 @@ void UUIDObject::setUUID ( const QString& uuid_ )
     uuid = uuid_;
 }
 
+/*****************************************************************************
+ * StringUUIDObject
+ *****************************************************************************/
+
+StringUUIDObject::StringUUIDObject ( const QString& str ) :
+    dataStr(str)
+{}
+
+const QString& StringUUIDObject::getData () const
+{ return dataStr; }
+
+void StringUUIDObject::setData ( const QString& str )
+{ dataStr = str; }
+
 /*****************************************************************************/
+

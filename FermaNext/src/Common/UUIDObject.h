@@ -32,4 +32,18 @@ private:
     QString uuid;
 };
 
+
+/** Simple string as UUID object. Used for passing string to plugin */
+class StringUUIDObject : public UUIDObject
+{
+public:
+    StringUUIDObject ( const QString& );
+
+    const QString& getData () const;
+    void setData ( const QString& );
+
+private:
+    QString dataStr;
+};
+
 #endif //UUIDOBJECT_H

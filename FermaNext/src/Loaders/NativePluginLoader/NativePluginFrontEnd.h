@@ -40,4 +40,7 @@
       plugin_instance__ = 0; \
     }
 
+/** Easy way to get plugin instance from plugin. */
+#define PLUGIN_INSTANCE plugin_instance__
+
 #endif //PLUGINFRONTEND_H

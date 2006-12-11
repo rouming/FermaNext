@@ -3,6 +3,7 @@
 #define OPTIMIZATION_GA_FITNESS_FUNCTION_NODEPOSITION_H
 
 #include "NativePlugin.h"
+#include "TrussUnit.h"
 
 class GAOptimizationFitnessFunctionNodePosition: public NativePlugin
 {
@@ -10,6 +11,9 @@ public:
     GAOptimizationFitnessFunctionNodePosition ( PluginManager& mng, 
                                                 const QString& path );
     virtual ~GAOptimizationFitnessFunctionNodePosition ();
+
+    /** Changes node position according to GA genome */
+    bool changeNodePosition ( TrussUnit*, StringUUIDObject* ) const;
 
     virtual Plugin::ExecutionResult specificExecute ( 
                               const PluginExecutionParams& params,
