@@ -12,7 +12,6 @@
 #include "WindowListBox.h"
 #include "Global.h"
 #include "TrussUnitActions.h"
-#include "TrussCalcData.h"
 
 /*****************************************************************************
  * Project ToolBox
