@@ -23,6 +23,10 @@ public:
     virtual void tryToAcceptParams ( const PluginExecutionParams& ) const;
     virtual Plugin::DependenceMode dependenceMode () const;
     virtual const QStringList& requiredPluginTypes () const;
+
+private:
+    /** Returns true and fills fw param if can parse execution results */
+    bool getForceWeight ( float& fw, const Plugin::ExecutionResult& );
 };
 
 #endif //OPTIMIZATION_GA_CRITERIA_FORCE_H
