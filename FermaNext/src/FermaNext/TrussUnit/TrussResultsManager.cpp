@@ -61,12 +61,15 @@ bool TrussResultsManager::parseExecutionResults (
     QString trussID = pluginResElem.attribute( "trussUUID" );
 
     WindowList windows = windowMng.getTrussUnitWindowList();
+    bool found = false;
     TrussUnitWindow* w = 0;
     foreach ( w, windows )
-        if ( w->getUUID() == trussID )
+        if ( w->getUUID() == trussID ) {
+            found = true;
             break;
+        }
 
-    if ( ! w ) {
+    if ( ! found ) {
         errMsg = QString( tr("Truss with the given UUID wasn't found") );
         return false;
     }
