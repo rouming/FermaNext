@@ -7,7 +7,6 @@
 #include "Global.h"
 #include "TrussUnitActions.h"
 #include "FermaNextWorkspace.h"
-#include "TrussCalcData.h"
 
 /*****************************************************************************
  * Truss Unit Window Item
