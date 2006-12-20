@@ -46,9 +46,11 @@ bool GAOptimizationFitnessFunctionNodePosition::changeNodePosition (
         return false;
     }
 
-    QDomNodeList genomes = rootElem.elementsByTagName( "GAGenomes" );
+    QDomNodeList genomes = rootElem.elementsByTagName( "GAGenome" );
     if ( genomes.count() == 0 ) {
-        LOG4CXX_WARN( logger, "Genomes list from GA.algorithm is empty." );
+        LOG4CXX_WARN( logger, 
+                      QString("Genomes list from GA.algorithm is empty: %1.").
+                        arg(xmlGenome->getData()).toStdString() );
         return false;
     }
 
@@ -84,16 +86,23 @@ bool GAOptimizationFitnessFunctionNodePosition::changeNodePosition (
             break;
 
 
-        if ( nodes.size() >= nodeIndex )
+        if ( nodeIndex >= nodes.size() )
             break;
 
         const DoublePoint& point = nodes[nodeIndex]->getPoint();
-        
+
+       
         // Set nodes position
-        if ( x ) 
+        if ( x ) {
+            LOG4CXX_DEBUG(logger, 
+                          QString("Set X axis: %1").arg(value).toStdString() );
             nodes[nodeIndex]->setPoint( value, point.getY() );
-        else
+        }
+        else {
+            LOG4CXX_DEBUG(logger, 
+                          QString("Set Y axis: %1").arg(value).toStdString() );
             nodes[nodeIndex]->setPoint( point.getX(), value );
+        }
     }
     return true;
 }
