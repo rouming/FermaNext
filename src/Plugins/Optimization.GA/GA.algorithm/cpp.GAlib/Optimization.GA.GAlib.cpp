@@ -45,6 +45,9 @@ StringUUIDObject genomeToXml( const GARealGenome& g )
 
 float resultToFitness ( const Plugin::ExecutionResult& res )
 {
+    LOG4CXX_DEBUG(logger, QString("resultToFitness: fitness value %1").
+                  arg(res.data).toStdString() );
+
     if ( res.status != Plugin::OkStatus ) {
         LOG4CXX_WARN(logger, "Execution results of fitness plugin have NOT OK"
                      " status." );
@@ -135,8 +138,8 @@ Plugin::ExecutionResult GAOptimization::specificExecute (
     fitnessPlugin = deps.values()[0][0];
 
     // Thinking these MIN and MAX are suitable
-    GARealAlleleSet alleles( -1000, 1000 );
-    GARealGenome genome( 10, alleles, GAOptimizationObjective );
+    GARealAlleleSet alleles( 0, 300 );
+    GARealGenome genome( 2, alleles, GAOptimizationObjective );
 
     GASteadyStateGA ga(genome);
     GASigmaTruncationScaling scale;      

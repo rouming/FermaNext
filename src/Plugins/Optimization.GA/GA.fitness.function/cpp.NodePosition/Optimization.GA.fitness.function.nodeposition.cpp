@@ -77,17 +77,10 @@ bool GAOptimizationFitnessFunctionNodePosition::changeNodePosition (
             return false;
         }
 
-        int nodeIndex = int(i/2);
+        // TODO: CHOOSE NODE INDEX BY WIDGET
+        int nodeIndex = 2;//int(i/2);
         bool x = (i % 2 == 0 ? true : false);
 
-
-        // TODO: CHOOSE NODE INDEX BY WIDGET
-        if ( nodeIndex >= 1 )
-            break;
-
-
-        if ( nodeIndex >= nodes.size() )
-            break;
 
         const DoublePoint& point = nodes[nodeIndex]->getPoint();
 

@@ -22,7 +22,6 @@ class QMenu;
 class QSignalMapper;
 
 class TrussSolutionResults;
-struct PluginInfo;
 
 /*****************************************************************************/
 
@@ -32,6 +31,8 @@ class FermaNextMainWindow : public QMainWindow
 public:
     FermaNextMainWindow ( FermaNextWorkspace& );
     ~FermaNextMainWindow ();
+
+    void pluginWasExecuted ( Plugin*, const Plugin::ExecutionResult& );
 
 public slots:
     void someProjectRemoved ( FermaNextProject& );
@@ -100,7 +101,6 @@ protected slots:
     void editPreferences ();
 
     void showResultsWindow ( const TrussUnitWindow& );
-    void showPluginErrorMessageBox ( const PluginInfo&, const QString& );
 
     void helpContents ();
     void helpAbout ();
@@ -122,10 +122,6 @@ protected slots:
     // Catch designer widget focus change
     void trussWindowLostFocus ( TrussUnitWindow& );
     void trussWindowReceivedFocus ( TrussUnitWindow& );
-
-    void afterPluginWasLoaded ( Plugin& );
-    void beforePluginWasUnloaded ( Plugin& );
-    void pluginWasExecuted ( Plugin&, Plugin::ExecutionResult );
 
 private:
     // Current system workspace
