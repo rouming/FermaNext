@@ -3,6 +3,11 @@
 
 #include "PluginExecutorDialog.h"
 
+// TODO: for now this headers are used for passing execution results to 
+//       result manager. in future should be done in more attractive way.
+#include "FermaNextWorkspace.h"
+#include "FermaNextMainWindow.h"
+
 /*****************************************************************************/
 
 PluginExecutorDialog::PluginExecutorDialog ( PluginManager& mng, QWidget* p ) :
@@ -50,7 +55,12 @@ void PluginExecutorDialog::execute ( Plugin* plg,
 {
     try { 
         plgMng.preparePluginExecutionContext( execTree );
-        plg->execute( params );
+        Plugin::ExecutionResult results = plg->execute( params );
+        
+        // TODO: in future should be replaced by attractive call of 
+        //       results manager
+        FermaNextMainWindow* mw = FermaNextWorkspace::workspace().mainWindow();
+        mw->pluginWasExecuted( plg, results );
     }
     catch ( PluginExecutionContext::ContextIsEmptyException& ) {
         QMessageBox::warning( this, tr("Context warning"), 

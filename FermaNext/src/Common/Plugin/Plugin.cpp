@@ -1,4 +1,6 @@
 
+#include <QCoreApplication>
+
 #include "PluginManager.h"
 #include "Plugin.h"
 #include "Log4CXX.h"
@@ -29,6 +31,10 @@ Plugin::ExecutionResult Plugin::execute ( const QList<UUIDObject*>& args )
              WrongExecutionArgsException)*/
 {
     LOG4CXX_DEBUG(logger, "execute");
+
+    // Try to workaround problem of gui hanging while execution
+    // In ultimate future all execution should be done in other thread.
+    QCoreApplication::processEvents();
 
     PluginExecutionContext& context = plgMng.currentExecutionContext();
     // Step to next context
