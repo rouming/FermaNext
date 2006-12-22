@@ -171,7 +171,6 @@ int HtmlTable::getHeight () const
 {
     int height = 0;
     QDomNodeList rows = childTable.elementsByTagName( "tr" );
-    int num = rows.count();
     for ( int i = 0; i < rows.count(); ++i ) {
         QDomNode rowNode = rows.item( i );
         if ( ! rowNode.isElement() )

@@ -152,7 +152,7 @@ int MaterialModel::rowCount ( const QModelIndex& idx ) const
 	return 0;
 }
 
-int MaterialModel::columnCount(const QModelIndex& idx) const
+int MaterialModel::columnCount ( const QModelIndex& ) const
 {
 	return 1;
 }

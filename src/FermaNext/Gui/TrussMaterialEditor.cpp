@@ -262,6 +262,9 @@ bool MaterialTreeWidget::dropMimeData ( QTreeWidgetItem* parent, int index,
                                         const QMimeData* data, 
                                         Qt::DropAction action )
 {
+    Q_UNUSED(index);
+    Q_UNUSED(action);
+
     QDomDocument doc;
     if ( ! doc.setContent( data->text() ) )
         return false;
@@ -393,7 +396,6 @@ void MaterialEditWidget::init ()
 
     // Init empty page
     QWidget* emptyPage = new QWidget;
-    QVBoxLayout* emptyPageLayout = new QVBoxLayout( emptyPage );
     widgetStack->addWidget( emptyPage );
 
     QVBoxLayout* mainLayout = new QVBoxLayout( this );

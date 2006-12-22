@@ -113,9 +113,6 @@ private:
 
     textFont actionFont;
 
-    // max width
-    int widthLimit;
-
     // menu geometry
     int separatorHeight, 
         topIndent, bottomIndent, leftIndent, rightIndent;
@@ -124,8 +121,11 @@ private:
     int actionHeight, actionWidth;
 
     // selection geometry
-    int selectionHeight, selectionWidth;
-    int selectionVerIndent, selectionHorIndent;
+    int selectionWidth, selectionHeight;
+    int selectionHorIndent, selectionVerIndent;
+
+    // max width
+    int widthLimit;
  
     // menu flags
     mutable bool rendered;

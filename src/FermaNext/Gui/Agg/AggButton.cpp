@@ -7,11 +7,11 @@
 
 AggButton::AggButton ( const QString& text ) :
     width(0), height(0),
-    buttonText( text ),
     pressed(false),
     enabled(true),
     highlighted(false),
-    leftTopPos(QPoint(0,0))
+    leftTopPos(QPoint(0,0)),
+    buttonText( text )
 {}
 
 AggButton::AggButton () :
