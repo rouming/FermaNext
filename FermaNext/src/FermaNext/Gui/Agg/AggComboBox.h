@@ -1,6 +1,6 @@
 
-#ifndef AGGCOMBOBOX
-#define AGGCOMBOBOX
+#ifndef AGGCOMBOBOX_H
+#define AGGCOMBOBOX_H
 
 #include <QMap>
 #include <QVariant>
@@ -105,4 +105,4 @@ private:
     int currIdx;
 };
 
-#endif //AGGCOMBOBOX
+#endif //AGGCOMBOBOX_H

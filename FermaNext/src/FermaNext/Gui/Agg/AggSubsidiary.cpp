@@ -92,7 +92,7 @@ template<class Source> struct DashStroke
 QString fitTextToWidth ( QString str, int pixWidth, glyph_gen& glyph )
 {
     int strLength = str.length();
-    for ( uint i = 0; i < strLength; ++i )
+    for ( int i = 0; i < strLength; ++i )
     {
         int textLength = (int)glyph.width( str.toAscii().data() ); 
 

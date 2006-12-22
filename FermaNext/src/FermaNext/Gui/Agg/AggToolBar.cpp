@@ -120,11 +120,11 @@ void AggToolBarHideButton::paint ( ren_dynarow& baseRend ) const
 
 AggToolBar::AggToolBar( QWidget* parentWidget ) :
     toolBarBuf( new rbuf_dynarow( 0, 0 ) ),
+    designerWidget( parentWidget ),
     currentHintedButton( 0 ),
     hideButton( 0 ),
     hintTimer( new QTimer( this ) ),
     animTimer( new QBasicTimer ),
-    designerWidget( parentWidget ),
     pixNumb( 0 ),
     toolBarWidth( 0 ),
     toolBarHeight( 0 ),
@@ -132,8 +132,8 @@ AggToolBar::AggToolBar( QWidget* parentWidget ) :
     borderRight( 15 ),
     borderTop( 8 ),
     borderBottom( 5 ),
-    cornerRadius( 30 ),
     separator( 5 ),
+    cornerRadius( 30 ),
     rendered( false ),
     visible( true ),
     enabled( true ),
@@ -349,8 +349,6 @@ void AggToolBar::removeButton ( AggButton& btn )
 {
     if ( buttons.empty() )
         return;
-
-    int delWidth = 0;
 
     ButtonListIter iter = std::find( buttons.begin(),
                                      buttons.end(),

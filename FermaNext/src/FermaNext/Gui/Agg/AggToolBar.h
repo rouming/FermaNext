@@ -137,10 +137,10 @@ private:
     AggToolBarHideButton* hideButton;
 
     // timer fot the tool tips
-    QTimer *hintTimer;
+    QTimer* hintTimer;
     
     // tool bar hide animation timer
-    QBasicTimer *animTimer;
+    QBasicTimer* animTimer;
     
     // current number of visible pixels of the tool bar
     int pixNumb;

@@ -32,6 +32,7 @@ isEmpty(DISABLE_LOGGING): DISABLE_LOGGING = $$(DISABLE_LOGGING)
 
      # Debug libs
      CONFIG(debug, debug|release) {
+        LIBPATH += $$LOG4CXXDIR/build/debug/static
         LIBPATH += $$LOG4CXXDIR/build/debug/shared
    
         win32:LIBS += log4cxxd.lib aprutil-1d.lib apr-1d.lib  
@@ -40,10 +41,9 @@ isEmpty(DISABLE_LOGGING): DISABLE_LOGGING = $$(DISABLE_LOGGING)
 
      # Release libs
      CONFIG(release, debug|release) {
+        LIBPATH += $$LOG4CXXDIR/build/release/static
         LIBPATH += $$LOG4CXXDIR/build/release/shared
-   
-        win32:LIBS += log4cxx.lib aprutil-1.lib apr-1.lib  
-        unix:LIBS += -llog4cxx -laprutil-1 -lapr-1
+        LIBS += -llog4cxx -laprutil-1 -lapr-1
      }
 }
 

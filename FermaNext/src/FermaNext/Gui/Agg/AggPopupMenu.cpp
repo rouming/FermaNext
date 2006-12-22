@@ -123,6 +123,7 @@ void AggPopupMenu::updateGeometry ()
     //glyph_gen glyph( actionFont );
 
     foreach ( AggMenuAction* action, actionList ) {
+        Q_UNUSED(action);
         //int textLenght = (int)glyph.width( action->text().toAscii().data() );
         //if ( textLenght > selectionWidth )
         //    selectionWidth = textLenght;
@@ -371,9 +372,9 @@ void AggPopupMenu::drawAction ( ren_dynarow& baseRend,
         QPoint selectionRightBottom( selectionLeftTop.x() + selectionWidth,
                                      selectionLeftTop.y() + selectionHeight );
 
-        color_type firstColor( aggColor( 255, 255, 255, 0.7 ) );
-        color_type middleColor( aggColor( 210, 220, 230, 0.8 ) );
-        color_type lastColor( aggColor( 255, 255, 255, 0.7 ) );
+        color_type firstColor( aggColor( 255, 255, 255, 70 ) );
+        color_type middleColor( aggColor( 210, 220, 230, 80 ) );
+        color_type lastColor( aggColor( 255, 255, 255, 70 ) );
 
         color_array_type gradColors;
 

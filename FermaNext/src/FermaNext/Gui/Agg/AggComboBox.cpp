@@ -149,7 +149,7 @@ void AggComboBoxButton::paint ( base_renderer& baseRenderer ) const
         color_type lastColor( aggColor( 155, 155, 175, 155 ) );
 
         double lineWidth = 0.8;
-        int pushButtonHeight = getHeight() - lineWidth * 2;
+        int pushButtonHeight = int(getHeight() - lineWidth * 2);
         double rad = 3;
         DoublePoint p1( lineWidth, lineWidth ),
                     p2( getWidth() - lineWidth, getHeight() - lineWidth );
@@ -179,7 +179,6 @@ void AggComboBoxButton::paint ( base_renderer& baseRenderer ) const
         int widthLim = getWidth() - 5 - pushButtonHeight;
         QString str = fitTextToWidth( text(), widthLim, glyph );
 
-        int yIndent = getHeight() - ( getHeight() - glyph.height() ) / 2;
         DoublePoint textPos( 4, glyph.height() );
         drawText( textRend, str, agg::rgba( 0, 0, 0 ), textPos );
 
