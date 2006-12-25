@@ -67,9 +67,9 @@ else : warning( You should have 'Apache Ant' to build Java plugin loader. \
 SUBDIRS += \
           src/Plugins/old_SimpleCalc \
           # GA optimization
-          src\Plugins\Optimization.GA\GA.algorithm\cpp.GAlib \
-          src\Plugins\Optimization.GA\GA.fitness.function\cpp.NodePosition \
-          src\Plugins\Optimization.GA\GA.criteria\cpp.Force
+          src/Plugins/Optimization.GA/GA.algorithm/cpp.GAlib \
+          src/Plugins/Optimization.GA/GA.fitness.function/cpp.NodePosition \
+          src/Plugins/Optimization.GA/GA.criteria/cpp.Force
 
 # Generates commands for Win32 to generate VS project files
 win32 {
@@ -77,7 +77,7 @@ win32 {
   VCPROJ_CMDS =
   for(sub, MY_SUBDIRS) {
     sub_pro = $$sub/$${basename(sub)}.pro
-    VCPROJ_CMDS += pushd "$$sub" && qmake -tp vc && popd &&
+    VCPROJ_CMDS += pushd \"$$sub\" && qmake -tp vc && popd &&
   }
   # Dummy last command
   VCPROJ_CMDS += echo off
