@@ -223,9 +223,9 @@ AggComboBox::AggComboBox ( QWidget& parentWidget ) :
 
 AggComboBox::~AggComboBox ()
 {
+    clear();
     delete menu;
     delete button;
-    clear();
 }
 
 int AggComboBox::width () const
