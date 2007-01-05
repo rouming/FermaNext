@@ -61,18 +61,22 @@ class TrussUnit : public Truss<TrussNode, TrussPivot>,
 {
     Q_OBJECT
 public:        
-    TrussUnit ( const QString& name, ObjectStateManager* mng );
+    TrussUnit ( const QString& name, 
+                ObjectStateManager* mng,
+                const TrussMaterialLibrary& mLib );
     virtual ~TrussUnit ();
 
     // XML serialization
     virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
     virtual QDomElement saveToXML ( QDomDocument& );
-    virtual void setMaterialUUIDMap ( const QMap<QString, TrussMaterial*>& );
 
     const QString& getTrussName () const;
 
     virtual bool isCalculated () const;
     virtual void setCalculatedStatus ( bool );
+
+    virtual bool isElementPositionCheckEnabled () const;
+    virtual void enableElementPositionCheck ( bool );
 
     virtual void setFocusOnNode ( TrussNode* selectedNode );
     virtual void setFocusOnPivot ( TrussPivot* selectedPivot );
@@ -148,6 +152,7 @@ protected slots:
 signals:
     void onTrussNameChange ( const QString& );
     void onCalculationStatusChange ( bool );
+    void onElementPositionCheckFlagChange ( bool );
 // Paintable signals
     void onVisibleChange ( bool );
     void onHighlightChange ( bool );
@@ -201,11 +206,11 @@ protected:
 
 private:
     mutable bool trussRendered, calculated;
+    bool elementPositionCheck;
     QPoint leftTopPos;
     QSize pixAreaSize;
     QString trussName;
     TrussNode *frontNode, *firstFront, *lastFront;
-    const QMap<QString, TrussMaterial*> *materialUUIDMap;
 };
 
 /*****************************************************************************/
@@ -249,13 +254,13 @@ class TrussPivot : public Pivot<TrussNode>,
 {
     Q_OBJECT
 public:
-    TrussPivot ( ObjectStateManager* );
-    TrussPivot ( TrussNode&, TrussNode&, ObjectStateManager* );
+    TrussPivot ( ObjectStateManager*, const TrussMaterialLibrary& );
+    TrussPivot ( TrussNode&, TrussNode&, ObjectStateManager*,
+                 const TrussMaterialLibrary& );
 
     // XML serialization
     virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
     virtual QDomElement saveToXML ( QDomDocument& );
-    virtual void setMaterialUUIDMap ( const QMap<QString, TrussMaterial*>& );
 
     bool getDrawingStatus () const;
     void setDrawingStatus ( bool status );
@@ -276,7 +281,6 @@ public slots:
     void removePivotHighlight ();
 
 private:
-    const QMap<QString, TrussMaterial*> *materialUUIDMap;
     bool drawingStatus;
 };
 

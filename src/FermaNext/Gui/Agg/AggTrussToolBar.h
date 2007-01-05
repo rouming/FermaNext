@@ -14,15 +14,14 @@ class AggMaterialComboBox : public AggComboBox
     Q_OBJECT
 public:
     AggMaterialComboBox ( QWidget& parentWidget,
-                          const TrussMaterialLibrary* mLib = 0 );
+                          TrussMaterialLibrary* mLib = 0 );
 
     const TrussMaterialLibrary& getMaterialLibrary () const;
     const TrussMaterial* getMaterialByIndex ( int ) const;
-    void setCurrentMaterial ( const TrussMaterial& );
     const TrussMaterial* getCurrentMaterial () const;
     int getMaterialIndex ( const TrussMaterial& ) const;
     
-    void setMaterialLibrary ( const TrussMaterialLibrary& );
+    void setMaterialLibrary ( TrussMaterialLibrary& );
     void clearMaterialLibrary ();
 
 protected:
@@ -32,9 +31,10 @@ protected slots:
     void addMaterialItem ( const TrussMaterial& );
     void removeMaterialItem ( const TrussMaterial& );
     void updateMaterialItemName ( const QString& );
+    void setCurrentMaterial ( int idx );
 
 private:
-    const TrussMaterialLibrary* materialLib;
+    TrussMaterialLibrary* materialLib;
 };
 
 /*****************************************************************************/
@@ -46,7 +46,9 @@ public:
     AggTrussToolBar ( TrussDesignerWidget* );
     virtual ~AggTrussToolBar ();
 
-    void setMaterialLibrary ( const TrussMaterialLibrary& );
+    const TrussMaterial* getCurrentMaterial () const;
+    
+    void setMaterialLibrary ( TrussMaterialLibrary& );
 
 protected:
     void initButtons ();

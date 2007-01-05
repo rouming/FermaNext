@@ -6,7 +6,9 @@
  *****************************************************************************/
 
 AggTrussWindowButton::AggTrussWindowButton ( const QPoint& pos, 
-                                             const QString& fname ) :
+                                             const QString& fname,
+                                             WindowButtonType::Type type ) :
+    buttonType( type ),
     windowHighlighted( true ),
     edgingCol( agg::rgba( 0, 0, 0, 0.7 ) ),
     normalCol( agg::rgba( 20, 60, 80, 0.5 ) ),
@@ -16,8 +18,8 @@ AggTrussWindowButton::AggTrussWindowButton ( const QPoint& pos,
 {
     parseSvg( pathRend, fname.toLocal8Bit() );
     setPosition( pos );
-    setWidth( Global::headWidth - 6 );
-    setHeight( Global::headWidth - 6 );
+    setWidth( Global::windowButtonWidth );
+    setHeight( Global::windowButtonHeight );
 }
 
 AggTrussWindowButton::~AggTrussWindowButton ()
@@ -31,6 +33,11 @@ AggTrussWindowButton::~AggTrussWindowButton ()
 void AggTrussWindowButton::setButtonHighlightType ( bool type )
 {
     windowHighlighted = type;
+}
+
+WindowButtonType::Type AggTrussWindowButton::getButtonType () const
+{
+    return buttonType;
 }
 
 void AggTrussWindowButton::paint ( ren_dynarow& baseRend ) const

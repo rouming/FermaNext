@@ -76,6 +76,8 @@ extern const int defaultWidth,
                  resizeLimit,
                  winCornerRadius,
                  resEllRad,
+                 windowButtonWidth,
+                 windowButtonHeight,
                  snapPixels;
 
 extern const bool flipY;

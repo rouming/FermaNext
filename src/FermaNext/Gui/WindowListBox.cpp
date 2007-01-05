@@ -197,7 +197,7 @@ void TrussUnitWindowItem::executePlugin ( Plugin* plugin )
 
 void TrussUnitWindowItem::remove ()
 {
-    if ( QMessageBox::question( 0, tr("Truss unit deleting"),
+    if ( QMessageBox::question( listWidget(), tr("Truss unit deleting"),
                                 tr("Delete truss \"%1\"?").
                                 arg(trussWindow.getTrussName()),
                                 tr("&Yes"), tr("&No"),

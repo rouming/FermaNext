@@ -31,7 +31,8 @@ FermaNextWorkspace::FermaNextWorkspace () :
     pluginMng( fermaConfig ),
     fermaMainWindow(0),
     plgExecutorDialog(0),
-    stackedWidget(0)
+    stackedWidget(0),
+    clipboardObject(0)
 {
     fermaMainWindow = new FermaNextMainWindow( *this );
     stackedWidget = new QStackedWidget( fermaMainWindow );
@@ -42,6 +43,7 @@ FermaNextWorkspace::FermaNextWorkspace () :
 FermaNextWorkspace::~FermaNextWorkspace ()
 {
     quitFermaNextApplication();
+    clearClipboard();
 }
 
 void FermaNextWorkspace::loadFromFile ( const QString& fileName )
@@ -378,6 +380,22 @@ FermaNextMainWindow* FermaNextWorkspace::mainWindow () const
 PluginExecutorDialog* FermaNextWorkspace::pluginExecutor () const
 {
     return plgExecutorDialog;
+}
+
+void FermaNextWorkspace::setClipboardObject ( const QString& xmlStr,
+                                              QStringList materials )
+{
+    clipboardObject = new ClipBoardObject( xmlStr, materials );
+}
+
+const ClipBoardObject* FermaNextWorkspace::getClipboardObject () const
+{
+    return clipboardObject;
+}
+
+void FermaNextWorkspace::clearClipboard ()
+{
+    delete clipboardObject;
 }
 
 /*****************************************************************************/

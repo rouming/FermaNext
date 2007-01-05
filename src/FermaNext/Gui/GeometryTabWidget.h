@@ -161,6 +161,7 @@ protected:
     virtual void fillAreaSizeTab ();
     virtual void saveNodeStateAfterMoving ( TrussNode& node,
                                             const DoublePoint& pos );
+    virtual void updateTrussAreaSpinBoxLimits ();
 
 protected slots:
     virtual void trussUnitWindowWasCreated ( TrussUnitWindow& );
@@ -184,8 +185,7 @@ protected slots:
     virtual void updatePivotState ( int row, int col );
 
     virtual void updateTrussAreaSize ( double );
-    virtual void updateTableTrussAreaSize ( const DoubleSize& );
-    virtual void updateAreaSizeSpinBoxes ();
+    virtual void updateTrussAreaSpinBoxes ( const DoubleSize& );
     
 private:
     TrussUnitWindow *focusWindow;
@@ -196,6 +196,8 @@ private:
     QDoubleSpinBox *xSizeEdit, *ySizeEdit;
     // Undo/Redo
     DoublePoint beforeMovingNodePos;
+
+    bool blockUpdateAreaSignals;
 };
 
 #endif //GEOMETRYTABWIDGET_H

@@ -172,7 +172,8 @@ double TrussMaterial::getDensity () const
  * Truss Material Library
  *****************************************************************************/
 
-TrussMaterialLibrary::TrussMaterialLibrary ()
+TrussMaterialLibrary::TrussMaterialLibrary () :
+    selectedMaterial( 0 )
 {}
 
 TrussMaterialLibrary::~TrussMaterialLibrary ()
@@ -197,10 +198,8 @@ void TrussMaterialLibrary::loadFromXML ( const QDomElement& projElem )
         if ( ! material.isElement() )
             throw LoadException();
         QDomElement materialElem = material.toElement();
-        TrussMaterial& newMaterial = createMaterial( "new", 1, 1, 1 );
-        qWarning("create material with UUID: %s", newMaterial.getUUID().toAscii().data() );
+        TrussMaterial& newMaterial = createMaterial( 0, 0, 0, "" );
         newMaterial.loadFromXML( materialElem );
-        materialUUIDMap[newMaterial.getUUID()] = &newMaterial;
     }
 }
 
@@ -219,17 +218,49 @@ QDomElement TrussMaterialLibrary::saveToXML ( QDomDocument& doc )
     return materialLibElem;
 }
 
-TrussMaterial& TrussMaterialLibrary::createMaterial ( const QString& name, 
-                                                      double ws, 
+TrussMaterial& TrussMaterialLibrary::createMaterial ( double ws, 
                                                       double em,
-                                                      double d )
+                                                      double d,
+                                                      const QString& name )
 {
-    TrussMaterial* material = new TrussMaterial( name, ws, em, d );
+    QString mName = name;
+    if ( mName.isNull() )
+        mName = getDefaultMaterialName( "Unnamed material" );
+
+    TrussMaterial* material = new TrussMaterial( mName, ws, em, d );
     materials.push_back( material );
 
     emit onAfterMaterialCreation( *material );
 
     return *material;
+}
+
+TrussMaterial& TrussMaterialLibrary::createMaterial ( const QString& xmlProps )
+{
+    // Create empty material
+    TrussMaterial& material = createMaterial( 0, 0, 0, "" );
+
+    // Save material UUID 
+    QString mUUID = material.getUUID();
+
+    QDomDocument doc;
+    if ( ! doc.setContent( xmlProps ) )
+        return material;
+
+    QDomNodeList nodeList = doc.elementsByTagName( "TrussMaterial" );
+    if ( nodeList.isEmpty() )
+        return material;
+    
+    QDomElement materialElem = nodeList.at( 0 ).toElement();
+    if ( materialElem.isNull() )
+        return material;
+
+    material.loadFromXML( materialElem );
+
+    // Restore UUID
+    material.setUUID( mUUID );
+
+    return material;
 }
 
 bool TrussMaterialLibrary::removeMaterial ( TrussMaterial& material )
@@ -297,15 +328,101 @@ TrussMaterial* TrussMaterialLibrary::getMaterial ( const QString& uuid ) const
     return 0;
 }
 
+QString TrussMaterialLibrary::getMaterialXml ( const TrussMaterial& material )
+{
+    QDomDocument doc;
+    TrussMaterial& m = const_cast<TrussMaterial&>( material );
+    QDomElement mProps = m.saveToXML( doc );
+    doc.appendChild( mProps );
+    return doc.toString();
+}
+
 int TrussMaterialLibrary::countMaterials () const
 {
     return materials.size();
 }
 
-const QMap<QString, TrussMaterial*>& 
-                            TrussMaterialLibrary::getMaterialUUIDMap () const
+void TrussMaterialLibrary::selectMaterial ( const TrussMaterial& m )
 {
-    return materialUUIDMap;
+    selectedMaterial = &m;
+}
+
+void TrussMaterialLibrary::selectMaterial ( int idx )
+{
+    selectedMaterial = getMaterial( idx );
+}
+
+void TrussMaterialLibrary::selectMaterial ( const QString& uuid )
+{
+    selectedMaterial = getMaterial( uuid );
+}
+
+const TrussMaterial* TrussMaterialLibrary::getSelectedMaterial () const
+{
+    return selectedMaterial;
+}
+
+TrussMaterial* TrussMaterialLibrary::getMaterialWithSameProperties ( 
+                                              const TrussMaterial& m ) const
+{
+    foreach ( TrussMaterial* material, materials )
+        if ( material->getMaterialName() == m.getMaterialName() && 
+             material->getWorkingStress() == m.getWorkingStress() &&
+             material->getElasticityModule() == m.getElasticityModule() &&
+             material->getDensity() == m.getDensity() )
+            return material;  
+    return 0;
+}
+
+TrussMaterial* TrussMaterialLibrary::getMaterialWithSameProperties ( 
+                                          const QString& xmlProps ) const
+{
+    QDomDocument doc;
+    if ( ! doc.setContent( xmlProps ) )
+        return false;
+
+    QDomNodeList nodeList = doc.elementsByTagName( "TrussMaterial" );
+    if ( nodeList.isEmpty() )
+        return false; 
+    
+    QDomElement materialElem = nodeList.at( 0 ).toElement();
+    if ( materialElem.isNull() )
+        return false;
+
+    // Create fake material to compare with the library materials
+    TrussMaterial* fakeMaterial = new TrussMaterial();
+    fakeMaterial->loadFromXML( materialElem );
+
+    TrussMaterial* sameMaterial = getMaterialWithSameProperties( *fakeMaterial );
+
+    delete fakeMaterial;
+
+    return sameMaterial;
+}
+
+QString TrussMaterialLibrary::getDefaultMaterialName ( 
+                                                const QString& nameBasis, 
+                                                uint startIdx /* = 0 */ ) const
+{
+    QString defaultName = nameBasis;
+    foreach ( TrussMaterial* material, materials ) {
+        if ( material->getMaterialName() == defaultName ) {
+            if ( startIdx != 0 ) {
+
+                QString numb = QString::number( startIdx );
+
+                // should remove previous index
+                if ( startIdx > 1 )
+                    defaultName.chop( 3 + numb.size() );
+
+                defaultName = defaultName + " (" + numb + ")";
+            }
+            
+            defaultName = getDefaultMaterialName( defaultName, ++startIdx );
+        }
+    }
+
+    return defaultName;
 }
 
 void TrussMaterialLibrary::clean ()

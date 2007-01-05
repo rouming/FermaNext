@@ -1,4 +1,4 @@
-
+ 
 #ifndef AGGCOMBOBOX_H
 #define AGGCOMBOBOX_H
 
@@ -39,6 +39,9 @@ protected:
 public slots:
     void clearRenderedFlag();
 
+signals:
+    void onShowStatusTip( const QString& );
+
 private:
     rbuf_dynarow* buttonBuf;
     mutable bool rendered;
@@ -70,12 +73,17 @@ public:
     int currentIndex () const;
     QVariant itemData ( int ) const;
 
+    const QString& getStatusTip () const;
+    void setStatusTip ( const QString& );
+
     int width () const;
     int height () const;
 
     void resize ( int, int );
 
     void clear ();
+
+    bool inRect ( int xGlobal, int yGlobal ) const;
 
     virtual void mouseMove ( int xGlobal, int yGlobal );
     virtual void mousePress ( int xGlobal, int yGlobal );
@@ -90,11 +98,12 @@ public slots:
     void setCurrentIndex ( int idx );
 
 protected slots:
-    void showMenu ();
+    void triggerMenuVisibility ();
 
 signals:
     void currentIndexChanged ( int );
     void sizeChanged ();
+    void onShowStatusTip( const QString& );
 
 private:
     QMap<AggMenuAction*, QVariant> dataMap;
@@ -102,6 +111,7 @@ private:
     AggComboBoxButton* button;
     QWidget& designerWidget;
     QPoint leftTopPos;
+    QString statusTip;
     int currIdx;
 };
 

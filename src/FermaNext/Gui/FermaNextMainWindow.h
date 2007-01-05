@@ -4,6 +4,7 @@
 
 #include <QMainWindow>
 #include <QStatusBar>
+#include <QDomElement>
 
 #include "Plugin.h"
 
@@ -75,6 +76,14 @@ protected:
     // Close handler. Calls 'clean' for correct close.
     void closeEvent ( QCloseEvent* );
 
+    bool onCopyTrussUnitWindow ();
+    TrussUnitWindow* onPasteTrussUnitWindow ();
+
+    // When copy truss to another project we need to ensure that all materials
+    // of the copied truss are valid
+    void copyMaterialsForPivot ( QDomElement pivotDomElem, 
+                                 QStringList materialXmls );
+
 protected slots:
     void fileNew ();
     void fileOpen ();
@@ -113,11 +122,13 @@ protected slots:
 	void refreshPluginsActions ();
     // Refresh truss geometry and property windows
     void refreshGeometryAndPropertyWindows ();
+    // Refresh copy-paste actions
+    void refreshCopyPaste ();
 
     // Methods for status bar update
     void updateStatusBar ();
-    void setStatusBarHint ( const QString& );
     void projectModified ();
+    void projectSaved ();
 
     // Catch designer widget focus change
     void trussWindowLostFocus ( TrussUnitWindow& );
@@ -151,6 +162,9 @@ private:
     // Some actions
     QAction* undoAction;
     QAction* redoAction;
+    QAction* copyAction;
+    QAction* cutAction;
+    QAction* pasteAction;
     QAction* saveProjectAction;
     QAction* saveAsProjectAction;
     QAction* saveAllAction;

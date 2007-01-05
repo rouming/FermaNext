@@ -80,6 +80,16 @@ void AggButton::setHint ( const QString& hint_ )
     emit onChangeButtonState();
 }
 
+const QString& AggButton::getStatusTip() const
+{
+    return statusTip;
+}
+
+void AggButton::setStatusTip ( const QString& statusTip_ )
+{
+    statusTip = statusTip_;
+}
+
 bool AggButton::isPressed () const
 {
     return pressed;

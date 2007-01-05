@@ -239,9 +239,6 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
     QDomElement materialLibElem = materialLib.item(0).toElement();
     materialLibrary->loadFromXML( materialLibElem );
     
-    const QMap<QString, TrussMaterial*>* uuidMap = 
-                        &materialLibrary->getMaterialUUIDMap();
-    
     /**
      * Create truss unit windows
      *****************************/
@@ -257,7 +254,6 @@ void FermaNextProject::loadFromXML ( const QDomElement& prjElem )
             throw LoadException();
         QDomElement windowElem = trussWindow.toElement();
         TrussUnitWindow& wnd = mng.createTrussUnitWindow( QString::null );
-        wnd.setMaterialUUIDMap( *uuidMap );
         wnd.loadFromXML( windowElem );
         if ( windowElem.hasAttribute( "layoutOrder" ) ) {
             bool ok;

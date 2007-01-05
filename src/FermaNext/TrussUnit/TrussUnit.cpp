@@ -81,10 +81,12 @@ bool PaintableTrussElement::isRendered () const
  * Truss Unit
  *****************************************************************************/
 
-TrussUnit::TrussUnit ( const QString& name, ObjectStateManager* mng ) :
-    Truss<TrussNode, TrussPivot>(mng),
+TrussUnit::TrussUnit ( const QString& name, ObjectStateManager* mng,
+                       const TrussMaterialLibrary& mLib ) :
+    Truss<TrussNode, TrussPivot>(mng, mLib),
     trussRendered(false),
     calculated(false),
+    elementPositionCheck(true),
     trussName(name),
     frontNode(0),
     firstFront(0),
@@ -260,7 +262,6 @@ void TrussUnit::loadFromXML ( const QDomElement& elem )
 
         TrussPivot& pivot = createPivot( *nodeUUIDMap[firstNodeId],
                                          *nodeUUIDMap[lastNodeId] );
-        pivot.setMaterialUUIDMap( *materialUUIDMap );
         pivot.loadFromXML( pivotElem );
     }
 
@@ -274,11 +275,6 @@ void TrussUnit::loadFromXML ( const QDomElement& elem )
         setCalculatedStatus( true );
     else
         setCalculatedStatus( false );
-}
-
-void TrussUnit::setMaterialUUIDMap ( const QMap<QString, TrussMaterial*>& m )
-{
-    materialUUIDMap = &m;
 }
 
 QDomElement TrussUnit::saveToXML ( QDomDocument& doc )
@@ -385,6 +381,19 @@ void TrussUnit::setCalculatedStatus ( bool status )
         return;
     calculated = status;
     emit onCalculationStatusChange( status );
+}
+
+bool TrussUnit::isElementPositionCheckEnabled () const
+{
+    return elementPositionCheck;
+}
+
+void TrussUnit::enableElementPositionCheck ( bool status )
+{
+    if ( status == elementPositionCheck )
+        return;
+    elementPositionCheck = status;
+    emit onElementPositionCheckFlagChange( status );
 }
 
 void TrussUnit::setTrussRenderedStatus ( bool status ) const
@@ -701,6 +710,11 @@ void TrussUnit::moveTrussNode ( int x, int y, TrussNode* node )
 
     removePivotsHighlight ();
 
+    if ( ! elementPositionCheck ) {
+        setTrussRenderedStatus( false );
+        return;
+    }
+
     // highlight the merging node
     TrussNode* mergeNode = 0;
     if ( ! node->isVisible() )
@@ -794,6 +808,11 @@ void TrussUnit::moveTrussPivot ( int x, int y, TrussPivot* pivot,
 
     removePivotsHighlight ( pivot );
 
+    if ( ! elementPositionCheck ) {
+        setTrussRenderedStatus( false );
+        return;
+    }
+
     // highlight the merging node
     TrussNode* mergeNode = nodesMergingComparison( first, 
                                                    2 * getNodePrecision(), 
@@ -854,6 +873,9 @@ TrussNode* TrussUnit::nodesMergingComparison ( TrussNode& comparableNode,
 
 void TrussUnit::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
 {
+    if ( ! elementPositionCheck )
+        return;
+
     ObjectStateManager* mng = mergingNode->getStateManager();
     mng->startStateBlock();
 
@@ -931,15 +953,21 @@ void TrussUnit::mergeNodes ( TrussNode* mergingNode, TrussNode* node )
 }
 
 void TrussUnit::dividePivot ( TrussPivot& dividualPivot, 
-                                    TrussNode& dividingNode )
+                              TrussNode& dividingNode )
 {
+    if ( ! elementPositionCheck )
+        return;
+
     TrussNode& first = dividualPivot.getFirstNode();
     TrussNode& last = dividualPivot.getLastNode();
 
     ObjectStateManager* mng = dividualPivot.getStateManager();
     mng->startStateBlock();
 
-    dividualPivot.setHighlighted ( false );
+    dividualPivot.setHighlighted( false );
+
+    // Save pivot material
+    const TrussMaterial* material = dividualPivot.getMaterial();
 
     // Save remove pivot action
     ObjectState& state = dividualPivot.createState( "remove pivot" );
@@ -947,8 +975,8 @@ void TrussUnit::dividePivot ( TrussPivot& dividualPivot,
     state.save();
     dividualPivot.desist();
 
-    TrussPivot* pivot1 = findPivotByNodes ( first, dividingNode );
-    TrussPivot* pivot2 = findPivotByNodes ( last, dividingNode );
+    TrussPivot* pivot1 = findPivotByNodes( first, dividingNode );
+    TrussPivot* pivot2 = findPivotByNodes( last, dividingNode );
     if ( pivot1 )
     {
         // Save remove pivot action
@@ -972,6 +1000,9 @@ void TrussUnit::dividePivot ( TrussPivot& dividualPivot,
     else
         newlyCreated = &createPivot( dividingNode, first );
 
+    // Restore material
+    newlyCreated->setMaterial( material );
+
     // Save create pivot action
     ObjectState& stateFirst = newlyCreated->createState( "create pivot" );
     stateFirst.addAction( new TrussPivotCreateAction( *newlyCreated ) );
@@ -981,6 +1012,9 @@ void TrussUnit::dividePivot ( TrussPivot& dividualPivot,
         newlyCreated = &createPivot( last, dividingNode );
     else
         newlyCreated = &createPivot( dividingNode, last );
+
+    // Restore material
+    newlyCreated->setMaterial( material );
 
     // Save create pivot action
     ObjectState& stateSecond = newlyCreated->createState( "create pivot" );
@@ -1177,6 +1211,9 @@ void TrussUnit::updateNodePosition ( TrussNode* selectedNode,
 void TrussUnit::updateAfterNodeManipulation ( TrussNode* selectedNode, 
                                               bool fixationCheck )
 {
+    if ( ! elementPositionCheck )
+        return;
+    
     int numb = selectedNode->getNumber();
 
     PivotList adjPivotList = findAdjoiningPivots ( *selectedNode );
@@ -1197,6 +1234,9 @@ void TrussUnit::updateAfterNodeManipulation ( TrussNode* selectedNode,
 void TrussUnit::updateAfterPivotManipulation ( TrussPivot* selectedPivot,
                                                bool fixationCheck )
 {
+    if ( ! elementPositionCheck )
+        return;
+    
     TrussNode& first = selectedPivot->getFirstNode();
     TrussNode& last = selectedPivot->getLastNode();
     DoublePointArray crossPoints;

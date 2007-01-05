@@ -119,6 +119,7 @@ signals:
     void onHintShowsUp ( const QString& hint, const QPoint pos, bool smooth );
     void onHintHides ( bool smooth );
     void onAnimationPlays ( bool );
+    void onShowStatusTip ( const QString& text );
 
 private:
     ButtonList buttons;
@@ -129,14 +130,14 @@ private:
     // parent widget
     QWidget* designerWidget;
     
-    // current left top position of the status tip
+    // current left top position of the button hint
     QPoint hintCurrentPos;
 
     AggButton* currentHintedButton;
 
     AggToolBarHideButton* hideButton;
 
-    // timer fot the tool tips
+    // timer for the button hints
     QTimer* hintTimer;
     
     // tool bar hide animation timer

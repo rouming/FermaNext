@@ -3,17 +3,18 @@
 #define TRUSSUNITWINDOW_H
 
 #include "TrussUnit.h"
-#include "AggTrussWindowButton.h"
 
 #include <QTimer>
 
 class QWidget;
+class AggTrussWindowButton;
 
 class TrussUnitWindow : public TrussUnit
 {
     Q_OBJECT
 public:
-    TrussUnitWindow ( const QString& name, ObjectStateManager* );
+    TrussUnitWindow ( const QString& name, ObjectStateManager*,
+                      const TrussMaterialLibrary& );
     virtual ~TrussUnitWindow ();
 
     // Set owner of this window. 
@@ -55,19 +56,21 @@ public:
     virtual bool inCanvasRect ( int  x, int  y ) const;
     virtual bool inHeadlineRect ( int  x, int  y ) const;
     virtual bool inTrussAreaRect ( int x, int y ) const;
+
     virtual bool inHorResizeRect ( int x, int y ) const;
     virtual bool inVerResizeRect ( int x, int y ) const;
     virtual bool inBDiagResizeRect ( int x, int y );
     virtual bool inFDiagResizeRect ( int x, int y );
-    virtual bool inHideButtonRect ( int x, int y ) const;
-    virtual bool inRollUpButtonRect ( int x, int y ) const;
 
+    virtual AggTrussWindowButton* getButtonByCoord ( int xGlobal, 
+                                                     int yGlobal ) const;
+   
     virtual void setHighlighted ( bool );
     virtual void removeButtonsHighlight ();
     virtual void releaseButtons ();
     virtual void clearButtonHint ();
 
-    virtual void checkMouseMoveEvent ( int x, int y, bool mousePressed );
+    virtual void checkMouseMoveEvent ( int x, int y, bool buttonPressed );
     virtual void checkMousePressEvent ( int x, int y );
     virtual void checkMouseReleaseEvent ( int x, int y );
 
@@ -87,9 +90,13 @@ public:
     virtual void paint ( base_renderer& baseRend ) const;
 
 protected:
+    void initWindowButtons ();
+
     virtual QPoint getButtonBufPos () const;
-    virtual bool inButtonsRect ( int x, int y ) const;
+    virtual bool inButtonBufRect ( int x, int y ) const;
+    
     virtual void hide ();
+
     virtual QString fitTextToWindowSize ( QString str, int lengthLimit, 
                                           glyph_gen& glyph ) const;
 
@@ -129,35 +136,66 @@ signals:
     void onTrussUnitWindowRollUp ();
     void onHintShowsUp ( const QString& hint, const QPoint pos, bool smooth );
     void onHintHides ( bool smooth );
+    void onClearButtonRenderedFlag ();
 
 protected slots:
     void clearWindowRenderedFlag ();
     void clearButtonBufRenderedFlag ();
     void setWindowButtonHinted ();
+    void setProportionalSize ();
 
 private:
     // Owner of this window
     QWidget* windowOwner;
+
     // Window has position
     bool positionIsSet;
-    QPoint windowLeftTopPos, windowRightBottomPos;
-    QSize windowSize, coordFieldSize;
+
+    // Window left top position in designer widget coordinates
+    QPoint windowLeftTopPos;
+
+    // Window size in pixels
+    QSize windowSize;
+
+    // Current cursor coordinate in truss coordinate system
     DoublePoint cursorCoord;
+
+    // Render flags 
     mutable bool buttonBufRendered, coordFieldRendered;
+
+    // Window palette colors
     color_type canvColor, headFirstColor, headMiddleColor, 
-           headLastColor, borderColor, resEllColor;
+               headLastColor, borderColor, resEllColor;
+
+    // Window fonts
     textFont headFont, numbersFont;
+
+    // Window blending buffers
     rbuf_dynarow *windowBuf, *trussBuf, *coordBuf, 
                  *numbersBuf, *buttonBuf;
-    AggTrussWindowButton *hideButton, *rollUpButton;
+
+    // Window button list
+    QList<AggTrussWindowButton*> windowButtons;
+
+    // Currently pressed window button
     AggTrussWindowButton *currentPressedButton;
-    // hints subsidiaries
+
+    // Currently hinted window button
     AggTrussWindowButton *currentHintedButton;
+
+    // Hint timer
     QTimer *timer;
+
+    // Current hint position
     QPoint hintCurrentPos;
+
+    // Is some window button currently hinted
     bool hinted;
-    // minimize/maximize subsidiaries
+
+    // Is window maximized
     bool maximized;
+
+    // Saved window geometry for minimization
     QPoint minLeftTopPos, minRightBottomPos;
 };
 

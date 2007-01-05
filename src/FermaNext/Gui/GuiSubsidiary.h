@@ -7,10 +7,13 @@
 #include <QHeaderView>
 #include <QStringList>
 #include <QValidator>
+#include <QCommonStyle>
 
 #include "Global.h"
 
 class QString;
+class QStyleOption;
+class QPainter;
 class TrussMaterial;
 class TrussMaterialLibrary;
 
@@ -108,5 +111,15 @@ public:
     TableHeader ( Qt::Orientation orientation, QWidget * parent = 0 );
     QSize sizeHint () const;
 };
+
+/*****************************************************************************/
+
+class FlatStyle : public QCommonStyle
+{
+public:
+	void drawPrimitive ( PrimitiveElement pe, const QStyleOption *opt, 
+                         QPainter* p, const QWidget* w = 0 ) const;
+};
+
 
 #endif //GUISUBSIDIARY_H

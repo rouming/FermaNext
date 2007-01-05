@@ -18,6 +18,25 @@
 class QStackedWidget;
 class FermaNextMainFrame;
 
+class ClipBoardObject 
+{
+public:
+    ClipBoardObject ( const QString& xml, QStringList materials ) :
+        xmlStruct( xml ), materialXmls( materials ) {};
+
+    ~ClipBoardObject () {};
+
+    QString getObjectXML () const
+    { return xmlStruct; };
+
+    QStringList getMaterialXMLs () const
+    { return materialXmls; };
+
+private:
+    QString xmlStruct;
+    QStringList materialXmls;
+};
+
 class FermaNextWorkspace : public QObject, public XMLSerializableObject
 {
     Q_OBJECT
@@ -85,6 +104,10 @@ public:
     FermaNextMainWindow* mainWindow () const;
     PluginExecutorDialog* pluginExecutor () const;
 
+    void setClipboardObject ( const QString&, QStringList );
+    const ClipBoardObject* getClipboardObject () const;
+    void clearClipboard ();
+
 public slots:
     void clearProjects ();
 
@@ -134,6 +157,7 @@ private:
     FermaNextMainWindow* fermaMainWindow;
     PluginExecutorDialog* plgExecutorDialog;
     QStackedWidget* stackedWidget;
+    ClipBoardObject* clipboardObject;
 };
 
 #endif //FERMANEXTWORKSPACE_H

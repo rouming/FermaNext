@@ -96,7 +96,8 @@ TrussUnitWindow& TrussUnitWindowManager::createTrussUnitWindow (
     suspendedClean();
 
     ObjectStateManager* stateManager = new ObjectStateManager;
-    TrussUnitWindow* trussWindow = new TrussUnitWindow(name, stateManager);
+    TrussUnitWindow* trussWindow = 
+        new TrussUnitWindow(name, stateManager, materialLib);
     stateManagerMap[trussWindow] = stateManager;
 
     QObject::connect( trussWindow, SIGNAL(onAfterRevive(StatefulObject&)), 

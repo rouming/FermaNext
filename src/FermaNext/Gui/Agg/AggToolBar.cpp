@@ -73,7 +73,8 @@ AggToolBarHideButton::AggToolBarHideButton () :
     lineCol( agg::rgba( 10, 10, 10 ) ), 
     highlightFill( agg::rgba( 1, 1, 1, 0.5 ) )
 {
-    setHint( "Hide tool bar" );
+    setHint( tr( "Hide tool bar" ) );
+    setStatusTip( tr( "Hides or shows a tool bar" ) );
     setWidth( Global::buttonWidth * 3 );
     setHeight( 6 );  
 }
@@ -405,6 +406,11 @@ void AggToolBar::addComboBox ( AggComboBox& combo )
     connect( &combo, SIGNAL( sizeChanged() ),
                        SLOT( updateToolBarGeometry() ) );
 
+    // Delegate status tip signals because combobox has its own 
+    // mouse event handlers
+    connect( &combo, SIGNAL( onShowStatusTip( const QString& ) ),
+                     SIGNAL( onShowStatusTip( const QString& ) ) );
+
     updateToolBarGeometry();
 }
 
@@ -487,6 +493,8 @@ void AggToolBar::showToolBar ()
 
     pixNumb = toolBarHeight - hideButton->getHeight();
 
+    hideButton->setHint( tr( "Hide tool bar" ) );
+    
     enabled = false;
     visible = true;
 
@@ -505,6 +513,8 @@ void AggToolBar::hideToolBar ()
     pixNumb = toolBarHeight - hideButton->getHeight();
 
     enabled = false;
+
+    hideButton->setHint( tr( "Show tool bar" ) );
 
     animTimer->start( 1, this );
 
@@ -583,15 +593,13 @@ void AggToolBar::mouseMove ( int x, int y )
     if ( ! enabled )
         return;
 
-    foreach ( AggComboBox* cb, comboBoxes )
-        cb->mouseMove( x, y );
-
     removeButtonHighlight();
 
     AggButton* button = getButton( x, y );
     if ( button && button->isEnabled() )
     {
         button->setHighlighted( true );
+        emit onShowStatusTip( button->getStatusTip() );
 
         if ( toolBarIsHinted )
         {
@@ -617,6 +625,19 @@ void AggToolBar::mouseMove ( int x, int y )
             currentHintedButton = 0;
             emit onHintHides( false );
         }
+
+        // This flag was introduced because comboboxes have their own mouse event 
+        // handlers and we need to ensure that they wasn't mouse hovered.
+        bool comboboxSelected = false;
+        foreach ( AggComboBox* cb, comboBoxes ) {
+            comboboxSelected = cb->inRect( x, y );
+            cb->mouseMove( x, y );
+        }
+
+        // No tool bar elements selected. Replace status bar message by
+        // the default one.
+        if ( ! comboboxSelected )
+            emit onShowStatusTip( tr( "Ready" ) );
     }
 
     if ( ! inToolBarRect( x, y, true ) )
