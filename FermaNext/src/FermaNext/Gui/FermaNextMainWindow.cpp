@@ -20,6 +20,7 @@
 #include <QToolBar>
 #include <QSignalMapper>
 
+#include "AggTrussToolBar.h"
 #include "FermaNextMainWindow.h"
 #include "FermaNextWorkspace.h"
 #include "GeometryTabWidget.h"
@@ -93,6 +94,9 @@ void FermaNextMainWindow::init ()
                              SLOT(refreshProjectActions()) );
     connect( projectToolBox, SIGNAL(currentChanged(int)), 
                              SLOT(refreshGeometryAndPropertyWindows()) );
+    connect( projectToolBox, SIGNAL(currentChanged(int)), 
+                             SLOT(refreshCopyPaste()) );
+
     connect( projectToolBox, SIGNAL(onShowTrussResults(const TrussUnitWindow&)),
                              SLOT(showResultsWindow(const TrussUnitWindow&)) );
 
@@ -191,39 +195,29 @@ void FermaNextMainWindow::initTrussPropertyWindow ()
 
 void FermaNextMainWindow::createStatusBar ()
 {
-    QWidget* statusBarWidget = new QWidget;
-    QHBoxLayout* statusBarLayout = new QHBoxLayout( statusBarWidget );
-    statusBarLayout->setMargin(2);
-    statusBarLayout->setSpacing(2);
+    statusBar()->setStyle( new FlatStyle() );
 
     hintLabel = new QLabel( "  Ready" );
-    // statusBar()->addWidget( hintLabel, 1 );
+    statusBar()->addWidget( hintLabel, 1 );
 
     coordLabel = new QLabel( "  999.99 : 999.99  " );
     coordLabel->setAlignment( Qt::AlignCenter );
     coordLabel->setMinimumSize( coordLabel->sizeHint() );
-    coordLabel->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
-    //statusBar()->addPermanentWidget( coordLabel );
+    coordLabel->setFrameStyle( QFrame::Panel | QFrame::Sunken );
+    statusBar()->addPermanentWidget( coordLabel );
 
     elementLabel = new QLabel( " pivot #999 " );
     elementLabel->setAlignment( Qt::AlignCenter );
     elementLabel->setMinimumSize( elementLabel->sizeHint() );
-    elementLabel->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
-    //statusBar()->addPermanentWidget( elementLabel );
+    elementLabel->setFrameStyle( QFrame::Panel | QFrame::Sunken );
+    statusBar()->addPermanentWidget( elementLabel );
 
     modLabel = new QLabel( " MOD " );
     modLabel->setEnabled( false );
     modLabel->setAlignment( Qt::AlignCenter );
     modLabel->setMinimumSize( modLabel->sizeHint() );
-    modLabel->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
-    // statusBar()->addWidget( modLabel );
-
-    statusBarLayout->addWidget( hintLabel, 1 );
-    statusBarLayout->addWidget( coordLabel );
-    statusBarLayout->addWidget( elementLabel );
-    statusBarLayout->addWidget( modLabel );
-
-    statusBar()->addPermanentWidget( statusBarWidget, 1 );
+    modLabel->setFrameStyle( QFrame::Panel | QFrame::Sunken );
+    statusBar()->addPermanentWidget( modLabel );
 
     updateStatusBar();
 }
@@ -239,6 +233,9 @@ void FermaNextMainWindow::someProjectRemoved ( FermaNextProject& prj )
         showUndoRedoAction->setEnabled( false );
         showTrussPropWindowAction->setEnabled( false );
         showGeometryWindowAction->setEnabled( false );
+        copyAction->setEnabled( false );
+        cutAction->setEnabled( false );
+        pasteAction->setEnabled( false );
     }
     TrussDesignerWidget& designerWidget = prj.getDesignerWidget();
     designerWidget.disconnect( this );
@@ -267,8 +264,10 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
                             SLOT(trussWindowReceivedFocus(TrussUnitWindow&)) );
     connect( &designerWidget, SIGNAL(cursorMoved()),
                             SLOT(updateStatusBar()) );
-    connect( &designerWidget, SIGNAL(onHintChange(const QString&)),
-                              SLOT(setStatusBarHint(const QString&)) );
+
+    connect( &designerWidget.getToolBar(), 
+                SIGNAL(onShowStatusTip(const QString&)),
+             statusBar(), SLOT(showMessage(const QString&)) );
 
     TrussUnitWindowManager& mng = prj.getTrussUnitWindowManager();
     connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
@@ -300,9 +299,9 @@ void FermaNextMainWindow::createProject ()
 
         // Create material
         TrussMaterialLibrary& materialLib = prj.getMaterialLibrary();
-        TrussMaterial* m = &materialLib.createMaterial( tr( "Aluminum Alloy" ), 
-                                                       30000, 7000000, 0.028 );
-        materialLib.createMaterial( tr( "Steel" ), 70000, 20000000, 0.078 );
+        TrussMaterial* m = &materialLib.createMaterial( 30000, 7000000, 0.028,
+                                                        tr( "Aluminum Alloy" ) );
+        materialLib.createMaterial( 70000, 20000000, 0.078, tr( "Steel" ) );
 
         // Create nodes
         TrussNode& node1 = trussWindow.createNode ( 100.0, 0.0 );
@@ -367,6 +366,7 @@ void FermaNextMainWindow::setupFileActions ()
     a = new QAction( QIcon(Global::imagesPath() + "/filenew.png"), 
                      tr( "&New..." ), this );
     a->setShortcut( tr("CTRL+N") );
+    a->setStatusTip( tr( "Creates a new project" ) );
     connect( a, SIGNAL(triggered()), SLOT(fileNew()) );
     tb->addAction( a );
     menu->addAction( a );
@@ -375,6 +375,7 @@ void FermaNextMainWindow::setupFileActions ()
     a = new QAction( QIcon(Global::imagesPath() + "/fileopen.png"), 
                       tr( "&Open..." ), this );
     a->setShortcut( tr("CTRL+O") );
+    a->setStatusTip( tr( "Opens an existing project" ) );
     connect( a, SIGNAL(triggered()), SLOT(fileOpen()) );
     tb->addAction( a );
     menu->addAction( a );   
@@ -384,6 +385,7 @@ void FermaNextMainWindow::setupFileActions ()
         new QAction( QIcon(Global::imagesPath() + "/filesave.png"),
                      tr( "&Save..." ), this );
     saveProjectAction->setShortcut( tr("CTRL+S") );
+    saveProjectAction->setStatusTip( tr( "Saves the current project" ) );
     connect( saveProjectAction, SIGNAL(triggered()), SLOT(fileSave()) );
     tb->addAction( saveProjectAction );
     menu->addAction( saveProjectAction );
@@ -395,6 +397,7 @@ void FermaNextMainWindow::setupFileActions ()
         new QAction( QIcon(Global::imagesPath() + "/filesaveall.png"),
                      tr( "&Save All..." ), this );
     saveAllAction->setShortcut( tr("CTRL+SHIFT+S") );
+    saveAllAction->setStatusTip( tr( "Saves all the open files" ) );
     connect( saveAllAction, SIGNAL(triggered()), SLOT(fileSaveAll()) );
     tb->addAction( saveAllAction );
     menu->addAction( saveAllAction );
@@ -403,6 +406,7 @@ void FermaNextMainWindow::setupFileActions ()
 
     // Save As
     saveAsProjectAction = new QAction( tr( "Save &As..." ), this );
+    saveAsProjectAction->setStatusTip( tr( "Saves the project with a new name" ) );
     connect( saveAsProjectAction, SIGNAL(triggered()), SLOT(fileSaveAs()) );
     menu->addAction( saveAsProjectAction );
     saveAsProjectAction->setDisabled(true);
@@ -410,6 +414,7 @@ void FermaNextMainWindow::setupFileActions ()
     // Close
     closeProjectAction = new QAction( tr( "&Close" ), this );
     connect( closeProjectAction, SIGNAL(triggered()), SLOT(fileClose()) );
+    closeProjectAction->setStatusTip( tr( "Closes the curent project" ) );
     menu->addAction( closeProjectAction );
     closeProjectAction->setDisabled(true);
     menu->addSeparator();
@@ -417,22 +422,26 @@ void FermaNextMainWindow::setupFileActions ()
     // Open Wsp
     a = new QAction( tr( "Open Workspace..." ), this );
     a->setShortcut( tr("SHIFT+F2") );
+    a->setStatusTip( tr( "Opens an existing workspace" ) );
     connect( a, SIGNAL(triggered()), SLOT(fileOpenWsp()) );
     menu->addAction( a );
 
     // Save Wsp
     a = new QAction( tr( "Save Workspace" ), this );
     a->setShortcut( tr("SHIFT+F3") );
+    a->setStatusTip( tr( "Saves the workspace" ) );
     connect( a, SIGNAL(triggered()), SLOT(fileSaveWsp()) );
     menu->addAction( a );
 
     // Save Wsp As
     a = new QAction( tr( "Save Workspace As..." ), this );
+    a->setStatusTip( tr( "Saves the workspace with a new name" ) );
     connect( a, SIGNAL(triggered()), SLOT(fileSaveWspAs()) );
     menu->addAction( a );
 
     // Close Wsp
     a = new QAction( tr( "Close Workspace" ), this );
+    a->setStatusTip( tr( "Closes the workspace" ) );
     a->setShortcut( tr("SHIFT+F4") );
     connect( a, SIGNAL(triggered()), SLOT(fileCloseWsp()) );
     menu->addAction( a );
@@ -440,6 +449,7 @@ void FermaNextMainWindow::setupFileActions ()
     
     // Page Setup
     a = new QAction( tr( "Page setup..." ), this );
+    a->setStatusTip( tr( "Changes the page layout settings" ) );
     connect( a, SIGNAL(triggered()), SLOT(filePageSetup()) );
     menu->addAction( a );
     a->setDisabled(true);
@@ -447,6 +457,7 @@ void FermaNextMainWindow::setupFileActions ()
     // Print Preview
     a = new QAction( tr( "Print Preview" ), this );
     a->setShortcut( tr("CTRL+ALT+P") );
+    a->setStatusTip( tr( "Shows the print preview" ) );
     connect( a, SIGNAL(triggered()), SLOT(filePrintPreview()) );
     menu->addAction( a );
     a->setDisabled(true);
@@ -455,6 +466,7 @@ void FermaNextMainWindow::setupFileActions ()
     printAction = new QAction( QIcon(Global::imagesPath() + "/print.png"), 
                                tr( "&Print..." ),  this ); 
     printAction->setShortcut( tr("CTRL+P") );
+    printAction->setStatusTip( tr( "Prints the designer widget area" ) );
     connect( printAction, SIGNAL(triggered()), SLOT(filePrint()) );        
     menu->addAction( printAction );
     printAction->setDisabled(true);
@@ -463,6 +475,7 @@ void FermaNextMainWindow::setupFileActions ()
     // Exit
     a = new QAction( tr( "E&xit" ), this );
     a->setShortcut( tr("CTRL+Q") );
+    a->setStatusTip( tr( "Quits the application; promts to save documents" ) );
     connect( a, SIGNAL(triggered()), SLOT(fileExit()) );
     menu->addAction( a );
 }
@@ -475,6 +488,7 @@ void FermaNextMainWindow::setupEditActions ()
     // Undo
     undoAction = new QAction( QIcon(Global::imagesPath() + "/undo.png"), 
                               tr( "&Undo" ), this );
+    undoAction->setStatusTip( tr( "Undoes the last action" ) );
     undoAction->setShortcut( tr("CTRL+Z") );                               
     connect( undoAction, SIGNAL(triggered()), SLOT(editUndo()) );
     undoAction->setDisabled(true);
@@ -485,6 +499,7 @@ void FermaNextMainWindow::setupEditActions ()
     redoAction = new QAction( QIcon(Global::imagesPath() + "/redo.png"), 
                               tr( "&Redo" ), this );
     redoAction->setShortcut( tr("CTRL+Y") );
+    redoAction->setStatusTip( tr( "Redoes the previously undone action" ) );
     connect( redoAction, SIGNAL(triggered()), SLOT(editRedo()) );
     redoAction->setDisabled(true);
     tb->addAction( redoAction );
@@ -492,17 +507,51 @@ void FermaNextMainWindow::setupEditActions ()
     menu->addSeparator();
     tb->addSeparator();
 
+    // Copy
+    copyAction = new QAction( QIcon(Global::imagesPath() + "/editcopy.png"), 
+                              tr( "&Copy" ), this );
+    copyAction->setShortcut( tr("CTRL+C") );
+    copyAction->setStatusTip( tr( "Copies the selected truss to the Clipboard" ) );
+    connect( copyAction, SIGNAL(triggered()), SLOT(editCopy()) );
+    copyAction->setDisabled(true);
+    tb->addAction( copyAction );
+    menu->addAction( copyAction );
+
+    // Copy
+    cutAction = new QAction( QIcon(Global::imagesPath() + "/editcut.png"), 
+                              tr( "Cu&t" ), this );
+    cutAction->setShortcut( tr("CTRL+X") );
+    cutAction->setStatusTip( tr( "Cuts the selected truss and moves it to the Clipboard" ) );
+    connect( cutAction, SIGNAL(triggered()), SLOT(editCut()) );
+    cutAction->setDisabled(true);
+    tb->addAction( cutAction );
+    menu->addAction( cutAction );
+
+    // Paste
+    pasteAction = new QAction( QIcon(Global::imagesPath() + "/editpaste.png"), 
+                              tr( "&Paste" ), this );
+    pasteAction->setShortcut( tr("CTRL+V") );
+    pasteAction->setStatusTip( tr( "Inserts the truss from the Clipboard" ) );
+    connect( pasteAction, SIGNAL(triggered()), SLOT(editPaste()) );
+    pasteAction->setDisabled(true);
+    tb->addAction( pasteAction );
+    menu->addAction( pasteAction );
+    menu->addSeparator();
+    tb->addSeparator();    
+
     // Material Editor
     materialEditorAction = new QAction( tr( "&Material Editor" ), this );
     materialEditorAction->setShortcut( tr("CTRL+M") );
+    materialEditorAction->setStatusTip( tr( "Opens the material editor" ) );
     connect( materialEditorAction, SIGNAL(triggered()), 
                                    SLOT(editMaterials()) );
     menu->addAction( materialEditorAction );
     materialEditorAction->setEnabled( false );
 
     // Preferences
-    QAction* prefAction = new QAction( tr( "&Preferences..." ), this );
+    QAction* prefAction = new QAction( tr( "Pre&ferences..." ), this );
     prefAction->setShortcut( tr("CTRL+K") );
+    prefAction->setStatusTip( tr( "Edits the application preferences" ) );
     connect( prefAction, SIGNAL(triggered()), SLOT(editPreferences()) );
     menu->addAction( prefAction );
 }
@@ -583,6 +632,165 @@ void FermaNextMainWindow::setupHelpActions ()
     connect( a, SIGNAL(triggered()), SLOT(helpAbout()) );
         menu->addAction( a );    
     a->setDisabled(true);
+}
+
+bool FermaNextMainWindow::onCopyTrussUnitWindow ()
+{
+    FermaNextProject* currProj = workspace.currentActivatedProject();
+    if ( ! currProj )
+        return false;
+
+    TrussUnitWindow* selectedWindow = 
+        currProj->getDesignerWidget().getFocusedWindow();
+    if ( ! selectedWindow )
+        return false;
+
+    QDomDocument doc;
+    QDomElement copyProps = selectedWindow->saveToXML( doc );
+    doc.appendChild( copyProps );
+    QString wndXml = doc.toString();
+
+    TrussMaterialLibrary& mLib = currProj->getMaterialLibrary();
+
+    // Parse truss materials 
+    QStringList materialXmls;
+    foreach ( TrussPivot* pivot, selectedWindow->getPivotList() ) {
+        const TrussMaterial* m = pivot->getMaterial();
+        if ( ! m )
+            continue;
+
+        materialXmls.append( mLib.getMaterialXml( *m ) );
+    }
+
+    workspace.setClipboardObject( wndXml, materialXmls );
+
+    return true;
+}
+
+void FermaNextMainWindow::copyMaterialsForPivot ( QDomElement pivotDomElem,
+                                                  QStringList materialXmls )
+{
+    if ( ! pivotDomElem.hasAttribute( "materialID" ) )
+        return;
+
+    QString pivotMaterialUUID = pivotDomElem.attribute( "materialID" );
+
+    FermaNextProject* currProj = workspace.currentActivatedProject();
+    if ( ! currProj )
+        return;    
+
+    TrussMaterialLibrary& mLib = currProj->getMaterialLibrary();
+
+    // Get material for the current pivot 
+    foreach ( QString mXml, materialXmls ) {
+        QDomDocument doc;
+        if ( ! doc.setContent( mXml ) )
+            return;
+
+        QDomNodeList mNodeList = doc.elementsByTagName( "TrussMaterial" );
+        if ( mNodeList.isEmpty() )
+            return;
+        
+        int nodeNumb = mNodeList.count();
+        for ( int i = 0; i < nodeNumb; ++i ) {
+            QDomElement mElem = mNodeList.at( i ).toElement();
+            if ( ! mElem.hasAttribute( "uuid" ) )
+                return;
+
+            QString mUUID = mElem.attribute( "uuid" );
+
+            if ( mUUID != pivotMaterialUUID )
+                continue;
+
+            TrussMaterial* sameMaterial = 
+                mLib.getMaterialWithSameProperties( mXml );
+
+            // No material with such properties was found, so we should create it
+            if ( ! sameMaterial ) {
+                TrussMaterial& newMaterial = mLib.createMaterial( mXml );
+                pivotMaterialUUID = newMaterial.getUUID();
+            }
+            else 
+                pivotMaterialUUID = sameMaterial->getUUID();
+
+            // Replace pivot material UUID with UUID of the same material in the
+            // current library
+            pivotDomElem.setAttribute( "materialID", pivotMaterialUUID );
+        }
+    }
+}
+
+TrussUnitWindow* FermaNextMainWindow::onPasteTrussUnitWindow ()
+{
+    FermaNextProject* currProj = workspace.currentActivatedProject();
+    if ( ! currProj )
+        return 0;    
+
+    const ClipBoardObject* clipboardObj = workspace.getClipboardObject();
+    if ( ! clipboardObj )
+        return 0;
+
+    QString objXml = clipboardObj->getObjectXML();
+    if ( objXml.isEmpty() )
+        return 0;
+
+    QDomDocument doc;
+    if ( ! doc.setContent( objXml ) )
+        return 0;
+
+    QDomNodeList wndElemList = doc.elementsByTagName( "TrussUnitWindow" );
+    if ( wndElemList.isEmpty() )
+        return 0;
+
+    QDomElement wndProps = wndElemList.at( 0 ).toElement();
+
+
+    //------------ Set materials from other project if necessary ------------//
+
+    TrussMaterialLibrary& mLib = currProj->getMaterialLibrary();
+    QStringList materialXmls = clipboardObj->getMaterialXMLs();
+
+    QDomNodeList pivotElemList = wndProps.elementsByTagName( "TrussPivot" );
+    int elemNumb = pivotElemList.count();
+    for ( int i = 0; i < elemNumb; ++i ) {
+        QDomElement pivotElem = pivotElemList.at( i ).toElement();
+        if ( pivotElem.isNull() )
+            continue;
+
+        copyMaterialsForPivot( pivotElem, materialXmls );
+    }
+
+
+    //------------------------ Create truss window --------------------------//
+
+    TrussUnitWindowManager& wndMng = currProj->getTrussUnitWindowManager();
+
+    TrussUnitWindow& copyWnd = wndMng.createTrussUnitWindow( "" );
+    copyWnd.setVisible( false );
+    
+    // Save UUID to restore it after copy properties from XML string
+    QString wndUuid = copyWnd.getUUID();
+
+    try {
+        copyWnd.loadFromXML( wndProps );
+        copyWnd.setUUID( wndUuid );
+    } 
+    catch ( ... ) {
+        wndMng.removeTrussUnitWindow( copyWnd );
+        return 0;
+    }
+
+    QPoint copyWndPos = copyWnd.getWindowLeftTopPos();
+
+    foreach ( TrussUnitWindow* wnd, wndMng.getTrussUnitWindowList() )
+        if ( wnd != &copyWnd && wnd->getWindowLeftTopPos() == copyWndPos ) {
+            // Add single indent to the window position
+            copyWndPos = QPoint( copyWndPos + QPoint( 15, 10 ) );
+            copyWnd.setWindowPosition( copyWndPos );
+
+        }
+
+    return &copyWnd;
 }
 
 void FermaNextMainWindow::reloadPlugins ()
@@ -718,6 +926,21 @@ void FermaNextMainWindow::refreshGeometryAndPropertyWindows ()
     trussPropTabWidget->changeMaterialLibrary( prj->getMaterialLibrary() );
 }
 
+void FermaNextMainWindow::refreshCopyPaste ()
+{
+    FermaNextProject* prj = projectToolBox->currentProject();
+    if ( ! prj )
+        return;
+    
+    bool windowSelected = false;
+    TrussUnitWindow* window = prj->getDesignerWidget().getFocusedWindow();
+    if ( window )
+        windowSelected = true;
+
+    copyAction->setEnabled( windowSelected );
+    cutAction->setEnabled( windowSelected );
+}
+
 void FermaNextMainWindow::updateStatusBar ()
 {
     FermaNextProject* prj = projectToolBox->currentProject();
@@ -762,13 +985,15 @@ void FermaNextMainWindow::updateStatusBar ()
         elementLabel->setText( " " );
 }
 
-void FermaNextMainWindow::setStatusBarHint ( const QString& text )
+void FermaNextMainWindow::projectModified ()
 {
-    hintLabel->setText( " " + text );
+    modLabel->setEnabled( true );
 }
 
-void FermaNextMainWindow::projectModified ()
-{}
+void FermaNextMainWindow::projectSaved ()
+{
+    modLabel->setEnabled( false );
+}
 
 void FermaNextMainWindow::trussWindowLostFocus ( TrussUnitWindow& window )
 {
@@ -777,6 +1002,9 @@ void FermaNextMainWindow::trussWindowLostFocus ( TrussUnitWindow& window )
         mng->disconnect( this );
 
     refreshUndoRedoActions();
+    
+    copyAction->setEnabled( false );
+    cutAction->setEnabled( false );
 
     geometryTabWidget->changeFocusWindow( 0 );
     trussPropTabWidget->changeFocusWindow( 0 );
@@ -799,6 +1027,9 @@ void FermaNextMainWindow::trussWindowReceivedFocus ( TrussUnitWindow& window )
                   SLOT(refreshUndoRedoActions()) );
     
     refreshUndoRedoActions();
+
+    copyAction->setEnabled( true );
+    cutAction->setEnabled( true );
     
     geometryTabWidget->changeFocusWindow( &window );
     trussPropTabWidget->changeFocusWindow( &window );
@@ -1162,17 +1393,30 @@ void FermaNextMainWindow::editRedo ()
 
 void FermaNextMainWindow::editCopy ()
 {
-    qWarning("Not implmented yet!");
-}
-
-void FermaNextMainWindow::editPaste ()
-{
-    qWarning("Not implmented yet!");
+    bool copyResult = onCopyTrussUnitWindow();
+    pasteAction->setEnabled( copyResult );
 }
 
 void FermaNextMainWindow::editCut ()
 {
-    qWarning("Not implmented yet!");
+    bool copyResult = onCopyTrussUnitWindow();
+    if ( copyResult ) {
+        FermaNextProject* currProj = workspace.currentActivatedProject();
+        TrussUnitWindowManager& wndMng = 
+            currProj->getTrussUnitWindowManager();
+        TrussUnitWindow* focusedWindow = 
+            currProj->getDesignerWidget().getFocusedWindow();
+        if ( ! focusedWindow )
+            return;
+
+        wndMng.removeTrussUnitWindow( *focusedWindow );
+        pasteAction->setEnabled( true );
+    }    
+}
+
+void FermaNextMainWindow::editPaste ()
+{
+    onPasteTrussUnitWindow();
 }
 
 void FermaNextMainWindow::editSelectAll ()
@@ -1213,20 +1457,20 @@ void FermaNextMainWindow::showResultsWindow ( const TrussUnitWindow& w )
     TrussSolutionResults* trussResults = 
         resMng.getResultsForTrussUnit( w.getUUID() );
     if ( ! trussResults ) {
-        if ( ! QMessageBox::question( 0, tr("Calculate truss unit"),
+        if ( ! QMessageBox::question( this, tr("Calculate truss unit"),
                                       tr("Calculate truss \"%1\"?").
                                       arg(w.getTrussName()),
                                       tr("&Yes"), tr("&No"),
                                       QString::null, 0, 1 ) )
             emit calculateTrussUnit( w );
         else
-            QMessageBox::information( 0, tr( "Calculate truss unit" ), 
+            QMessageBox::information( this, tr( "Calculate truss unit" ), 
                             tr( "There are no results for current truss" ), 
                             QMessageBox::Ok );
     }
     else {
         if ( ! w.isCalculated() ) {
-            if ( ! QMessageBox::question( 0, tr("Recalculate truss"),
+            if ( ! QMessageBox::question( this, tr("Recalculate truss"),
                                           tr("Truss \"%1\" was changed.\n"
                                              "Recalculate truss?").
                                           arg(w.getTrussName()),

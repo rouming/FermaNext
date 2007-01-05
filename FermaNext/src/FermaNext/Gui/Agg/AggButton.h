@@ -32,6 +32,9 @@ public:
     virtual const QString& getHint () const;    
     virtual void setHint ( const QString& );
 
+    virtual const QString& getStatusTip () const;
+    virtual void setStatusTip ( const QString& );
+
     virtual void setPressed ( bool );
     virtual bool isPressed () const;
 
@@ -59,7 +62,7 @@ private:
     bool pressed, enabled, highlighted;
     // leftTopPos - button position in inner dynarow buffer coords
     QPoint leftTopPos;
-    QString buttonText, hint;
+    QString buttonText, hint, statusTip;
 };
 
 #endif //AGGBUTTON_H

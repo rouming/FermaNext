@@ -58,6 +58,8 @@ const int defaultWidth = 250,
           resizeLimit = 200,
           winCornerRadius = 24,
           resEllRad = 3,
+          windowButtonWidth = headWidth - 6,
+          windowButtonHeight = windowButtonWidth, 
           snapPixels = 8;
 
 const bool flipY = true;

@@ -551,6 +551,8 @@ GeometryTabWidget::~GeometryTabWidget ()
 
 void GeometryTabWidget::init ()
 {
+    blockUpdateAreaSignals = false;
+    
     setFont( QFont( "Arial", 8 ) );
     initNodesTab();
     initPivotsTab();
@@ -728,7 +730,7 @@ void GeometryTabWidget::trussUnitWindowWasCreated ( TrussUnitWindow& window )
 
     // connections for area tab
     connect( &window, SIGNAL(onAreaChange(const DoubleSize&)),
-                      SLOT(updateTableTrussAreaSize(const DoubleSize&)) );
+                        SLOT(updateTrussAreaSpinBoxes(const DoubleSize&)) );
 
     connect( xSizeEdit, SIGNAL(valueChanged(double)),
                         SLOT(updateTrussAreaSize(double)) );
@@ -825,7 +827,7 @@ void GeometryTabWidget::addNodeToTable ( const Node& node )
                     SLOT(updateNodeTableFixation()) );
 
     pivotTable->setNodesTotalNumber( focusWindow->getNodeList().size() );
-    updateAreaSizeSpinBoxes();
+    updateTrussAreaSpinBoxLimits();
 }
 
 void GeometryTabWidget::showNodeTableRow ( bool visible )
@@ -875,7 +877,7 @@ void GeometryTabWidget::removeNodeFromTable ( const Node& node )
                 this, SLOT(showNodeTableRow(bool)) );
 
     pivotTable->setNodesTotalNumber( focusWindow->getNodeList().size() - 1 );
-    updateAreaSizeSpinBoxes();
+    updateTrussAreaSpinBoxLimits();
 }
 
 void GeometryTabWidget::updateNodeTableCoords ()
@@ -888,7 +890,7 @@ void GeometryTabWidget::updateNodeTableCoords ()
     }
     catch ( ... ) { return; }
     
-    updateAreaSizeSpinBoxes();
+    updateTrussAreaSpinBoxLimits();
 }
 
 void GeometryTabWidget::updateNodeTableFixation ()
@@ -938,7 +940,7 @@ void GeometryTabWidget::updateNodeState ( int row, int col )
         focusWindow->updateAfterNodeManipulation ( node, true );
         mng->endStateBlock();
         
-        updateAreaSizeSpinBoxes();
+        updateTrussAreaSpinBoxLimits();
     }
     else {
         FixationItem* item = nodeTable->getFixationItem( row );
@@ -1175,26 +1177,28 @@ void GeometryTabWidget::updatePivotState ( int row, int col )
     mng->endStateBlock();
 }
 
-/****************************** area ***************************************/
+/******************************** area ***************************************/
 
 void GeometryTabWidget::fillAreaSizeTab ()
 {
     sizeGroupBox->show();
     DoubleSize areaSize = focusWindow->getTrussAreaSize();
-    xSizeEdit->setValue( areaSize.width() );
-    ySizeEdit->setValue( areaSize.height() );
-    updateAreaSizeSpinBoxes();
+    updateTrussAreaSpinBoxes( areaSize );
 }
 
-void GeometryTabWidget::updateTableTrussAreaSize ( const DoubleSize& areaSize )
-{
+void GeometryTabWidget::updateTrussAreaSpinBoxes ( const DoubleSize& areaSize )
+{   
+    updateTrussAreaSpinBoxLimits();  
+
     xSizeEdit->setValue( areaSize.width() );
     ySizeEdit->setValue( areaSize.height() );
-    updateAreaSizeSpinBoxes();
 }
 
 void GeometryTabWidget::updateTrussAreaSize ( double newValue )
 {
+    if ( blockUpdateAreaSignals || ! focusWindow )
+        return;
+    
     DoubleSize areaSize = focusWindow->getTrussAreaSize();
     if ( sender() == xSizeEdit && areaSize.width() != newValue )
         focusWindow->setTrussAreaSize(DoubleSize(newValue, areaSize.height()));
@@ -1205,19 +1209,21 @@ void GeometryTabWidget::updateTrussAreaSize ( double newValue )
 /*
     Updates area tab spin boxes minimum values after 
     changing node position. It's need to ensure that
-    area size is less than or equal to the truss size. 
+    area size is larger than or equal to the truss size. 
 */
-void GeometryTabWidget::updateAreaSizeSpinBoxes()
+void GeometryTabWidget::updateTrussAreaSpinBoxLimits()
 {
-    xSizeEdit->blockSignals( true );
-    ySizeEdit->blockSignals( true );    
+    if ( ! focusWindow )
+        return;
+    
     DoubleSize trussSize = focusWindow->getTrussSize();
+
+    blockUpdateAreaSignals = true;
     if ( xSizeEdit->minimum() != trussSize.width() )
         xSizeEdit->setMinimum( trussSize.width() );
     if ( ySizeEdit->minimum() != trussSize.height() )
         ySizeEdit->setMinimum( trussSize.height() );
-    xSizeEdit->blockSignals( false );
-    ySizeEdit->blockSignals( false );
+    blockUpdateAreaSignals = false;
 }
 
 /***************************************************************************/

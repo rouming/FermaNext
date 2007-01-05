@@ -8,12 +8,54 @@
 #include "FermaNextWorkspace.h"
 #include "FermaNextProject.h"
 
-// Container for smart FermaNext projects navigation
+class WindowListBox;
+
+/*****************************************************************************/
+
+class ProjectToolBoxPage : public QWidget
+{
+    Q_OBJECT
+
+public:
+    ProjectToolBoxPage ( FermaNextProject& prj, QWidget* parent = 0, 
+                         Qt::WFlags f = 0 );
+
+    FermaNextProject& project () const;
+
+    void setTrussNumber ( uint );
+    uint getTrussNumber () const;
+
+    void setHiddenTrussNumber ( uint );
+    uint getHiddenTrussNumber () const;
+
+    void setTOK ( double );
+    double getTOK () const;
+
+    WindowListBox& getWindowListBox () const;
+
+protected:
+    void init ();
+
+protected slots:
+    void importIsPressed ();
+    void newTrussIsPressed ();
+    void calculateAllIsPressed ();
+    void afterTrussCountChange ( TrussUnitWindow& );
+    void afterTrussVisibilityChange ();
+
+private:
+    FermaNextProject& pageProject;
+    WindowListBox* listBox;
+
+    // project info labels
+    QLabel *tokLabel, *trussNumberLabel, *trussHiddenLabel;
+};
+
+/*****************************************************************************/
+
 class ProjectToolBox : public QToolBox
 {
     Q_OBJECT
-protected:
-    virtual QWidget* createSubsidiaryWidget ( FermaNextProject& );
 
 public:
     ProjectToolBox ( FermaNextWorkspace&,
@@ -22,6 +64,9 @@ public:
 
     virtual FermaNextProject* currentProject () const;
 
+    virtual ProjectToolBoxPage* getPageForProject ( 
+                                        const FermaNextProject& ) const;
+
     virtual bool eventFilter( QObject*, QEvent* );
 
 protected slots:
@@ -29,32 +74,17 @@ protected slots:
     virtual int removeProject ( FermaNextProject& );
     virtual void projectRename ( const QString& );
     virtual void projectIsActivated ( FermaNextProject& );
- 
-    void activateSelected ( int index );
+    virtual void activateSelected ( int index );
 
 public slots:
     virtual void clear ();
-    virtual void importIsPressed ();
-    virtual void newTrussIsPressed ();
-    virtual void calculateAllIsPressed ();
-
-    virtual void afterTrussCountChange ( TrussUnitWindow& );
-    virtual void afterTrussVisibilityChange ();
 
 signals:
     void onShowTrussResults ( const TrussUnitWindow& );
     void calculateTrussUnit ( const TrussUnitWindow& );
 
 private:
-    typedef QMap<FermaNextProject*, QWidget*> ProjectMap;
-    typedef QMap<FermaNextProject*, QWidget*>::iterator ProjectMapIter;
-
-    ProjectMap projects;
-    FermaNextProject* currentPrj;
     FermaNextWorkspace& workspace;
-    
-    // project info labels
-    QLabel *tokLabel, *trussNumberLabel, *trussHiddenLabel;
 };
 
 #endif //PROJECTTOOLBOX_H

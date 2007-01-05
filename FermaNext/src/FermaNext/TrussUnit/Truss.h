@@ -164,8 +164,9 @@ public:
     typedef typename TopologyList::iterator TopologyListIter;
     typedef typename TopologyList::const_iterator TopologyListConstIter;    
 
-    Truss ( ObjectStateManager* mng ) :
-        TrussEmitter(mng)
+    Truss ( ObjectStateManager* mng, const TrussMaterialLibrary& mLib ) :
+        TrussEmitter(mng),
+        materialLibrary(mLib)
     {
         // Signal connects to catch life time changing and deligate them
         // to common 'onStateChange' signal
@@ -346,7 +347,7 @@ public:
         suspendedClean();
 
         emit beforePivotCreation();
-        P* pivot = new P( first, last, getStateManager() );
+        P* pivot = new P( first, last, getStateManager(), materialLibrary );
 
         // Signal connects to be the first and to catch life time changing
         QObject::connect( pivot, SIGNAL(onBeforeRevive(StatefulObject&)),
@@ -894,6 +895,7 @@ private:
     DoubleSize trussAreaSize;
     LoadCases loadCases;
     TrussDimension dimension;
+    const TrussMaterialLibrary& materialLibrary;
 };
 
 /*****************************************************************************
@@ -924,15 +926,18 @@ template <class N>
 class Pivot : public PivotEmitter
 {
 public:
-    Pivot ( ObjectStateManager* mng ) : 
+    Pivot ( ObjectStateManager* mng, const TrussMaterialLibrary& mLib ) : 
         PivotEmitter(mng),
+        materialLib(mLib),
         first(0), last(0),
         material(0),
         thickness(0.1),
         number(0)
     {}
-    Pivot ( N& first_, N& last_, ObjectStateManager* mng ) :
+    Pivot ( N& first_, N& last_, ObjectStateManager* mng, 
+            const TrussMaterialLibrary& mLib ) :
         PivotEmitter(mng),
+        materialLib(mLib),
         first(&first_),
         last(&last_),
         material(0),
@@ -975,9 +980,14 @@ public:
     virtual void setNumber ( int num )
     { number = num; }
 
+protected:
+    virtual const TrussMaterialLibrary& materialLibrary() const
+    { return materialLib; }
+
 private:    
     N *first, *last;
     const TrussMaterial* material;
+    const TrussMaterialLibrary& materialLib;
     double thickness;
     int number;
 };

@@ -253,4 +253,18 @@ QSize TableHeader::sizeHint () const
     return QSize( 20, 20 );
 }
 
+/*****************************************************************************
+ * Flat Style
+ *****************************************************************************/
+
+void FlatStyle::drawPrimitive ( PrimitiveElement pe, 
+                                const QStyleOption* opt, 
+                                QPainter* p, const QWidget* widget ) const
+{
+	if ( pe == PE_FrameStatusBar )
+		return;
+
+	QCommonStyle::drawPrimitive( pe, opt, p, widget );
+}
+
 /***************************************************************************/

@@ -77,10 +77,12 @@ public:
     TrussMaterialLibrary ();
     virtual ~TrussMaterialLibrary ();
 
-    virtual TrussMaterial& createMaterial ( const QString& name = "Unnamed material", 
-                                            double ws = 0.0, 
+    virtual TrussMaterial& createMaterial ( double ws = 0.0, 
                                             double em = 0.0, 
-                                            double d = 0.0 ); 
+                                            double d = 0.0,
+                                            const QString& name = QString() ); 
+
+    virtual TrussMaterial& createMaterial ( const QString& xmlProps ); 
 
     // XML serialization
     virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
@@ -93,24 +95,39 @@ public:
     virtual TrussMaterial* getMaterial ( int indx ) const;
     virtual TrussMaterial* getMaterial ( const QString& uuid ) const;
 
+    virtual QString getMaterialXml ( const TrussMaterial& );
+
     virtual int countMaterials () const;
     virtual void clean ();
 
-    virtual const TrussMaterialUUIDMap& getMaterialUUIDMap () const;
+    virtual void selectMaterial ( const TrussMaterial& );
+    virtual void selectMaterial ( const QString& uuid );
+    virtual void selectMaterial ( int indx );
+    virtual const TrussMaterial* getSelectedMaterial () const;
+
+    virtual TrussMaterial* getMaterialWithSameProperties ( 
+                                        const QString& xmlProps ) const;
+
+    virtual TrussMaterial* getMaterialWithSameProperties ( 
+                                        const TrussMaterial& ) const;
+
+    virtual QString getDefaultMaterialName ( const QString& nameBasis, 
+                                             uint startIdx = 0 ) const;
 
 signals:
     void onAfterMaterialCreation ( const TrussMaterial& );
     void onBeforeMaterialRemoval ( const TrussMaterial& );
     void onAfterMaterialRemoval ();
-    
+
 private:
     typedef QList<TrussMaterial*> TrussMaterialList;
     typedef TrussMaterialList::iterator TrussMaterialListIter;
     typedef TrussMaterialList::const_iterator TrussMaterialListConstIter;
 
     TrussMaterialList materials;
-    // Tie UUID with truss materials to link materials with pivots
-    TrussMaterialUUIDMap materialUUIDMap;
+    
+    // Material which is currently selected on designer toolbar
+    const TrussMaterial* selectedMaterial;
 };
 
 /************************* Declare meta types ********************************/

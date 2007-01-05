@@ -8,10 +8,13 @@
  *****************************************************************************/
 
 AggMaterialComboBox::AggMaterialComboBox ( QWidget& parentWidget,
-                                           const TrussMaterialLibrary* mLib ) :
+                                           TrussMaterialLibrary* mLib ) :
     AggComboBox( parentWidget ),
     materialLib( mLib )
 {
+    connect( this, SIGNAL(currentIndexChanged(int)),
+                     SLOT(setCurrentMaterial(int)) );
+
     if ( mLib )
         setMaterialLibrary( *mLib );
 }
@@ -21,7 +24,7 @@ const TrussMaterialLibrary& AggMaterialComboBox::getMaterialLibrary () const
     return *materialLib;
 }
 
-void AggMaterialComboBox::setMaterialLibrary ( const TrussMaterialLibrary& mLib )
+void AggMaterialComboBox::setMaterialLibrary ( TrussMaterialLibrary& mLib )
 {
     if ( materialLib ) {
         disconnect( materialLib, 
@@ -58,11 +61,9 @@ const TrussMaterial* AggMaterialComboBox::getCurrentMaterial () const
     return getMaterialByIndex( currentIndex() );
 }
 
-void AggMaterialComboBox::setCurrentMaterial ( const TrussMaterial& m )
+void AggMaterialComboBox::setCurrentMaterial ( int idx )
 {
-    int idx = getMaterialIndex( m );
-    if ( idx >= 0 )
-        setCurrentIndex( idx );
+    materialLib->selectMaterial( idx );
 }
 
 int AggMaterialComboBox::getMaterialIndex ( const TrussMaterial& material ) const
@@ -113,14 +114,14 @@ void AggMaterialComboBox::removeMaterialItem ( const TrussMaterial& m )
         removeItem( idx );
 }
 
-void AggMaterialComboBox::updateMaterialItemName( const QString& name )
+void AggMaterialComboBox::updateMaterialItemName ( const QString& name )
 {
     const TrussMaterial* senderMaterial = 
         dynamic_cast<const TrussMaterial*>( sender() );
 
     if ( ! senderMaterial )
         return;
-    
+
     int idx = getMaterialIndex( *senderMaterial );
     if ( idx >= 0 )
         setItemText( idx, name );
@@ -156,6 +157,7 @@ void AggTrussToolBar::initButtons ()
     AggToolBarButton* select = 
         new AggToolBarButton( Global::imagesSvgPath() + "/arrowIcon.svg" );
     select->setHint( "Select 'Esc'" );
+    select->setStatusTip( tr( "Allows to select a single truss element" ) );
     addButton( *select );
 
     connect( select, SIGNAL( onButtonPress() ),
@@ -168,7 +170,8 @@ void AggTrussToolBar::initButtons ()
 
     AggToolBarButton* nodeDraw = 
         new AggToolBarButton( Global::imagesSvgPath() + "/nodeIcon.svg" );
-    nodeDraw->setHint( "Draw node 'N'" );
+    nodeDraw->setHint( tr( "Draw node 'N'" ) );
+    nodeDraw->setStatusTip( tr( "Draws a single node" ) );
     addButton( *nodeDraw );
 
     designerWidget->changeBehaviourToSelect();
@@ -182,7 +185,8 @@ void AggTrussToolBar::initButtons ()
 
     AggToolBarButton* pivotDraw = 
         new AggToolBarButton( Global::imagesSvgPath() + "/pivotIcon.svg" );
-    pivotDraw->setHint( "Draw pivot 'P'" );
+    pivotDraw->setHint( tr( "Draw pivot 'P'" ) );
+    pivotDraw->setStatusTip( tr( "Draws a single pivot" ) );
     addButton( *pivotDraw );
 
     connect( pivotDraw, SIGNAL( onButtonPress() ),
@@ -195,7 +199,8 @@ void AggTrussToolBar::initButtons ()
 
     AggToolBarButton* fixDraw = 
         new AggToolBarButton( Global::imagesSvgPath() + "/fixIcon.svg" );
-    fixDraw->setHint( "Set node fixation 'F'" );
+    fixDraw->setHint( tr( "Set node fixation 'F'" ) );
+    fixDraw->setStatusTip( tr( "Adds a fixation" ) );
     addButton( *fixDraw );
 
     connect( fixDraw, SIGNAL( onButtonPress() ),
@@ -208,7 +213,8 @@ void AggTrussToolBar::initButtons ()
 
     AggToolBarButton* loadDraw = 
         new AggToolBarButton( Global::imagesSvgPath() + "/forceIcon.svg" );
-    loadDraw->setHint( "Load node 'L'" );
+    loadDraw->setHint( tr( "Load node 'L'" ) );
+    loadDraw->setStatusTip( tr( "Loads a node" ) );
     addButton( *loadDraw );
 
     connect( loadDraw, SIGNAL( onButtonPress() ),
@@ -221,7 +227,8 @@ void AggTrussToolBar::initButtons ()
 
     AggToolBarButton* erase = 
         new AggToolBarButton( Global::imagesSvgPath() + "/eraseIcon.svg" );
-    erase->setHint( "Erase 'R'" );
+    erase->setHint( tr( "Erase 'R'" ) );
+    erase->setStatusTip( tr( "Erase a single truss element" ) );
     addButton( *erase );
 
     connect( erase, SIGNAL( onButtonPress() ),
@@ -233,12 +240,16 @@ void AggTrussToolBar::initButtons ()
     //-------------------------------------------------------------------------
 
     aggComboBox = new AggMaterialComboBox( *designerWidget );
-
+    aggComboBox->setStatusTip( tr( "Selects a current pivot material" ) );
     addComboBox( *aggComboBox );
 }
 
+const TrussMaterial* AggTrussToolBar::getCurrentMaterial () const
+{
+    return aggComboBox->getCurrentMaterial();
+}
 
-void AggTrussToolBar::setMaterialLibrary ( const TrussMaterialLibrary& mLib )
+void AggTrussToolBar::setMaterialLibrary ( TrussMaterialLibrary& mLib )
 {
     aggComboBox->setMaterialLibrary( mLib );
 }

@@ -105,7 +105,7 @@ protected:
     // remove highlight from nodes and pivots and renew their behaviour  
     virtual void removeTrussElemHighlight ();
     // remove highlight from all window buttons
-    virtual void removeWindowButtonHighlight ();
+    virtual void removeButtonHighlightFromWindows ();
     // set release status for all window buttons
     virtual void releaseWindowButtons ();
     // clear window cursor position field
@@ -138,7 +138,6 @@ public:
 
 signals:
     void cursorMoved ();
-    void onHintChange ( const QString& );
 
     // Tool bar signals
     void pressSelectButton ();

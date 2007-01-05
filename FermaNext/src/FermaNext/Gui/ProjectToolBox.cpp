@@ -14,15 +14,234 @@
 #include "TrussUnitActions.h"
 
 /*****************************************************************************
+ * Project ToolBox Page
+ *****************************************************************************/
+
+ProjectToolBoxPage::ProjectToolBoxPage ( FermaNextProject& prj,
+                                         QWidget* parent, Qt::WFlags f ) :
+    QWidget( parent, f ),
+    pageProject( prj ),
+    listBox( 0 )
+{
+    init();
+}
+
+void ProjectToolBoxPage::init ()
+{
+    QVBoxLayout* pageLayout = new QVBoxLayout( this );
+    pageLayout->setMargin(3);
+    pageLayout->setSpacing(0);
+
+    QGroupBox* propertyBox = new QGroupBox( tr( "Project Info" ), this );
+    pageLayout->addWidget( propertyBox );
+    
+    QGridLayout* propertyLayout = new QGridLayout( propertyBox );
+    tokLabel = new QLabel( "", propertyBox );
+    trussNumberLabel = new QLabel( "0", propertyBox );
+    trussHiddenLabel = new QLabel( "0", propertyBox );
+    propertyLayout->addWidget( new QLabel( tr( "TOK: ") ), 0, 0 );
+    propertyLayout->addWidget( new QLabel( tr( "Total trusses: ") ), 1, 0 );
+    propertyLayout->addWidget( new QLabel( tr( "Hidden trusses: ") ), 2, 0 );
+    propertyLayout->addWidget( tokLabel, 0, 1 );
+    propertyLayout->addWidget( trussNumberLabel, 1, 1 );
+    propertyLayout->addWidget( trussHiddenLabel, 2, 1 );
+
+    // Truss units group box
+    QGroupBox* groupBoxTrussUnits = new QGroupBox( tr( "Trusses" ), this );
+
+    QVBoxLayout* trussUnitsLayout = new QVBoxLayout( groupBoxTrussUnits );
+    trussUnitsLayout->setMargin(3);
+    trussUnitsLayout->setSpacing(0);
+    pageLayout->addWidget( groupBoxTrussUnits );
+
+    listBox = new WindowListBox( pageProject, groupBoxTrussUnits );
+    trussUnitsLayout->addWidget( listBox );
+
+    // Buttons
+    QPushButton* calculateAllButton = new QPushButton;    
+    trussUnitsLayout->addSpacing(10);
+    trussUnitsLayout->addWidget( calculateAllButton );
+    calculateAllButton->setFlat( true );
+    calculateAllButton->setStatusTip( tr( "Calculates all the project trusses" ) );
+    calculateAllButton->setToolTip( tr( "Calculate All (F5)" ) );
+    calculateAllButton->setText( tr("Calculate all") );    
+    calculateAllButton->setIcon( 
+                       QIcon(Global::imagesPath() + "/calculate_all.png") );
+        
+    connect( calculateAllButton, SIGNAL(clicked()), 
+                                    SLOT(calculateAllIsPressed()) ); 
+
+    // Calculate all action
+    QAction* calculationAllAction = new QAction( tr("Calculate all"), this );
+    calculationAllAction->setShortcut( tr("F5") );
+    connect( calculationAllAction, SIGNAL(triggered()) , 
+                                    SLOT(calculateAllIsPressed()) );
+
+    QFrame* buttonsGroupBox = new QFrame;
+    buttonsGroupBox->setFrameStyle( QFrame::Plain | QFrame::NoFrame );
+    buttonsGroupBox->setMidLineWidth( 3 );
+    QHBoxLayout* buttonsLayout = new QHBoxLayout;
+    buttonsLayout->setSpacing(0);
+    buttonsLayout->setMargin(0);
+    buttonsGroupBox->setLayout( buttonsLayout );
+    trussUnitsLayout->addWidget( buttonsGroupBox );
+
+    QPushButton* buttonImport = new QPushButton;    
+    buttonsLayout->addWidget( buttonImport );
+    buttonImport->setFlat( true );
+    buttonImport->setText( tr("Import") );
+    buttonImport->setStatusTip( tr( "Imports a truss of the previous format" ) );
+    buttonImport->setToolTip( tr( "Import Truss" ) );
+    buttonImport->setMinimumWidth( 60 );
+    connect( buttonImport, SIGNAL(clicked()), 
+                             SLOT(importIsPressed()) ); 
+
+    QPushButton* buttonNewTruss = new QPushButton;
+    buttonsLayout->addWidget( buttonNewTruss );
+    buttonNewTruss->setFlat( true );
+    buttonNewTruss->setText( tr("New") );
+    buttonNewTruss->setStatusTip( tr( "Creates a new truss" ) );
+    buttonNewTruss->setToolTip( tr( "New Truss" ) );
+    buttonNewTruss->setMinimumWidth( 60 );
+    connect( buttonNewTruss, SIGNAL(clicked()), 
+                               SLOT(newTrussIsPressed()) ); 
+
+    // Catch truss count and visibility changing
+    TrussUnitWindowManager& mng =  pageProject.getTrussUnitWindowManager();
+    connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)),
+                     SLOT(afterTrussCountChange(TrussUnitWindow&)) );
+    connect( &mng, SIGNAL(onTrussUnitWindowRevive(TrussUnitWindow&)),
+                     SLOT(afterTrussCountChange(TrussUnitWindow&)) );
+    connect( &mng, SIGNAL(onTrussUnitWindowDesist(TrussUnitWindow&)),
+                     SLOT(afterTrussCountChange(TrussUnitWindow&)) );
+    connect( &mng, SIGNAL(onTrussWindowVisibilityChange(bool)),
+                     SLOT(afterTrussVisibilityChange()) );
+}
+
+FermaNextProject& ProjectToolBoxPage::project () const
+{
+    return pageProject;
+}
+
+WindowListBox& ProjectToolBoxPage::getWindowListBox () const
+{
+    return *listBox;
+}
+
+void ProjectToolBoxPage::setTrussNumber ( uint numb )
+{
+    trussNumberLabel->setText( QString::number(numb) );
+}
+
+uint ProjectToolBoxPage::getTrussNumber () const
+{
+    return trussNumberLabel->text().toUInt();
+}
+
+void ProjectToolBoxPage::setHiddenTrussNumber ( uint numb )
+{
+    trussHiddenLabel->setText( QString::number(numb) );
+}
+
+uint ProjectToolBoxPage::getHiddenTrussNumber () const
+{
+    return trussHiddenLabel->text().toUInt();
+}
+
+void ProjectToolBoxPage::setTOK ( double numb )
+{
+    tokLabel->setText( QString::number(numb) );
+}
+
+double ProjectToolBoxPage::getTOK () const
+{
+    return tokLabel->text().toDouble();
+}
+
+void ProjectToolBoxPage::importIsPressed ()
+{
+    QString fileName = QFileDialog::getOpenFileName( 
+        this,
+        tr( "Import trusses" ),
+        QString(),
+        "FermaNext, Ferma old (*" + TrussUnitWindowManager::newFormatExtension()  +
+        " *" + TrussUnitWindowManager::oldFormatExtension() +")"
+         );
+
+    if ( fileName.isEmpty() ) 
+        return;
+
+    try { 
+        TrussUnitWindowManager& mng = pageProject.getTrussUnitWindowManager();
+        mng.createTrussUnitWindowFromFile(fileName);
+
+    } catch ( TrussUnitWindowManager::ReadFileException& ) {
+        QMessageBox::critical( 
+                   0, "TrussUnitWindowManager::ReadFileException",
+                   QString("TrussUnitWindowManager::ReadFileException") );
+        return;
+
+    } catch ( TrussUnitWindowManager::WrongFormatException& ) {
+        QMessageBox::critical( 
+                   0, "TrussUnitWindowManager::WrongFormatException",
+                   QString("TrussUnitWindowManager::WrongFormatException") );
+    }
+}
+
+void ProjectToolBoxPage::newTrussIsPressed ()
+{
+    QString trussName = QInputDialog::getText(
+            this,
+            tr("Truss unit creation"), 
+            tr("Enter truss unit name:") );
+    if ( ! trussName.isEmpty() ) {
+        TrussUnitWindowManager& trussMng = 
+            pageProject.getTrussUnitWindowManager();
+        TrussUnitWindow& truss = trussMng.createTrussUnitWindow(trussName);
+        truss.setTrussAreaSize( DoubleSize( 300, 300 ) );
+    } else {
+        // user entered nothing or pressed Cancel
+    }
+}
+
+void ProjectToolBoxPage::calculateAllIsPressed ()
+{
+    QMessageBox::warning( this, "Not implemented", "Not implemented" );
+}
+
+void ProjectToolBoxPage::afterTrussCountChange ( TrussUnitWindow& w )
+{
+    TrussUnitWindowManager& mng = pageProject.getTrussUnitWindowManager();
+    setTrussNumber( mng.getTrussUnitWindowList().size() );
+    if ( ! w.isVisible() )
+        afterTrussVisibilityChange();
+
+}
+
+void ProjectToolBoxPage::afterTrussVisibilityChange ()
+{
+    TrussUnitWindowManager& mng = pageProject.getTrussUnitWindowManager();
+    int numb = 0;
+    WindowList trussWindows = mng.getTrussUnitWindowList();
+    WindowListIter iter = trussWindows.begin();
+    for ( ; iter != trussWindows.end(); ++iter )
+        if ( ! (*iter)->isVisible() )
+            ++numb;
+
+    setHiddenTrussNumber( numb );
+}
+
+/*****************************************************************************
  * Project ToolBox
  *****************************************************************************/
 
 ProjectToolBox::ProjectToolBox ( FermaNextWorkspace& ws, QWidget* parent, 
                                  Qt::WFlags f ) :
     QToolBox(parent, f),
-    currentPrj(0),
     workspace(ws)
 {    
+    setMouseTracking( true );
+        
     // Fill in toolbox by existent projects
     if ( workspace.countProjects() ) {
         for ( int i=0; i < workspace.countProjects(); ++i ) {
@@ -41,49 +260,70 @@ ProjectToolBox::ProjectToolBox ( FermaNextWorkspace& ws, QWidget* parent,
                    SLOT(activateSelected(int)) );
 }
 
+FermaNextProject* ProjectToolBox::currentProject () const
+{
+    ProjectToolBoxPage* currPage = 
+        dynamic_cast<ProjectToolBoxPage*>( currentWidget() );
+
+    if ( currPage )
+        return &currPage->project();
+
+    return 0;
+}
+
+ProjectToolBoxPage* ProjectToolBox::getPageForProject ( 
+                                         const FermaNextProject& prj ) const
+{
+    for ( int i = 0; i < count(); ++i ) {
+        ProjectToolBoxPage* page = 
+            dynamic_cast<ProjectToolBoxPage*>( widget( i ) );
+        if ( ! page )
+            continue;
+
+        if ( &page->project() == &prj )
+            return page;        
+    }
+    return 0;
+}
+
 int ProjectToolBox::addProject ( FermaNextProject& prj )
 {
-    currentPrj = &prj;
-    QWidget* page = createSubsidiaryWidget(prj);
-    projects[&prj] = page;
+    ProjectToolBoxPage* page = new ProjectToolBoxPage( prj );
 
     // Catch name changing
-    QObject::connect( &prj, SIGNAL(onNameChange(const QString&)),
-                            SLOT(projectRename(const QString&)) );
-
-    // Catch truss count and visibility changing
-    TrussUnitWindowManager& mng =  prj.getTrussUnitWindowManager();
-    QObject::connect( &mng, SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)),
-                            SLOT(afterTrussCountChange(TrussUnitWindow&)) );
-    QObject::connect( &mng, SIGNAL(onTrussUnitWindowRevive(TrussUnitWindow&)),
-                            SLOT(afterTrussCountChange(TrussUnitWindow&)) );
-    QObject::connect( &mng, SIGNAL(onTrussUnitWindowDesist(TrussUnitWindow&)),
-                            SLOT(afterTrussCountChange(TrussUnitWindow&)) );
-    QObject::connect( &mng, SIGNAL(onTrussWindowVisibilityChange(bool)),
-                            SLOT(afterTrussVisibilityChange()) );
-    
+    connect( &prj, SIGNAL(onNameChange(const QString&)),
+                     SLOT(projectRename(const QString&)) );
 
     QIcon iconSet( Global::imagesPath() + "/project_toolbox.png"  );
     int result = addItem( page, iconSet, prj.getName() );    
     setCurrentWidget(page);
     prj.activate();
+
+    // FIXME: kill this long chain of signal delegations
+    connect( &page->getWindowListBox(), 
+                SIGNAL(onShowTrussResults(const TrussUnitWindow&)),
+                SIGNAL(onShowTrussResults(const TrussUnitWindow&)) );
+
+    connect( this, 
+             SIGNAL(calculateTrussUnit(const TrussUnitWindow&)),
+             &page->getWindowListBox(), 
+             SLOT(solveTrussUnit(const TrussUnitWindow&)) );
+
     return result;
 }
 
 int ProjectToolBox::removeProject ( FermaNextProject& prj )
 {
-    // Zeroing currentPrj if we should remove it
-    if ( currentPrj != 0 && currentPrj->getName() == prj.getName () )
-      currentPrj = 0;
-    ProjectMapIter iter = projects.find(&prj);
-    if ( iter == projects.end() ) 
+    ProjectToolBoxPage* page = getPageForProject( prj );
+    if ( ! page )
         return -1;
-    QWidget* page = iter.value();
-    int pageIndex = indexOf(page);
-    projects.erase(iter);
+
+    int pageIndex = indexOf( page );
     removeItem( pageIndex );
+    
     if ( pageIndex > 0 )
-        setCurrentIndex( pageIndex - 1 );        
+        setCurrentIndex( pageIndex - 1 );    
+    
     delete page;
     return pageIndex;
 }
@@ -94,130 +334,45 @@ void ProjectToolBox::projectRename ( const QString& newName )
         QObject* prjSender = const_cast<QObject*>( sender() );
         FermaNextProject& prj = 
             dynamic_cast<FermaNextProject&>( *prjSender );
-        if ( projects.contains( &prj ) ) {
-            int indx = indexOf( projects[&prj] );
-            if ( indx != -1 )
-                setItemText( indx, newName );
-        }
-    } catch ( ... ) {}
+
+        ProjectToolBoxPage* page = getPageForProject( prj );
+        if ( ! page )
+            return;
+
+        int pageIndex = indexOf( page );
+
+        if ( pageIndex != -1 )
+            setItemText( pageIndex, newName );
+    } 
+    catch ( ... ) {}
 }
 
 void ProjectToolBox::projectIsActivated ( FermaNextProject& prj )
 {
-    // Double activation check
-    if ( currentProject() == &prj )
+    ProjectToolBoxPage* page = getPageForProject( prj );
+    if ( ! page && page == currentWidget() )
         return;
-    setCurrentWidget( projects[&prj] );
-}
 
-QWidget* ProjectToolBox::createSubsidiaryWidget ( FermaNextProject& prj )
-{
-    // Main widget
-    QWidget* page = new QWidget;
-    QVBoxLayout* pageLayout = new QVBoxLayout;
-    pageLayout->setMargin(3);
-    pageLayout->setSpacing(0);
-    page->setLayout( pageLayout );
-
-    QGroupBox* propertyBox = new QGroupBox( tr( "Project Info" ), page );
-    pageLayout->addWidget( propertyBox );
-    
-    QGridLayout* propertyLayout = new QGridLayout( propertyBox );
-    tokLabel = new QLabel( "", propertyBox );
-    trussNumberLabel = new QLabel( "0", propertyBox );
-    trussHiddenLabel = new QLabel( "0", propertyBox );
-    propertyLayout->addWidget( new QLabel( tr( "TOK: ") ), 0, 0 );
-    propertyLayout->addWidget( new QLabel( tr( "Total trusses: ") ), 1, 0 );
-    propertyLayout->addWidget( new QLabel( tr( "Hidden trusses: ") ), 2, 0 );
-    propertyLayout->addWidget( tokLabel, 0, 1 );
-    propertyLayout->addWidget( trussNumberLabel, 1, 1 );
-    propertyLayout->addWidget( trussHiddenLabel, 2, 1 );
-
-    // Truss units group box
-    QGroupBox* groupBoxTrussUnits = new QGroupBox( tr( "Trusses" ), page );
-
-    QVBoxLayout* trussUnitsLayout = new QVBoxLayout( groupBoxTrussUnits );
-    trussUnitsLayout->setMargin(3);
-    trussUnitsLayout->setSpacing(0);
-    pageLayout->addWidget( groupBoxTrussUnits );
-
-    WindowListBox * listBox = new WindowListBox( prj, groupBoxTrussUnits );
-    trussUnitsLayout->addWidget( listBox );
-    QObject::connect( listBox, 
-                      SIGNAL(onShowTrussResults(const TrussUnitWindow&)),
-                      SIGNAL(onShowTrussResults(const TrussUnitWindow&)) );
-    QObject::connect( this, 
-                      SIGNAL(calculateTrussUnit(const TrussUnitWindow&)),
-                      listBox,
-                      SLOT(solveTrussUnit(const TrussUnitWindow&)) );
-    // Buttons
-    QPushButton* calculateAllButton = new QPushButton;    
-    trussUnitsLayout->addSpacing(10);
-    trussUnitsLayout->addWidget( calculateAllButton );
-    calculateAllButton->setFlat( true );
-    calculateAllButton->setText( tr("Calculate all") );    
-    calculateAllButton->setIcon( 
-                       QIcon(Global::imagesPath() + "/calculate_all.png") );
-        
-    connect( calculateAllButton, SIGNAL(clicked()), 
-             SLOT(calculateAllIsPressed()) ); 
-
-    // Calculate all action
-    QAction* calculationAllAction = new QAction( tr("Calculate all"), this );
-    calculationAllAction->setShortcut( tr("F5") );
-    connect( calculationAllAction, SIGNAL(triggered()) , 
-             SLOT(calculateAllIsPressed()) );
-
-    QFrame* buttonsGroupBox = new QFrame;
-    buttonsGroupBox->setFrameStyle( QFrame::Plain | QFrame::NoFrame );
-    buttonsGroupBox->setMidLineWidth( 3 );
-    QHBoxLayout* buttonsLayout = new QHBoxLayout;
-    buttonsLayout->setSpacing(0);
-    buttonsLayout->setMargin(0);
-    buttonsGroupBox->setLayout( buttonsLayout );
-    trussUnitsLayout->addWidget( buttonsGroupBox );
-
-    QPushButton* buttonImport = new QPushButton;    
-    buttonsLayout->addWidget( buttonImport );
-    buttonImport->setFlat( true );
-    buttonImport->setText( tr("Import") );
-    buttonImport->setMinimumWidth( 60 );
-    connect( buttonImport, SIGNAL(clicked()), SLOT(importIsPressed()) ); 
-
-    QPushButton* buttonNewTruss = new QPushButton;
-    buttonsLayout->addWidget( buttonNewTruss );
-    buttonNewTruss->setFlat( true );
-    buttonNewTruss->setText( tr("New") );
-    buttonNewTruss->setMinimumWidth( 60 );
-    connect( buttonNewTruss, SIGNAL(clicked()), SLOT(newTrussIsPressed()) ); 
-
-    return page;
-}
-
-FermaNextProject* ProjectToolBox::currentProject () const
-{
-    return currentPrj;
+    setCurrentWidget( page );
 }
 
 void ProjectToolBox::activateSelected ( int index )
 {   
     if ( index == -1 ) 
         return;
-    QWidget* page = currentWidget();
-    QList<FermaNextProject*> keys = projects.keys();
-    QList<FermaNextProject*>::iterator i = keys.begin();
-    for ( ; i != keys.end(); ++i )
-        if ( page == projects[*i] ) {
-            currentPrj = *i;
-            if ( ! currentPrj->isActivated() )
-                currentPrj->activate();
-            break;
-        }
+
+    FermaNextProject* currPrj = currentProject();
+    if ( ! currPrj )
+        return;
+
+    if ( ! currPrj->isActivated() )
+        currPrj->activate();
 
     QIcon activeIconSet( Global::imagesPath() + "/project_toolbox.png" );
     QIcon disablesIconSet( Global::imagesPath() + "/project_d.png" );
-    for ( int ind = 0; ind < count(); ++ind )
-        setItemIcon( ind, disablesIconSet );
+    for ( int i = 0; i < count(); ++i )
+        setItemIcon( i, disablesIconSet );
+
     setItemIcon( index, activeIconSet );        
 }
 
@@ -225,99 +380,6 @@ void ProjectToolBox::clear ()
 {
     for ( int i=0; i < workspace.countProjects(); ++i )
         removeProject( workspace.getProject(i) );        
-    currentPrj = 0;
-}
-
-void ProjectToolBox::importIsPressed ()
-{
-    FermaNextProject* currPrj = currentProject();
-    if ( currPrj == 0 )
-        return;
-
-    QString fileName = QFileDialog::getOpenFileName( 
-        this,
-        tr( "Import trusses" ),
-        QString(),
-        "FermaNext, Ferma old (*" + TrussUnitWindowManager::newFormatExtension()  +
-        " *" + TrussUnitWindowManager::oldFormatExtension() +")"
-         );
-
-    if ( fileName.isEmpty() ) 
-        return;
-
-    try { 
-        TrussUnitWindowManager& mng = currPrj->getTrussUnitWindowManager();
-        mng.createTrussUnitWindowFromFile(fileName);
-
-    } catch ( TrussUnitWindowManager::ReadFileException& ) {
-        QMessageBox::critical( 
-                   0, "TrussUnitWindowManager::ReadFileException",
-                   QString("TrussUnitWindowManager::ReadFileException") );
-        return;
-
-    } catch ( TrussUnitWindowManager::WrongFormatException& ) {
-        QMessageBox::critical( 
-                   0, "TrussUnitWindowManager::WrongFormatException",
-                   QString("TrussUnitWindowManager::WrongFormatException") );
-    }
-}
-
-void ProjectToolBox::newTrussIsPressed ()
-{
-    FermaNextProject* currPrj = currentProject();
-    if ( currPrj == 0 )
-        return;
-
-    QString trussName = QInputDialog::getText(
-            this,
-            tr("Truss unit creation"), 
-            tr("Enter truss unit name:") );
-    if ( !trussName.isEmpty() ) {
-        TrussUnitWindowManager& trussMng = 
-            currPrj->getTrussUnitWindowManager();
-        TrussUnitWindow& truss = trussMng.createTrussUnitWindow(trussName);
-        truss.setTrussAreaSize( DoubleSize( 300, 300 ) );
-    } else {
-        // user entered nothing or pressed Cancel
-    }
-}
-
-void ProjectToolBox::calculateAllIsPressed ()
-{
-    FermaNextProject* currPrj = currentProject();
-    if ( currPrj == 0 )
-        return;
-
-    QMessageBox::warning( this, "Not implemented", "Not implemented" );
-}
-
-void ProjectToolBox::afterTrussCountChange ( TrussUnitWindow& w)
-{
-    TrussUnitWindowManager& mng = currentProject()->getTrussUnitWindowManager();
-    if ( sender() != &mng )
-        return;
-
-    int numb = mng.getTrussUnitWindowList().size();
-    trussNumberLabel->setText( QString::number(numb) );
-    if ( ! w.isVisible() )
-        afterTrussVisibilityChange();
-
-}
-
-void ProjectToolBox::afterTrussVisibilityChange ()
-{
-    TrussUnitWindowManager& mng = currentProject()->getTrussUnitWindowManager();
-    if ( sender() != &mng )
-        return;
-
-    int numb = 0;
-    WindowList trussWindows = mng.getTrussUnitWindowList();
-    WindowListIter iter = trussWindows.begin();
-    for ( ; iter != trussWindows.end(); ++iter )
-        if ( ! (*iter)->isVisible() )
-            ++numb;
-
-    trussHiddenLabel->setText( QString::number(numb) );
 }
 
 bool ProjectToolBox::eventFilter( QObject*, QEvent* event )
@@ -327,7 +389,9 @@ bool ProjectToolBox::eventFilter( QObject*, QEvent* event )
         if ( keyEvent->key() == Qt::Key_N || keyEvent->key() == Qt::Key_P ||
              keyEvent->key() == Qt::Key_F || keyEvent->key() == Qt::Key_L ||
              keyEvent->key() == Qt::Key_Escape ) {
-            currentPrj->getDesignerWidget().aggKeyPressEvent( keyEvent );
+            FermaNextProject* prj = currentProject();
+            if ( prj )
+                prj->getDesignerWidget().aggKeyPressEvent( keyEvent );
             return true;
         }
     }

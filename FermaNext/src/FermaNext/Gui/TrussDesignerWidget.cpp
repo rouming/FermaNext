@@ -295,7 +295,9 @@ void TrussDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow )
     QObject::connect( &trussWindow, 
                       SIGNAL(onStateChange()),
                       SLOT(update()) );
-    
+    QObject::connect( &trussWindow, 
+                      SIGNAL(onClearButtonRenderedFlag()),
+                      SLOT(update()) );
     QObject::connect( &trussWindow, 
                       SIGNAL(onSwitchLoadCase()),
                       SLOT(update()) );
@@ -552,7 +554,7 @@ void TrussDesignerWidget::removeTrussElemHighlight ()
     update ();
 }
 
-void TrussDesignerWidget::removeWindowButtonHighlight ()
+void TrussDesignerWidget::removeButtonHighlightFromWindows ()
 {
     WindowListIter iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter ) 
@@ -751,7 +753,7 @@ void TrussDesignerWidget::aggPaintEvent ( QPaintEvent* )
     pixfmt pixf ( getAggRenderingBuffer() );
     base_renderer baseRend ( pixf );
     solid_renderer solidRend ( baseRend );
-    baseRend.clear ( agg::rgba( 10, 10, 10 ) );
+    baseRend.clear ( agg::rgba( 10, 10, 10, 0 ) );
     WindowListIter iter = trussWindows.begin();
     for ( ; iter != trussWindows.end(); ++iter ) {
         TrussUnitWindow* w = *iter;
@@ -1024,22 +1026,21 @@ void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         {
             if ( window->inTrussAreaRect( x, y ) )
             {
-                clearAllCursorCoordFields ();
-                window->setCursorCoord ( QPoint(x, y) );
+                clearAllCursorCoordFields();
+                window->setCursorCoord( QPoint(x, y) );
             }
             else
-                clearAllCursorCoordFields ();
+                clearAllCursorCoordFields();
 
-            removeWindowButtonHighlight ();
+            removeButtonHighlightFromWindows();
             clearHintsFromNonSelectedWindows( window );
             window->releaseButtons();
             window->checkMouseMoveEvent( x, y, buttonPressed );
-            update();
         }
         else
         {
             clearHintsFromNonSelectedWindows( 0 );
-            removeWindowButtonHighlight();
+            removeButtonHighlightFromWindows();
         }
 
         if ( designerBehaviour == onNodeDraw || 
@@ -1289,12 +1290,9 @@ void TrussDesignerWidget::aggMouseReleaseEvent ( QMouseEvent* me )
         selectedWindow = findWindowByWidgetPos ( x, y );
         if ( selectedWindow )
         {
-            if ( selectedWindow->inHideButtonRect( x, y ) ||
-                 selectedWindow->inRollUpButtonRect( x, y ) )
-            {
+            if ( selectedWindow->getButtonByCoord( x, y ) )
                 selectedWindow->checkMouseReleaseEvent( x, y );
-                update();
-            }
+
         }
         nodeBehaviour = nodeIdle;
         pivotBehaviour = pivotIdle;
@@ -1328,12 +1326,10 @@ void TrussDesignerWidget::aggMousePressEvent ( QMouseEvent* me )
             ObjectStateManager* mng = focusedWindow->getStateManager();
             mng->startStateBlock();
 
-            if ( selectedWindow->inHideButtonRect( xPos, yPos ) ||
-                 selectedWindow->inRollUpButtonRect( xPos, yPos ) )
+            if ( selectedWindow->getButtonByCoord( xPos, yPos ) )
             {
                 buttonPressed = true;
                 selectedWindow->checkMousePressEvent( xPos, yPos );
-                update();
             }
             else if ( selectedWindow->inHeadlineRect( xPos, yPos ) )
             {

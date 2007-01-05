@@ -1081,6 +1081,9 @@ void TrussPropertyTabWidget::updateTableThickness ()
 
 void TrussPropertyTabWidget::updatePivotState ( int row, int col )
 {
+    if ( ! focusWindow )
+        return;
+
     TrussUnit::PivotList pivotList = focusWindow->getPivotList();
     TrussUnit::PivotListIter pivotIter = pivotList.begin();
     TrussPivot* pivot = 0;
@@ -1102,6 +1105,9 @@ void TrussPropertyTabWidget::updatePivotState ( int row, int col )
 
 void TrussPropertyTabWidget::levelPivotState ()
 {
+    if ( ! focusWindow )
+        return;
+
     TrussUnit::PivotList pivotList = focusWindow->getPivotList();
     TrussUnit::PivotListIter pivotIter = pivotList.begin();
     if ( thickSpinBox->isVisible() ) {
@@ -1117,6 +1123,9 @@ void TrussPropertyTabWidget::levelPivotState ()
 
 void TrussPropertyTabWidget::changeLevelEditor ( int indx )
 {
+    if ( ! focusWindow )
+        return;
+
     if ( indx == 0 ) {
         thickSpinBox->setVisible( true );
         materialComboBox->setVisible( false );
@@ -1132,6 +1141,9 @@ void TrussPropertyTabWidget::changeLevelEditor ( int indx )
 
 void TrussPropertyTabWidget::updateLevelButtonState ( bool noMaterials )
 {
+    if ( ! focusWindow )
+        return;
+
     if ( focusWindow && materialComboBox->isVisible() )
         levelButton->setEnabled( ! noMaterials );
     isLevelButtonEnabled = ! noMaterials;

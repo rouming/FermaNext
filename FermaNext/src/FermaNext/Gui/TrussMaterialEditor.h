@@ -87,7 +87,7 @@ protected:
 
 private:
     QPoint dragPos;
-    bool acceptDrag;;
+    bool acceptDrag;
 };
 
 /*****************************************************************************/

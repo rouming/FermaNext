@@ -1,27 +1,31 @@
 
 #include "TrussUnit.h"
 
+//#include "../FermaNextWorkspace.h"
+
 /*****************************************************************************
  * Truss Pivot
  *****************************************************************************/
 
-TrussPivot::TrussPivot ( ObjectStateManager* mng ) :
-    Pivot<TrussNode>(mng), 
-    materialUUIDMap(0), 
+TrussPivot::TrussPivot ( ObjectStateManager* mng, 
+                         const TrussMaterialLibrary& mLib ) :
+    Pivot<TrussNode>(mng, mLib), 
     drawingStatus(true)
 {
     QObject::connect( this, SIGNAL(onAfterDesist( StatefulObject& )),
-                            SLOT(removePivotHighlight()) );   
+                            SLOT(removePivotHighlight()) );  
+    setMaterial( materialLibrary().getSelectedMaterial() );
 }
 
 TrussPivot::TrussPivot ( TrussNode& first, TrussNode& last,
-                         ObjectStateManager* mng) :
-    Pivot<TrussNode>(first, last, mng), 
-    materialUUIDMap(0), 
+                         ObjectStateManager* mng,
+                         const TrussMaterialLibrary& mLib ) :
+    Pivot<TrussNode>(first, last, mng, mLib), 
     drawingStatus(true)
 {
     QObject::connect( this, SIGNAL(onAfterDesist( StatefulObject& )),
                             SLOT(removePivotHighlight()) );   
+    setMaterial( materialLibrary().getSelectedMaterial() );
 }
 
 void TrussPivot::loadFromXML ( const QDomElement& pivotElem ) 
@@ -47,11 +51,12 @@ void TrussPivot::loadFromXML ( const QDomElement& pivotElem )
     if ( ! pivotElem.hasAttribute( "materialID" ) )
         return;
 
-    QString materialID = pivotElem.attribute( "materialID" );
-    if ( ! materialUUIDMap || ! materialUUIDMap->contains(materialID) )
+    TrussMaterial* material = 
+        materialLibrary().getMaterial( pivotElem.attribute( "materialID" ) );
+    if ( ! material )
         throw LoadException();
     
-    setMaterial( materialUUIDMap->value(materialID) );
+    setMaterial( material );
 }
 
 QDomElement TrussPivot::saveToXML ( QDomDocument& doc )
@@ -79,11 +84,6 @@ QDomElement TrussPivot::saveToXML ( QDomDocument& doc )
     pivotElem.setAttribute( "materialID", m->getUUID() );
 
     return pivotElem;
-}
-
-void TrussPivot::setMaterialUUIDMap ( const QMap<QString, TrussMaterial*>& m )
-{
-    materialUUIDMap = &m;
 }
 
 bool TrussPivot::getDrawingStatus () const

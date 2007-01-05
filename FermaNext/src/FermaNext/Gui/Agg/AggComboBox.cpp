@@ -50,8 +50,10 @@ void AggComboBoxButton::mouseMove ( int xGlobal, int yGlobal )
     if ( ! isEnabled() )
         return;
     
-    if ( inButtonRect( xGlobal, yGlobal ) )
+    if ( inButtonRect( xGlobal, yGlobal ) ) {
         setHighlighted( true );
+        emit onShowStatusTip( getStatusTip() );
+    }
     else 
         setHighlighted( false );
 }
@@ -85,7 +87,7 @@ void AggComboBoxButton::drawButton ( ren_dynarow& baseRend,
     agg::trans_affine mtx;
 
     color_type firstColor( aggColor( 130, 130, 150 ) );
-    color_type middleColor( aggColor( 255, 255, 255 ) );
+    color_type middleColor( aggColor( 225, 225, 245 ) );
     color_type lastColor( aggColor( 130, 130, 150 ) );
 
     double lineWidth = 0.8;
@@ -144,9 +146,9 @@ void AggComboBoxButton::paint ( base_renderer& baseRenderer ) const
         agg::scanline_p8 sl;
         agg::trans_affine mtx;
     
-        color_type firstColor( aggColor( 155, 155, 175, 155 ) );
-        color_type middleColor( aggColor( 255, 255, 255, 255 ) );
-        color_type lastColor( aggColor( 155, 155, 175, 155 ) );
+        color_type firstColor( aggColor( 185, 185, 195, 155 ) );
+        color_type middleColor( aggColor( 235, 235, 255, 200 ) );
+        color_type lastColor( aggColor( 185, 185, 195, 155 ) );
 
         double lineWidth = 0.8;
         int pushButtonHeight = int(getHeight() - lineWidth * 2);
@@ -214,11 +216,17 @@ AggComboBox::AggComboBox ( QWidget& parentWidget ) :
              &parentWidget, SLOT( update() ) );
 
     connect( button, SIGNAL(onButtonPress()),
-                       SLOT(showMenu()) ); 
+                       SLOT(triggerMenuVisibility()) ); 
 
     connect( button, SIGNAL( onChangeButtonState() ),
              &parentWidget, SLOT( update() ) );
+    
+    connect( button, SIGNAL( onChangeButtonState() ),
+             &parentWidget, SLOT( update() ) );
 
+    // Delegate status tip to the parent tool bar
+    connect( button, SIGNAL( onShowStatusTip( const QString& ) ),
+                     SIGNAL( onShowStatusTip( const QString& ) ) );
 }
 
 AggComboBox::~AggComboBox ()
@@ -256,8 +264,6 @@ void AggComboBox::setPosition ( QPoint pos )
     button->setPosition( leftTopPos );
     
     updateMenuShowPosition();
-
-    designerWidget.update();
 }
 
 void AggComboBox::addItem ( const QString& text )
@@ -270,8 +276,6 @@ void AggComboBox::addItem ( const QString& text )
 
     if ( currIdx == -1 )
         setCurrentIndex( 0 );
-
-    designerWidget.update();
 }
 
 void AggComboBox::addItem ( const QString& text, QVariant data )
@@ -285,8 +289,6 @@ void AggComboBox::addItem ( const QString& text, QVariant data )
     
     if ( currIdx == -1 )
         setCurrentIndex( 0 );
-
-    designerWidget.update();
 }
 
 void AggComboBox::removeItem ( int idx )
@@ -300,8 +302,6 @@ void AggComboBox::removeItem ( int idx )
         setCurrentIndex( idx - 1 );
     else
         setCurrentIndex( idx );
-
-    designerWidget.update();
 }
 
 void AggComboBox::setCurrentIndex ( int idx )
@@ -315,8 +315,6 @@ void AggComboBox::setCurrentIndex ( int idx )
         button->setText( "" );
 
     currIdx = idx;
-
-    designerWidget.update();
 }
 
 void AggComboBox::setItemText ( int idx, const QString& text )
@@ -325,7 +323,8 @@ void AggComboBox::setItemText ( int idx, const QString& text )
     if ( action )
         action->setText( text );
 
-    designerWidget.update();
+    if ( idx == currIdx )
+        button->setText( action->text() );
 }
 
 void AggComboBox::setItemData ( int idx, QVariant data )
@@ -356,6 +355,16 @@ QVariant AggComboBox::itemData ( int idx ) const
     return dataMap.value( action );
 }
 
+const QString& AggComboBox::getStatusTip() const
+{
+    return button->getStatusTip();
+}
+
+void AggComboBox::setStatusTip ( const QString& text )
+{
+    button->setStatusTip( text );
+}
+
 void AggComboBox::clear ()
 {
     menu->clear();
@@ -370,17 +379,28 @@ void AggComboBox::updateMenuShowPosition ()
     menu->setPosition( menuPos );
 }
 
-void AggComboBox::showMenu ()
+void AggComboBox::triggerMenuVisibility ()
 {
     if ( menu->isVisible() ) {
         menu->hide();
         return;
     }
     
-    AggMenuAction* action = menu->getAction( currentIndex() );
     menu->removeHighlight();
-    action->highlight( true );
+
+    if ( ! menu->countActions() )
+        return;
+
+    AggMenuAction* action = menu->getAction( currentIndex() );
+    if ( action )
+        action->highlight( true );
+
     menu->show();
+}
+
+bool AggComboBox::inRect ( int xGlobal, int yGlobal ) const
+{
+    return button->inButtonRect( xGlobal, yGlobal );
 }
 
 void AggComboBox::mouseMove ( int xGlobal, int yGlobal )

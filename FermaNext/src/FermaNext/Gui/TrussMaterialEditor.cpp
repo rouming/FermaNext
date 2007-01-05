@@ -225,14 +225,15 @@ void MaterialTreeWidget::startDrag ()
     
     acceptDrag = true;
 
-    QDomDocument doc;
-    TrussMaterial& m = const_cast<TrussMaterial&>( mItem->getItemMaterial() );
-    QDomElement mProps = m.saveToXML( doc );
-    doc.appendChild( mProps );
+    ProjectTreeWidgetItem* prjItem = getSelectedProjectItem();
+    if ( ! prjItem )
+        return;
+
+    TrussMaterialLibrary& mLib = prjItem->getMaterialLibrary();
 
     QDrag* materialDrag = new QDrag( this );
     QMimeData* mimeData = new QMimeData;
-    mimeData->setText( doc.toString() );
+    mimeData->setText( mLib.getMaterialXml( mItem->getItemMaterial() ) );
     materialDrag->setHotSpot( visualItemRect( currentItem() ).topLeft() );
     materialDrag->setMimeData( mimeData );
 
@@ -265,10 +266,6 @@ bool MaterialTreeWidget::dropMimeData ( QTreeWidgetItem* parent, int index,
     Q_UNUSED(index);
     Q_UNUSED(action);
 
-    QDomDocument doc;
-    if ( ! doc.setContent( data->text() ) )
-        return false;
-    
     ProjectTreeWidgetItem* pItem = 0;
 
     MaterialTreeWidgetItem* mItem = 
@@ -279,23 +276,15 @@ bool MaterialTreeWidget::dropMimeData ( QTreeWidgetItem* parent, int index,
     else
         pItem = dynamic_cast<ProjectTreeWidgetItem*>( parent );
 
-    if ( ! pItem ) {
+    if ( ! pItem || pItem == getSelectedProjectItem() ) {
         acceptDrag = false;
         return false;
     }
 
     TrussMaterialLibrary& mLib = pItem->getMaterialLibrary();
-    TrussMaterial& m = mLib.createMaterial();
-    QDomNodeList nodeList = doc.elementsByTagName( "TrussMaterial" );
-    if ( nodeList.isEmpty() )
-        return false;
-
-    QDomElement mProps = nodeList.at( 0 ).toElement();
-    m.loadFromXML( mProps );
-
+    TrussMaterial& m = mLib.createMaterial( data->text() );
     MaterialTreeWidgetItem* newItem = new MaterialTreeWidgetItem( m );
     pItem->addChild( newItem );
-    //setCurrentItem( newItem );
 
     return true;
 }
@@ -626,7 +615,6 @@ void TrussMaterialEditor::copyLib ( TrussMaterialLibrary& libFrom,
 
         QDomDocument materialDoc;
         QDomElement copyProps = mFrom->saveToXML( materialDoc );
-        materialDoc.appendChild( copyProps );
 
         TrussMaterial* mTo = libTo.getMaterial( mFrom->getUUID() );
         if ( ! mTo )
@@ -692,7 +680,7 @@ void TrussMaterialEditor::addMaterial ()
         return;
 
     TrussMaterialLibrary& lib = projItem->getMaterialLibrary();
-  
+
     TrussMaterial& m = lib.createMaterial();
 
     materialLibTreeList->addMaterialItem( m );
