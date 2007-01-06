@@ -52,26 +52,20 @@ void FixationPopupMenu::showFixationPopup ( QMouseEvent* e, TrussNode* n)
 
 void FixationPopupMenu::fixNodeByX ()
 {
-    if ( node ) {
+    if ( node )
         node->setFixation( TrussNode::FixationByX );
-        emit nodeWasFixed( *node );
-    }
 }
 
 void FixationPopupMenu::fixNodeByY ()
 {
-    if ( node ) {
+    if ( node )
         node->setFixation( TrussNode::FixationByY );
-        emit nodeWasFixed( *node );
-    }
 }
 
 void FixationPopupMenu::fixNodeByXY ()
 {
-    if ( node ) {
+    if ( node )
         node->setFixation( TrussNode::FixationByXY );
-        emit nodeWasFixed( *node );
-    }
 }
 
 void FixationPopupMenu::unfixNode ()
@@ -255,9 +249,6 @@ TrussDesignerWidget::TrussDesignerWidget ( QWidget* p ) :
     
     QObject::connect( toolBar, SIGNAL( onAnimationPlays(bool) ),
                                  SLOT( setToolBarAnimStatus(bool) ) );
-
-    QObject::connect( fixationPopup, SIGNAL(nodeWasFixed(const TrussNode&)),
-                                SLOT(removeLoadsFromNode(const TrussNode&)) );
 
     QWidget::setFocus();
     QWidget::setMouseTracking( true );
@@ -641,19 +632,6 @@ bool TrussDesignerWidget::nodeCanBeDrawn ( int x, int y )
     return false;
 }
 
-void TrussDesignerWidget::removeLoadsFromNode ( const TrussNode& node )
-{
-    if ( ! focusedWindow )
-        return;
-
-    const TrussUnit::LoadCases& loadCases = focusedWindow->getLoadCases();
-    for ( int i = 1; i <= loadCases.countLoadCases(); ++i ) {
-        TrussUnit::LoadCase* loadCase = loadCases.findLoadCase( i );
-        if ( loadCase )
-            loadCase->removeLoad( node );
-    }
-}
-
 void TrussDesignerWidget::saveNodeStateAfterDrag ( TrussNode& node,
                                                    const DoublePoint& pos )
 {
@@ -753,6 +731,35 @@ void TrussDesignerWidget::savePivotStateAfterCreate ( TrussNode& firstNode,
     mng->endStateBlock();
 }
 
+void TrussDesignerWidget::fitWindowPosition ( QPoint& leftTop,
+                                              const TrussUnitWindow& wnd )
+{
+    int wndWidth = wnd.getWindowSize().width();
+
+    if ( leftTop.x() < Global::winCornerRadius - wndWidth )
+        leftTop.setX( Global::winCornerRadius - wndWidth );
+    else if ( leftTop.x() > width() - Global::winCornerRadius )
+        leftTop.setX( width() - Global::winCornerRadius );
+/*
+    if ( rightBottom.x() < Global::winCornerRadius )
+        rightBottom.setX( Global::winCornerRadius );
+    else if ( rightBottom.x() > width() - wndWidth - Global::winCornerRadius )
+        rightBottom.setX( width() - wndWidth - Global::winCornerRadius );
+*/
+    if ( leftTop.y() > height() - Global::winCornerRadius )
+        leftTop.setY( height() - Global::winCornerRadius );
+    else if ( leftTop.y() < -Global::winCornerRadius + 2 * Global::bordWidth )
+        leftTop.setY( -Global::winCornerRadius + 2 * Global::bordWidth );
+/*
+    if ( rightBottom.y() > height() - Global::winCornerRadius - wndHeight )
+        rightBottom.setY( height() - Global::winCornerRadius - wndHeight );
+    else if ( rightBottom.y() < 
+                -Global::winCornerRadius + 2 * Global::bordWidth + wndHeight )
+        rightBottom.setY( -Global::winCornerRadius + 
+                            2 * Global::bordWidth + wndHeight );
+*/
+}
+
 /*****************************************************************************/
 // Event handlers
 
@@ -783,8 +790,10 @@ void TrussDesignerWidget::aggResizeEvent ( QResizeEvent* )
     }
     int width = getAggRenderingBuffer().width(),
         height = getAggRenderingBuffer().height();
+
     toolBar->setPosition( QPoint( width/2, height ) - 
         QPoint( toolBar->getWidth() / 2, toolBar->getHeight() ) );
+
     aggHint->renewWidgetSize( size() );
 }
 
@@ -995,10 +1004,13 @@ void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
         leftTop.setX( x - mouseOffset.x() );
         leftTop.setY( y - mouseOffset.y() ); 
 
+        int wndWidth = selectedWindow->getWindowSize().width();
+        int wndHeight = selectedWindow->getWindowSize().height();
+
         int left = x - mouseOffset.x();
         int top = y - mouseOffset.y();
-        int right = left + selectedWindow->getWindowSize().width();
-        int bottom = top + selectedWindow->getWindowSize().height();
+        int right = left + wndWidth;
+        int bottom = top + wndHeight;
 
 	    // snap window to screen edges
         int vertOffset = 0,
@@ -1014,13 +1026,14 @@ void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
             h = getAggRenderingBuffer().height();
 	    if ( right < w - horOffset + Global::snapPixels && 
              right > w - horOffset - Global::snapPixels )
-		    leftTop.setX( w - horOffset - 
-                          selectedWindow->getWindowSize().width() );
+		    leftTop.setX( w - horOffset - wndWidth );
 
 	    if ( bottom < h - vertOffset + Global::snapPixels && 
              bottom > h - vertOffset - Global::snapPixels )
-		    leftTop.setY( h - vertOffset - 
-                          selectedWindow->getWindowSize().height() );
+		    leftTop.setY( h - vertOffset - wndHeight );
+
+        // check for outside borders
+        fitWindowPosition( leftTop, *selectedWindow );
 
         selectedWindow->setWindowPosition( leftTop );
         update();

@@ -32,9 +32,6 @@ protected slots:
     void fixNodeByXY ();
     void unfixNode ();
 
-signals:
-    void nodeWasFixed ( const TrussNode& );
-
 private:
     TrussNode* node;
 };
@@ -128,6 +125,10 @@ protected:
                                              TrussNode& lastNode, 
                                              TrussPivot& );
 
+    // Fits window left top position to current designer widget size.
+    // Used to make sure that window headlines are always reachable.
+    virtual void fitWindowPosition ( QPoint& leftTop, const TrussUnitWindow& );
+
 public:
     // Handlers on events
     void aggPaintEvent ( QPaintEvent* );
@@ -172,8 +173,6 @@ protected slots:
     // Life-time and visibility changes
     virtual void trussWindowChangedVisibility ( bool );
     virtual void trussWindowDesisted ( StatefulObject& );
-
-    virtual void removeLoadsFromNode ( const TrussNode& );
 
 private:
     enum TrussWindowBehaviour { windowIdle = 0, onWindowDrag, 

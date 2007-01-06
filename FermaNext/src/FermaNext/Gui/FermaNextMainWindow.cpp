@@ -19,6 +19,7 @@
 #include <QMenu>
 #include <QToolBar>
 #include <QSignalMapper>
+#include <QSettings>
 
 #include "AggTrussToolBar.h"
 #include "FermaNextMainWindow.h"
@@ -141,9 +142,32 @@ void FermaNextMainWindow::initUndoRedoWindow ()
 {
     undoRedoHistoryWidget = new QWidget( this, Qt::Window | Qt::Tool );
 
-    undoRedoHistoryWidget->setFixedSize( 196, 120 );
-    // Pretty history widget offset from the end point of the screen
-    undoRedoHistoryWidget->move( QApplication::desktop()->width() - 215, 100 );
+    QSettings appSettings;
+    appSettings.beginGroup( "Preferences" );
+
+    int height;
+    if ( appSettings.contains( "UndoRedoHeight" ) )
+        height = appSettings.value( "UndoRedoHeight" ).toInt();
+    else
+        height = 120;
+
+    int xPos, yPos;
+    if ( appSettings.contains( "UndoRedoXPosition" ) )
+        xPos = appSettings.value( "UndoRedoXPosition" ).toInt();
+    else
+        xPos = QApplication::desktop()->width() - 215;
+
+    if ( appSettings.contains( "UndoRedoYPosition" ) )
+        yPos = appSettings.value( "UndoRedoYPosition" ).toInt();
+    else
+        yPos = 100;
+
+    appSettings.endGroup();
+
+    undoRedoHistoryWidget->setFixedWidth( 196 );
+    undoRedoHistoryWidget->setMinimumHeight( 120 );
+    undoRedoHistoryWidget->resize( 196, height );
+    undoRedoHistoryWidget->move( xPos, yPos );
     undoRedoHistoryWidget->setWindowTitle( tr("History") );
     undoRedoListBox = new UndoRedoListBox( undoRedoHistoryWidget );
     undoRedoHistoryWidget->installEventFilter( this );
@@ -157,11 +181,35 @@ void FermaNextMainWindow::initUndoRedoWindow ()
 
 void FermaNextMainWindow::initGeometryWindow ()
 {
+    QSettings appSettings;
+    appSettings.beginGroup( "Preferences" );
+
+    int height;
+    if ( appSettings.contains( "GeometryWindowHeight" ) )
+        height = appSettings.value( "GeometryWindowHeight" ).toInt();
+    else
+        height = 170;
+
+    int xPos, yPos;
+    if ( appSettings.contains( "GeometryWindowXPosition" ) )
+        xPos = appSettings.value( "GeometryWindowXPosition" ).toInt();
+    else
+        xPos = QApplication::desktop()->width() - 215;
+
+    if ( appSettings.contains( "GeometryWindowYPosition" ) )
+        yPos = appSettings.value( "GeometryWindowYPosition" ).toInt();
+    else
+        yPos = 250;
+
+    appSettings.endGroup();
+
     geometryWindow = new QWidget( this, Qt::Window | Qt::Tool );
-    geometryWindow->setFixedSize( 196, 170 );
+    geometryWindow->setFixedWidth( 196 );
+    geometryWindow->setMinimumHeight( 170 );
+    geometryWindow->resize( 196, height );
     geometryWindow->setWindowTitle( tr("Truss Geometry") );
     geometryTabWidget = new GeometryTabWidget( geometryWindow );
-    geometryWindow->move( QApplication::desktop()->width() - 215, 250 );
+    geometryWindow->move( xPos, yPos );
     geometryWindow->installEventFilter( this );
 
     QVBoxLayout* tabLayout = new QVBoxLayout;
@@ -176,11 +224,35 @@ void FermaNextMainWindow::initGeometryWindow ()
 
 void FermaNextMainWindow::initTrussPropertyWindow ()
 {
+    QSettings appSettings;
+    appSettings.beginGroup( "Preferences" );
+
+    int height;
+    if ( appSettings.contains( "PropertyWindowHeight" ) )
+        height = appSettings.value( "PropertyWindowHeight" ).toInt();
+    else
+        height = 224;
+
+    int xPos, yPos;
+    if ( appSettings.contains( "PropertyWindowXPosition" ) )
+        xPos = appSettings.value( "PropertyWindowXPosition" ).toInt();
+    else
+        xPos = QApplication::desktop()->width() - 215;
+
+    if ( appSettings.contains( "PropertyWindowYPosition" ) )
+        yPos = appSettings.value( "PropertyWindowYPosition" ).toInt();
+    else
+        yPos = 450;
+
+    appSettings.endGroup();
+
     trussPropertyWindow = new QWidget( this, Qt::Window | Qt::Tool );
-    trussPropertyWindow->setFixedSize( 196, 224 );
+    trussPropertyWindow->setFixedWidth( 196 );
+    trussPropertyWindow->setMinimumHeight( 224 );
+    trussPropertyWindow->resize( 196, height );
     trussPropertyWindow->setWindowTitle( tr("Truss Properties") );
     trussPropTabWidget = new TrussPropertyTabWidget( trussPropertyWindow );
-    trussPropertyWindow->move( QApplication::desktop()->width() - 215, 450 );
+    trussPropertyWindow->move( xPos, yPos );
     trussPropertyWindow->installEventFilter( this );
 
     QVBoxLayout* tabLayout = new QVBoxLayout;
@@ -254,9 +326,13 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
         projectsDockWidget->show();
 
         showNodeNumbersAction->setEnabled( true );
+        showNodeNumbersAction->setChecked( Global::showNodeNumbers );
         showPivotNumbersAction->setEnabled( true ); 
+        showPivotNumbersAction->setChecked( Global::showPivotNumbers );
         showLoadsAction->setEnabled( true ); 
+        showLoadsAction->setChecked( Global::showLoads );
         showFixationsAction->setEnabled( true ); 
+        showFixationsAction->setChecked( Global::showFixations );
 
         showUndoRedoAction->setEnabled( true );
         showTrussPropWindowAction->setEnabled( true );
@@ -460,7 +536,7 @@ void FermaNextMainWindow::setupFileActions ()
     connect( a, SIGNAL(triggered()), SLOT(fileCloseWsp()) );
     menu->addAction( a );
     menu->addSeparator();
-    
+    /*
     // Page Setup
     a = new QAction( tr( "Page setup..." ), this );
     a->setStatusTip( tr( "Changes the page layout settings" ) );
@@ -485,7 +561,7 @@ void FermaNextMainWindow::setupFileActions ()
     menu->addAction( printAction );
     printAction->setDisabled(true);
     menu->addSeparator();    
-
+*/
     // Exit
     a = new QAction( tr( "E&xit" ), this );
     a->setShortcut( tr("CTRL+Q") );
@@ -566,6 +642,7 @@ void FermaNextMainWindow::setupEditActions ()
     QAction* prefAction = new QAction( tr( "Pre&ferences..." ), this );
     prefAction->setShortcut( tr("CTRL+K") );
     prefAction->setStatusTip( tr( "Edits the application preferences" ) );
+    prefAction->setEnabled( false );
     connect( prefAction, SIGNAL(triggered()), SLOT(editPreferences()) );
     menu->addAction( prefAction );
 }
@@ -919,8 +996,10 @@ void FermaNextMainWindow::reloadPlugins ( bool reload )
     pluginsMenu->addSeparator();
 
     // Reload plugins
-    pluginsMenu->addAction( tr("Reload plugins"), this, 
-                            SLOT(reloadPlugins()) );
+    QAction* a = new QAction( tr("Reload plugins"), this );
+    a->setStatusTip( tr( "Reloads all available plugins" ) );
+    connect( a, SIGNAL(triggered()), SLOT(reloadPlugins()) );
+    pluginsMenu->addAction( a );
 }
 
 void FermaNextMainWindow::refreshUndoRedoActions ()
@@ -958,7 +1037,7 @@ void FermaNextMainWindow::refreshProjectActions ()
     saveAllAction->setEnabled(enableActions);
     saveAsProjectAction->setEnabled(enableActions);
     closeProjectAction->setEnabled(enableActions);
-    printAction->setEnabled(enableActions);
+    //printAction->setEnabled(enableActions);
     materialEditorAction->setEnabled( enableActions );
 }
 
@@ -1386,8 +1465,29 @@ void FermaNextMainWindow::filePrint ()
     prj->getDesignerWidget().print();
 }
 
+void FermaNextMainWindow::saveApplicationSettings ()
+{
+    QSettings appSettings;
+    appSettings.beginGroup( "Preferences" );
+
+    appSettings.setValue( "UndoRedoHeight", undoRedoHistoryWidget->height() );
+    appSettings.setValue( "UndoRedoXPosition", undoRedoHistoryWidget->pos().x() );
+    appSettings.setValue( "UndoRedoYPosition", undoRedoHistoryWidget->pos().y() );
+    
+    appSettings.setValue( "GeometryWindowHeight", geometryWindow->height() );
+    appSettings.setValue( "GeometryWindowXPosition", geometryWindow->pos().x() );
+    appSettings.setValue( "GeometryWindowYPosition", geometryWindow->pos().y() );
+
+    appSettings.setValue( "PropertyWindowHeight", trussPropertyWindow->height() );
+    appSettings.setValue( "PropertyWindowXPosition", trussPropertyWindow->pos().x() );
+    appSettings.setValue( "PropertyWindowYPosition", trussPropertyWindow->pos().y() );
+
+    appSettings.endGroup();
+}
+
 void FermaNextMainWindow::fileExit ()
 {
+    saveApplicationSettings();
     workspace.quitFermaNextApplication();
 }
 
@@ -1555,6 +1655,11 @@ void FermaNextMainWindow::showNodeNumbers ( bool status )
 
     Global::showNodeNumbers = status;
 
+    QSettings appSettings;
+    appSettings.beginGroup( "Preferences" );
+    appSettings.setValue( "ShowNodeNumbers", status );
+    appSettings.endGroup();
+
     FermaNextProject* prj = projectToolBox->currentProject();
     if ( prj == 0 )
         return;
@@ -1567,6 +1672,11 @@ void FermaNextMainWindow::showPivotNumbers ( bool status )
         return;
 
     Global::showPivotNumbers = status;
+
+    QSettings appSettings;
+    appSettings.beginGroup( "Preferences" );
+    appSettings.setValue( "ShowPivotNumbers", status );
+    appSettings.endGroup();
 
     FermaNextProject* prj = projectToolBox->currentProject();
     if ( prj == 0 )
@@ -1581,6 +1691,11 @@ void FermaNextMainWindow::showFixations ( bool status )
 
     Global::showFixations = status;
 
+    QSettings appSettings;
+    appSettings.beginGroup( "Preferences" );
+    appSettings.setValue( "ShowFixations", status );
+    appSettings.endGroup();
+
     FermaNextProject* prj = projectToolBox->currentProject();
     if ( prj == 0 )
         return;
@@ -1593,6 +1708,11 @@ void FermaNextMainWindow::showLoads ( bool status )
         return;
 
     Global::showLoads = status;
+    
+    QSettings appSettings;
+    appSettings.beginGroup( "Preferences" );
+    appSettings.setValue( "ShowLoads", status );
+    appSettings.endGroup();
 
     FermaNextProject* prj = projectToolBox->currentProject();
     if ( prj == 0 )
@@ -1655,7 +1775,7 @@ bool FermaNextMainWindow::eventFilter( QObject* targetObj, QEvent* event )
  */
 void FermaNextMainWindow::closeEvent ( QCloseEvent* )
 {
-    workspace.quitFermaNextApplication();
+    fileExit();
 }
 
 /*****************************************************************************/

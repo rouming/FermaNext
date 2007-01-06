@@ -456,7 +456,6 @@ void TrussPropertyTabWidget::initLoadTab ()
     QHBoxLayout* loadCaseLayout = new QHBoxLayout( loadCaseGroupBox );
     parentLayout->addLayout( topLayout );
     parentLayout->addLayout( tableLayout );
-    parentLayout->addStretch(1);
     topLayout->addWidget( nodesNumbLabel );
     topLayout->addWidget( loadedNodesLabel );
     tableLayout->addWidget( loadTable );
@@ -553,7 +552,6 @@ void TrussPropertyTabWidget::initPivotPropertyTab ()
     parentLayout->addLayout( tableLayout );
     topLayout->addWidget( pivotsNumbLabel );
     tableLayout->addWidget( pivotPropTable );
-    parentLayout->addStretch( 1 );
     parentLayout->addWidget( levelGroupBox );
     bottomLayout->addWidget( levelComboBox, 0, 0 );
     bottomLayout->addWidget( thickSpinBox, 0, 1 );
