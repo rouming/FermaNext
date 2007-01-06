@@ -30,6 +30,7 @@ HEADERS = \
           JavaPlugin.h \
           JavaPluginArgumentRegistrator.h \
           JavaPluginLoader.h \
+          JavaVariableRegistrator.h \
           \
           JavaVM/JavaVirtualMachine.h \
           JavaVM/JNITypes.h
@@ -38,13 +39,20 @@ SOURCES = \
           JavaPlugin.cpp \
           JavaPluginArgumentRegistrator.cpp \
           JavaPluginLoader.cpp \
+          JavaVariableRegistrator.cpp \
           \
           JavaVM/JavaVirtualMachine.cpp \
           \
+          stubs-src/fermanext_system_JavaPluginLoader.cpp \
+          stubs-src/fermanext_system_NativePlugin.cpp \
+          stubs-src/fermanext_system_Plugin.cpp \
+          stubs-src/fermanext_system_PluginManager.cpp \
+          stubs-src/fermanext_system_StringUUIDObject.cpp \
+          \
           stubs-src/fermanext_logging_log4cxx_BasicConfigurator.cpp \
           stubs-src/fermanext_logging_log4cxx_Logger.cpp \
-          stubs-src/fermanext_logging_log4cxx_NDC.cpp \
           stubs-src/fermanext_logging_log4cxx_PropertyConfigurator.cpp \
+          \
           stubs-src/fermanext_trussunit_TrussLoad.cpp \
           stubs-src/fermanext_trussunit_TrussLoadCase.cpp \
           stubs-src/fermanext_trussunit_TrussLoadCaseArray.cpp \
@@ -102,5 +110,9 @@ contains( HAS_JAVA_HOME, FALSE ) {
 }
 
 # 'Apache Ant' check
-contains( HAS_ANT, TRUE): JavaBuild.commands = "$$ANT"
+contains( HAS_ANT, TRUE): {
+   # Turn on debug build
+   CONFIG(debug, debug|release):JavaBuild.commands = "$$ANT" -Ddebug=on
+   else: JavaBuild.commands = "$$ANT"
+}
 else: error( "'Apache Ant' is not installed, but should be." )

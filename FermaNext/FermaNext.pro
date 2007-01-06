@@ -68,6 +68,7 @@ SUBDIRS += \
           src/Plugins/old_SimpleCalc \
           # GA optimization
           src/Plugins/Optimization.GA/GA.algorithm/cpp.GAlib \
+          src/Plugins/Optimization.GA/GA.algorithm/java.JGAP \
           src/Plugins/Optimization.GA/GA.fitness.function/cpp.NodePosition \
           src/Plugins/Optimization.GA/GA.criteria/cpp.Force
 

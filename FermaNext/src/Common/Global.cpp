@@ -153,6 +153,11 @@ QString pluginsPath ()
     return applicationDirPath() + pathSeparator() + "plugins";
 }
 
+QString pluginParamsPath () 
+{ 
+    return pluginsPath() + pathSeparator() + "params";
+}
+
 QString pluginLoadersPath ()
 {
     return pluginsPath() + pathSeparator() + "loaders";

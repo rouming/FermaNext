@@ -1,5 +1,14 @@
 
 #include "PluginExecutionContext.h"
+#include "Log4CXX.h"
+
+/*****************************************************************************
+ * Logger
+ *****************************************************************************/
+
+using log4cxx::LoggerPtr;
+using log4cxx::Logger;
+static LoggerPtr logger( Logger::getLogger("common.PluginExecutionContext") );
 
 /*****************************************************************************/
 
@@ -13,6 +22,8 @@ PluginExecutionContext::PluginExecutionContext (
     topNode(tree.getTreeTop()),
     currentContext(-1)
 {
+    LOG4CXX_DEBUG(logger, "PluginExecutionContext constructor");
+
     if ( topNode.isNull() || ! topNode.isInUse() )
         throw ContextIsEmptyException();
 
@@ -23,6 +34,9 @@ PluginExecutionContext::PluginExecutionContext (
 
     QList<PluginExecutionTree::Node> childs = topNode.childNodes();
 
+    LOG4CXX_INFO(logger, QString("Found %1 children of top node").
+                 arg(childs.size()).toStdString());
+
     while ( ! childs.isEmpty() ) {
         // Pick up only is in use children for next context
         QList<PluginExecutionTree::Node> isInUseChilds;
@@ -30,6 +44,10 @@ PluginExecutionContext::PluginExecutionContext (
             if ( !child.isNull() && child.isInUse() )
                 isInUseChilds.append(child);
         }
+
+        LOG4CXX_INFO(logger, QString("Found %1 children, is in use %2").
+                     arg(childs.size()).arg(isInUseChilds.size()).
+                     toStdString());
 
         if ( isInUseChilds.isEmpty() )
             // Nothing to do
@@ -98,27 +116,45 @@ PluginExecutionContext::getCallerDependencies ( const Plugin* plg ) const
 
     Q_ASSERT(plg);
 
-    if ( ! isValid() )
+    LOG4CXX_DEBUG(logger, QString("getCallerDependencies( Plugin: %1 )").
+                  arg(plg->pluginInfo().name).toStdString());
+
+    if ( ! isValid() ) {
+        LOG4CXX_WARN(logger, "context is not valid");
         return DependenciesMap();
+    }
 
     QList<PluginExecutionTree::Node> context = contextList[currentContext];
+
+    LOG4CXX_INFO(logger, QString("Found context for context index %1").
+                 arg(currentContext).toStdString());
+
     foreach ( PluginExecutionTree::Node node, context ) {
         if ( node.getPlugin() == plg ) {
             QList<PluginExecutionTree::Node> childs = node.childNodes();
+            LOG4CXX_INFO(logger, QString("Found %1 children for plugin").
+                         arg(childs.size()).toStdString());
             DependenciesMap isInUsePlugins;
             foreach ( PluginExecutionTree::Node child, childs ) {
                 if ( !child.isNull() && child.getPlugin() != 0 &&
                      child.isInUse() ) {
 
                     Plugin* plg = child.getPlugin();
+
+                    LOG4CXX_INFO(logger, QString("Found is in use plugin from "
+                                                 "context '%1'").
+                                 arg(plg->pluginInfo().name).toStdString());
+
                     QString type = plg->pluginInfo().type;
                     QList<Plugin*>& plugins = isInUsePlugins[type];
                     plugins << plg;
-                }
+                }                
             }
             return isInUsePlugins;
         }
     }
+
+    LOG4CXX_WARN(logger, "Nothing was found from context!"); 
 
     // Nothing was found. Wrong plg? 
     return DependenciesMap();

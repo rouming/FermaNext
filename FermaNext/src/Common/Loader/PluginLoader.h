@@ -27,7 +27,7 @@ typedef PluginLoaderList::ConstIterator PluginLoaderListConstIter;
  * which determines the order of plugin loading. Loading priority should 
  * be choosed according to your needs.
  */
-class PluginLoader
+class PluginLoader : public UUIDObject
 {
 public:
     // Exceptions

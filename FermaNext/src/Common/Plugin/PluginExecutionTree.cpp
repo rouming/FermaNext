@@ -14,7 +14,7 @@ public:
         ref(1), parent(0), 
         plugin(0), inUse(false),
         canBeResolved(false),
-        paramsAreAccepted(false)
+        uuid( QUuid::createUuid().toString() )
     {}
 
     ~NodePrivate ()
@@ -23,7 +23,6 @@ public:
         plugin = 0;
         inUse = false;
         canBeResolved = false;
-        paramsAreAccepted = false;
     }
 
     QAtomic ref;
@@ -32,7 +31,7 @@ public:
     Plugin* plugin;
     bool inUse;
     bool canBeResolved;
-    bool paramsAreAccepted;
+    QString uuid;
     PluginExecutionParams pluginParams;
 };
 
@@ -177,21 +176,12 @@ void PluginExecutionTree::Node::canBeResolved ( bool canBeResolved_ )
 
 void PluginExecutionTree::Node::setPluginParams ( 
     const PluginExecutionParams& params )
-    /*throw (Plugin::ParamsAreNotAcceptedException)*/
 {
     if ( isNull() || data->plugin == 0 )
         return;
 
     // Firstly save params
     data->pluginParams = params;
-
-    try { data->plugin->tryToAcceptParams( params ); }
-    catch ( Plugin::ParamsAreNotAcceptedException& ) {
-        data->paramsAreAccepted = false;
-        throw;
-    }
-    // Ok, params are accepted
-    data->paramsAreAccepted = true;
 }
  
 
@@ -200,13 +190,6 @@ PluginExecutionParams PluginExecutionTree::Node::getPluginParams () const
     if ( isNull() || data->plugin == 0 )
         return PluginExecutionParams();
     return data->pluginParams;
-}
-
-bool PluginExecutionTree::Node::areParamsAccepted () const
-{
-    if ( isNull() || data->plugin == 0 )
-        return false;
-    return data->paramsAreAccepted;
 }
 
 void PluginExecutionTree::Node::use ( bool useFlag )
@@ -221,6 +204,13 @@ bool PluginExecutionTree::Node::isInUse () const
     if ( isNull() )
         return false;
     return data->inUse;
+}
+
+QString PluginExecutionTree::Node::uuid () const
+{
+    if ( isNull() )
+        return QString();
+    return data->uuid;
 }
 
 /*****************************************************************************
@@ -243,25 +233,25 @@ PluginExecutionTree::Node PluginExecutionTree::buildExecutionTree (
 PluginExecutionTree::Node PluginExecutionTree::getTreeTop () const
 { return treeTop; }
 
-PluginExecutionTree::Node PluginExecutionTree::findNodeByPluginUUID ( 
+PluginExecutionTree::Node PluginExecutionTree::findNodeByUUID ( 
     const QString& uuid ) const
 {
-    return findNodeByPluginUUID(treeTop, uuid);
+    return findNodeByUUID(treeTop, uuid);
 }
 
-PluginExecutionTree::Node PluginExecutionTree::findNodeByPluginUUID ( 
+PluginExecutionTree::Node PluginExecutionTree::findNodeByUUID ( 
     const PluginExecutionTree::Node& node,
     const QString& uuid ) const
 {
     if ( node.isNull() || node.getPlugin() == 0 )
         return PluginExecutionTree::Node();
 
-    if ( node.getPlugin()->getUUID() == uuid )
+    if ( node.uuid() == uuid )
         return node;
 
     QList<PluginExecutionTree::Node> nodes = node.childNodes();
     foreach ( PluginExecutionTree::Node n, nodes ) {
-        PluginExecutionTree::Node retNode = findNodeByPluginUUID(n, uuid);
+        PluginExecutionTree::Node retNode = findNodeByUUID(n, uuid);
         if ( ! retNode.isNull() )
             return retNode;
     }

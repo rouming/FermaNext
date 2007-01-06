@@ -1,6 +1,6 @@
 package fermanext.trussunit;
 
-public class DoubleSize extends java.awt.geom.Dimension2D
+public final class DoubleSize extends java.awt.geom.Dimension2D
 {
     private double width = 0;
     private double height = 0;

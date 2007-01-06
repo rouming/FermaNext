@@ -2,7 +2,7 @@ package fermanext.trussunit;
 
 import java.util.UUID;
 
-public class TrussUnit implements fermanext.system.NativeObject
+public final class TrussUnit implements fermanext.system.NativeObject
 {
     public native TrussNode findNodeByCoord ( DoublePoint p );
     public native TrussNode findNodeByNumber ( int num );
@@ -32,7 +32,7 @@ public class TrussUnit implements fermanext.system.NativeObject
     { this.uuid = uuid; }
 
     // Checks if this plugin really wraps native class
-    public native boolean isValid ();
+    public final native boolean isValid ();
 
     static { 
         System.loadLibrary("JavaPluginLoader.ldr");

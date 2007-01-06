@@ -6,6 +6,7 @@
 
 #include "PluginLoaderFrontEnd.h"
 #include "JavaPluginLoader.h"
+#include "JavaVariableRegistrator.h"
 #include "JavaPlugin.h"
 #include "PluginManager.h"
 #include "Plugin.h"
@@ -37,9 +38,8 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
                                      const QString& path ) :
     PluginLoader( plgMng, path ),
     javaVM(0),
-    fnClass(0),
-    fnObject(0),
-    plgLoaderObject(0)
+    jloaderClass(0),
+    jloaderObject(0)
 {
     // Subsidiary stuff
     QString appPath(".");
@@ -215,16 +215,21 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
                               );        
     }
 
-    // Try to load main 'FermaNext' java class
-    fnClass = javaVM->findClass("fermanext/system/FermaNext");
-    if ( fnClass == 0 ) {
+    // Great, JavaVM init is complete. 
+    // Register loader to have access to it from jni side.
+    JavaVariableRegistrator::registerVariable( this );
+
+    // Try to load main 'JavaPluginLoader' java class
+    jloaderClass = javaVM->findClass("fermanext/system/JavaPluginLoader");
+    if ( jloaderClass == 0 ) {
         // Clears pending exception
         javaVM->exceptionClear();
 
         QMessageBox::warning( 
                       0, QObject::tr("Wrong JavaPluginLoader package"), 
                       QObject::tr("Subsidiary system class\n"
-                                   "'fermanext.system.FermaNext' doesn't exist"
+                                  "'fermanext.system.JavaPluginLoader' "
+                                  "doesn't exist"
                                    "\n\nJava loader has been disabled!")
                       );
         delete javaVM;
@@ -233,8 +238,8 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
     }
 
     // Create global Java ref
-    fnClass = (JClass)javaVM->newGlobalRef( fnClass );
-    if ( fnClass == 0 ) {
+    jloaderClass = (JClass)javaVM->newGlobalRef( jloaderClass );
+    if ( jloaderClass == 0 ) {
         // Clears pending exception
         javaVM->getAndClearPendingException();
         LOG4CXX_ERROR(logger, "out of memory");
@@ -244,54 +249,76 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
         return;        
     }
 
-    JMethodID fnInstance =
-        javaVM->getStaticMethodID( fnClass, "instance", 
-                                   "()Lfermanext/system/FermaNext;" );
+    JMethodID jloaderInstance = javaVM->getStaticMethodID( 
+                   jloaderClass, "instance", 
+                   "(Ljava/lang/String;)Lfermanext/system/JavaPluginLoader;" );
 
-    if ( fnInstance == 0 ) {
+    if ( jloaderInstance == 0 ) {
         // Clears pending exception
         javaVM->exceptionClear();
 
         QMessageBox::warning( 0, QObject::tr("Wrong JavaPluginLoader package"),
                               QObject::tr("Method 'instance' doesn't "
                                           "exist in \nsystem class "
-                                          "'fermanext.system.FermaNext'"
+                                          "'fermanext.system.JavaPluginLoader'"
                                           "\n\nJava loader has been disabled!")
                               );
-        javaVM->deleteGlobalRef( fnClass );
-        fnClass = 0;
+        javaVM->deleteGlobalRef( jloaderClass );
+        jloaderClass = 0;
+        delete javaVM;
+        javaVM = 0;
+        return;
+    }
+
+    // Create Java string
+    JString jUuid = javaVM->newStringUTF( getUUID().toUtf8().data() );
+    if ( jUuid == 0 ) {
+        // Clears pending exception
+        javaVM->exceptionClear();
+        
+        QMessageBox::warning( 0, QObject::tr("Wrong JavaPluginLoader package"),
+                              QObject::tr("Error has occured while creating\n"
+                                          "java string.") );
+
+        javaVM->deleteGlobalRef( jloaderClass );
+        jloaderClass = 0;
         delete javaVM;
         javaVM = 0;
         return;
     }
     
-    fnObject = javaVM->callStaticObjectMethod( fnClass, fnInstance );
-    if ( fnObject == 0 ) {
-        // Clears pending exception
-        javaVM->exceptionClear();
+    jloaderObject = javaVM->callStaticObjectMethod( jloaderClass, 
+                                                    jloaderInstance,
+                                                    jUuid );
+    if ( jloaderObject == 0 ) {
+        QString e = javaVM->getAndClearPendingException();            
+        QString errMsg = "Java exception while  calling method 'instance' of "
+                         "'fermanext.system.JavaPluginLoader': " + 
+                         javaErrorMsg.arg(e) + "\n";
+        LOG4CXX_ERROR(logger, errMsg.toStdString());
 
         QMessageBox::warning( 0, QObject::tr("Wrong JavaPluginLoader package"),
                               QObject::tr("Error has occured while calling\n"
                                           "method 'instance' of "
-                                          "'fermanext.system.FermaNext'"
+                                          "'fermanext.system.JavaPluginLoader'"
                                           "\n\nJava loader has been disabled!")
                               );
-        javaVM->deleteGlobalRef( fnClass );
-        fnClass = 0;
+        javaVM->deleteGlobalRef( jloaderClass );
+        jloaderClass = 0;
         delete javaVM;
         javaVM = 0;
         return;
     }
 
     // Create global Java ref
-    fnObject = javaVM->newGlobalRef( fnObject );
-    if ( fnObject == 0 ) {
+    jloaderObject = javaVM->newGlobalRef( jloaderObject );
+    if ( jloaderObject == 0 ) {
         // Clears pending exception
         javaVM->getAndClearPendingException();
         LOG4CXX_ERROR(logger, "out of memory");
 
-        javaVM->deleteGlobalRef( fnClass );
-        fnClass = 0;
+        javaVM->deleteGlobalRef( jloaderClass );
+        jloaderClass = 0;
         delete javaVM;
         javaVM = 0;
         return;
@@ -305,15 +332,15 @@ JavaPluginLoader::~JavaPluginLoader ()
 
     // Try to unload JVM
     if ( javaVM ) {
-        Q_ASSERT(fnClass);
-        Q_ASSERT(fnObject);
+        Q_ASSERT(jloaderClass);
+        Q_ASSERT(jloaderObject);
 
         // Find dispose method for cleanly exit
         JMethodID disposeAllFrames = 
-            javaVM->getMethodID( fnClass, "disposeAllFrames", "()V" );
+            javaVM->getMethodID( jloaderClass, "disposeAllFrames", "()V" );
 
         if ( disposeAllFrames )
-            javaVM->callVoidMethod( fnObject, disposeAllFrames );
+            javaVM->callVoidMethod( jloaderObject, disposeAllFrames );
         else {
             QString msg( "Can't find 'disposeAllFrames' while destructing!\n"
                          "Seems 'fermanext.system.FermaNext' is not a valid"
@@ -322,10 +349,8 @@ JavaPluginLoader::~JavaPluginLoader ()
             msg = msg + javaErrorMsg.arg(e);
             LOG4CXX_ERROR(logger, msg.toStdString());
         }
-        javaVM->deleteGlobalRef( fnClass );
-        javaVM->deleteGlobalRef( fnObject );
-        if ( plgLoaderObject )
-            javaVM->deleteGlobalRef( plgLoaderObject );
+        javaVM->deleteGlobalRef( jloaderObject );
+        javaVM->deleteGlobalRef( jloaderClass );
         delete javaVM;
     }
 }
@@ -345,35 +370,7 @@ Plugin& JavaPluginLoader::specificLoadPlugin ( const QString& pluginPath )
     LOG4CXX_DEBUG(logger, "specificLoadPlugin(QString): " + 
                   pluginPath.toStdString() );
 
-    // Suspended init
-    if ( plgLoaderObject == 0 ) {
-        JMethodID plgLoaderMethod = 
-            javaVM->getMethodID( fnClass, "pluginLoader", 
-                                 "()Lfermanext/system/JavaPluginLoader;" );
-        if ( plgLoaderMethod == 0 ) {
-            // Returns and clears pending exception
-            QString e = javaVM->getAndClearPendingException();
-            LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
-            throw PluginLoadException();
-        }
-        plgLoaderObject = javaVM->callObjectMethod( fnObject, plgLoaderMethod );
-        if ( plgLoaderObject == 0 ) {
-            // Returns and clears pending exception
-            QString e = javaVM->getAndClearPendingException();
-            LOG4CXX_ERROR(logger, javaErrorMsg.arg(e).toStdString());
-            throw PluginLoadException();
-        }        
-        // Create global Java ref
-        plgLoaderObject = javaVM->newGlobalRef( plgLoaderObject );
-        if ( plgLoaderObject == 0 ) {
-            // Clears pending exception
-            javaVM->getAndClearPendingException();
-            LOG4CXX_ERROR(logger, "out of memory");
-            throw PluginLoadException();
-        }
-    }
-
-    JClass loaderClass = javaVM->getObjectClass( plgLoaderObject );
+    JClass loaderClass = javaVM->getObjectClass( jloaderObject );
     if ( loaderClass == 0 ) {
         // Returns and clears pending exception
         QString e = javaVM->getAndClearPendingException();
@@ -401,7 +398,7 @@ Plugin& JavaPluginLoader::specificLoadPlugin ( const QString& pluginPath )
     }
 
     // Create Java string
-    JString pluginPathJStr = javaVM->newStringUTF( pluginPath.toUtf8().data() );
+    JString pluginPathJStr = javaVM->newStringUTF( pluginPath.toUtf8().data());
     if ( pluginPathJStr == 0 ) {
         javaVM->deleteGlobalRef( loaderClass );
         // Returns and clears pending exception
@@ -419,7 +416,7 @@ Plugin& JavaPluginLoader::specificLoadPlugin ( const QString& pluginPath )
         throw PluginLoadException();
     }
 
-    JObject javaPlgInst = javaVM->callObjectMethod( plgLoaderObject, 
+    JObject javaPlgInst = javaVM->callObjectMethod( jloaderObject, 
                                                     loadPluginMethod, 
                                                     pluginPathJStr );
 
@@ -433,7 +430,7 @@ Plugin& JavaPluginLoader::specificLoadPlugin ( const QString& pluginPath )
         throw PluginLoadException();
     }
 
-    return *new JavaPlugin( *javaVM, javaPlgInst, pluginManager(), pluginPath );
+    return *new JavaPlugin( *javaVM, javaPlgInst, pluginManager(), pluginPath);
 }
 
 void JavaPluginLoader::specificUnloadPlugin ( Plugin& plugin )
@@ -441,16 +438,12 @@ void JavaPluginLoader::specificUnloadPlugin ( Plugin& plugin )
     LOG4CXX_DEBUG(logger, "specificUnloadPlugin: " + 
                   plugin.pluginPath().toStdString() );
 
-    // Nothing was loaded
-    if ( plgLoaderObject == 0 )
-        return;
-
     JavaPlugin* javaPlugin = dynamic_cast<JavaPlugin*>( &plugin );
     // Check casting
     if ( javaPlugin == 0 )
         return;
 
-    JClass loaderClass = javaVM->getObjectClass( plgLoaderObject );
+    JClass loaderClass = javaVM->getObjectClass( jloaderObject );
     if ( loaderClass == 0 ) {
         // Returns and clears pending exception
         QString e = javaVM->getAndClearPendingException();
@@ -477,7 +470,7 @@ void JavaPluginLoader::specificUnloadPlugin ( Plugin& plugin )
         return;
     }
 
-    javaVM->callVoidMethod( plgLoaderObject, unloadPluginMethod,
+    javaVM->callVoidMethod( jloaderObject, unloadPluginMethod,
                             javaPlugin->javaPluginInstance() );
 
     javaVM->deleteGlobalRef( loaderClass );
@@ -494,12 +487,7 @@ void JavaPluginLoader::specificUnloadPlugins ()
 {
     LOG4CXX_DEBUG(logger, "specificUnloadPlugins" );
 
-    // Nothing was loaded
-    if ( plgLoaderObject == 0 )
-        return;
-
-
-    JClass loaderClass = javaVM->getObjectClass( plgLoaderObject );
+    JClass loaderClass = javaVM->getObjectClass( jloaderObject );
     if ( loaderClass == 0 ) {
         // Returns and clears pending exception
         QString e = javaVM->getAndClearPendingException();
@@ -517,7 +505,7 @@ void JavaPluginLoader::specificUnloadPlugins ()
     }
 
     // Call 
-    javaVM->callVoidMethod( plgLoaderObject, unloadPluginsMethod );
+    javaVM->callVoidMethod( jloaderObject, unloadPluginsMethod );
 
     if ( javaVM->exceptionCheck() ) {
         QString e = javaVM->getAndClearPendingException();

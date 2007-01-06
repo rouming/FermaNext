@@ -67,15 +67,8 @@ public:
          */
         bool canBeResolved () const;
 
-        /** 
-         * Sets plugin params. 
-         * @throw PluginExecutionParams::ParamsAreNotAcceptedException,
-         *        occurs when plugin does not want to accept params.
-         *        Note: params are set to this node, even plugin does
-         *              not want to accept them.
-         */
-        void setPluginParams ( const PluginExecutionParams& )
-            /*throw (Plugin::ParamsAreNotAcceptedException)*/;
+        /** Sets plugin params. */
+        void setPluginParams ( const PluginExecutionParams& );
 
         /** 
          * Returns current plugin params.
@@ -95,6 +88,9 @@ public:
          * I.e. is a node of execution process.
          */
         bool isInUse () const;
+
+        /** Returns node uuid */
+        QString uuid () const;
 
     private:
         /** Constructs with new data */
@@ -137,15 +133,16 @@ public:
      PluginExecutionTree::Node getTreeTop () const;
 
     /** 
-     * Tries to find node by plugin uuid. 
+     * Tries to find node by uuid. 
      * If node is not found, returns null node.
      * @see PluginExecutionTree::Node::isNull
+     * @see PluginExecutionTree::Node::uuid
      */
-    PluginExecutionTree::Node findNodeByPluginUUID ( const QString& ) const;
+    PluginExecutionTree::Node findNodeByUUID ( const QString& ) const;
 
 private:
-    /** Recursively finds node by specified plugin uuid */
-    PluginExecutionTree::Node findNodeByPluginUUID ( 
+    /** Recursively finds node by specified uuid */
+    PluginExecutionTree::Node findNodeByUUID ( 
                                      const PluginExecutionTree::Node&,
                                      const QString& uuid ) const;
 

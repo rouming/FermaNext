@@ -67,12 +67,10 @@ private:
 private:
     /** JVM */
     JavaVirtualMachine* javaVM;
-    /** Loaded java 'FermaNext' class */
-    JClass fnClass;
-    /** Instance of java 'FermaNext' class */
-    JObject fnObject;
+    /** Loaded java 'JavaPluginLoader' class */
+    JClass jloaderClass;
     /** Instance of java 'JavaPluginLoader' class */
-    JObject plgLoaderObject;
+    JObject jloaderObject;
 };
 
 #endif //JAVAPLUGINLOADER_H

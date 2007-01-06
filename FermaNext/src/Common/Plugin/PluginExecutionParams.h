@@ -19,10 +19,10 @@ public:
     void removeParam ( const QString& name );
 
     /** Returns whole map of params */
-    const QMultiHash<QString, QVariant>& getParams () const;
+    const QHash<QString, QVariant>& getParams () const;
 
 private:
-    QMultiHash<QString, QVariant> params;
+    QHash<QString, QVariant> params;
 };
 
 #endif //PLUGINEXECUTIONPARAMS_H

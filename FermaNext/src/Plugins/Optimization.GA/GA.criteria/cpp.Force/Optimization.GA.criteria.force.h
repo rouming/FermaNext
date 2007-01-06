@@ -14,8 +14,10 @@ public:
                               const PluginExecutionParams& params,
                               const QList<UUIDObject*>& args,
                               const QHash< QString, QList<Plugin*> >& deps  )
-        /*throw (WrongExecutionArgsException,
-                 DependenciesAreNotResolvedException)*/;
+        /*throw (ContextIsNotValidException,
+                 ParamsAreNotAcceptedException,
+                 DependenciesAreNotResolvedException,
+                 WrongExecutionArgsException)*/;
 
     virtual const PluginInfo& pluginInfo () const;
     virtual Plugin::Status pluginStatusCode () const;
@@ -23,6 +25,9 @@ public:
     virtual void tryToAcceptParams ( const PluginExecutionParams& ) const;
     virtual Plugin::DependenceMode dependenceMode () const;
     virtual const QStringList& requiredPluginTypes () const;
+
+    /** Is not user executable, so returns false */
+    virtual bool isUserExecutable () const;
 
 private:
     /** Returns true and fills fw param if can parse execution results */

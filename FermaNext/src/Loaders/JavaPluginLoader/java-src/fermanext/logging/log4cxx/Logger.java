@@ -5,7 +5,7 @@ import java.util.UUID;
 import java.util.Map;
 import java.util.HashMap;
 
-public class Logger 
+public final class Logger 
 {
     // Static root logger instance
     private static Logger rootLogger = null;

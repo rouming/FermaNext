@@ -127,7 +127,7 @@ jstring JNICALL Java_fermanext_trussunit_TrussMaterial_getMaterialName
                               "properly registered?" );
         return 0;
     }
-    return env->NewStringUTF( qPrintable(trussMat->getMaterialName()) );
+    return env->NewStringUTF( trussMat->getMaterialName().toUtf8().data() );
 }
 
 /*

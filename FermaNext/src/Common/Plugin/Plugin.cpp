@@ -42,7 +42,7 @@ Plugin::ExecutionResult Plugin::execute ( const QList<UUIDObject*>& args )
 
     if ( !context.isValid() ) {
         LOG4CXX_WARN(logger, "plugin context is not valid");
-        throw ContextIsNotValidException();
+        throw ContextIsNotValidException(getUUID());
     }
 
     QHash< QString, QList<Plugin*> > dependencies = 
@@ -61,15 +61,38 @@ Plugin::ExecutionResult Plugin::execute ( const QList<UUIDObject*>& args )
 
     ExecutionResult result;
     try { result = specificExecute( execParams, args, dependencies ); }
-    catch ( WrongExecutionArgsException& ) {
-        LOG4CXX_WARN(logger, "plugin execution args are wrong");
+    catch ( WrongExecutionArgsException& e ) {
+        LOG4CXX_WARN(logger, QString("execution args of plugin with uuid '%1'"
+                             " are wrong").arg(e.pluginUuid).toStdString());
         // Step to previous context
         context.previousContext();
         emit afterExecution( *this, ExecutionResult(UnknownStatus) );
         throw;        
     }
-    catch ( DependenciesAreNotResolvedException& ) {
-        LOG4CXX_WARN(logger, "plugin dependencies are not resolved");
+    catch ( DependenciesAreNotResolvedException& e ) {
+        LOG4CXX_WARN(logger, QString("dependencies of plugin with uuid '%1'"
+                             " are not resolved").arg(e.pluginUuid).
+                             toStdString());
+
+        // Step to previous context
+        context.previousContext();
+        emit afterExecution( *this, ExecutionResult(UnknownStatus) );
+        throw;
+    }
+    catch ( ContextIsNotValidException& e ) {
+        LOG4CXX_WARN(logger, QString("context of plugin with uuid '%1'"
+                             " is not valid").arg(e.pluginUuid).toStdString());
+
+        // Step to previous context
+        context.previousContext();
+        emit afterExecution( *this, ExecutionResult(UnknownStatus) );
+        throw;
+    }
+    catch ( ParamsAreNotAcceptedException& e ) {
+        LOG4CXX_WARN(logger, QString("params of plugin with uuid '%1'"
+                             " are not accepted").arg(e.pluginUuid).
+                             toStdString());
+
         // Step to previous context
         context.previousContext();
         emit afterExecution( *this, ExecutionResult(UnknownStatus) );
@@ -99,6 +122,9 @@ Plugin::DependenceMode Plugin::dependenceMode () const
 
 const QStringList& Plugin::requiredPluginTypes () const
 { static QStringList emptyList; return emptyList; }
+
+bool Plugin::isUserExecutable () const
+{ return true; }
 
 void Plugin::setStatus ( Status s )
 { status = s; }

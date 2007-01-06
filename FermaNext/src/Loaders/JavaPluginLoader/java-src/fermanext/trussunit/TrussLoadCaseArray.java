@@ -2,7 +2,7 @@ package fermanext.trussunit;
 
 import java.util.UUID;
 
-public class TrussLoadCaseArray implements fermanext.system.NativeObject
+public final class TrussLoadCaseArray implements fermanext.system.NativeObject
 {
     public native TrussLoadCase createLoadCase ();
 
@@ -31,7 +31,7 @@ public class TrussLoadCaseArray implements fermanext.system.NativeObject
     { this.uuid = uuid; }
 
     // Checks if this plugin really wraps native class
-    public native boolean isValid ();
+    public final native boolean isValid ();
 
     static { 
         System.loadLibrary("JavaPluginLoader.ldr");

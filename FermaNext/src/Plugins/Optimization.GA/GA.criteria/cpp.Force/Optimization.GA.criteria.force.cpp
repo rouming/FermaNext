@@ -71,33 +71,35 @@ Plugin::ExecutionResult GAOptimizationCriteriaForce::specificExecute (
     const PluginExecutionParams& params,
     const QList<UUIDObject*>& args,
     const QHash< QString, QList<Plugin*> >& deps  )
-    /*throw (WrongExecutionArgsException,
-             DependenciesAreNotResolvedException)*/
+    /*throw (ContextIsNotValidException,
+             ParamsAreNotAcceptedException,
+             DependenciesAreNotResolvedException,
+             WrongExecutionArgsException)*/
 {
     LOG4CXX_DEBUG(logger, "specificExecute" );
 
     if ( args.size() != 1 ) {
         LOG4CXX_WARN(logger, "Wrong number of passed arguments." );
-        throw WrongExecutionArgsException();
+        throw WrongExecutionArgsException(getUUID());
     }
 
     TrussUnit* truss = dynamic_cast<TrussUnit*>(args[0]);
     if ( truss == 0 ) {
         LOG4CXX_WARN(logger, "First execution argument should be an instance "
                      "of TrussUnit." );
-        throw WrongExecutionArgsException();
+        throw WrongExecutionArgsException(getUUID());
     }
 
     if ( deps.size() != 1 ) {
         LOG4CXX_WARN(logger, "Dependence is wrong: should be one plugin." );
-        DependenciesAreNotResolvedException e;
+        DependenciesAreNotResolvedException e(getUUID());
         e.unresolvedTypes = requiredPluginTypes();
         throw e;
     }
     if ( deps.values()[0].size() != 1 ) {
         LOG4CXX_WARN(logger, "Dependence is wrong: should be one plugin in "
                              "list." );
-        DependenciesAreNotResolvedException e;
+        DependenciesAreNotResolvedException e(getUUID());
         e.unresolvedTypes = requiredPluginTypes();
         throw e;
     }
@@ -144,5 +146,8 @@ const QStringList& GAOptimizationCriteriaForce::requiredPluginTypes () const
     static QStringList types( QStringList() << "calculation.*" );
     return types;
 }
+
+bool GAOptimizationCriteriaForce::isUserExecutable () const
+{ return false; }
 
 /*****************************************************************************/

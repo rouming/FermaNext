@@ -10,7 +10,7 @@ include(../Common/Common.pri)
 include(../3rdparty/agg23/agg23.pri)
 
 QT += core gui xml
-CONFIG += qt warn_on thread
+CONFIG += qt warn_on thread uitools
 DESTDIR = $$LEVEL
 
 unix {

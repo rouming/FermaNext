@@ -11,9 +11,8 @@ public abstract class JavaPlugin extends Plugin
     /** Plugin logger */
     private static Logger logger = Logger.getLogger("java.plugin.JavaPlugin");
 
-    public JavaPlugin ( String pluginPath )
-    { super(pluginPath); }
-
+    public JavaPlugin ( PluginManager pluginMng, String pluginPath )
+    { super(pluginMng, pluginPath); }
 
     /**
      * This is a main execute method, which is called from native side.
@@ -21,83 +20,55 @@ public abstract class JavaPlugin extends Plugin
      * be declated in derived class, then takes formal parameters of 
      * found method and invokes it with created args.
      */
-    public final ExecutionResult execute ( String[] uuids )
+    private final ExecutionResult nativeCall_specificExecute ( 
+                                             PluginExecutionParams params,
+                                             String[] uuids,
+                                             Hashtable<String, Plugin[]> deps )
+        throws ContextIsNotValidException,
+               ParamsAreNotAcceptedException,
+               DependenciesAreNotResolvedException,
+               WrongExecutionArgsException
     {
-        logger.debug( "execute" );
+        logger.debug( "nativeCall_execute(String[])" );
 
-        if ( uuids == null || uuids.length == 0 ) {
-            // FIXME: throw exception instead returning smth
-            logger.warn( "Uuids array is null or empty." );
-            
-            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
+        /**************
+         * Check uuids
+         **************/
+        if ( uuids == null ) {
+            logger.warn( "Uuids array is null." );
+            throw new WrongExecutionArgsException(getUUID());
         }
 
-        Method[] methods = getClass().getDeclaredMethods();
-        
-        Method specificExecuteMethod = null;
-        for ( Method method : methods ) {
-            if ( method.getName() == "specificExecute" ) {
-                if ( specificExecuteMethod == null )
-                    specificExecuteMethod = method;
-                else {
-                    // FIXME: throw exception instead returning smth
-                    logger.warn( "'specificExecute' method is declared " + 
-                                 "several times, should be declared once." );
-                    
-                    return new ExecutionResult( 
-                                         Plugin.Status.InternalErrStatus, "" );
-                }
-            }
-        }
+        /*********************************
+         * Count execution argument types
+         *********************************/
+        Class<?>[] classes = executionArgumentTypes();
 
-        if ( specificExecuteMethod == null ) {
-            // FIXME: throw exception instead returning smth
-            logger.warn( "'specificExecute' is not declared." );
-
-            
-            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
-        }
-
-        Class<?> retType = specificExecuteMethod.getReturnType();
-        if ( Plugin.ExecutionResult.class != retType ) {
-            logger.warn( "Return type '" + 
-                         retType.getName() +
-                         "' of 'specificExecute' is wrong. Must be '" +
-                         Plugin.ExecutionResult.class.getName() + "'" );
-            // FIXME: throw exception instead returning smth
-
-            
-            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
-        }
-
-        Class<?>[] classes = specificExecuteMethod.getParameterTypes();
         if ( uuids.length != classes.length ) {
-            logger.warn( "Parameters number " + classes.length + 
+            logger.warn( "Execution argument types number " + classes.length + 
                          " doesn't equal to number of uuids " + uuids.length );
-            // FIXME: throw exception instead returning smth
-
-            
-            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
+            throw new WrongExecutionArgsException(getUUID());
         }
 
+        /*********************************************************************
+         * Every execution argument type should be assignable from NativeObject
+         *********************************************************************/
         Class<fermanext.system.NativeObject> nativeObjClass = 
                 fermanext.system.NativeObject.class;
-        
+
         for ( Class<?> paramClass : classes ) {
             if ( ! nativeObjClass.isAssignableFrom(paramClass) ) {
-                logger.warn( "Parameter class '" + paramClass.getName() + 
-                             "' doesn't extend '" +  
+                logger.warn( "Execution argument type '" + 
+                             paramClass.getName() + "' doesn't extend '" +  
                              nativeObjClass.getName() + "'" );
-                // FIXME: throw exception instead returning smth
-
-                
-                return new ExecutionResult( Plugin.Status.InternalErrStatus, 
-                                            "" );
+                throw new WrongExecutionArgsException(getUUID());
             }
         }
-            
 
-        Object[] args = new Object[ classes.length ];
+        /********************************
+         * Create java wrappers by uuids
+         ********************************/
+        UUIDObject[] args = new UUIDObject[ classes.length ];
         for ( int i = 0; i < classes.length; ++i ) {
             try {
                 NativeObject obj = 
@@ -107,21 +78,17 @@ public abstract class JavaPlugin extends Plugin
                                  "type '" +  classes[i].getName() + 
                                  "' to '" + nativeObjClass.getName() +
                                  "'" );
-
-                    // FIXME: throw exception instead returning smth
-                    return new ExecutionResult( 
-                                         Plugin.Status.InternalErrStatus, "" );
+                    throw new WrongExecutionArgsException(getUUID());
                 }
 
+                // Set uuid
                 obj.setUUID( uuids[i] );
+                // Do native cast
                 if ( !obj.isValid() ) {
                     logger.warn( "Can't create argument [" + i + "] of " +
                                  "class '"+  classes[i].getName() + 
                                  "', object "+ "is not valid: " + uuids[i] );
-                    // FIXME: throw exception instead returning smth
-                    return new ExecutionResult( 
-                                         Plugin.Status.InternalErrStatus, "" );
-
+                    throw new WrongExecutionArgsException(getUUID());
                 }
                 // Save newly created wrapper to args array
                 args[i] = obj;
@@ -132,117 +99,58 @@ public abstract class JavaPlugin extends Plugin
                 logger.warn( "Can't create argument [" + i + "] of class '" +
                              classes[i].getName() + "', argument type " +
                              "is abstract: " + uuids[i] );
-                // FIXME: throw exception instead returning smth
-
-                
-                return new ExecutionResult( 
-                                         Plugin.Status.InternalErrStatus, "" );
-
+                throw new WrongExecutionArgsException(getUUID());
             } 
             catch ( java.lang.IllegalAccessException e ) {
                 logger.warn( "Can't create argument [" + i + "] of class '" +
                              classes[i].getName() + "', constructor is " +
                              "inaccessible: " + uuids[i] );
-                // FIXME: throw exception instead returning smth
-
-                
-                return new ExecutionResult( 
-                                         Plugin.Status.InternalErrStatus, "" );
+                throw new WrongExecutionArgsException(getUUID());
             }
 
         }
 
-        Plugin.ExecutionResult execResults = null;
-        
-        // Invoke execution method
-        try { 
-            Object objRes = specificExecuteMethod.invoke(this, args);
-            execResults = Plugin.ExecutionResult.class.cast( objRes );  
-        }
-        catch (  IllegalAccessException e  ) {
-            logger.warn( "Can't invoke method '" + 
-                         specificExecuteMethod.getName() + "', method is " +
-                         "inaccessible." );
-            // FIXME: throw exception instead returning smth
-
-            
-            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
-        }
-        catch ( IllegalArgumentException e ) {
-            logger.warn( "Can't invoke method '" + 
-                         specificExecuteMethod.getName() + "', parameters " +
-                         "differ." );
-            // FIXME: throw exception instead returning smth
-
-            
-            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
-        }
-        catch ( InvocationTargetException e ) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace( new PrintWriter(sw) );
-            String stackTrace = sw.toString();
-
-            // TODO: in future execution method can throw an exception.
-
-            logger.warn( "Can't invoke method '" + 
-                         specificExecuteMethod.getName() + "', method throws "+
-                         "an exception:\n" + stackTrace );
-            // FIXME: throw exception instead returning smth
-
-            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
-        }
-        catch ( ClassCastException e ) {
-            logger.warn( "Can't cast return object to execution result" );
-            // FIXME: throw exception instead returning smth
-
-            return new ExecutionResult( Plugin.Status.InternalErrStatus, "" );
-        }
-
-        return execResults;
+        // Invoking specific execute method
+        return specificExecute( params, args, deps );
     }
 
-    /**
-     * This is a main execute method.
+    /** 
+     * Main entry point to execute plugin. This method is 
+     * private because it can be called only from #execute method. 
+     * You should override #specificExecute in child classes.
+     * @param params of plugin.
+     * @param args execution arguments.
+     * @param deps plugin dependencies.
+     * @return result of executed operation
+     * @throw ContextIsNotValidException occurs when this plugin execute
+     *        its dependence and there smth has gone wrong.
+     * @throw ParamsAreNotAcceptedException occurs when this plugin execute
+     *        its dependence and there smth has gone wrong.
+     * @throw WrongExecutionArgsException, 
+     *        occurs when contract (argument list) between calling side
+     *        and plugin is wrong. 
+     * @throw DependenciesAreNotResolvedException, 
+     *        occurs when dependencies are not resolved.
      * @see execute
-     */
-    public final ExecutionResult execute ( UUIDObject[] args )
-    {
-        String[] uuids = new String[args.length];
-        for ( int i = 0; i < uuids.length; ++i )
-            uuids[i] = args[i].getUUID();
-        return execute( uuids );
-    }
+     * @see executionArgumentTypes
+     */    
+    protected abstract ExecutionResult specificExecute ( 
+                                           PluginExecutionParams params,
+                                           UUIDObject[] args,
+                                           Hashtable<String, Plugin[]> deps  )
+        throws ContextIsNotValidException,
+               ParamsAreNotAcceptedException,
+               DependenciesAreNotResolvedException,
+               WrongExecutionArgsException;
+
 
     /**
-     * Executes plugin with specified arguments.
-     * Should be implemented in your derived class.
-     * You should declare your own #specificExecute method 
-     * with assumed arguments, #execute method will dynamically 
-     * find this method, dynamically create objects of parameters 
-     * types and then will invoke it. 
-     * @see execute
+     * Returns classes of required execution arguments.
+     * This method is used to dynamically create wrappers for required
+     * types by their uuids.
+     * @see nativeCall_specificExecute
+     * @see specificExecute
+     * @return classes of execution arguments
      */
-    /* public abstract void specificExecute ( ... );*/
-
-
-    /** 
-     * Describes itself.
-     * @return plugin info
-     */
-    public abstract PluginInfo pluginInfo ();
-
-    /** 
-     * Describes plugin state by status code.
-     * @return plugin status code
-     * @see pluginStatusMsg for detailed information about status.
-     */
-    public abstract Status pluginStatusCode ();
-
-    /** 
-     * Describes plugin state by status msg. 
-     * (e.g. describes the sort of internal error if it has been occured)
-     * @return plugin status str msg. Returns empty string if status is Ok
-     * @see pluginStatusCode
-     */
-    public abstract String pluginStatusMsg ();
+    protected abstract Class<?>[] executionArgumentTypes ();
 }
