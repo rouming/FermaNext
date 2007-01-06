@@ -19,6 +19,10 @@
 #include <log4cxx/helpers/exception.h>
 #include <log4cxx/ndc.h>
 
+#if defined _WIN32 && defined _MSC_VER
+#pragma warning(pop)
+#endif
+
 #else //ENABLE_LOG4CXX
 
 #include <string>
@@ -80,10 +84,6 @@ namespace log4cxx {
 
 
 } //namespace log4cxx
-
-#if defined _WIN32 && defined _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif //ENABLE_LOG4CXX
 
