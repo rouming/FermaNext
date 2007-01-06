@@ -17,7 +17,6 @@ class QGroupBox;
 class QLabel;
 class QLineEdit;
 class QPainter;
-class QSpacerItem;
 
 /*****************************************************************************/
 

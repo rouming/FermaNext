@@ -224,7 +224,10 @@ int AggToolBar::getWidth () const
 
 int AggToolBar::getHeight () const
 {
-    return toolBarHeight;
+    if ( isVisible() )
+        return toolBarHeight;
+    else
+        return hideButton->getHeight() / 2;
 }
 
 QWidget* AggToolBar::parentWidget () const

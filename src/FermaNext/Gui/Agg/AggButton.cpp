@@ -9,6 +9,7 @@ AggButton::AggButton ( const QString& text ) :
     width(0), height(0),
     pressed(false),
     enabled(true),
+    visible(true),
     highlighted(false),
     leftTopPos(QPoint(0,0)),
     buttonText( text )
@@ -18,6 +19,7 @@ AggButton::AggButton () :
     width(0), height(0),
     pressed(false),
     enabled(true),
+    visible(true),
     highlighted(false),
     leftTopPos(QPoint(0,0))
 {}
@@ -119,6 +121,19 @@ void AggButton::setEnabled ( bool e_ )
     if ( enabled == e_ )
         return;
     enabled = e_;
+    emit onChangeButtonState();
+}
+
+bool AggButton::isVisible () const
+{
+    return visible;
+}
+
+void AggButton::setVisible ( bool v_ )
+{
+    if ( visible == v_ )
+        return;
+    visible = v_;
     emit onChangeButtonState();
 }
 

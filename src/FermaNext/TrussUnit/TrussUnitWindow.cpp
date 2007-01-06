@@ -93,7 +93,7 @@ void TrussUnitWindow::initWindowButtons ()
 
     AggTrussWindowButton* propSizeButton = 
                     new AggTrussWindowButton( QPoint( 1, 1 ),
-                        Global::imagesSvgPath() + "/rollUpIcon.svg",
+                        Global::imagesSvgPath() + "/propSizeIcon.svg",
                         WindowButtonType::PropSizeButton );   
 
     windowButtons.append( hideButton );
@@ -371,8 +371,7 @@ const QSize& TrussUnitWindow::getWindowSize () const
 QSize TrussUnitWindow::getMaximizedWindowSize () const
 {
     if ( windowOwner )
-        return QSize( windowOwner->width() - Global::bordWidth,
-                      windowOwner->height() - Global::bordWidth );
+        return QSize( windowOwner->width(), windowOwner->height() );
     return QSize(0,0); 
 }
 
@@ -443,9 +442,11 @@ void TrussUnitWindow::maximize ( bool saveOldSize )
             QPoint( maximizedSize.width(), maximizedSize.height() ) );
 
     foreach ( AggTrussWindowButton* button, windowButtons )
-        if ( button->getButtonType() == WindowButtonType::RollUpButton ) {
+        if ( button->getButtonType() == WindowButtonType::RollUpButton )
             button->setHint( "Minimize truss unit" );
-            break;
+        else if ( button->getButtonType() == WindowButtonType::PropSizeButton ) {
+            button->setEnabled( false );
+            button->setVisible( false );
         }
 
     maximized = true;
@@ -461,9 +462,11 @@ void TrussUnitWindow::minimize ()
     resize( minLeftTopPos, minRightBottomPos );
 
     foreach ( AggTrussWindowButton* button, windowButtons )
-        if ( button->getButtonType() == WindowButtonType::RollUpButton ) {
+        if ( button->getButtonType() == WindowButtonType::RollUpButton )
             button->setHint( "Maximize truss unit" );
-            break;
+        else if ( button->getButtonType() == WindowButtonType::PropSizeButton ) {
+            button->setEnabled( true );
+            button->setVisible( true );
         }
 
     maximized = false;
@@ -800,7 +803,7 @@ void TrussUnitWindow::checkMouseMoveEvent ( int x, int y, bool buttonPressed )
 
     AggTrussWindowButton* selectedButton = getButtonByCoord( x, y );
 
-    if ( selectedButton )
+    if ( selectedButton && selectedButton->isEnabled() )
     {
         selectedButton->setHighlighted( true );
 
@@ -835,7 +838,7 @@ void TrussUnitWindow::checkMousePressEvent ( int x, int y )
 
     AggTrussWindowButton* selectedButton = getButtonByCoord( x, y );
 
-    if ( selectedButton ) {
+    if ( selectedButton && selectedButton->isEnabled() ) {
         selectedButton->setPressed( true );
         currentPressedButton = selectedButton;
     }
@@ -844,7 +847,7 @@ void TrussUnitWindow::checkMousePressEvent ( int x, int y )
 void TrussUnitWindow::checkMouseReleaseEvent ( int x, int y )
 {
     AggTrussWindowButton* selectedButton = getButtonByCoord( x, y );
-    if ( ! selectedButton )
+    if ( ! selectedButton ||  ! selectedButton->isEnabled() )
         return;
 
     if ( selectedButton->getButtonType() == 
@@ -1072,12 +1075,23 @@ void TrussUnitWindow::drawHeadline ( ren_dynarow& baseRend,
                                      color_array_type& gradColors ) const
 {
     QPoint p1, p2;
-    p1.setX( 3 * Global::bordWidth );
+    int rad;
+    if ( ! maximized ) {
+        p1.setX( 3 * Global::bordWidth );
+        p2.setX( windowSize.width() - 3 * Global::bordWidth );
+        rad = 9;
+    } 
+    else {
+        p1.setX( windowSize.width() - 3 * Global::bordWidth - 
+                 buttonBuf->width() + Global::windowButtonWidth );
+        p2.setX( windowSize.width() - 3 * Global::bordWidth );
+        rad = 6;
+    }
+
     p1.setY( Global::bordWidth / 2 );
-    p2.setX( windowSize.width() - 3 * Global::bordWidth );
     p2.setY( p1.y() + Global::headWidth );
 
-    agg::rounded_rect headline( p1.x(), p1.y(), p2.x(), p2.y(), 9 );
+    agg::rounded_rect headline( p1.x(), p1.y(), p2.x(), p2.y(), rad );
 
     gradient_span_alloc gradSpan;
     linear_gradient gradFunc;
@@ -1090,8 +1104,12 @@ void TrussUnitWindow::drawHeadline ( ren_dynarow& baseRend,
     ras.add_path( headline );
     agg::render_scanlines( ras, sl, gradRend );
 
-    agg::rounded_rect outline( p1.x(), p1.y(), p2.x(), p2.y(), 
-                               Global::headWidth / 2 );
+    if ( ! maximized )
+        rad = Global::headWidth / 2;
+    else
+        rad = 6;
+
+    agg::rounded_rect outline( p1.x(), p1.y(), p2.x(), p2.y(), rad );
     solidRend.color( agg::rgba( 30, 20, 10 ) );
     agg::conv_stroke<agg::rounded_rect> stroke( outline );
     stroke.width( 1.2 );
@@ -1230,8 +1248,13 @@ void TrussUnitWindow::drawCalcIndicator ( ren_dynarow& baseRend,
     int rad =  Global::headWidth/4 + 2;
     agg::ellipse ell;
 
+    // draw shadow
     ell.init ( pos.x(), pos.y(), rad + 1, rad + 1, 100 );
-    solidRend.color ( agg::rgba( 0, 0, 0, 0.4 ) );
+    if ( ! maximized )
+        solidRend.color( agg::rgba( 0, 0, 0, 0.4 ) );
+    else 
+        solidRend.color( agg::rgba( 0, 0, 0, 0.6 ) );
+
     ras.add_path(ell);
     agg::render_scanlines ( ras, sl, solidRend );
 
@@ -1239,11 +1262,11 @@ void TrussUnitWindow::drawCalcIndicator ( ren_dynarow& baseRend,
 
     // draw edging
     linear_gradient gradFunc;
-    color_type firstColor ( agg::rgba( 0, 0, 0 ) );
-    color_type middleColor ( agg::rgba( 1, 15, 25 ) );
+    color_type firstColor( agg::rgba( 0, 0, 0 ) );
+    color_type middleColor( agg::rgba( 1, 15, 25 ) );
     if ( ! isHighlighted() )
         middleColor = agg::rgba( 1, 1, 1 );
-    color_type lastColor ( agg::rgba( 0, 0, 0 ) );
+    color_type lastColor( agg::rgba( 0, 0, 0 ) );
     fillColorArray ( gradColors, firstColor, middleColor, lastColor );
     drawGradientEllipse( baseRend, ras, sl, gradFunc, gradColors, mtx, 
                          pos.x(), pos.y(), rad, -6, Global::headWidth + 8 );
@@ -1365,6 +1388,8 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 
         /*------draw simple calculation indicator------*/
         QPoint centerPos( 22, Global::bordWidth/2 + Global::headWidth/2 );
+        if ( maximized )
+            centerPos.setX( centerPos.x() - 10 );
         drawCalcIndicator( baseRend, solidRend, ras, sl, 
                            gradColors, centerPos );
 
@@ -1374,12 +1399,24 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         QString title = fitTextToWindowSize( getTrussName (), 
                                              (int)lengthLimit, glyph );
         int titleLength = (int)glyph.width( title.toAscii().data() );
+
         DoublePoint titlePos( ( windowSize.width() - 2 * Global::bordWidth - 
                                 titleLength ) / 2, 14 );
+        if ( maximized )
+            titlePos.setY( titlePos.y() + 1 );
+
+        int titleHeight;
+        if ( ! maximized )
+            titleHeight = Global::headWidth - 1;
+        else
+            titleHeight = Global::headWidth + 2;
 
         DoublePoint rectPos1( titlePos.x() - 15, Global::bordWidth / 2 ),
                     rectPos2( titlePos.x() + titleLength + 15, 
-                              rectPos1.y() + Global::headWidth -1 );
+                              rectPos1.y() + titleHeight );
+
+        if ( maximized )
+            rectPos1.setY( rectPos1.y() - 1 );
 
         color_type firstColor( agg::rgba( 0, 0, 0 ) );
         color_type middleColor( agg::rgba8( 180, 130, 100 ) );

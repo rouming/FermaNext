@@ -42,6 +42,9 @@ WindowButtonType::Type AggTrussWindowButton::getButtonType () const
 
 void AggTrussWindowButton::paint ( ren_dynarow& baseRend ) const
 {
+    if ( ! isVisible() )
+        return;
+    
     scanline_rasterizer ras;
     agg::scanline_p8 sl; 
     solidRenderer solidRend( baseRend );

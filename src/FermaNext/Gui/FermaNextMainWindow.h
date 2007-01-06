@@ -84,6 +84,8 @@ protected:
     void copyMaterialsForPivot ( QDomElement pivotDomElem, 
                                  QStringList materialXmls );
 
+    void saveApplicationSettings ();
+
 protected slots:
     void fileNew ();
     void fileOpen ();

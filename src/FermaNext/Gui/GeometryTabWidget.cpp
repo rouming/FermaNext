@@ -583,14 +583,13 @@ void GeometryTabWidget::initNodesTab ()
     topLayout->addWidget( nodesNumbLabel );
     topLayout->addWidget( fixedNodesLabel );
     bottomLayout->addWidget( nodeTable );
-    parentLayout->addStretch( 1 );
     topLayout->setMargin( 5 );
     topLayout->setSpacing( 5 );
     bottomLayout->setMargin( 1 );
     bottomLayout->setSpacing( 1 );
     parentLayout->setMargin( 1 );
     parentLayout->setSpacing( 1 );
-    
+
     // init node table
     nodeTable->setColumnCount( 3 );
     nodeTable->setSelectionMode( QAbstractItemView::NoSelection );
@@ -634,7 +633,6 @@ void GeometryTabWidget::initPivotsTab ()
     parentLayout->addLayout( bottomLayout );
     topLayout->addWidget( pivotsNumbLabel );
     bottomLayout->addWidget( pivotTable );
-    parentLayout->addStretch( 1 );
     topLayout->setMargin( 5 );
     topLayout->setSpacing( 5 );
     bottomLayout->setMargin( 1 );
@@ -677,6 +675,7 @@ void GeometryTabWidget::initAreaTab ()
 
     QVBoxLayout* parenLayout = new QVBoxLayout( parentFrame );
     parenLayout->addWidget( sizeGroupBox );
+    parenLayout->addStretch( 1 );
     parenLayout->setMargin( 10 );
 
     QGridLayout *grid = new QGridLayout( sizeGroupBox );

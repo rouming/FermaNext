@@ -62,6 +62,7 @@ public:
 
 protected slots:
     virtual void loadIsChanged () = 0;
+    virtual void checkFixation () = 0;
 
 signals:
     void onAfterLoadCreation ( const Node& );
@@ -113,7 +114,9 @@ public:
                       load, SLOT(enable()) );
             connect( &node, SIGNAL(destroyed()),
                       load, SLOT(remove()) );
-
+            
+            connect( &node, SIGNAL(onFixationChange(Fixation)),
+                              SLOT(checkFixation()) );
             connect( load, SIGNAL(onForceChange()),
                            SLOT(loadIsChanged()) );
             connect( load, SIGNAL(onEnableChange(bool)),
@@ -203,6 +206,18 @@ protected:
         if ( ! node )
             return;    
         emit onLoadChange( *node );
+    }
+
+    void checkFixation ()
+    {
+        N* node = dynamic_cast<N*>( sender() );
+        if ( ! node )
+            return;
+
+        if ( node->getFixation() == Node::Unfixed )
+            return;
+
+        removeLoad( *node );
     }
 
 private:
