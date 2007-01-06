@@ -21,6 +21,10 @@ public:
     // e.g. window uses owner for correct maximizing.
     virtual void setWindowOwner ( QWidget* owner );
 
+    // Emits signal to clear render flag of the parent truss unit.
+    // Use it for force updating of the truss units
+    virtual void redrawTrussUnit ();
+
     // XML serialization
     virtual void loadFromXML ( const QDomElement& ) /*throw (LoadException)*/;
     virtual QDomElement saveToXML ( QDomDocument& );
@@ -86,7 +90,7 @@ public:
     virtual void setHeadlineLastColor ( int r, int g, int b );
     virtual void setBorderColor ( int r, int g, int b );
     virtual void setResEllColor ( int r, int g, int b );
-
+ 
     virtual void paint ( base_renderer& baseRend ) const;
 
 protected:
@@ -136,6 +140,7 @@ signals:
     void onTrussUnitWindowRollUp ();
     void onHintShowsUp ( const QString& hint, const QPoint pos, bool smooth );
     void onHintHides ( bool smooth );
+    void onForceRedrawTrussUnit ();
     void onClearButtonRenderedFlag ();
 
 protected slots:

@@ -204,6 +204,10 @@ protected:
                                             scanline_rasterizer& ras, 
                                             agg::scanline_p8& sl ) const;
 
+    virtual void drawNode ( TrussNode& node, ren_dynarow& baseRend, 
+                            const DoublePoint& scaleMult, 
+                            double trussAreaHeight ) const;
+
 private:
     mutable bool trussRendered, calculated;
     bool elementPositionCheck;
@@ -234,7 +238,7 @@ public:
                         double lineWidth, color_type color ) const;
 
     void paint ( ren_dynarow& baseRend,  const DoublePoint& scaleMult,
-                 double trussAreaHeight ) const;
+                 double trussAreaHeight, bool loaded ) const;
 
 signals:
 // Paintable signals

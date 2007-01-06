@@ -96,6 +96,8 @@ public:
 
     virtual AggTrussToolBar& getToolBar () const;
 
+    virtual void redrawAllTrussUnits();
+
 protected:
     virtual void clearTrussUnitWindows ();
 

@@ -129,6 +129,15 @@ extern const QString htmlTitleBgColor,
                      htmlCellHighlightColor;
 
 /************************************
+ * User Editable Consts 
+ ************************************/
+
+extern bool showNodeNumbers,
+            showPivotNumbers,
+            showFixations,
+            showLoads;
+
+/************************************
  * Main subs
  ************************************/
 

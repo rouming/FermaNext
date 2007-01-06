@@ -1316,6 +1316,9 @@ void TrussUnit::desistAdjoiningPivots ( const TrussNode& node )
 void TrussUnit::drawLoad ( ren_dynarow& baseRend, const TrussLoad& load, 
                            const DoublePoint& tailPos ) const
 {
+    if ( ! Global::showLoads )
+        return;
+
     double x = load.getXForce (),
            y = load.getYForce (), 
            x1 = 1, y1 = 1, sinA;
@@ -1348,9 +1351,14 @@ void TrussUnit::drawLoad ( ren_dynarow& baseRend, const TrussLoad& load,
     solidRenderer solidRend( baseRend );
     scanline_rasterizer ras;
     agg::scanline_p8 sl;
-    color_type color = agg::rgba( 0, 0, 25 );
 
-    drawArrow( ras, solidRend, sl, tailPos, headPos, color, 4, 4, 4, 6 ); 
+    // draw white highlight
+    drawArrow( ras, solidRend, sl, tailPos, headPos, 
+                aggColor( 255, 255, 255 ), 5, 5, 7, 8 ); 
+
+    // draw load arrow
+    drawArrow( ras, solidRend, sl, tailPos, headPos, 
+               aggColor( 50, 50, 255 ), 4, 4, 5, 7 ); 
 }
 
 void TrussUnit::drawNodeNumber( TrussNode* node, 
@@ -1523,103 +1531,84 @@ void TrussUnit::drawTrussElementsNumbers ( ren_dynarow& baseRend,
                                            scanline_rasterizer& ras, 
                                            agg::scanline_p8& sl ) const
 {
-    PivotList pivots = getPivotList ();
-    PivotListIter pivotIter = pivots.begin ();
-    for ( ; pivotIter != pivots.end(); ++pivotIter )
-        drawPivotNumber ( *pivotIter, baseRend, solidRend, ras, sl );
+    if ( Global::showPivotNumbers ) {
+        PivotList pivots = getPivotList ();
+        PivotListIter pivotIter = pivots.begin ();
+        for ( ; pivotIter != pivots.end(); ++pivotIter )
+            drawPivotNumber ( *pivotIter, baseRend, solidRend, ras, sl );
+    }
 
-    NodeList nodes = getNodeList ();
-    NodeListIter nodeIter = nodes.begin ();
-    for ( ; nodeIter != nodes.end(); ++nodeIter )
-        drawNodeNumber ( *nodeIter, baseRend, solidRend, ras, sl );
+    if ( Global::showNodeNumbers ) {
+        NodeList nodes = getNodeList ();
+        NodeListIter nodeIter = nodes.begin ();
+        for ( ; nodeIter != nodes.end(); ++nodeIter )
+            drawNodeNumber ( *nodeIter, baseRend, solidRend, ras, sl );
+    }
+}
+
+void TrussUnit::drawNode ( TrussNode& node, ren_dynarow& baseRend,
+                           const DoublePoint& scaleMult, 
+                           double trussAreaHeight ) const
+{
+    DoublePoint nodePos = getWidgetPosFromTrussCoord( node.getPoint() ) - 
+                            DoublePoint( leftTopPos.x(), leftTopPos.y() );
+
+    const LoadCases& loadCases = getLoadCases();
+
+    // Draw load arrow for current load case
+    LoadCase* currLoadCase = loadCases.getCurrentLoadCase();
+    if ( currLoadCase )  {
+        TrussLoad* load = currLoadCase->findLoad( node );
+        if ( load ) drawLoad( baseRend, *load, nodePos );
+    }
+
+    // Check if node is loaded by another load case
+    bool loaded = false;
+    for ( int i = 0; i < loadCases.countLoadCases(); ++i ) {
+        LoadCase* loadCase = loadCases.findLoadCase( i );
+        if ( loadCase ) {
+            TrussLoad* load = loadCase->findLoad( node );
+            if ( load )
+                loaded = true;
+        }
+    }
+
+    node.paint( baseRend, scaleMult, trussAreaHeight, loaded );
 }
 
 void TrussUnit::paint ( ren_dynarow& baseRend ) const
 {
-    bool numbersDrawing = true;
-
     if ( ! trussRendered )
     {
         baseRend.clear ( agg::rgba( 20, 20, 20, 0 ) );
+
         DoublePoint scaleMult = getTrussScaleMultiplier ();
-        scanline_rasterizer ras;
-        agg::scanline_p8 sl;
-        solidRenderer solidRend ( baseRend ); 
-        agg::ellipse ell;
-        DoublePoint pos;
         double trussAreaHeight = getTrussAreaSize().height();
-        PivotList pivotList = getPivotList ();
-        PivotList::const_iterator pivotsIter = pivotList.begin();
-        for ( ; pivotsIter != pivotList.end(); ++pivotsIter )
-            (*pivotsIter)->paint( baseRend, scaleMult, trussAreaHeight );
+
+        foreach ( TrussPivot* pivot, getPivotList() )
+            pivot->paint( baseRend, scaleMult, trussAreaHeight );
 
         LoadCase* loadCase = getLoadCases().getCurrentLoadCase();
         
-        NodeList nodeList = getNodeList ();
-        NodeList::const_iterator nodesIter = nodeList.begin();
-        for ( ; nodesIter != nodeList.end(); ++nodesIter )
-            if ( *nodesIter != frontNode &&
-                 *nodesIter != firstFront &&
-                 *nodesIter != lastFront )
-            {
-                TrussNode* node = *nodesIter;
-                DoublePoint nodePos = 
-                    getWidgetPosFromTrussCoord( node->getPoint() ) - 
-                    DoublePoint( leftTopPos.x(), leftTopPos.y() );
-
-                if ( loadCase ) 
-                {
-                    TrussLoad* load = loadCase->findLoad( *node );
-                    if ( load ) drawLoad( baseRend, *load, nodePos );
-                }
-                node->paint( baseRend, scaleMult, trussAreaHeight );
-            }
+        foreach ( TrussNode* node, getNodeList() )
+            if ( node != frontNode && node != firstFront &&
+                 node != lastFront )
+                drawNode( *node, baseRend, scaleMult, trussAreaHeight );
            
         if ( frontNode ) 
-        {
-            DoublePoint nodePos = 
-                getWidgetPosFromTrussCoord( frontNode->getPoint() ) -
-                DoublePoint( leftTopPos.x(), leftTopPos.y() );
-            if ( loadCase ) 
-            {
-                pos = getWidgetPosFromTrussCoord( frontNode->getPoint() );
-                TrussLoad* load = loadCase->findLoad( *frontNode );
-                if ( load ) drawLoad( baseRend, *load, nodePos );
-            }
-            frontNode->paint( baseRend, scaleMult, trussAreaHeight );
-        }
+            drawNode( *frontNode, baseRend, scaleMult, trussAreaHeight );
 
         if ( firstFront && firstFront != frontNode ) 
-        {
-            DoublePoint nodePos = 
-                getWidgetPosFromTrussCoord( firstFront->getPoint() ) - 
-                DoublePoint( leftTopPos.x(), leftTopPos.y() );
-            if ( loadCase ) 
-            {
-                pos = getWidgetPosFromTrussCoord( firstFront->getPoint() );
-                TrussLoad* load = loadCase->findLoad( *firstFront );
-                if ( load ) drawLoad( baseRend, *load, nodePos );
-            }
-            firstFront->paint( baseRend, scaleMult, trussAreaHeight );
-        }
+            drawNode( *firstFront, baseRend, scaleMult, trussAreaHeight );
 
         if ( lastFront && lastFront != frontNode ) 
-        {
-            DoublePoint nodePos = 
-                getWidgetPosFromTrussCoord( lastFront->getPoint() ) - 
-                DoublePoint( leftTopPos.x(), leftTopPos.y() );
-            if ( loadCase ) 
-            {
-                pos = getWidgetPosFromTrussCoord( lastFront->getPoint() );
-                TrussLoad* load = loadCase->findLoad( *lastFront );
-                if ( load ) drawLoad( baseRend, *load, nodePos );
-            }
-            lastFront->paint( baseRend, scaleMult, trussAreaHeight );
-        }
+            drawNode( *lastFront, baseRend, scaleMult, trussAreaHeight );
 
         /*------draw truss elements numbers------*/
-        if ( numbersDrawing )
-            drawTrussElementsNumbers ( baseRend, solidRend, ras, sl );
+        scanline_rasterizer ras;
+        agg::scanline_p8 sl;
+        solidRenderer solidRend ( baseRend );
+        drawTrussElementsNumbers ( baseRend, solidRend, ras, sl );
         
         setTrussRenderedStatus(true);
     }
