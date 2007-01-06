@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<project name="JavaPluginLoader" default="build.all" basedir=".">
+
+    <property name="src.dir" value="src"/>
+    <property name="pkg.name" value="fermanext"/>
+    <property name="plugin.name" value="JGAP.plg"/>
+    <property name="main.class" value="fermanext.jgap.GAOptimizationPlugin"/>
+    <property name="root.dir" value="../../../../.."/>
+    <property name="plugins.dir" value="${root.dir}/plugins"/>
+    <property name="build.dir" value="${root.dir}/build"/>
+    <property name="fermanext.jar" value="${root.dir}/plugins/loaders/fermanext.jar"/>
+    <property name="jgap.dir" value="jgap"/>
+    <property name="jgap.jar" value="jgap.jar"/>
+    <property name="dist.build.dir" value="${build.dir}/${plugin.name}"/>
+    <property name="src.build.dir" value="${dist.build.dir}/classes"/>
+    <property name="debug" value="off"/>
+    <property environment="env"/>
+
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${dist.build.dir}"/>
+    <mkdir dir="${src.build.dir}"/>
+
+    <!-- ================================================================== -->
+    <!-- Set up build class path                                            -->
+    <!-- ================================================================== -->
+    <path id="build.classpath">
+      <pathelement path="${src.build.dir}"/>
+      <pathelement location="${fermanext.jar}"/>
+      <pathelement location="${jgap.dir}/${jgap.jar}"/>
+    </path>
+
+
+    <!-- ================================================================== -->
+    <!-- Build all                                                          -->
+    <!-- ================================================================== -->
+    <target name="build.all" 
+            depends="build.src">
+    </target>
+
+
+    <!-- ================================================================== -->
+    <!-- Build all src                                                      -->
+    <!-- ================================================================== -->
+    <target name="build.src">
+      <antcall target="compile">
+        <param name="includes" value="${pkg.name}/**/*.java"/>
+      </antcall>
+
+      <!-- Plugin jar -->
+      <jar jarfile="${plugins.dir}/${plugin.name}.jar" 
+           includes="${pkg.name}/**"
+           basedir="${src.build.dir}">
+
+        <!-- Merge with original JGAP lib -->
+        <zipgroupfileset dir="${jgap.dir}">
+          <include name="${jgap.jar}"/>
+        </zipgroupfileset>
+
+        <manifest>
+          <attribute name="Main-Class" value="${main.class}"/>
+        </manifest>
+      </jar>
+
+    </target>
+
+
+
+    <!-- ================================================================== -->
+    <!-- Useful compile target                                              -->
+    <!-- ================================================================== -->
+    <target name="compile">
+        <property name="includes" value=""/>
+        <property name="excludes" value=""/>
+
+        <javac srcdir="${src.dir}" 
+               destdir="${src.build.dir}" 
+               classpathref="build.classpath" 
+               includes="${includes}" 
+               excludes="${excludes}"
+               debug="${debug}"
+               compiler="modern">
+          <compilerarg line="-Xlint:unchecked"/>          
+        </javac>
+    </target>
+
+
+    <!-- ================================================================== -->
+    <!-- Cleans                                                             -->
+    <!-- ================================================================== -->
+    <target name="clean" depends="clean.build">
+      <echo message="Cleaning all"/>
+    </target>
+
+    <target name="clean.build">
+      <echo message="Cleaning build"/>
+      <delete dir="${dist.build.dir}"/>
+      <delete dir="${stubs.headers}"/>
+    </target>
+
+</project>

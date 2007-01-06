@@ -61,18 +61,17 @@ Plugin::ExecutionResult SimpleCalcPlugin::specificExecute (
     const PluginExecutionParams& params,
     const QList<UUIDObject*>& argsList,
     const QHash< QString, QList<Plugin*> >& deps  )
-    /*throw (Plugin::WrongExecutionArgsException,
-             Plugin::DependenciesAreNotResolvedException)*/
+    /*throw (Plugin::WrongExecutionArgsException)*/
 {
     Q_UNUSED(params);
     Q_UNUSED(deps);
 
     if ( argsList.size() != 1 )
-        throw WrongExecutionArgsException();
+        throw WrongExecutionArgsException(getUUID());
     
     TrussUnit* truss = dynamic_cast<TrussUnit*>(argsList[0]);
     if ( truss == 0 )
-        throw WrongExecutionArgsException();
+        throw WrongExecutionArgsException(getUUID());
 
     //---------------- Check if truss has no nodes
 

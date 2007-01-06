@@ -31,8 +31,10 @@ public:
                               const PluginExecutionParams& params,
                               const QList<UUIDObject*>& args,
                               const QHash< QString, QList<Plugin*> >& deps  )
-        /*throw (WrongExecutionArgsException,
-                 DependenciesAreNotResolvedException)*/;
+        /*throw (ContextIsNotValidException,
+                 ParamsAreNotAcceptedException,
+                 DependenciesAreNotResolvedException,
+                 WrongExecutionArgsException)*/;
 
     virtual const PluginInfo& pluginInfo () const;
     virtual Plugin::Status pluginStatusCode () const;
@@ -42,6 +44,12 @@ public:
     virtual const QStringList& requiredPluginTypes () const;
 
 private:
+    enum GAType { GASimple = 0, 
+                  GASteady = 1, 
+                  GADCrowding = 2, 
+                  GAIncremental = 3, 
+                  GADeme = 4 };
+
     Plugin* fitnessPlugin;
     TrussUnit* trussArg;
 };

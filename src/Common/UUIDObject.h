@@ -11,10 +11,13 @@
 class UUIDObject
 {
 protected:
+    /** Hidden constructor */
     UUIDObject ();
-    virtual ~UUIDObject ();
 
 public:
+    /** Destructor */
+    virtual ~UUIDObject ();    
+
     // Exceptions
     /** Occurs when UUID is not valid */
     class WrongUUIDException {};

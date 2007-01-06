@@ -2,7 +2,7 @@
 package fermanext.system;
 
 /** Plugin info */
-public class PluginInfo
+public final class PluginInfo
 {
     public PluginInfo ( String n, String d, String t )
     { name = n; description = d; type = t; }

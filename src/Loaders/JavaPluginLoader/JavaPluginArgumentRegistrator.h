@@ -5,8 +5,10 @@
 #include <jni.h>
 
 #include <QHash>
+#include <QPair>
 #include <QStack>
 
+#include "JavaVM/JavaVirtualMachine.h"
 #include "UUIDObject.h"
 
 /** 
@@ -22,18 +24,29 @@ public:
     static void pop ();
 
     /** Registers argument in current argument context */
-    static bool registerArgument ( UUIDObject* );
+    static bool registerArgument ( UUIDObject*, bool shouldBeDeleted = false );
 
     /** 
-     * Registers argument in current argument context and returns 
-     * tries to create Java object by UUID
+     * Registers argument in current argument context,
+     * creates Java object of specified class name and
+     * sets uuid.
+     * Note: Java class should be assignable from fermanext.system.NativeObject
      * @param uuidObj native object to register
      * @param env Java environment
      * @param javaClsName name of Java class to create an object
      * @return 0 if smth goes wrong, valid Java object otherwise
      */
     static jobject registerArgument ( UUIDObject* uuidObj, JNIEnv* env, 
-                                      const char* javaClsName );
+                                      const char* javaClsName,
+                                      bool shouldBeDeleted = false );
+
+    /** Same as above */
+    static JObject registerArgument ( UUIDObject* uuidObj, 
+                                      JavaVirtualMachine& javaVM,
+                                      const char* javaClsName,
+                                      bool shouldBeDeleted = false );
+
+
     /** Unregisters argument from current argument context */
     static bool unregisterArgument ( UUIDObject* );
     /** Unregisters all arguments from current argument context */
@@ -54,7 +67,7 @@ public:
     static UUIDObject* getRegisteredByJavaObj ( JNIEnv* env, jobject self );
 
 private:
-    typedef QHash<QString, UUIDObject*> UUIDObjectMap;
+    typedef QHash<QString, QPair<UUIDObject*, bool> > UUIDObjectMap;
     typedef QStack<UUIDObjectMap*> UUIDObjectMapStack;
 
     /** 

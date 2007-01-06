@@ -6,7 +6,10 @@
 
 // Disable annoying MSVC warning
 #if defined _WIN32 && defined _MSC_VER
+#pragma warning(push)
 #pragma warning(disable: 4250)
+#pragma warning(disable: 4251)
+#pragma warning(disable: 4786)
 #endif
 
 #include <log4cxx/logstring.h>
@@ -61,15 +64,6 @@ namespace log4cxx {
         { return LoggerPtr(); }
     };
 
-    class NDC
-    {
-    public:
-        inline static std::string get () { return ""; }
-        inline static std::string pop () { return ""; }
-        inline static void push ( const std::string& ) {};
-        inline static void remove () {};
-    };
-
     class BasicConfigurator
     {
     public:
@@ -86,6 +80,10 @@ namespace log4cxx {
 
 
 } //namespace log4cxx
+
+#if defined _WIN32 && defined _MSC_VER
+#pragma warning(pop)
+#endif
 
 #endif //ENABLE_LOG4CXX
 

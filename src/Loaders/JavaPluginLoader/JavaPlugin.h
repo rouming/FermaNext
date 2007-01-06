@@ -24,18 +24,36 @@ public:
                               const PluginExecutionParams& params,
                               const QList<UUIDObject*>& args,
                               const QHash< QString, QList<Plugin*> >& deps  )
-        /*throw (WrongExecutionArgsException,
-                 DependenciesAreNotResolvedException)*/;
+        /*throw (ContextIsNotValidException,
+                 ParamsAreNotAcceptedException,
+                 DependenciesAreNotResolvedException,
+                 WrongExecutionArgsException)*/;
 
     virtual const PluginInfo& pluginInfo () const;
     virtual Status pluginStatusCode () const;
     virtual QString pluginStatusMsg () const;
     virtual void tryToAcceptParams ( const PluginExecutionParams& ) const
-        /*throw(Plugin::ParamsAreNotAcceptedException)*/;
+        /*throw(ParamsAreNotAcceptedException)*/;
+    virtual Plugin::DependenceMode dependenceMode () const;
 
     virtual const QStringList& requiredPluginTypes () const;
+    virtual bool isUserExecutable () const;
 
     JObject javaPluginInstance () const;
+
+private:
+    /** 
+     * Converts params to java instance.
+     * @return 0 if smth goes wrong, valid java object otherwise
+     */
+    JObject executionParamsToJava ( const PluginExecutionParams& ) const;
+
+    /**
+     * Converts dependencies hashtable to java instance.
+     * @return 0 if smth goes wrong, valid java object otherwise
+     */
+    JObject dependenciesHashToJava ( 
+        const QHash<QString, QList<Plugin*> >& ) const;
 
 private:
     /** JVM instance */
@@ -43,7 +61,9 @@ private:
     /** Java plugin instance */
     JObject javaPluginInst;
     /** Plugin info */
-    PluginInfo pluginInf;
+    mutable PluginInfo pluginInf;
+    /** Required plugin types */
+    mutable QStringList requiredPlgTypes;
 };
 
 #endif //JAVAPLUGIN_H

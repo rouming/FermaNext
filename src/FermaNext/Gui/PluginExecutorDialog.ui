@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>PluginExecutorDialog</class>
  <widget class="QDialog" name="PluginExecutorDialog" >
   <property name="geometry" >
@@ -18,34 +15,6 @@
   <property name="modal" >
    <bool>true</bool>
   </property>
-  <widget class="QGroupBox" name="groupBox_2" >
-   <property name="geometry" >
-    <rect>
-     <x>9</x>
-     <y>9</y>
-     <width>471</width>
-     <height>241</height>
-    </rect>
-   </property>
-   <property name="title" >
-    <string>Plugin parameters</string>
-   </property>
-   <layout class="QHBoxLayout" >
-    <property name="margin" >
-     <number>9</number>
-    </property>
-    <property name="spacing" >
-     <number>6</number>
-    </property>
-    <item>
-     <widget class="QTextEdit" name="textEdit" >
-      <property name="html" >
-       <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:MS Shell Dlg 2; font-size:8.25pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:Sans Serif; font-size:9pt;">&lt;span style=" font-weight:600; text-decoration: underline;">Plugins can be: &lt;/span>&lt;/p>&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:Sans Serif; font-size:9pt; font-weight:600;">&lt;span style=" font-weight:400;">&lt;br />&lt;/span>MultiDependeble&lt;span style=" font-weight:400;">  -- plugin manager will resolve plugin dependence with several found plugins, and plugin will manually choose what dependent plugin to execute in every iteration. &lt;br />&lt;br />&lt;/span>SingleDependeble &lt;span style=" font-weight:400;">-- plugin manager will resolve plugin dependence only with a single found plugin. &lt;br />&lt;/span>&lt;span style=" font-weight:400; font-style:italic; text-decoration: underline;">&lt;br />&lt;/span>&lt;span style=" font-style:italic; text-decoration: underline;">Main execution rules: &lt;br />&lt;/span>&lt;span style=" font-weight:400;">&lt;br />1. All plugins execution flow should be run in a single thread &lt;br />2. To avoid recursion every execution branch should contain every plugin only once. &lt;/span>&lt;/p>&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:Sans Serif; font-size:9pt;">&lt;/p>&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:Sans Serif; font-size:9pt;">&lt;span style=" font-weight:600; text-decoration: underline;">GUI feautres:&lt;/span>&lt;/p>&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:Sans Serif; font-size:9pt; font-weight:600; text-decoration: underline;">&lt;/p>&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:Sans Serif; font-size:9pt;">1. Plugins are marked with icons or highlighted: &lt;/p>&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:Sans Serif; font-size:9pt;">     a) plugin is enabled/disabled&lt;/p>&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:Sans Serif; font-size:9pt;">     b) single/multi dependeble plugin&lt;/p>&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:Sans Serif; font-size:9pt;">     c) params are invalid &lt;/p>&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:Sans Serif; font-size:9pt;">     d) &lt;/p>&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:Sans Serif; font-size:9pt;">     &lt;/p>&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:Sans Serif; font-size:9pt;">     &lt;/p>&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:Sans Serif; font-size:9pt;">     &lt;/p>&lt;/body>&lt;/html></string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QGroupBox" name="groupBox" >
    <property name="geometry" >
     <rect>
@@ -58,19 +27,6 @@
    <property name="title" >
     <string>Dependence</string>
    </property>
-   <widget class="QGroupBox" name="groupBox_3" >
-    <property name="geometry" >
-     <rect>
-      <x>290</x>
-      <y>20</y>
-      <width>161</width>
-      <height>231</height>
-     </rect>
-    </property>
-    <property name="title" >
-     <string>Dependent plugin parameters</string>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="groupBox_4" >
     <property name="geometry" >
      <rect>
@@ -149,7 +105,7 @@
       <string>Depends on</string>
      </property>
      <property name="icon" >
-      <iconset>..\..\dd\doghat1.jpg</iconset>
+      <iconset>../../dd/doghat1.jpg</iconset>
      </property>
     </column>
     <column>
@@ -198,9 +154,45 @@
      </item>
     </item>
    </widget>
+   <widget class="QGroupBox" name="depParamsGroupBox" >
+    <property name="geometry" >
+     <rect>
+      <x>290</x>
+      <y>20</y>
+      <width>171</width>
+      <height>231</height>
+     </rect>
+    </property>
+    <property name="sizePolicy" >
+     <sizepolicy>
+      <hsizetype>5</hsizetype>
+      <vsizetype>5</vsizetype>
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="autoFillBackground" >
+     <bool>false</bool>
+    </property>
+    <property name="title" >
+     <string>Dependent plugin parameters</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="paramsGroupBox" >
+   <property name="geometry" >
+    <rect>
+     <x>9</x>
+     <y>9</y>
+     <width>471</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Plugin parameters</string>
+   </property>
   </widget>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources/>
  <connections/>
 </ui>

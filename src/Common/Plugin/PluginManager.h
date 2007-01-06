@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QObject>
 
+#include "UUIDObject.h"
 #include "PluginLoader.h"
 #include "PluginExecutionTree.h"
 #include "PluginExecutionContext.h"
@@ -18,7 +19,8 @@ class Config;
  * plugins (not #NativePlugin) should have their loaders and be registered 
  * by #registerPluginLoader.
  */
-class PluginManager : public QObject
+class PluginManager : public QObject,
+                      public UUIDObject
 {
     Q_OBJECT
 public:

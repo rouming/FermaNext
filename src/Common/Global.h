@@ -147,6 +147,7 @@ QString imagesPath ();
 QString imagesSvgPath ();
 QString imagesCursorsPath ();
 QString pluginsPath ();
+QString pluginParamsPath ();
 QString pluginLoadersPath ();
 QString configFileName ();
 QString loggingFileName ();

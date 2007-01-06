@@ -20,8 +20,7 @@ public:
                               const PluginExecutionParams& params,
                               const QList<UUIDObject*>& args,
                               const QHash< QString, QList<Plugin*> >& deps  )
-        /*throw (WrongExecutionArgsException,
-                 DependenciesAreNotResolvedException)*/;
+        /*throw (WrongExecutionArgsException)*/;
 
     virtual const PluginInfo& pluginInfo () const;
     virtual Status pluginStatusCode () const;

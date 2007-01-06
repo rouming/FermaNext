@@ -88,6 +88,10 @@ void TrussUnitWindowItem::fillPopup ( QMenu* popup )
                                                     "/calculate.png"),
                                               "Calculate" );
             foreach ( Plugin* plugin, plugins ) {
+                // Plugin must be a user executable
+                if ( ! plugin->isUserExecutable() )
+                    continue;
+
                 PluginActionReceiver* pluginAction =
                     new PluginActionReceiver( plugin, this ); 
                 calcMenu->addAction(  QIcon(Global::imagesPath() + 

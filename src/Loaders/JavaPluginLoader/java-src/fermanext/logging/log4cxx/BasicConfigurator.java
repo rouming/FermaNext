@@ -1,7 +1,7 @@
 
 package fermanext.logging.log4cxx;
 
-public class BasicConfigurator
+public final class BasicConfigurator
 {
     public native static void configure ();
     public native static void resetConfiguration ();

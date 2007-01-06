@@ -19,6 +19,11 @@ INCLUDEPATH += ./
 HEADERS += Optimization.GA.GAlib.h
 SOURCES += Optimization.GA.GAlib.cpp
 
+# Copy plugin param file
+PARAM_FILE = Optimization.GA.GAlib.ui
+win32:QMAKE_POST_LINK = xcopy /y "$$PARAM_FILE" "$$LEVEL/plugins/params"
+unix:QMAKE_POST_LINK = cp $$PARAM_FILE $$LEVEL/plugins/params
+
 #########################################
 # GAlib paths, special conf and sources
 #########################################

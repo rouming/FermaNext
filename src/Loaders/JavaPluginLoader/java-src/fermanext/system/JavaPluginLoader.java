@@ -1,6 +1,7 @@
 
 package fermanext.system;
 
+import java.awt.Frame;
 import java.util.*;
 import java.util.jar.*;
 import java.net.*;
@@ -19,17 +20,55 @@ class PluginLoadException extends Exception {}
  * 
  * TODO: add further description.
  */
-public class JavaPluginLoader
+public final class JavaPluginLoader
 {
     /** Loader logger */
     private static Logger logger = 
         Logger.getLogger("java.loader.JavaPluginLoader");
+    
+    /** Plugin manager */
+    private PluginManager plgManager = null;
+    /** Loader path */
+    private String loaderPath = null;
 
     /** Class loaders and loaded Java plugins */
     private Map<String, URLClassLoader> classLoaders = 
         new HashMap<String, URLClassLoader>();
     private Map<String, JavaPlugin> javaPlugins = 
         new HashMap<String, JavaPlugin>();
+
+
+    /** 
+     * Natively creates java instance and associates it with native 
+     * java plugin loader instance
+     */        
+    public static synchronized native JavaPluginLoader instance ( String id );
+
+    /** Private constructor. Use #instance instead */
+    private JavaPluginLoader ( PluginManager plgMng, String ldrPath )
+    {
+        plgManager = plgMng;
+        loaderPath = ldrPath;
+    }
+
+    /**
+     * Correctly disposes all frames and allows the
+     * application to exit cleanly. Call this method 
+     * before stopping JVM.
+     */
+    public void disposeAllFrames ()
+    {
+        logger.debug( "disposeAllFrames()" );
+        Frame frames[] = Frame.getFrames();
+        for ( int i = 0; i < frames.length; ++i )
+            frames[i].dispose();
+    }
+
+    public String pluginLoaderPath ()
+    { return loaderPath; }
+
+    public PluginManager pluginManager ()
+    { return plgManager; }
 
     public JavaPlugin loadPlugin ( String jarPath )
         throws PluginLoadException
@@ -86,10 +125,12 @@ public class JavaPluginLoader
             }
             // Find constructor of this Java plugin
             Constructor javaPluginConstr = 
-                loadedClass.getConstructor( String.class );
+                loadedClass.getConstructor( PluginManager.class,
+                                            String.class );
             // Create an instance of this Java plugin
             JavaPlugin javaPluginInst = 
-                (JavaPlugin)javaPluginConstr.newInstance( jarPath );
+                (JavaPlugin)javaPluginConstr.newInstance( pluginManager(),
+                                                          jarPath );
 
             logger.debug( "javaPluginInst.pluginPath " +
                           javaPluginInst.pluginPath() );
@@ -197,21 +238,5 @@ public class JavaPluginLoader
                 return entry.getKey();            
         }        
         return new String();
-    }
-
-
-    public static void main ( String[] args )
-    {
-        JavaPluginLoader loader = new JavaPluginLoader();
-        try { 
-            JavaPlugin javaPlugin = loader.loadPlugin( args[0] );
-            System.out.println( "Plugin loaded >>>>" );
-            System.out.println( "Path: " + javaPlugin.pluginPath() );
-            System.out.println( "Name: " + javaPlugin.pluginInfo().name );
-            System.out.println( "Desc: " + javaPlugin.pluginInfo().description);
-            System.out.println( "Type: " + javaPlugin.pluginInfo().type );
-        } catch ( PluginLoadException excp ) {
-            System.out.println("Can't load plugin");
-        }
     }
 }

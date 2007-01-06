@@ -64,8 +64,8 @@ class Plugin : public QObject,
 public:
     /** Status codes */
     enum Status {
-        UnknownStatus = -1,    /**< Unknown status. */
-        OkStatus = 0,          /**< Evrth is ok. Successfully loaded. */
+        UnknownStatus = 0,    /**< Unknown status. */
+        OkStatus = 1,          /**< Evrth is ok. Successfully loaded. */
         InternalErrStatus,     /**< Internal error. */
         UnresolvedDependStatus /**< Unresolved dependencies. */
     };
@@ -82,21 +82,50 @@ public:
 
     // Exceptions 
 
-    /** Occurs when context is not valid. */
-    class ContextIsNotValidException {};
-
-    /** Occurs when dependencies of the plugin are not resolved. */
-    class DependenciesAreNotResolvedException 
+    /** Base class for all plugin exceptions */
+    class PluginException
     {
     public:
+        /** Constructor */
+        PluginException ( const QString& uuid ) :
+            pluginUuid(uuid)
+        {}
+
+        QString pluginUuid; /**< Uuid of plugin, which has thrown exception */
+    };
+
+    /** Occurs when context is not valid. */
+    class ContextIsNotValidException : public PluginException 
+    {
+    public:
+        /** Constructor */
+        ContextIsNotValidException ( const QString& uuid ) :
+            PluginException(uuid)
+        {}
+    };
+
+    /** Occurs when dependencies of the plugin are not resolved. */
+    class DependenciesAreNotResolvedException : public PluginException
+    {
+    public:
+        /** Constructor */
+        DependenciesAreNotResolvedException ( const QString& uuid ) :
+            PluginException(uuid)
+        {}
+
         QStringList unresolvedTypes; /**< Contains required 
                                            but unresolved types */
     };
 
     /** Occurs when plugin does not want to accept params. */
-    class ParamsAreNotAcceptedException
+    class ParamsAreNotAcceptedException : public PluginException
     {
     public:
+        /** Constructor */
+        ParamsAreNotAcceptedException ( const QString& uuid ) :
+            PluginException(uuid)
+        {}
+
         /** 
          * Contains varible name (which describes what variable is wrong)
          * and reason (why plugin does not want to accept this variable)
@@ -110,7 +139,14 @@ public:
      * Occurs when #Plugin::execute called with wrong arguments.
      * Calling side should know correct order and type of arguments.
      */
-    class WrongExecutionArgsException {};
+    class WrongExecutionArgsException : public PluginException 
+    {
+    public:
+        /** Constructor */
+        WrongExecutionArgsException ( const QString& uuid ) :
+            PluginException(uuid)
+        {}
+    };
 
 
 
@@ -151,6 +187,11 @@ public:
      * override #specificExecute in your successor class.
      * @param arguments to start execution
      * @return result of executed operation
+     * @throw ContextIsNotValidException occurs when context is wrong.
+     * @throw ParamsAreNotAcceptedException occurs when plugin does not 
+     *        accept user's params.
+     * @throw DependenciesAreNotResolvedException occurs when dependencies
+     *        were not corretly resolved.
      * @throw WrongExecutionArgsException occurs when 
      *        contract (argument list) between calling side
      *        and plugin is wrong. 
@@ -196,7 +237,9 @@ public:
     virtual QString pluginStatusMsg () const = 0;
 
     /**
-     * Every plugin should
+     * Every plugin may accept or reject suggested user's params.
+     * This check should be done in inner execution mechanism,
+     * before #specificExecute call.
      */
     virtual void tryToAcceptParams ( const PluginExecutionParams& ) const 
         /*throw (ParamsAreNotAcceptedException)*/ = 0;
@@ -215,12 +258,26 @@ public:
      */
     virtual const QStringList& requiredPluginTypes () const;
 
+    /**
+     * Every plugin can be a user executable plugin (i.e. execution
+     * can be started by user from GUI) or plugin can be only a part 
+     * of execution tree (i.e. it makes sense to execute such plugin 
+     * _only_ from another plugin, not from GUI). 
+     * Note: it is absolutely correct if one plugin can be a user 
+     *       executable plugin and can be a part of execution tree.
+     *       Such plugin should return true.
+     *       (by default #Plugin returns true)
+     * @return true if plugin can be executed by user from GUI,
+     *         false if plugin is a part of execution tree.
+     */
+    virtual bool isUserExecutable () const;
+
 protected:
     /** 
      * Sets plugin status.
      * @param s plugin status
      */
-    void setStatus ( Status s );
+    void setStatus ( Plugin::Status s );
 
 private:
     /** 
@@ -231,6 +288,10 @@ private:
      * @param args execution arguments.
      * @param deps plugin dependencies.
      * @return result of executed operation
+     * @throw ContextIsNotValidException occurs when this plugin execute
+     *        its dependence and there smth has gone wrong.
+     * @throw ParamsAreNotAcceptedException occurs when this plugin execute
+     *        its dependence and there smth has gone wrong.
      * @throw WrongExecutionArgsException, 
      *        occurs when contract (argument list) between calling side
      *        and plugin is wrong. 
@@ -238,12 +299,15 @@ private:
      *        occurs when dependencies are not resolved.
      * @see execute
      */    
-    virtual ExecutionResult specificExecute ( 
+    virtual Plugin::ExecutionResult specificExecute ( 
                               const PluginExecutionParams& params,
                               const QList<UUIDObject*>& args,
                               const QHash< QString, QList<Plugin*> >& deps  )
-        /*throw (WrongExecutionArgsException,
-                 DependenciesAreNotResolvedException)*/ = 0;
+        /*throw (ContextIsNotValidException,
+                 ParamsAreNotAcceptedException,
+                 DependenciesAreNotResolvedException,
+                 WrongExecutionArgsException)*/ = 0;
+
 
 signals:
     /** Is emitted before actual plugins execution */

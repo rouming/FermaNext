@@ -12,6 +12,7 @@
     <property name="src.build.dir" value="${dist.build.dir}/classes"/>
     <property name="lib.build.dir" value="${loaders.dir}"/>
     <property name="src.build.jar" value="${pkg.name}.jar"/>
+    <property name="debug" value="off"/>
     <property environment="env"/>
 
     <mkdir dir="${build.dir}"/>
@@ -66,11 +67,18 @@
     <target name="build.headers">
       <javah destdir="${stubs.headers}" 
              classpath="${src.build.dir}">
+
+         <!-- fermanext.system -->
+         <class name="fermanext.system.JavaPluginLoader"/>
+         <class name="fermanext.system.NativePlugin"/>
+         <class name="fermanext.system.Plugin"/>
+         <class name="fermanext.system.PluginManager"/>
+         <class name="fermanext.system.StringUUIDObject"/>
+
          <!-- fermanext.logging.log4cxx -->
          <class name="fermanext.logging.log4cxx.Logger"/>
          <class name="fermanext.logging.log4cxx.BasicConfigurator"/>
          <class name="fermanext.logging.log4cxx.PropertyConfigurator"/>
-         <class name="fermanext.logging.log4cxx.NDC"/>
 
          <!-- fermanext.trussunit -->
          <class name="fermanext.trussunit.TrussUnit"/>
@@ -95,6 +103,7 @@
                classpathref="build.classpath" 
                includes="${includes}" 
                excludes="${excludes}"
+               debug="${debug}"
                compiler="modern">
           <compilerarg line="-Xlint:unchecked"/>          
         </javac>

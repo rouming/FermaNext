@@ -3,7 +3,8 @@
     <JavaPluginLoader>
        <JREPath path="%APPDIR%/jre" />
 
-       <!-- <JVMOption option="-verbose:jni" /> -->
+       <!-- Verbose: <JVMOption option="-verbose:jni" /> -->
+       <!-- Debug mode: <JVMOption option="-agentlib:jdwp=transport=dt_shmem,address=fermanext,server=y,suspend=n" /> -->
        <JVMOption option="-Xcheck:jni" />
        
        <JVMClassPath path="%APPDIR%" />

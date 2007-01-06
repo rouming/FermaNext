@@ -3,16 +3,11 @@ package fermanext.system;
 
 import java.util.UUID;
 
-public class NativePlugin extends Plugin 
-                          implements NativeObject
+public final class NativePlugin extends Plugin
 {
-    public NativePlugin ( String pluginPath )
-    { super(pluginPath); }
+    public NativePlugin ( PluginManager pluginManager, String pluginPath )
+    { super(pluginManager, pluginPath); }
 
-    /**
-     * This is a main execute method.
-     */
-    public native ExecutionResult execute ( UUIDObject[] uuids );
 
     /** 
      * Describes itself.
@@ -27,6 +22,7 @@ public class NativePlugin extends Plugin
      */
     public native Status pluginStatusCode ();
 
+
     /** 
      * Describes plugin state by status msg. 
      * (e.g. describes the sort of internal error if it has been occured)
@@ -35,22 +31,39 @@ public class NativePlugin extends Plugin
      */
     public native String pluginStatusMsg ();
 
+    /**
+     * Every plugin may accept or reject suggested user's params.
+     * This check should be done in inner execution mechanism,
+     * before #specificExecute call.
+     */
+    public native void tryToAcceptParams ( PluginExecutionParams p )
+        throws ParamsAreNotAcceptedException;
 
-    // Random UUID
-    private String uuid = UUID.randomUUID().toString();
+    /**
+     * Returns #Plugin::DependenceMode of this plugin.
+     * @see requiredPluginTypes
+     */
+    public native DependenceMode dependenceMode ();
 
-    // UUID getter.
-    public final String getUUID ()
-    { return uuid; }
+    /**
+     * Other plugins which are requried for properly use.
+     * @see dependsOnPluginType
+     * @see resolveDependence
+     * @return list of plugin types. List is empty if nothing is required
+     */
+    public native String[] requiredPluginTypes ();
 
-    // UUID setter.
-    public final void setUUID ( String uuid )
-    { this.uuid = uuid; }
-
-    // Checks if this plugin really wraps native class
-    public native boolean isValid ();
-
-    static { 
-        System.loadLibrary("JavaPluginLoader.ldr");
-    }
+    /**
+     * Every plugin can be a user executable plugin (i.e. execution
+     * can be started by user from GUI) or plugin can be only a part 
+     * of execution tree (i.e. it makes sense to execute such plugin 
+     * _only_ from another plugin, not from GUI). 
+     * Note: it is absolutely correct if one plugin can be a user 
+     *       executable plugin and can be a part of execution tree.
+     *       Such plugin should return true.
+     *       (by default #Plugin returns true)
+     * @return true if plugin can be executed by user from GUI,
+     *         false if plugin is a part of execution tree.
+     */
+    public native boolean isUserExecutable ();
 }

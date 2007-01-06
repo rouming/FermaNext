@@ -1,7 +1,7 @@
 
 package fermanext.logging.log4cxx;
 
-public class PropertyConfigurator
+public final class PropertyConfigurator
 {
     public native static void configureAndWatch ( String fileName, long delay );
 

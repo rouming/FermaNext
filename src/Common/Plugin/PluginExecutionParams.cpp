@@ -10,7 +10,7 @@ void PluginExecutionParams::addParam ( const QString& name,
 void PluginExecutionParams::removeParam ( const QString& name )
 { params.remove(name); }
 
-const QMultiHash<QString, QVariant>& PluginExecutionParams::getParams () const
+const QHash<QString, QVariant>& PluginExecutionParams::getParams () const
 { return params; }
 
 /*****************************************************************************/

@@ -1,6 +1,6 @@
 package fermanext.trussunit;
 
-public class DoublePoint extends java.awt.geom.Point2D.Double
+public final class DoublePoint extends java.awt.geom.Point2D.Double
 {
     public DoublePoint () 
     {
