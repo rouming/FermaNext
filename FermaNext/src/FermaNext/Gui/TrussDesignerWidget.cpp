@@ -344,6 +344,14 @@ bool TrussDesignerWidget::removeTrussUnitWindow ( TrussUnitWindow& window )
     return false; 
 }
 
+void TrussDesignerWidget::redrawAllTrussUnits ()
+{
+    foreach ( TrussUnitWindow* wnd, trussWindows )
+        wnd->redrawTrussUnit();
+    
+    update();
+}
+
 void TrussDesignerWidget::changeBehaviourToSelect ()
 {
     designerBehaviour = onSelect;

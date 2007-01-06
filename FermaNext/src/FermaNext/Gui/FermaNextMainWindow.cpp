@@ -230,9 +230,16 @@ void FermaNextMainWindow::someProjectRemoved ( FermaNextProject& prj )
         geometryWindow->hide();
         trussPropertyWindow->hide();
         trussPropTabWidget->clearMaterialComboBox();
+
+        showNodeNumbersAction->setEnabled( false );
+        showPivotNumbersAction->setEnabled( false ); 
+        showLoadsAction->setEnabled( false ); 
+        showFixationsAction->setEnabled( false ); 
+
         showUndoRedoAction->setEnabled( false );
         showTrussPropWindowAction->setEnabled( false );
         showGeometryWindowAction->setEnabled( false );
+
         copyAction->setEnabled( false );
         cutAction->setEnabled( false );
         pasteAction->setEnabled( false );
@@ -245,9 +252,16 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
 {
     if ( !projectsDockWidget->isVisible() && 0 < workspace.countProjects() ) {
         projectsDockWidget->show();
+
+        showNodeNumbersAction->setEnabled( true );
+        showPivotNumbersAction->setEnabled( true ); 
+        showLoadsAction->setEnabled( true ); 
+        showFixationsAction->setEnabled( true ); 
+
         showUndoRedoAction->setEnabled( true );
         showTrussPropWindowAction->setEnabled( true );
         showGeometryWindowAction->setEnabled( true );
+
         if ( showUndoRedoAction->isChecked() )
             undoRedoHistoryWidget->show();
         if ( showTrussPropWindowAction->isChecked() )
@@ -565,7 +579,7 @@ void FermaNextMainWindow::setupViewActions ()
     showUndoRedoAction = new QAction( QIcon(Global::imagesPath() + 
                                       "/undo_redo_window.png"),
                                       tr( "&Show History Window" ), this );
-    showUndoRedoAction->setStatusTip( tr( "Show or hide history window" ) );
+    showUndoRedoAction->setStatusTip( tr( "Shows history window" ) );
     showUndoRedoAction->setCheckable( true );
     showUndoRedoAction->setChecked( true );
     menu->addAction( showUndoRedoAction );
@@ -578,7 +592,7 @@ void FermaNextMainWindow::setupViewActions ()
         new QAction( QIcon(Global::imagesPath() + "/truss_geom.png"),
                      tr( "&Show Truss Geometry Window" ), this );
     showGeometryWindowAction->
-        setStatusTip( tr( "Show or hide truss geometry window" ) );
+        setStatusTip( tr( "Shows truss geometry window" ) );
     showGeometryWindowAction->setCheckable( true );
     showGeometryWindowAction->setChecked( true );
     menu->addAction( showGeometryWindowAction );
@@ -591,14 +605,55 @@ void FermaNextMainWindow::setupViewActions ()
         new QAction( QIcon(Global::imagesPath() + "/truss_prop.png"),
                      tr( "&Show Truss Property Window" ), this );
     showTrussPropWindowAction->
-        setStatusTip( tr( "Show or hide truss property window" ) );
+        setStatusTip( tr( "Shows truss property window" ) );
     showTrussPropWindowAction->setCheckable( true );
     showTrussPropWindowAction->setChecked( true );
     menu->addAction( showTrussPropWindowAction );
     tb->addAction( showTrussPropWindowAction );
     connect( showTrussPropWindowAction, SIGNAL(toggled(bool)), 
              trussPropertyWindow, SLOT(setVisible(bool)) );
-    showTrussPropWindowAction->setEnabled( false );  
+    showTrussPropWindowAction->setEnabled( false ); 
+    
+    menu->addSeparator();
+
+    showNodeNumbersAction = new QAction( tr( "&Show Node Numbers" ), this );
+    showNodeNumbersAction->setStatusTip( tr( "Shows the node numbers" ) );
+    showNodeNumbersAction->setCheckable( true );
+    showNodeNumbersAction->setChecked( true );
+    menu->addAction( showNodeNumbersAction );
+    connect( showNodeNumbersAction, SIGNAL(toggled(bool)), 
+                                      SLOT(showNodeNumbers(bool)) );
+    showNodeNumbersAction->setEnabled( false ); 
+
+
+    showPivotNumbersAction = new QAction( tr( "&Show Pivot Numbers" ), this );
+    showPivotNumbersAction->setStatusTip( tr( "Shows the pivot numbers" ) );
+    showPivotNumbersAction->setCheckable( true );
+    showPivotNumbersAction->setChecked( true );
+    menu->addAction( showPivotNumbersAction );
+    connect( showPivotNumbersAction, SIGNAL(toggled(bool)), 
+                                      SLOT(showPivotNumbers(bool)) );
+    showPivotNumbersAction->setEnabled( false ); 
+  
+
+    showLoadsAction = new QAction( tr( "&Show Loads" ), this );
+    showLoadsAction->setStatusTip( tr( "Shows the node loads" ) );
+    showLoadsAction->setCheckable( true );
+    showLoadsAction->setChecked( true );
+    menu->addAction( showLoadsAction );
+    connect( showLoadsAction, SIGNAL(toggled(bool)), 
+                                SLOT(showLoads(bool)) );
+    showLoadsAction->setEnabled( false );  
+  
+
+    showFixationsAction = new QAction( tr( "&Show Fixations" ), this );
+    showFixationsAction->setStatusTip( tr( "Shows the node fixations" ) );
+    showFixationsAction->setCheckable( true );
+    showFixationsAction->setChecked( true );
+    menu->addAction( showFixationsAction );
+    connect( showFixationsAction, SIGNAL(toggled(bool)), 
+                                    SLOT(showFixations(bool)) );
+    showFixationsAction->setEnabled( false );  
 }
 
 void FermaNextMainWindow::setupProjectActions ()
@@ -1492,6 +1547,58 @@ void FermaNextMainWindow::showResultsWindow ( const TrussUnitWindow& w )
             resultsWindow->exec();
         }
     }
+}
+
+void FermaNextMainWindow::showNodeNumbers ( bool status )
+{
+    if ( Global::showNodeNumbers == status )
+        return;
+
+    Global::showNodeNumbers = status;
+
+    FermaNextProject* prj = projectToolBox->currentProject();
+    if ( prj == 0 )
+        return;
+    prj->getDesignerWidget().redrawAllTrussUnits();
+}
+
+void FermaNextMainWindow::showPivotNumbers ( bool status )
+{
+    if ( Global::showPivotNumbers == status )
+        return;
+
+    Global::showPivotNumbers = status;
+
+    FermaNextProject* prj = projectToolBox->currentProject();
+    if ( prj == 0 )
+        return;
+    prj->getDesignerWidget().redrawAllTrussUnits();
+}
+
+void FermaNextMainWindow::showFixations ( bool status )
+{
+    if ( Global::showFixations == status )
+        return;
+
+    Global::showFixations = status;
+
+    FermaNextProject* prj = projectToolBox->currentProject();
+    if ( prj == 0 )
+        return;
+    prj->getDesignerWidget().redrawAllTrussUnits();
+}
+
+void FermaNextMainWindow::showLoads ( bool status )
+{
+    if ( Global::showLoads == status )
+        return;
+
+    Global::showLoads = status;
+
+    FermaNextProject* prj = projectToolBox->currentProject();
+    if ( prj == 0 )
+        return;
+    prj->getDesignerWidget().redrawAllTrussUnits();
 }
 
 void FermaNextMainWindow::helpContents ()

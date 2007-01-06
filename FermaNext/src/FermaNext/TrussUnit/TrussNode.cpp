@@ -186,7 +186,7 @@ void TrussNode::drawFixation( scanline_rasterizer& ras,
 }
 
 void TrussNode::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
-                        double trussAreaHeight ) const
+                        double trussAreaHeight, bool loaded ) const
 {
     if ( !isVisible() )
         return;
@@ -217,9 +217,11 @@ void TrussNode::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
     ras.add_path( ell );
     agg::render_scanlines( ras, sl, solidRend );
 
-    //  draw fixation
-    if ( getFixation () )
-        drawFixation ( ras, solidRend, sl, nodePos, 2, agg::rgba(0, 0, 35) ); 
+    if ( Global::showFixations ) {
+        //  draw fixation
+        if ( getFixation () )
+            drawFixation ( ras, solidRend, sl, nodePos, 2, agg::rgba(0, 0, 35) ); 
+    }
 
     if ( isHighlighted () )
     {
@@ -243,6 +245,11 @@ void TrussNode::paint ( ren_dynarow& baseRend, const DoublePoint& scaleMult,
     {
         color_type begin( 255, 255, 255 ); 
         color_type middle( 230, 200, 195 ); 
+        if ( loaded ) {
+            begin = aggColor( 235, 235, 255 );
+            middle = aggColor( 50, 50, 255 );
+        }
+
         color_type end( uint(130 - highlightKoeff * 100), 
                         uint(90 - highlightKoeff * 60), 
                         uint(70 - highlightKoeff * 50) );

@@ -110,6 +110,10 @@ protected slots:
     void editPreferences ();
 
     void showResultsWindow ( const TrussUnitWindow& );
+    void showNodeNumbers ( bool );
+    void showPivotNumbers ( bool );
+    void showFixations ( bool );
+    void showLoads ( bool );
 
     void helpContents ();
     void helpAbout ();
@@ -174,6 +178,10 @@ private:
     QAction* showGeometryWindowAction;
     QAction* showTrussPropWindowAction;
     QAction* showResultsWindowAction;
+    QAction* showNodeNumbersAction;
+    QAction* showPivotNumbersAction;
+    QAction* showLoadsAction;
+    QAction* showFixationsAction;
     QAction* materialEditorAction;
 
     // Plugins menu

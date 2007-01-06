@@ -49,6 +49,11 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name,
     connect( this, SIGNAL( onCalculationStatusChange(bool) ),
                    SLOT( clearWindowRenderedFlag() ) );
 
+    // Clear rendered flag of the parent truss unit. Used for force updating 
+    // truss units from the outside
+    connect( this, SIGNAL( onForceRedrawTrussUnit() ),
+                   SLOT( clearRenderedFlag() ) );
+
     initWindowButtons();
 
     setCanvasColor( 8, 10, 12 );
@@ -139,6 +144,11 @@ void TrussUnitWindow::initWindowButtons ()
 void TrussUnitWindow::setWindowOwner ( QWidget* owner )
 {
     windowOwner = owner;
+}
+
+void TrussUnitWindow::redrawTrussUnit ()
+{
+    emit onForceRedrawTrussUnit();
 }
 
 /** 

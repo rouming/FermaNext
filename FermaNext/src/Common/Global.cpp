@@ -114,12 +114,22 @@ const QString htmlTitleBgColor = "#C1D2EC",
               htmlBorderColor = "#BCC6DE",
               htmlCellHighlightColor = "#FFCECE";
 
+/************************************
+ * User Editable Consts 
+ ************************************/
+
+bool showNodeNumbers = true,
+     showPivotNumbers = true,
+     showFixations = true,
+     showLoads = true;
+
  /************************************
  * Main subs
  ************************************/
 
 QChar pathSeparator ()
 { return QDir::separator(); }
+
 
 QString imagesPath () 
 { 
