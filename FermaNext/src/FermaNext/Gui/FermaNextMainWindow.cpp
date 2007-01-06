@@ -802,7 +802,6 @@ TrussUnitWindow* FermaNextMainWindow::onPasteTrussUnitWindow ()
 
     //------------ Set materials from other project if necessary ------------//
 
-    TrussMaterialLibrary& mLib = currProj->getMaterialLibrary();
     QStringList materialXmls = clipboardObj->getMaterialXMLs();
 
     QDomNodeList pivotElemList = wndProps.elementsByTagName( "TrussPivot" );

@@ -235,8 +235,8 @@ QString GAOptimizationFitnessFunctionNodePosition::pluginStatusMsg () const
 { return QString(); }
 
 void GAOptimizationFitnessFunctionNodePosition::tryToAcceptParams ( 
-    const PluginExecutionParams& params ) 
-    /*throw (Plugin::ParamsAreNotAcceptedException)*/ const
+    const PluginExecutionParams& params ) const
+    /*throw (Plugin::ParamsAreNotAcceptedException)*/
 {
     const QHash<QString, QVariant>& hashParams = params.getParams();
 
@@ -255,8 +255,7 @@ void GAOptimizationFitnessFunctionNodePosition::tryToAcceptParams (
                                                   "Variable name is wrong!") );
             continue;
         }
-    
-        if ( hashParams[name].type() != QVariant::Int )
+        else if ( hashParams[name].type() != QVariant::Int )
             e.problemList.append( QPair<QString, QString>(name, 
                                                           "Is not integer") );
 

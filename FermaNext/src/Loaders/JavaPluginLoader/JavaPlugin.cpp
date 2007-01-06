@@ -934,7 +934,8 @@ JObject JavaPlugin::executionParamsToJava (
             JMethodID jCtor = javaVM.getMethodID( jVariantCls, "<init>", 
                                                   "(C)V" );
             Q_ASSERT(jCtor);
-            jVar = javaVM.newObject( jVariantCls, jCtor, value.toChar() );
+            jVar = javaVM.newObject( jVariantCls, jCtor, 
+                                     value.toChar().toAscii() );
             Q_ASSERT(jVar);
             break;
         }
@@ -961,18 +962,19 @@ JObject JavaPlugin::executionParamsToJava (
             JMethodID jCtor = javaVM.getMethodID( jVariantCls, "<init>", 
                                                "(Ljava/lang/String;)V" );
             Q_ASSERT(jCtor);
-            jVar = javaVM.newObject( jVariantCls, jCtor, 
-                                     value.toString().toUtf8().data() );
+            JString jStr = (JString)javaVM.newStringUTF( 
+                                            value.toString().toUtf8().data() );
+            jVar = javaVM.newObject( jVariantCls, jCtor, jStr );
             Q_ASSERT(jVar);
             break;
         }
         case QVariant::Invalid : {
             LOG4CXX_WARN(logger, "QVariant type is invalid!");
-            break;
+            continue;
         }
         default : {
             LOG4CXX_WARN(logger, "QVariant type is unknown!");
-            break;
+            continue;
         }
         }
 
@@ -1097,7 +1099,7 @@ JObject JavaPlugin::dependenciesHashToJava (
 
         JString jStr = javaVM.newStringUTF( key.toUtf8().data() );
         Q_ASSERT(jStr);
-
+                
         // Call hash.put(key, list)
         javaVM.callObjectMethod( jHash, jHashPut, jStr, jPlgArr );
     }

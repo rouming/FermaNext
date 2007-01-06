@@ -131,6 +131,7 @@ QWidget* PluginExecutorDialog::createPluginParamsWidget (
     // Remove plugin extension
     const QString& plgExt = PluginManager::systemPluginExtension();
     plgPathBaseName = plgPathBaseName.remove( "." + plgExt );
+    plgPathBaseName = plgPathBaseName.remove( QRegExp("^lib") );
 
     QFile file( Global::pluginParamsPath() + Global::pathSeparator() +
                 plgPathBaseName + ".ui" );
@@ -520,7 +521,7 @@ void PluginExecutorDialog::executeIsPressed ()
 
 void PluginExecutorDialog::onCurrentItemChanged ( 
     QTreeWidgetItem* current, 
-    QTreeWidgetItem* previous )
+    QTreeWidgetItem* )
 {
     if ( current == 0 )
         return;

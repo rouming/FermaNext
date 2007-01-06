@@ -31,8 +31,16 @@ bool sortPluginsByPath ( Plugin* plg1, Plugin* plg2 )
     return plg1->pluginPath() < plg2->pluginPath();
 }
 
+// Plugin sorter by name
+bool sortPluginsByName ( Plugin* plg1, Plugin* plg2 )
+{
+    Q_ASSERT(plg1);
+    Q_ASSERT(plg2);
+    return plg1->pluginInfo().name < plg2->pluginInfo().name;
+}
+
 // Plugin loader sorter by path
-static bool sortPluginLoadersByPath ( PluginLoader* ldr1, PluginLoader* ldr2 )
+bool sortPluginLoadersByPath ( PluginLoader* ldr1, PluginLoader* ldr2 )
 {
     Q_ASSERT(ldr1);
     Q_ASSERT(ldr2);
@@ -454,7 +462,7 @@ PluginList PluginManager::loadedPlugins ( bool onlyOk ) const
             pluginList.push_back( plg );
     }
     qSort( pluginList.begin(), pluginList.end(), 
-           SortHelper::sortPluginsByPath );
+           SortHelper::sortPluginsByName );
     return pluginList;
 }
 
@@ -479,7 +487,7 @@ PluginList PluginManager::loadedPluginsOfType ( const QString& plgType,
         }
     }
     qSort( pluginsOfType.begin(), pluginsOfType.end(), 
-           SortHelper::sortPluginsByPath );
+           SortHelper::sortPluginsByName );
     return pluginsOfType;
 }
 

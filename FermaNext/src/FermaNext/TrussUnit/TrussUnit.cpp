@@ -1588,8 +1588,6 @@ void TrussUnit::paint ( ren_dynarow& baseRend ) const
         foreach ( TrussPivot* pivot, getPivotList() )
             pivot->paint( baseRend, scaleMult, trussAreaHeight );
 
-        LoadCase* loadCase = getLoadCases().getCurrentLoadCase();
-        
         foreach ( TrussNode* node, getNodeList() )
             if ( node != frontNode && node != firstFront &&
                  node != lastFront )
