@@ -35,8 +35,8 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name,
     currentPressedButton( 0 ),
     currentHintedButton( 0 ),
     timer( new QTimer( this ) ),
-    maximized( false ), 
-    hinted( false )
+    hinted( false ),
+    maximized( false )
 {
     const QPoint& pixAreaSize = getTrussAreaRightBottomPos() -
                                 getTrussAreaLeftTopPos();
@@ -482,8 +482,7 @@ void TrussUnitWindow::setProportionalSize ()
     int w = windowSize.width(), h = windowSize.height();
 
     if ( h < w )  {
-        w = h * getTrussAreaSize().width() / getTrussAreaSize().height();
-        qWarning( "h = %d", h );
+        w = int(h * getTrussAreaSize().width() / getTrussAreaSize().height());
 
         // Check if size is smaller then minimum window size 
         if ( w < Global::resizeLimit ) {
@@ -494,7 +493,7 @@ void TrussUnitWindow::setProportionalSize ()
         }
     }
     else {
-        h = w * getTrussAreaSize().height() / getTrussAreaSize().width();
+        h = int(w * getTrussAreaSize().height() / getTrussAreaSize().width());
 
         // Check if size is smaller then minimum window size 
         if ( h < Global::resizeLimit ) {

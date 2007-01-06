@@ -296,11 +296,11 @@ public final class GAOptimizationPlugin extends JavaPlugin
         if ( ! hashParams.containsKey("populations") )
             e.problemList.put( "populations", "Does not exist" );
         
-        if ( hashParams.get("populations").getType() != VariantTypes.INT )
+        else if ( hashParams.get("populations").getType() != VariantTypes.INT )
             e.problemList.put( "populations",  "Is not integer" );
         
-        if ( hashParams.get("populations").getInt() < 50 || 
-             hashParams.get("populations").getInt() > 1000 )
+        else if ( hashParams.get("populations").getInt() < 50 || 
+                  hashParams.get("populations").getInt() > 1000 )
             e.problemList.put( "populations", "Should be [50, 1000]" );
         
         
@@ -308,11 +308,11 @@ public final class GAOptimizationPlugin extends JavaPlugin
         if ( ! hashParams.containsKey("genes") )
             e.problemList.put( "genes", "Does not exist" );
         
-        if ( hashParams.get("genes").getType() != VariantTypes.INT )
+        else if ( hashParams.get("genes").getType() != VariantTypes.INT )
             e.problemList.put( "genes",  "Is not integer" );
     
-        if ( hashParams.get("genes").getInt() < 2 || 
-             hashParams.get("genes").getInt() > 100 )
+        else if ( hashParams.get("genes").getInt() < 2 || 
+                  hashParams.get("genes").getInt() > 100 )
             e.problemList.put( "genes", "Should be [2, 100]" );
 
         
@@ -320,11 +320,11 @@ public final class GAOptimizationPlugin extends JavaPlugin
         if ( ! hashParams.containsKey("minValue") )
             e.problemList.put( "minValue", "Does not exist" );
         
-        if ( hashParams.get("minValue").getType() != VariantTypes.DOUBLE )
+        else if ( hashParams.get("minValue").getType() != VariantTypes.DOUBLE )
             e.problemList.put( "minValue",  "Is not double" );
         
-        if ( hashParams.get("minValue").getDouble() < 0.0 || 
-             hashParams.get("minValue").getDouble() > 1000.0 )
+        else if ( hashParams.get("minValue").getDouble() < 0.0 || 
+                  hashParams.get("minValue").getDouble() > 1000.0 )
             e.problemList.put( "minValue", "Should be [0.0, 1000.0]" );
 
 
@@ -332,10 +332,10 @@ public final class GAOptimizationPlugin extends JavaPlugin
         if ( ! hashParams.containsKey("maxValue") )
             e.problemList.put( "maxValue", "Does not exist" );
 
-        if ( hashParams.get("maxValue").getType() != VariantTypes.DOUBLE )
+        else if ( hashParams.get("maxValue").getType() != VariantTypes.DOUBLE )
             e.problemList.put( "maxValue",  "Is not double" );
 
-        if ( hashParams.get("maxValue").getDouble() < 0.0 || 
+        else if ( hashParams.get("maxValue").getDouble() < 0.0 || 
              hashParams.get("maxValue").getDouble() > 1000.0 )
             e.problemList.put( "maxValue", "Should be [0.0, 1000.0]" );
 

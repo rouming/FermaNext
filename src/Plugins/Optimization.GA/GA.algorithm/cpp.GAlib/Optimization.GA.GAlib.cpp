@@ -209,8 +209,8 @@ QString GAOptimization::pluginStatusMsg () const
 { return QString(); }
 
 void GAOptimization::tryToAcceptParams ( 
-    const PluginExecutionParams& params ) 
-    /*throw (Plugin::ParamsAreNotAcceptedException)*/ const
+    const PluginExecutionParams& params ) const
+    /*throw (Plugin::ParamsAreNotAcceptedException)*/
 {
     const QHash<QString, QVariant>& hashParams = params.getParams();
 
@@ -220,11 +220,11 @@ void GAOptimization::tryToAcceptParams (
     if ( ! hashParams.contains("gaType") )
         e.problemList.append( QPair<QString, QString>("gaType", 
                                                       "Does not exist") );
-    if ( hashParams["gaType"].type() != QVariant::Int )
+    else if ( hashParams["gaType"].type() != QVariant::Int )
         e.problemList.append( QPair<QString, QString>("gaType", 
                                                       "Is not integer") );
-    if ( hashParams["gaType"].toInt() < 0 || 
-         hashParams["gaType"].toInt() > 4 )
+    else if ( hashParams["gaType"].toInt() < 0 || 
+              hashParams["gaType"].toInt() > 4 )
         e.problemList.append( QPair<QString, QString>("gaType", 
                                                       "Should be [0, 4]") );
 
@@ -233,11 +233,11 @@ void GAOptimization::tryToAcceptParams (
         e.problemList.append( QPair<QString, QString>("generations", 
                                                       "Does not exist") );
 
-    if ( hashParams["generations"].type() != QVariant::Int )
+    else if ( hashParams["generations"].type() != QVariant::Int )
         e.problemList.append( QPair<QString, QString>("generations", 
                                                       "Is not integer") );
-    if ( hashParams["generations"].toInt() < 100 || 
-         hashParams["generations"].toInt() > 1000 )
+    else if ( hashParams["generations"].toInt() < 100 || 
+              hashParams["generations"].toInt() > 1000 )
         e.problemList.append( QPair<QString, QString>("generations", 
                                                     "Should be [100, 1000]") );
 
@@ -246,11 +246,11 @@ void GAOptimization::tryToAcceptParams (
         e.problemList.append( QPair<QString, QString>("populations", 
                                                       "Does not exist") );
 
-    if ( hashParams["populations"].type() != QVariant::Int )
+    else if ( hashParams["populations"].type() != QVariant::Int )
         e.problemList.append( QPair<QString, QString>("populations", 
                                                       "Is not integer") );
-    if ( hashParams["populations"].toInt() < 50 || 
-         hashParams["populations"].toInt() > 500 )
+    else if ( hashParams["populations"].toInt() < 50 || 
+              hashParams["populations"].toInt() > 500 )
         e.problemList.append( QPair<QString, QString>("populations", 
                                                     "Should be [50, 500]") );
 
@@ -260,11 +260,11 @@ void GAOptimization::tryToAcceptParams (
         e.problemList.append( QPair<QString, QString>("mutation", 
                                                       "Does not exist") );
 
-    if ( hashParams["mutation"].type() != QVariant::Double )
+    else if ( hashParams["mutation"].type() != QVariant::Double )
         e.problemList.append( QPair<QString, QString>("mutation", 
                                                       "Is not double") );
-    if ( hashParams["mutation"].toDouble() < 0.001 || 
-         hashParams["mutation"].toDouble() > 99.99 )
+    else if ( hashParams["mutation"].toDouble() < 0.001 || 
+              hashParams["mutation"].toDouble() > 99.99 )
         e.problemList.append( QPair<QString, QString>("mutation", 
                                                  "Should be [0.001, 99.99]") );
 
@@ -273,11 +273,11 @@ void GAOptimization::tryToAcceptParams (
         e.problemList.append( QPair<QString, QString>("crossing", 
                                                       "Does not exist") );
 
-    if ( hashParams["crossing"].type() != QVariant::Double )
+    else if ( hashParams["crossing"].type() != QVariant::Double )
         e.problemList.append( QPair<QString, QString>("crossing", 
                                                       "Is not double") );
-    if ( hashParams["crossing"].toDouble() < 0.1 || 
-         hashParams["crossing"].toDouble() > 99.9 )
+    else if ( hashParams["crossing"].toDouble() < 0.1 || 
+              hashParams["crossing"].toDouble() > 99.9 )
         e.problemList.append( QPair<QString, QString>("crossing", 
                                                  "Should be [0.1, 99.9]") );
 
@@ -287,11 +287,11 @@ void GAOptimization::tryToAcceptParams (
         e.problemList.append( QPair<QString, QString>("genes", 
                                                       "Does not exist") );
 
-    if ( hashParams["genes"].type() != QVariant::Int )
+    else if ( hashParams["genes"].type() != QVariant::Int )
         e.problemList.append( QPair<QString, QString>("genes", 
                                                       "Is not integer") );
-    if ( hashParams["genes"].toInt() < 2 || 
-         hashParams["genes"].toInt() > 100 )
+    else if ( hashParams["genes"].toInt() < 2 || 
+              hashParams["genes"].toInt() > 100 )
         e.problemList.append( QPair<QString, QString>("genes", 
                                                       "Should be [2, 100]") );
 
@@ -300,11 +300,11 @@ void GAOptimization::tryToAcceptParams (
         e.problemList.append( QPair<QString, QString>("minValue", 
                                                       "Does not exist") );
 
-    if ( hashParams["minValue"].type() != QVariant::Double )
+    else if ( hashParams["minValue"].type() != QVariant::Double )
         e.problemList.append( QPair<QString, QString>("minValue", 
                                                       "Is not double") );
-    if ( hashParams["minValue"].toDouble() < 0.0 || 
-         hashParams["minValue"].toDouble() > 1000.0 )
+    else if ( hashParams["minValue"].toDouble() < 0.0 || 
+              hashParams["minValue"].toDouble() > 1000.0 )
         e.problemList.append( QPair<QString, QString>("minValue", 
                                                  "Should be [0.0, 1000.0]") );
 
@@ -313,11 +313,11 @@ void GAOptimization::tryToAcceptParams (
         e.problemList.append( QPair<QString, QString>("maxValue", 
                                                       "Does not exist") );
 
-    if ( hashParams["maxValue"].type() != QVariant::Double )
+    else if ( hashParams["maxValue"].type() != QVariant::Double )
         e.problemList.append( QPair<QString, QString>("maxValue", 
                                                       "Is not double") );
-    if ( hashParams["maxValue"].toDouble() < 0.0 || 
-         hashParams["maxValue"].toDouble() > 1000.0 )
+    else if ( hashParams["maxValue"].toDouble() < 0.0 || 
+              hashParams["maxValue"].toDouble() > 1000.0 )
         e.problemList.append( QPair<QString, QString>("maxValue", 
                                                  "Should be [0.0, 1000.0]") );
 

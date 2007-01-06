@@ -984,10 +984,10 @@ protected:
     virtual const TrussMaterialLibrary& materialLibrary() const
     { return materialLib; }
 
-private:    
+private:
+    const TrussMaterialLibrary& materialLib;
     N *first, *last;
     const TrussMaterial* material;
-    const TrussMaterialLibrary& materialLib;
     double thickness;
     int number;
 };

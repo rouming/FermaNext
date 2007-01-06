@@ -68,7 +68,7 @@ bool GAOptimizationCriteriaForce::getForceWeight (
 }
 
 Plugin::ExecutionResult GAOptimizationCriteriaForce::specificExecute ( 
-    const PluginExecutionParams& params,
+    const PluginExecutionParams&,
     const QList<UUIDObject*>& args,
     const QHash< QString, QList<Plugin*> >& deps  )
     /*throw (ContextIsNotValidException,
