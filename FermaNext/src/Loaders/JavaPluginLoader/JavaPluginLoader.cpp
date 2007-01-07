@@ -105,6 +105,8 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
 
     // Check JRE path existence
     if ( jrePath.isEmpty() ) {
+        LOG4CXX_ERROR(logger, "JRE path is empty. Java loader is disabled");
+        /*
         QMessageBox::warning( 
                   0, QObject::tr("JRE path is empty"), 
                   QObject::tr("Please, specify JAVA_HOME environment\n"
@@ -112,6 +114,7 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
                               "<JREPath path=\"path_to_jre\"> in your "
                               "config\nif you want to use Java plugins\n\n"
                               "Java loader has been disabled") );
+        */
         return;
     } 
 
@@ -125,6 +128,8 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
     jvmLibPath    = jvmLibDir + "/libjvm.so";
 #endif
     if ( ! QFile::exists( jvmLibPath ) ) {
+        LOG4CXX_ERROR(logger, "Can't find JVM lib. Java loader is disabled");
+        /*
         QMessageBox::warning( 
                      0, QObject::tr("Can't find JVM lib"),
                      QObject::tr("JRE path is set to \"%1\"\n").
@@ -132,6 +137,7 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
                      QObject::tr("but can't find JVM lib there: \"%1\"\n\n").
                           arg(jvmLibPath) + 
                      QObject::tr("Java loader has been disabled!") );
+        */
         return;
     }
     
