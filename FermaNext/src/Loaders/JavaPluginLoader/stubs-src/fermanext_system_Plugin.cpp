@@ -282,6 +282,12 @@ jobject JNICALL Java_fermanext_system_Plugin_execute
         Q_ASSERT(jElem);
         break;
     }
+    case Plugin::ExecutionStopped : {
+        LOG4CXX_INFO(logger, "'ExecutionStopped' was choosed");
+        jElem = env->NewStringUTF(QString("ExecutionStopped").toUtf8().data());
+        Q_ASSERT(jElem);
+        break;
+    }
     default : {
         LOG4CXX_ERROR(logger, "Status variable is unknown after execution!");
         jElem = env->NewStringUTF( QString("UnknownStatus").toUtf8().data() );

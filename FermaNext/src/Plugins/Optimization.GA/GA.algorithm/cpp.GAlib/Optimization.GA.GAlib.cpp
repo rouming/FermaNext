@@ -25,6 +25,12 @@ float GAOptimizationObjective ( GAGenome& g )
     return that->objectiveFunction( g );
 }
 
+GABool GAOptimizationTerminator ( GAGeneticAlgorithm& )
+{
+    GAOptimization* that = PLUGIN_INSTANCE;
+    return (that->isExecutionStopped() ? gaTrue : gaFalse);
+}
+
 StringUUIDObject genomeToXml( const GARealGenome& g )
 {
     QDomDocument doc;
@@ -69,7 +75,9 @@ float resultToFitness ( const Plugin::ExecutionResult& res )
 
 GAOptimization::GAOptimization ( PluginManager& mng, const QString& path ) :
     NativePlugin(mng, path),
-    fitnessPlugin(0)
+    fitnessPlugin(0),
+    trussArg(0),
+    executionStopped(false)
 {}
 
 GAOptimization::~GAOptimization ()
@@ -79,6 +87,10 @@ float GAOptimization::objectiveFunction ( GAGenome& g )
 {
     Q_ASSERT(trussArg);
     Q_ASSERT(fitnessPlugin);
+
+    // Hack. GA Termination function does not work properly.
+    if ( executionStopped )
+        throw ExecutionStoppedException();
 
     GARealGenome* realGenome = dynamic_cast<GARealGenome*>(&g);
     if ( realGenome == 0 ) {
@@ -181,8 +193,32 @@ Plugin::ExecutionResult GAOptimization::specificExecute (
     ga->pCrossover( hashParams["crossing"].toDouble() );
     ga->selectScores( GAStatistics::AllScores );
 
-    ga->initialize();
-    ga->evolve();
+    // Clear execution flag
+    executionStopped = false;
+
+    ga->terminator( GAOptimizationTerminator );
+
+    // Evolve and try to catch termination exception
+    try { ga->evolve(); } 
+    catch ( ExecutionStoppedException& ) {
+        delete ga;
+
+        // Zero 
+        trussArg = 0;
+        fitnessPlugin = 0;
+
+        LOG4CXX_WARN(logger, "Execution was stopped");
+        return Plugin::ExecutionResult( Plugin::ExecutionStopped );
+    }
+    catch ( ... ) {
+        delete ga;
+
+        // Zero 
+        trussArg = 0;
+        fitnessPlugin = 0;
+
+        throw;
+    }
 
     delete ga;
 
@@ -190,8 +226,22 @@ Plugin::ExecutionResult GAOptimization::specificExecute (
     trussArg = 0;
     fitnessPlugin = 0;
 
-    return Plugin::ExecutionResult( OkStatus, QString() );
+    // Check stop flag
+    if ( executionStopped ) {
+        LOG4CXX_WARN(logger, "Execution was stopped");
+        return Plugin::ExecutionResult( Plugin::ExecutionStopped );
+    }
+
+    return Plugin::ExecutionResult( OkStatus );
 }
+
+void GAOptimization::stopExecution ()
+{
+    executionStopped = true;
+}
+
+bool GAOptimization::isExecutionStopped ()
+{ return executionStopped; }
 
 const PluginInfo& GAOptimization::pluginInfo () const
 {

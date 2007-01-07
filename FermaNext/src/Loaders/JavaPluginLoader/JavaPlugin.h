@@ -29,6 +29,7 @@ public:
                  DependenciesAreNotResolvedException,
                  WrongExecutionArgsException)*/;
 
+    virtual void stopExecution ();
     virtual const PluginInfo& pluginInfo () const;
     virtual Status pluginStatusCode () const;
     virtual QString pluginStatusMsg () const;

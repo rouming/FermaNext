@@ -111,6 +111,9 @@ Plugin::ExecutionResult Plugin::execute ( const QList<UUIDObject*>& args )
     return result; 
 }
 
+void Plugin::stopExecution ()
+{ /* do nothing */ }
+
 PluginManager& Plugin::pluginManager ()
 { return plgMng; }
 

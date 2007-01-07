@@ -36,6 +36,10 @@ public:
                  DependenciesAreNotResolvedException,
                  WrongExecutionArgsException)*/;
 
+    virtual void stopExecution ();
+
+    bool isExecutionStopped ();
+
     virtual const PluginInfo& pluginInfo () const;
     virtual Plugin::Status pluginStatusCode () const;
     virtual QString pluginStatusMsg () const;
@@ -44,6 +48,9 @@ public:
     virtual const QStringList& requiredPluginTypes () const;
 
 private:
+    // Exception for internal use
+    class ExecutionStoppedException {};
+
     enum GAType { GASimple = 0, 
                   GASteady = 1, 
                   GADCrowding = 2, 
@@ -52,6 +59,7 @@ private:
 
     Plugin* fitnessPlugin;
     TrussUnit* trussArg;
+    volatile bool executionStopped;
 };
 
 #endif //OPTIMIZATION_GA_GALIB_H

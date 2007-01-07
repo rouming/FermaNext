@@ -480,6 +480,22 @@ Plugin::ExecutionResult JavaPlugin::specificExecute (
     return ExecutionResult( status, data );
 }
 
+void JavaPlugin::stopExecution ()
+{
+    LOG4CXX_DEBUG(logger, "JavaPlugin::stopExecution");
+
+    // Find class
+    JClass jPlgCls = javaVM.getObjectClass( javaPluginInst );
+    Q_ASSERT( jPlgCls );
+
+    // Find stopExecution method
+    JMethodID jStopId = javaVM.getMethodID( jPlgCls, "stopExecution", "()V" );
+    Q_ASSERT( jStopId );
+
+    // Call stopExecution method
+    javaVM.callVoidMethod( javaPluginInst, jStopId );
+}
+
 const PluginInfo& JavaPlugin::pluginInfo () const
 {
     LOG4CXX_DEBUG(logger, "JavaPlugin::pluginInfo");

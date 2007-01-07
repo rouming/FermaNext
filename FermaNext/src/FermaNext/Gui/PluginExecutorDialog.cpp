@@ -47,7 +47,10 @@ PluginExecutorDialog::PluginExecutorDialog ( PluginManager& mng, QWidget* p ) :
     QObject::connect( executeButton, SIGNAL(clicked(bool)),
                       SLOT(executeIsPressed()) );
 
-    
+    QObject::connect( stopButton, SIGNAL(clicked(bool)),
+                      SLOT(stopIsPressed()) );
+
+
     // Connect tree
     QObject::connect( executionTreeWidget, 
                       SIGNAL(currentItemChanged(QTreeWidgetItem*, 
@@ -155,9 +158,49 @@ void PluginExecutorDialog::execute ( Plugin* plg,
         Plugin::ExecutionResult results = plg->execute( params );
         
         // TODO: in future should be replaced by attractive call of 
-        //       results manager
-        FermaNextMainWindow* mw = FermaNextWorkspace::workspace().mainWindow();
-        mw->pluginWasExecuted( plg, results );
+        //       results manager. For now only 'calculation.*' plugins
+        //       are supported by results manager
+        if ( plg->pluginInfo().type.contains(QRegExp("^calculation\\..+$")) ) {
+            FermaNextMainWindow* mw = 
+                FermaNextWorkspace::workspace().mainWindow();
+            mw->pluginWasExecuted( plg, results );
+        }
+        else {
+            switch ( results.status ) {
+            case Plugin::OkStatus :
+                QMessageBox::information( this, tr("Plugin"), 
+                                          tr("Execution is successfully "
+                                             "completed") +
+                                          (results.data.isEmpty() ? "." :
+                                           tr(" with data:\n") +results.data));
+                break;
+            case Plugin::UnknownStatus :
+                QMessageBox::warning( this, tr("Plugin"), 
+                                      tr("Execution completed with unknown "
+                                         "status.\n") +
+                                      (results.data.isEmpty() ? "" :
+                                       tr("Data is:\n") + results.data) );
+                break;
+            case Plugin::InternalErrStatus :
+                QMessageBox::warning( this, tr("Plugin"), 
+                                      tr("Execution completed with internall "
+                                         "error.\n") +
+                                      (results.data.isEmpty() ? "" :
+                                       tr("Data is:\n") + results.data) );
+                break;
+            case Plugin::ExecutionStopped :
+                QMessageBox::warning( this, tr("Plugin"), 
+                                      tr("Execution was stopped.\n") +
+                                      (results.data.isEmpty() ? "" :
+                                       tr("Data is:\n") + results.data) );
+                break;
+            default :
+                QMessageBox::information( this, tr("Plugin"), 
+                                          tr("Unexpected status from plugin. "
+                                             "Data is:\n") + results.data );
+                break;
+            }
+        }
     }
     catch ( PluginExecutionContext::ContextIsEmptyException& ) {
         QMessageBox::warning( this, tr("Context warning"), 
@@ -387,6 +430,12 @@ void PluginExecutorDialog::showExecutionTree ()
     QList<PluginExecutionTree::Node> nodes =
         execTree.getTreeTop().childNodes();
     addNodesToExecutionTree(nodes);
+
+    // Disable and enable buttons
+    includeButton->setEnabled(true);
+    excludeButton->setEnabled(true);
+    executeButton->setEnabled(true);
+    stopButton->setEnabled(false);
     
     show();
 }
@@ -516,7 +565,32 @@ void PluginExecutorDialog::executeIsPressed ()
 
     setExecutionParams();
 
+    // Disable and enable buttons
+    includeButton->setEnabled(false);
+    excludeButton->setEnabled(false);
+    executeButton->setEnabled(false);
+    stopButton->setEnabled(true);
+
     execute( plugin, execTree, execParams );
+
+    // Disable and enable buttons
+    includeButton->setEnabled(true);
+    excludeButton->setEnabled(true);
+    executeButton->setEnabled(true);
+    stopButton->setEnabled(false);
+}
+
+void PluginExecutorDialog::stopIsPressed ()
+{
+    Q_ASSERT(plugin);
+
+    plugin->stopExecution();
+
+    // Disable and enable buttons
+    includeButton->setEnabled(true);
+    excludeButton->setEnabled(true);
+    executeButton->setEnabled(true);
+    stopButton->setEnabled(false);
 }
 
 void PluginExecutorDialog::onCurrentItemChanged ( 

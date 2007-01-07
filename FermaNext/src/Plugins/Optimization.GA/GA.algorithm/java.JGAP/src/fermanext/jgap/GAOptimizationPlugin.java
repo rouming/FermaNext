@@ -73,6 +73,9 @@ final class GAOptimizationFitnessFunction extends FitnessFunction
 
     public double evaluate ( IChromosome a_chromosome ) 
     {
+        if ( gaPlugin.isExecutionStopped() )
+            throw new RuntimeException();
+        
         int numGenes = a_chromosome.size();
 
         StringUUIDObject chromosomeXml = chromosomeToXml( a_chromosome );
@@ -120,10 +123,15 @@ public final class GAOptimizationPlugin extends JavaPlugin
     private static Class[] m_execArgumentTypes = 
         new Class[]{ TrussUnit.class };
 
+
+    // Exceptions from other plugins
     public Plugin.ContextIsNotValidException contextException = null;
     public Plugin.ParamsAreNotAcceptedException paramsException = null;
     public Plugin.DependenciesAreNotResolvedException dependException = null;
     public Plugin.WrongExecutionArgsException wrongArgsException = null;
+
+    // Flag to stop execution
+    private volatile boolean executionStopped = false;
 
 // Methods
     public GAOptimizationPlugin ( PluginManager pluginMng, String pluginPath )
@@ -236,6 +244,9 @@ public final class GAOptimizationPlugin extends JavaPlugin
         // We expect the rest of the config parameter, for example 
         // the population size, to be set via the config file
 
+        // Clear stop flag
+        executionStopped = false;
+
         // Clean exceptions
         contextException = null;
         paramsException = null;
@@ -245,6 +256,7 @@ public final class GAOptimizationPlugin extends JavaPlugin
         // Evolve the population
         try { population.evolve(); }
         catch ( RuntimeException e ) {
+            // Check exceptions first
             if ( contextException != null )
                 throw contextException;
             else if ( paramsException != null )
@@ -253,6 +265,12 @@ public final class GAOptimizationPlugin extends JavaPlugin
                 throw dependException;
             else if ( wrongArgsException != null )
                 throw wrongArgsException;
+
+            // Check stop flag
+            else if ( executionStopped ) {
+                logger.warn( "Execution was stopped" );
+                return new ExecutionResult( Status.ExecutionStopped );
+            }
 
             // Unexpected exception
             throw e;
@@ -266,7 +284,15 @@ public final class GAOptimizationPlugin extends JavaPlugin
         System.out.println("a = " + aVal.doubleValue());
         System.out.println("b = " + bVal.doubleValue());
        
-        return new ExecutionResult( Status.OkStatus, "Nothing from Java" );
+        return new ExecutionResult( Status.OkStatus );
+    }
+
+    public final boolean isExecutionStopped ()
+    { return executionStopped; }
+
+    public void stopExecution ()
+    {
+        executionStopped = true;
     }
 
     public PluginInfo pluginInfo ()

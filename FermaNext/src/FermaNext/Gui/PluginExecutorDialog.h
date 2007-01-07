@@ -24,6 +24,7 @@ private slots:
     void includeIsPressed ();
     void excludeIsPressed ();
     void executeIsPressed ();
+    void stopIsPressed ();
 
     void onCurrentItemChanged ( QTreeWidgetItem*, QTreeWidgetItem* );
 
