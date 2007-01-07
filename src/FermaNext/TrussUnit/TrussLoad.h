@@ -202,7 +202,7 @@ protected:
         if ( ! load )
             return;
 
-        const Node* node = loads.key( load );
+        const N* node = loads.key( load );
         if ( ! node )
             return;    
         emit onLoadChange( *node );
@@ -214,7 +214,7 @@ protected:
         if ( ! node )
             return;
 
-        if ( node->getFixation() == Node::Unfixed )
+        if ( node->getFixation() == N::Unfixed )
             return;
 
         removeLoad( *node );
