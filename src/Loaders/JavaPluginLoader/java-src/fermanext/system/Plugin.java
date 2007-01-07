@@ -9,10 +9,11 @@ public abstract class Plugin implements NativeObject
 {
     /** Status codes */
     public enum Status {
-        UnknownStatus,         /**< Unknown status. */
-        OkStatus,              /**< Evrth is ok. Successfully loaded. */
-        InternalErrStatus,     /**< Internal error. */
-        UnresolvedDependStatus /**< Unresolved dependencies. */
+        UnknownStatus,          /**< Unknown status. */
+        OkStatus,               /**< Evrth is ok. Successfully loaded. */
+        InternalErrStatus,      /**< Internal error. */
+        UnresolvedDependStatus, /**< Unresolved dependencies. */
+        ExecutionStopped        /**< Execution was stopped */
     }
 
     /** Dependence mode. */
@@ -88,11 +89,17 @@ public abstract class Plugin implements NativeObject
     /** Execution result */
     public static final class ExecutionResult 
     {
+        public ExecutionResult ()
+        {}
+
+        public ExecutionResult ( Status s )
+        { status = s; }
+
         public ExecutionResult ( Status s, String d )
         { status = s; data = d; }
 
-        public Status status;
-        public String data;
+        public Status status = Status.UnknownStatus;
+        public String data = new String();
     }
 
     /** 
@@ -128,6 +135,15 @@ public abstract class Plugin implements NativeObject
                ParamsAreNotAcceptedException,
                DependenciesAreNotResolvedException,
                WrongExecutionArgsException;
+
+    /** 
+     * Stops execution. 
+     * Should be implemented in child classes.
+     * @see execute
+     */
+    public void stopExecution ()
+    { /* do nothing */ }
+
 
     /** 
      * Returns plugin manager.

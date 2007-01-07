@@ -9,6 +9,14 @@
     <height>514</height>
    </rect>
   </property>
+  <property name="sizePolicy" >
+   <sizepolicy>
+    <hsizetype>0</hsizetype>
+    <vsizetype>0</vsizetype>
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle" >
    <string>Plugin executor</string>
   </property>
@@ -72,6 +80,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="stopButton" >
+       <property name="text" >
+        <string>Stop</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QToolButton" name="executeButton" >

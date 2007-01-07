@@ -64,19 +64,20 @@ class Plugin : public QObject,
 public:
     /** Status codes */
     enum Status {
-        UnknownStatus = 0,    /**< Unknown status. */
-        OkStatus = 1,          /**< Evrth is ok. Successfully loaded. */
-        InternalErrStatus,     /**< Internal error. */
-        UnresolvedDependStatus /**< Unresolved dependencies. */
+        UnknownStatus = 0,      /**< Unknown status. */
+        OkStatus = 1,           /**< Evrth is ok. Successfully loaded. */
+        InternalErrStatus,      /**< Internal error. */
+        UnresolvedDependStatus, /**< Unresolved dependencies. */
+        ExecutionStopped        /**< Execution was stopped */
     };
 
     /** Dependence mode. */
     enum DependenceMode {
-        Independent = 0,      /**< Plugin is independent */
-        SingleDependent,      /**< Plugin depends on a single plugin
-                                   from #requiredPluginTypes list */
-        MultiDependent        /**< Plugin depends on all plugins from
-                                   from #requiredPluginTypes list */
+        Independent = 0,  /**< Plugin is independent */
+        SingleDependent,  /**< Plugin depends on a single plugin
+                               from #requiredPluginTypes list */
+        MultiDependent    /**< Plugin depends on all plugins from
+                               from #requiredPluginTypes list */
     };
 
 
@@ -202,6 +203,14 @@ public:
                  ParamsAreNotAcceptedException,
                  DependenciesAreNotResolvedException,
                  WrongExecutionArgsException)*/;
+
+    
+    /** 
+     * Stops execution. 
+     * Should be implemented in child classes.
+     * @see execute
+     */
+    virtual void stopExecution ();
 
     /** 
      * Returns plugin manager.

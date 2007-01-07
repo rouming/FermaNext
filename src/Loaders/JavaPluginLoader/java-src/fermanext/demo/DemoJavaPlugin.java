@@ -77,7 +77,7 @@ public final class DemoJavaPlugin extends JavaPlugin
         System.out.println( "Plg required types:" + calcPlg.requiredPluginTypes() );
         System.out.println( "Plg is executable:" + calcPlg.isUserExecutable() );
 
-        calcPlg.execute( args );
+        ExecutionResult calcPlgRes = calcPlg.execute( args );
 
 
         logger.debug( "count nodes: " + truss.countNodes() );
@@ -130,7 +130,7 @@ public final class DemoJavaPlugin extends JavaPlugin
                                        "Java plugin works great!",
                                        JOptionPane.INFORMATION_MESSAGE );
 
-        return new ExecutionResult( Status.OkStatus, "Nothing from Java" );
+        return calcPlgRes;
     }
 
     public PluginInfo pluginInfo ()
