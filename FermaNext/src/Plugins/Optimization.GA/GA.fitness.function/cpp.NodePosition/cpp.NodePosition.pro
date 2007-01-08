@@ -21,5 +21,5 @@ SOURCES += Optimization.GA.fitness.function.nodeposition.cpp
 
 # Copy plugin param file
 PARAM_FILE = Optimization.GA.fitness.function.nodeposition.ui
-win32:QMAKE_POST_LINK = xcopy /y "$$PARAM_FILE" "$$LEVEL/plugins/params"
+win32:QMAKE_POST_LINK = xcopy /y \"$$PARAM_FILE\" \"$$LEVEL/plugins/params\"
 unix:QMAKE_POST_LINK = cp $$PARAM_FILE $$LEVEL/plugins/params
