@@ -92,7 +92,8 @@ void ProjectTreeWidgetItem::setCurrent ( bool status )
  *****************************************************************************/
 
 MaterialTreeWidget::MaterialTreeWidget ( QWidget* parent /* = 0 */ ) :
-    QTreeWidget( parent )
+    QTreeWidget( parent ),
+    acceptDrag( false )
 {
     setAcceptDrops( true );
 }
