@@ -1,16 +1,27 @@
 
-TARGET = java.JGAP
+###############################################################
+# This is pure Java project.                                  #
+# To avoid qmake annoying attempts to link everything against #
+# _empty_ sources we add dummy source file to SOURCES list    #
+###############################################################
 
-QMAKE_LINK = echo "This is qmake hack to avoid annoying linking without sources"
-QMAKE_LFLAGS = 
-QMAKE_LIBDIR = 
+TARGET = _dummy_jgap
 
 LEVEL = ../../../../..
 include($$LEVEL/FermaNext.pri)
 
+SOURCES += _dummy.cpp
+
+TEMPLATE = lib
+CONFIG += staticlib
+
+#################################
+# Pure Java project starts here #
+#################################
+
 # Copy plugin param file
 PARAM_FILE = JGAP.ui
-win32:QMAKE_POST_LINK = xcopy /y "$$PARAM_FILE" "$$LEVEL/plugins/params"
+win32:QMAKE_POST_LINK = xcopy /y \"$$PARAM_FILE\" \"$$LEVEL/plugins/params\"
 unix:QMAKE_POST_LINK = cp $$PARAM_FILE $$LEVEL/plugins/params
 
 # Build Java sources

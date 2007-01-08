@@ -8,6 +8,11 @@ CONFIG += debug_and_release
 
 DEFINES += FERMA_VERSION=$$FERMA_VERSION
 
+# Visual Studio 8 introduced a strange way to force developers 
+# move to the Microsoft-Specific version of the Standatd
+# We're avoiding all these warnings with this define
+win32:DEFINES += _CRT_SECURE_NO_DEPRECATE
+
 # Enable logging from ENV
 isEmpty(ENABLE_LOGGING): ENABLE_LOGGING = $$(ENABLE_LOGGING)
 
