@@ -158,6 +158,8 @@ signals:
     void onFocusReceive ( TrussUnitWindow& );
     void onFocusLose ( TrussUnitWindow& );
 
+    void modified ();
+
 public slots:
     virtual void addTrussUnitWindow ( TrussUnitWindow& );    
     virtual bool removeTrussUnitWindow ( TrussUnitWindow& );

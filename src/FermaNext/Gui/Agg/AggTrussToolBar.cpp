@@ -14,7 +14,6 @@ AggMaterialComboBox::AggMaterialComboBox ( QWidget& parentWidget,
 {
     connect( this, SIGNAL(currentIndexChanged(int)),
                      SLOT(setCurrentMaterial(int)) );
-
     if ( mLib )
         setMaterialLibrary( *mLib );
 }
@@ -32,7 +31,11 @@ void AggMaterialComboBox::setMaterialLibrary ( TrussMaterialLibrary& mLib )
                     this, SLOT(addMaterialItem(const TrussMaterial&)) );    
         disconnect( materialLib, 
                     SIGNAL(onBeforeMaterialRemoval(const TrussMaterial&)),
-                    this, SLOT(removeMaterialItem(const TrussMaterial&)) );  
+                    this, SLOT(removeMaterialItem(const TrussMaterial&)) ); 
+        disconnect( materialLib, 
+                    SIGNAL(onSelectedMaterialChange(const TrussMaterial&)),
+                    this, 
+                    SLOT(updateCurrentMaterial(const TrussMaterial&)) );        
     }
   
     materialLib = &mLib;
@@ -40,6 +43,8 @@ void AggMaterialComboBox::setMaterialLibrary ( TrussMaterialLibrary& mLib )
                           SLOT(addMaterialItem(const TrussMaterial&)) );    
     connect( materialLib, SIGNAL(onBeforeMaterialRemoval(const TrussMaterial&)),
                           SLOT(removeMaterialItem(const TrussMaterial&)) );
+    connect( materialLib, SIGNAL(onSelectedMaterialChange(const TrussMaterial&)),
+                            SLOT(updateCurrentMaterial(const TrussMaterial&)) );
     setArgList();
 }
 
@@ -63,7 +68,22 @@ const TrussMaterial* AggMaterialComboBox::getCurrentMaterial () const
 
 void AggMaterialComboBox::setCurrentMaterial ( int idx )
 {
+    if ( currentIndex() == idx )
+        return;
+    
     materialLib->selectMaterial( idx );
+}
+
+void AggMaterialComboBox::updateCurrentMaterial ( const TrussMaterial& m )
+{
+    int idx = materialLib->getIndexOfMaterial( m );
+    if ( idx < 0 )
+        return;
+
+    if ( idx == currentIndex() )
+        return;
+
+    setCurrentIndex( idx );
 }
 
 int AggMaterialComboBox::getMaterialIndex ( const TrussMaterial& material ) const
@@ -95,7 +115,7 @@ void AggMaterialComboBox::addMaterialItem ( const TrussMaterial& m )
     const TrussMaterialLibrary* lib = 
         dynamic_cast<const TrussMaterialLibrary*>(sender());
 
-    if ( sender() && materialLib != lib )
+    if ( lib && materialLib != lib )
         return;
 
     QVariant material;

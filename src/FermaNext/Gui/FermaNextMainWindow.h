@@ -84,7 +84,9 @@ protected:
     void copyMaterialsForPivot ( QDomElement pivotDomElem, 
                                  QStringList materialXmls );
 
+    void restoreApplicationSettings ();
     void saveApplicationSettings ();
+    void checkModified ();
 
 protected slots:
     void fileNew ();
@@ -119,6 +121,8 @@ protected slots:
 
     void helpContents ();
     void helpAbout ();
+
+    void currentProjectChanged ();
 
     // Refresh undo/redo
     void refreshUndoRedoActions ();

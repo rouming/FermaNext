@@ -108,6 +108,8 @@ public:
     const ClipBoardObject* getClipboardObject () const;
     void clearClipboard ();
 
+    bool isWorkspaceModified () const;
+
 public slots:
     void clearProjects ();
 
@@ -158,6 +160,8 @@ private:
     PluginExecutorDialog* plgExecutorDialog;
     QStackedWidget* stackedWidget;
     ClipBoardObject* clipboardObject;
+    bool modified;
+    bool silenceMode;
 };
 
 #endif //FERMANEXTWORKSPACE_H

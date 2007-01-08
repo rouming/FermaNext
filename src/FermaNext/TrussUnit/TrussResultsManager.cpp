@@ -28,6 +28,9 @@ TrussSolutionResults& TrussResultsManager::createSolutionResults ()
 {
     TrussSolutionResults* res = new TrussSolutionResults( windowMng );
     trussResultsList.push_back( res );
+
+    emit onAfterCreateSolutionResults( *res );
+    
     return *res;
 }
 
@@ -143,7 +146,9 @@ void TrussResultsManager::removeSolutionResults ( TrussSolutionResults& res )
     if ( iter == trussResultsList.end() )
         return;
 
-    trussResultsList.erase( iter );    
+    trussResultsList.erase( iter ); 
+    
+    emit onAfterRemoveSolutionResults();
 }
 
 void TrussResultsManager::removeSolutionResults ( TrussUnitWindow& w )

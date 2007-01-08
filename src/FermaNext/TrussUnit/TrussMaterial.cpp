@@ -125,6 +125,8 @@ void TrussMaterial::setMaterialName ( const QString& name )
     emit onBeforeNameChange( name );
     materialName = name;
     emit onAfterNameChange( name );
+
+    emit materialModified();
 }
 
 void TrussMaterial::setWorkingStress ( double ws )
@@ -132,6 +134,8 @@ void TrussMaterial::setWorkingStress ( double ws )
     emit onBeforeWorkingStressChange( ws );
     workingStress = ws;
     emit onAfterWorkingStressChange( ws );
+
+    emit materialModified();
 }
 
 void TrussMaterial::setElasticityModule ( double em )
@@ -139,6 +143,8 @@ void TrussMaterial::setElasticityModule ( double em )
     emit onBeforeElasticityModuleChange( em );
     elasticityModule = em;   
     emit onAfterElasticityModuleChange( em );
+
+    emit materialModified();
 }
 
 void TrussMaterial::setDensity ( double d )
@@ -146,6 +152,8 @@ void TrussMaterial::setDensity ( double d )
     emit onBeforeDensityChange( d );
     density = d;
     emit onAfterDensityChange( d );
+
+    emit materialModified();
 }
 
 const QString& TrussMaterial::getMaterialName () const
@@ -201,6 +209,17 @@ void TrussMaterialLibrary::loadFromXML ( const QDomElement& projElem )
         TrussMaterial& newMaterial = createMaterial( 0, 0, 0, "" );
         newMaterial.loadFromXML( materialElem );
     }
+
+    /** 
+     * Set selected material
+     ************************/
+    if ( ! projElem.hasAttribute( "selectedMaterial" ) )
+        throw LoadException();
+
+    QString mUUID = projElem.attribute( "selectedMaterial" );
+    TrussMaterial* m = getMaterial( mUUID );
+    if ( m )
+        selectMaterial( *m );
 }
 
 QDomElement TrussMaterialLibrary::saveToXML ( QDomDocument& doc )
@@ -214,6 +233,15 @@ QDomElement TrussMaterialLibrary::saveToXML ( QDomDocument& doc )
     TrussMaterialListIter iter = materials.begin();
     for ( ; iter != materials.end(); ++iter )
         materialLibElem.appendChild( (*iter)->saveToXML( doc ) );
+
+    /** 
+     * Save selected material
+     ************************/
+    QString uuid;
+    if ( selectedMaterial )
+        uuid = selectedMaterial->getUUID();
+
+    materialLibElem.setAttribute( "selectedMaterial", uuid );
 
     return materialLibElem;
 }
@@ -231,6 +259,11 @@ TrussMaterial& TrussMaterialLibrary::createMaterial ( double ws,
     materials.push_back( material );
 
     emit onAfterMaterialCreation( *material );
+
+    connect( material, SIGNAL(materialModified()),
+                       SIGNAL(libraryModified()) );
+
+    emit libraryModified();
 
     return *material;
 }
@@ -276,6 +309,8 @@ bool TrussMaterialLibrary::removeMaterial ( TrussMaterial& material )
     materials.erase( iter );
     delete m;
     emit onAfterMaterialRemoval();
+
+    emit libraryModified();
 
     return true;
 }
@@ -328,6 +363,18 @@ TrussMaterial* TrussMaterialLibrary::getMaterial ( const QString& uuid ) const
     return 0;
 }
 
+int TrussMaterialLibrary::getIndexOfMaterial ( const TrussMaterial& material ) const
+{
+    int i = 0;
+    foreach ( TrussMaterial* m, materials ) {
+        if ( m == &material )
+            return i;
+        ++i;
+    }
+
+    return -1;
+}
+
 QString TrussMaterialLibrary::getMaterialXml ( const TrussMaterial& material )
 {
     QDomDocument doc;
@@ -344,17 +391,28 @@ int TrussMaterialLibrary::countMaterials () const
 
 void TrussMaterialLibrary::selectMaterial ( const TrussMaterial& m )
 {
+    if ( selectedMaterial == &m )
+        return;
+
     selectedMaterial = &m;
+
+    emit onSelectedMaterialChange( m );
 }
 
 void TrussMaterialLibrary::selectMaterial ( int idx )
 {
-    selectedMaterial = getMaterial( idx );
+    TrussMaterial* material = getMaterial( idx );
+
+    if ( material )
+        selectMaterial( *material );
 }
 
 void TrussMaterialLibrary::selectMaterial ( const QString& uuid )
 {
-    selectedMaterial = getMaterial( uuid );
+    TrussMaterial* material = getMaterial( uuid );
+
+    if ( material )
+        selectMaterial( *material );
 }
 
 const TrussMaterial* TrussMaterialLibrary::getSelectedMaterial () const

@@ -52,6 +52,8 @@ signals:
     void onBeforeDensityChange ( double );    
     void onAfterDensityChange ( double );
 
+    void materialModified ();
+
 private:
     QString materialName;
     double workingStress;
@@ -95,6 +97,8 @@ public:
     virtual TrussMaterial* getMaterial ( int indx ) const;
     virtual TrussMaterial* getMaterial ( const QString& uuid ) const;
 
+    virtual int getIndexOfMaterial ( const TrussMaterial& ) const;
+
     virtual QString getMaterialXml ( const TrussMaterial& );
 
     virtual int countMaterials () const;
@@ -118,6 +122,8 @@ signals:
     void onAfterMaterialCreation ( const TrussMaterial& );
     void onBeforeMaterialRemoval ( const TrussMaterial& );
     void onAfterMaterialRemoval ();
+    void onSelectedMaterialChange ( const TrussMaterial& );
+    void libraryModified ();
 
 private:
     typedef QList<TrussMaterial*> TrussMaterialList;

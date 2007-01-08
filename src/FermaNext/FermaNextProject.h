@@ -48,6 +48,8 @@ public:
     virtual void activate ();
     virtual bool isActivated () const;
 
+    virtual bool isProjectModified () const;
+
     virtual TrussUnitWindowManager& getTrussUnitWindowManager ();
     virtual TrussResultsManager& getTrussResultsManager ();  
     virtual TrussDesignerWidget& getDesignerWidget ();
@@ -62,6 +64,10 @@ protected:
 
     virtual void setProjectFileName ( const QString& );
 
+protected slots:
+    void projectModified ();
+    void projectSaved ();
+
 signals:
     void onActivate ( FermaNextProject& );
     void onNameChange ( const QString& );
@@ -70,6 +76,9 @@ signals:
     void tabWasChanged ( int );
     void afterTrussCreation ();
     void afterTrussRemoval ();
+
+    void modified ();
+    void saved ();
   
 private:
     friend class FermaNextWorkspace;
@@ -88,6 +97,8 @@ private:
     TrussMaterialLibrary* materialLibrary;
     TrussUnitWindowManager* trussWindowManager;
     TrussResultsManager* trussResultsManager;
+    bool isModified;
+    bool silenceMode;
 };
 
 #endif //FERMANEXTPROJECT_H
