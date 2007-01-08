@@ -237,8 +237,8 @@ void MaterialTreeWidget::startDrag ()
     materialDrag->setHotSpot( visualItemRect( currentItem() ).topLeft() );
     materialDrag->setMimeData( mimeData );
 
-    if ( materialDrag->start( Qt::MoveAction ) == 
-                Qt::MoveAction | Qt::CopyAction && acceptDrag )
+    if ( materialDrag->start(Qt::MoveAction) &
+         (Qt::MoveAction | Qt::CopyAction) && acceptDrag )
         removeItemWithMaterial( *mItem );
 }
 
