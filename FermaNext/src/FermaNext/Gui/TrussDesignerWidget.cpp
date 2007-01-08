@@ -280,34 +280,42 @@ void TrussDesignerWidget::addTrussUnitWindow ( TrussUnitWindow& trussWindow )
     trussWindow.setWindowOwner( this );
 
     // We should repaint all area after truss changes its visibility or state
-    QObject::connect( &trussWindow, 
-                      SIGNAL(onVisibleChange(bool)), 
-                      SLOT(trussWindowChangedVisibility(bool)) );
-    QObject::connect( &trussWindow, 
-                      SIGNAL(onStateChange()),
-                      SLOT(update()) );
-    QObject::connect( &trussWindow, 
-                      SIGNAL(onClearButtonRenderedFlag()),
-                      SLOT(update()) );
-    QObject::connect( &trussWindow, 
-                      SIGNAL(onSwitchLoadCase()),
-                      SLOT(update()) );
+    connect( &trussWindow, SIGNAL(onVisibleChange(bool)), 
+                            SLOT(trussWindowChangedVisibility(bool)) );
+    connect( &trussWindow, SIGNAL(onStateChange()),
+                            SLOT(update()) );
 
-    QObject::connect( &trussWindow, 
-                      SIGNAL(onBeforeDesist(StatefulObject&)), 
-                      SLOT(trussWindowDesisted(StatefulObject&)));
+    // Catch truss window state change
+    connect( &trussWindow, SIGNAL(onStateChange()),
+                           SIGNAL(modified()) );
+    connect( &trussWindow, SIGNAL(onResize( QSize, QSize )),
+                           SIGNAL(modified()) );
+    connect( &trussWindow, SIGNAL(onMove( QPoint, QPoint )),
+                           SIGNAL(modified()) );
+    connect( &trussWindow, SIGNAL(onTrussUnitWindowHide()),
+                           SIGNAL(modified()) );
+    connect( &trussWindow, SIGNAL(onTrussUnitWindowHide()),
+                           SIGNAL(modified()) );
 
-    QObject::connect( &trussWindow, SIGNAL(onHintShowsUp(const QString&, 
-                                                         const QPoint,bool)),
+    connect( &trussWindow, SIGNAL(onClearButtonRenderedFlag()),
+                             SLOT(update()) );
+    connect( &trussWindow, SIGNAL(onSwitchLoadCase()),
+                             SLOT(update()) );
+
+    connect( &trussWindow, SIGNAL(onBeforeDesist(StatefulObject&)), 
+                            SLOT(trussWindowDesisted(StatefulObject&)));
+
+    connect( &trussWindow, SIGNAL(onHintShowsUp(const QString&, 
+                                                const QPoint,bool)),
                       aggHint, SLOT(show(const QString&,const QPoint,bool)) );
-    QObject::connect( &trussWindow, SIGNAL(onHintShowsUp(const QString&, 
-                                                         const QPoint,bool)),
-                                    SLOT( update() ) );
+    connect( &trussWindow, SIGNAL(onHintShowsUp(const QString&, 
+                                                const QPoint,bool)),
+                            SLOT( update() ) );
 
-    QObject::connect( &trussWindow, SIGNAL( onHintHides(bool) ),
-                      aggHint, SLOT( hide(bool) ) );
-    QObject::connect( &trussWindow, SIGNAL( onHintHides(bool) ),
-                                    SLOT( update() ) );
+    connect( &trussWindow, SIGNAL( onHintHides(bool) ),
+                    aggHint, SLOT( hide(bool) ) );
+    connect( &trussWindow, SIGNAL( onHintHides(bool) ),
+                             SLOT( update() ) );
 
     trussWindows.push_back(&trussWindow);
     // If window position was not set, we set default value
@@ -448,6 +456,8 @@ void TrussDesignerWidget::focusOnWindow ( TrussUnitWindow& window )
     emit onFocusReceive( *focusedWindow );
 
     update();
+
+    emit modified();
 }
 
 /*  
@@ -533,6 +543,8 @@ void TrussDesignerWidget::clearWindowFocus ()
         focusedWindow = 0;
         emit onFocusLose( *fWindow );
         update();
+
+        emit modified();
     }
 }
 

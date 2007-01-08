@@ -34,7 +34,9 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
     materialLibrary( new TrussMaterialLibrary ),
     trussWindowManager( new TrussUnitWindowManager( *materialLibrary ) ),
     trussResultsManager( new TrussResultsManager( wsp.pluginManager(), 
-                                                  *trussWindowManager ) )
+                                                  *trussWindowManager ) ),
+    isModified(false),
+    silenceMode(true)
 {
     connect( materialLibrary, 
              SIGNAL(onBeforeMaterialRemoval(const TrussMaterial&)), 
@@ -62,6 +64,37 @@ FermaNextProject::FermaNextProject ( FermaNextWorkspace& wsp,
              designerWidget, SLOT(removeTrussUnitWindow(TrussUnitWindow&)) );
 
     designerWidget->getToolBar().setMaterialLibrary( *materialLibrary );
+
+    // Catch modified signals
+    connect( designerWidget, SIGNAL(modified()),
+                               SLOT(projectModified()) );
+    
+    connect( materialLibrary, SIGNAL(libraryModified()),
+                                SLOT(projectModified()) );
+
+    connect( trussWindowManager, 
+             SIGNAL(onTrussUnitWindowCreate(TrussUnitWindow&)), 
+             SLOT(projectModified()) );
+
+    connect( trussWindowManager, 
+             SIGNAL(onTrussUnitWindowRemove(TrussUnitWindow&)), 
+             SLOT(projectModified()) );
+
+    connect( trussResultsManager, 
+             SIGNAL(onAfterCreateSolutionResults(TrussSolutionResults&)), 
+             SLOT(projectModified()) );
+
+    connect( trussResultsManager, 
+             SIGNAL(onAfterRemoveSolutionResults()), 
+             SLOT(projectModified()) );
+
+    // Create default materials
+    TrussMaterial& m = materialLibrary->createMaterial( 
+                    30000, 7000000, 0.028, tr( "Aluminum Alloy" ) );
+    materialLibrary->createMaterial( 70000, 20000000, 0.078, tr( "Steel" ) );
+    materialLibrary->selectMaterial( m );
+
+    silenceMode = false;
 }
 
 FermaNextProject::~FermaNextProject ()
@@ -76,6 +109,8 @@ FermaNextProject::~FermaNextProject ()
 void FermaNextProject::loadFromFile ( const QString& fileName )
     /*throw (IOException, WrongXMLDocException, LoadException)*/
 {
+    silenceMode = true;
+
     QFile xmlFile( fileName );
     if ( ! xmlFile.open( QIODevice::ReadOnly ) )
         throw IOException();
@@ -92,6 +127,8 @@ void FermaNextProject::loadFromFile ( const QString& fileName )
     loadFromXML( docElem );
 
     setProjectFileName( fileName );
+
+    silenceMode = false;
 }
 
 void FermaNextProject::saveToFile () /*throw (FileNameIsNotDefinedException, 
@@ -121,6 +158,8 @@ void FermaNextProject::saveToFile ( const QString& fileName )
     QDomElement prjElement = saveToXML( doc );
     doc.appendChild( prjElement );
     doc.save( stream, 4 );
+
+    projectSaved();
 }
     
 const QString& FermaNextProject::getProjectFileName () const
@@ -311,6 +350,29 @@ void FermaNextProject::setName ( const QString& name_ )
 {
     name = name_;
     emit onNameChange(name);
+}
+
+bool FermaNextProject::isProjectModified () const
+{
+    return isModified;
+}
+
+void FermaNextProject::projectModified ()
+{
+    if ( isModified || silenceMode )
+        return;
+
+    isModified = true;
+    emit modified();
+}
+
+void FermaNextProject::projectSaved ()
+{
+    if ( ! isModified )
+        return;
+
+    isModified = false;
+    emit saved();
 }
 
 TrussUnitWindowManager& FermaNextProject::getTrussUnitWindowManager ()

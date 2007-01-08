@@ -32,7 +32,9 @@ FermaNextWorkspace::FermaNextWorkspace () :
     fermaMainWindow(0),
     plgExecutorDialog(0),
     stackedWidget(0),
-    clipboardObject(0)
+    clipboardObject(0),
+    modified(false),
+    silenceMode(false)
 {
     fermaMainWindow = new FermaNextMainWindow( *this );
     stackedWidget = new QStackedWidget( fermaMainWindow );
@@ -49,6 +51,8 @@ FermaNextWorkspace::~FermaNextWorkspace ()
 void FermaNextWorkspace::loadFromFile ( const QString& fileName )
     /*throw (IOException, WrongXMLDocException, LoadException)*/
 {
+    silenceMode = true;
+
     QFile xmlFile( fileName );
     if ( ! xmlFile.open( QIODevice::ReadOnly ) )
         throw IOException();
@@ -65,6 +69,8 @@ void FermaNextWorkspace::loadFromFile ( const QString& fileName )
     loadFromXML( docElem, fileName );
 
     setWorkspaceFileName( fileName );
+
+    silenceMode = false;
 }
 
 void FermaNextWorkspace::saveToFile ()
@@ -239,6 +245,10 @@ FermaNextProject& FermaNextWorkspace::createProject ( const QString& name )
 
     projects.push_back(project);
     emit onProjectCreate(*project);    
+
+    if ( ! silenceMode )
+        modified = true;
+
     return *project;
 }
 
@@ -265,6 +275,10 @@ FermaNextWorkspace::ProjectListIter FermaNextWorkspace::removeProject (
     iter = projects.erase(iter);
     delete prj;
     emit onAfterProjectRemove();
+
+    if ( ! silenceMode )
+        modified = true;
+
     return iter;        
 }
 
@@ -396,6 +410,11 @@ const ClipBoardObject* FermaNextWorkspace::getClipboardObject () const
 void FermaNextWorkspace::clearClipboard ()
 {
     delete clipboardObject;
+}
+
+bool FermaNextWorkspace::isWorkspaceModified () const
+{
+    return modified;
 }
 
 /*****************************************************************************/

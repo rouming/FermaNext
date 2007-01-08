@@ -38,6 +38,10 @@ protected slots:
     void removeSolutionResults ( TrussSolutionResults& );
     void removeSolutionResults ( TrussUnitWindow& );
 
+signals:
+    void onAfterCreateSolutionResults ( TrussSolutionResults& );
+    void onAfterRemoveSolutionResults ();
+
 private:
     TrussResultsList trussResultsList;
     const PluginManager& plgMng;

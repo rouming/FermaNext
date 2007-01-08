@@ -27,12 +27,15 @@ public:
 protected:
     void setArgList ();
 
-protected slots:
+public slots:
     void addMaterialItem ( const TrussMaterial& );
     void removeMaterialItem ( const TrussMaterial& );
-    void updateMaterialItemName ( const QString& );
     void setCurrentMaterial ( int idx );
 
+protected slots:
+    void updateMaterialItemName ( const QString& );
+    void updateCurrentMaterial ( const TrussMaterial& );   
+    
 private:
     TrussMaterialLibrary* materialLib;
 };

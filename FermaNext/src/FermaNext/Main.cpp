@@ -57,35 +57,6 @@ int main ( int argc, char* argv[] )
 
         splash->message( "Setting up GUI .." );
         
-        // init application preferences
-        QSettings appSettings;
-        appSettings.beginGroup( "Preferences" );
-
-        if ( ! appSettings.contains( "ShowNodeNumbers" ) )
-            appSettings.setValue( "ShowNodeNumbers", true );
-        else
-            Global::showNodeNumbers = 
-                appSettings.value( "ShowNodeNumbers" ).toBool();
-
-        if ( ! appSettings.contains( "ShowPivotNumbers" ) )
-            appSettings.setValue( "ShowPivotNumbers", true );
-        else
-            Global::showPivotNumbers = 
-                appSettings.value( "ShowPivotNumbers" ).toBool();
-
-        if ( ! appSettings.contains( "ShowFixations" ) )
-            appSettings.setValue( "ShowFixations", true );
-        else
-            Global::showFixations = 
-                appSettings.value( "ShowFixations" ).toBool();
-
-        if ( ! appSettings.contains( "ShowLoads" ) )
-            appSettings.setValue( "ShowLoads", true );
-        else
-            Global::showLoads = appSettings.value( "ShowLoads" ).toBool();
-        
-        appSettings.endGroup();
-
         FermaNextMainWindow* fermaMainWindow = wsp.mainWindow();
         fermaMainWindow->showMaximized();
         splash->finish( fermaMainWindow );
