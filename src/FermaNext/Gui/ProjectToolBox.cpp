@@ -7,11 +7,103 @@
 #include <QGroupBox>
 #include <QFrame>
 #include <QGridLayout>
+#include <QDoubleSpinBox>
 
 #include "ProjectToolBox.h"
 #include "WindowListBox.h"
 #include "Global.h"
 #include "TrussUnitActions.h"
+
+/*****************************************************************************
+ * Project ToolBox Page
+ *****************************************************************************/
+
+CreateTrussDialog::CreateTrussDialog ( TrussUnitWindowManager& mng,
+                                       QWidget* parent /* = 0 */ ) :
+    QDialog( parent ),
+    wndMng( mng )
+{
+    QVBoxLayout* parenLayout = new QVBoxLayout( this );
+
+    QVBoxLayout* nameLayout = new QVBoxLayout;
+    QLabel* nameLabel = new QLabel( tr( "Enter truss name:" ) );
+    nameEdit = new QLineEdit;
+    connect( nameEdit, SIGNAL(textEdited(const QString&)),
+                          SLOT(checkDialogState()) );
+    
+    nameLayout->addWidget( nameLabel );
+    nameLayout->addWidget( nameEdit );
+
+    QHBoxLayout* sizeLayout = new QHBoxLayout;
+    QGroupBox* sizeGroupBox = new QGroupBox( tr( "Area size" ), this );
+    QLabel* xSizeLabel = new QLabel( tr( "Size by X:" ), sizeGroupBox );
+    QLabel* ySizeLabel = new QLabel( tr( "Size by Y:" ), sizeGroupBox );
+    xSizeEdit = new QDoubleSpinBox;
+    xSizeEdit->setMaximum( Global::areaMaxDimension );
+    xSizeEdit->setValue( 300.0 );
+    connect( xSizeEdit, SIGNAL(valueChanged(double)),
+                          SLOT(checkDialogState()) );
+
+    ySizeEdit = new QDoubleSpinBox;
+    ySizeEdit->setMaximum( Global::areaMaxDimension );
+    ySizeEdit->setValue( 300.0 );
+    connect( ySizeEdit, SIGNAL(valueChanged(double)),
+                          SLOT(checkDialogState()) );
+
+    sizeLayout->addWidget( sizeGroupBox );
+
+    QGridLayout *grid = new QGridLayout( sizeGroupBox );
+    grid->addWidget( xSizeLabel, 0, 0 );
+    grid->addWidget( ySizeLabel, 1, 0 );
+    grid->addWidget( xSizeEdit, 0, 1 );
+    grid->addWidget( ySizeEdit, 1, 1 );
+    grid->setSpacing( 5 );
+    grid->setMargin( 15 );
+
+    QHBoxLayout* buttonLayout = new QHBoxLayout;
+    okButton = new QPushButton( tr( "OK" ) );
+    connect( okButton, SIGNAL(clicked()),
+                          SLOT(onOk()) );
+    okButton->setEnabled( false );
+    
+    QPushButton* cancelButton = new QPushButton( tr( "Cancel" ) );
+    connect( cancelButton, SIGNAL(clicked()),
+                             SLOT(onCancel()) );
+    buttonLayout->addStretch( 1 );
+    buttonLayout->addWidget( okButton );
+    buttonLayout->addWidget( cancelButton );
+
+    parenLayout->addLayout( nameLayout );
+    parenLayout->addWidget( sizeGroupBox );
+    parenLayout->addLayout( buttonLayout );
+    parenLayout->addStretch( 1 );
+    parenLayout->setMargin( 10 );
+
+    setWindowTitle( tr( "Create truss unit" ) );
+    nameEdit->setFocus( Qt::OtherFocusReason );
+}
+
+void CreateTrussDialog::checkDialogState ()
+{
+    if ( ! nameEdit->text().isEmpty() &&
+         xSizeEdit->value() > 0 && 
+         ySizeEdit->value() > 0)
+        okButton->setEnabled( true );
+    else
+        okButton->setEnabled( false ); 
+}
+
+void CreateTrussDialog::onOk ()
+{
+    TrussUnitWindow& truss = wndMng.createTrussUnitWindow( nameEdit->text() );
+    truss.setTrussAreaSize( DoubleSize( xSizeEdit->value(), ySizeEdit->value() ) );  
+    done( 1 );
+}
+
+void CreateTrussDialog::onCancel ()
+{
+    done( 0 );
+}
 
 /*****************************************************************************
  * Project ToolBox Page
@@ -190,18 +282,10 @@ void ProjectToolBoxPage::importIsPressed ()
 
 void ProjectToolBoxPage::newTrussIsPressed ()
 {
-    QString trussName = QInputDialog::getText(
-            this,
-            tr("Truss unit creation"), 
-            tr("Enter truss unit name:") );
-    if ( ! trussName.isEmpty() ) {
-        TrussUnitWindowManager& trussMng = 
-            pageProject.getTrussUnitWindowManager();
-        TrussUnitWindow& truss = trussMng.createTrussUnitWindow(trussName);
-        truss.setTrussAreaSize( DoubleSize( 300, 300 ) );
-    } else {
-        // user entered nothing or pressed Cancel
-    }
+    CreateTrussDialog* createDlg = 
+        new CreateTrussDialog( pageProject.getTrussUnitWindowManager(), this );
+
+    createDlg->exec();
 }
 
 void ProjectToolBoxPage::calculateAllIsPressed ()
