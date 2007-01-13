@@ -9,6 +9,30 @@
 #include "FermaNextProject.h"
 
 class WindowListBox;
+class QDoubleSpinBox;
+class QLineEdit;
+class QPushButton;
+
+/*****************************************************************************/
+
+class CreateTrussDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    CreateTrussDialog ( TrussUnitWindowManager&, QWidget* parent = 0 );
+
+protected slots:
+    void checkDialogState ();
+    void onOk ();
+    void onCancel ();
+
+private:
+    QLineEdit *nameEdit;
+    QDoubleSpinBox *xSizeEdit, *ySizeEdit;
+    QPushButton *okButton;
+    TrussUnitWindowManager& wndMng;
+};
 
 /*****************************************************************************/
 
