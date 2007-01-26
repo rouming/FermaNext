@@ -1,4 +1,4 @@
-//#include <windows.h>
+#include <windows.h>
 #include "editor.h"
 #include "line.h"
 #include "spoint.h"
