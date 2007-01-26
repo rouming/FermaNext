@@ -1,7 +1,8 @@
 #include <QtGui>
-#include "mainwindow.h"
 #include <QGraphicsScene>
+
 #include "editor.h"
+#include "mainWindow.h"
 
 MainWindow::MainWindow()
 {

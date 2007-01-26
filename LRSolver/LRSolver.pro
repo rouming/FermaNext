@@ -6,6 +6,7 @@ TEMPLATE = app
 TARGET = LRSolver
 DEPENDPATH += .
 INCLUDEPATH += .
+MOC_DIR = mocs
 
 # Input
 HEADERS += arc.h \

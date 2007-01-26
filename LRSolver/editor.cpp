@@ -4,7 +4,7 @@
 #include "spoint.h"
 #include "arc.h"
 #include "walkprop.h"
-#include "gridnode.h"
+#include "gridNode.h"
 #include <QMenu>
 #include <QContextMenuEvent>
 #include <QGraphicsEllipseItem>

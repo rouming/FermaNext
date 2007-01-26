@@ -1,4 +1,4 @@
-#include "gridnode.h"
+#include "gridNode.h"
 
 /*GridNode::GridNode()
 :QPointF()
