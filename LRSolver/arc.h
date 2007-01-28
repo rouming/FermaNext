@@ -10,15 +10,13 @@ class SPoint;
 class QPointF;
 class QGraphicsSceneMouseEvent;
 
-//namespace Vasya {
-
-class Arc : public QObject, public QGraphicsEllipseItem
+class Arch : public QObject, public QGraphicsEllipseItem
 {
 Q_OBJECT
 
 public:
-    Arc(QGraphicsItem * parent = 0, QGraphicsScene * scene = 0);
-    ~Arc();
+    Arch(QGraphicsItem * parent = 0, QGraphicsScene * scene = 0);
+    ~Arch();
     void setCenterNode(SPoint *p);
     void setStartNode(SPoint *p);
     void setSpanNode(SPoint *p);
@@ -65,7 +63,5 @@ private:
     bool selection;
 	QString boundaryCondition_;
 };
-
-//} //namespace Vasya
 
 #endif

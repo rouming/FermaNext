@@ -9,9 +9,7 @@
 
 #define PI 3.14159265
 
-//using namespace Vasya;
-
-Arc::Arc(QGraphicsItem * parent, QGraphicsScene * scene) 
+Arch::Arch(QGraphicsItem * parent, QGraphicsScene * scene) 
 : QObject(0), QGraphicsEllipseItem (parent,scene)
 {
     file=new QFile((const QString &)"arc_out.txt");
@@ -22,28 +20,28 @@ Arc::Arc(QGraphicsItem * parent, QGraphicsScene * scene)
 	boundaryCondition_="0";
 }
 
-Arc::~Arc()
+Arch::~Arch()
 {
     hide();
 }
 
-void Arc::setCenterNode(SPoint *p)
+void Arch::setCenterNode(SPoint *p)
 {
     centerNode_=p;
     QObject::connect(centerNode(),SIGNAL(positionChanged(QPointF)),this,SLOT(setCenter(QPointF)));
 }
-void Arc::setStartNode(SPoint *p)
+void Arch::setStartNode(SPoint *p)
 {
     startNode_=p;
     QObject::connect(startNode(),SIGNAL(positionChanged(QPointF)),this,SLOT(setStart(QPointF)));
 }
-void Arc::setSpanNode(SPoint *p)
+void Arch::setSpanNode(SPoint *p)
 {
     spanNode_=p;
     QObject::connect(spanNode(),SIGNAL(positionChanged(QPointF)),this,SLOT(setSpan(QPointF)));
 }
 
-void Arc::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
+void Arch::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
 	painter->setPen(Qt::black);
     if (select())
@@ -53,17 +51,17 @@ void Arc::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     painter->drawArc(rect(),startAngle(),spanAngle());
 }
 
-QPainterPath Arc::shape() const
+QPainterPath Arch::shape() const
 {   
     return QGraphicsEllipseItem::shape();
 }
 
-QRectF Arc::boundingRect() const
+QRectF Arch::boundingRect() const
 {
     return QGraphicsEllipseItem::boundingRect();
 }
 
-void  Arc::setStart(QPointF p)
+void  Arch::setStart(QPointF p)
 {
     start=mapFromScene(p);
     if (spec==TRUE)
@@ -96,7 +94,7 @@ void  Arc::setStart(QPointF p)
         startNode()->setPosition(mapToScene(p));
 }
 
-void  Arc::setSpan(QPointF p)
+void  Arch::setSpan(QPointF p)
 {
     span=mapFromScene(p);
     if (spec==TRUE)
@@ -127,7 +125,7 @@ void  Arc::setSpan(QPointF p)
         spanNode()->setPosition(mapToScene(p));
 }
 
-void  Arc::setCenter(QPointF p)
+void  Arch::setCenter(QPointF p)
 {
     center=mapFromScene(p);
     if (spec==TRUE)
@@ -163,7 +161,7 @@ void  Arc::setCenter(QPointF p)
     else centerNode()->setPosition(mapToScene(p));
 }
 
-void Arc::setActive(bool b)
+void Arch::setActive(bool b)
 {
     centerNode()->setActive(b);
     startNode()->setActive(b);
@@ -183,7 +181,7 @@ void Arc::setActive(bool b)
     return QGraphicsItem::itemChange(change, value);
 }*/
 
-void Arc::setArc(QPointF cent,int startAn,int spanAn, qreal rad)
+void Arch::setArc(QPointF cent,int startAn,int spanAn, qreal rad)
 {
 double strang;
 double spnang;
@@ -223,19 +221,19 @@ out<<"st "<<QString::number(strang)<<"sp "<<QString::number(spnang)<<endl;
     scene()->update();
 }
 
-void Arc::execProp()
+void Arch::execProp()
 {
     ArcProp dialog(this);
     dialog.exec();
 }
 
-bool Arc::setBoundaryCondition(const QString &str)
+bool Arch::setBoundaryCondition(const QString &str)
 {
 	boundaryCondition_=str;
 return true;
 }
 
-QString Arc::boundaryCondition()
+QString Arch::boundaryCondition()
 {
 return boundaryCondition_;
 }

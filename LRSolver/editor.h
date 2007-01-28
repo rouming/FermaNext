@@ -11,7 +11,7 @@
 #include <QGraphicsPathItem>
 
 class Line;
-class Arc;
+class Arch;
 class GridNode;
 
 class Editor : public QGraphicsView {
@@ -23,7 +23,7 @@ public:
     QGraphicsItem *pendingItem;
     QGraphicsItem *activeItem;
     Line *pendingLine;
-    Arc *pendingArc;
+    Arch *pendingArc;
 	int walkNumber() {return _walkNumber;}
 	double step() {return _step;}
 	void setWalkNumber(int i) {_walkNumber=i;}

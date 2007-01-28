@@ -2,7 +2,7 @@
 #include "arc.h"
 #include "spoint.h"
 
-ArcProp::ArcProp(Arc *parentArc, QWidget * parent, Qt::WindowFlags f)
+ArcProp::ArcProp(Arch *parentArc, QWidget * parent, Qt::WindowFlags f)
 :QDialog(parent,f)
 {
     file=new QFile((const QString &)"arcprop_out.txt");

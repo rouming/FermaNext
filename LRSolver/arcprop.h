@@ -6,14 +6,14 @@
 #include <QFile>
 #include <QTextStream>
 
-class Arc;
+class Arch;
 
 class ArcProp : public QDialog
 {
     Q_OBJECT
 
 public:
-    ArcProp(Arc *parentArc, QWidget * parent = 0, Qt::WindowFlags f = 0);
+    ArcProp(Arch *parentArc, QWidget * parent = 0, Qt::WindowFlags f = 0);
 public slots:
     void accept();
     void reject();
@@ -33,7 +33,7 @@ private:
 	QLineEdit *editBoundCond;
 	QLabel *labelBoundCond;
     QDialogButtonBox *buttonBox;
-    Arc *arc;
+    Arch *arc;
     QDoubleValidator* validator;
 	bool checkBoundCond(const QString &str);
 	QString start;

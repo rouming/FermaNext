@@ -1,4 +1,4 @@
-#include <windows.h>
+//#include <windows.h>
 #include "editor.h"
 #include "line.h"
 #include "spoint.h"
@@ -16,7 +16,6 @@
 
 #define PI 3.14159265
 
-
 Editor::Editor(QGraphicsScene * canvas, QWidget *parent) 
 : QGraphicsView(canvas, parent)
 {
@@ -31,15 +30,6 @@ Editor::Editor(QGraphicsScene * canvas, QWidget *parent)
     file=new QFile((const QString &)"editor_out.txt");
     file->open(QIODevice::WriteOnly);
     out.setDevice(file);
-    //debug output
-/*  pendingArc=new Arc();
-    pendingArc->setCenter(QPointF(0,0));
-    pendingArc->setStart(QPointF(10,10));
-//  pendingArc->setReady();
-    pendingArc->setSpan(QPointF(10,0));
-    scene()->addItem(pendingArc);
-    scene()->update();*/
-
     createActions();
     unSetStatus();
     pendingItem=0;
@@ -87,8 +77,8 @@ void Editor::setActiveItem(QGraphicsItem *item)
         }
         if (item->type()==QGraphicsItem::UserType+3)
         {
-            Arc *a;
-            a=qgraphicsitem_cast<Arc *>(item);
+            Arch *a;
+            a=qgraphicsitem_cast<Arch *>(item);
             a->setSelect(true);    
 			list.append(item);
 			scene()->update();
@@ -107,8 +97,8 @@ void Editor::setActiveItem(QGraphicsItem *item)
             }
             if (activeItem->type()==QGraphicsItem::UserType+3)
             {
-                Arc *a;
-                a=qgraphicsitem_cast<Arc *>(activeItem);
+                Arch *a;
+                a=qgraphicsitem_cast<Arch *>(activeItem);
                 a->setActive(false);    
             }
             if (activeItem->type()==QGraphicsItem::UserType+2)
@@ -129,8 +119,8 @@ void Editor::setActiveItem(QGraphicsItem *item)
             }
             if (activeItem->type()==QGraphicsItem::UserType+3)
             {
-                Arc *a;
-                a=qgraphicsitem_cast<Arc *>(activeItem);
+                Arch *a;
+                a=qgraphicsitem_cast<Arch *>(activeItem);
                 a->setActive(true); 
             }   
             if (activeItem->type()==QGraphicsItem::UserType+2)
@@ -211,7 +201,7 @@ void Editor::addLine()
 
 void Editor::addArc()
 {
-    addItem(new Arc());
+    addItem(new Arch());
     setStatus(QString("Specificate center point: "));
 }
 
@@ -262,7 +252,7 @@ void Editor::properties()
         }
         if (activeItem->type()==QGraphicsItem::UserType+3)
         {
-            Arc *item = qgraphicsitem_cast<Arc *>(activeItem);
+            Arch *item = qgraphicsitem_cast<Arch *>(activeItem);
             item->execProp();
         }
     }
@@ -347,7 +337,7 @@ void Editor::mousePressEvent(QMouseEvent *event)
             }
             if (pendingItem && pendingItem->type()==QGraphicsItem::UserType+3 && !pendingArc)
             {
-                pendingArc=qgraphicsitem_cast<Arc *>(pendingItem);
+                pendingArc=qgraphicsitem_cast<Arch *>(pendingItem);
                 SPoint *centerNode_ = new SPoint(this,pendingArc);
                 scene()->addItem(centerNode_);
                 SPoint *startNode_ = new SPoint(this,pendingArc);
@@ -523,7 +513,7 @@ void Editor::keyPressEvent(QKeyEvent *event)
 void Editor::compliteSelection()
 {
 Line *l;
-Arc *a;
+Arch *a;
 	if (list.isEmpty())
 	{
 		return;
@@ -547,7 +537,7 @@ QList <QPointF> pointList;
 		}
     	if (list.at(i)->type()==QGraphicsItem::UserType+3)
 		{
-			a=qgraphicsitem_cast<Arc *>(list.at(i));
+			a=qgraphicsitem_cast<Arch *>(list.at(i));
 			pointList.append(a->startNode()->posit());
 			pointList.append(a->spanNode()->posit());
 		}
@@ -597,8 +587,8 @@ void Editor::clearSelectionList()
         }
         if (list.at(i)->type()==QGraphicsItem::UserType+3)
         {
-            Arc *a;
-            a=qgraphicsitem_cast<Arc *>(list.at(i));
+            Arch *a;
+            a=qgraphicsitem_cast<Arch *>(list.at(i));
             a->setSelect(false);    
         }
     }
@@ -619,7 +609,7 @@ void Editor::createPath()
 	if (areaPath) delete areaPath;
 	areaPath=new QPainterPath();
 Line *l;
-Arc *a;
+Arch *a;
 QGraphicsItem *current;
 QGraphicsItem *newcurrent;
 QPointF position;
@@ -632,7 +622,7 @@ QPointF position;
     }
     if (list.at(0)->type()==QGraphicsItem::UserType+3)
     {
-        a=qgraphicsitem_cast<Arc *>(list.at(0));
+        a=qgraphicsitem_cast<Arch *>(list.at(0));
 		areaPath->moveTo(a->startNode()->posit());
 		position=a->startNode()->posit();
 		current=a;
@@ -658,7 +648,7 @@ QPointF position;
 		double delta;
 		double ang;
 		double radius;
-			a=qgraphicsitem_cast<Arc *>(current);
+			a=qgraphicsitem_cast<Arch *>(current);
 			if (position==a->startNode()->posit())
 			{
 				delta=a->spanAngle()/(-1600.0);
@@ -708,7 +698,7 @@ QPointF position;
 				}
 				if (list.at(j)->type()==QGraphicsItem::UserType+3)
 				{
-					a=qgraphicsitem_cast<Arc *>(list.at(j));
+					a=qgraphicsitem_cast<Arch *>(list.at(j));
 					if((a->startNode()->posit()==position)
 						||(a->spanNode()->posit()==position))
 						newcurrent=list.at(j);
@@ -918,8 +908,8 @@ double y;
 				it=l.at(ii);
 		}
 	}
-	Line*line=0;
-	Arc*arc=0;
+	Line *line=0;
+	Arch *arc=0;
 	QString boundCond;
 	boundCond="0";
 	if (it==0)
@@ -936,7 +926,7 @@ double y;
 	}
 	else if(it->type()==QGraphicsItem::UserType+3)
 	{
-		arc=qgraphicsitem_cast<Arc *>(it);
+		arc=qgraphicsitem_cast<Arch *>(it);
 		boundCond=arc->boundaryCondition();
 	}
 	else
@@ -953,7 +943,7 @@ double Editor::calculateBorderValue(QString s,QString x,QString y)
 {
 QStringList parsedList;
 int i;
-QRegExp rx("([\\d()+\\-/*,\\.XY]|(sin|cos|arccos|arcsin|tg|ctg|arctg|arcctg|ln|lg|exp|sqrt))");
+QRegExp rx("([\\d()+\\-/*,\\.XY]|(sin|cos|tg|ctg|ln|lg|exp|sqrt))");
 	parsedList.clear();
 	i=-1;
 	while(s.length()!=0)
@@ -983,12 +973,8 @@ QStringList biop;
 	unop.clear();
 	unop.append(QString("sin"));
 	unop.append(QString("cos"));
-	unop.append(QString("arcsin"));
-	unop.append(QString("arccos"));
 	unop.append(QString("tg"));
 	unop.append(QString("ctg"));
-	unop.append(QString("arctg"));
-	unop.append(QString("arcctg"));
 	unop.append(QString("ln"));
 	unop.append(QString("lg"));
 	unop.append(QString("exp"));
