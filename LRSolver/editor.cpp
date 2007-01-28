@@ -1,4 +1,3 @@
-//#include <windows.h>
 #include "editor.h"
 #include "line.h"
 #include "spoint.h"
@@ -13,6 +12,13 @@
 #include <stdlib.h>
 #include <QTime>
 #include <time.h>
+
+#ifdef Q_OS_WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#define Sleep usleep
+#endif
 
 #define PI 3.14159265
 
@@ -1180,8 +1186,7 @@ for (int i=0;i<_walkNumber;++i)
 			scene()->addItem(&demoPoint);
 			repaint();
 			QApplication::processEvents();
-		clock_t goal=500+clock();
-    	while (goal > clock());
+			Sleep(500);
 		}
 	}
 	repeat=true;
@@ -1227,8 +1232,7 @@ for (int i=0;i<_walkNumber;++i)
 			demoPoint.setRect(x-2,y-2,4,4);
 			repaint();
 			QApplication::processEvents();
-			clock_t goal=500+clock();
-		    while (goal > clock());
+			Sleep(500);
 		}
 	}
 }
