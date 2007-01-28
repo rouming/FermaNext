@@ -62,12 +62,16 @@ void MainWindow::createActions()
 	calculateAct->setStatusTip(tr("Calculate"));
 	calculateAct->setEnabled(false);	
 	connect(calculateAct,SIGNAL(triggered()),editor,SLOT(calculate()));
+    exitAct = new QAction(tr("E&xit"), this);
+    exitAct->setShortcut(tr("Ctrl+Q"));
+    exitAct->setStatusTip(tr("Exit the application"));
+    connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 }
 
 void MainWindow::createMenus()
 {
     fileMenu = menuBar()->addMenu(tr("&File"));
-
+    fileMenu->addAction(exitAct);
     editMenu = menuBar()->addMenu(tr("&Edit"));
     editMenu->addAction(delAct);
 	editMenu->addAction(addLineAct);

@@ -55,6 +55,7 @@ private:
 	QAction *breakAreaAct;
 	QAction *propertiesAct;
 	QAction *calculateAct;
+	QAction *exitAct;
 };
 
 #endif
