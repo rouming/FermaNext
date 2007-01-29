@@ -36,7 +36,8 @@ HEADERS += arc.h \
 					 mainWindow.h \
 					 spoint.h \
 					 walkprop.h \
-					 gridnode.h
+					 gridnode.h  \
+					 resultForm.h
 
 SOURCES += arc.cpp \
            editor.cpp \
@@ -46,8 +47,9 @@ SOURCES += arc.cpp \
            mainWindow.cpp \
            spoint.cpp \
        	   arcprop.cpp \
-				   walkprop.cpp \
-				   gridnode.cpp
+		   walkprop.cpp \
+		   gridnode.cpp \
+		   resultForm.cpp
 
 
 CONFIG(debug, debug|release) {
