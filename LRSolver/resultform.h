@@ -3,8 +3,6 @@
 
 #include <QtGui>
 #include <QDialog>
-#include <QFile>
-#include <QTextStream>
 
 class ResultForm : public QDialog
 {
@@ -29,8 +27,6 @@ private:
 	QTableWidget *table;
 	QList<double> resList;
     QDialogButtonBox *buttonBox;
-    QTextStream out;
-    QFile *file;
 	QGraphicsLineItem *hLine;
 	QGraphicsLineItem *vLine;
 	QPointF lastPos;

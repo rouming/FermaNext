@@ -3,9 +3,6 @@
 ResultForm::ResultForm(QWidget * parent, Qt::WindowFlags f)
 :QDialog(parent,f)
 {
-    file=new QFile("resultform_out.txt");
-    file->open(QIODevice::WriteOnly);
-    out.setDevice(file);
 	redPen.setColor(QColor(Qt::red));
 	resList.clear();
 	rootLabel=new QLabel(tr("Point coordinates:"));
