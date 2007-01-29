@@ -1254,4 +1254,5 @@ for (int i=0;i<_walkNumber;++i)
 	gridList.clear();
 	setRootPoint();
 	breakAreaAct->setEnabled(true);
+	emit lockCalculation(); 
 }
