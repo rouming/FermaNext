@@ -3,24 +3,38 @@
 
 #include <QtGui>
 #include <QDialog>
+#include <QFile>
+#include <QTextStream>
 
 class ResultForm : public QDialog
 {
     Q_OBJECT
 
 public:
-    ResultForm(QList<double> dl,double wn,QWidget * parent = 0, Qt::WindowFlags f = 0);
+    ResultForm(QWidget * parent = 0, Qt::WindowFlags f = 0);
+	void appendResult(double x, double y, double r);
+	void setRoot(double x,double y);
 public slots:
-    void accept();
     void reject();
 private:
     void createGroupBox();
-    void setValues();
     QGroupBox *groupBox;
-	QLabel resultLabel;
-	QLineEdit resultEdit;
+	QLabel *resultLabel;
+	QLineEdit *resultEdit;
+	QLabel *rootLabel;
+	QLineEdit *rootXEdit;
+	QLineEdit *rootYEdit;
 	QGraphicsView *view;
     QGraphicsScene *scene;
+	QTableWidget *table;
+	QList<double> resList;
+    QDialogButtonBox *buttonBox;
+    QTextStream out;
+    QFile *file;
+	QGraphicsLineItem *hLine;
+	QGraphicsLineItem *vLine;
+	QPointF lastPos;
+	QPen redPen;
 };
 
 #endif
