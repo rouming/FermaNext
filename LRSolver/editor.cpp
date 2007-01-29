@@ -4,6 +4,7 @@
 #include "arc.h"
 #include "walkprop.h"
 #include "gridNode.h"
+#include "resultForm.h"
 #include <QMenu>
 #include <QContextMenuEvent>
 #include <QGraphicsEllipseItem>
@@ -33,7 +34,7 @@ Editor::Editor(QGraphicsScene * canvas, QWidget *parent)
     setResizeAnchor(QGraphicsView::NoAnchor);
     setAlignment(Qt::AlignLeft | Qt::AlignTop);
     //debug output
-    file=new QFile((const QString &)"editor_out.txt");
+    file=new QFile("/output/editor_out.txt");
     file->open(QIODevice::WriteOnly);
     out.setDevice(file);
     createActions();
@@ -1171,25 +1172,35 @@ bool repeat;
 QGraphicsEllipseItem demoPoint;
 demoPoint.setPen(QPen(Qt::red));
 demoPoint.setBrush(QBrush(Qt::red));
-thread()->setPriority(QThread::HighestPriority);
+ResultForm form;
+form.setRoot(rootPoint.x(),rootPoint.y());
+QTime midnight(0, 0, 0);
+srand(midnight.msecsTo(QTime::currentTime()));
+scene()->addItem(&demoPoint);
 for (int i=0;i<_walkNumber;++i)
 {
-	QTime midnight(0, 0, 0);
-    srand(midnight.secsTo(QTime::currentTime()));
+	repeat=true;	
 	x=rootPoint.x();
 	y=rootPoint.y();
+	for(int j=0;j<gridList.size();++j)
+	{
+		if(QPointF(x,y)==(QPointF)gridList.at(j))
+		{
+			if(gridList[j].border())
+			{
+				s=s+gridList[j].value();
+				repeat=false;
+				form.appendResult(x,y,gridList[j].value());
+			}
+		}
+	}
 	if(demoMode())
 	{
 		demoPoint.setRect(x-2,y-2,4,4);
-		if (i==0)
-		{		
-			scene()->addItem(&demoPoint);
-			repaint();
-			QApplication::processEvents();
-			Sleep(500);
-		}
+		repaint();
+		QApplication::processEvents();
+		Sleep(500);
 	}
-	repeat=true;
 	while(repeat)
 	{
 		rd=((double)rand()/((double)(RAND_MAX)+(double)(1)));
@@ -1224,6 +1235,7 @@ for (int i=0;i<_walkNumber;++i)
 				{
 					s=s+gridList[j].value();
 					repeat=false;
+					form.appendResult(x,y,gridList[j].value());
 				}
 			}
 		}
@@ -1236,18 +1248,10 @@ for (int i=0;i<_walkNumber;++i)
 		}
 	}
 }
-result=s/_walkNumber;
-	QString msg;
-	msg="result is"+QString::number(result);
-	QMessageBox msgBox;
-	msgBox.setText(msg);
-	QPushButton *okButton = msgBox.addButton(QMessageBox::Ok);
-	msgBox.exec();
-	if (msgBox.clickedButton() == okButton) {
-    	pathTest.setPath(QPainterPath());
-		delete grid;
-		gridList.clear();
-		setRootPoint();
-		breakAreaAct->setEnabled(true);
- 	} 
+	form.exec();
+   	pathTest.setPath(QPainterPath());
+	delete grid;
+	gridList.clear();
+	setRootPoint();
+	breakAreaAct->setEnabled(true);
 }
