@@ -3,8 +3,6 @@
 
 #include <QGraphicsView>
 #include <QGraphicsItem>
-#include <QFile>
-#include <QTextStream>
 #include <QObject>
 
 class SPoint : public QObject, public QGraphicsItem
@@ -18,12 +16,7 @@ public:
     void setActive(bool activation);
     void setPosition(QPointF point);
 //при нажатии левой кнопки мыши  на экз Line, являющейся родителем экземпляра Node, значение active устанавливает в Т
-    
-    QTextStream out;
-    QFile *file;
-    
 	void positChange();
-
     QRectF boundingRect() const;
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget=0);

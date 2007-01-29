@@ -6,9 +6,6 @@
 SPoint::SPoint(QGraphicsView *view, QGraphicsItem *parent, QGraphicsScene *scene)
 :QObject(0), QGraphicsItem(parent, scene)
 {
-    file=new QFile((const QString &)"spoint_out.txt");
-    file->open(QIODevice::WriteOnly);
-    out.setDevice(file);
 	viewPort=view;
 }
 
