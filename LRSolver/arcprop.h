@@ -3,8 +3,6 @@
 
 #include <QtGui>
 #include <QDialog>
-#include <QFile>
-#include <QTextStream>
 
 class Arch;
 
@@ -41,8 +39,6 @@ private:
 	QString rad;
 	QString cx;
 	QString cy;
-    QTextStream out;
-    QFile *file;
 };
 
 #endif

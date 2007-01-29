@@ -5,9 +5,6 @@
 ArcProp::ArcProp(Arch *parentArc, QWidget * parent, Qt::WindowFlags f)
 :QDialog(parent,f)
 {
-    file=new QFile((const QString &)"arcprop_out.txt");
-    file->open(QIODevice::WriteOnly);
-    out.setDevice(file);
     arc=parentArc;
     labelAngle=new QLabel(tr("Angle"));
     labelCenter=new QLabel(tr("Center point"));
@@ -105,7 +102,6 @@ void ArcProp::accept()
         	arc->setArc(QPointF(editcx->text().toDouble(),editcy->text().toDouble()),
             	editStart->text().toDouble(),editSpan->text().toDouble(),
             	editRad->text().toDouble());
-			out<<"change"<<endl;
     	}
 	}
 	if (checkBoundCond(editBoundCond->text()))
