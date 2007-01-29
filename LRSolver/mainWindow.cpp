@@ -1,5 +1,6 @@
 #include <QtGui>
 #include <QGraphicsScene>
+#include <QCoreApplication>
 
 #include "editor.h"
 #include "mainWindow.h"
@@ -36,29 +37,29 @@ MainWindow::~MainWindow()
 
 void MainWindow::createActions()
 {
-    zoomInAct=new QAction(QIcon("../images/zoomin.png"), tr("Zoom In"), this);
+    zoomInAct=new QAction(QIcon(QCoreApplication::applicationDirPath() + "/images/zoomin.png"), tr("Zoom In"), this);
     zoomInAct->setStatusTip(tr("Zoom In Editors Field"));
     connect(zoomInAct, SIGNAL(triggered()), editor, SLOT(zoomIn()));
-    zoomOutAct=new QAction(QIcon("../images/zoomout.png"), tr("Zoom Out"), this);
+    zoomOutAct=new QAction(QIcon(QCoreApplication::applicationDirPath() + "/images/zoomout.png"), tr("Zoom Out"), this);
     zoomOutAct->setStatusTip(tr("Zoom Out Editors Field"));
     connect(zoomOutAct, SIGNAL(triggered()), editor, SLOT(zoomOut()));
-	delAct=new QAction(QIcon("../images/del.png"),tr("Delete Item"),this);
+	delAct=new QAction(QIcon(QCoreApplication::applicationDirPath() + "/images/del.png"),tr("Delete Item"),this);
 	connect(delAct,SIGNAL(triggered()),editor,SLOT(del()));
 	delAct->setStatusTip(tr("Delete Item"));
-	addLineAct=new QAction(QIcon("../images/add.png"),tr("Add Line"),this);
+	addLineAct=new QAction(QIcon(QCoreApplication::applicationDirPath() + "/images/add.png"),tr("Add Line"),this);
 	connect(addLineAct,SIGNAL(triggered()),editor,SLOT(addLine()));
 	addLineAct->setStatusTip(tr("Add Line Item"));
-	addArcAct=new QAction(QIcon("../images/add.png"),tr("Add Arc"),this);
+	addArcAct=new QAction(QIcon(QCoreApplication::applicationDirPath() + "/images/add.png"),tr("Add Arc"),this);
 	connect(addArcAct,SIGNAL(triggered()),editor,SLOT(addArc()));
 	addArcAct->setStatusTip(tr("Add Arc Item"));
-	breakAreaAct=new QAction(QIcon("../images/break.png"), tr("Break area"),this);
+	breakAreaAct=new QAction(QIcon(QCoreApplication::applicationDirPath() + "/images/break.png"), tr("Break area"),this);
 	breakAreaAct->setStatusTip(tr("Destroy Area"));
 	connect(breakAreaAct,SIGNAL(triggered()),editor,SLOT(breakArea()));
 	breakAreaAct->setEnabled(false);
-	propertiesAct=new QAction(QIcon("../images/prop.png"), tr("Random Walk Properties"),this);
+	propertiesAct=new QAction(QIcon(QCoreApplication::applicationDirPath() + "/images/prop.png"), tr("Random Walk Properties"),this);
 	propertiesAct->setStatusTip(tr("Show walk properties"));
 	connect(propertiesAct,SIGNAL(triggered()),editor,SLOT(walkProperties()));
-	calculateAct=new QAction(QIcon("../images/calc.png"), tr("Calculate"),this);
+	calculateAct=new QAction(QIcon(QCoreApplication::applicationDirPath() + "/images/calc.png"), tr("Calculate"),this);
 	calculateAct->setStatusTip(tr("Calculate"));
 	calculateAct->setEnabled(false);	
 	connect(calculateAct,SIGNAL(triggered()),editor,SLOT(calculate()));
