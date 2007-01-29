@@ -16,7 +16,6 @@ ResultForm::ResultForm(QWidget * parent, Qt::WindowFlags f)
     view->scale( 1, -1 );
 	view->setRenderHints(QPainter::Antialiasing);
 	hLine=scene->addLine(QLineF(10,10,20,10));
-	vLine=scene->addLine(QLineF(10,10,10,20));
 	QStringList header;
 	header<<tr("X")<<tr("Y")<<tr("Value");
 	table=new QTableWidget(0,3,this);
@@ -47,12 +46,9 @@ double s=0;
 		s=s+resList.at(i);
 	}
 	s=s/(len+1);
-		if(vLine->line().length()<s)
-			vLine->setLine(10,10,10,(int)s+20);
 	if (len==0)
 	{
 		lastPos=QPointF((len+1)*30,(int)s+10);
-		vLine->setLine(10,10,10,(int)s+20);
 	}
 	else
 	{
@@ -61,6 +57,12 @@ double s=0;
 	}
 	hLine->setLine(QLineF(10,10,(len+1)*30,10));
 	scene->addLine(QLineF((len+1)*30,5,(len+1)*30,15));
+	text=scene->addText(QString::number(s));
+	if(len%2)
+		text->setPos(QPointF((len+1)*30,(int)s+20));
+	else
+		text->setPos(QPointF((len+1)*30,(int)s-20));
+	text->scale(1,-1);
 	resultEdit->setText(QString::number(s));
 }
 

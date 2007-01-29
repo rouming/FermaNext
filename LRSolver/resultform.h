@@ -28,7 +28,7 @@ private:
 	QList<double> resList;
     QDialogButtonBox *buttonBox;
 	QGraphicsLineItem *hLine;
-	QGraphicsLineItem *vLine;
+	QGraphicsTextItem *text;
 	QPointF lastPos;
 	QPen redPen;
 };
