@@ -6,7 +6,6 @@
 class GridNode : public QPointF
 {
 public:
-//	GridNode();
     GridNode(qreal x, qreal y);
 	void setBorder(bool b) {borderNode=b;}
 	bool border() {return borderNode;}

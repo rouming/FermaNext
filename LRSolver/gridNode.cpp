@@ -1,11 +1,5 @@
 #include "gridNode.h"
 
-/*GridNode::GridNode()
-:QPointF()
-{
-	borderNode=false;
-}*/
-
 GridNode::GridNode(qreal x, qreal y)
 :QPointF(x ,y)
 {
