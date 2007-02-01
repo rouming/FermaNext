@@ -78,19 +78,22 @@ void ResultForm::createGroupBox()
     QVBoxLayout *layout=new QVBoxLayout;
     QHBoxLayout *lh1=new QHBoxLayout;
     QHBoxLayout *lh2=new QHBoxLayout;
-	QHBoxLayout *lh3=new QHBoxLayout;
 	QHBoxLayout *lh4=new QHBoxLayout;
+    QSplitter *splitter = new QSplitter;
+    splitter->addWidget(view);
+    splitter->addWidget(table);
+	splitter->setOrientation(Qt::Vertical);
+    splitter->setStretchFactor(0, 1);
+	splitter->setStretchFactor(1, 0);
     lh1->addWidget(resultLabel);
     lh1->addWidget(resultEdit);
-	lh2->addWidget(view);
-	lh3->addWidget(table);
+	lh2->addWidget(splitter);
 	lh4->addWidget(rootLabel);
 	lh4->addWidget(rootXEdit);
 	lh4->addWidget(rootYEdit);
     layout->addLayout(lh1);
 	layout->addLayout(lh4);
     layout->addLayout(lh2);
-	layout->addLayout(lh3);
     groupBox->setLayout(layout);
 }
 
