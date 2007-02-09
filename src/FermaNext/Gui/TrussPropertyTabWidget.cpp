@@ -583,7 +583,7 @@ void TrussPropertyTabWidget::initPivotPropertyTab ()
     pivotPropTable->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
     pivotPropTable->hide();
 
-    addTab( parentFrame, "Pivot Property" );
+    addTab( parentFrame, "Pivot Properties" );
 }
 
 
