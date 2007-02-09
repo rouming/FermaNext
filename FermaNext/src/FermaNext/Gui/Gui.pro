@@ -10,7 +10,7 @@ include(../../Common/Common.pri)
 include(../TrussUnit/TrussUnit.pri)
 
 TEMPLATE = lib
-CONFIG += staticlib uitools warn_on thread
+CONFIG += staticlib uitools warn_on thread console
 QT += core gui xml 
 
 win32 {

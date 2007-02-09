@@ -1310,6 +1310,8 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 
     if ( ! isRendered() ) 
     { 
+        qWarning( "<<<redraw truss window \n" );
+       
         ren_dynarow baseRend( windowPixf );
         baseRend.clear( agg::rgba (10, 10, 10, 0) );
         solidRenderer solidRend( baseRend );    

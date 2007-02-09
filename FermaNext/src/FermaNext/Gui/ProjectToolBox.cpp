@@ -131,10 +131,10 @@ void ProjectToolBoxPage::init ()
     tokLabel = new QLabel( "", propertyBox );
     trussNumberLabel = new QLabel( "0", propertyBox );
     trussHiddenLabel = new QLabel( "0", propertyBox );
-    propertyLayout->addWidget( new QLabel( tr( "TOK: ") ), 0, 0 );
+    //propertyLayout->addWidget( new QLabel( tr( "TOK: ") ), 0, 0 );
     propertyLayout->addWidget( new QLabel( tr( "Total trusses: ") ), 1, 0 );
     propertyLayout->addWidget( new QLabel( tr( "Hidden trusses: ") ), 2, 0 );
-    propertyLayout->addWidget( tokLabel, 0, 1 );
+    //propertyLayout->addWidget( tokLabel, 0, 1 );
     propertyLayout->addWidget( trussNumberLabel, 1, 1 );
     propertyLayout->addWidget( trussHiddenLabel, 2, 1 );
 
@@ -152,7 +152,7 @@ void ProjectToolBoxPage::init ()
     // Buttons
     QPushButton* calculateAllButton = new QPushButton;    
     trussUnitsLayout->addSpacing(10);
-    trussUnitsLayout->addWidget( calculateAllButton );
+    //trussUnitsLayout->addWidget( calculateAllButton );
     calculateAllButton->setFlat( true );
     calculateAllButton->setStatusTip( tr( "Calculates all the project trusses" ) );
     calculateAllButton->setToolTip( tr( "Calculate All (F5)" ) );

@@ -77,7 +77,7 @@ FermaNextMainWindow::~FermaNextMainWindow ()
 
 void FermaNextMainWindow::init ()
 {
-    setWindowTitle( fermaTitle);
+    setWindowTitle( fermaTitle );
     setMinimumSize( 640, 480 );
 
     projectsDockWidget = new DockedWidget( tr("Projects"), this );
@@ -232,14 +232,11 @@ void FermaNextMainWindow::someProjectRemoved ( FermaNextProject& prj )
         trussPropertyWindow->hide();
         trussPropTabWidget->clearMaterialComboBox();
 
-        showNodeNumbersAction->setEnabled( false );
-        showPivotNumbersAction->setEnabled( false ); 
-        showLoadsAction->setEnabled( false ); 
-        showFixationsAction->setEnabled( false ); 
-
+        prefAction->setEnabled( false );
         showUndoRedoAction->setEnabled( false );
         showTrussPropWindowAction->setEnabled( false );
         showGeometryWindowAction->setEnabled( false );
+        projectsDockAction->setEnabled( false );
 
         copyAction->setEnabled( false );
         cutAction->setEnabled( false );
@@ -252,19 +249,11 @@ void FermaNextMainWindow::someProjectRemoved ( FermaNextProject& prj )
 void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
 {
     if ( !projectsDockWidget->isVisible() && 0 < workspace.countProjects() ) {
-        projectsDockWidget->show();
-
-        showNodeNumbersAction->setEnabled( true );
-        showNodeNumbersAction->setChecked( Global::showNodeNumbers );
-        showPivotNumbersAction->setEnabled( true ); 
-        showPivotNumbersAction->setChecked( Global::showPivotNumbers );
-        showLoadsAction->setEnabled( true ); 
-        showLoadsAction->setChecked( Global::showLoads );
-        showFixationsAction->setEnabled( true ); 
-        showFixationsAction->setChecked( Global::showFixations );
+        prefAction->setEnabled( true );
         showUndoRedoAction->setEnabled( true );
         showTrussPropWindowAction->setEnabled( true );
         showGeometryWindowAction->setEnabled( true );
+        projectsDockAction->setEnabled( true );
 
         QSettings appSettings;
 
@@ -282,11 +271,16 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
         if ( appSettings.contains( "ShowPropertyWindow" ) )
             showPropertyWnd = appSettings.value( "ShowPropertyWindow" ).toBool();
 
+        bool showProjectBar = true;
+        if ( appSettings.contains( "ShowProjectsBar" ) )
+            showProjectBar = appSettings.value( "ShowProjectsBar" ).toBool();
+
         appSettings.endGroup();
 
         showUndoRedoAction->setChecked( showUndoRedo );
         showTrussPropWindowAction->setChecked( showGeometryWnd );
         showGeometryWindowAction->setChecked( showPropertyWnd );
+        projectsDockAction->setChecked( showProjectBar );
 
         if ( showUndoRedoAction->isChecked() )
             undoRedoHistoryWidget->show();
@@ -417,7 +411,7 @@ void FermaNextMainWindow::createProject ()
 
 void FermaNextMainWindow::setupFileActions ()
 {
-    QToolBar* tb = addToolBar( tr("File Actions") );
+    fileActions = addToolBar( tr("File Actions") );
     QMenu* menu = menuBar()->addMenu( tr( "&File" ) );
 
     QAction *a;
@@ -427,7 +421,7 @@ void FermaNextMainWindow::setupFileActions ()
     a->setShortcut( tr("CTRL+N") );
     a->setStatusTip( tr( "Creates a new project" ) );
     connect( a, SIGNAL(triggered()), SLOT(fileNew()) );
-    tb->addAction( a );
+    fileActions->addAction( a );
     menu->addAction( a );
 
     // Open
@@ -436,7 +430,7 @@ void FermaNextMainWindow::setupFileActions ()
     a->setShortcut( tr("CTRL+O") );
     a->setStatusTip( tr( "Opens an existing project" ) );
     connect( a, SIGNAL(triggered()), SLOT(fileOpen()) );
-    tb->addAction( a );
+    fileActions->addAction( a );
     menu->addAction( a );   
 
     // Save
@@ -446,7 +440,7 @@ void FermaNextMainWindow::setupFileActions ()
     saveProjectAction->setShortcut( tr("CTRL+S") );
     saveProjectAction->setStatusTip( tr( "Saves the current project" ) );
     connect( saveProjectAction, SIGNAL(triggered()), SLOT(fileSave()) );
-    tb->addAction( saveProjectAction );
+    fileActions->addAction( saveProjectAction );
     menu->addAction( saveProjectAction );
     saveProjectAction->setDisabled(true);
     menu->addSeparator();
@@ -458,7 +452,7 @@ void FermaNextMainWindow::setupFileActions ()
     saveAllAction->setShortcut( tr("CTRL+SHIFT+S") );
     saveAllAction->setStatusTip( tr( "Saves all the open files" ) );
     connect( saveAllAction, SIGNAL(triggered()), SLOT(fileSaveAll()) );
-    tb->addAction( saveAllAction );
+    fileActions->addAction( saveAllAction );
     menu->addAction( saveAllAction );
     saveAllAction->setDisabled(true);
     menu->addSeparator();
@@ -541,7 +535,7 @@ void FermaNextMainWindow::setupFileActions ()
 
 void FermaNextMainWindow::setupEditActions ()
 {
-    QToolBar* tb = addToolBar( tr("Edit Actions") );
+    editActions = addToolBar( tr("Edit Actions") );
     QMenu* menu = menuBar()->addMenu( tr( "&Edit" ) );
 
     // Undo
@@ -551,7 +545,7 @@ void FermaNextMainWindow::setupEditActions ()
     undoAction->setShortcut( tr("CTRL+Z") );                               
     connect( undoAction, SIGNAL(triggered()), SLOT(editUndo()) );
     undoAction->setDisabled(true);
-    tb->addAction( undoAction );
+    editActions->addAction( undoAction );
     menu->addAction( undoAction );
 
     // Redo
@@ -561,10 +555,10 @@ void FermaNextMainWindow::setupEditActions ()
     redoAction->setStatusTip( tr( "Redoes the previously undone action" ) );
     connect( redoAction, SIGNAL(triggered()), SLOT(editRedo()) );
     redoAction->setDisabled(true);
-    tb->addAction( redoAction );
+    editActions->addAction( redoAction );
     menu->addAction( redoAction );
     menu->addSeparator();
-    tb->addSeparator();
+    editActions->addSeparator();
 
     // Copy
     copyAction = new QAction( QIcon(Global::imagesPath() + "/editcopy.png"), 
@@ -573,7 +567,7 @@ void FermaNextMainWindow::setupEditActions ()
     copyAction->setStatusTip( tr( "Copies the selected truss to the Clipboard" ) );
     connect( copyAction, SIGNAL(triggered()), SLOT(editCopy()) );
     copyAction->setDisabled(true);
-    tb->addAction( copyAction );
+    editActions->addAction( copyAction );
     menu->addAction( copyAction );
 
     // Copy
@@ -583,7 +577,7 @@ void FermaNextMainWindow::setupEditActions ()
     cutAction->setStatusTip( tr( "Cuts the selected truss and moves it to the Clipboard" ) );
     connect( cutAction, SIGNAL(triggered()), SLOT(editCut()) );
     cutAction->setDisabled(true);
-    tb->addAction( cutAction );
+    editActions->addAction( cutAction );
     menu->addAction( cutAction );
 
     // Paste
@@ -593,11 +587,10 @@ void FermaNextMainWindow::setupEditActions ()
     pasteAction->setStatusTip( tr( "Inserts the truss from the Clipboard" ) );
     connect( pasteAction, SIGNAL(triggered()), SLOT(editPaste()) );
     pasteAction->setDisabled(true);
-    tb->addAction( pasteAction );
+    editActions->addAction( pasteAction );
     menu->addAction( pasteAction );
     menu->addSeparator();
-    tb->addSeparator();    
-
+ 
     // Material Editor
     materialEditorAction = new QAction( tr( "&Material Editor" ), this );
     materialEditorAction->setShortcut( tr("CTRL+M") );
@@ -606,97 +599,88 @@ void FermaNextMainWindow::setupEditActions ()
                                    SLOT(editMaterials()) );
     menu->addAction( materialEditorAction );
     materialEditorAction->setEnabled( false );
-/*
+
     // Preferences
-    QAction* prefAction = new QAction( tr( "Pre&ferences..." ), this );
-    prefAction->setShortcut( tr("CTRL+K") );
+    prefAction = new QAction( tr( "P&references..." ), this );
+    prefAction->setShortcut( tr("CTRL+R") );
     prefAction->setStatusTip( tr( "Edits the application preferences" ) );
     prefAction->setEnabled( false );
     connect( prefAction, SIGNAL(triggered()), SLOT(editPreferences()) );
-    menu->addAction( prefAction ); */
+    menu->addAction( prefAction ); 
 }
 
 void FermaNextMainWindow::setupViewActions ()
 {
-    QToolBar* tb = addToolBar( tr("View Actions") );
+    viewActions = addToolBar( tr("View Actions") );
     QMenu* menu = menuBar()->addMenu( tr( "&View" ) );
     
-    // Contents
     showUndoRedoAction = new QAction( QIcon(Global::imagesPath() + 
                                       "/undo_redo_window.png"),
-                                      tr( "&Show History Window" ), this );
+                                      tr( "&History" ), this );
     showUndoRedoAction->setStatusTip( tr( "Shows history window" ) );
     showUndoRedoAction->setCheckable( true );
     menu->addAction( showUndoRedoAction );
-    tb->addAction( showUndoRedoAction );
+    viewActions->addAction( showUndoRedoAction );
     connect( showUndoRedoAction, SIGNAL(toggled(bool)), 
              undoRedoHistoryWidget, SLOT(setVisible(bool)) );
     showUndoRedoAction->setEnabled( false );
 
     showGeometryWindowAction = 
         new QAction( QIcon(Global::imagesPath() + "/truss_geom.png"),
-                     tr( "&Show Truss Geometry Window" ), this );
+                     tr( "Truss &Geometry" ), this );
     showGeometryWindowAction->
         setStatusTip( tr( "Shows truss geometry window" ) );
     showGeometryWindowAction->setCheckable( true );
     menu->addAction( showGeometryWindowAction );
-    tb->addAction( showGeometryWindowAction );
+    viewActions->addAction( showGeometryWindowAction );
     connect( showGeometryWindowAction, SIGNAL(toggled(bool)),
              geometryWindow, SLOT(setVisible(bool) ) );
     showGeometryWindowAction->setEnabled( false );
     
     showTrussPropWindowAction = 
         new QAction( QIcon(Global::imagesPath() + "/truss_prop.png"),
-                     tr( "&Show Truss Property Window" ), this );
+                     tr( "Truss &Properties" ), this );
     showTrussPropWindowAction->
-        setStatusTip( tr( "Shows truss property window" ) );
+        setStatusTip( tr( "Shows truss properties window" ) );
     showTrussPropWindowAction->setCheckable( true );
     menu->addAction( showTrussPropWindowAction );
-    tb->addAction( showTrussPropWindowAction );
+    viewActions->addAction( showTrussPropWindowAction );
     connect( showTrussPropWindowAction, SIGNAL(toggled(bool)), 
              trussPropertyWindow, SLOT(setVisible(bool)) );
     showTrussPropWindowAction->setEnabled( false ); 
-    
+
     menu->addSeparator();
 
-    showNodeNumbersAction = new QAction( tr( "&Show Node Numbers" ), this );
-    showNodeNumbersAction->setStatusTip( tr( "Shows the node numbers" ) );
-    showNodeNumbersAction->setCheckable( true );
-    showNodeNumbersAction->setChecked( true );
-    menu->addAction( showNodeNumbersAction );
-    connect( showNodeNumbersAction, SIGNAL(toggled(bool)), 
-                                      SLOT(showNodeNumbers(bool)) );
-    showNodeNumbersAction->setEnabled( false ); 
+    QMenu* toolBarMenu = menu->addMenu( tr( "Tool Bar" ) );
 
+    showFileActions = new QAction( tr( "&File Actions" ), this );
+    showFileActions->setStatusTip( tr( "Shows file bar" ) );
+    showFileActions->setCheckable( true );
+    connect( showFileActions, SIGNAL(triggered(bool)), 
+                 fileActions, SLOT(setVisible(bool)) );
+    toolBarMenu->addAction( showFileActions ); 
 
-    showPivotNumbersAction = new QAction( tr( "&Show Pivot Numbers" ), this );
-    showPivotNumbersAction->setStatusTip( tr( "Shows the pivot numbers" ) );
-    showPivotNumbersAction->setCheckable( true );
-    showPivotNumbersAction->setChecked( true );
-    menu->addAction( showPivotNumbersAction );
-    connect( showPivotNumbersAction, SIGNAL(toggled(bool)), 
-                                      SLOT(showPivotNumbers(bool)) );
-    showPivotNumbersAction->setEnabled( false ); 
-  
+    showEditActions = new QAction( tr( "&Edit Actions" ), this );
+    showEditActions->setStatusTip( tr( "Shows edit bar" ) );
+    showEditActions->setCheckable( true );
+    connect( showEditActions, SIGNAL(triggered(bool)), 
+                 editActions, SLOT(setVisible(bool)) );
+    toolBarMenu->addAction( showEditActions ); 
 
-    showLoadsAction = new QAction( tr( "&Show Loads" ), this );
-    showLoadsAction->setStatusTip( tr( "Shows the node loads" ) );
-    showLoadsAction->setCheckable( true );
-    showLoadsAction->setChecked( true );
-    menu->addAction( showLoadsAction );
-    connect( showLoadsAction, SIGNAL(toggled(bool)), 
-                                SLOT(showLoads(bool)) );
-    showLoadsAction->setEnabled( false );  
-  
+    showViewActions = new QAction( tr( "&View Actions" ), this );
+    showViewActions->setStatusTip( tr( "Shows view bar" ) );
+    showViewActions->setCheckable( true );
+    connect( showViewActions, SIGNAL(triggered(bool)), 
+                 viewActions, SLOT(setVisible(bool)) );
+    toolBarMenu->addAction( showViewActions ); 
 
-    showFixationsAction = new QAction( tr( "&Show Fixations" ), this );
-    showFixationsAction->setStatusTip( tr( "Shows the node fixations" ) );
-    showFixationsAction->setCheckable( true );
-    showFixationsAction->setChecked( true );
-    menu->addAction( showFixationsAction );
-    connect( showFixationsAction, SIGNAL(toggled(bool)), 
-                                    SLOT(showFixations(bool)) );
-    showFixationsAction->setEnabled( false );  
+    projectsDockAction = new QAction( tr( "Pro&jects" ), this );
+    projectsDockAction->setStatusTip( tr( "Shows projects bar" ) );
+    projectsDockAction->setCheckable( true );
+    projectsDockAction->setEnabled( false );
+    connect( projectsDockAction, SIGNAL(triggered(bool)), 
+             projectsDockWidget, SLOT(setVisible(bool)) );
+    menu->addAction( projectsDockAction ); 
 }
 
 void FermaNextMainWindow::setupProjectActions ()
@@ -877,15 +861,20 @@ TrussUnitWindow* FermaNextMainWindow::onPasteTrussUnitWindow ()
         return 0;
     }
 
+    QString copyWndName = copyWnd.getTrussName();
     QPoint copyWndPos = copyWnd.getWindowLeftTopPos();
 
-    foreach ( TrussUnitWindow* wnd, wndMng.getTrussUnitWindowList() )
+    foreach ( TrussUnitWindow* wnd, wndMng.getTrussUnitWindowList() ) {
         if ( wnd != &copyWnd && wnd->getWindowLeftTopPos() == copyWndPos ) {
             // Add single indent to the window position
             copyWndPos = QPoint( copyWndPos + QPoint( 15, 10 ) );
             copyWnd.setWindowPosition( copyWndPos );
-
         }
+        if ( wnd != &copyWnd && wnd->getTrussName() == copyWndName ) {
+            copyWndName.append( "_copy" );
+            copyWnd.setTrussName( copyWndName );
+        }
+    }
 
     return &copyWnd;
 }
@@ -1535,33 +1524,25 @@ void FermaNextMainWindow::restoreApplicationSettings ()
 
     appSettings.endGroup();
 
-    //******************* Preferences 
-
     appSettings.beginGroup( "Preferences" );
 
-    if ( ! appSettings.contains( "ShowNodeNumbers" ) )
-        appSettings.setValue( "ShowNodeNumbers", true );
+    if ( ! appSettings.contains( "ShowFileActions" ) )
+        showFileActions->setChecked( true );
     else
-        showNodeNumbersAction->setChecked( 
-            appSettings.value( "ShowNodeNumbers" ).toBool() );
+        showFileActions->setChecked( 
+                appSettings.value( "ShowFileActions" ).toBool() );
 
-     if ( ! appSettings.contains( "ShowPivotNumbers" ) )
-        appSettings.setValue( "ShowPivotNumbers", true );
+    if ( ! appSettings.contains( "ShowEditActions" ) )
+        showEditActions->setChecked( true );
     else
-        showPivotNumbersAction->setChecked(
-            appSettings.value( "ShowPivotNumbers" ).toBool() );
+        showEditActions->setChecked( 
+                appSettings.value( "ShowEditActions" ).toBool() );
 
-    if ( ! appSettings.contains( "ShowFixations" ) )
-        appSettings.setValue( "ShowFixations", true );
+    if ( ! appSettings.contains( "ShowViewActions" ) )
+        showViewActions->setChecked( true );
     else
-        showFixationsAction->setChecked(
-            appSettings.value( "ShowFixations" ).toBool() );
-
-    if ( ! appSettings.contains( "ShowLoads" ) )
-        appSettings.setValue( "ShowLoads", true );
-    else
-        showLoadsAction->setChecked( 
-            appSettings.value( "ShowLoads" ).toBool() );
+        showViewActions->setChecked( 
+                appSettings.value( "ShowViewActions" ).toBool() );
 
     appSettings.endGroup();
 }
@@ -1597,21 +1578,20 @@ void FermaNextMainWindow::saveApplicationSettings ()
 
     appSettings.beginGroup( "Preferences" );
 
+    appSettings.setValue( "ShowFileActions", showFileActions->isChecked() );
+    appSettings.setValue( "ShowEditActions", showEditActions->isChecked() );
+    appSettings.setValue( "ShowViewActions", showViewActions->isChecked() );
+    appSettings.setValue( "ShowProjectsBar", projectsDockAction->isChecked() );
     appSettings.setValue( "ShowUndoRedo", showUndoRedoAction->isChecked() );
     appSettings.setValue( "ShowGeometryWindow", 
                 showGeometryWindowAction->isChecked() );
     appSettings.setValue( "ShowPropertyWindow", 
                 showTrussPropWindowAction->isChecked() );
 
-    appSettings.setValue( "ShowNodeNumbers", showNodeNumbersAction->isChecked() );
-    appSettings.setValue( "ShowPivotNumbers", showPivotNumbersAction->isChecked() );
-    appSettings.setValue( "ShowFixations", showFixationsAction->isChecked() );
-    appSettings.setValue( "ShowLoads", showLoadsAction->isChecked() );
-
     appSettings.endGroup();
 }
 
-void FermaNextMainWindow::checkModified ()
+bool FermaNextMainWindow::checkProjectsBeforeClose ()
 {
     FermaNextWorkspace::ProjectList projects = workspace.getProjectList();
     FermaNextWorkspace::ProjectListIter iter =  projects.begin();
@@ -1621,37 +1601,36 @@ void FermaNextMainWindow::checkModified ()
         if ( ! proj->isProjectModified() ) 
             continue;
 
-        if( QMessageBox::question( this, 
+        int res = QMessageBox::question( this, 
                             tr("Project closing - \"%1\"").arg(proj->getName()),
                             tr("Save project \"%1\"?").arg(proj->getName()),
-                            tr("&Yes"), tr("&No"),QString::null, 0, 1 ) )
+                            tr("&Yes"), tr("&No"), tr("&Cancel"), 0, 2 );
+
+        // No button was pressed
+        if ( res == 1 )
             continue;
+
+        // Cancel button was pressed
+        else if ( res == 2 )
+            return false;
 
         try { proj->saveToFile(); }
         catch ( FermaNextProject::FileNameIsNotDefinedException& ) {
-            fileSaveAs();
+            if ( ! fileSaveAs() )
+                return false;
         }
     }
 
-/*
-    if ( workspace.isWorkspaceModified() )
-        if( ! QMessageBox::question( this, 
-                            tr("Workspace closing - \"%1\"").
-                                arg(workspace.getName()),
-                            tr("Save workspace \"%1\"?").
-                                arg(workspace.getName()),
-                            tr("&Yes"), tr("&No"), QString::null, 0, 1 ) ) {
-            try { workspace.saveToFile(); }
-            catch ( FermaNextWorkspace::FileNameIsNotDefinedException& ) {
-                fileSaveAs();
-            }
-        }*/
+    return true;
 }
 
 void FermaNextMainWindow::fileExit ()
 {
+    // Return if user press Cancel
+    if ( ! checkProjectsBeforeClose() )
+        return;
+
     saveApplicationSettings();
-    checkModified();
     workspace.quitFermaNextApplication();
 }
 
@@ -1760,9 +1739,15 @@ void FermaNextMainWindow::editMaterials ()
 
 void FermaNextMainWindow::editPreferences ()
 {   
-    preferencesWidget->resize( 300, 300 );
-    preferencesWidget->setWindowTitle( tr("Preferences") );
-    preferencesWidget->exec();    
+    preferencesWidget = new PreferencesWidget( this );
+    int result = preferencesWidget->exec();    
+
+    if ( result ) {
+        FermaNextProject* prj = projectToolBox->currentProject();
+        if ( prj == 0 )
+            return;
+        prj->getDesignerWidget().redrawAllTrussUnits();
+    }
 }
 
 void FermaNextMainWindow::showResultsWindow ( const TrussUnitWindow& w )
@@ -1810,58 +1795,6 @@ void FermaNextMainWindow::showResultsWindow ( const TrussUnitWindow& w )
             resultsWindow->exec();
         }
     }
-}
-
-void FermaNextMainWindow::showNodeNumbers ( bool status )
-{
-    if ( Global::showNodeNumbers == status )
-        return;
-
-    Global::showNodeNumbers = status;
-
-    FermaNextProject* prj = projectToolBox->currentProject();
-    if ( prj == 0 )
-        return;
-    prj->getDesignerWidget().redrawAllTrussUnits();
-}
-
-void FermaNextMainWindow::showPivotNumbers ( bool status )
-{
-    if ( Global::showPivotNumbers == status )
-        return;
-
-    Global::showPivotNumbers = status;
-
-    FermaNextProject* prj = projectToolBox->currentProject();
-    if ( prj == 0 )
-        return;
-    prj->getDesignerWidget().redrawAllTrussUnits();
-}
-
-void FermaNextMainWindow::showFixations ( bool status )
-{
-    if ( Global::showFixations == status )
-        return;
-
-    Global::showFixations = status;
-
-    FermaNextProject* prj = projectToolBox->currentProject();
-    if ( prj == 0 )
-        return;
-    prj->getDesignerWidget().redrawAllTrussUnits();
-}
-
-void FermaNextMainWindow::showLoads ( bool status )
-{
-    if ( Global::showLoads == status )
-        return;
-
-    Global::showLoads = status;
-
-    FermaNextProject* prj = projectToolBox->currentProject();
-    if ( prj == 0 )
-        return;
-    prj->getDesignerWidget().redrawAllTrussUnits();
 }
 
 void FermaNextMainWindow::helpContents ()
@@ -1917,9 +1850,16 @@ bool FermaNextMainWindow::eventFilter( QObject* targetObj, QEvent* event )
 /*
  *  Correct clean.
  */
-void FermaNextMainWindow::closeEvent ( QCloseEvent* )
+void FermaNextMainWindow::closeEvent ( QCloseEvent* event )
 {
-    fileExit();
+    // Do nothing if user had pressed Cancel
+    if ( ! checkProjectsBeforeClose() ) {
+        event->ignore();
+        return;
+    }
+
+    saveApplicationSettings();
+    workspace.quitFermaNextApplication();
 }
 
 /*****************************************************************************/

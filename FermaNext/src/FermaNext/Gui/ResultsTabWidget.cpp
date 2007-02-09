@@ -1,4 +1,5 @@
 
+#include <QAbstractTextDocumentLayout>
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QScrollArea>
