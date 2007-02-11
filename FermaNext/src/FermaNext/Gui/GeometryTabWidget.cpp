@@ -553,7 +553,7 @@ void GeometryTabWidget::init ()
 {
     blockUpdateAreaSignals = false;
     
-    setFont( QFont( "Arial", 8 ) );
+    //setFont( QFont( "Arial", 8 ) );
     initNodesTab();
     initPivotsTab();
     initAreaTab();
@@ -564,6 +564,8 @@ void GeometryTabWidget::initNodesTab ()
     QFrame* parentFrame = new QFrame;
     nodesNumbLabel = new QLabel( tr( "Total nodes: " ), parentFrame );
     fixedNodesLabel = new QLabel( tr( "Nodes fixed: " ), parentFrame );
+    nodesNumbLabel->hide();
+    fixedNodesLabel->hide();
     nodeTable = new NodeTable( parentFrame );
     TableHeader *horHeader = new TableHeader( Qt::Horizontal ),
                 *vertHeader = new TableHeader( Qt::Vertical );
@@ -615,6 +617,7 @@ void GeometryTabWidget::initPivotsTab ()
 {
     QFrame* parentFrame = new QFrame;
     pivotsNumbLabel = new QLabel( tr( "Total pivots: " ), parentFrame );
+    pivotsNumbLabel->hide();
     pivotTable = new PivotTable( parentFrame );
     PivotTableDelegate* delegate = new PivotTableDelegate;
     TableHeader *horHeader = new TableHeader( Qt::Horizontal ),
