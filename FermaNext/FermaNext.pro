@@ -49,11 +49,16 @@ TEMPLATE = subdirs
 SUBDIRS += \
           src/3rdparty/expat \
           src/3rdparty/agg23 \
+          src/3rdparty/md5 \
           \
           src/Common \
           src/FermaNext/TrussUnit \
           src/FermaNext/Gui \
           src/FermaNext
+
+# LiveUpdate
+SUBDIRS += src/LiveUpdate
+           
 
 # Plugin loaders
 SUBDIRS += src/Loaders/NativePluginLoader 
