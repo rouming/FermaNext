@@ -143,7 +143,7 @@ void FermaNextMainWindow::init ()
 void FermaNextMainWindow::initUndoRedoWindow ()
 {
     undoRedoHistoryWidget = new QWidget( this, Qt::Window | Qt::Tool );
-    undoRedoHistoryWidget->setFixedWidth( 196 );
+    undoRedoHistoryWidget->setFixedWidth( 206 );
     undoRedoHistoryWidget->setMinimumHeight( 120 );
     undoRedoHistoryWidget->setWindowTitle( tr("History") );
     undoRedoListBox = new UndoRedoListBox( undoRedoHistoryWidget );
@@ -159,7 +159,7 @@ void FermaNextMainWindow::initUndoRedoWindow ()
 void FermaNextMainWindow::initGeometryWindow ()
 {
     geometryWindow = new QWidget( this, Qt::Window | Qt::Tool );
-    geometryWindow->setFixedWidth( 196 );
+    geometryWindow->setFixedWidth( 206 );
     geometryWindow->setMinimumHeight( 170 );
     geometryWindow->setWindowTitle( tr("Truss Geometry") );
     geometryTabWidget = new GeometryTabWidget( geometryWindow );
@@ -178,7 +178,7 @@ void FermaNextMainWindow::initGeometryWindow ()
 void FermaNextMainWindow::initTrussPropertyWindow ()
 {
     trussPropertyWindow = new QWidget( this, Qt::Window | Qt::Tool );
-    trussPropertyWindow->setFixedWidth( 196 );
+    trussPropertyWindow->setFixedWidth( 206 );
     trussPropertyWindow->setMinimumHeight( 224 );
     trussPropertyWindow->setWindowTitle( tr("Truss Properties") );
     trussPropTabWidget = new TrussPropertyTabWidget( trussPropertyWindow );
@@ -288,6 +288,8 @@ void FermaNextMainWindow::someProjectCreated ( FermaNextProject& prj )
             geometryWindow->show();
         if ( showGeometryWindowAction->isChecked() )
             trussPropertyWindow->show();
+        if ( projectsDockAction->isChecked() )
+            projectsDockWidget->show();
     }
 
     TrussDesignerWidget& designerWidget = prj.getDesignerWidget();

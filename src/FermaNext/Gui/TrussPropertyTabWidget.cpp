@@ -409,7 +409,7 @@ TrussPropertyTabWidget::~TrussPropertyTabWidget ()
 
 void TrussPropertyTabWidget::init ()
 {
-    setFont( QFont( "Arial", 8 ) );
+    //setFont( QFont( "Arial", 8 ) );
     initLoadTab();
     initPivotPropertyTab();
 }
@@ -419,6 +419,8 @@ void TrussPropertyTabWidget::initLoadTab ()
     QFrame* parentFrame = new QFrame;
     nodesNumbLabel = new QLabel( tr( "Total nodes: " ), parentFrame );
     loadedNodesLabel = new QLabel( tr( "Nodes loaded: " ), parentFrame );
+    nodesNumbLabel->hide();
+    loadedNodesLabel->hide();
     loadTable = new LoadTable( parentFrame );
     TableHeader *horHeader = new TableHeader( Qt::Horizontal ),
                 *vertHeader = new TableHeader( Qt::Vertical );
@@ -435,6 +437,7 @@ void TrussPropertyTabWidget::initLoadTab ()
             new QGroupBox( tr( "Load cases" ), parentFrame );
     QLabel* loadCaseNumb = 
         new QLabel( tr( "Current: " ), loadCaseGroupBox );
+    loadCaseNumb->hide();
     loadCaseComboBox = new QComboBox( loadCaseGroupBox );
     createLoadCaseBtn = new QPushButton( loadCaseGroupBox );
     createLoadCaseBtn->setIcon( QIcon( Global::imagesPath() + "/plus.png" ) );
@@ -500,6 +503,7 @@ void TrussPropertyTabWidget::initPivotPropertyTab ()
     QFrame* parentFrame = new QFrame;
     
     pivotsNumbLabel = new QLabel( tr( "Total pivots: " ), parentFrame );
+    pivotsNumbLabel->hide();
     pivotPropTable = new PivotPropertyTable( parentFrame );
     TableHeader *horHeader = new TableHeader( Qt::Horizontal ),
                 *vertHeader = new TableHeader( Qt::Vertical );

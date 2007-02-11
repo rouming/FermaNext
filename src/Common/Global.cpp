@@ -91,10 +91,10 @@ const double svgGamma = 1.0,
  ************************************/
 
 const int tableRowHeight = 17,
-          nodeColumnWidth = 40,
-          loadColumnWidth = 71,
+          nodeColumnWidth = 45,
+          loadColumnWidth = 76,
           thicknessColumnWidth = 62,
-          materialColumnWidth = 80;
+          materialColumnWidth = 90;
 
 // fixation check box side length 
 const int checkBoxLen = 12;
