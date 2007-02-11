@@ -3,4 +3,5 @@ TEMPLATE = subdirs
 
 SUBDIRS = \
           expat \
-          agg23
+          agg23 \
+          md5

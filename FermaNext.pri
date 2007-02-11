@@ -1,5 +1,5 @@
 # Ferma version definition
-FERMA_VERSION=0.2.2
+FERMA_VERSION=0.3.0
 
 # Define your own build rules
 include(Subsidiary.pri)
