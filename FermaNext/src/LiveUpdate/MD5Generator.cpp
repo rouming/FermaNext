@@ -82,7 +82,9 @@ QString MD5Generator::md5ForFiles ( const QString& path, bool recursion )
     md5Header.setAttribute( "recursion", (recursion ? "on" : "off") );
     doc.appendChild( md5Header );
 
-    ::md5ForFiles( doc, md5Header, QFileInfo(path), recursion, true );
+    QFileInfo fInfo( path );
+
+    ::md5ForFiles( doc, md5Header, fInfo, recursion, true );
 
     return doc.toString( 4 );
 }
