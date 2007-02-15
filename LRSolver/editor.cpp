@@ -1204,7 +1204,7 @@ for (int i=0;i<_walkNumber;++i)
 	while(repeat)
 	{
 		rd=((double)rand()/((double)(RAND_MAX)+(double)(1)));
-		ri=(int)(rd*100);
+		ri=(int)(rd*(double)(100));
 		if(ri<25)
 		{
 			dx=_step;
