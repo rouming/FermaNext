@@ -57,11 +57,15 @@ double s=0;
 	}
 	hLine->setLine(QLineF(10,10,(len+1)*30,10));
 	scene->addLine(QLineF((len+1)*30,5,(len+1)*30,15));
+	text=scene->addText(QString::number(len+1));
+	text->setPos(QPointF((len+1)*30,5));
+	text->scale(1,-1);
+	scene->addEllipse(QRectF(lastPos.x()-2,lastPos.y()-2,4,4),redPen);
 	text=scene->addText(QString::number(s));
 	if(len%2)
-		text->setPos(QPointF((len+1)*30,(int)s+20));
+		text->setPos(QPointF((len+1)*30,(int)s+30));
 	else
-		text->setPos(QPointF((len+1)*30,(int)s-20));
+		text->setPos(QPointF((len+1)*30,(int)s+10));
 	text->scale(1,-1);
 	resultEdit->setText(QString::number(s));
 }
