@@ -1580,8 +1580,6 @@ void TrussUnit::paint ( ren_dynarow& baseRend ) const
 {
     if ( ! trussRendered )
     {
-        qWarning( ">>>redraw truss unit \n" );
-
         baseRend.clear ( agg::rgba( 20, 20, 20, 0 ) );
 
         DoublePoint scaleMult = getTrussScaleMultiplier ();
