@@ -10,6 +10,8 @@ QT += core gui xml
 CONFIG += qt warn_on thread
 DESTDIR = $$LEVEL
 
+UI_DIR = ./ui
+
 FORMS = \
         LiveUpdateDialog.ui
 
