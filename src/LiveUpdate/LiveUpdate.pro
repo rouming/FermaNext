@@ -17,9 +17,12 @@ FORMS = \
 
 SOURCES = \
           Main.cpp \
+          JobBuilder.cpp \
           MD5Comparator.cpp \
           MD5Generator.cpp
 
+
 HEADERS = \
+          JobBuilder.h \
           MD5Comparator.h \
           MD5Generator.h

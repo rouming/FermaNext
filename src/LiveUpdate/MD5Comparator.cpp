@@ -13,7 +13,7 @@
 
 using log4cxx::LoggerPtr;
 using log4cxx::Logger;
-static LoggerPtr logger( Logger::getLogger("LiveUpdate") );
+static LoggerPtr logger( Logger::getLogger("LiveUpdate.MD5Comparator") );
 
 /*****************************************************************************
  * Helpers
