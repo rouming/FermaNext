@@ -87,6 +87,8 @@ public:
     void resolveConflict ();
     virtual QString conflictMessage () const = 0;
 
+    const QString& jobUuid () const;
+
     JobType jobType () const;
     virtual QString jobMessage () const = 0;
 
@@ -94,12 +96,13 @@ public:
     virtual bool undoJob () = 0;
 
 //signals:
-    virtual void progress ( uint done ) = 0;
+    virtual void progress ( const QString& jobUuid, double done ) = 0;
 
 protected:
     Job ( JobType, bool isConflict );
 
 private:
+    QString m_jobUuid;
     JobType m_jobType;
     bool m_isConflict;
 };
@@ -119,7 +122,7 @@ public:
     virtual bool undoJob ();
 
 signals:
-    void progress ( uint done );
+    void progress ( const QString& jobUuid, double done );
 
 private:
     QString m_urlToDownload;
@@ -140,7 +143,7 @@ public:
     virtual bool undoJob ();
 
 signals:
-    void progress ( uint done );
+    void progress ( const QString& jobUuid, double done );
 
 private:
     QString m_fromPath;
@@ -161,7 +164,7 @@ public:
     virtual bool undoJob ();
 
 signals:
-    void progress ( uint done );
+    void progress ( const QString& jobUuid, double done );
 
 private:
     QString m_pathToDelete;
@@ -181,25 +184,30 @@ public:
     virtual bool undoJob ();
 
 signals:
-    void progress ( uint done );
+    void progress ( const QString& jobUuid, double done );
 
 private:
     QString m_dirToCreate;
 };
-
 
 class JobBuilder : public QObject
 {
     Q_OBJECT
 public:
     JobBuilder ( const QDomDocument& md5Compared );
+    ~JobBuilder ();
 
     void doJobs ();
     void undoJobs ();
 
     const QList<Job*>& getJobs () const;
 
+    Job* findJobByUuid ( const QString& ) const;
+
 private:
+    /** Clears jobs */
+    void clearJobs ();
+
     /** Recursively parses xml document */
     void parseDocument ( const QDomElement& md5CmpElem,
                          QList<QDomElement>& );
@@ -208,13 +216,20 @@ private:
     void createJobsList ( const QList<QDomElement>& );
 
 signals:
-    void beforeDoJobs ();
-    void beforeUndoJobs ();
+    /** Emits before do */
+    void beforeDoJobs ( uint jobsToDo );
+    /** Emits before do */
+    void beforeUndoJobs ( uint jobsToUndo );
 
-    void progress ( uint done );
+    /** Emits when job has failed */
+    void jobFailed ( const QString& jobUuid );
+
+    /** Works for both sides: do and undo */
+    void progress ( const QString& jobUuid, double percentageDone );
 
 private:
     QList<Job*> m_jobs;
+    Job* m_currentJob;
 };
 
 #endif //JOBBUILDER_H
