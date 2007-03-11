@@ -108,10 +108,24 @@ QDomDocument LiveUpdateChecker::getDownloadedMD5File () const
 
 void LiveUpdateChecker::httpDone ( bool err )
 {
-    m_httpGetId = 0;
     if ( err ) {
         emit error( m_http.errorString() );
     }
+    else {
+        QDomDocument md5Doc = getDownloadedMD5File();
+        QDomElement md5Elem = md5Doc.documentElement();
+        if ( md5Elem.tagName() != "MD5" ||
+             ! md5Elem.hasAttribute("appVersion") ) {
+            emit error( "Wrong MD5 file" );
+        }
+        else {
+            QString newVer = md5Elem.attribute("appVersion");
+            QString curVer = Global::applicationVersionNumber();
+            emit newVersionIsAvailable( newVer != curVer, newVer );
+        }        
+    }
+
+    m_httpGetId = 0;
 }
 
 /*****************************************************************************/
