@@ -213,15 +213,17 @@ QString applicationVersionNumber ()
 
 QString applicationName ()
 {
-    return QObject::tr("FermaNext");
+    QString appPath = QCoreApplication::applicationFilePath();
+    QRegExp rx("(.*)/([^/]+)");
+    if ( rx.indexIn(appPath) != -1 )
+        return rx.cap(2);
+    else
+        return appPath;
 }
 
 QString applicationDirPath ()
 {
-    if ( qApp ) 
-        return qApp->applicationDirPath();
-    else 
-        return ".";
+    return QCoreApplication::applicationDirPath();
 }
 
 QString filePathToRelative ( const QString& fname, const QString& dir )

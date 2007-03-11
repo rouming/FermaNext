@@ -52,7 +52,7 @@ LiveUpdateChecker::LiveUpdateChecker () :
 #else
 #error Unsupported os
 #endif
-        m_url = cfgUrl + "/" + cfgName + "_" + os + "/" + cfgRootFile;
+        m_url = cfgUrl + "/" + cfgName + "-" + os + "/" + cfgRootFile;
         LOG4CXX_INFO(logger, QString("Url : %1").arg(m_url.toString()).
                      toStdString());
 
