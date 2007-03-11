@@ -16,7 +16,7 @@ FORMS = \
           LiveUpdateDialog.ui
 
 SOURCES = \
-          Main.cpp \
+          LiveUpdateMain.cpp \
           JobBuilder.cpp \
           LiveUpdateChecker.cpp \
           MD5Comparator.cpp \
