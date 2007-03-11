@@ -6,6 +6,7 @@
 
 #include "md5.h"
 #include "MD5Generator.h"
+#include "Global.h"
 
 /*****************************************************************************
  * Helpers
@@ -80,6 +81,7 @@ QString MD5Generator::md5ForFiles ( const QString& path, bool recursion )
 
     QDomElement md5Header = doc.createElement( "MD5" );
     md5Header.setAttribute( "recursion", (recursion ? "on" : "off") );
+    md5Header.setAttribute( "appVersion", Global::applicationVersionNumber() );
     doc.appendChild( md5Header );
 
     QFileInfo fInfo( path );
