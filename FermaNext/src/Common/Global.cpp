@@ -180,15 +180,20 @@ Config& config ()
 
 QString applicationVersion ()
 {
-#ifndef FERMA_VERSION
-#error Macros 'FERMA_VERSION' is required.
-#endif
     QString version;
 #if (defined DEBUG || defined _DEBUG)
     version = QObject::tr("debug ");
 #endif
-    version += QString("%1, %2").arg(TO_STR(FERMA_VERSION)).arg(__DATE__);
+    version += QString("%1, %2").arg(applicationVersionNumber()).arg(__DATE__);
     return version;
+}
+
+QString applicationVersionNumber ()
+{
+#ifndef FERMA_VERSION
+#error Macros 'FERMA_VERSION' is required.
+#endif
+    return QString( TO_STR(FERMA_VERSION) );
 }
 
 QString applicationName ()
