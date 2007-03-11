@@ -13,6 +13,6 @@
        <JVMLibraryPath path="%APPDIR%/plugins/loaders" />
     </JavaPluginLoader>
 
-    <LiveUpdate url="http://ferma.sourceforge.net/LiveUpdate" name="FermaNext" />
+    <LiveUpdate url="http://ferma.sourceforge.net/LiveUpdate" name="FermaNext" rootFile="md5.xml" />
 
 </FermaNextConfig>
