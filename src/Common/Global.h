@@ -158,6 +158,9 @@ Config& config ();
 //    for debug   build: 'debug x.x.x, MMM DD YYYY'
 QString applicationVersion ();
 
+// Returns application version number: x.x.x
+QString applicationVersionNumber ();
+
 // Returns application name
 QString applicationName ();
 
