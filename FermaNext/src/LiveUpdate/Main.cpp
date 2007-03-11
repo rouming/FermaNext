@@ -7,6 +7,8 @@
 #include "MD5Generator.h"
 #include "MD5Comparator.h"
 #include "JobBuilder.h"
+#include "LiveUpdateChecker.h"
+#include "Global.h"
 
 #include <iostream>
 
@@ -119,6 +121,18 @@ int main ( int argc, char* argv[] )
             qWarning("%s", qPrintable(job->jobMessage()));
         }
         return 0;
+    }
+    else {
+        // Start live update
+        LiveUpdateChecker checker;
+        checker.startCheck();
+        checker.wait();
+
+        QDomDocument md5Doc = checker.getDownloadedMD5File();
+        if ( md5Doc.isNull() ) {
+            qWarning("Can't get root file!");
+        }
+        qWarning("%s", qPrintable(md5Doc.toString(4)));
     }
 
     return 0;

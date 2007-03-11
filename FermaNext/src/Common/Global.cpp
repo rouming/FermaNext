@@ -7,6 +7,12 @@
 #include "Global.h"
 #include "Config.h"
 
+#ifdef Q_OS_WIN
+ #include <windows.h>
+#else
+  #include <unistd.h>
+#endif
+
 namespace Global {
 
 /************************************
@@ -126,6 +132,15 @@ bool showNodeNumbers = true,
  /************************************
  * Main subs
  ************************************/
+
+void sleepMsecs ( quint32 msecs )
+{
+#ifdef Q_OS_WIN
+    Sleep(msecs);
+#else
+    usleep(msecs * 1000);
+#endif    
+}
 
 QChar pathSeparator ()
 { return QDir::separator(); }

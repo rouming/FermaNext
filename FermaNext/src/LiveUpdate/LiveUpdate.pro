@@ -6,23 +6,25 @@ include($$LEVEL/FermaNext.pri)
 include(../Common/Common.pri)
 include(../3rdparty/md5/md5.pri)
 
-QT += core gui xml
+QT += core gui xml network
 CONFIG += qt warn_on thread
 DESTDIR = $$LEVEL
 
 UI_DIR = ./ui
 
 FORMS = \
-        LiveUpdateDialog.ui
+          LiveUpdateDialog.ui
 
 SOURCES = \
           Main.cpp \
           JobBuilder.cpp \
+          LiveUpdateChecker.cpp \
           MD5Comparator.cpp \
           MD5Generator.cpp
 
 
 HEADERS = \
           JobBuilder.h \
+          LiveUpdateChecker.h \
           MD5Comparator.h \
           MD5Generator.h

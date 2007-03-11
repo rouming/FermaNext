@@ -141,6 +141,9 @@ extern bool showNodeNumbers,
  * Main subs
  ************************************/
 
+/** Cross-platform way to sleep for msecs */
+void sleepMsecs ( quint32 msecs );
+
 QChar pathSeparator ();
 
 QString imagesPath ();
