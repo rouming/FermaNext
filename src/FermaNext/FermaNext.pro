@@ -9,7 +9,7 @@ include(Gui/Agg/Agg.pri)
 include(../Common/Common.pri)
 include(../3rdparty/agg23/agg23.pri)
 
-# Include LiveUpdate
+# Include LiveUpdate sources
 include(../LiveUpdate/LiveUpdateChecker.pri)
 
 QT += core gui xml
