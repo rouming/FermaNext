@@ -6,6 +6,7 @@
 
 #include "MD5Generator.h"
 #include "MD5Comparator.h"
+#include "JobBuilder.h"
 
 #include <iostream>
 
@@ -87,6 +88,38 @@ int main ( int argc, char* argv[] )
         return 0;
     }
 
+    // Print job list
+    else if ( args.size() > 1 && args[1] == "--job-list" ) {
+        if ( args.size() <= 2 ) {
+            qWarning( "Usage: %s --job-list md5.xml", 
+                    qPrintable(QCoreApplication::applicationName()) );
+            return 1;
+        }
+
+        QFile md5File( args[2] );
+
+        if ( ! md5File.open(QIODevice::ReadOnly) ) {
+            qWarning( "Can't open file: '%s' for reading", 
+                      qPrintable(md5File.fileName()) );
+            return 1;
+        }
+
+        QDomDocument md5Doc;
+        if ( ! md5Doc.setContent(&md5File) ) {
+            qWarning( "Can't parse XML data from file: '%s'", 
+                      qPrintable(md5File.fileName()) );
+            return 1;            
+        }
+
+        JobBuilder jobBuilder( md5Doc );
+        const QList<Job*>& jobs = jobBuilder.getJobs();
+        QList<Job*>::ConstIterator it = jobs.begin();
+        for ( ; it != jobs.end(); ++it ) {
+            Job* job = *it;
+            qWarning("%s", qPrintable(job->jobMessage()));
+        }
+        return 0;
+    }
 
     return 0;
 }

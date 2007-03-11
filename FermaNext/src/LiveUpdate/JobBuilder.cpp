@@ -3,6 +3,8 @@
 #include <QUuid>
 
 #include "JobBuilder.h"
+#include "Config.h"
+#include "Global.h"
 #include "Log4CXX.h"
 
 /*****************************************************************************
@@ -24,6 +26,21 @@ static LoggerPtr logger( Logger::getLogger("LiveUpdate.JobBuilder") );
 
 bool SortElements ( const QDomElement& fir,  const QDomElement& sec )
 {
+    /*
+    // Sorted jobs:
+
+    A(GET)_A(DIR)_/home/user/a.dir
+    A(GET)_A(DIR)_/home/user/b.dir
+    A(GET)_B(FILE)_/home/user/a.file
+    A(GET)_B(FILE)_/home/user/b.file
+    B(REPLACE)_/home/user/a
+    B(REPLACE)_/home/user/b
+    C(DELETE)_A(FILE)_/home/user/a.file
+    C(DELETE)_A(FILE)_/home/user/b.file
+    C(DELETE)_B(DIR)_/home/user/a.dir
+    C(DELETE)_B(DIR)_/home/user/b.dir
+    */
+
     QString firSortString;
     QString secSortString;
 
@@ -78,8 +95,8 @@ bool SortElements ( const QDomElement& fir,  const QDomElement& sec )
             secSortString += "B";
     }
 
-    firSortString = fir.attribute("name");
-    secSortString = sec.attribute("name");
+    firSortString += fir.attribute("name");
+    secSortString += sec.attribute("name");
 
     return firSortString < secSortString;
 }
@@ -128,7 +145,8 @@ QString DownloadJob::conflictMessage () const
 QString DownloadJob::jobMessage () const
 {
     //TODO
-    return "";
+    return QString("DownloadJob (url: %1, save: %2)").arg(m_urlToDownload).
+        arg(m_pathToSave);
 }
 
 bool DownloadJob::doJob ()
@@ -164,7 +182,8 @@ QString RenameJob::conflictMessage () const
 QString RenameJob::jobMessage () const
 {
     //TODO
-    return "";
+    return QString("RenameJob (from: %1, to: %2)").arg(m_fromPath).
+        arg(m_toPath);
 }
 
 bool RenameJob::doJob ()
@@ -198,7 +217,7 @@ QString DeleteJob::conflictMessage () const
 QString DeleteJob::jobMessage () const
 {
     //TODO
-    return "";
+    return QString("DeleteJob (%1)").arg(m_pathToDelete);
 }
 
 bool DeleteJob::doJob ()
@@ -232,7 +251,7 @@ QString CreateDirJob::conflictMessage () const
 QString CreateDirJob::jobMessage () const
 {
     //TODO
-    return "";
+    return QString("CreateDirJob (%1)").arg(m_dirToCreate);
 }
 
 bool CreateDirJob::doJob ()
@@ -277,31 +296,88 @@ void JobBuilder::clearJobs ()
 void JobBuilder::parseDocument ( const QDomElement& md5CmpElem,
                                  QList<QDomElement>& elements )
 {
-    if ( ! md5CmpElem.isNull() &&
+    if ( md5CmpElem.isNull() ||
          md5CmpElem.tagName() != "Directory" && 
          md5CmpElem.tagName() != "File" && 
          md5CmpElem.tagName() != "MD5" ) {
-        LOG4CXX_WARN(logger, "Element is not a file or directory");
+        LOG4CXX_WARN(logger, 
+                     QString("Element is not a file or directory: %1").
+                     arg(md5CmpElem.tagName()).toStdString() );
         return;
+    }  
+
+    if ( md5CmpElem.tagName() != "MD5" ) {
+        // Add if File or Directory
+        elements.append( md5CmpElem );
+ 
+        LOG4CXX_INFO(logger, QString("Add element to list: %1").
+                     arg(md5CmpElem.tagName()).toStdString() );
     }
 
-    if ( md5CmpElem.tagName() != "MD5" )
-        elements.append( md5CmpElem );
-
-    if ( md5CmpElem.tagName() == "Directory" &&
+    if ( (md5CmpElem.tagName() == "Directory" || 
+          md5CmpElem.tagName() == "MD5" ) &&
          md5CmpElem.hasChildNodes() ) {
 
         QDomNodeList kids = md5CmpElem.childNodes();
         for ( int i = 0; i < kids.size(); ++i ) {
             QDomNode node = kids.item(i);
-            if ( node.isElement() )
-                parseDocument( node.toElement(), elements );
+            if ( node.isElement() ) {
+
+                QDomElement elem = node.toElement();
+
+                // Set full relative path
+                if ( md5CmpElem.tagName() == "Directory" &&
+                     md5CmpElem.hasAttribute("name") ) {
+                    QString newName = md5CmpElem.attribute("name") + "/" +
+                                      elem.attribute("name");
+                    elem.setAttribute( "name", newName );
+                }
+
+                parseDocument( elem, elements );
+            }
         }
     }
 }
 
 void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
 {
+    QString url = "http://";
+
+    Config& config = Global::config();
+    ConfigNode rootNode = config.rootNode();
+    ConfigNodeList cfgNodes = rootNode.findChildNodes( "LiveUpdate" );
+    if ( cfgNodes.size() != 0 ) {
+        NodeAttributeList attrs = cfgNodes.at(0).getAttributes();
+        QString cfgUrl;
+        QString cfgName;
+        foreach ( NodeAttribute attr, attrs ) {
+            if ( attr.first == "url" )
+                cfgUrl = attr.second;
+            else if ( attr.first == "name" )
+                cfgName = attr.second;
+        }
+
+        if ( cfgUrl.isEmpty() || cfgName.isEmpty() ) {
+            LOG4CXX_ERROR(logger, "Config for LiveUpdate is not valid");
+            return;
+        }
+
+#if defined Q_OS_WIN
+        QString os = "win";
+#elif defined Q_OS_LINUX
+        QString os = "lin";
+#elif defined Q_OS_MAX
+        QString os = "mac";
+#else
+#error Unsupported os
+#endif
+        url = cfgUrl + "/" + cfgName + "_" + os + "/";
+
+    } else {
+        LOG4CXX_ERROR(logger, "Config for LiveUpdate is not available");
+        return;
+    }
+
     QRegExp conflictRegExp("^" + QString(CONFLICT) + "\\(.+\\)$");
 
     QList<QDomElement>::ConstIterator it = elements.begin();
@@ -313,30 +389,36 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
     for ( ; it != elements.end(); ++it ) {
         QDomElement elem = *it;
 
-        if ( elem.tagName() == "File" &&
-             elem.hasAttribute("status") ) {
+        // Continue if attribute does not have any status or name
+        if ( !elem.hasAttribute("status") ||
+             !elem.hasAttribute("name") )
+            continue;
 
-            QString status = elem.attribute("status");
+        QString status = elem.attribute("status");
+        QString name = elem.attribute("name");
+        bool conflict = conflictRegExp.exactMatch(status);
 
-            bool conflict = conflictRegExp.exactMatch(status);
-        
+        if ( elem.tagName() == "File" ) {
             if ( status.contains(DO_GET) ) {
                 firstSteps.append(
-                          new DownloadJob( "url", "path_to_save", conflict ) );
+                          new DownloadJob( url + name, name, conflict) );
             }
             else if ( status.contains(DO_REPLACE) ) {
-                firstSteps.append(
-                          new DownloadJob( "url", "path_to_save", conflict ) );
+                firstSteps.append( 
+                          new DownloadJob( url + name, name + ".NEW", 
+                                           conflict ) );
                 secondSteps.append(
-                          new RenameJob( "from", "to", conflict ) );
+                          new RenameJob( name, name + ".DELETE", conflict ) );
+                secondSteps.append(
+                          new RenameJob( name + ".NEW", name, conflict ) );
                 thirdSteps.append(
-                          new DeleteJob( "path_to_delete", conflict ) );
+                          new DeleteJob( name + ".DELETE", conflict ) );
             }
             else if ( status.contains(DO_DELETE) ) {
                 secondSteps.append( 
-                          new RenameJob( "from", "to", conflict ) );
+                          new RenameJob( name, name + ".DELETE", conflict ) );
                 thirdSteps.append( 
-                          new DeleteJob("path_to_delete", conflict ) );
+                          new DeleteJob( name + ".DELETE", conflict ) );
             }
             else 
                 // Ok, status is unknown
@@ -344,22 +426,18 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
         }
         else if ( elem.tagName() == "Directory" &&
                   elem.hasAttribute("status") ) {
-
-            QString status = elem.attribute("status");
-
-            bool conflict = conflictRegExp.exactMatch(status);
-        
             if ( status.contains(DO_GET) ) {
-                firstSteps.append(
-                          new CreateDirJob( "path_to_create", conflict ) );
+                firstSteps.append( new CreateDirJob( name, conflict ) );
             }
             else if ( status.contains(DO_REPLACE) ) {
                 // Never should happen for directory
+                LOG4CXX_WARN(logger, QString("Replace for directory: %1. "
+                                             "Should never happen").arg(name).
+                             toStdString());
                 continue;
             }
             else if ( status.contains(DO_DELETE) ) {
-                thirdSteps.append(
-                          new DeleteJob( "path_to_delete", conflict ) );
+                thirdSteps.append( new DeleteJob( name, conflict ) );
             }
             else 
                 // Ok, status is unknown
