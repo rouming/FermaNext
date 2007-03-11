@@ -21,7 +21,7 @@ int main ( int argc, char* argv[] )
     // Generate MD5 sum 
     if ( args.size() > 1 && args[1] == "--gen-md5" ) {
 
-        QString pathToMd5 = QCoreApplication::applicationDirPath();
+        QString pathToMd5 = Global::applicationDirPath();
         QString output;
 
         if ( args.size() > 2 )
@@ -29,10 +29,10 @@ int main ( int argc, char* argv[] )
         if ( args.size() > 3 )
             pathToMd5 = args[3];
 
-        QString md5Xml = MD5Generator::md5ForFiles( pathToMd5 );
+        QDomDocument md5Xml = MD5Generator::md5ForFiles( pathToMd5 );
         
         if ( output.isEmpty() ) {
-            std::cout << qPrintable(md5Xml);
+            std::cout << qPrintable(md5Xml.toString(4));
             return 0;
         }
 
@@ -42,7 +42,7 @@ int main ( int argc, char* argv[] )
                       qPrintable(output) );
             return 1;
         }
-        outFile.write( md5Xml.toAscii() );
+        outFile.write( md5Xml.toString(4).toAscii() );
         return 0;
     }
 
@@ -50,7 +50,7 @@ int main ( int argc, char* argv[] )
     else if ( args.size() > 1 && args[1] == "--cmp-md5" ) {
         if ( args.size() <= 3 ) {
             qWarning( "Usage: %s --cmp-md5 md5.xml md5.xml", 
-                    qPrintable(QCoreApplication::applicationName()) );
+                    qPrintable(Global::applicationName()) );
             return 1;
         }
         if ( args[2] == args[3] ) {
@@ -94,7 +94,7 @@ int main ( int argc, char* argv[] )
     else if ( args.size() > 1 && args[1] == "--job-list" ) {
         if ( args.size() <= 2 ) {
             qWarning( "Usage: %s --job-list md5.xml", 
-                    qPrintable(QCoreApplication::applicationName()) );
+                    qPrintable(Global::applicationName()) );
             return 1;
         }
 
@@ -132,7 +132,60 @@ int main ( int argc, char* argv[] )
         if ( md5Doc.isNull() ) {
             qWarning("Can't get root file!");
         }
-        qWarning("%s", qPrintable(md5Doc.toString(4)));
+
+        QString appPath = Global::applicationDirPath();
+        QString md5FileName = appPath + "/md5.xml";
+
+        QDomDocument downloadedMD5Doc = md5Doc;
+        QDomDocument currentMD5Doc;
+        QDomDocument generatedMD5Doc = MD5Generator::md5ForFiles( appPath );
+
+        // Create current md5 if does not exist
+        if ( ! QFile::exists(md5FileName) ) {
+            currentMD5Doc = generatedMD5Doc;
+
+            QFile outFile(md5FileName);
+            if ( ! outFile.open(QIODevice::WriteOnly) ) {
+                qWarning( "Can't open file: '%s' for writing", 
+                          qPrintable(md5FileName) );
+            }
+            outFile.write( currentMD5Doc.toString(4).toAscii() );
+        }
+        else {
+            QFile inFile(md5FileName);
+            if ( ! inFile.open(QIODevice::ReadOnly) ) {
+                qWarning( "Can't open file: '%s' for reading", 
+                          qPrintable(md5FileName) );
+                return 1;
+            }
+            if ( ! currentMD5Doc.setContent(&inFile) ) {
+                qWarning( "Can't parse XML data from file: '%s'", 
+                          qPrintable(md5FileName) );
+                return 1;
+            }
+        }
+
+        // Firstly compare current and downloaded
+        QDomDocument cmpCurrentDownloadedMD5 = 
+            MD5Comparator::md5Compare( currentMD5Doc, downloadedMD5Doc );
+        // Then compare current and generated
+        QDomDocument cmpCurrentGeneratedMD5 = 
+            MD5Comparator::md5Compare( currentMD5Doc, generatedMD5Doc );
+        // Then compare two comparisons
+        QDomDocument cmpMD5 = 
+            MD5Comparator::md5Compare( cmpCurrentGeneratedMD5,
+                                       cmpCurrentDownloadedMD5 );
+
+        JobBuilder jobBuilder( cmpMD5 );
+
+        const QList<Job*>& jobs = jobBuilder.getJobs();
+        QList<Job*>::ConstIterator it = jobs.begin();
+        for ( ; it != jobs.end(); ++it ) {
+            Job* job = *it;
+            qWarning("%s %s", qPrintable(job->jobMessage()),
+                     (job->isConflict() ? "CONFLICT" :""));
+        }
+        return 0;
     }
 
     return 0;

@@ -371,7 +371,7 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
 #else
 #error Unsupported os
 #endif
-        url = cfgUrl + "/" + cfgName + "_" + os + "/";
+        url = cfgUrl + "/" + cfgName + "-" + os + "/";
 
     } else {
         LOG4CXX_ERROR(logger, "Config for LiveUpdate is not available");
@@ -407,12 +407,16 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
                 firstSteps.append( 
                           new DownloadJob( url + name, name + ".NEW", 
                                            conflict ) );
-                secondSteps.append(
-                          new RenameJob( name, name + ".DELETE", conflict ) );
-                secondSteps.append(
+
+                // We can't just replace LiveUpdate[.exe] binary from itself
+                if ( ! name.contains( QRegExp("^LiveUpdate(\\.exe)?$") ) ) {
+                    secondSteps.append(
+                           new RenameJob( name, name + ".DELETE", conflict ) );
+                    secondSteps.append(
                           new RenameJob( name + ".NEW", name, conflict ) );
-                thirdSteps.append(
+                    thirdSteps.append(
                           new DeleteJob( name + ".DELETE", conflict ) );
+                }
             }
             else if ( status.contains(DO_DELETE) ) {
                 secondSteps.append( 

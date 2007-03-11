@@ -16,17 +16,14 @@
 int main ( int argc, char* argv[] )
 {
     try {
+        QApplication app(argc, argv);
+
         // Configuration of the logging system
         std::string logFile = Global::loggingFileName().toStdString();
         log4cxx::PropertyConfigurator::configureAndWatch( logFile, 3000 );
 
-        QApplication app(argc, argv);
-
-        QCoreApplication::setOrganizationName( "MAI" );
-        QCoreApplication::setApplicationName( "Ferma" );
-
-        // Set default style
-        //QApplication::setStyle( QStyleFactory::create ("plastique") );
+        QCoreApplication::setOrganizationName( "Scumbag & Brainfucker Inc." );
+        QCoreApplication::setApplicationName( Global::applicationName() );
 
         // Do some 'splash' job, so set wait cursor
         QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );

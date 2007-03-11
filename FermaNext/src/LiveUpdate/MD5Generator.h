@@ -2,7 +2,7 @@
 #ifndef MD5GENERATOR_H
 #define MD5GENERATOR_H
 
-#include <QString>
+#include <QDomDocument>
 
 class MD5Generator
 {
@@ -16,7 +16,8 @@ public:
      *                  directory.
      * @return MD5 sums in xml format.
      */
-    static QString md5ForFiles ( const QString& path, bool recursion = true );
+    static QDomDocument md5ForFiles ( const QString& path, 
+                                      bool recursion = true );
 };
 
 #endif //MD5GENERATOR_H

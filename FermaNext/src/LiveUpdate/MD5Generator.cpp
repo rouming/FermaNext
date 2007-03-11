@@ -72,7 +72,7 @@ static void md5ForFiles ( QDomDocument& doc, QDomElement& parent,
  * md5 Generator
  *****************************************************************************/
 
-QString MD5Generator::md5ForFiles ( const QString& path, bool recursion )
+QDomDocument MD5Generator::md5ForFiles ( const QString& path, bool recursion )
 {
     QDomDocument doc;
     QDomNode xmlInstr = doc.createProcessingInstruction(
@@ -88,7 +88,7 @@ QString MD5Generator::md5ForFiles ( const QString& path, bool recursion )
 
     ::md5ForFiles( doc, md5Header, fInfo, recursion, true );
 
-    return doc.toString( 4 );
+    return doc;
 }
 
 /*****************************************************************************/
