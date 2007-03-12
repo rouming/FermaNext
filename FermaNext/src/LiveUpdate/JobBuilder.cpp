@@ -1,6 +1,7 @@
 
 #include <QRegExp>
 #include <QUuid>
+#include <QCoreApplication>
 
 #include "JobBuilder.h"
 #include "Config.h"
@@ -138,37 +139,119 @@ Job::~Job ()
 const QString& Job::jobUuid () const
 { return m_jobUuid; }
 
+const QString& Job::lastError () const
+{ return m_lastError; }
+
+bool Job::isError () const
+{ return ! m_lastError.isEmpty(); }
+
+void Job::clearLastError ()
+{ m_lastError.clear(); }
+
+void Job::setErrorString ( const QString& err ) 
+{ m_lastError = err; }
+
 Job::JobType Job::jobType () const
 { return m_jobType; }
 
 /*****************************************************************************/
 
-DownloadJob::DownloadJob ( const QString& url, const QString& pathToSave ) :
+DownloadJob::DownloadJob ( const QString& url, const QString& fileToSave ) :
     Job( Job::DownloadJob ),
     m_urlToDownload( url ),
-    m_pathToSave( pathToSave )
-{}
+    m_fileToSave( fileToSave ),
+    m_progressStatus( Job::Success ),
+    m_progressDone(0.0)
+{
+    m_http.setHost( m_urlToDownload.host() );
+
+    QObject::connect( &m_http, SIGNAL(dataReadProgress(int,int)), 
+                               SLOT(httpReadProgress(int,int)) );
+    QObject::connect( &m_http, SIGNAL(requestFinished(int,bool)),
+                               SLOT(httpRequestFinished(int,bool)) );
+}
 
 DownloadJob::~DownloadJob ()
-{}
+{
+    m_fileToSave.close();
+    m_http.close();
+}
 
 QString DownloadJob::jobMessage () const
 {
-    //TODO
-    return QString("DownloadJob (url: %1, save: %2)").
-        arg(m_urlToDownload.toString()).arg(m_pathToSave);
+    QString msg( tr("Downloading '%1'") );
+    return msg.arg( m_urlToDownload.toString() );
 }
 
-bool DownloadJob::doJob ()
+void DownloadJob::doJob ()
 {
-    //TODO
-    return true;
+    if ( m_progressStatus == Job::Running )
+        return;
+
+    m_progressStatus = Job::Running;
+    m_progressDone = 0.0;
+    Job::clearLastError();
+
+    if ( m_fileToSave.exists() ) {
+        m_progressStatus = Job::Failed;
+        m_progressDone = 0.0;
+
+        QString msg( tr("File name exists: '%1'") );
+        Job::setErrorString( msg.arg(m_fileToSave.fileName()) );
+        return;
+    }
+
+    if ( m_fileToSave.open(QIODevice::WriteOnly) ) {
+        m_progressStatus = Job::Failed;
+        m_progressDone = 0.0;
+
+        QString msg( tr("Can't open file for writing: '%1'") );
+        Job::setErrorString( msg.arg(m_fileToSave.fileName()) );
+        return;
+    }
+
+    m_http.get( m_urlToDownload.path(), &m_fileToSave );
 }
 
-bool DownloadJob::undoJob ()
+void DownloadJob::undoJob ()
 {
-    //TODO
-    return true;
+    m_fileToSave.remove();
+}
+
+void DownloadJob::stopJob ()
+{
+    if ( m_progressStatus != Job::Running )
+        return;
+
+    m_http.abort();
+}
+
+void DownloadJob::getCurrentProgress ( JobProgressStatus& status, 
+                                       double& done )
+{
+    status = m_progressStatus;
+    done = m_progressDone;
+}
+
+void DownloadJob::httpReadProgress ( int done, int total )
+{
+    m_progressDone = done * 100 / total;
+}
+
+void DownloadJob::httpRequestFinished ( int, bool error )
+{
+    m_fileToSave.close();
+
+    if ( error ) {
+        m_fileToSave.remove();
+        m_progressDone = 0.0;
+        m_progressStatus = Job::Failed;
+        Job::setErrorString( m_http.errorString() );
+    }
+    else {
+        m_progressDone = 100.0;
+        m_progressStatus = Job::Success;
+    }
 }
 
 /*****************************************************************************/
@@ -189,16 +272,24 @@ QString RenameJob::jobMessage () const
         arg(m_toPath);
 }
 
-bool RenameJob::doJob ()
+void RenameJob::doJob ()
 {
     //TODO
-    return true;
 }
 
-bool RenameJob::undoJob ()
+void RenameJob::undoJob ()
 {
     //TODO
-    return true;
+}
+
+void RenameJob::stopJob ()
+{
+    // Nothing
+}
+
+void RenameJob::getCurrentProgress ( JobProgressStatus& status, 
+                                     double& done )
+{
 }
 
 /*****************************************************************************/
@@ -217,16 +308,24 @@ QString DeleteJob::jobMessage () const
     return QString("DeleteJob (%1)").arg(m_pathToDelete);
 }
 
-bool DeleteJob::doJob ()
+void DeleteJob::doJob ()
 {
     //TODO
-    return true;
 }
 
-bool DeleteJob::undoJob ()
+void DeleteJob::undoJob ()
 {
     //TODO
-    return true;
+}
+
+void DeleteJob::stopJob ()
+{
+    // Nothing
+}
+
+void DeleteJob::getCurrentProgress ( JobProgressStatus& status, 
+                                     double& done )
+{
 }
 
 /*****************************************************************************/
@@ -245,22 +344,32 @@ QString CreateDirJob::jobMessage () const
     return QString("CreateDirJob (%1)").arg(m_dirToCreate);
 }
 
-bool CreateDirJob::doJob ()
+void CreateDirJob::doJob ()
 {
     //TODO
-    return true;
 }
 
-bool CreateDirJob::undoJob ()
+void CreateDirJob::undoJob ()
 {
     //TODO
-    return true;
+}
+
+void CreateDirJob::stopJob ()
+{
+    // Nothing
+}
+
+void CreateDirJob::getCurrentProgress ( JobProgressStatus& status, 
+                                        double& done )
+{
 }
 
 /*****************************************************************************/
 
 JobBuilder::JobBuilder ( const QDomDocument& md5Compared ) :
-    m_currentJob(0)
+    m_currentJob(0),
+    m_isConflict(false),
+    m_jobsTerminated(false)
 {
     QDomElement md5CmpElem = md5Compared.documentElement();
     QList<QDomElement> elems;
@@ -274,9 +383,24 @@ JobBuilder::~JobBuilder ()
     clearJobs();
 }
 
+bool JobBuilder::isConflict () const
+{ return m_isConflict; }
+
+void JobBuilder::resolveConflict ()
+{ 
+    m_conflictMsgs.clear();
+    m_isConflict = false; 
+}
+
+const QStringList& JobBuilder::conflictMessages () const
+{ return m_conflictMsgs; }
+
 void JobBuilder::clearJobs ()
 {
+    resolveConflict();
+
     m_currentJob = 0;
+    m_jobsTerminated = false;
 
     QList<Job*>::Iterator it = m_jobs.begin();
     for ( ; it != m_jobs.end(); ++it )
@@ -376,6 +500,8 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
     QList<Job*> firstSteps;
     QList<Job*> secondSteps;
     QList<Job*> thirdSteps;
+    QStringList conflictMsgs;
+    bool conflict = false;
 
     for ( ; it != elements.end(); ++it ) {
         QDomElement elem = *it;
@@ -387,13 +513,26 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
 
         QString status = elem.attribute("status");
         QString name = elem.attribute("name");
-        bool conflict = conflictRegExp.exactMatch(status);
+
+        bool elemConflict = conflictRegExp.exactMatch(status);
+
+        // Mark that there was a conflict
+        if ( ! conflict && elemConflict ) {
+            conflict = true;
+        }
 
         if ( elem.tagName() == "File" ) {
             if ( status.contains(DO_GET) ) {
                 firstSteps.append( new DownloadJob( url + name, name) );
             }
             else if ( status.contains(DO_REPLACE) ) {
+
+                // Add conflict message
+                if ( conflict ) {
+                    QString msg( tr("Can't replace. Locally modified: '%1'") );
+                    conflictMsgs.append( msg.arg(name) );
+                }
+
                 firstSteps.append( 
                           new DownloadJob( url + name, name + ".NEW" ) );
 
@@ -408,6 +547,13 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
                 }
             }
             else if ( status.contains(DO_DELETE) ) {
+
+                // Add conflict message
+                if ( conflict ) {
+                    QString msg( tr("Can't delete. Locally modified: '%1'") );
+                    conflictMsgs.append( msg.arg(name) );
+                }
+
                 secondSteps.append( 
                           new RenameJob( name, name + ".DELETE" ) );
                 thirdSteps.append( 
@@ -446,49 +592,136 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
 
     // Append in order
     m_jobs = firstSteps + secondSteps + thirdSteps;
+
+    // Sort and copy conflict msgs
+    qSort( conflictMsgs.begin(), conflictMsgs.end() );
+    m_conflictMsgs = conflictMsgs;
+    m_isConflict = conflict;
 }
 
-void JobBuilder::doJobs ()
+bool JobBuilder::doJobs ()
 {
-    QList<Job*>::Iterator it;
+    // Do nothing if conflict. Should be resolved first.
+    if ( m_isConflict )
+        return false;
 
     double percentsPerJob = 100 / m_jobs.size();
+    double percentsDone = 0;
     
     emit beforeDoJobs( m_jobs.size() );
 
-    for ( it = m_jobs.begin(); it != m_jobs.end(); ++it ) {
+    m_currentJob = 0;
+
+    QList<Job*>::Iterator it = m_jobs.begin();
+    for ( ; it != m_jobs.end(); ++it ) {
         Job* job = *it;
-        bool jobRes = job->doJob();
-        if ( ! jobRes ) {
-            m_currentJob = job;
-            emit jobFailed( job->jobUuid() );
-            return;
+
+        Job::JobProgressStatus status = Job::Running;
+        double percentageJob = 0;
+
+        // Progress before do
+        emit progress( job->jobUuid(), percentsDone );
+
+        m_currentJob = job;
+
+        // Job can be terminated at this point
+        if ( m_jobsTerminated )
+            emit jobStopped( job->jobUuid() );
+
+        job->doJob();
+
+        do {
+            double percentage = 0;
+            job->getCurrentProgress( status, percentage );
+            if ( percentage != percentageJob ) {
+                percentageJob = percentage;
+                percentsDone += percentsPerJob * percentageJob / 100.0;
+                emit progress( job->jobUuid(), percentsDone );
+            }
+            if ( status == Job::Running && ! m_jobsTerminated ) {
+                QCoreApplication::processEvents();
+                Global::sleepMsecs( 20 );
+            }
         }
+        while ( status != Job::Running && ! m_jobsTerminated );
+        
+        if ( status == Job::Failed ) {
+            if ( m_jobsTerminated )
+                emit jobStopped( job->jobUuid() );
+            else
+                emit jobFailed( job->jobUuid() );
+            return false;
+        }
+
+        // If jobs were terminated, but current job successfully completed,
+        // we should iterate to next job for correct possible redo.
+        if ( m_jobsTerminated && (it + 1) != m_jobs.end() ) {
+            m_currentJob = *(++it);
+            emit jobStopped( m_currentJob->jobUuid() );
+            return false;
+        }
+
+        // Success        
+        // Last element
+        if ( it + 1 == m_jobs.end() )
+            percentsDone = 100.0;
+        else
+            percentsDone += percentsPerJob;
+
+        emit progress( job->jobUuid(), percentsDone );
     }
+    m_currentJob = 0;
+    return true;
 }
 
-void JobBuilder::undoJobs ()
+bool JobBuilder::undoJobs ()
 {
+    // Do nothing if conflict. Should be resolved first.
+    if ( m_isConflict )
+        return false;
+
     if ( m_currentJob == 0 )
         // Nothing to undo
-        return;
+        return true;
 
     int index = m_jobs.indexOf( m_currentJob );
 
-    // If nothing was found
-    if ( index == -1 ) {
+    // If nothing was found or first job failed
+    if ( index == -1 || index == 0 ) {
         m_currentJob = 0;
-        return;
+        return true;
     }
 
-    emit beforeUndoJobs( index + 1 );
+    double percentsPerJob = 100 / m_jobs.size();
+    double percentsDone = index * percentsPerJob;
 
-    for ( int i = index; i >= 0; --i ) {
+    emit beforeUndoJobs( index );
+
+    for ( int i = index - 1; i >= 0; --i ) {
         Job* job = m_jobs[i];
+
+        // Progress before undo
+        emit progress( job->jobUuid(), percentsDone );
+
         job->undoJob();
+
+        // Last element
+        if ( i == 0 )
+            percentsDone = 0.0;
+        else
+            percentsDone -= percentsPerJob;
+
+        emit progress( job->jobUuid(), percentsDone );
     }
 
     m_currentJob = 0;
+
+    return true;
+}
+
+void JobBuilder::stopJobs ()
+{
+    m_jobsTerminated = true;
 }
 
 const QList<Job*>& JobBuilder::getJobs () const

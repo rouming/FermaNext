@@ -1,12 +1,15 @@
 <ui version="4.0" >
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog" >
+ <class>LiveUpdateDialog</class>
+ <widget class="QDialog" name="LiveUpdateDialog" >
+  <property name="windowModality" >
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>422</width>
-    <height>74</height>
+    <width>418</width>
+    <height>108</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -39,7 +42,7 @@
        <number>6</number>
       </property>
       <item>
-       <widget class="QLabel" name="downloadLabel" >
+       <widget class="QLabel" name="jobLabel" >
         <property name="sizePolicy" >
          <sizepolicy>
           <hsizetype>1</hsizetype>
@@ -49,30 +52,45 @@
          </sizepolicy>
         </property>
         <property name="text" >
-         <string>Downloading :</string>
+         <string>Downloading : some_file_name</string>
         </property>
         <property name="alignment" >
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QLabel" name="fileNameLabel" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>4</hsizetype>
-          <vsizetype>4</vsizetype>
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text" >
-         <string>some_file_name</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancelButton" >
+       <property name="text" >
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

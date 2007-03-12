@@ -69,6 +69,9 @@
 #include <QList>
 #include <QUrl>
 #include <QString>
+#include <QFile>
+#include <QHttp>
+#include <QStringList>
 #include <QDomDocument>
 
 class Job
@@ -81,25 +84,38 @@ public:
         CreateDirJob      /**< Create empty directory  */
     };
 
+    enum JobProgressStatus {
+        Running = 0, /**< Job is running */
+        Success,     /**< Job is finished with success */
+        Failed       /**< Job is finished with failure */
+    };
+
     virtual ~Job ();
 
     const QString& jobUuid () const;
+    
+    const QString& lastError () const;
+    bool isError () const;
 
     JobType jobType () const;
     virtual QString jobMessage () const = 0;
 
-    virtual bool doJob () = 0;
-    virtual bool undoJob () = 0;
+    virtual void doJob () = 0;
+    virtual void undoJob () = 0;
+    virtual void stopJob () = 0;
 
-//signals:
-    virtual void progress ( const QString& jobUuid, double done ) = 0;
+    virtual void getCurrentProgress ( JobProgressStatus&, double& done ) = 0;
 
 protected:
     Job ( JobType );
 
+    void clearLastError ();
+    void setErrorString ( const QString& err );
+
 private:
     QString m_jobUuid;
     JobType m_jobType;
+    QString m_lastError;
 };
 
 class DownloadJob : public QObject, public Job
@@ -111,15 +127,22 @@ public:
 
     virtual QString jobMessage () const;
 
-    virtual bool doJob ();
-    virtual bool undoJob ();
+    virtual void doJob ();
+    virtual void undoJob ();
+    virtual void stopJob ();
 
-signals:
-    void progress ( const QString& jobUuid, double done );
+    virtual void getCurrentProgress ( JobProgressStatus&, double& done );
+
+protected slots:
+    void httpReadProgress ( int done, int total );
+    void httpRequestFinished ( int done, bool error );
 
 private:
     QUrl m_urlToDownload;
-    QString m_pathToSave;
+    QFile m_fileToSave;
+    JobProgressStatus m_progressStatus;
+    double m_progressDone;
+    QHttp m_http;
 };
 
 class RenameJob : public QObject, public Job
@@ -131,11 +154,11 @@ public:
 
     virtual QString jobMessage () const;
 
-    virtual bool doJob ();
-    virtual bool undoJob ();
+    virtual void doJob ();
+    virtual void undoJob ();
+    virtual void stopJob ();
 
-signals:
-    void progress ( const QString& jobUuid, double done );
+    virtual void getCurrentProgress ( JobProgressStatus&, double& done );
 
 private:
     QString m_fromPath;
@@ -151,11 +174,11 @@ public:
 
     virtual QString jobMessage () const;
 
-    virtual bool doJob ();
-    virtual bool undoJob ();
+    virtual void doJob ();
+    virtual void undoJob ();
+    virtual void stopJob ();
 
-signals:
-    void progress ( const QString& jobUuid, double done );
+    virtual void getCurrentProgress ( JobProgressStatus&, double& done );
 
 private:
     QString m_pathToDelete;
@@ -170,11 +193,11 @@ public:
 
     virtual QString jobMessage () const;
 
-    virtual bool doJob ();
-    virtual bool undoJob ();
+    virtual void doJob ();
+    virtual void undoJob ();
+    virtual void stopJob ();
 
-signals:
-    void progress ( const QString& jobUuid, double done );
+    virtual void getCurrentProgress ( JobProgressStatus&, double& done );
 
 private:
     QString m_dirToCreate;
@@ -187,8 +210,14 @@ public:
     JobBuilder ( const QDomDocument& md5Compared );
     ~JobBuilder ();
 
-    void doJobs ();
-    void undoJobs ();
+    bool isConflict () const;
+    void resolveConflict ();
+
+    const QStringList& conflictMessages () const;
+
+    bool doJobs ();
+    bool undoJobs ();
+    void stopJobs ();
 
     const QList<Job*>& getJobs () const;
 
@@ -211,15 +240,25 @@ signals:
     /** Emits before do */
     void beforeUndoJobs ( uint jobsToUndo );
 
-    /** Emits when job has failed */
+    /** Emits when job has been failed */
     void jobFailed ( const QString& jobUuid );
 
-    /** Works for both sides: do and undo */
+    /** Emits when job has been stopped */
+    void jobStopped ( const QString& jobUuid );
+
+    /** 
+     * Works for both sides: do and undo 
+     * For do it works: from 0 to 100 percent.
+     * For undo works in reverse mode: from 100 to 0 percent.
+     */
     void progress ( const QString& jobUuid, double percentageDone );
 
 private:
     QList<Job*> m_jobs;
     Job* m_currentJob;
+    bool m_isConflict;
+    bool m_jobsTerminated;
+    QStringList m_conflictMsgs;
 };
 
 #endif //JOBBUILDER_H
