@@ -118,7 +118,8 @@ int main ( int argc, char* argv[] )
         QList<Job*>::ConstIterator it = jobs.begin();
         for ( ; it != jobs.end(); ++it ) {
             Job* job = *it;
-            qWarning("%s", qPrintable(job->jobMessage()));
+            qWarning("%s %s", qPrintable(job->jobMessage()),
+                     (job->isConflict() ? "CONFLICT" :""));
         }
         return 0;
     }

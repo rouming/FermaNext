@@ -1,0 +1,36 @@
+
+LiveUpdate updates current local version of FermaNext app in cvs/svn manner.
+
+TODO:
+
+1. Conflict resolving messages with full description what will be done.
+
+2. Conflict detection in subdirectories:
+
+       <Directory status="deleted(delete)" name="dir_A_C_removed" >
+            <Directory status="deleted(delete)" name="dir_A_C_A" >
+                <Directory status="deleted(delete)" name="dir_A_C_A_A" >
+                    <File status="deleted(delete)" md5="" name="file_A" />
+                    <File status="deleted(delete)" md5="" name="file_B" />
+                </Directory>
+            </Directory>
+            <File status="conflict(delete)" md5="" name="file_A" />
+            <File status="deleted(delete)" md5="" name="file_B" />
+       </Directory>
+
+   It is obvious, that root directory 'dir_A_C_removed' can't be just deleted,
+   because of the conflict in file 'dir_A_C_removed/file_A'
+
+3. Correct sorting of directory deletion jobs:
+
+    DeleteJob (dir_A/dir_A_C_removed)
+    DeleteJob (dir_A/dir_A_C_removed/dir_A_C_A)
+    DeleteJob (dir_A/dir_A_C_removed/dir_A_C_A/dir_A_C_A_A)
+
+   It is obvious, that firstly all files in directory should be removed,
+   and only then directory can be removed. I.e. should be:
+
+    DeleteJob (dir_A/dir_A_C_removed/dir_A_C_A/dir_A_C_A_A)
+    DeleteJob (dir_A/dir_A_C_removed/dir_A_C_A)
+    DeleteJob (dir_A/dir_A_C_removed)
+
