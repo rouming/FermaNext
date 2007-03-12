@@ -289,6 +289,9 @@ static void md5Compare ( QDomDocument& doc, QDomElement& parent,
         rootElem = doc.importNode( aliveElem, false ).toElement();
         Q_ASSERT( ! rootElem.isNull() );
         rootElem.setAttribute( "status", statusAttr );
+        // Set new md5 to newly created element
+        if ( rootElem.tagName() == "File" )
+            rootElem.setAttribute( "md5", newMD5 );
         parent.appendChild( rootElem );
     }
     else
