@@ -66,8 +66,8 @@
 //                                     UNDO: CAN'T
 
 
-#include <QObject>
 #include <QList>
+#include <QUrl>
 #include <QString>
 #include <QDomDocument>
 
@@ -83,10 +83,6 @@ public:
 
     virtual ~Job ();
 
-    bool isConflict () const;
-    void resolveConflict ();
-    virtual QString conflictMessage () const = 0;
-
     const QString& jobUuid () const;
 
     JobType jobType () const;
@@ -99,23 +95,20 @@ public:
     virtual void progress ( const QString& jobUuid, double done ) = 0;
 
 protected:
-    Job ( JobType, bool isConflict );
+    Job ( JobType );
 
 private:
     QString m_jobUuid;
     JobType m_jobType;
-    bool m_isConflict;
 };
 
 class DownloadJob : public QObject, public Job
 {
     Q_OBJECT
 public:
-    DownloadJob ( const QString& url, const QString& pathToSave,
-                  bool isConflict );
+    DownloadJob ( const QString& url, const QString& pathToSave );
     virtual ~DownloadJob ();
 
-    virtual QString conflictMessage () const;
     virtual QString jobMessage () const;
 
     virtual bool doJob ();
@@ -125,7 +118,7 @@ signals:
     void progress ( const QString& jobUuid, double done );
 
 private:
-    QString m_urlToDownload;
+    QUrl m_urlToDownload;
     QString m_pathToSave;
 };
 
@@ -133,10 +126,9 @@ class RenameJob : public QObject, public Job
 {
     Q_OBJECT
 public:
-    RenameJob ( const QString& from, const QString& to, bool isConflict );
+    RenameJob ( const QString& from, const QString& to );
     virtual ~RenameJob ();
 
-    virtual QString conflictMessage () const;
     virtual QString jobMessage () const;
 
     virtual bool doJob ();
@@ -154,10 +146,9 @@ class DeleteJob : public QObject, public Job
 {
     Q_OBJECT
 public:
-    DeleteJob ( const QString& path, bool isConflict );
+    DeleteJob ( const QString& path );
     virtual ~DeleteJob ();
 
-    virtual QString conflictMessage () const;
     virtual QString jobMessage () const;
 
     virtual bool doJob ();
@@ -174,10 +165,9 @@ class CreateDirJob : public QObject, public Job
 {
     Q_OBJECT
 public:
-    CreateDirJob ( const QString& path, bool isConflict );
+    CreateDirJob ( const QString& path );
     virtual ~CreateDirJob ();
 
-    virtual QString conflictMessage () const;
     virtual QString jobMessage () const;
 
     virtual bool doJob ();

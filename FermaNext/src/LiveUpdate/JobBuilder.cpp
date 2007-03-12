@@ -31,12 +31,18 @@ bool SortElements ( const QDomElement& fir,  const QDomElement& sec )
 
     A(GET)_A(DIR)_/home/user/a.dir
     A(GET)_A(DIR)_/home/user/b.dir
+
     A(GET)_B(FILE)_/home/user/a.file
     A(GET)_B(FILE)_/home/user/b.file
+
     B(REPLACE)_/home/user/a
     B(REPLACE)_/home/user/b
+
     C(DELETE)_A(FILE)_/home/user/a.file
     C(DELETE)_A(FILE)_/home/user/b.file
+
+    C(DELETE)_B(DIR)_/home/user/a.dir/b.dir/c.dir
+    C(DELETE)_B(DIR)_/home/user/a.dir/b.dir
     C(DELETE)_B(DIR)_/home/user/a.dir
     C(DELETE)_B(DIR)_/home/user/b.dir
     */
@@ -98,25 +104,36 @@ bool SortElements ( const QDomElement& fir,  const QDomElement& sec )
     firSortString += fir.attribute("name");
     secSortString += sec.attribute("name");
 
+    // If first and second element are directories
+    // with same DELETE status: use reverse order!
+    // Because:
+    //    Delete /a.dir/b.dir/c.dir
+    //    Delete /a.dir/b.dir
+    //    Delete /a.dir
+    // 
+    // I.e. we should delete all subdirs firstly
+
+    if ( firTag == "Directory" && 
+         secTag == "Directory" &&
+         secStatus.contains(DO_DELETE) &&
+         firStatus.contains(DO_DELETE) ) {
+        // Reverse order!
+        return secSortString < firSortString;
+    }
+
+    // Direct order!
     return firSortString < secSortString;
 }
 
 /*****************************************************************************/
 
-Job::Job ( Job::JobType jobType, bool isConflict ) :
+Job::Job ( Job::JobType jobType ) :
     m_jobUuid( QUuid::createUuid().toString() ),
-    m_jobType( jobType ),
-    m_isConflict( isConflict )
+    m_jobType( jobType )
 {}
 
 Job::~Job ()
 {}
-
-bool Job::isConflict () const
-{ return m_isConflict; }
-
-void Job::resolveConflict ()
-{ m_isConflict = false; }
 
 const QString& Job::jobUuid () const
 { return m_jobUuid; }
@@ -126,9 +143,8 @@ Job::JobType Job::jobType () const
 
 /*****************************************************************************/
 
-DownloadJob::DownloadJob ( const QString& url, const QString& pathToSave, 
-                           bool isConflict ) :
-    Job( Job::DownloadJob, isConflict ),
+DownloadJob::DownloadJob ( const QString& url, const QString& pathToSave ) :
+    Job( Job::DownloadJob ),
     m_urlToDownload( url ),
     m_pathToSave( pathToSave )
 {}
@@ -136,17 +152,11 @@ DownloadJob::DownloadJob ( const QString& url, const QString& pathToSave,
 DownloadJob::~DownloadJob ()
 {}
 
-QString DownloadJob::conflictMessage () const
-{
-    //TODO
-    return "";
-}
-
 QString DownloadJob::jobMessage () const
 {
     //TODO
-    return QString("DownloadJob (url: %1, save: %2)").arg(m_urlToDownload).
-        arg(m_pathToSave);
+    return QString("DownloadJob (url: %1, save: %2)").
+        arg(m_urlToDownload.toString()).arg(m_pathToSave);
 }
 
 bool DownloadJob::doJob ()
@@ -163,21 +173,14 @@ bool DownloadJob::undoJob ()
 
 /*****************************************************************************/
 
-RenameJob::RenameJob ( const QString& from, const QString& to, 
-                           bool isConflict ) :
-    Job( Job::RenameJob, isConflict ),
+RenameJob::RenameJob ( const QString& from, const QString& to ) :
+    Job( Job::RenameJob ),
     m_fromPath( from ),
     m_toPath( to )
 {}
 
 RenameJob::~RenameJob ()
 {}
-
-QString RenameJob::conflictMessage () const
-{
-    //TODO
-    return "";
-}
 
 QString RenameJob::jobMessage () const
 {
@@ -200,19 +203,13 @@ bool RenameJob::undoJob ()
 
 /*****************************************************************************/
 
-DeleteJob::DeleteJob ( const QString& path,  bool isConflict ) :
-    Job( Job::DeleteJob, isConflict ),
+DeleteJob::DeleteJob ( const QString& path ) :
+    Job( Job::DeleteJob ),
     m_pathToDelete( path )
 {}
 
 DeleteJob::~DeleteJob ()
 {}
-
-QString DeleteJob::conflictMessage () const
-{
-    //TODO
-    return "";
-}
 
 QString DeleteJob::jobMessage () const
 {
@@ -234,19 +231,13 @@ bool DeleteJob::undoJob ()
 
 /*****************************************************************************/
 
-CreateDirJob::CreateDirJob ( const QString& path,  bool isConflict ) :
-    Job( Job::CreateDirJob, isConflict ),
+CreateDirJob::CreateDirJob ( const QString& path ) :
+    Job( Job::CreateDirJob ),
     m_dirToCreate( path )
 {}
 
 CreateDirJob::~CreateDirJob ()
 {}
-
-QString CreateDirJob::conflictMessage () const
-{
-    //TODO
-    return "";
-}
 
 QString CreateDirJob::jobMessage () const
 {
@@ -400,29 +391,27 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
 
         if ( elem.tagName() == "File" ) {
             if ( status.contains(DO_GET) ) {
-                firstSteps.append(
-                          new DownloadJob( url + name, name, conflict) );
+                firstSteps.append( new DownloadJob( url + name, name) );
             }
             else if ( status.contains(DO_REPLACE) ) {
                 firstSteps.append( 
-                          new DownloadJob( url + name, name + ".NEW", 
-                                           conflict ) );
+                          new DownloadJob( url + name, name + ".NEW" ) );
 
                 // We can't just replace LiveUpdate[.exe] binary from itself
                 if ( ! name.contains( QRegExp("^LiveUpdate(\\.exe)?$") ) ) {
                     secondSteps.append(
-                           new RenameJob( name, name + ".DELETE", conflict ) );
+                           new RenameJob( name, name + ".DELETE" ) );
                     secondSteps.append(
-                          new RenameJob( name + ".NEW", name, conflict ) );
+                          new RenameJob( name + ".NEW", name ) );
                     thirdSteps.append(
-                          new DeleteJob( name + ".DELETE", conflict ) );
+                          new DeleteJob( name + ".DELETE" ) );
                 }
             }
             else if ( status.contains(DO_DELETE) ) {
                 secondSteps.append( 
-                          new RenameJob( name, name + ".DELETE", conflict ) );
+                          new RenameJob( name, name + ".DELETE" ) );
                 thirdSteps.append( 
-                          new DeleteJob( name + ".DELETE", conflict ) );
+                          new DeleteJob( name + ".DELETE" ) );
             }
             else 
                 // Ok, status is unknown
@@ -431,7 +420,7 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
         else if ( elem.tagName() == "Directory" &&
                   elem.hasAttribute("status") ) {
             if ( status.contains(DO_GET) ) {
-                firstSteps.append( new CreateDirJob( name, conflict ) );
+                firstSteps.append( new CreateDirJob( name ) );
             }
             else if ( status.contains(DO_REPLACE) ) {
                 // Never should happen for directory
@@ -441,7 +430,7 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
                 continue;
             }
             else if ( status.contains(DO_DELETE) ) {
-                thirdSteps.append( new DeleteJob( name, conflict ) );
+                thirdSteps.append( new DeleteJob( name ) );
             }
             else 
                 // Ok, status is unknown
