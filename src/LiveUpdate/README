@@ -3,9 +3,9 @@ LiveUpdate updates current local version of FermaNext app in cvs/svn manner.
 
 TODO:
 
-1. Conflict resolving messages with full description what will be done.
+DONE>>> 1. Conflict resolving messages with full description what will be done.
 
-2. Conflict detection in subdirectories:
+DONE>>> 2. Conflict detection in subdirectories:
 
        <Directory status="deleted(delete)" name="dir_A_C_removed" >
             <Directory status="deleted(delete)" name="dir_A_C_A" >
@@ -35,5 +35,5 @@ DONE>>> 3. Correct sorting of directory deletion jobs:
     DeleteJob (dir_A/dir_A_C_removed/dir_A_C_A)
     DeleteJob (dir_A/dir_A_C_removed)
 
-4. Correct progress counter with async jobs.
+DONE>>> 4. Correct progress counter with async jobs.
 

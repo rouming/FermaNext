@@ -19,6 +19,7 @@ SOURCES = \
           LiveUpdateMain.cpp \
           JobBuilder.cpp \
           LiveUpdateChecker.cpp \
+          LiveUpdateDialog.cpp \
           MD5Comparator.cpp \
           MD5Generator.cpp
 
@@ -26,5 +27,6 @@ SOURCES = \
 HEADERS = \
           JobBuilder.h \
           LiveUpdateChecker.h \
+          LiveUpdateDialog.h \
           MD5Comparator.h \
           MD5Generator.h

@@ -7,7 +7,7 @@
 #include "MD5Generator.h"
 #include "MD5Comparator.h"
 #include "JobBuilder.h"
-#include "LiveUpdateChecker.h"
+#include "LiveUpdateDialog.h"
 #include "Global.h"
 
 #include <iostream>
@@ -114,15 +114,31 @@ int main ( int argc, char* argv[] )
         }
 
         JobBuilder jobBuilder( md5Doc );
+
+        if ( jobBuilder.isConflict() ) {
+            const QStringList& msgs = jobBuilder.conflictMessages();
+            foreach ( QString msg, msgs ) {
+                qWarning("CONFLICT: %s", qPrintable(msg));
+            }
+
+            qWarning("");
+            qWarning("");
+        }
+
         const QList<Job*>& jobs = jobBuilder.getJobs();
-        QList<Job*>::ConstIterator it = jobs.begin();
-        for ( ; it != jobs.end(); ++it ) {
-            Job* job = *it;
+        foreach ( Job* job, jobs ) {
             qWarning("%s", qPrintable(job->jobMessage()));
         }
         return 0;
     }
     else {
+        LiveUpdateDialog dialog;
+        dialog.show();
+        return app.exec();
+
+
+        /* TODO
+        
         // Start live update
         LiveUpdateChecker checker;
         checker.startCheck();
@@ -177,14 +193,23 @@ int main ( int argc, char* argv[] )
                                        cmpCurrentDownloadedMD5 );
 
         JobBuilder jobBuilder( cmpMD5 );
+        if ( jobBuilder.isConflict() ) {
+            const QStringList& msgs = jobBuilder.conflictMessages();
+            foreach ( QString msg, msgs ) {
+                qWarning("CONFLICT: %s", qPrintable(msg));
+            }
+
+            qWarning("");
+            qWarning("");
+        }
 
         const QList<Job*>& jobs = jobBuilder.getJobs();
-        QList<Job*>::ConstIterator it = jobs.begin();
-        for ( ; it != jobs.end(); ++it ) {
-            Job* job = *it;
+        foreach ( Job* job, jobs ) {
             qWarning("%s", qPrintable(job->jobMessage()));
         }
         return 0;
+
+        */
     }
 
     return 0;
