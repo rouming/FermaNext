@@ -127,6 +127,14 @@ void LiveUpdateDialog::startUpdate ()
     }
     
     const QList<Job*>& jobs = jobBuilder.getJobs();
+
+    if ( jobs.isEmpty() ) {
+        setProgress( tr("Curent version '%1' is up to date.").
+                     arg( Global::applicationVersionNumber() ), 100 );
+        m_checker->disconnect();
+        return;
+    }
+
     foreach ( Job* job, jobs ) {
         qWarning("%s", qPrintable(job->jobMessage()));
     }
