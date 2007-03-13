@@ -27,6 +27,12 @@ public:
     /** Waits for check */
     void wait ();
 
+    /** Returns true if check succeed and version is up to date */
+    bool isUpToDate ();
+
+    /** Returns checked version if check succeed */
+    const QString& checkedVersion () const;
+
     /** Returns downloaded MD5 file */
     QDomDocument getDownloadedMD5File () const;
 
@@ -36,10 +42,10 @@ signals:
      *   true if new version is available,
      *   false if current version is up to date.
      */
-    void newVersionIsAvailable ( bool newVersion, QString versionNumber );
+    void newVersionIsAvailable ( bool newVersion, const QString& ver );
 
     /** The signal is emitted if error has been occured while check */
-    void error ( QString );
+    void error ( const QString& );
 
 private slots:
     void httpDone ( bool );
@@ -51,6 +57,8 @@ private:
     QHttp m_http;
     QByteArray m_md5ByteArray;
     QBuffer m_md5Buffer;
+    bool m_isUpToDate;
+    QString m_version;
 };
 
 #endif //LIVEUPDATECHECKER_H

@@ -161,6 +161,8 @@ public:
     virtual void getCurrentProgress ( JobProgressStatus&, double& done );
 
 private:
+    JobProgressStatus m_progressStatus;
+    double m_progressDone;
     QString m_fromPath;
     QString m_toPath;
 };
@@ -181,6 +183,8 @@ public:
     virtual void getCurrentProgress ( JobProgressStatus&, double& done );
 
 private:
+    JobProgressStatus m_progressStatus;
+    double m_progressDone;
     QString m_pathToDelete;
 };
 
@@ -200,6 +204,8 @@ public:
     virtual void getCurrentProgress ( JobProgressStatus&, double& done );
 
 private:
+    JobProgressStatus m_progressStatus;
+    double m_progressDone;
     QString m_dirToCreate;
 };
 
