@@ -18,7 +18,10 @@ static LoggerPtr logger( Logger::getLogger("LiveUpdate.LiveUpdateChecker") );
 
 LiveUpdateChecker::LiveUpdateChecker () :
     m_httpGetId(0),
-    m_md5Buffer( &m_md5ByteArray )
+    m_md5Buffer( &m_md5ByteArray ),
+    m_isUpToDate(true),
+    m_version( Global::applicationVersionNumber() )
+
     /*throw (LiveUpdateChecker::ConfigIsWrongException)*/
 {
     Config& config = Global::config();
@@ -93,6 +96,12 @@ void LiveUpdateChecker::wait ()
     }
 }
 
+bool LiveUpdateChecker::isUpToDate ()
+{ return m_isUpToDate; }
+
+const QString& LiveUpdateChecker::checkedVersion () const
+{ return m_version; }
+
 QDomDocument LiveUpdateChecker::getDownloadedMD5File () const
 {
     if ( m_httpGetId != 0 )
@@ -112,7 +121,8 @@ void LiveUpdateChecker::httpDone ( bool err )
         emit error( m_http.errorString() );
     }
     else {
-        QDomDocument md5Doc = getDownloadedMD5File();
+        QDomDocument md5Doc;
+        md5Doc.setContent( m_md5ByteArray );
         QDomElement md5Elem = md5Doc.documentElement();
         if ( md5Elem.tagName() != "MD5" ||
              ! md5Elem.hasAttribute("appVersion") ) {
@@ -121,7 +131,9 @@ void LiveUpdateChecker::httpDone ( bool err )
         else {
             QString newVer = md5Elem.attribute("appVersion");
             QString curVer = Global::applicationVersionNumber();
-            emit newVersionIsAvailable( newVer != curVer, newVer );
+            m_isUpToDate = newVer <= curVer;
+            m_version = newVer;
+            emit newVersionIsAvailable( newVer > curVer, newVer );
         }        
     }
 

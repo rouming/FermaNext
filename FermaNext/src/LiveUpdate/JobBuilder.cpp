@@ -1,5 +1,7 @@
 
 #include <QRegExp>
+#include <QDir>
+#include <QFileInfo>
 #include <QUuid>
 #include <QCoreApplication>
 
@@ -193,20 +195,22 @@ void DownloadJob::doJob ()
     Job::clearLastError();
 
     if ( m_fileToSave.exists() ) {
-        m_progressStatus = Job::Failed;
-        m_progressDone = 0.0;
-
         QString msg( tr("File name exists: '%1'") );
         Job::setErrorString( msg.arg(m_fileToSave.fileName()) );
+
+        m_progressDone = 0.0;
+        m_progressStatus = Job::Failed;
+
         return;
     }
 
     if ( m_fileToSave.open(QIODevice::WriteOnly) ) {
-        m_progressStatus = Job::Failed;
-        m_progressDone = 0.0;
-
         QString msg( tr("Can't open file for writing: '%1'") );
         Job::setErrorString( msg.arg(m_fileToSave.fileName()) );
+
+        m_progressDone = 0.0;
+        m_progressStatus = Job::Failed;
+
         return;
     }
 
@@ -258,6 +262,8 @@ void DownloadJob::httpRequestFinished ( int, bool error )
 
 RenameJob::RenameJob ( const QString& from, const QString& to ) :
     Job( Job::RenameJob ),
+    m_progressStatus( Job::Success ),
+    m_progressDone(0.0),
     m_fromPath( from ),
     m_toPath( to )
 {}
@@ -267,19 +273,32 @@ RenameJob::~RenameJob ()
 
 QString RenameJob::jobMessage () const
 {
-    //TODO
-    return QString("RenameJob (from: %1, to: %2)").arg(m_fromPath).
-        arg(m_toPath);
+    QString msg( tr("Renaming from '%1' to '%2'") );
+    return msg.arg( m_fromPath ).arg( m_toPath );
 }
 
 void RenameJob::doJob ()
 {
-    //TODO
+    m_progressStatus = Job::Running;
+    m_progressDone = 0.0;
+
+    if  ( ! QFile::rename(m_fromPath, m_toPath) ) {
+        QString msg( tr("Can't rename file from '%1' to '%2'") );
+        Job::setErrorString( msg.arg(m_fromPath).arg(m_toPath) );
+
+        m_progressDone = 0.0;
+        m_progressStatus = Job::Failed;
+
+        return;
+    }
+
+    m_progressDone = 100.0;
+    m_progressStatus = Job::Success;
 }
 
 void RenameJob::undoJob ()
 {
-    //TODO
+    QFile::rename( m_toPath, m_fromPath );
 }
 
 void RenameJob::stopJob ()
@@ -290,12 +309,16 @@ void RenameJob::stopJob ()
 void RenameJob::getCurrentProgress ( JobProgressStatus& status, 
                                      double& done )
 {
+    status = m_progressStatus;
+    done = m_progressDone;
 }
 
 /*****************************************************************************/
 
 DeleteJob::DeleteJob ( const QString& path ) :
     Job( Job::DeleteJob ),
+    m_progressStatus( Job::Success ),
+    m_progressDone(0.0),
     m_pathToDelete( path )
 {}
 
@@ -304,18 +327,45 @@ DeleteJob::~DeleteJob ()
 
 QString DeleteJob::jobMessage () const
 {
-    //TODO
-    return QString("DeleteJob (%1)").arg(m_pathToDelete);
+    QString msg( tr("Deleting '%1'") );
+    return msg.arg( m_pathToDelete );
 }
 
 void DeleteJob::doJob ()
 {
-    //TODO
+    m_progressStatus = Job::Running;
+    m_progressDone = 0.0;
+
+    QFileInfo fileInfo( m_pathToDelete );
+    bool res = false;
+
+    // If directory
+    if ( fileInfo.isDir() ) {
+        QDir dir;
+        res = dir.rmdir( m_pathToDelete );
+    }
+    // If file
+    else {
+        res = QFile::remove( m_pathToDelete );
+    }
+
+    if  ( ! res ) {
+        QString msg( tr("Can't delete '%1'") );
+        Job::setErrorString( msg.arg(m_pathToDelete) );
+
+        m_progressDone = 0.0;
+        m_progressStatus = Job::Failed;
+
+        return;
+    }
+
+    m_progressDone = 100.0;
+    m_progressStatus = Job::Success;
 }
 
 void DeleteJob::undoJob ()
 {
-    //TODO
+    // Nothing. Can't redo
 }
 
 void DeleteJob::stopJob ()
@@ -326,12 +376,16 @@ void DeleteJob::stopJob ()
 void DeleteJob::getCurrentProgress ( JobProgressStatus& status, 
                                      double& done )
 {
+    status = m_progressStatus;
+    done = m_progressDone;
 }
 
 /*****************************************************************************/
 
 CreateDirJob::CreateDirJob ( const QString& path ) :
     Job( Job::CreateDirJob ),
+    m_progressStatus( Job::Success ),
+    m_progressDone(0.0),
     m_dirToCreate( path )
 {}
 
@@ -340,18 +394,35 @@ CreateDirJob::~CreateDirJob ()
 
 QString CreateDirJob::jobMessage () const
 {
-    //TODO
-    return QString("CreateDirJob (%1)").arg(m_dirToCreate);
+    QString msg( tr("Creating directory '%1'") );
+    return msg.arg( m_dirToCreate );
 }
 
 void CreateDirJob::doJob ()
 {
-    //TODO
+    m_progressStatus = Job::Running;
+    m_progressDone = 0.0;
+
+    QDir dir;
+
+    if ( dir.mkdir(m_dirToCreate) ) {
+        QString msg( tr("Can't create directory '%1'") );
+        Job::setErrorString( msg.arg(m_dirToCreate) );
+
+        m_progressDone = 0.0;
+        m_progressStatus = Job::Failed;
+
+        return;
+    }
+
+    m_progressDone = 100.0;
+    m_progressStatus = Job::Success;
 }
 
 void CreateDirJob::undoJob ()
 {
-    //TODO
+    QDir dir;
+    dir.rmdir(m_dirToCreate);
 }
 
 void CreateDirJob::stopJob ()
@@ -362,6 +433,8 @@ void CreateDirJob::stopJob ()
 void CreateDirJob::getCurrentProgress ( JobProgressStatus& status, 
                                         double& done )
 {
+    status = m_progressStatus;
+    done = m_progressDone;
 }
 
 /*****************************************************************************/
