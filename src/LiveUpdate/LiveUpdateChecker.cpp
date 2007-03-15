@@ -50,7 +50,7 @@ LiveUpdateChecker::LiveUpdateChecker () :
         QString os = "win";
 #elif defined Q_OS_LINUX
         QString os = "lin";
-#elif defined Q_OS_MAX
+#elif defined Q_OS_MAC
         QString os = "mac";
 #else
 #error Unsupported os
