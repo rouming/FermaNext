@@ -13,6 +13,10 @@ TEMPLATE = lib
 CONFIG += staticlib uitools warn_on thread
 QT += core gui xml 
 
+# Turn off optimization for release on Unix
+# because of painting problems in Agg23
+unix:QMAKE_CXXFLAGS_RELEASE -= -O2
+
 win32 {
   DEFINES += WIN32
 }
