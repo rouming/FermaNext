@@ -707,8 +707,10 @@ bool JobBuilder::doJobs ()
         m_currentJob = job;
 
         // Job can be terminated at this point
-        if ( m_jobsTerminated )
+        if ( m_jobsTerminated ) {
             emit jobStopped( job->jobUuid() );
+            return false;
+        }
 
         job->doJob();
 
@@ -735,7 +737,7 @@ bool JobBuilder::doJobs ()
 
         // If jobs were terminated, but current job successfully completed,
         // we should iterate to next job for correct possible redo.
-        if ( m_jobsTerminated && (i + 1) != m_jobs.size() ) {
+        if ( m_jobsTerminated && (i + 1) < m_jobs.size() ) {
             m_currentJob = m_jobs[i+1];
             emit jobStopped( m_currentJob->jobUuid() );
             return false;

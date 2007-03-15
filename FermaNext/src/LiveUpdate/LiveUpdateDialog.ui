@@ -1,9 +1,9 @@
 <ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
  <class>LiveUpdateDialog</class>
  <widget class="QDialog" name="LiveUpdateDialog" >
-  <property name="windowModality" >
-   <enum>Qt::WindowModal</enum>
-  </property>
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -11,6 +11,14 @@
     <width>418</width>
     <height>108</height>
    </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy>
+    <hsizetype>0</hsizetype>
+    <vsizetype>0</vsizetype>
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle" >
    <string>LiveUpdate</string>
@@ -33,34 +41,32 @@
     </widget>
    </item>
    <item>
-    <widget class="QWidget" native="1" name="widget" >
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="jobLabel" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>1</hsizetype>
-          <vsizetype>1</vsizetype>
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text" >
-         <string>Downloading : some_file_name</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>9</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="jobLabel" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>1</hsizetype>
+         <vsizetype>1</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text" >
+        <string>Downloading : some_file_name</string>
+       </property>
+       <property name="alignment" >
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" >
@@ -84,7 +90,17 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="cancelButton" >
+      <widget class="QPushButton" name="m_detailsButton" >
+       <property name="text" >
+        <string>Details ...</string>
+       </property>
+       <property name="flat" >
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_cancelButton" >
        <property name="text" >
         <string>Cancel</string>
        </property>
@@ -94,6 +110,7 @@
    </item>
   </layout>
  </widget>
+ <pixmapfunction></pixmapfunction>
  <resources/>
  <connections/>
 </ui>
