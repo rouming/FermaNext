@@ -163,18 +163,20 @@ DownloadJob::DownloadJob ( const QString& url, const QString& fileToSave ) :
     m_urlToDownload( url ),
     m_fileToSave( fileToSave ),
     m_progressStatus( Job::Success ),
-    m_progressDone(0.0)
+    m_progressDone(0.0),
+    m_requestAborted(false)
 {
     m_http.setHost( m_urlToDownload.host() );
 
     QObject::connect( &m_http, SIGNAL(dataReadProgress(int,int)), 
                                SLOT(httpReadProgress(int,int)) );
-    QObject::connect( &m_http, SIGNAL(requestFinished(int,bool)),
-                               SLOT(httpRequestFinished(int,bool)) );
+    QObject::connect( &m_http, SIGNAL(done(bool)),
+                               SLOT(httpDone(bool)) );
 }
 
 DownloadJob::~DownloadJob ()
 {
+    m_http.disconnect();
     m_fileToSave.close();
     m_http.close();
 }
@@ -204,7 +206,7 @@ void DownloadJob::doJob ()
         return;
     }
 
-    if ( m_fileToSave.open(QIODevice::WriteOnly) ) {
+    if ( ! m_fileToSave.open(QIODevice::WriteOnly) ) {
         QString msg( tr("Can't open file for writing: '%1'") );
         Job::setErrorString( msg.arg(m_fileToSave.fileName()) );
 
@@ -219,6 +221,7 @@ void DownloadJob::doJob ()
 
 void DownloadJob::undoJob ()
 {
+    m_fileToSave.close();
     m_fileToSave.remove();
 }
 
@@ -227,7 +230,9 @@ void DownloadJob::stopJob ()
     if ( m_progressStatus != Job::Running )
         return;
 
+    m_fileToSave.close();
     m_http.abort();
+    m_requestAborted = true;
 }
 
 void DownloadJob::getCurrentProgress ( JobProgressStatus& status, 
@@ -242,9 +247,14 @@ void DownloadJob::httpReadProgress ( int done, int total )
     m_progressDone = done * 100 / total;
 }
 
-void DownloadJob::httpRequestFinished ( int, bool error )
+void DownloadJob::httpDone ( bool error )
 {
     m_fileToSave.close();
+
+    if ( m_requestAborted ) {
+        m_fileToSave.remove();
+        return;
+    }
 
     if ( error ) {
         m_fileToSave.remove();
@@ -405,7 +415,7 @@ void CreateDirJob::doJob ()
 
     QDir dir;
 
-    if ( dir.mkdir(m_dirToCreate) ) {
+    if ( ! dir.mkdir(m_dirToCreate) ) {
         QString msg( tr("Can't create directory '%1'") );
         Job::setErrorString( msg.arg(m_dirToCreate) );
 
@@ -678,18 +688,17 @@ bool JobBuilder::doJobs ()
     if ( m_isConflict )
         return false;
 
-    double percentsPerJob = 100 / m_jobs.size();
-    double percentsDone = 0;
-    
+    double percentsPerJob = 100.0 / m_jobs.size();
+  
     emit beforeDoJobs( m_jobs.size() );
 
     m_currentJob = 0;
 
-    QList<Job*>::Iterator it = m_jobs.begin();
-    for ( ; it != m_jobs.end(); ++it ) {
-        Job* job = *it;
+    for ( int i = 0; i < m_jobs.size(); ++i ) {
+        Job* job = m_jobs[i];
 
         Job::JobProgressStatus status = Job::Running;
+        double percentsDone = percentsPerJob * i;
         double percentageJob = 0;
 
         // Progress before do
@@ -704,19 +713,17 @@ bool JobBuilder::doJobs ()
         job->doJob();
 
         do {
-            double percentage = 0;
-            job->getCurrentProgress( status, percentage );
-            if ( percentage != percentageJob ) {
-                percentageJob = percentage;
-                percentsDone += percentsPerJob * percentageJob / 100.0;
-                emit progress( job->jobUuid(), percentsDone );
-            }
+            job->getCurrentProgress( status, percentageJob );
+            double done = percentsDone + percentsPerJob * percentageJob /100.0;
+
+            emit progress( job->jobUuid(), done );
+
             if ( status == Job::Running && ! m_jobsTerminated ) {
                 QCoreApplication::processEvents();
                 Global::sleepMsecs( 20 );
             }
         }
-        while ( status != Job::Running && ! m_jobsTerminated );
+        while ( status == Job::Running && ! m_jobsTerminated );
         
         if ( status == Job::Failed ) {
             if ( m_jobsTerminated )
@@ -728,18 +735,18 @@ bool JobBuilder::doJobs ()
 
         // If jobs were terminated, but current job successfully completed,
         // we should iterate to next job for correct possible redo.
-        if ( m_jobsTerminated && (it + 1) != m_jobs.end() ) {
-            m_currentJob = *(++it);
+        if ( m_jobsTerminated && (i + 1) != m_jobs.size() ) {
+            m_currentJob = m_jobs[i+1];
             emit jobStopped( m_currentJob->jobUuid() );
             return false;
         }
 
         // Success        
         // Last element
-        if ( it + 1 == m_jobs.end() )
+        if ( i + 1 == m_jobs.size() )
             percentsDone = 100.0;
-        else
-            percentsDone += percentsPerJob;
+        else 
+            percentsDone = percentsPerJob * (i + 1);
 
         emit progress( job->jobUuid(), percentsDone );
     }

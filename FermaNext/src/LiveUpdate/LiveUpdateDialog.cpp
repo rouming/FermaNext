@@ -5,14 +5,14 @@
 #include "Global.h"
 #include "MD5Generator.h"
 #include "MD5Comparator.h"
-#include "JobBuilder.h"
 #include "LiveUpdateDialog.h"
 
 /*****************************************************************************/
 
 LiveUpdateDialog::LiveUpdateDialog ( QWidget* parent ) :
     QDialog(parent),
-    m_checker(0)
+    m_checker(0),
+    m_jobBuilder(0)
 {
     setupUi(this);
 }
@@ -69,13 +69,6 @@ void LiveUpdateDialog::startUpdate ()
         warning( tr("Current MD5 file does not exist.<br>Will create new.") );
 
         currentMD5Doc = generatedMD5Doc;
-
-        QFile outFile(md5FileName);
-        if ( ! outFile.open(QIODevice::WriteOnly) ) {
-            error( tr("Can't open file: '%1' for writing").arg(md5FileName) );
-            return;
-        }
-        outFile.write( currentMD5Doc.toString(4).toAscii() );
     }
     else {
         setProgress( tr("Reading local MD5 file ..."), 3 );
@@ -113,9 +106,32 @@ void LiveUpdateDialog::startUpdate ()
 
     setProgress( tr("Build job list ..."), 10 );
 
-    JobBuilder jobBuilder( cmpMD5 );
-    if ( jobBuilder.isConflict() ) {
-        const QStringList& msgs = jobBuilder.conflictMessages();
+    m_jobBuilder = new JobBuilder( cmpMD5 );
+
+
+    QObject::connect( m_jobBuilder, 
+                      SIGNAL(progress(const QString&,double)),
+                      SLOT(onJobProgress(const QString&,double)));
+
+    QObject::connect( m_jobBuilder, 
+                      SIGNAL(beforeDoJobs(uint)),
+                      SLOT(onBeforeDoJobs(uint)));
+    
+    QObject::connect( m_jobBuilder, 
+                      SIGNAL(beforeUndoJobs(uint)),
+                      SLOT(onBeforeUndoJobs(uint)));
+                                        
+    QObject::connect( m_jobBuilder, 
+                      SIGNAL(jobFailed(const QString&)),
+                      SLOT(onJobFailed(const QString&)));
+
+    QObject::connect( m_jobBuilder, 
+                      SIGNAL(jobStopped(const QString&)),
+                      SLOT(onJobStopped(const QString&)));
+
+
+    if ( m_jobBuilder->isConflict() ) {
+        const QStringList& msgs = m_jobBuilder->conflictMessages();
         QString msg = msgs.join("<br>");
         warning( msg );
         foreach ( QString msg, msgs ) {
@@ -126,7 +142,7 @@ void LiveUpdateDialog::startUpdate ()
         qWarning(" ");
     }
     
-    const QList<Job*>& jobs = jobBuilder.getJobs();
+    const QList<Job*>& jobs = m_jobBuilder->getJobs();
 
     if ( jobs.isEmpty() ) {
         setProgress( tr("Curent version '%1' is up to date.").
@@ -136,16 +152,25 @@ void LiveUpdateDialog::startUpdate ()
     }
 
     foreach ( Job* job, jobs ) {
-        qWarning("%s", qPrintable(job->jobMessage()));
+        qWarning("%s, UUID: %s", qPrintable(job->jobMessage()),
+                 qPrintable(job->jobUuid()));
     }
 
+    // Do jobs
+    m_jobBuilder->doJobs();
+
     // Success. Quit
-    m_checker->disconnect();
-    QCoreApplication::quit();
+    delete m_jobBuilder;
+    m_jobBuilder = 0;
+    //delete m_checker;
+    //m_checker = 0;
+
+    //QCoreApplication::quit();
 }
 
 LiveUpdateDialog::~LiveUpdateDialog ()
 {
+    delete m_jobBuilder;
     delete m_checker;
 }
 
@@ -173,6 +198,38 @@ void LiveUpdateDialog::setProgress ( const QString& text, int done )
     jobLabel->setText( text );
     progressBar->setValue( done );
     QCoreApplication::processEvents();
+}
+
+void LiveUpdateDialog::onJobProgress ( const QString& jobUuid, double done )
+{
+    if ( ! m_jobBuilder )
+        return;
+
+    Job* job = m_jobBuilder->findJobByUuid( jobUuid );
+    if ( ! job )
+        return;
+
+    setProgress( job->jobMessage(), int(done * 90 / 100) + 10 );
+}
+
+void LiveUpdateDialog::onBeforeDoJobs ( uint jobsToDo )
+{
+    qWarning("onBeforeDoJobs %d", jobsToDo );
+}
+
+void LiveUpdateDialog::onBeforeUndoJobs ( uint jobsToUndo )
+{
+    qWarning("onBeforeUndoJobs %d", jobsToUndo );
+}
+
+void LiveUpdateDialog::onJobFailed ( const QString& jobUuid )
+{
+    qWarning("onJobFailed %s", qPrintable(jobUuid) );
+}
+
+void LiveUpdateDialog::onJobStopped ( const QString& jobUuid )
+{
+    qWarning("onJobStopped %s", qPrintable(jobUuid) );
 }
 
 /*****************************************************************************/

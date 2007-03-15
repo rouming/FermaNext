@@ -135,7 +135,7 @@ public:
 
 protected slots:
     void httpReadProgress ( int done, int total );
-    void httpRequestFinished ( int done, bool error );
+    void httpDone ( bool error );
 
 private:
     QUrl m_urlToDownload;
@@ -143,6 +143,7 @@ private:
     JobProgressStatus m_progressStatus;
     double m_progressDone;
     QHttp m_http;
+    bool m_requestAborted;
 };
 
 class RenameJob : public QObject, public Job

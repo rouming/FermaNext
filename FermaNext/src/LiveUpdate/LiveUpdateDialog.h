@@ -6,6 +6,7 @@
 
 #include "ui_LiveUpdateDialog.h"
 
+#include "JobBuilder.h"
 #include "LiveUpdateChecker.h"
 
 class LiveUpdateDialog : public QDialog, 
@@ -28,8 +29,20 @@ private slots:
     /** Sets progress */
     void setProgress ( const QString& text, int done );
 
+    void onJobProgress ( const QString& jobUuid, double done );
+
+    void onBeforeDoJobs ( uint jobsToDo );
+
+    void onBeforeUndoJobs ( uint jobsToUndo );
+
+    void onJobFailed ( const QString& jobUuid );
+
+    void onJobStopped ( const QString& jobUuid );
+
+
 private:
     LiveUpdateChecker* m_checker;
+    JobBuilder* m_jobBuilder;
 };
 
 #endif //LIVEUPDATEDIALOG_H

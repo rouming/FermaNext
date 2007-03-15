@@ -69,6 +69,7 @@ LiveUpdateChecker::LiveUpdateChecker () :
 
 LiveUpdateChecker::~LiveUpdateChecker ()
 {
+    m_http.disconnect();
     m_http.close();
 }
 
