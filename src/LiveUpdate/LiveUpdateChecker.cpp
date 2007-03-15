@@ -55,6 +55,7 @@ LiveUpdateChecker::LiveUpdateChecker () :
 #else
 #error Unsupported os
 #endif
+        m_rootMD5File = cfgRootFile;
         m_url = cfgUrl + "/" + cfgName + "-" + os + "/" + cfgRootFile;
         LOG4CXX_INFO(logger, QString("Url : %1").arg(m_url.toString()).
                      toStdString());
@@ -96,6 +97,9 @@ void LiveUpdateChecker::wait ()
         Global::sleepMsecs( 200 );
     }
 }
+
+const QString& LiveUpdateChecker::rootMD5File () const
+{ return m_rootMD5File; }
 
 bool LiveUpdateChecker::isUpToDate ()
 { return m_isUpToDate; }
