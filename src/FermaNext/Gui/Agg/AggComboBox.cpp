@@ -133,6 +133,10 @@ void AggComboBoxButton::drawButton ( ren_dynarow& baseRend,
     drawTriangle( baseRend, pt1, pt2, pt3, aggColor( 100, 100, 125 ), lineColor );
 }
 
+// For some unknown reason VS 6.0 falls with INTERNAL ERROR.
+// To avoid this behaviour this dummy function is placed here.
+static void dummy () {}
+
 void AggComboBoxButton::paint ( base_renderer& baseRenderer ) const
 {
     pixf_dynarow pixf( *buttonBuf );
