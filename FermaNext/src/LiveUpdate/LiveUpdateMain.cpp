@@ -22,15 +22,16 @@ int main ( int argc, char* argv[] )
     // Generate MD5 sum 
     if ( args.size() > 1 && args[1] == "--gen-md5" ) {
 
-        QString pathToMd5 = Global::applicationDirPath();
+        QString path = Global::applicationDirPath();
         QString output;
 
         if ( args.size() > 2 )
-            output = args[2];
+            path = args[2];            
         if ( args.size() > 3 )
-            pathToMd5 = args[3];
+            output = args[3];
 
-        QDomDocument md5Xml = MD5Generator::md5ForFiles( pathToMd5 );
+        QDomDocument md5Xml = 
+            MD5Generator::md5ForFiles( path, QStringList() << output );
         
         if ( output.isEmpty() ) {
             std::cout << qPrintable(md5Xml.toString(4));

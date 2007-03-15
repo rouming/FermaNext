@@ -12,11 +12,14 @@ public:
      * to directory.
      * @param path to file or directory with files for which MD5 sum should
      *        be generated.
+     * @param exc except list. Files or dir names from this list are skipped 
+     *        from result xml doc.
      * @param recursion should we recursively find files for specified 
      *                  directory.
      * @return MD5 sums in xml format.
      */
     static QDomDocument md5ForFiles ( const QString& path, 
+                                      const QStringList& exc = QStringList(),
                                       bool recursion = true );
 };
 

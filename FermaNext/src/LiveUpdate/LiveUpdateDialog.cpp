@@ -52,7 +52,7 @@ void LiveUpdateDialog::startUpdate ()
         return;
 
     QString appPath = Global::applicationDirPath();
-    QString md5FileName = appPath + "/md5.xml";
+    QString md5FileName = appPath + "/" + m_checker->rootMD5File();
         
     QDomDocument downloadedMD5Doc = md5Doc;
     QDomDocument currentMD5Doc;
@@ -85,7 +85,7 @@ void LiveUpdateDialog::startUpdate ()
             return;
         }
     }
-    
+
     setProgress( tr("Compare local and downloaded MD5..."), 5 );
 
     // Firstly compare current and downloaded
@@ -159,6 +159,16 @@ void LiveUpdateDialog::startUpdate ()
 
     // Do jobs
     m_jobBuilder->doJobs();
+
+
+    // Rewrite MD5 root file
+    QFile outMD5File( md5FileName );
+    if ( ! outMD5File.open(QIODevice::WriteOnly) ) {
+        warning( tr("Can't rewrite root MD5 file: '%1'").
+                 arg(m_checker->rootMD5File()) );
+    }
+    outMD5File.write( downloadedMD5Doc.toString(4).toAscii() );
+
 
     // Success. Quit
     delete m_jobBuilder;

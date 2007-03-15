@@ -27,6 +27,9 @@ public:
     /** Waits for check */
     void wait ();
 
+    /** Return root MD5 file name */
+    const QString& rootMD5File () const;
+
     /** Returns true if check succeed and version is up to date */
     bool isUpToDate ();
 
@@ -59,6 +62,7 @@ private:
     QBuffer m_md5Buffer;
     bool m_isUpToDate;
     QString m_version;
+    QString m_rootMD5File;
 };
 
 #endif //LIVEUPDATECHECKER_H

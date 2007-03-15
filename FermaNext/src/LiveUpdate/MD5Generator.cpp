@@ -13,10 +13,14 @@
  *****************************************************************************/
 
 static void md5ForFiles ( QDomDocument& doc, QDomElement& parent,
-                          QFileInfo& fileInfo, bool recursion,
-                          bool rootCall )
+                          QFileInfo& fileInfo, const QStringList& except,
+                          bool recursion, bool rootCall )
 {
     if ( ! fileInfo.exists() )
+        return;
+
+    // Skip if found
+    if ( -1 != except.indexOf(fileInfo.absoluteFilePath()) )
         return;
 
     // Directory
@@ -51,7 +55,7 @@ static void md5ForFiles ( QDomDocument& doc, QDomElement& parent,
                                                              QDir::Name );
 
         foreach ( QFileInfo fInfo, infoList )
-            ::md5ForFiles( doc, elem, fInfo, recursion, false );
+            ::md5ForFiles( doc, elem, fInfo, except, recursion, false );
     }
     // File
     else if ( fileInfo.isFile() ) {
@@ -72,7 +76,9 @@ static void md5ForFiles ( QDomDocument& doc, QDomElement& parent,
  * md5 Generator
  *****************************************************************************/
 
-QDomDocument MD5Generator::md5ForFiles ( const QString& path, bool recursion )
+QDomDocument MD5Generator::md5ForFiles ( const QString& path, 
+                                         const QStringList& except,
+                                         bool recursion )
 {
     QDomDocument doc;
     QDomNode xmlInstr = doc.createProcessingInstruction(
@@ -86,7 +92,14 @@ QDomDocument MD5Generator::md5ForFiles ( const QString& path, bool recursion )
 
     QFileInfo fInfo( path );
 
-    ::md5ForFiles( doc, md5Header, fInfo, recursion, true );
+    QStringList exceptList = except;
+    for ( int i = 0; i < exceptList.size(); ++i ) {
+        QString& exceptPath = exceptList[i];
+        QFileInfo fi(exceptPath);
+        exceptPath = fi.absoluteFilePath();
+    }
+
+    ::md5ForFiles( doc, md5Header, fInfo, exceptList, recursion, true );
 
     return doc;
 }
