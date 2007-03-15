@@ -15,6 +15,12 @@ LiveUpdateDialog::LiveUpdateDialog ( QWidget* parent ) :
     m_jobBuilder(0)
 {
     setupUi(this);
+    m_detailsButton->setVisible(false);
+
+    QObject::connect( m_detailsButton, SIGNAL(pressed()),
+                      SLOT(onDetailsPressed()) );
+    QObject::connect( m_cancelButton, SIGNAL(pressed()),
+                      SLOT(onCancelPressed()) );
 }
 
 void LiveUpdateDialog::startUpdate ()
@@ -160,23 +166,31 @@ void LiveUpdateDialog::startUpdate ()
     // Do jobs
     m_jobBuilder->doJobs();
 
-
-    // Rewrite MD5 root file
-    QFile outMD5File( md5FileName );
-    if ( ! outMD5File.open(QIODevice::WriteOnly) ) {
-        warning( tr("Can't rewrite root MD5 file: '%1'").
-                 arg(m_checker->rootMD5File()) );
+    // Was an error? 
+    if ( ! m_jobFailed.isEmpty() ) {
+        m_jobBuilder->undoJobs();
     }
-    outMD5File.write( downloadedMD5Doc.toString(4).toAscii() );
+    else {
+        // Rewrite MD5 root file
+        QFile outMD5File( md5FileName );
+        if ( ! outMD5File.open(QIODevice::WriteOnly) ) {
+            warning( tr("Can't rewrite root MD5 file: '%1'").
+                     arg(m_checker->rootMD5File()) );
+        }
+        outMD5File.write( downloadedMD5Doc.toString(4).toAscii() );
+    }
 
-
-    // Success. Quit
+    // Success. Clean up
     delete m_jobBuilder;
     m_jobBuilder = 0;
 
-    setProgress( tr("Done. Version '%1' has been updated to '%2'.").
-                 arg( Global::applicationVersionNumber() ).
-                 arg( m_checker->checkedVersion() ),  100 );
+    if ( m_jobFailed.isEmpty() ) {
+        setProgress( tr("Done. Version '%1' has been updated to '%2'.").
+                     arg( Global::applicationVersionNumber() ).
+                     arg( m_checker->checkedVersion() ),  100 );
+    }
+    else 
+        m_jobFailed.clear();
 }
 
 LiveUpdateDialog::~LiveUpdateDialog ()
@@ -193,7 +207,6 @@ void LiveUpdateDialog::error ( const QString& e )
     m_checker->disconnect();
 
     QCoreApplication::processEvents();
-    QCoreApplication::quit();
     return;
 }
 
@@ -209,6 +222,17 @@ void LiveUpdateDialog::setProgress ( const QString& text, int done )
     jobLabel->setText( text );
     progressBar->setValue( done );
     QCoreApplication::processEvents();
+}
+
+void LiveUpdateDialog::onCancelPressed ()
+{
+    if ( ! m_jobBuilder )
+        return;
+    m_jobBuilder->stopJobs();
+}
+
+void LiveUpdateDialog::onDetailsPressed ()
+{
 }
 
 void LiveUpdateDialog::onJobProgress ( const QString& jobUuid, double done )
@@ -236,6 +260,8 @@ void LiveUpdateDialog::onBeforeUndoJobs ( uint jobsToUndo )
 void LiveUpdateDialog::onJobFailed ( const QString& jobUuid )
 {
     qWarning("onJobFailed %s", qPrintable(jobUuid) );
+
+    m_jobFailed = jobUuid;
 }
 
 void LiveUpdateDialog::onJobStopped ( const QString& jobUuid )

@@ -28,21 +28,27 @@ private slots:
 
     /** Sets progress */
     void setProgress ( const QString& text, int done );
-
+    
+    /** Job progress */
     void onJobProgress ( const QString& jobUuid, double done );
-
+    /** Before do jobs */
     void onBeforeDoJobs ( uint jobsToDo );
-
+    /** Before undo jobs */
     void onBeforeUndoJobs ( uint jobsToUndo );
-
+    /** Before job failed */
     void onJobFailed ( const QString& jobUuid );
-
+    /** Before job stopped */
     void onJobStopped ( const QString& jobUuid );
 
+    /** Cancel pressed */
+    void onCancelPressed ();
+    /** Details pressed */
+    void onDetailsPressed ();
 
 private:
     LiveUpdateChecker* m_checker;
     JobBuilder* m_jobBuilder;
+    QString m_jobFailed;
 };
 
 #endif //LIVEUPDATEDIALOG_H
