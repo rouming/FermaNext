@@ -619,8 +619,8 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
                 firstSteps.append( 
                           new DownloadJob( url + name, name + ".NEW" ) );
 
-                // We can't just replace LiveUpdate[.exe] binary from itself
-                if ( ! name.contains( QRegExp("^LiveUpdate(\\.exe)?$") ) ) {
+                // We can't just replace ourselfs
+                if ( name != Global::applicationName() ) {
                     secondSteps.append(
                            new RenameJob( name, name + ".DELETE" ) );
                     secondSteps.append(

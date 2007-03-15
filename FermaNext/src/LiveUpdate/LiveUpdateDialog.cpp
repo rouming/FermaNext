@@ -66,7 +66,8 @@ void LiveUpdateDialog::startUpdate ()
 
         setProgress( tr("Creating local MD5 file ..."), 3 );
 
-        warning( tr("Current MD5 file does not exist.<br>Will create new.") );
+        warning( tr("MD5 file for local copy does not exist.<br>"
+                    "Will generate new.") );
 
         currentMD5Doc = generatedMD5Doc;
     }
@@ -162,10 +163,10 @@ void LiveUpdateDialog::startUpdate ()
     // Success. Quit
     delete m_jobBuilder;
     m_jobBuilder = 0;
-    //delete m_checker;
-    //m_checker = 0;
 
-    //QCoreApplication::quit();
+    setProgress( tr("Done. Version '%1' has been updated to '%2'.").
+                 arg( Global::applicationVersionNumber() ).
+                 arg( m_checker->checkedVersion() ),  100 );
 }
 
 LiveUpdateDialog::~LiveUpdateDialog ()
@@ -188,7 +189,7 @@ void LiveUpdateDialog::error ( const QString& e )
 
 void LiveUpdateDialog::warning ( const QString& w )
 {
-    QMessageBox::critical( this, tr("Warning"), w );
+    QMessageBox::warning( this, tr("Warning"), w );
     QCoreApplication::processEvents();
     return;
 }
