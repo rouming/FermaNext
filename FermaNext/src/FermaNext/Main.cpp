@@ -7,6 +7,7 @@
 #include "Global.h"
 #include "FermaNextWorkspace.h"
 #include "FermaNextMainWindow.h"
+#include "LiveUpdateChecker.h"
 #include "Log4CXX.h"
 
 /*****************************************************************************
@@ -92,6 +93,10 @@ int main ( int argc, char* argv[] )
                 appSettings.value( "ShowLoads" ).toBool();
 
         appSettings.endGroup();
+
+        // Start live update check
+        LiveUpdateChecker checker( LiveUpdateChecker::Application );
+        checker.startCheck();
 
         FermaNextMainWindow* fermaMainWindow = wsp.mainWindow();
         fermaMainWindow->showMaximized();

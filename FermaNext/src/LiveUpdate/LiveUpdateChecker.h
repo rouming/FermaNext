@@ -68,6 +68,9 @@ private slots:
     void httpDone ( bool );
     void httpResponseHeader ( const QHttpResponseHeader& );
 
+    void onNewVersionIsAvailable ( bool, const QString& );
+    void onAppAboutToQuit ();
+
 private:
     volatile int m_httpGetId;
     Mode m_mode;
@@ -76,6 +79,7 @@ private:
     QByteArray m_md5ByteArray;
     QBuffer m_md5Buffer;
     bool m_isUpToDate;
+    bool m_startUpdatingOnExit;
     QString m_version;
     QString m_rootMD5File;
     QString m_lastError;
