@@ -12,18 +12,26 @@ class LiveUpdateChecker : public QObject
 {
     Q_OBJECT
 public:
+    enum Mode {
+        Application = 0, /**< Downloads root MD5 file in daemon mode
+                              and raises message box about possible update */
+        LiveUpdate       /**< Just does what live update tells */
+    };
+
     // Exceptions
     class ConfigIsWrongException {};
 
-    LiveUpdateChecker () /*throw (ConfigIsWrongException)*/;
+    LiveUpdateChecker ( Mode ) /*throw (ConfigIsWrongException)*/;
     ~LiveUpdateChecker ();
 
+public slots:
     /** Starts check */
     void startCheck ();
     
     /** Stops check */
     void stopCheck ();
 
+public:
     /** Waits for check */
     void wait ();
 
@@ -62,6 +70,7 @@ private slots:
 
 private:
     volatile int m_httpGetId;
+    Mode m_mode;
     QUrl m_url;
     QHttp m_http;
     QByteArray m_md5ByteArray;
