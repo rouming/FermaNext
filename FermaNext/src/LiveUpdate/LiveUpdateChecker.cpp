@@ -101,6 +101,12 @@ void LiveUpdateChecker::wait ()
     }
 }
 
+bool LiveUpdateChecker::isError () const
+{ return ! m_lastError.isEmpty(); }
+
+const QString& LiveUpdateChecker::lastError () const
+{ return m_lastError; }
+
 const QString& LiveUpdateChecker::rootMD5File () const
 { return m_rootMD5File; }
 
@@ -135,7 +141,8 @@ void LiveUpdateChecker::httpResponseHeader (
 void LiveUpdateChecker::httpDone ( bool err )
 {
     if ( err ) {
-        emit error( m_http.errorString() );
+        m_lastError = m_http.errorString();
+        emit error( m_lastError );
     }
     else {
         QDomDocument md5Doc;
@@ -143,7 +150,8 @@ void LiveUpdateChecker::httpDone ( bool err )
         QDomElement md5Elem = md5Doc.documentElement();
         if ( md5Elem.tagName() != "MD5" ||
              ! md5Elem.hasAttribute("appVersion") ) {
-            emit error( "Wrong MD5 file" );
+            m_lastError = "Wrong MD5 file";
+            emit error( m_lastError );
         }
         else {
             QString newVer = md5Elem.attribute("appVersion");
