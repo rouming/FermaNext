@@ -1,6 +1,10 @@
 
 #include <QMessageBox>
 #include <QFile>
+#include <QDialogButtonBox>
+#include <QListWidget>
+#include <QVBoxLayout>
+
 
 #include "Global.h"
 #include "MD5Generator.h"
@@ -16,9 +20,13 @@ LiveUpdateDialog::LiveUpdateDialog ( QWidget* parent ) :
 {
     setupUi(this);
     m_detailsButton->setVisible(false);
+    m_okButton->setVisible(false);
+    m_cancelButton->setVisible(true);
 
     QObject::connect( m_detailsButton, SIGNAL(pressed()),
                       SLOT(onDetailsPressed()) );
+    QObject::connect( m_okButton, SIGNAL(pressed()),
+                      SLOT(close()) );
     QObject::connect( m_cancelButton, SIGNAL(pressed()),
                       SLOT(onCancelPressed()) );
 }
@@ -31,23 +39,28 @@ void LiveUpdateDialog::startUpdate ()
     catch ( LiveUpdateChecker::ConfigIsWrongException& ) {
         QMessageBox::critical( this, tr("Error"), 
                                tr("Invalid LiveUpdate configuration.<br>"
-                                  "Updation will be terminated.") );
+                                  "Update will be terminated.") );
         QCoreApplication::quit();
         return;
     }
-
-    QObject::connect( m_checker, SIGNAL(error(const QString&)),
-                                 SLOT(error(const QString&)) );
 
     show();
 
     m_checker->startCheck();
     m_checker->wait();
 
+    if ( m_checker->isError() ) {
+        error( m_checker->lastError() );
+        return;
+    }
+
     if ( m_checker->isUpToDate() ) {
         setProgress( tr("Curent version '%1' is up to date.").
                      arg( Global::applicationVersionNumber() ), 100 );
-        m_checker->disconnect();
+
+        m_cancelButton->setVisible(false);
+        m_okButton->setVisible(true);
+        //TODO: m_detailsButton->setVisible(true);
         return;
     }
 
@@ -72,8 +85,13 @@ void LiveUpdateDialog::startUpdate ()
 
         setProgress( tr("Creating local MD5 file ..."), 3 );
 
-        warning( tr("MD5 file for local copy does not exist.<br>"
-                    "Will generate new.") );
+        bool ok = question( tr("MD5 file for local copy does not exist.<br>"
+                               "Will generate new?") );
+
+        if ( !ok ) {
+            error( tr("MD5 file for local copy does not exist.") );
+            return;
+        }
 
         currentMD5Doc = generatedMD5Doc;
     }
@@ -139,14 +157,14 @@ void LiveUpdateDialog::startUpdate ()
 
     if ( m_jobBuilder->isConflict() ) {
         const QStringList& msgs = m_jobBuilder->conflictMessages();
-        QString msg = msgs.join("<br>");
-        warning( msg );
-        foreach ( QString msg, msgs ) {
-            qWarning("CONFLICT: %s", qPrintable(msg));
+
+        if ( resolveConflict(msgs) ) {
+            m_jobBuilder->resolveConflict();
         }
-        
-        qWarning(" ");
-        qWarning(" ");
+        else {
+            error( tr("Conflicts were found.") );
+            return;
+        }
     }
     
     const QList<Job*>& jobs = m_jobBuilder->getJobs();
@@ -154,13 +172,10 @@ void LiveUpdateDialog::startUpdate ()
     if ( jobs.isEmpty() ) {
         setProgress( tr("Curent version '%1' is up to date.").
                      arg( Global::applicationVersionNumber() ), 100 );
-        m_checker->disconnect();
+        m_cancelButton->setVisible(false);
+        m_okButton->setVisible(true);
+        //TODO: m_detailsButton->setVisible(true);
         return;
-    }
-
-    foreach ( Job* job, jobs ) {
-        qWarning("%s, UUID: %s", qPrintable(job->jobMessage()),
-                 qPrintable(job->jobUuid()));
     }
 
     // Do jobs
@@ -170,6 +185,11 @@ void LiveUpdateDialog::startUpdate ()
     if ( ! m_jobFailed.isEmpty() ) {
         m_jobBuilder->undoJobs();
     }
+    // Was stopped? 
+    else if ( ! m_jobStopped.isEmpty() ) {
+        m_jobBuilder->undoJobs();
+    }
+    // Success
     else {
         // Rewrite MD5 root file
         QFile outMD5File( md5FileName );
@@ -180,11 +200,20 @@ void LiveUpdateDialog::startUpdate ()
         outMD5File.write( downloadedMD5Doc.toString(4).toAscii() );
     }
 
-    if ( m_jobFailed.isEmpty() ) {
+    // Success
+    if ( m_jobFailed.isEmpty() && m_jobStopped.isEmpty() ) {
         setProgress( tr("Done. Version '%1' has been updated to '%2'.").
                      arg( Global::applicationVersionNumber() ).
                      arg( m_checker->checkedVersion() ),  100 );
     }
+    // Stopped
+    else if ( ! m_jobStopped.isEmpty() ) {
+        Job* job = m_jobBuilder->findJobByUuid( m_jobStopped );
+        if ( job ) {         
+            setProgress( tr("Canceled."),  0 );
+        }
+    }
+    // Error
     else {
         Job* job = m_jobBuilder->findJobByUuid( m_jobFailed );
         if ( job ) {         
@@ -192,10 +221,17 @@ void LiveUpdateDialog::startUpdate ()
         }
     }
 
-    // Success. Clean up
+    // Success.
+
+    m_cancelButton->setVisible(false);
+    m_okButton->setVisible(true);
+    //TODO: m_detailsButton->setVisible(true);
+
     delete m_jobBuilder;
     m_jobBuilder = 0;
+    m_conflictList.clear();
     m_jobFailed.clear();
+    m_jobStopped.clear();
 }
 
 LiveUpdateDialog::~LiveUpdateDialog ()
@@ -206,11 +242,10 @@ LiveUpdateDialog::~LiveUpdateDialog ()
 
 void LiveUpdateDialog::error ( const QString& e )
 {
-    QMessageBox::critical( this, tr("Error"), e );
-
-    // Do disconnection to stop other possible errors
-    m_checker->disconnect();
-
+    m_cancelButton->setVisible(false);
+    m_okButton->setVisible(true);
+    //TODO: m_detailsButton->setVisible(true);
+    setProgress( tr("Failed : %1.").arg(e), 0 );
     QCoreApplication::processEvents();
     return;
 }
@@ -220,6 +255,68 @@ void LiveUpdateDialog::warning ( const QString& w )
     QMessageBox::warning( this, tr("Warning"), w );
     QCoreApplication::processEvents();
     return;
+}
+
+bool LiveUpdateDialog::question ( const QString& w )
+{
+    bool res = false;
+    if ( QMessageBox::Ok == QMessageBox::question(this, tr("Question"), w,
+                                                  QMessageBox::Yes,
+                                                  QMessageBox::No) )
+        res = true;
+    QCoreApplication::processEvents();
+    return res;
+}
+
+bool LiveUpdateDialog::resolveConflict ( const QStringList& conflicts )
+{
+    if ( conflicts.size() == 0 )
+        return true;
+
+    QString msg( (conflicts.size() == 1 ? "Conflict was found." : 
+                                          "Conflicts were found.") );
+    QMessageBox msgBox( QMessageBox::Question, "Conflict", 
+                        msg, QMessageBox::NoButton, this);
+    QPushButton* resolveButton = 
+        msgBox.addButton(tr("Resolve all"), QMessageBox::ActionRole);
+    QPushButton* cancelButton = 
+        msgBox.addButton(tr("Cancel"), QMessageBox::ActionRole);
+    msgBox.addButton(tr("Details ..."), QMessageBox::ActionRole);
+
+    while ( 1 ) {
+        msgBox.exec();
+        if ( msgBox.clickedButton() == resolveButton )
+            return true;
+        else if ( msgBox.clickedButton() == cancelButton )
+            return false;
+        // Details is pressed
+        else { 
+            // Create conflicts detail dialog
+            
+            QDialog d( this );            
+            d.setWindowTitle( tr("Conflict details") );
+            QVBoxLayout* vboxLayout = new QVBoxLayout(&d);
+            vboxLayout->setSpacing(6);
+            vboxLayout->setMargin(9);
+            QListWidget* listWidget = new QListWidget(&d);
+            listWidget->addItems( conflicts );
+            vboxLayout->addWidget(listWidget);
+
+            QDialogButtonBox* buttonBox = new QDialogButtonBox(&d);
+            QObject::connect( buttonBox, SIGNAL(accepted()),
+                              &d, SLOT(hide()) );
+            buttonBox->setOrientation(Qt::Horizontal);
+            buttonBox->setStandardButtons(QDialogButtonBox::Ok);
+            vboxLayout->addWidget(buttonBox);
+
+            QSize size(350, 250);
+            size = size.expandedTo(d.minimumSizeHint());
+            d.resize(size);
+            d.exec();
+
+            continue;
+        }
+    } 
 }
 
 void LiveUpdateDialog::setProgress ( const QString& text, int done )
@@ -254,24 +351,22 @@ void LiveUpdateDialog::onJobProgress ( const QString& jobUuid, double done )
 
 void LiveUpdateDialog::onBeforeDoJobs ( uint jobsToDo )
 {
-    qWarning("onBeforeDoJobs %d", jobsToDo );
+    Q_UNUSED(jobsToDo);
 }
 
 void LiveUpdateDialog::onBeforeUndoJobs ( uint jobsToUndo )
 {
-    qWarning("onBeforeUndoJobs %d", jobsToUndo );
+    Q_UNUSED(jobsToUndo);
 }
 
 void LiveUpdateDialog::onJobFailed ( const QString& jobUuid )
 {
-    qWarning("onJobFailed %s", qPrintable(jobUuid) );
-
     m_jobFailed = jobUuid;
 }
 
 void LiveUpdateDialog::onJobStopped ( const QString& jobUuid )
 {
-    qWarning("onJobStopped %s", qPrintable(jobUuid) );
+    m_jobStopped = jobUuid;
 }
 
 /*****************************************************************************/

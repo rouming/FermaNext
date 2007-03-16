@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>LiveUpdateDialog</class>
  <widget class="QDialog" name="LiveUpdateDialog" >
   <property name="geometry" >
@@ -100,6 +97,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="m_okButton" >
+       <property name="text" >
+        <string>OK</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="m_cancelButton" >
        <property name="text" >
         <string>Cancel</string>
@@ -110,7 +114,6 @@
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources/>
  <connections/>
 </ui>

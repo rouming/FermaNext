@@ -134,6 +134,9 @@ int main ( int argc, char* argv[] )
         return 0;
     }
     else {
+        QObject::connect( &app, SIGNAL(lastWindowClosed()),
+                          &app, SLOT(quit()) );
+
         LiveUpdateDialog dialog;
         QTimer::singleShot( 0, &dialog, SLOT(startUpdate()) );
         return app.exec();

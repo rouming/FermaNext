@@ -625,7 +625,7 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
             else if ( status.contains(DO_REPLACE) ) {
 
                 // Add conflict message
-                if ( conflict ) {
+                if ( elemConflict ) {
                     QString msg( tr("Can't replace. Locally modified: '%1'") );
                     conflictMsgs.append( msg.arg(name) );
                 }
@@ -646,7 +646,7 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
             else if ( status.contains(DO_DELETE) ) {
 
                 // Add conflict message
-                if ( conflict ) {
+                if ( elemConflict ) {
                     QString msg( tr("Can't delete. Locally modified: '%1'") );
                     conflictMsgs.append( msg.arg(name) );
                 }

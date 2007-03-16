@@ -25,6 +25,10 @@ private slots:
     void error ( const QString& );
     /** Raises message box with warning string */
     void warning ( const QString& );
+    /** Raises message box with question */
+    bool question ( const QString& );
+    /** Raises message box with question to resolve conflicts */
+    bool resolveConflict ( const QStringList& );
 
     /** Sets progress */
     void setProgress ( const QString& text, int done );
@@ -48,7 +52,9 @@ private slots:
 private:
     LiveUpdateChecker* m_checker;
     JobBuilder* m_jobBuilder;
+    QStringList m_conflictList;
     QString m_jobFailed;
+    QString m_jobStopped;
 };
 
 #endif //LIVEUPDATEDIALOG_H

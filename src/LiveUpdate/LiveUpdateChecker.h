@@ -27,6 +27,12 @@ public:
     /** Waits for check */
     void wait ();
 
+    /** Returns true if some error has happened */
+    bool isError () const;
+
+    /** Returns last error */
+    const QString& lastError () const;
+
     /** Return root MD5 file name */
     const QString& rootMD5File () const;
 
@@ -63,6 +69,7 @@ private:
     bool m_isUpToDate;
     QString m_version;
     QString m_rootMD5File;
+    QString m_lastError;
 };
 
 #endif //LIVEUPDATECHECKER_H
