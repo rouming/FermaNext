@@ -702,7 +702,14 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
 
                 secondSteps.append( 
                           new RenameJob( name, name + ".DELETE" ) );
-                thirdSteps.append( 
+
+                // We can't just delete ourselfs. 
+                if ( name == Global::applicationName() ) {
+                    thirdSteps.append(
+                          new DeleteLiveUpdateBinaryJob( name + ".DELETE" ) );
+                }
+                else
+                    thirdSteps.append(
                           new DeleteJob( name + ".DELETE" ) );
             }
             else 
