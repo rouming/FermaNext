@@ -172,6 +172,9 @@ DownloadJob::DownloadJob ( const QString& url, const QString& fileToSave ) :
                                SLOT(httpReadProgress(int,int)) );
     QObject::connect( &m_http, SIGNAL(done(bool)),
                                SLOT(httpDone(bool)) );
+    QObject::connect( &m_http, 
+                   SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
+                   SLOT(httpResponseHeader(const QHttpResponseHeader &)) );
 }
 
 DownloadJob::~DownloadJob ()
@@ -244,7 +247,18 @@ void DownloadJob::getCurrentProgress ( JobProgressStatus& status,
 
 void DownloadJob::httpReadProgress ( int done, int total )
 {
+    if ( total == 0 ) {
+        return;
+    }
     m_progressDone = done * 100 / total;
+}
+
+void DownloadJob::httpResponseHeader ( const QHttpResponseHeader& header )
+{
+    if ( header.statusCode() != 200 ) {
+        m_http.abort();
+        return;
+    }
 }
 
 void DownloadJob::httpDone ( bool error )
@@ -688,6 +702,9 @@ bool JobBuilder::doJobs ()
     if ( m_isConflict )
         return false;
 
+    if ( m_jobs.size() == 0 )
+        return true;
+
     double percentsPerJob = 100.0 / m_jobs.size();
   
     emit beforeDoJobs( m_jobs.size() );
@@ -696,6 +713,7 @@ bool JobBuilder::doJobs ()
 
     for ( int i = 0; i < m_jobs.size(); ++i ) {
         Job* job = m_jobs[i];
+        m_currentJob = job;
 
         Job::JobProgressStatus status = Job::Running;
         double percentsDone = percentsPerJob * i;
@@ -703,8 +721,6 @@ bool JobBuilder::doJobs ()
 
         // Progress before do
         emit progress( job->jobUuid(), percentsDone );
-
-        m_currentJob = job;
 
         // Job can be terminated at this point
         if ( m_jobsTerminated ) {
@@ -735,11 +751,9 @@ bool JobBuilder::doJobs ()
             return false;
         }
 
-        // If jobs were terminated, but current job successfully completed,
-        // we should iterate to next job for correct possible redo.
-        if ( m_jobsTerminated && (i + 1) < m_jobs.size() ) {
-            m_currentJob = m_jobs[i+1];
-            emit jobStopped( m_currentJob->jobUuid() );
+        // If jobs were terminated
+        if ( m_jobsTerminated ) {
+            emit jobStopped( job->jobUuid() );
             return false;
         }
 
@@ -769,17 +783,17 @@ bool JobBuilder::undoJobs ()
     int index = m_jobs.indexOf( m_currentJob );
 
     // If nothing was found or first job failed
-    if ( index == -1 || index == 0 ) {
+    if ( index == -1 ) {
         m_currentJob = 0;
         return true;
     }
 
     double percentsPerJob = 100 / m_jobs.size();
-    double percentsDone = index * percentsPerJob;
+    double percentsDone = (index + 1) * percentsPerJob;
 
     emit beforeUndoJobs( index );
 
-    for ( int i = index - 1; i >= 0; --i ) {
+    for ( int i = index; i >= 0; --i ) {
         Job* job = m_jobs[i];
 
         // Progress before undo

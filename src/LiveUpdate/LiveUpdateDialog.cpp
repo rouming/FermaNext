@@ -180,17 +180,22 @@ void LiveUpdateDialog::startUpdate ()
         outMD5File.write( downloadedMD5Doc.toString(4).toAscii() );
     }
 
-    // Success. Clean up
-    delete m_jobBuilder;
-    m_jobBuilder = 0;
-
     if ( m_jobFailed.isEmpty() ) {
         setProgress( tr("Done. Version '%1' has been updated to '%2'.").
                      arg( Global::applicationVersionNumber() ).
                      arg( m_checker->checkedVersion() ),  100 );
     }
-    else 
-        m_jobFailed.clear();
+    else {
+        Job* job = m_jobBuilder->findJobByUuid( m_jobFailed );
+        if ( job ) {         
+            setProgress( tr("Failed : %1.").arg(job->jobMessage()),  0 );
+        }
+    }
+
+    // Success. Clean up
+    delete m_jobBuilder;
+    m_jobBuilder = 0;
+    m_jobFailed.clear();
 }
 
 LiveUpdateDialog::~LiveUpdateDialog ()
