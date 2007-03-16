@@ -52,7 +52,7 @@ signals:
 
 private slots:
     void httpDone ( bool );
-    
+    void httpResponseHeader ( const QHttpResponseHeader& );
 
 private:
     volatile int m_httpGetId;

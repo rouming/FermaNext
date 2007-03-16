@@ -66,6 +66,9 @@ LiveUpdateChecker::LiveUpdateChecker () :
     }
 
     QObject::connect(&m_http, SIGNAL(done(bool)), SLOT(httpDone(bool)));
+    QObject::connect( &m_http, 
+                   SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
+                   SLOT(httpResponseHeader(const QHttpResponseHeader &)) );
 }
 
 LiveUpdateChecker::~LiveUpdateChecker ()
@@ -118,6 +121,15 @@ QDomDocument LiveUpdateChecker::getDownloadedMD5File () const
         return QDomDocument();
     }
     return xmlDoc;
+}
+
+void LiveUpdateChecker::httpResponseHeader ( 
+    const QHttpResponseHeader& header )
+{
+    if ( header.statusCode() != 200 ) {
+        m_http.abort();
+        return;
+    }
 }
 
 void LiveUpdateChecker::httpDone ( bool err )

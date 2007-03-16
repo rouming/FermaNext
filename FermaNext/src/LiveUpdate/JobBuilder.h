@@ -136,6 +136,7 @@ public:
 protected slots:
     void httpReadProgress ( int done, int total );
     void httpDone ( bool error );
+    void httpResponseHeader ( const QHttpResponseHeader& );
 
 private:
     QUrl m_urlToDownload;
