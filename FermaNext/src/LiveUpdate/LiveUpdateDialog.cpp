@@ -14,7 +14,7 @@
 /*****************************************************************************/
 
 LiveUpdateDialog::LiveUpdateDialog ( QWidget* parent ) :
-    QDialog(parent),
+    QDialog(parent, Qt::WindowTitleHint),
     m_checker(0),
     m_jobBuilder(0)
 {
@@ -22,6 +22,7 @@ LiveUpdateDialog::LiveUpdateDialog ( QWidget* parent ) :
     m_detailsButton->setVisible(false);
     m_okButton->setVisible(false);
     m_cancelButton->setVisible(true);
+    m_cancelButton->setEnabled(false);
 
     QObject::connect( m_detailsButton, SIGNAL(pressed()),
                       SLOT(onDetailsPressed()) );
@@ -35,7 +36,7 @@ void LiveUpdateDialog::startUpdate ()
 {
     setProgress( tr("Verifying version ..."), 1 );
 
-    try { m_checker = new LiveUpdateChecker; }
+    try { m_checker = new LiveUpdateChecker( LiveUpdateChecker::LiveUpdate ); }
     catch ( LiveUpdateChecker::ConfigIsWrongException& ) {
         QMessageBox::critical( this, tr("Error"), 
                                tr("Invalid LiveUpdate configuration.<br>"
@@ -133,7 +134,6 @@ void LiveUpdateDialog::startUpdate ()
 
     m_jobBuilder = new JobBuilder( cmpMD5 );
 
-
     QObject::connect( m_jobBuilder, 
                       SIGNAL(progress(const QString&,double)),
                       SLOT(onJobProgress(const QString&,double)));
@@ -177,6 +177,8 @@ void LiveUpdateDialog::startUpdate ()
         //TODO: m_detailsButton->setVisible(true);
         return;
     }
+
+    m_cancelButton->setEnabled(true);
 
     // Do jobs
     m_jobBuilder->doJobs();

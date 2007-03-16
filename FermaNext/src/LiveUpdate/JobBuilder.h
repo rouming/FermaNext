@@ -74,7 +74,7 @@
 #include <QStringList>
 #include <QDomDocument>
 
-class Job
+class Job : public QObject
 {
 public:
     enum JobType {
@@ -118,7 +118,7 @@ private:
     QString m_lastError;
 };
 
-class DownloadJob : public QObject, public Job
+class DownloadJob : public Job
 {
     Q_OBJECT
 public:
@@ -147,9 +147,8 @@ private:
     bool m_requestAborted;
 };
 
-class RenameJob : public QObject, public Job
+class RenameJob : public Job
 {
-    Q_OBJECT
 public:
     RenameJob ( const QString& from, const QString& to );
     virtual ~RenameJob ();
@@ -169,9 +168,8 @@ private:
     QString m_toPath;
 };
 
-class DeleteJob : public QObject, public Job
+class DeleteJob : public Job
 {
-    Q_OBJECT
 public:
     DeleteJob ( const QString& path );
     virtual ~DeleteJob ();
@@ -184,15 +182,26 @@ public:
 
     virtual void getCurrentProgress ( JobProgressStatus&, double& done );
 
+protected:
+    virtual const QString& pathToDelete () const;
+
 private:
     JobProgressStatus m_progressStatus;
     double m_progressDone;
     QString m_pathToDelete;
 };
 
-class CreateDirJob : public QObject, public Job
+class DeleteLiveUpdateBinaryJob : public DeleteJob
 {
-    Q_OBJECT
+public:
+    DeleteLiveUpdateBinaryJob ( const QString& path );
+    virtual ~DeleteLiveUpdateBinaryJob ();
+
+    virtual void doJob ();
+};
+
+class CreateDirJob : public Job
+{
 public:
     CreateDirJob ( const QString& path );
     virtual ~CreateDirJob ();

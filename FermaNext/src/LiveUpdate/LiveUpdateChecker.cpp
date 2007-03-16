@@ -16,8 +16,9 @@ static LoggerPtr logger( Logger::getLogger("LiveUpdate.LiveUpdateChecker") );
 
 /*****************************************************************************/
 
-LiveUpdateChecker::LiveUpdateChecker () :
+LiveUpdateChecker::LiveUpdateChecker ( LiveUpdateChecker::Mode mode ) :
     m_httpGetId(0),
+    m_mode( mode ),
     m_md5Buffer( &m_md5ByteArray ),
     m_isUpToDate(true),
     m_version( Global::applicationVersionNumber() )

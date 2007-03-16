@@ -12,6 +12,8 @@ DESTDIR = $$LEVEL
 
 UI_DIR = ./ui
 
+win32:LIBS += -lshell32
+
 FORMS = \
           LiveUpdateDialog.ui
 

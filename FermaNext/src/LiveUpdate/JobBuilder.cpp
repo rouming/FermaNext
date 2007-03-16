@@ -5,6 +5,10 @@
 #include <QUuid>
 #include <QCoreApplication>
 
+#ifdef Q_OS_WIN
+ #include <windows.h>
+#endif
+
 #include "JobBuilder.h"
 #include "Config.h"
 #include "Global.h"
@@ -187,7 +191,7 @@ DownloadJob::~DownloadJob ()
 QString DownloadJob::jobMessage () const
 {
     QString msg( tr("Downloading '%1'") );
-    return msg.arg( m_urlToDownload.toString() );
+    return msg.arg( m_urlToDownload.path().section('/', -1) );
 }
 
 void DownloadJob::doJob ()
@@ -201,7 +205,7 @@ void DownloadJob::doJob ()
 
     if ( m_fileToSave.exists() ) {
         QString msg( tr("File name exists: '%1'") );
-        Job::setErrorString( msg.arg(m_fileToSave.fileName()) );
+        Job::setErrorString( msg.arg(m_fileToSave.fileName().section('/',-1)));
 
         m_progressDone = 0.0;
         m_progressStatus = Job::Failed;
@@ -211,7 +215,7 @@ void DownloadJob::doJob ()
 
     if ( ! m_fileToSave.open(QIODevice::WriteOnly) ) {
         QString msg( tr("Can't open file for writing: '%1'") );
-        Job::setErrorString( msg.arg(m_fileToSave.fileName()) );
+        Job::setErrorString( msg.arg(m_fileToSave.fileName().section('/',-1)));
 
         m_progressDone = 0.0;
         m_progressStatus = Job::Failed;
@@ -297,8 +301,8 @@ RenameJob::~RenameJob ()
 
 QString RenameJob::jobMessage () const
 {
-    QString msg( tr("Renaming from '%1' to '%2'") );
-    return msg.arg( m_fromPath ).arg( m_toPath );
+    QString msg( tr("Renaming to '%1'") );
+    return msg.arg( m_toPath.section('/', -1) );
 }
 
 void RenameJob::doJob ()
@@ -308,7 +312,8 @@ void RenameJob::doJob ()
 
     if  ( ! QFile::rename(m_fromPath, m_toPath) ) {
         QString msg( tr("Can't rename file from '%1' to '%2'") );
-        Job::setErrorString( msg.arg(m_fromPath).arg(m_toPath) );
+        Job::setErrorString( msg.arg(m_fromPath.section('/', -1)).
+                                 arg(m_toPath.section('/', -1)) );
 
         m_progressDone = 0.0;
         m_progressStatus = Job::Failed;
@@ -352,7 +357,7 @@ DeleteJob::~DeleteJob ()
 QString DeleteJob::jobMessage () const
 {
     QString msg( tr("Deleting '%1'") );
-    return msg.arg( m_pathToDelete );
+    return msg.arg( m_pathToDelete.section('/', -1) );
 }
 
 void DeleteJob::doJob ()
@@ -375,7 +380,7 @@ void DeleteJob::doJob ()
 
     if  ( ! res ) {
         QString msg( tr("Can't delete '%1'") );
-        Job::setErrorString( msg.arg(m_pathToDelete) );
+        Job::setErrorString( msg.arg(m_pathToDelete.section('/', -1)) );
 
         m_progressDone = 0.0;
         m_progressStatus = Job::Failed;
@@ -404,6 +409,46 @@ void DeleteJob::getCurrentProgress ( JobProgressStatus& status,
     done = m_progressDone;
 }
 
+const QString& DeleteJob::pathToDelete () const
+{ return m_pathToDelete; }
+
+/*****************************************************************************/
+
+DeleteLiveUpdateBinaryJob::DeleteLiveUpdateBinaryJob ( const QString& path ) :
+    DeleteJob(path)
+{}
+
+DeleteLiveUpdateBinaryJob::~DeleteLiveUpdateBinaryJob ()
+{}
+
+void DeleteLiveUpdateBinaryJob::doJob ()
+{
+#ifdef Q_OS_WIN
+    QString toRemove = QDir::toNativeSeparators(DeleteJob::pathToDelete());
+    QString tempFileName( QDir::tempPath() + "/" + 
+                          QUuid::createUuid().toString() + ".bat" );
+    tempFileName = QDir::toNativeSeparators(tempFileName);
+    QFile tempFile(tempFileName);
+    if ( ! tempFile.open(QIODevice::WriteOnly) ) {
+        // Last try
+        QFile::remove(toRemove);
+        return;
+    }
+
+    QString batContent =  QString(":Repeat\r\n"
+                                  "del \"%1\"\r\n"
+                                  "if exist \"%1\" goto Repeat\r\n"
+                                  "del \"%2\"").
+        arg(toRemove).arg(tempFileName);
+
+    tempFile.write( batContent.toAscii().data() );
+    tempFile.close();
+    ShellExecuteA( 0, "open", tempFileName.toAscii().data(), 0, 0, SW_HIDE );
+#else
+    DeleteJob::doJob();
+#endif
+}
+
 /*****************************************************************************/
 
 CreateDirJob::CreateDirJob ( const QString& path ) :
@@ -419,7 +464,7 @@ CreateDirJob::~CreateDirJob ()
 QString CreateDirJob::jobMessage () const
 {
     QString msg( tr("Creating directory '%1'") );
-    return msg.arg( m_dirToCreate );
+    return msg.arg( m_dirToCreate.section('/', -1) );
 }
 
 void CreateDirJob::doJob ()
@@ -431,7 +476,7 @@ void CreateDirJob::doJob ()
 
     if ( ! dir.mkdir(m_dirToCreate) ) {
         QString msg( tr("Can't create directory '%1'") );
-        Job::setErrorString( msg.arg(m_dirToCreate) );
+        Job::setErrorString( msg.arg(m_dirToCreate.section('/', -1)) );
 
         m_progressDone = 0.0;
         m_progressStatus = Job::Failed;
@@ -633,15 +678,19 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
                 firstSteps.append( 
                           new DownloadJob( url + name, name + ".NEW" ) );
 
-                // We can't just replace ourselfs
-                if ( name != Global::applicationName() ) {
-                    secondSteps.append(
-                           new RenameJob( name, name + ".DELETE" ) );
-                    secondSteps.append(
+                secondSteps.append(
+                          new RenameJob( name, name + ".DELETE" ) );
+                secondSteps.append(
                           new RenameJob( name + ".NEW", name ) );
+
+                // We can't just delete ourselfs. 
+                if ( name == Global::applicationName() ) {
+                    thirdSteps.append(
+                          new DeleteLiveUpdateBinaryJob( name + ".DELETE" ) );
+                }
+                else
                     thirdSteps.append(
                           new DeleteJob( name + ".DELETE" ) );
-                }
             }
             else if ( status.contains(DO_DELETE) ) {
 
