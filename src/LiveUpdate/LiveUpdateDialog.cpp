@@ -185,10 +185,12 @@ void LiveUpdateDialog::startUpdate ()
 
     // Was an error? 
     if ( ! m_jobFailed.isEmpty() ) {
+        m_cancelButton->setEnabled(false);
         m_jobBuilder->undoJobs();
     }
     // Was stopped? 
     else if ( ! m_jobStopped.isEmpty() ) {
+        m_cancelButton->setEnabled(false);
         m_jobBuilder->undoJobs();
     }
     // Success
@@ -259,10 +261,10 @@ void LiveUpdateDialog::warning ( const QString& w )
     return;
 }
 
-bool LiveUpdateDialog::question ( const QString& w )
+bool LiveUpdateDialog::question ( const QString& q )
 {
     bool res = false;
-    if ( QMessageBox::Ok == QMessageBox::question(this, tr("Question"), w,
+    if ( QMessageBox::Ok == QMessageBox::question(this, tr("Question"), q,
                                                   QMessageBox::Yes,
                                                   QMessageBox::No) )
         res = true;

@@ -1,5 +1,7 @@
 
 #include <QCoreApplication>
+#include <QProcess>
+#include <QMessageBox>
 
 #include "LiveUpdateChecker.h"
 #include "Config.h"
@@ -21,6 +23,7 @@ LiveUpdateChecker::LiveUpdateChecker ( LiveUpdateChecker::Mode mode ) :
     m_mode( mode ),
     m_md5Buffer( &m_md5ByteArray ),
     m_isUpToDate(true),
+    m_startUpdatingOnExit(false),
     m_version( Global::applicationVersionNumber() )
 
     /*throw (LiveUpdateChecker::ConfigIsWrongException)*/
@@ -70,6 +73,15 @@ LiveUpdateChecker::LiveUpdateChecker ( LiveUpdateChecker::Mode mode ) :
     QObject::connect( &m_http, 
                    SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
                    SLOT(httpResponseHeader(const QHttpResponseHeader &)) );
+
+    // Dome some connections for Application mode
+    if ( m_mode == LiveUpdateChecker::Application ) {
+        QObject::connect( this, 
+                          SIGNAL(newVersionIsAvailable(bool,const QString&)),
+                          SLOT(onNewVersionIsAvailable(bool,const QString&)) );
+        QObject::connect( QCoreApplication::instance() , SIGNAL(aboutToQuit()),
+                          SLOT(onAppAboutToQuit()) );
+    }
 }
 
 LiveUpdateChecker::~LiveUpdateChecker ()
@@ -164,6 +176,30 @@ void LiveUpdateChecker::httpDone ( bool err )
     }
 
     m_httpGetId = 0;
+}
+
+void LiveUpdateChecker::onNewVersionIsAvailable ( bool isNew, 
+                                                  const QString& ver )
+{
+    if ( m_mode == LiveUpdateChecker::Application && isNew ) {
+        if ( QMessageBox::Yes == QMessageBox::question( 0,
+                      tr("New version '%1' is available").arg(ver),
+                      tr("Start updating to new version '%1' on exit?").
+                      arg(ver), QMessageBox::Yes, QMessageBox::No) ) {
+            m_startUpdatingOnExit = true;
+        }
+    }        
+}
+
+void LiveUpdateChecker::onAppAboutToQuit ()
+{
+    if ( ! m_startUpdatingOnExit )
+        return;
+    QString liveUpdateBin( Global::applicationDirPath() + "/" + "LiveUpdate" );
+#ifdef Q_OS_WIN
+    liveUpdateBin += ".exe";
+#endif
+    QProcess::startDetached( liveUpdateBin );
 }
 
 /*****************************************************************************/
