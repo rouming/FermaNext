@@ -13,7 +13,7 @@ DESTDIR = $$LEVEL/plugins/
 QT += core network xml
 
 TEMPLATE = lib
-CONFIG += plugin warn_on thread
+CONFIG += plugin warn_off thread
 INCLUDEPATH += ./
 
 HEADERS += Optimization.GA.GAlib.h
