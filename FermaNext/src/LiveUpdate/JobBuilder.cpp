@@ -162,13 +162,15 @@ Job::JobType Job::jobType () const
 
 /*****************************************************************************/
 
-DownloadJob::DownloadJob ( const QString& url, const QString& fileToSave ) :
+DownloadJob::DownloadJob ( const QString& url, const QString& fileToSave,
+                           bool executable ) :
     Job( Job::DownloadJob ),
     m_urlToDownload( url ),
     m_fileToSave( fileToSave ),
     m_progressStatus( Job::Success ),
     m_progressDone(0.0),
-    m_requestAborted(false)
+    m_requestAborted(false),
+    m_executable(executable)
 {
     m_http.setHost( m_urlToDownload.host() );
 
@@ -281,6 +283,12 @@ void DownloadJob::httpDone ( bool error )
         Job::setErrorString( m_http.errorString() );
     }
     else {
+        // Set file permissions
+        if ( m_executable ) {
+            QFile::Permissions p = m_fileToSave.permissions();
+            m_fileToSave.setPermissions( p | QFile::QFile::ExeOwner );
+        }
+
         m_progressDone = 100.0;
         m_progressStatus = Job::Success;
     }
@@ -366,27 +374,19 @@ void DeleteJob::doJob ()
     m_progressDone = 0.0;
 
     QFileInfo fileInfo( m_pathToDelete );
-    bool res = false;
 
     // If directory
     if ( fileInfo.isDir() ) {
         QDir dir;
-        res = dir.rmdir( m_pathToDelete );
+        dir.rmdir( m_pathToDelete );
     }
     // If file
     else {
-        res = QFile::remove( m_pathToDelete );
+        QFile::remove( m_pathToDelete );
     }
 
-    if  ( ! res ) {
-        QString msg( tr("Can't delete '%1'") );
-        Job::setErrorString( msg.arg(m_pathToDelete.section('/', -1)) );
-
-        m_progressDone = 0.0;
-        m_progressStatus = Job::Failed;
-
-        return;
-    }
+    // Delete job (3-rd step) CAN NOT FAIL.
+    // Axiom!
 
     m_progressDone = 100.0;
     m_progressStatus = Job::Success;
@@ -511,7 +511,8 @@ void CreateDirJob::getCurrentProgress ( JobProgressStatus& status,
 JobBuilder::JobBuilder ( const QDomDocument& md5Compared ) :
     m_currentJob(0),
     m_isConflict(false),
-    m_jobsTerminated(false)
+    m_jobsTerminated(false),
+    m_pointOfNoReturnInd(-1)
 {
     QDomElement md5CmpElem = md5Compared.documentElement();
     QList<QDomElement> elems;
@@ -543,6 +544,7 @@ void JobBuilder::clearJobs ()
 
     m_currentJob = 0;
     m_jobsTerminated = false;
+    m_pointOfNoReturnInd = -1;
 
     QList<Job*>::Iterator it = m_jobs.begin();
     for ( ; it != m_jobs.end(); ++it )
@@ -664,8 +666,11 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
         }
 
         if ( elem.tagName() == "File" ) {
+            
+            bool exec = elem.hasAttribute( "permissions" );
+
             if ( status.contains(DO_GET) ) {
-                firstSteps.append( new DownloadJob( url + name, name) );
+                firstSteps.append( new DownloadJob( url + name, name, exec) );
             }
             else if ( status.contains(DO_REPLACE) ) {
 
@@ -676,7 +681,7 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
                 }
 
                 firstSteps.append( 
-                          new DownloadJob( url + name, name + ".NEW" ) );
+                          new DownloadJob( url + name, name + ".NEW", exec ) );
 
                 secondSteps.append(
                           new RenameJob( name, name + ".DELETE" ) );
@@ -746,6 +751,9 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
     // Append in order
     m_jobs = firstSteps + secondSteps + thirdSteps;
 
+    // Set point of not return index
+    m_pointOfNoReturnInd = firstSteps.size() + secondSteps.size();
+
     // Sort and copy conflict msgs
     qSort( conflictMsgs.begin(), conflictMsgs.end() );
     m_conflictMsgs = conflictMsgs;
@@ -768,8 +776,13 @@ bool JobBuilder::doJobs ()
     m_currentJob = 0;
 
     for ( int i = 0; i < m_jobs.size(); ++i ) {
+
         Job* job = m_jobs[i];
         m_currentJob = job;
+
+        // Point of not return is reached
+        if ( i == m_pointOfNoReturnInd )
+            emit pointOfNoReturn( job->jobUuid() );
 
         Job::JobProgressStatus status = Job::Running;
         double percentsDone = percentsPerJob * i;
@@ -843,6 +856,10 @@ bool JobBuilder::undoJobs ()
         m_currentJob = 0;
         return true;
     }
+
+    // Can't undo if point of no return is reached
+    if ( m_pointOfNoReturnInd == index )
+        return false;
 
     double percentsPerJob = 100 / m_jobs.size();
     double percentsDone = (index + 1) * percentsPerJob;

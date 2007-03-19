@@ -43,6 +43,8 @@ private slots:
     void onJobFailed ( const QString& jobUuid );
     /** Before job stopped */
     void onJobStopped ( const QString& jobUuid );
+    /** On point of not return */
+    void onPointOfNoReturn ( const QString& jobUuid );
 
     /** Cancel pressed */
     void onCancelPressed ();

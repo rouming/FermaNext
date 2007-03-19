@@ -122,7 +122,7 @@ class DownloadJob : public Job
 {
     Q_OBJECT
 public:
-    DownloadJob ( const QString& url, const QString& pathToSave );
+    DownloadJob ( const QString& url, const QString& pathToSave, bool exec );
     virtual ~DownloadJob ();
 
     virtual QString jobMessage () const;
@@ -145,6 +145,7 @@ private:
     double m_progressDone;
     QHttp m_http;
     bool m_requestAborted;
+    bool m_executable;
 };
 
 class RenameJob : public Job
@@ -264,6 +265,13 @@ signals:
     void jobStopped ( const QString& jobUuid );
 
     /** 
+     * Deletion operations (3-rd step) can't be undoed.  
+     * The signal is emitted when 3-rd step is reached.
+     * Undo will not work after this signal.
+     */
+    void pointOfNoReturn ( const QString& jobUuid );
+
+    /** 
      * Works for both sides: do and undo 
      * For do it works: from 0 to 100 percent.
      * For undo works in reverse mode: from 100 to 0 percent.
@@ -275,6 +283,7 @@ private:
     Job* m_currentJob;
     bool m_isConflict;
     bool m_jobsTerminated;
+    int m_pointOfNoReturnInd;
     QStringList m_conflictMsgs;
 };
 

@@ -290,8 +290,13 @@ static void md5Compare ( QDomDocument& doc, QDomElement& parent,
         Q_ASSERT( ! rootElem.isNull() );
         rootElem.setAttribute( "status", statusAttr );
         // Set new md5 to newly created element
-        if ( rootElem.tagName() == "File" )
+        if ( rootElem.tagName() == "File" ) {
             rootElem.setAttribute( "md5", newMD5 );
+            if ( newMD5Elem.hasAttribute("permissions") ) {
+                QString perms = newMD5Elem.attribute("permissions" );
+                rootElem.setAttribute( "permissions", perms );
+            }
+        }
         parent.appendChild( rootElem );
     }
     else

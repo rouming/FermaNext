@@ -3,9 +3,13 @@ LiveUpdate updates current local version of FermaNext app in cvs/svn manner.
 
 TODO:
 
-DONE>>> 1. Conflict resolving messages with full description what will be done.
+DONE>>  6. Disable cancellation while doing third step. (Deleting)
 
-DONE>>> 2. Conflict detection in subdirectories:
+DONE>>  5. Set executable permissions for new or replaced binaries (actually on Unix only).
+
+DONE>>> 4. Conflict resolving messages with full description what will be done.
+
+DONE>>> 3. Conflict detection in subdirectories:
 
        <Directory status="deleted(delete)" name="dir_A_C_removed" >
             <Directory status="deleted(delete)" name="dir_A_C_A" >
@@ -21,7 +25,7 @@ DONE>>> 2. Conflict detection in subdirectories:
    It is obvious, that root directory 'dir_A_C_removed' can't be just deleted,
    because of the conflict in file 'dir_A_C_removed/file_A'
 
-DONE>>> 3. Correct sorting of directory deletion jobs:
+DONE>>> 2. Correct sorting of directory deletion jobs:
 
     DeleteJob (dir_A/dir_A_C_removed)
     DeleteJob (dir_A/dir_A_C_removed/dir_A_C_A)
@@ -35,5 +39,5 @@ DONE>>> 3. Correct sorting of directory deletion jobs:
     DeleteJob (dir_A/dir_A_C_removed/dir_A_C_A)
     DeleteJob (dir_A/dir_A_C_removed)
 
-DONE>>> 4. Correct progress counter with async jobs.
+DONE>>> 1. Correct progress counter with async jobs.
 
