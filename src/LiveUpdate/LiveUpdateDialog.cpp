@@ -154,6 +154,9 @@ void LiveUpdateDialog::startUpdate ()
                       SIGNAL(jobStopped(const QString&)),
                       SLOT(onJobStopped(const QString&)));
 
+    QObject::connect( m_jobBuilder, 
+                      SIGNAL(pointOfNoReturn(const QString&)),
+                      SLOT(onPointOfNoReturn(const QString&)));
 
     if ( m_jobBuilder->isConflict() ) {
         const QStringList& msgs = m_jobBuilder->conflictMessages();
@@ -264,9 +267,9 @@ void LiveUpdateDialog::warning ( const QString& w )
 bool LiveUpdateDialog::question ( const QString& q )
 {
     bool res = false;
-    if ( QMessageBox::Ok == QMessageBox::question(this, tr("Question"), q,
-                                                  QMessageBox::Yes,
-                                                  QMessageBox::No) )
+    if ( QMessageBox::Yes == QMessageBox::question(this, tr("Question"), q,
+                                                   QMessageBox::Yes,
+                                                   QMessageBox::No) )
         res = true;
     QCoreApplication::processEvents();
     return res;
@@ -371,6 +374,12 @@ void LiveUpdateDialog::onJobFailed ( const QString& jobUuid )
 void LiveUpdateDialog::onJobStopped ( const QString& jobUuid )
 {
     m_jobStopped = jobUuid;
+}
+
+void LiveUpdateDialog::onPointOfNoReturn ( const QString& )
+{
+    m_cancelButton->setEnabled(false);
+    QCoreApplication::processEvents();
 }
 
 /*****************************************************************************/

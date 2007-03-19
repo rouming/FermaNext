@@ -68,6 +68,11 @@ static void md5ForFiles ( QDomDocument& doc, QDomElement& parent,
 
         QString md5Sum = ::qtMD5( file.readAll() );
         elem.setAttribute( "md5", md5Sum );
+
+        QFile::Permissions perms = file.permissions();
+        if ( perms.testFlag(QFile::ExeOwner) )
+            elem.setAttribute( "permissions", "executable" );
+
         parent.appendChild( elem );
     }
 }
