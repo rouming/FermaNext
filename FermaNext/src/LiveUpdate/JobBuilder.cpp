@@ -286,7 +286,7 @@ void DownloadJob::httpDone ( bool error )
         // Set file permissions
         if ( m_executable ) {
             QFile::Permissions p = m_fileToSave.permissions();
-            m_fileToSave.setPermissions( p | QFile::QFile::ExeOwner );
+            m_fileToSave.setPermissions( p | QFile::ExeOwner );
         }
 
         m_progressDone = 100.0;
