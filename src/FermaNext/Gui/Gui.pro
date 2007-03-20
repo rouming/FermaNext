@@ -24,6 +24,7 @@ unix {
 }
 
 SOURCES = \
+          AboutDialog.cpp \
           ColorRangeControl.cpp \
           FermaNextMainWindow.cpp \
           GeometryTabWidget.cpp \
@@ -55,6 +56,7 @@ SOURCES = \
           Agg/AggWidget.cpp
 
 HEADERS = \
+          AboutDialog.h \
           ColorRangeControl.h \
           FermaNextMainWindow.h \
           GeometryTabWidget.h \
@@ -87,4 +89,5 @@ HEADERS = \
 
 
 FORMS += \
+         AboutDialog.ui \
          PluginExecutorDialog.ui

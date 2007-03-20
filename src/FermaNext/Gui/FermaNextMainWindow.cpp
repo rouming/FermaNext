@@ -35,6 +35,7 @@
 #include "TrussMaterialEditor.h"
 #include "TrussResultsManager.h"
 #include "UndoRedoListBox.h"
+#include "AboutDialog.h"
 
 #include "Plugin.h"
 #include <QTextStream>
@@ -709,13 +710,15 @@ void FermaNextMainWindow::setupHelpActions ()
     connect( a, SIGNAL(triggered()), SLOT(helpContents()) );
         menu->addAction( a );
     a->setDisabled(true);
-    menu->addSeparator();
+    a->setVisible(false);
+
+    a = menu->addSeparator();
+    a->setVisible(false);
 
     // About
-    a = new QAction( tr( "About FermaNext" ), this );
+    a = new QAction( tr( "About" ), this );
     connect( a, SIGNAL(triggered()), SLOT(helpAbout()) );
         menu->addAction( a );    
-    a->setDisabled(true);
 }
 
 bool FermaNextMainWindow::onCopyTrussUnitWindow ()
@@ -1806,7 +1809,8 @@ void FermaNextMainWindow::helpContents ()
 
 void FermaNextMainWindow::helpAbout ()
 {
-    qWarning("Not implmented yet!");
+    AboutDialog about(this);
+    about.exec();
 }
 
 /*****************************************************************************
