@@ -69,7 +69,7 @@ void ConfigTestThread::run ()
 */
 /*****************************************************************************/
 
-const QString ConfigFileName( "../build/config.xml" );
+const QString ConfigFileName( "config.xml" );
 
 class ConfigTest : public QThread
 {

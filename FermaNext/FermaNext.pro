@@ -1,6 +1,5 @@
 QMAKE_EXTRA_TARGETS = release debug release-clean debug-clean \
-                      release-distclean debug-distclean vcproj \
-                      build-tests clean-tests
+                      release-distclean debug-distclean vcproj
 
 release.CONFIG = recursive
 debug.CONFIG = recursive
@@ -32,15 +31,6 @@ isEmpty( ant_version ) {
             ANT =
         }
     }
-}
-
-contains( HAS_ANT, TRUE) {
-    build-tests.commands = cd tests && $$ANT
-    clean-tests.commands = cd tests && $$ANT clean
-}
-else {
-    build-tests.commands = echo 'Apache Ant' is required for building tests.
-    clean-tests.commands = echo 'Apache Ant' is required for building tests.
 }
 
 TEMPLATE = subdirs
@@ -76,6 +66,9 @@ SUBDIRS += \
           src/Plugins/Optimization.GA/GA.algorithm/java.JGAP \
           src/Plugins/Optimization.GA/GA.fitness.function/cpp.NodePosition \
           src/Plugins/Optimization.GA/GA.criteria/cpp.Force
+
+# Tests
+SUBDIRS += tests
 
 # Generates commands for Win32 to generate VS project files
 win32 {

@@ -6,7 +6,7 @@
 #include <time.h>
 
 #include <QRegion> 
-#include <QPointArray>
+#include <QPolygon>
 #include <QMap>
 
 #define MIN(v1, v2)( (v1) < (v2) ? (v1) : (v2)  )
@@ -272,7 +272,7 @@ struct Graph
     Pivots sortNodePivotsByAngle ( GraphNode* node )
     {
         Pivots res = nodePivots(node);
-        std::sort( res.begin(), res.end(), PivotsSortAlg(node) );
+        qSort( res.begin(), res.end(), PivotsSortAlg(node) );
         return res;
     }
 
@@ -325,7 +325,7 @@ struct Graph
         //TODO: path should be sorted by direction!! 
         Nodes neighbors = neighborNodes( seg.centerNode ); 
 
-        QPointArray points( path.size() + 2 );
+        QPolygon points( path.size() + 2 );
         points.setPoint( 0, seg.centerNode->point() );
 
         Pivots::const_iterator iter = path.begin();
@@ -376,7 +376,7 @@ struct Graph
     Pivots nearestPivots ( const Segment& seg, const Pivots& path )
     {
         //TODO: path should be sorted by direction!! 
-        QPointArray points( path.size() + 2 );
+        QPolygon points( path.size() + 2 );
         Nodes pathNodes;
 
         points.setPoint( 0, seg.centerNode->point() );
