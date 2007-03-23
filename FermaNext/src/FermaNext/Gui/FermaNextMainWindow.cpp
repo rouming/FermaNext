@@ -61,7 +61,8 @@ FermaNextMainWindow::FermaNextMainWindow ( FermaNextWorkspace& wsp ) :
     setupProjectActions();
     setupWindowActions();
     setupPluginsActions();
-    setupHelpActions();
+    //TODO
+    //setupHelpActions();
 
     // Refresh plugins menu
     PluginManager& plgManager = workspace.pluginManager();
@@ -701,9 +702,7 @@ void FermaNextMainWindow::setupPluginsActions ()
 
 void FermaNextMainWindow::setupHelpActions ()
 {
-    QMenu* menu = menuBar()->addMenu( tr( "&Help" ) );
-    // TODO
-    menu->setVisible(false);
+    QMenu* menu = menuBar()->addMenu( tr( "&Helpp" ) );
 
     QAction *a;
     // Contents
