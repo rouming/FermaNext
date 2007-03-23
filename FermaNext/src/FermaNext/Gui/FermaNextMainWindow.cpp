@@ -702,6 +702,8 @@ void FermaNextMainWindow::setupPluginsActions ()
 void FermaNextMainWindow::setupHelpActions ()
 {
     QMenu* menu = menuBar()->addMenu( tr( "&Help" ) );
+    // TODO
+    menu->setVisible(false);
 
     QAction *a;
     // Contents
@@ -852,6 +854,7 @@ TrussUnitWindow* FermaNextMainWindow::onPasteTrussUnitWindow ()
     TrussUnitWindowManager& wndMng = currProj->getTrussUnitWindowManager();
 
     TrussUnitWindow& copyWnd = wndMng.createTrussUnitWindow( "" );
+    // TODO
     copyWnd.setVisible( false );
     
     // Save UUID to restore it after copy properties from XML string
