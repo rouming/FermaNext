@@ -26,7 +26,7 @@ struct Vector
 
 float vectorlength ( const Vector& v )
 {
-    return sqrt(v.x * v.x + v.y * v.y);
+    return sqrt( float(v.x * v.x + v.y * v.y) );
 }
 
 float angle ( const Vector& a, const Vector& b )
