@@ -3,6 +3,7 @@ TARGET = JavaPluginLoader.ldr
 
 LEVEL = ../../..
 include($$LEVEL/FermaNext.pri)
+include(../../FermaNext/Gui/Gui.pri)
 include(../../FermaNext/Gui/Agg/Agg.pri)
 include(../../FermaNext/TrussUnit/TrussUnit.pri)
 include(../../Common/Common.pri)

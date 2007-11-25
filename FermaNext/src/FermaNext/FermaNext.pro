@@ -17,7 +17,7 @@ CONFIG += qt warn_on thread uitools
 DESTDIR = $$LEVEL
 
 unix {
-  QMAKE_LFLAGS += -export-dynamic
+  !mac:QMAKE_LFLAGS += -export-dynamic
 }
 
 SOURCES += \
