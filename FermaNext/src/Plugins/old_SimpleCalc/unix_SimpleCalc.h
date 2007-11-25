@@ -31,6 +31,8 @@ public:
     
     virtual void run()
     {
+        QMutexLocker locker( &m_mutex );
+
         // Wine call. Assuming wine is installed
         QProcess::startDetached("wine plugins/Simple_f.exe 1212");
           //> /dev/null 2>&1
@@ -46,13 +48,21 @@ public:
         QString okMsg("OK\n");
             
         while ( m_calculating ) {
+
+            m_sync.wait( &m_mutex );
+
+            if ( ! m_calculating )
+	        break;
             
             QDataStream out( &socket );
             out.setVersion( QDataStream::Qt_4_0 );
+         
             QString fileName = nextToCalculate();
             
             if ( fileName.isEmpty() )
                 continue;
+
+            m_mutex.unlock();
             
             out.writeRawData( qPrintable(fileName), fileName.length() );
             socket.waitForBytesWritten();
@@ -64,6 +74,7 @@ public:
             socket.readAll();
             
             m_sync.wakeAll();
+            m_mutex.lock();
         }
 
         QString quitMsg("quit\n");
@@ -81,17 +92,23 @@ public:
     {
         if ( fileName.isEmpty() )
             return;
-        QMutexLocker locker(&m_mutex);
+        m_mutex.lock();
+        if ( ! m_calculating )
+	    return;
         m_calculateQueue.append(fileName);
+        m_mutex.unlock();
+        m_sync.wakeAll();
+        m_mutex.lock();
         m_sync.wait(&m_mutex);
+        m_mutex.unlock();
     }
 
 public slots:
     void stopCalculating ()
     {
         m_calculating = false;
-        while ( isRunning() )
-            usleep(200);
+        m_sync.wakeAll();
+        QThread::wait();
     }
     
 private:
