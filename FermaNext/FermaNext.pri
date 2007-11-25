@@ -13,6 +13,11 @@ DEFINES += FERMA_VERSION=$$FERMA_VERSION
 # We're avoiding all these warnings with this define
 win32:DEFINES += _CRT_SECURE_NO_DEPRECATE
 
+# Platform specific macroses
+win32:DEFINES += _WIN_
+mac:DEFINES += _MAC_
+linux-*:DEFINES += _LIN_
+
 # Enable logging from ENV
 isEmpty(ENABLE_LOGGING): ENABLE_LOGGING = $$(ENABLE_LOGGING)
 

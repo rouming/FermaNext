@@ -32,17 +32,19 @@ QString dl_error ()
 
 const QString& DynaLoader::libExtension ()
 {
-#if defined _WIN32 || defined WIN32
+#ifdef _WIN_
     static QString extension = "dll";
-#else
+#elif _LIN_
     static QString extension = "so";
+#else _MAC_
+    static QString extension = "dylib";
 #endif
     return extension;
 }
 
 const QString& DynaLoader::libPrefix ()
 {
-#if defined _WIN32 || defined WIN32
+#ifdef _WIN_
     static QString prefix = "";
 #else
     static QString prefix = "lib";
