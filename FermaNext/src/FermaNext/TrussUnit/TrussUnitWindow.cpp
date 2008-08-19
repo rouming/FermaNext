@@ -10,10 +10,10 @@
  * Truss Unit Window
  *****************************************************************************/
 
-/* 
+/*
    Constructs a new truss unit window with the title name.
 */
-TrussUnitWindow::TrussUnitWindow ( const QString& name, 
+TrussUnitWindow::TrussUnitWindow ( const QString& name,
                                    ObjectStateManager* mng,
                                    const TrussMaterialLibrary& mLib ) :
     TrussUnit( name, mng, mLib ),
@@ -25,9 +25,9 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name,
     coordFieldRendered(false),
     headFont( agg::verdana14_bold ),
     numbersFont( agg::verdana13 ),
-    windowBuf( new rbuf_dynarow( Global::defaultWidth, 
+    windowBuf( new rbuf_dynarow( Global::defaultWidth,
                                  Global::defaultHeight ) ),
-    trussBuf( new rbuf_dynarow( Global::defaultBufWidth, 
+    trussBuf( new rbuf_dynarow( Global::defaultBufWidth,
                                 Global::defaultBufHeight ) ),
     coordBuf( new rbuf_dynarow( 100, 10 ) ),
     numbersBuf( new rbuf_dynarow( 60, 10 ) ),
@@ -42,14 +42,14 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name,
                                 getTrussAreaLeftTopPos();
 
     setTrussAreaSizeInPix( QSize(pixAreaSize.x(),pixAreaSize.y()) );
-    
+
     connect( this, SIGNAL( onAreaChange(const DoubleSize&) ),
                    SLOT( clearWindowRenderedFlag() ) );
 
     connect( this, SIGNAL( onCalculationStatusChange(bool) ),
                    SLOT( clearWindowRenderedFlag() ) );
 
-    // Clear rendered flag of the parent truss unit. Used for force updating 
+    // Clear rendered flag of the parent truss unit. Used for force updating
     // truss units from the outside
     connect( this, SIGNAL( onForceRedrawTrussUnit() ),
                    SLOT( clearRenderedFlag() ) );
@@ -58,11 +58,11 @@ TrussUnitWindow::TrussUnitWindow ( const QString& name,
 
     setCanvasColor( 8, 10, 12 );
 
-    setHighlighted( false ); 
+    setHighlighted( false );
 }
 
-/* 
-   Destroys truss unit window. 
+/*
+   Destroys truss unit window.
 */
 TrussUnitWindow::~TrussUnitWindow ()
 {
@@ -75,26 +75,26 @@ TrussUnitWindow::~TrussUnitWindow ()
     foreach ( AggTrussWindowButton* b, windowButtons )
         delete b;
     windowButtons.clear();
-    
+
     delete timer;
 }
 
 void TrussUnitWindow::initWindowButtons ()
 {
-    AggTrussWindowButton* hideButton = 
+    AggTrussWindowButton* hideButton =
                 new AggTrussWindowButton( QPoint( 30, 1 ),
                     Global::imagesSvgPath() + "/closeIcon.svg",
                     WindowButtonType::HideButton );
 
-    AggTrussWindowButton* rollUpButton = 
+    AggTrussWindowButton* rollUpButton =
                   new AggTrussWindowButton( QPoint( 15, 1 ),
                       Global::imagesSvgPath() + "/rollUpIcon.svg",
                       WindowButtonType::RollUpButton );
 
-    AggTrussWindowButton* propSizeButton = 
+    AggTrussWindowButton* propSizeButton =
                     new AggTrussWindowButton( QPoint( 1, 1 ),
                         Global::imagesSvgPath() + "/propSizeIcon.svg",
-                        WindowButtonType::PropSizeButton );   
+                        WindowButtonType::PropSizeButton );
 
     windowButtons.append( hideButton );
     windowButtons.append( rollUpButton );
@@ -135,7 +135,7 @@ void TrussUnitWindow::initWindowButtons ()
 
     connect( propSizeButton, SIGNAL( onButtonRelease() ),
              this, SLOT( setProportionalSize() ) );
-    
+
     // Setup timer for button tool tips
     connect( timer, SIGNAL( timeout() ),
                     SLOT( setWindowButtonHinted() ) );
@@ -151,15 +151,15 @@ void TrussUnitWindow::redrawTrussUnit ()
     emit onForceRedrawTrussUnit();
 }
 
-/** 
+/**
  * Loads truss window from XML format
  */
-void TrussUnitWindow::loadFromXML ( const QDomElement& elem ) 
+void TrussUnitWindow::loadFromXML ( const QDomElement& elem )
     /*throw (LoadException)*/
 {
     TrussUnit::loadFromXML( elem );
 
-    /** 
+    /**
      * Set window size
      *******************/
     if ( ! elem.hasAttribute( "windowWidth" ) )
@@ -176,7 +176,7 @@ void TrussUnitWindow::loadFromXML ( const QDomElement& elem )
 
     setWindowSize( width, height );
 
-    /** 
+    /**
      * Set window pisition
      ***********************/
     if ( ! elem.hasAttribute( "windowXPosition" ) )
@@ -217,7 +217,7 @@ void TrussUnitWindow::loadFromXML ( const QDomElement& elem )
     }
 }
 
-/** 
+/**
  * Saves truss window to XML format
  */
 QDomElement TrussUnitWindow::saveToXML ( QDomDocument& doc )
@@ -225,13 +225,13 @@ QDomElement TrussUnitWindow::saveToXML ( QDomDocument& doc )
     QDomElement trussElem = TrussUnit::saveToXML( doc );
     trussElem.setTagName( "TrussUnitWindow" );
 
-    /** 
+    /**
      * Save window size and window position
      ***************************************/
     QSize size;
     QPoint pos;
     if ( isMaximized() ) {
-        size = QSize( minRightBottomPos.x() - minLeftTopPos.x(), 
+        size = QSize( minRightBottomPos.x() - minLeftTopPos.x(),
                       minRightBottomPos.y() - minLeftTopPos.y() );
         pos = minLeftTopPos;
     } else {
@@ -256,8 +256,8 @@ QDomElement TrussUnitWindow::saveToXML ( QDomDocument& doc )
     return trussElem;
 }
 
-/* 
-   Sets rendered flag of the window buffer to FALSE, so it 
+/*
+   Sets rendered flag of the window buffer to FALSE, so it
    will be repainted, when the paint method will be called.
 */
 void TrussUnitWindow::clearWindowRenderedFlag ()
@@ -265,8 +265,8 @@ void TrussUnitWindow::clearWindowRenderedFlag ()
     rendered( false );
 }
 
-/* 
-   Sets rendered flag of the button buffer to FALSE, so it 
+/*
+   Sets rendered flag of the button buffer to FALSE, so it
    will be repainted, when the paint method will be called.
 */
 void TrussUnitWindow::clearButtonBufRenderedFlag ()
@@ -275,18 +275,18 @@ void TrussUnitWindow::clearButtonBufRenderedFlag ()
     emit onClearButtonRenderedFlag();
 }
 
-/* 
-   Returns left top position of the truss unit window 
-   relative to main agg rendering buffer. 
+/*
+   Returns left top position of the truss unit window
+   relative to main agg rendering buffer.
 */
 QPoint TrussUnitWindow::getWindowLeftTopPos () const
 {
     return windowLeftTopPos;
 }
 
-/* 
-   Returns right bottom position of the truss unit window 
-   relative to main agg rendering buffer. 
+/*
+   Returns right bottom position of the truss unit window
+   relative to main agg rendering buffer.
 */
 QPoint TrussUnitWindow::getWindowRightBottomPos () const
 {
@@ -294,9 +294,9 @@ QPoint TrussUnitWindow::getWindowRightBottomPos () const
                    windowLeftTopPos.y() + windowSize.height() );
 }
 
-/* 
+/*
    Returns left top position of the editable truss area.
-   Truss units are painted within it. 
+   Truss units are painted within it.
 */
 QPoint TrussUnitWindow::getTrussAreaLeftTopPos () const
 {
@@ -306,22 +306,22 @@ QPoint TrussUnitWindow::getTrussAreaLeftTopPos () const
     return point;
 }
 
-/* 
+/*
    Returns right bottom position of the editable truss area.
-   Truss units are painted within it. 
+   Truss units are painted within it.
 */
 QPoint TrussUnitWindow::getTrussAreaRightBottomPos () const
 {
     QPoint point;
-    point.setX( windowLeftTopPos.x() + windowSize.width() - 
+    point.setX( windowLeftTopPos.x() + windowSize.width() -
                 Global::rigthWindowIndent );
-    point.setY( windowLeftTopPos.y() + windowSize.height() - 
+    point.setY( windowLeftTopPos.y() + windowSize.height() -
                 Global::bottomWindowIndent );
     return point;
 }
 
-/* 
-   Sets window left top position relative to main agg 
+/*
+   Sets window left top position relative to main agg
    rendering buffer .
 */
 void TrussUnitWindow::setWindowPosition ( QPoint pos )
@@ -341,8 +341,8 @@ bool TrussUnitWindow::hasPosition () const
     return positionIsSet;
 }
 
-/* 
-   Returns button buffer left top position relative to main agg 
+/*
+   Returns button buffer left top position relative to main agg
    rendering buffer.
 */
 QPoint TrussUnitWindow::getButtonBufPos () const
@@ -352,11 +352,11 @@ QPoint TrussUnitWindow::getButtonBufPos () const
         buttonsWidth = buttonsWidth + b->getWidth();
 
     int xIndent = 22, yIndent = 4;
-    return QPoint( getWindowRightBottomPos().x() - buttonsWidth - xIndent, 
+    return QPoint( getWindowRightBottomPos().x() - buttonsWidth - xIndent,
                    windowLeftTopPos.y() + yIndent );
 }
 
-/* 
+/*
    Returns current size of the truss unit window.
 */
 const QSize& TrussUnitWindow::getWindowSize () const
@@ -372,10 +372,10 @@ QSize TrussUnitWindow::getMaximizedWindowSize () const
 {
     if ( windowOwner )
         return QSize( windowOwner->width(), windowOwner->height() );
-    return QSize(0,0); 
+    return QSize(0,0);
 }
 
-/* 
+/*
    Sets a new size of the truss unit window.
 */
 void TrussUnitWindow::setWindowSize ( int width, int height )
@@ -391,7 +391,7 @@ void TrussUnitWindow::setWindowSize ( const QSize& size )
 
     QPoint pixAreaSize = getTrussAreaRightBottomPos() -
                          getTrussAreaLeftTopPos();
-    trussBuf->init( pixAreaSize.x() + 2 * Global::trussBufIndent, 
+    trussBuf->init( pixAreaSize.x() + 2 * Global::trussBufIndent,
                     pixAreaSize.y() + 2 * Global::trussBufIndent );
 
     setTrussAreaSizeInPix( QSize(pixAreaSize.x(),pixAreaSize.y()) );
@@ -400,7 +400,7 @@ void TrussUnitWindow::setWindowSize ( const QSize& size )
     emit onResize( oldSize, windowSize );
 }
 
-/* 
+/*
    Resizes truss unit window and moves it to the leftTop pos.
 */
 void TrussUnitWindow::resize ( QPoint leftTop, QPoint rightBottom )
@@ -411,7 +411,7 @@ void TrussUnitWindow::resize ( QPoint leftTop, QPoint rightBottom )
     setWindowPosition( leftTop );
 }
 
-/* 
+/*
    Check if window is maximized. Returns TRUE if it so.
 */
 bool TrussUnitWindow::isMaximized () const
@@ -438,7 +438,7 @@ void TrussUnitWindow::maximize ( bool saveOldSize )
     }
 
     QSize maximizedSize = getMaximizedWindowSize();
-    resize( QPoint( 0, 0 ), 
+    resize( QPoint( 0, 0 ),
             QPoint( maximizedSize.width(), maximizedSize.height() ) );
 
     foreach ( AggTrussWindowButton* button, windowButtons )
@@ -453,7 +453,7 @@ void TrussUnitWindow::maximize ( bool saveOldSize )
 }
 
 /*
-    Minimizes truss unit window. Sets its size to saved 
+    Minimizes truss unit window. Sets its size to saved
     minLeftTopPos and minRightBottomPos.
 */
 void TrussUnitWindow::minimize ()
@@ -487,7 +487,7 @@ void TrussUnitWindow::setProportionalSize ()
     if ( h < w )  {
         w = int(h * getTrussAreaSize().width() / getTrussAreaSize().height());
 
-        // Check if size is smaller then minimum window size 
+        // Check if size is smaller then minimum window size
         if ( w < Global::resizeLimit ) {
             double sizeCoeff = double( Global::resizeLimit ) / w;
             qWarning( "sizeCoeff = %f", sizeCoeff );
@@ -498,7 +498,7 @@ void TrussUnitWindow::setProportionalSize ()
     else {
         h = int(w * getTrussAreaSize().height() / getTrussAreaSize().width());
 
-        // Check if size is smaller then minimum window size 
+        // Check if size is smaller then minimum window size
         if ( h < Global::resizeLimit ) {
             double sizeCoeff =  double( Global::resizeLimit ) / h ;
             h = Global::resizeLimit;
@@ -518,7 +518,7 @@ DoublePoint TrussUnitWindow::getCursorCoord () const
 }
 
 /*
-    Sets new truss coordinates of the mouse cursor 
+    Sets new truss coordinates of the mouse cursor
     above the truss area.
 */
 void TrussUnitWindow::setCursorCoord ( const QPoint& p )
@@ -526,7 +526,7 @@ void TrussUnitWindow::setCursorCoord ( const QPoint& p )
     if ( cursorCoord == DoublePoint( p.x(), p.y() ) )
         return;
 
-    if ( p.x() != -1 && p.y() != -1 ) 
+    if ( p.x() != -1 && p.y() != -1 )
     {
         DoublePoint coord = getTrussCoordFromWidgetPos( p.x(), p.y() );
         const DoubleSize& size = getTrussAreaSize();
@@ -535,7 +535,7 @@ void TrussUnitWindow::setCursorCoord ( const QPoint& p )
             cursorCoord.setX( -1 );
             cursorCoord.setY( -1 );
         }
-        else 
+        else
             cursorCoord = DoublePoint( coord.x(), coord.y() );
     }
     else
@@ -544,10 +544,10 @@ void TrussUnitWindow::setCursorCoord ( const QPoint& p )
     coordFieldRendered = false;
 }
 
-/* 
-    Sets new truss coordinates of the mouse cursor above 
-    the truss area. Assuming this coords are from truss 
-    node position, so we don't want to convert them from 
+/*
+    Sets new truss coordinates of the mouse cursor above
+    the truss area. Assuming this coords are from truss
+    node position, so we don't want to convert them from
     widget position.
 */
 void TrussUnitWindow::setCursorCoord ( const DoublePoint& p )
@@ -561,8 +561,8 @@ void TrussUnitWindow::setCursorCoord ( const DoublePoint& p )
 bool TrussUnitWindow::inWindowRect ( int x, int y ) const
 {
     QPoint windowRightBottomPos = getWindowRightBottomPos();
-    
-    if ( x >= windowLeftTopPos.x() && x <= windowRightBottomPos.x() && 
+
+    if ( x >= windowLeftTopPos.x() && x <= windowRightBottomPos.x() &&
          y >= windowLeftTopPos.y() && y <= windowRightBottomPos.y() )
     {
         return true;
@@ -574,9 +574,9 @@ bool TrussUnitWindow::inCanvasRect ( int x, int y ) const
 {
     QPoint windowRightBottomPos = getWindowRightBottomPos();
 
-    if ( x >= windowLeftTopPos.x() + Global::bordWidth && 
-        x <= windowRightBottomPos.x() - Global::bordWidth && 
-        y >= windowLeftTopPos.y() + Global::bordWidth + Global::headWidth && 
+    if ( x >= windowLeftTopPos.x() + Global::bordWidth &&
+        x <= windowRightBottomPos.x() - Global::bordWidth &&
+        y >= windowLeftTopPos.y() + Global::bordWidth + Global::headWidth &&
         y <= windowRightBottomPos.y() - Global::bordWidth )
     {
         return true;
@@ -591,10 +591,10 @@ bool TrussUnitWindow::inHeadlineRect ( int x, int y ) const
 
     QPoint windowRightBottomPos = getWindowRightBottomPos();
 
-    if ( x >= windowLeftTopPos.x() + 3 * Global::bordWidth && 
-         x <= windowRightBottomPos.x() - 3 * Global::bordWidth && y >= 
-         windowLeftTopPos.y() + Global::bordWidth && 
-         y <= windowLeftTopPos.y() + Global::headWidth + 
+    if ( x >= windowLeftTopPos.x() + 3 * Global::bordWidth &&
+         x <= windowRightBottomPos.x() - 3 * Global::bordWidth && y >=
+         windowLeftTopPos.y() + Global::bordWidth &&
+         y <= windowLeftTopPos.y() + Global::headWidth +
               Global::bordWidth / 2 &&
          ! inButtonBufRect( x, y ) )
     {
@@ -605,7 +605,7 @@ bool TrussUnitWindow::inHeadlineRect ( int x, int y ) const
 
 bool TrussUnitWindow::inTrussAreaRect ( int x, int y ) const
 {
-    if ( x >= getTrussAreaLeftTopPos().x() && 
+    if ( x >= getTrussAreaLeftTopPos().x() &&
          x <= getTrussAreaRightBottomPos().x() &&
          y >= getTrussAreaLeftTopPos().y() &&
          y <= getTrussAreaRightBottomPos().y() )
@@ -622,14 +622,14 @@ bool TrussUnitWindow::inHorResizeRect ( int x, int y ) const
 
     QPoint windowRightBottomPos = getWindowRightBottomPos();
 
-    if ( x >= windowLeftTopPos.x() + 1 && 
-         x <= windowLeftTopPos.x() + Global::bordWidth && 
-         y >= windowLeftTopPos.y() + Global::winCornerRadius && 
-         y <= windowRightBottomPos.y() - Global::winCornerRadius ||
-         x >= windowRightBottomPos.x() - Global::bordWidth && 
-         x <= windowRightBottomPos.x() - 1 && 
-         y >= windowLeftTopPos.y() + Global::winCornerRadius && 
-         y <= windowRightBottomPos.y() - Global::winCornerRadius )
+    if ( (x >= windowLeftTopPos.x() + 1 &&
+          x <= windowLeftTopPos.x() + Global::bordWidth &&
+          y >= windowLeftTopPos.y() + Global::winCornerRadius &&
+          y <= windowRightBottomPos.y() - Global::winCornerRadius) ||
+         (x >= windowRightBottomPos.x() - Global::bordWidth &&
+          x <= windowRightBottomPos.x() - 1 &&
+          y >= windowLeftTopPos.y() + Global::winCornerRadius &&
+          y <= windowRightBottomPos.y() - Global::winCornerRadius) )
     {
         return true;
     }
@@ -643,14 +643,14 @@ bool TrussUnitWindow::inVerResizeRect ( int x, int y ) const
 
     QPoint windowRightBottomPos = getWindowRightBottomPos();
 
-    if ( x >= windowLeftTopPos.x() + Global::winCornerRadius && 
-         x <= windowRightBottomPos.x() - Global::winCornerRadius && 
-         y >= windowLeftTopPos.y() && 
-         y <= windowLeftTopPos.y() + Global::bordWidth / 2 ||
-         x >= windowLeftTopPos.x() + Global::winCornerRadius && 
-         x <= windowRightBottomPos.x() - Global::winCornerRadius && 
-         y >= windowRightBottomPos.y() - Global::bordWidth && 
-         y <= windowRightBottomPos.y() )
+    if ( (x >= windowLeftTopPos.x() + Global::winCornerRadius &&
+          x <= windowRightBottomPos.x() - Global::winCornerRadius &&
+          y >= windowLeftTopPos.y() &&
+          y <= windowLeftTopPos.y() + Global::bordWidth / 2) ||
+         (x >= windowLeftTopPos.x() + Global::winCornerRadius &&
+          x <= windowRightBottomPos.x() - Global::winCornerRadius &&
+          y >= windowRightBottomPos.y() - Global::bordWidth &&
+          y <= windowRightBottomPos.y()) )
     {
         return true;
     }
@@ -664,16 +664,16 @@ bool TrussUnitWindow::inBDiagResizeRect ( int x, int y )
 
     QPoint windowRightBottomPos = getWindowRightBottomPos();
 
-    if ( sqrt( double((x - (windowRightBottomPos.x() - Global::bordWidth)) * 
+    if ( sqrt( double((x - (windowRightBottomPos.x() - Global::bordWidth)) *
                       (x - (windowRightBottomPos.x() - Global::bordWidth)) +
-                      (y - (windowLeftTopPos.y() + Global::bordWidth)) * 
-                      (y - (windowLeftTopPos.y() + Global::bordWidth)) )) 
+                      (y - (windowLeftTopPos.y() + Global::bordWidth)) *
+                      (y - (windowLeftTopPos.y() + Global::bordWidth)) ))
          <= Global::resEllRad )
     {
         return true;
     }
-    else if ( sqrt(double((x -(windowLeftTopPos.x() + Global::bordWidth)) * 
-                          (x -(windowLeftTopPos.x() + Global::bordWidth)) + 
+    else if ( sqrt(double((x -(windowLeftTopPos.x() + Global::bordWidth)) *
+                          (x -(windowLeftTopPos.x() + Global::bordWidth)) +
                           (y -(windowRightBottomPos.y() - Global::bordWidth))*
                           (y -(windowRightBottomPos.y() - Global::bordWidth))))
               <= Global::resEllRad )
@@ -689,11 +689,11 @@ bool TrussUnitWindow::inFDiagResizeRect ( int x, int y )
         return false;
 
     QPoint windowRightBottomPos = getWindowRightBottomPos();
-    
-    if ( sqrt( double((x - (windowLeftTopPos.x() + Global::bordWidth)) * 
+
+    if ( sqrt( double((x - (windowLeftTopPos.x() + Global::bordWidth)) *
                       (x - (windowLeftTopPos.x() + Global::bordWidth)) +
-                      (y - (windowLeftTopPos.y() + Global::bordWidth)) * 
-                      (y - (windowLeftTopPos.y() + Global::bordWidth))) ) 
+                      (y - (windowLeftTopPos.y() + Global::bordWidth)) *
+                      (y - (windowLeftTopPos.y() + Global::bordWidth))) )
          <= Global::resEllRad )
     {
         return true;
@@ -710,9 +710,9 @@ bool TrussUnitWindow::inFDiagResizeRect ( int x, int y )
 }
 
 
-AggTrussWindowButton* TrussUnitWindow::getButtonByCoord ( int xGlobal, 
+AggTrussWindowButton* TrussUnitWindow::getButtonByCoord ( int xGlobal,
                                                           int yGlobal ) const
-{   
+{
     QPoint widgetPos( xGlobal, yGlobal );
 
     // inner buffer coordinates
@@ -732,7 +732,7 @@ bool TrussUnitWindow::inButtonBufRect ( int x, int y ) const
     QPoint rectLeftTopPnt = getButtonBufPos();
     QPoint rectRightBottomPnt( rectLeftTopPnt.x() + 2 + buttonsWidth,
                                rectLeftTopPnt.y() + 1 +
-                               Global::windowButtonHeight ); 
+                               Global::windowButtonHeight );
 
     if ( x > getButtonBufPos().x() && x < rectRightBottomPnt.x() &&
          y > getButtonBufPos().y() && y < rectRightBottomPnt.y() )
@@ -753,7 +753,7 @@ void TrussUnitWindow::setHighlighted ( bool h )
         setResEllColor( 90, 90, 90 );
         setHeadlineFirstColor( 180, 130, 150 );
         setHeadlineMiddleColor( 230, 210, 200 );
-        setHeadlineLastColor( 150, 90, 110 );        
+        setHeadlineLastColor( 150, 90, 110 );
     }
     TrussUnit::setHighlighted(h);
     coordFieldRendered = false;
@@ -764,7 +764,7 @@ void TrussUnitWindow::setWindowButtonHinted ()
 {
     hinted = true;
     if( currentHintedButton )
-        emit onHintShowsUp( currentHintedButton->getHint(), 
+        emit onHintShowsUp( currentHintedButton->getHint(),
                             hintCurrentPos, true );
 }
 
@@ -816,7 +816,7 @@ void TrussUnitWindow::checkMouseMoveEvent ( int x, int y, bool buttonPressed )
             {
                 currentHintedButton = selectedButton;
                 hintCurrentPos = QPoint( x, y );
-                emit onHintShowsUp( currentHintedButton->getHint(), 
+                emit onHintShowsUp( currentHintedButton->getHint(),
                                     hintCurrentPos, false );
             }
         }
@@ -850,7 +850,7 @@ void TrussUnitWindow::checkMouseReleaseEvent ( int x, int y )
     if ( ! selectedButton ||  ! selectedButton->isEnabled() )
         return;
 
-    if ( selectedButton->getButtonType() == 
+    if ( selectedButton->getButtonType() ==
                             WindowButtonType::HideButton )
     {
         if ( selectedButton->isPressed() )
@@ -860,9 +860,9 @@ void TrussUnitWindow::checkMouseReleaseEvent ( int x, int y )
             hide();
         }
     }
-    else if ( selectedButton->getButtonType() == 
+    else if ( selectedButton->getButtonType() ==
                                 WindowButtonType::RollUpButton )
-    {   
+    {
         if ( selectedButton->isPressed() )
         {
             selectedButton->setPressed( false );
@@ -873,8 +873,8 @@ void TrussUnitWindow::checkMouseReleaseEvent ( int x, int y )
                 maximize ();
         }
     }
-    else if ( selectedButton->getButtonType() == 
-                                WindowButtonType::PropSizeButton ) 
+    else if ( selectedButton->getButtonType() ==
+                                WindowButtonType::PropSizeButton )
     {
         if ( selectedButton->isPressed() )
         {
@@ -939,14 +939,14 @@ void TrussUnitWindow::setResEllColor ( int r , int g, int b )
     resEllColor = agg::rgba(r, g, b);
 }
 
-QString TrussUnitWindow::fitTextToWindowSize ( QString str, int lengthLimit, 
+QString TrussUnitWindow::fitTextToWindowSize ( QString str, int lengthLimit,
                                                glyph_gen& glyph ) const
 {
     int textLength; // text length in pixels
     uint i, totalChar = str.length();
     for ( i = 0; i < totalChar; i++ )
     {
-        textLength = (int)glyph.width( str.toAscii().data() ); 
+        textLength = (int)glyph.width( str.toAscii().data() );
         if ( textLength <= lengthLimit )
             break;
         else
@@ -959,22 +959,22 @@ QString TrussUnitWindow::fitTextToWindowSize ( QString str, int lengthLimit,
 }
 
 void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
-                                      scanline_rasterizer& ras, 
-                                      textRenderer& textRend, 
-                                      solidRenderer& solidRend, 
+                                      scanline_rasterizer& ras,
+                                      textRenderer& textRend,
+                                      solidRenderer& solidRend,
                                       agg::scanline_p8& sl ) const
 {
     // Draw coordinate lines with arrow heads
-    DoublePoint leftTopAreaPos( Global::leftWindowIndent, 
+    DoublePoint leftTopAreaPos( Global::leftWindowIndent,
                                 Global::topWindowIndent );
-    DoublePoint rightBottomAreaPos( windowSize.width() - 
-                                    Global::rigthWindowIndent, 
-                                    windowSize.height() - 
+    DoublePoint rightBottomAreaPos( windowSize.width() -
+                                    Global::rigthWindowIndent,
+                                    windowSize.height() -
                                     Global::bottomWindowIndent);
     DoublePoint p1, p2;
     p2 = leftTopAreaPos;
     p1 = rightBottomAreaPos;
-    baseRend.copy_bar( (int)p2.x(), (int)p2.y(), 
+    baseRend.copy_bar( (int)p2.x(), (int)p2.y(),
                        (int)p1.x(), (int)p1.y(), agg::rgba(1,1,1) );
     p2.setY( p2.y() - Global::arrowHeadIndent );
     p1.setX( p2.x() );
@@ -1025,9 +1025,9 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
         strokePnt2.setY( strokePnt1.y() );
         drawLine ( ras, solidRend, sl, strokePnt1, strokePnt2 );
         textPos.setY( strokePnt1.y() + 3 );
-        str = QString("%1").arg( getTrussAreaSize().height() - 
-                                 i * scaleFactorYInAbs,0,'f',2 );   
-        drawText ( textRend, str, agg::rgba(100, 100, 100), textPos ); 
+        str = QString("%1").arg( getTrussAreaSize().height() -
+                                 i * scaleFactorYInAbs,0,'f',2 );
+        drawText ( textRend, str, agg::rgba(100, 100, 100), textPos );
     }
 
     // sign X-axis
@@ -1045,9 +1045,9 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
         strokePnt2.setX( strokePnt1.x() );
         drawLine( ras, solidRend, sl, strokePnt1, strokePnt2 );
         textPos.setX( strokePnt1.x() - 12 );
-        str = QString("%1").arg( getTrussAreaSize().width() - 
-                                 i * scaleFactorXInAbs,0,'f',2 );   
-        drawText( textRend, str, agg::rgba(100, 100, 100), textPos ); 
+        str = QString("%1").arg( getTrussAreaSize().width() -
+                                 i * scaleFactorXInAbs,0,'f',2 );
+        drawText( textRend, str, agg::rgba(100, 100, 100), textPos );
     }
 
     // draw area boundary values
@@ -1062,16 +1062,16 @@ void TrussUnitWindow::drawTrussArea ( ren_dynarow& baseRend,
     drawText( textRend, str, agg::rgba(100, 100, 100), strokePnt2 );
 
     strokePnt1.setX( leftTopAreaPos.x() - Global::scaleTextLeftBottomIndent );
-    strokePnt1.setY( rightBottomAreaPos.y() + 
+    strokePnt1.setY( rightBottomAreaPos.y() +
                       Global::scaleTextLeftBottomIndent );
     drawText( textRend, "0", agg::rgba(100, 100, 100), strokePnt1 );
-    
+
 }
 
-void TrussUnitWindow::drawHeadline ( ren_dynarow& baseRend, 
-                                     solidRenderer& solidRend, 
+void TrussUnitWindow::drawHeadline ( ren_dynarow& baseRend,
+                                     solidRenderer& solidRend,
                                      scanline_rasterizer& ras,
-                                     agg::scanline_p8& sl, 
+                                     agg::scanline_p8& sl,
                                      color_array_type& gradColors ) const
 {
     QPoint p1, p2;
@@ -1080,9 +1080,9 @@ void TrussUnitWindow::drawHeadline ( ren_dynarow& baseRend,
         p1.setX( 3 * Global::bordWidth );
         p2.setX( windowSize.width() - 3 * Global::bordWidth );
         rad = 9;
-    } 
+    }
     else {
-        p1.setX( windowSize.width() - 3 * Global::bordWidth - 
+        p1.setX( windowSize.width() - 3 * Global::bordWidth -
                  buttonBuf->width() + Global::windowButtonWidth );
         p2.setX( windowSize.width() - 3 * Global::bordWidth );
         rad = 6;
@@ -1098,7 +1098,7 @@ void TrussUnitWindow::drawHeadline ( ren_dynarow& baseRend,
     agg::trans_affine mtx;
     interpolator inter ( mtx );
     mtx *= agg::trans_affine_translation( 0, -1 );
-    linear_gradient_span_gen gradSpanGen( gradSpan, inter, gradFunc, 
+    linear_gradient_span_gen gradSpanGen( gradSpan, inter, gradFunc,
                                            gradColors, 0, Global::headWidth );
     linear_gradient_renderer gradRend( baseRend, gradSpanGen );
     ras.add_path( headline );
@@ -1120,13 +1120,13 @@ void TrussUnitWindow::drawHeadline ( ren_dynarow& baseRend,
 void TrussUnitWindow::drawCursorCoordinatesField ( ren_dynarow& baseRend,
                                                    textRenderer& textRend,
                                                    glyph_gen& glyph ) const
-                                             
+
 {
     if ( isHighlighted() )
         baseRend.clear( agg::rgba( 25,55,65 ) );
     else
         baseRend.clear( agg::rgba( 40,65,60 ) );
-    
+
     DoublePoint textPos( 0.0, 9.0 );
     color_type textColor = agg::rgba( 0, 0, 0 );
 
@@ -1141,8 +1141,8 @@ void TrussUnitWindow::drawCursorCoordinatesField ( ren_dynarow& baseRend,
         str = QString( "%1" ).arg( cursorCoord.x(),0,'f',2 );
         str.append(" : ");
         drawText( textRend, str, textColor, textPos );
-        int textLength = (int)glyph.width( str.toAscii().data() ); 
-        str = QString( "%1" ).arg( cursorCoord.y(),0,'f',2 );  
+        int textLength = (int)glyph.width( str.toAscii().data() );
+        str = QString( "%1" ).arg( cursorCoord.y(),0,'f',2 );
         textPos.setX ( textPos.x() + textLength );
         drawText( textRend, str, textColor, textPos );
     }
@@ -1150,13 +1150,13 @@ void TrussUnitWindow::drawCursorCoordinatesField ( ren_dynarow& baseRend,
 
 void TrussUnitWindow::drawNumbersField ( ren_dynarow& baseRend,
                                          textRenderer& textRend ) const
-                                             
+
 {
     if ( isHighlighted() )
         baseRend.clear ( agg::rgba( 25,55,65 ) );
     else
         baseRend.clear ( agg::rgba( 40,65,60 ) );
-    
+
     int nodeNumb = 0, pivotNumb = 0;
     PivotList pivotList = getPivotList();
     PivotListIter iter = pivotList.begin();
@@ -1206,41 +1206,41 @@ void TrussUnitWindow::drawNumbersField ( ren_dynarow& baseRend,
         str = QString("%1").arg( nodeNumb );
         textPos.setX ( 41 );
         drawText ( textRend, str, textColor, textPos );
-    }    
+    }
 }
 
-void TrussUnitWindow::drawResizeEllipses ( solidRenderer& solidRend, 
-                                           scanline_rasterizer& ras, 
+void TrussUnitWindow::drawResizeEllipses ( solidRenderer& solidRend,
+                                           scanline_rasterizer& ras,
                                            agg::scanline_p8& sl ) const
 {
     QPoint leftTopPos( Global::bordWidth, Global::bordWidth );
-    QPoint leftBottomPos( Global::bordWidth, 
+    QPoint leftBottomPos( Global::bordWidth,
                           windowSize.height() - Global::bordWidth );
-    QPoint rightTopPos( windowSize.width() - Global::bordWidth, 
+    QPoint rightTopPos( windowSize.width() - Global::bordWidth,
                         Global::bordWidth );
-    QPoint rightBottomPos( windowSize.width() - Global::bordWidth, 
+    QPoint rightBottomPos( windowSize.width() - Global::bordWidth,
                            windowSize.height() - Global::bordWidth );
 
     agg::ellipse ell;
     solidRend.color( resEllColor );
-    ell.init( leftTopPos.x(), leftTopPos.y(), 
+    ell.init( leftTopPos.x(), leftTopPos.y(),
               Global::resEllRad, Global::resEllRad, 10 );
     ras.add_path( ell );
-    ell.init( rightTopPos.x(), rightTopPos.y(), 
+    ell.init( rightTopPos.x(), rightTopPos.y(),
               Global::resEllRad, Global::resEllRad, 10 );
     ras.add_path ( ell );
-    ell.init( leftBottomPos.x(), leftBottomPos.y(), 
+    ell.init( leftBottomPos.x(), leftBottomPos.y(),
               Global::resEllRad, Global::resEllRad, 10 );
     ras.add_path ( ell );
-    ell.init( rightBottomPos.x(), rightBottomPos.y(), 
+    ell.init( rightBottomPos.x(), rightBottomPos.y(),
               Global::resEllRad, Global::resEllRad, 10 );
     ras.add_path(ell);
     agg::render_scanlines ( ras, sl, solidRend );
 }
 
-void TrussUnitWindow::drawCalcIndicator ( ren_dynarow& baseRend, 
+void TrussUnitWindow::drawCalcIndicator ( ren_dynarow& baseRend,
                                           solidRenderer& solidRend,
-                                          scanline_rasterizer& ras, 
+                                          scanline_rasterizer& ras,
                                           agg::scanline_p8& sl,
                                           color_array_type& gradColors,
                                           const QPoint& pos ) const
@@ -1252,7 +1252,7 @@ void TrussUnitWindow::drawCalcIndicator ( ren_dynarow& baseRend,
     ell.init ( pos.x(), pos.y(), rad + 1, rad + 1, 100 );
     if ( ! maximized )
         solidRend.color( agg::rgba( 0, 0, 0, 0.4 ) );
-    else 
+    else
         solidRend.color( agg::rgba( 0, 0, 0, 0.6 ) );
 
     ras.add_path(ell);
@@ -1268,7 +1268,7 @@ void TrussUnitWindow::drawCalcIndicator ( ren_dynarow& baseRend,
         middleColor = agg::rgba( 1, 1, 1 );
     color_type lastColor( agg::rgba( 0, 0, 0 ) );
     fillColorArray ( gradColors, firstColor, middleColor, lastColor );
-    drawGradientEllipse( baseRend, ras, sl, gradFunc, gradColors, mtx, 
+    drawGradientEllipse( baseRend, ras, sl, gradFunc, gradColors, mtx,
                          pos.x(), pos.y(), rad, -6, Global::headWidth + 8 );
 
     // draw indicator
@@ -1289,7 +1289,7 @@ void TrussUnitWindow::drawCalcIndicator ( ren_dynarow& baseRend,
     }
     fillColorArray( gradColors, firstColor, middleColor, lastColor );
 
-    drawGradientEllipse( baseRend, ras, sl, gradRadFunc, gradColors, mtx, 
+    drawGradientEllipse( baseRend, ras, sl, gradRadFunc, gradColors, mtx,
                          pos.x(), pos.y(), rad - 2, 0, rad - 2 );
 }
 
@@ -1299,20 +1299,20 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         return;
 
     glyph_gen glyph( 0 );
-    scanline_rasterizer ras;    
+    scanline_rasterizer ras;
     agg::scanline_p8 sl;
 
     pixf_dynarow windowPixf( *windowBuf ),
                  trussPixf( *trussBuf ),
                  numbersPixf( *numbersBuf ),
                  coordPixf( *coordBuf ),
-                 buttonPixf( *buttonBuf ); 
+                 buttonPixf( *buttonBuf );
 
-    if ( ! isRendered() ) 
-    { 
+    if ( ! isRendered() )
+    {
         ren_dynarow baseRend( windowPixf );
         baseRend.clear( agg::rgba (10, 10, 10, 0) );
-        solidRenderer solidRend( baseRend );    
+        solidRenderer solidRend( baseRend );
         textRenderer textRend( baseRend, glyph );
 
         /*------draw resize ellipses------*/
@@ -1321,14 +1321,14 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 
         /*------draw window border------*/
         if ( maximized )
-            baseRend.copy_bar( 0, 0, windowSize.width(), 
+            baseRend.copy_bar( 0, 0, windowSize.width(),
                                      windowSize.height(), borderColor );
         else
         {
             DoublePoint borderLeftTop( 0, -1 );
-            DoublePoint borderRightBottom( windowSize.width(), 
+            DoublePoint borderRightBottom( windowSize.width(),
                                            windowSize.height() );
-            DoublePoint shadowLeftTop( borderLeftTop.x() + 1, 
+            DoublePoint shadowLeftTop( borderLeftTop.x() + 1,
                                        borderLeftTop.y() + 1 );
 
             color_type shadowColor = agg::rgba( 0, 0, 0 );
@@ -1336,45 +1336,45 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
                 shadowColor = agg::rgba( 120, 0, 0 );
 
             drawOutlineRoundedRect( solidRend, ras, sl,
-                                    shadowLeftTop, borderRightBottom, 
+                                    shadowLeftTop, borderRightBottom,
                                     shadowColor, borderColor,
                                     Global::winCornerRadius, 1 );
             drawOutlineRoundedRect( solidRend, ras, sl,
-                                    borderLeftTop, borderRightBottom, 
+                                    borderLeftTop, borderRightBottom,
                                     agg::rgba( 1, 1, 1, 0.6 ), borderColor,
                                     Global::winCornerRadius, 1 );
         }
 
         /*------draw window canvas------*/
-        QPoint canvasLeftTop( Global::bordWidth, 
+        QPoint canvasLeftTop( Global::bordWidth,
                               Global::bordWidth + Global::headWidth );
-        QPoint canvasRightBottom( windowSize.width() - Global::bordWidth, 
+        QPoint canvasRightBottom( windowSize.width() - Global::bordWidth,
                                   windowSize.height() - coordBuf->height()-5 );
 
         color_type shadowColor = agg::rgba( 0, 0, 0, 0.2 );
         if ( isHighlighted() )
             shadowColor = agg::rgba( 120, 0, 0, 0.3 );
-        agg::rounded_rect shadow ( canvasLeftTop.x(), 
-                                   canvasLeftTop.y(), 
-                                   canvasRightBottom.x(), 
-                                   canvasRightBottom.y(), 
+        agg::rounded_rect shadow ( canvasLeftTop.x(),
+                                   canvasLeftTop.y(),
+                                   canvasRightBottom.x(),
+                                   canvasRightBottom.y(),
                                    Global::winCornerRadius / 3 );
         ras.add_path ( shadow );
         solidRend.color ( shadowColor );
         agg::render_scanlines ( ras, sl, solidRend );
 
-        DoublePoint lineLeftPnt( canvasLeftTop.x() + Global::winCornerRadius / 3, 
+        DoublePoint lineLeftPnt( canvasLeftTop.x() + Global::winCornerRadius / 3,
                                  canvasRightBottom.y() + 1 ),
-                    lineRightPnt( canvasRightBottom.x() - 
-                                  Global::winCornerRadius / 3, 
+                    lineRightPnt( canvasRightBottom.x() -
+                                  Global::winCornerRadius / 3,
                                   canvasRightBottom.y() + 1 );
-        drawLine( ras, solidRend, sl, lineLeftPnt, lineRightPnt, 
+        drawLine( ras, solidRend, sl, lineLeftPnt, lineRightPnt,
                   1, agg::rgba( 1, 1, 1, 0.7 ) );
 
-        agg::rounded_rect canvas ( canvasLeftTop.x() + 1, 
-                                   canvasLeftTop.y() + 1, 
-                                   canvasRightBottom.x(), 
-                                   canvasRightBottom.y(), 
+        agg::rounded_rect canvas ( canvasLeftTop.x() + 1,
+                                   canvasLeftTop.y() + 1,
+                                   canvasRightBottom.x(),
+                                   canvasRightBottom.y(),
                                    Global::winCornerRadius / 3 );
         ras.add_path ( canvas );
         solidRend.color ( canvColor );
@@ -1382,7 +1382,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 
         /*------draw window headline------*/
         color_array_type gradColors;
-        fillColorArray( gradColors, headFirstColor, 
+        fillColorArray( gradColors, headFirstColor,
                         headMiddleColor, headLastColor );
         drawHeadline( baseRend, solidRend, ras, sl, gradColors );
 
@@ -1390,17 +1390,17 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         QPoint centerPos( 22, Global::bordWidth/2 + Global::headWidth/2 );
         if ( maximized )
             centerPos.setX( centerPos.x() - 10 );
-        drawCalcIndicator( baseRend, solidRend, ras, sl, 
+        drawCalcIndicator( baseRend, solidRend, ras, sl,
                            gradColors, centerPos );
 
         /*------draw window title text and background rounded rectangle------*/
         glyph.font ( headFont );
         double lengthLimit = windowSize.width() / 2 - 38;
-        QString title = fitTextToWindowSize( getTrussName (), 
+        QString title = fitTextToWindowSize( getTrussName (),
                                              (int)lengthLimit, glyph );
         int titleLength = (int)glyph.width( title.toAscii().data() );
 
-        DoublePoint titlePos( ( windowSize.width() - 2 * Global::bordWidth - 
+        DoublePoint titlePos( ( windowSize.width() - 2 * Global::bordWidth -
                                 titleLength ) / 2, 14 );
         if ( maximized )
             titlePos.setY( titlePos.y() + 1 );
@@ -1412,7 +1412,7 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
             titleHeight = Global::headWidth + 2;
 
         DoublePoint rectPos1( titlePos.x() - 15, Global::bordWidth / 2 ),
-                    rectPos2( titlePos.x() + titleLength + 15, 
+                    rectPos2( titlePos.x() + titleLength + 15,
                               rectPos1.y() + titleHeight );
 
         if ( maximized )
@@ -1426,8 +1426,8 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
 
         fillColorArray( gradColors, firstColor, middleColor, lastColor );
         agg::trans_affine mtx;
-        drawOutlineRoundedRect( baseRend, solidRend, ras, sl, gradColors, 
-                                mtx, rectPos1, rectPos2, 
+        drawOutlineRoundedRect( baseRend, solidRend, ras, sl, gradColors,
+                                mtx, rectPos1, rectPos2,
                                 agg::rgba( 1, 1, 1, 0.6 ),
                                 8, 1, 0, Global::headWidth * 2 );
 
@@ -1466,8 +1466,8 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
         /*------draw buttons------*/
         baseRend = buttonPixf;
         baseRend.clear( agg::rgba (10, 10, 10, 0) );
-        solidRenderer solidRend( baseRend ); 
-        
+        solidRenderer solidRend( baseRend );
+
         foreach ( AggTrussWindowButton* b, windowButtons )
             b->paint( baseRend );
 
@@ -1475,26 +1475,26 @@ void TrussUnitWindow::paint ( base_renderer& baseRenderer ) const
     }
 
     /*------blend buffers------*/
-    baseRenderer.blend_from( windowPixf, 0, windowLeftTopPos.x(), 
+    baseRenderer.blend_from( windowPixf, 0, windowLeftTopPos.x(),
                              windowLeftTopPos.y(), unsigned(1.0 * 255) );
 
     const QPoint& areaLeftTop = getTrussAreaLeftTopPos();
 
-    baseRenderer.blend_from( trussPixf, 0, 
+    baseRenderer.blend_from( trussPixf, 0,
                              areaLeftTop.x() - Global::trussBufIndent,
-                             areaLeftTop.y() - Global::trussBufIndent, 
+                             areaLeftTop.y() - Global::trussBufIndent,
                              uint(1.0 * 255) );
 /*
-    baseRenderer.blend_from ( coordPixf, 0, 
-                              windowLeftTopPos.x() + Global::winCornerRadius, 
+    baseRenderer.blend_from ( coordPixf, 0,
+                              windowLeftTopPos.x() + Global::winCornerRadius,
                               windowRightBottomPos.y() - coordBuf->height() -3,
                               uint(1.0 * 255) );
 
-    baseRenderer.blend_from ( numbersPixf, 0, windowRightBottomPos.x() - 80, 
+    baseRenderer.blend_from ( numbersPixf, 0, windowRightBottomPos.x() - 80,
                               windowRightBottomPos.y() - coordBuf->height() -3,
                               uint(1.0 * 255) );
 */
-    baseRenderer.blend_from( buttonPixf, 0, getButtonBufPos().x(), 
+    baseRenderer.blend_from( buttonPixf, 0, getButtonBufPos().x(),
                              getButtonBufPos().y(), uint(1.0 * 255) );
 }
 

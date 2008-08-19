@@ -16,7 +16,7 @@
 #include "TrussLoad.h"
 #include "TrussMaterial.h"
 
-// Basic classes for truss unit construction. 
+// Basic classes for truss unit construction.
 template <class N, class P> class Truss;
 template <class N> class Pivot;
 class Node;
@@ -38,8 +38,8 @@ public:
     TrussDimension ();
     TrussDimension ( LengthMeasure, ForceMeasure );
     // Try to parse arguments
-    TrussDimension ( const QString& lengthMeasure, 
-                     const QString& forceMeasure ) 
+    TrussDimension ( const QString& lengthMeasure,
+                     const QString& forceMeasure )
         /*throw (WrongArgsException)*/;
 
     TrussDimension& operator= ( const TrussDimension& );
@@ -62,7 +62,7 @@ private:
  * Truss Emitter
  *****************************************************************************/
 
-// Truss emitter. All signals logic was moved to this 
+// Truss emitter. All signals logic was moved to this
 // classe because of Qt rejection to moc templates.
 
 class TrussEmitter : public StatefulObject
@@ -138,13 +138,13 @@ signals:
 };
 
 /*****************************************************************************
- * Truss 
+ * Truss
  *****************************************************************************/
 
-template <class N, class P> 
-class Truss : public TrussEmitter                                    
+template <class N, class P>
+class Truss : public TrussEmitter
 {
-public:   
+public:
     // Truss exceptions
     class NodeIndexOutOfBoundException {};
 
@@ -162,7 +162,7 @@ public:
     typedef typename PivotList::const_iterator PivotListConstIter;
     // Topology iterators
     typedef typename TopologyList::iterator TopologyListIter;
-    typedef typename TopologyList::const_iterator TopologyListConstIter;    
+    typedef typename TopologyList::const_iterator TopologyListConstIter;
 
     Truss ( ObjectStateManager* mng, const TrussMaterialLibrary& mLib ) :
         TrussEmitter(mng),
@@ -192,18 +192,18 @@ public:
         loadCases.createLoadCase();
     }
 
-    virtual void clear () 
+    virtual void clear ()
     {
         NodeListIter itNode;
         PivotListIter itPivot;
         TopologyListIter itTopology;
-        for ( itNode = nodes.begin(); 
+        for ( itNode = nodes.begin();
               itNode != nodes.end(); )
             itNode = removeNode( itNode );
-        for ( itPivot = pivots.begin(); 
+        for ( itPivot = pivots.begin();
               itPivot != pivots.end(); )
             itPivot = removePivot( itPivot );
-        for ( itTopology = topologies.begin(); 
+        for ( itTopology = topologies.begin();
               itTopology != topologies.end(); )
             itTopology = removeTopology( itTopology );
     }
@@ -214,7 +214,7 @@ public:
     }
 
     virtual N* findNodeByCoord ( const DoublePoint& point ) const
-    {   
+    {
         NodeListConstIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
         {
@@ -225,11 +225,11 @@ public:
                 return node;
         }
         return 0;
-    } 
-    
-    virtual N* findNodeByCoord ( const DoublePoint& point, 
+    }
+
+    virtual N* findNodeByCoord ( const DoublePoint& point,
                                  double precision ) const
-    {        
+    {
         NodeListConstIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
         {
@@ -237,18 +237,18 @@ public:
             if ( !node->isAlive() )
                 continue;
             const DoublePoint& pos = node->getPoint();
-            if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) + 
-                   (point.y() - pos.y()) * (point.y() - pos.y()) ) < 
+            if ( ( (point.x() - pos.x()) * (point.x() - pos.x()) +
+                   (point.y() - pos.y()) * (point.y() - pos.y()) ) <
                  sqrt( precision ) )
                 return node;
         }
         return 0;
-    }   
+    }
 
     virtual N* findNodeByNumber ( uint num ) const
     {
         NodeListConstIter iter = nodes.begin();
-        for ( uint i = 1; iter != nodes.end(); ++iter ) 
+        for ( uint i = 1; iter != nodes.end(); ++iter )
         {
             if ( (*iter)->isAlive() && i++ == num )
                 return *iter;
@@ -259,7 +259,7 @@ public:
     virtual P* findPivotByNumber ( uint num ) const
     {
         PivotListConstIter iter = pivots.begin();
-        for ( uint i = 1; iter != pivots.end(); ++iter ) 
+        for ( uint i = 1; iter != pivots.end(); ++iter )
         {
             if ( (*iter)->isAlive() && i++ == num )
                 return *iter;
@@ -275,10 +275,10 @@ public:
             P* pivot = (*iter);
             if ( ! pivot->isAlive() )
                 continue;
-            if ( &(pivot->getFirstNode()) == &node1 && 
-                 &(pivot->getLastNode()) == &node2 ||
-                 &(pivot->getFirstNode()) == &node2 && 
-                 &(pivot->getLastNode()) == &node1 ) {
+            if ( (&(pivot->getFirstNode()) == &node1 &&
+                  &(pivot->getLastNode()) == &node2) ||
+                 (&(pivot->getFirstNode()) == &node2 &&
+                  &(pivot->getLastNode()) == &node1) ) {
                 return pivot;
             }
         }
@@ -323,18 +323,18 @@ public:
 
         // Force reindex of elements numbers
         reindexNodesPivotsNumbers();
-        
+
         emit afterNodeCreation(*node);
         emit onStateChange();
         return *node;
     }
 
-    virtual P& createPivot ( uint firstNodeIndex, uint lastNodeIndex ) 
+    virtual P& createPivot ( uint firstNodeIndex, uint lastNodeIndex )
         /*throw (NodeIndexOutOfBoundException)*/
     {
         if ( firstNodeIndex >= nodes.size() || lastNodeIndex >= nodes.size() )
             throw NodeIndexOutOfBoundException();
-        
+
         N* first = nodes.at(firstNodeIndex);
         N* last  = nodes.at(lastNodeIndex);
 
@@ -367,17 +367,17 @@ public:
                                  SLOT(stateIsChanged()) );
         QObject::connect( pivot, SIGNAL(onLastNodeChange()),
                                  SLOT(stateIsChanged()) );
-        
+
         pivots.push_back(pivot);
 
         // Force reindex of elements numbers
         reindexNodesPivotsNumbers();
-        
-        emit afterPivotCreation(pivot->getFirstNode(), 
+
+        emit afterPivotCreation(pivot->getFirstNode(),
                                 pivot->getLastNode());
         emit onStateChange();
 
-        return *pivot;    
+        return *pivot;
     }
 
     // Momentary removing of an object. Nothing can revive it.
@@ -386,7 +386,7 @@ public:
         // Clean earlier desisted truss objects
         suspendedClean();
         PivotListIter iter = pivots.begin();
-        for ( ; iter != pivots.end(); ++iter ) 
+        for ( ; iter != pivots.end(); ++iter )
             if ( (*iter) == &pivot ) {
                 // Desist first
                 (*iter)->desist();
@@ -395,7 +395,7 @@ public:
                     return false;
                 return true;
             }
-        return false;    
+        return false;
     }
 
     // Momentary removing of an object. Nothing can revive it.
@@ -405,15 +405,15 @@ public:
         suspendedClean();
         NodeListIter iter = nodes.begin();
         for ( ; iter != nodes.end(); ++iter )
-            if ( (*iter) == &node ) {                
+            if ( (*iter) == &node ) {
                 // Desist first
                 (*iter)->desist();
                 iter = removeNode(iter);
                 if ( iter == nodes.end() )
                     return false;
-                return true; 
-            }            
-        return false;    
+                return true;
+            }
+        return false;
     }
 
     // Momentary removing of an object. Nothing can revive it.
@@ -480,8 +480,8 @@ public:
             material = pivot->getMaterial();
             if ( ! material )
                 continue;
-            
-            QList<const TrussMaterial*>::const_iterator mIter = 
+
+            QList<const TrussMaterial*>::const_iterator mIter =
                 std::find( materials.begin(), materials.end(),
                                               material );
             if ( mIter == materials.end() )
@@ -538,12 +538,12 @@ public:
     }
 
     virtual void setTrussAreaSize ( const DoubleSize& area )
-    {    
+    {
         trussAreaSize = area;
         emit onAreaChange( trussAreaSize );
         emit onStateChange();
     }
-    
+
     virtual const LoadCases& getLoadCases () const
     {
         return loadCases;
@@ -575,7 +575,7 @@ protected:
     virtual void nodeBeforeRevive ( StatefulObject& st )
     {
         // Safe conversion
-        try { 
+        try {
             N& node = dynamic_cast<N&>(st);
             emit beforeNodeRevive(node);
         }
@@ -585,7 +585,7 @@ protected:
     virtual void nodeAfterRevive ( StatefulObject& st )
     {
         // Safe conversion
-        try { 
+        try {
             N& node = dynamic_cast<N&>(st);
             // Force reindex of elements numbers
             reindexNodesPivotsNumbers();
@@ -599,7 +599,7 @@ protected:
     virtual void nodeBeforeDesist ( StatefulObject& st )
     {
         // Safe conversion
-        try { 
+        try {
             N& node = dynamic_cast<N&>(st);
             PivotList pivotsToDesist = findAdjoiningPivots( node, false );
             PivotListIter iter = pivotsToDesist.begin();
@@ -616,14 +616,14 @@ protected:
     virtual void nodeAfterDesist ( StatefulObject& st )
     {
         // Safe conversion
-        try { 
+        try {
             N& node = dynamic_cast<N&>(st);
             // Force reindex of elements numbers
             reindexNodesPivotsNumbers();
             emit afterNodeDesist(node);
             emit onStateChange();
         }
-        catch ( ... ) { return; }        
+        catch ( ... ) { return; }
     }
 
 /****************************** pivots ***************************************/
@@ -631,7 +631,7 @@ protected:
     virtual void pivotBeforeRevive ( StatefulObject& st )
     {
         // Safe conversion
-        try { 
+        try {
             P& pivot = dynamic_cast<P&>(st);
             emit beforePivotRevive( pivot.getFirstNode(), pivot.getLastNode());
         }
@@ -641,7 +641,7 @@ protected:
     virtual void pivotAfterRevive ( StatefulObject& st )
     {
         // Safe conversion
-        try { 
+        try {
             P& pivot = dynamic_cast<P&>(st);
             // Force reindex of elements numbers
             reindexNodesPivotsNumbers();
@@ -654,7 +654,7 @@ protected:
     virtual void pivotBeforeDesist ( StatefulObject& st )
     {
         // Safe conversion
-        try { 
+        try {
             P& pivot = dynamic_cast<P&>(st);
             emit beforePivotDesist( pivot.getFirstNode(), pivot.getLastNode());
         }
@@ -664,7 +664,7 @@ protected:
     virtual void pivotAfterDesist ( StatefulObject& st )
     {
         // Safe conversion
-        try { 
+        try {
             P& pivot = dynamic_cast<P&>(st);
             // Force reindex of elements numbers
             reindexNodesPivotsNumbers();
@@ -677,7 +677,7 @@ protected:
     virtual void removePivotMaterial ( const TrussMaterial& mat )
     {
         PivotList pivots = getPivotList();
-        for ( PivotListIter iter = pivots.begin(); 
+        for ( PivotListIter iter = pivots.begin();
               iter != pivots.end(); ++iter ) {
             P* pivot = *iter;
             if ( pivot->getMaterial() == &mat )
@@ -712,7 +712,7 @@ protected:
     {
         // Safe conversion
         try {
-            TrussTopology& topology = dynamic_cast<TrussTopology&>(st); 
+            TrussTopology& topology = dynamic_cast<TrussTopology&>(st);
             emit beforeTopologyDesist( topology );
         }
         catch ( ... ) { return; }
@@ -747,11 +747,11 @@ protected:
             P* pivot = *pIter;
             if ( pivot->isAlive() )
                 pivot->setNumber( i++ );
-        }        
+        }
     }
 
     // Physically removes nodes and pivots
-    virtual void suspendedClean () 
+    virtual void suspendedClean ()
     {
         // Clean desisted pivots without states
         PivotListIter pIter = pivots.begin();
@@ -779,7 +779,7 @@ protected:
         TopologyListIter tIter = topologies.begin();
         for ( ; tIter != topologies.end(); ) {
             TrussTopology* topology = *tIter;
-            if ( !topology->isAlive() && 
+            if ( !topology->isAlive() &&
                  topology->countEnabledStates() == 0 ) {
                 tIter = removeTopology(tIter);
             }
@@ -822,7 +822,7 @@ protected:
         PivotListConstIter iter = pivots.begin();
         for ( ; iter != pivots.end(); ++iter ) {
             P* pivot = (*iter);
-            if ( selectAlive && 
+            if ( selectAlive &&
                  ( !pivot->isAlive() ) )
                 continue;
             if ( &(pivot->getFirstNode()) == &node ||
@@ -840,9 +840,9 @@ protected:
         for ( ; iter != pivotsToRemove.end(); ++iter ) {
             // Desist first
             (*iter)->desist();
-            // Find not temp iter. 
+            // Find not temp iter.
             // (As you know, we create temp vector for adjoining elements)
-            PivotListIter realIter = std::find( pivots.begin(), pivots.end(), 
+            PivotListIter realIter = std::find( pivots.begin(), pivots.end(),
                                                 *iter );
             // We can omit saving of the returning iter, bacause we are
             // working with temp vector
@@ -902,7 +902,7 @@ private:
  * Pivot Emitter
  *****************************************************************************/
 
-// Pivot emitter. All signals logic was moved to this 
+// Pivot emitter. All signals logic was moved to this
 // class because of Qt rejection to moc templates.
 
 class PivotEmitter : public StatefulObject
@@ -922,11 +922,11 @@ signals:
  * Pivot
  *****************************************************************************/
 
-template <class N> 
+template <class N>
 class Pivot : public PivotEmitter
 {
 public:
-    Pivot ( ObjectStateManager* mng, const TrussMaterialLibrary& mLib ) : 
+    Pivot ( ObjectStateManager* mng, const TrussMaterialLibrary& mLib ) :
         PivotEmitter(mng),
         materialLib(mLib),
         first(0), last(0),
@@ -934,7 +934,7 @@ public:
         thickness(0.1),
         number(0)
     {}
-    Pivot ( N& first_, N& last_, ObjectStateManager* mng, 
+    Pivot ( N& first_, N& last_, ObjectStateManager* mng,
             const TrussMaterialLibrary& mLib ) :
         PivotEmitter(mng),
         materialLib(mLib),
@@ -952,27 +952,27 @@ public:
     virtual N& getLastNode () const
     { return *last; }
     virtual void setFirstNode ( N* first_ )
-    { first = first_; 
+    { first = first_;
       emit onFirstNodeChange(); }
 
     virtual void setLastNode ( N* last_ )
     { last = last_;
       emit onLastNodeChange(); }
-    
+
     virtual const TrussMaterial* getMaterial () const
     { return material; }
     virtual void setMaterial ( const TrussMaterial* mat )
-    { 
+    {
         if ( material == mat )
             return;
-        material = mat; 
+        material = mat;
         emit onMaterialChange();
     }
 
     virtual double getThickness () const
     { return thickness; }
     virtual void setThickness ( double t_ )
-    { thickness = t_; 
+    { thickness = t_;
       emit onThicknessChange(thickness); }
 
     virtual int getNumber () const
@@ -1001,8 +1001,8 @@ class Node : public StatefulObject
     Q_OBJECT
 public:
     typedef enum { Unfixed = 0,
-                   FixationByX, 
-                   FixationByY, 
+                   FixationByX,
+                   FixationByY,
                    FixationByXY } Fixation;
 
 signals:
@@ -1016,10 +1016,10 @@ public:
 
     virtual void setFixation ( Fixation );
     virtual Fixation getFixation () const;
-    
+
     virtual void setPoint ( DoublePoint );
     virtual void setPoint ( double x, double y );
-        
+
     virtual const DoublePoint& getPoint () const;
     virtual double getX () const;
     virtual double getY () const;

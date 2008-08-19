@@ -63,7 +63,7 @@ static QString md5CompareStatus ( ElementType elemType,
 
         // NO_STAT
         commonHash[ NO_STAT  ][ NO_ELEM  ] = DELETED DO_DELETE;
-        commonHash[ NO_STAT  ][ NO_STAT  ] = PRE_COMPARE "?" EQUAL DO_NOTHING 
+        commonHash[ NO_STAT  ][ NO_STAT  ] = PRE_COMPARE "?" EQUAL DO_NOTHING
                                                        ":" MODIFIED DO_REPLACE;
         commonHash[ NO_STAT  ][ EQUAL    ] = UNDEFINED;
         commonHash[ NO_STAT  ][ CREATED  ] = UNDEFINED;
@@ -82,7 +82,7 @@ static QString md5CompareStatus ( ElementType elemType,
         commonHash[ CREATED  ][ NO_ELEM  ] = CREATED DO_NOTHING;
         commonHash[ CREATED  ][ NO_STAT  ] = UNDEFINED;
         commonHash[ CREATED  ][ EQUAL    ] = UNDEFINED;
-        commonHash[ CREATED  ][ CREATED  ] = PRE_COMPARE "?" EQUAL DO_NOTHING 
+        commonHash[ CREATED  ][ CREATED  ] = PRE_COMPARE "?" EQUAL DO_NOTHING
                                                        ":" CONFLICT DO_REPLACE;
         commonHash[ CREATED  ][ DELETED  ] = UNDEFINED;
         commonHash[ CREATED  ][ MODIFIED ] = UNDEFINED;
@@ -101,17 +101,17 @@ static QString md5CompareStatus ( ElementType elemType,
         commonHash[ MODIFIED ][ EQUAL    ] = MODIFIED DO_NOTHING;
         commonHash[ MODIFIED ][ CREATED  ] = UNDEFINED;
         commonHash[ MODIFIED ][ DELETED  ] = CONFLICT DO_DELETE;
-        commonHash[ MODIFIED ][ MODIFIED ] = PRE_COMPARE "?" EQUAL DO_NOTHING 
+        commonHash[ MODIFIED ][ MODIFIED ] = PRE_COMPARE "?" EQUAL DO_NOTHING
                                                        ":" CONFLICT DO_REPLACE;
 
-        
+
         elemStatusHash[FileElement] = commonHash;
         elemStatusHash[DirectoryElement] = commonHash;
 
         StatusHash& dirStatusHash = elemStatusHash[DirectoryElement];
 
         // Minor changes for directories
-        dirStatusHash[ NO_STAT  ][ NO_STAT  ] = EQUAL DO_NOTHING; 
+        dirStatusHash[ NO_STAT  ][ NO_STAT  ] = EQUAL DO_NOTHING;
         dirStatusHash[ EQUAL    ][ MODIFIED ] = UNDEFINED;
         dirStatusHash[ CREATED  ][ CREATED  ] = EQUAL DO_NOTHING;
 
@@ -134,7 +134,7 @@ static QString md5CompareStatus ( ElementType elemType,
 
     QString oldStatus;
     QString newStatus;
-    
+
     // Element does not exist
     if ( ! oldElemExists )
         oldStatus = NO_ELEM;
@@ -155,7 +155,7 @@ static QString md5CompareStatus ( ElementType elemType,
     else
         newStatus = newSt;
 
-    
+
     // Get status from hash
     if ( statusHash.contains(oldStatus) &&
          statusHash[oldStatus].contains(newStatus) ) {
@@ -164,7 +164,7 @@ static QString md5CompareStatus ( ElementType elemType,
         LOG4CXX_INFO(logger, QString("Found status: %1").arg(comparedStatus).
                                toStdString());
 
-        QRegExp preCompareRegExp( "^" PRE_COMPARE 
+        QRegExp preCompareRegExp( "^" PRE_COMPARE
                                   "\\?(.+\\(.+\\)):(.+\\(.+\\))$" );
 
         if ( preCompareRegExp.exactMatch(comparedStatus) ) {
@@ -191,7 +191,7 @@ static QString md5CompareStatus ( ElementType elemType,
 }
 
 static void md5Compare ( QDomDocument& doc, QDomElement& parent,
-                         const QDomElement& oldMD5Elem, 
+                         const QDomElement& oldMD5Elem,
                          const QDomElement& newMD5Elem )
 {
     Q_ASSERT( ! oldMD5Elem.isNull() || ! newMD5Elem.isNull() );
@@ -199,22 +199,22 @@ static void md5Compare ( QDomDocument& doc, QDomElement& parent,
     // Check old elem
 
     if ( ! oldMD5Elem.isNull() &&
-         oldMD5Elem.tagName() != "Directory" && 
-         oldMD5Elem.tagName() != "File" && 
+         oldMD5Elem.tagName() != "Directory" &&
+         oldMD5Elem.tagName() != "File" &&
          oldMD5Elem.tagName() != "MD5" ) {
         LOG4CXX_WARN(logger, "Old element is not a file or directory");
         return;
     }
 
-    if ( ! oldMD5Elem.isNull() && 
-         oldMD5Elem.tagName() != "MD5" && 
+    if ( ! oldMD5Elem.isNull() &&
+         oldMD5Elem.tagName() != "MD5" &&
          ! oldMD5Elem.hasAttribute("name") ) {
         LOG4CXX_WARN(logger, "Old element does not have 'name' attribute");
         return;
     }
 
-    if ( ! oldMD5Elem.isNull() && 
-         oldMD5Elem.tagName() == "File" && 
+    if ( ! oldMD5Elem.isNull() &&
+         oldMD5Elem.tagName() == "File" &&
          ! oldMD5Elem.hasAttribute("md5") ) {
         LOG4CXX_WARN(logger, "Old file element does not have 'md5' "
                      "attribute");
@@ -224,22 +224,22 @@ static void md5Compare ( QDomDocument& doc, QDomElement& parent,
     // Check new elem
 
     if ( ! newMD5Elem.isNull() &&
-         newMD5Elem.tagName() != "Directory" && 
-         newMD5Elem.tagName() != "File" && 
+         newMD5Elem.tagName() != "Directory" &&
+         newMD5Elem.tagName() != "File" &&
          newMD5Elem.tagName() != "MD5" ) {
         LOG4CXX_WARN(logger, "New element is not a file or directory");
         return;
     }
 
-    if ( ! newMD5Elem.isNull() && 
-         oldMD5Elem.tagName() != "MD5" && 
+    if ( ! newMD5Elem.isNull() &&
+         oldMD5Elem.tagName() != "MD5" &&
          ! newMD5Elem.hasAttribute("name") ) {
         LOG4CXX_WARN(logger, "New element does not have 'name' attribute");
         return;
     }
 
-    if ( ! newMD5Elem.isNull() && 
-         newMD5Elem.tagName() == "File" && 
+    if ( ! newMD5Elem.isNull() &&
+         newMD5Elem.tagName() == "File" &&
          ! newMD5Elem.hasAttribute("md5") ) {
         LOG4CXX_WARN(logger, "New file element does not have 'md5' "
                      "attribute");
@@ -252,11 +252,11 @@ static void md5Compare ( QDomDocument& doc, QDomElement& parent,
     bool newElemExists = ! newMD5Elem.isNull();
 
     ElementType elemType = DirectoryElement;
-    if ( oldElemExists && oldMD5Elem.tagName() == "File" ||
-         newElemExists && newMD5Elem.tagName() == "File" )
+    if ( (oldElemExists && oldMD5Elem.tagName() == "File") ||
+         (newElemExists && newMD5Elem.tagName() == "File") )
         elemType = FileElement;
 
-    QString oldSt = (oldElemExists ? 
+    QString oldSt = (oldElemExists ?
                      oldMD5Elem.attribute("status").remove(bracketsRegExp) :
                      "");
     QString newSt = (newElemExists ?
@@ -266,7 +266,7 @@ static void md5Compare ( QDomDocument& doc, QDomElement& parent,
     QString oldMD5 = (oldElemExists ? oldMD5Elem.attribute("md5") : "");
     QString newMD5 = (newElemExists ? newMD5Elem.attribute("md5") : "");
 
-    QString statusAttr = ::md5CompareStatus( 
+    QString statusAttr = ::md5CompareStatus(
                                         elemType, oldElemExists, newElemExists,
                                         oldSt, newSt, oldMD5, newMD5 );
 
@@ -312,7 +312,7 @@ static void md5Compare ( QDomDocument& doc, QDomElement& parent,
         QDomNode n;
         // Get all tags for oldMD5
         if ( oldElemExists ) {
-            for ( n = oldMD5Elem.firstChild(); !n.isNull(); 
+            for ( n = oldMD5Elem.firstChild(); !n.isNull();
                   n = n.nextSibling() ) {
                 if ( n.isNull() || ! n.isElement() ) {
                     LOG4CXX_WARN(logger, "Element is null or not an element");
@@ -341,7 +341,7 @@ static void md5Compare ( QDomDocument& doc, QDomElement& parent,
 
         // Get all tags for newMD5
         if ( newElemExists ) {
-            for ( n = newMD5Elem.firstChild(); !n.isNull(); 
+            for ( n = newMD5Elem.firstChild(); !n.isNull();
                   n = n.nextSibling() ) {
                 if ( n.isNull() || ! n.isElement() ) {
                     LOG4CXX_WARN(logger, "Element is null or not an element");
@@ -376,7 +376,7 @@ static void md5Compare ( QDomDocument& doc, QDomElement& parent,
         }
 
         // Compare old and new children
-        QSet<QString> setKeys = oldMD5Elems.keys().toSet() | 
+        QSet<QString> setKeys = oldMD5Elems.keys().toSet() |
                                 newMD5Elems.keys().toSet();
         QList<QString> keys = setKeys.toList();
         qSort( keys.begin(), keys.end() );

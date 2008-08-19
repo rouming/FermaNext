@@ -2,21 +2,26 @@
 #ifndef PLUGINEXECUTIONTREE_H
 #define PLUGINEXECUTIONTREE_H
 
+#include <QtGlobal>
 #include "Plugin.h"
 #include "PluginExecutionParams.h"
+
+#if QT_VERSION >= 0x040400
+  #include <QAtomicPointer>
+#endif
 
 class PluginManager;
 
 /** Private node data */
 template <class N> class NodePrivate;
 
-/** 
+/**
  * Execution tree of a plugin which is going to be executed.
  * Every plugin may have single or several dependencies, in one's
- * part this dependent plugin may have dependencies too. So this 
+ * part this dependent plugin may have dependencies too. So this
  * class is an execution tree of every possible variants of execution.
  */
-class PluginExecutionTree 
+class PluginExecutionTree
 {
 public:
     /** Node of the execution tree */
@@ -40,14 +45,14 @@ public:
         /** For search in lists and vectors */
         bool operator== ( const Node& );
 
-        /** 
-         * Returns parent node. 
+        /**
+         * Returns parent node.
          * Node is null (#isNull) if it is a root node
          */
         Node parentNode () const;
 
-        /** 
-         * Node can be null, if it was 
+        /**
+         * Node can be null, if it was
          * constructed with default constructor.
          */
         bool isNull () const;
@@ -61,7 +66,7 @@ public:
         /** Returns true if this plugin depends on other */
         bool isDependent () const;
 
-        /** 
+        /**
          * Returns true if this plugin (whith all its dependencies)
          * can be resolved.
          */
@@ -70,9 +75,9 @@ public:
         /** Sets plugin params. */
         void setPluginParams ( const PluginExecutionParams& );
 
-        /** 
+        /**
          * Returns current plugin params.
-         * Params can be not accepted (#areParamsAccepted), 
+         * Params can be not accepted (#areParamsAccepted),
          * so check them first.
          */
         PluginExecutionParams getPluginParams () const;
@@ -83,7 +88,7 @@ public:
         /** Should we use plugin in execution or not */
         void use ( bool );
 
-        /** 
+        /**
          * Checks if this plugin is in use.
          * I.e. is a node of execution process.
          */
@@ -99,13 +104,13 @@ public:
         /** Constructs plugin node with parent */
         Node ( Node& parent, Plugin* );
 
-        /** 
-         * Creates child node. 
+        /**
+         * Creates child node.
          * Should be called only by outer #PluginExecutionTree class.
          */
         Node createChildNode ( Plugin* );
 
-        /** 
+        /**
          * Removes child node if can find it.
          * Should be called only by outer #PluginExecutionTree class.
          */
@@ -115,16 +120,20 @@ public:
         void canBeResolved ( bool );
 
     private:
+#if QT_VERSION >= 0x040400
+        QAtomicPointer< NodePrivate<Node> > data;
+#else
         NodePrivate<Node>* data;
+#endif
     };
 
 public:
     /** Constructor */
     PluginExecutionTree ( PluginManager& );
 
-    /** 
-     * Builds execution tree for specified plugin 
-     * @return top node of the execution tree, actually, 
+    /**
+     * Builds execution tree for specified plugin
+     * @return top node of the execution tree, actually,
      *         top node always contains argument plugin.
      */
      PluginExecutionTree::Node buildExecutionTree ( Plugin* plg );
@@ -132,8 +141,8 @@ public:
      /** Return last top of the execution tree */
      PluginExecutionTree::Node getTreeTop () const;
 
-    /** 
-     * Tries to find node by uuid. 
+    /**
+     * Tries to find node by uuid.
      * If node is not found, returns null node.
      * @see PluginExecutionTree::Node::isNull
      * @see PluginExecutionTree::Node::uuid
@@ -142,7 +151,7 @@ public:
 
 private:
     /** Recursively finds node by specified uuid */
-    PluginExecutionTree::Node findNodeByUUID ( 
+    PluginExecutionTree::Node findNodeByUUID (
                                      const PluginExecutionTree::Node&,
                                      const QString& uuid ) const;
 

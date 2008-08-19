@@ -2,6 +2,12 @@
 #include "PluginExecutionTree.h"
 #include "PluginManager.h"
 
+#if QT_VERSION >= 0x040400
+  #include <QAtomicInt>
+#else
+  #include <QAtomic>
+#endif
+
 /*****************************************************************************
  * Node Private
  *****************************************************************************/
@@ -11,7 +17,7 @@ class NodePrivate
 {
 public:
     NodePrivate () :
-        ref(1), parent(0), 
+        ref(1), parent(0),
         plugin(0), inUse(false),
         canBeResolved(false),
         uuid( QUuid::createUuid().toString() )
@@ -25,7 +31,13 @@ public:
         canBeResolved = false;
     }
 
+
+#if QT_VERSION >= 0x040400
+    QAtomicInt ref;
+#else
     QAtomic ref;
+#endif
+
     NodePrivate<N>* parent;
     QList<N> childs;
     Plugin* plugin;
@@ -67,7 +79,7 @@ PluginExecutionTree::Node::Node ( Node& parent_, Plugin* plugin ) :
     data->parent = parent_.data;
 }
 
-PluginExecutionTree::Node::Node ( 
+PluginExecutionTree::Node::Node (
     NodePrivate<PluginExecutionTree::Node>* nodeData ) :
     data( nodeData )
 {
@@ -82,13 +94,17 @@ PluginExecutionTree::Node::Node ( const Node& node ) :
         data->ref.ref();
 }
 
-PluginExecutionTree::Node& PluginExecutionTree::Node::operator= ( 
+PluginExecutionTree::Node& PluginExecutionTree::Node::operator= (
     const PluginExecutionTree::Node& node )
 {
     NodePrivate<PluginExecutionTree::Node>* p = node.data;
     if ( p )
         p->ref.ref();
+#if QT_VERSION >= 0x040400
+    p = data.fetchAndStoreOrdered( p );
+#else
     p = qAtomicSetPtr( &data, p );
+#endif
     if ( p && !p->ref.deref() )
         delete p;
     return *this;
@@ -115,13 +131,13 @@ PluginExecutionTree::Node PluginExecutionTree::Node::createChildNode (
     return node;
 }
 
-void PluginExecutionTree::Node::removeChildNode ( 
+void PluginExecutionTree::Node::removeChildNode (
     PluginExecutionTree::Node& node )
 {
     if ( isNull() )
         return;
 
-    PluginExecutionNodeList::Iterator foundIt = 
+    PluginExecutionNodeList::Iterator foundIt =
         qFind( data->childs.begin(), data->childs.end(), node );
 
     if ( foundIt == data->childs.end() )
@@ -137,7 +153,7 @@ void PluginExecutionTree::Node::removeChildNode (
 }
 
 QList<PluginExecutionTree::Node> PluginExecutionTree::Node::childNodes () const
-{ 
+{
     if ( isNull() )
         return QList<PluginExecutionTree::Node>();
     return data->childs;
@@ -174,7 +190,7 @@ void PluginExecutionTree::Node::canBeResolved ( bool canBeResolved_ )
     data->canBeResolved = canBeResolved_;
 }
 
-void PluginExecutionTree::Node::setPluginParams ( 
+void PluginExecutionTree::Node::setPluginParams (
     const PluginExecutionParams& params )
 {
     if ( isNull() || data->plugin == 0 )
@@ -183,7 +199,7 @@ void PluginExecutionTree::Node::setPluginParams (
     // Firstly save params
     data->pluginParams = params;
 }
- 
+
 
 PluginExecutionParams PluginExecutionTree::Node::getPluginParams () const
 {
@@ -221,7 +237,7 @@ PluginExecutionTree::PluginExecutionTree ( PluginManager& mng ) :
     plgMng(mng)
 {}
 
-PluginExecutionTree::Node PluginExecutionTree::buildExecutionTree ( 
+PluginExecutionTree::Node PluginExecutionTree::buildExecutionTree (
     Plugin* plugin )
 {
     Q_ASSERT(plugin);
@@ -233,13 +249,13 @@ PluginExecutionTree::Node PluginExecutionTree::buildExecutionTree (
 PluginExecutionTree::Node PluginExecutionTree::getTreeTop () const
 { return treeTop; }
 
-PluginExecutionTree::Node PluginExecutionTree::findNodeByUUID ( 
+PluginExecutionTree::Node PluginExecutionTree::findNodeByUUID (
     const QString& uuid ) const
 {
     return findNodeByUUID(treeTop, uuid);
 }
 
-PluginExecutionTree::Node PluginExecutionTree::findNodeByUUID ( 
+PluginExecutionTree::Node PluginExecutionTree::findNodeByUUID (
     const PluginExecutionTree::Node& node,
     const QString& uuid ) const
 {
@@ -258,8 +274,8 @@ PluginExecutionTree::Node PluginExecutionTree::findNodeByUUID (
     return PluginExecutionTree::Node();
 }
 
-void PluginExecutionTree::getParents ( 
-    PluginExecutionTree::Node& child, PluginList& parents ) 
+void PluginExecutionTree::getParents (
+    PluginExecutionTree::Node& child, PluginList& parents )
 {
     if ( child.parentNode().isNull() ) {
         // Top
@@ -267,14 +283,14 @@ void PluginExecutionTree::getParents (
         return;
     }
     PluginExecutionTree::Node parent = child.parentNode();
-    getParents( parent, parents );    
+    getParents( parent, parents );
     parents.append( child.getPlugin() );
 }
 
-PluginExecutionNodeList PluginExecutionTree::getDependentPlugins ( 
+PluginExecutionNodeList PluginExecutionTree::getDependentPlugins (
     PluginExecutionNode& parent )
 {
-    RequiredPluginsMap pluginsMap = 
+    RequiredPluginsMap pluginsMap =
         plgMng.getDependencies( parent.getPlugin() );
 
     PluginList parents;
@@ -282,7 +298,7 @@ PluginExecutionNodeList PluginExecutionTree::getDependentPlugins (
 
     PluginExecutionNodeList dependencies;
 
-    foreach ( PluginList plugins, pluginsMap.values() ) {    
+    foreach ( PluginList plugins, pluginsMap.values() ) {
         foreach ( Plugin* plugin, plugins ) {
             // Pick up plugins which were not mentioned before
             // and which are not equal to the parent plugin.
@@ -295,7 +311,7 @@ PluginExecutionNodeList PluginExecutionTree::getDependentPlugins (
     return dependencies;
 }
 
-bool PluginExecutionTree::buildExecutionTree ( 
+bool PluginExecutionTree::buildExecutionTree (
     PluginExecutionTree::Node& parent )
 {
     if ( ! parent.isDependent() ) {
@@ -310,7 +326,7 @@ bool PluginExecutionTree::buildExecutionTree (
         parent.canBeResolved(false);
         return false;
     }
-    
+
     bool validDependence = false;
     foreach ( PluginExecutionNode depNode, dependencies ) {
         bool ok = buildExecutionTree( depNode );
@@ -320,7 +336,7 @@ bool PluginExecutionTree::buildExecutionTree (
             validDependence = true;
     }
 
-    // We can resolve this node if at least 
+    // We can resolve this node if at least
     // we can resolve one dependence branch :)
     parent.canBeResolved( validDependence );
 

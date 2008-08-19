@@ -16,7 +16,7 @@ class Node;
  * Truss Load
  *****************************************************************************/
 
-class TrussLoad : public QObject, 
+class TrussLoad : public QObject,
                   public UUIDObject
 {
     Q_OBJECT
@@ -88,7 +88,7 @@ public:
     {}
 
     virtual ~TrussLoadCase ()
-    { 
+    {
         TrussLoadMapIter iter = loads.begin();
         for ( ; iter != loads.end(); )
             iter = removeLoad( iter );
@@ -114,14 +114,14 @@ public:
                       load, SLOT(enable()) );
             connect( &node, SIGNAL(destroyed()),
                       load, SLOT(remove()) );
-            
+
             connect( &node, SIGNAL(onFixationChange(Fixation)),
                               SLOT(checkFixation()) );
             connect( load, SIGNAL(onForceChange()),
                            SLOT(loadIsChanged()) );
             connect( load, SIGNAL(onEnableChange(bool)),
                            SLOT(loadIsChanged()) );
-            
+
             loads[&node] = load;
 
             emit onAfterLoadCreation( node );
@@ -143,7 +143,7 @@ public:
         return iter;
     }
 
-    virtual bool removeLoad ( const N& node ) 
+    virtual bool removeLoad ( const N& node )
     {
         // Do suspended clean
         suspendedClean();
@@ -152,7 +152,7 @@ public:
         if ( iter == loads.end() )
             return false;
         else
-            return true;       
+            return true;
     }
 
     // Returns load, 0 if fails
@@ -177,7 +177,7 @@ public:
         int loadsNum = 0;
         TrussLoadMapConstIter iter = loads.begin();
         for ( ; iter != loads.end(); ++iter ) {
-            if ( iter.value()->isEnabled() ) 
+            if ( iter.value()->isEnabled() )
                 ++loadsNum;
         }
         return loadsNum;
@@ -204,7 +204,7 @@ protected:
 
         const N* node = loads.key( load );
         if ( ! node )
-            return;    
+            return;
         emit onLoadChange( *node );
     }
 
@@ -273,7 +273,7 @@ public:
     {
         TrussLoadCase<N>* loadCase = new TrussLoadCase<N>;
         loadCases.push_back( loadCase );
-        
+
         connect( loadCase, SIGNAL( onLoadChange(const Node&) ),
                            SIGNAL( onTrussLoadChange(const Node&) ) );
         connect( loadCase, SIGNAL( onAfterLoadCreation(const Node&) ),
@@ -311,13 +311,13 @@ public:
             else if ( countLoadCases() ) {
                 TrussLoadCase<N>* current = findLoadCase( indx - 1 );
                 if ( current )
-                    setCurrentLoadCase( *current );                
+                    setCurrentLoadCase( *current );
             }
         }
 
-        TrussLoadCaseListIter iter = std::find( loadCases.begin(),
-                                                loadCases.end(),
-                                                &loadCase );
+        TrussLoadCaseListIter iter = qFind( loadCases.begin(),
+                                            loadCases.end(),
+                                            &loadCase );
         if ( iter == loadCases.end() )
             return false;
 
@@ -328,13 +328,13 @@ public:
         loadCases.erase(iter);
 
         emit afterLoadCaseRemoval();
-        
+
         if ( countLoadCases() == 1 )
             emit loadCaseCanBeRemoved( false );
 
         if ( countLoadCases() < Global::maxLoadCaseNumber )
             emit loadCaseCanBeAdded( true );
-        
+
         return true;
     }
 
@@ -345,10 +345,10 @@ public:
         if ( indx == 0 || indx > loadCases.size() )
             return false;
         int index = indx - 1;
-        
+
         try {
             return removeLoadCase( *loadCases.at(index) );
-        } 
+        }
         catch ( ... ) {
             return false;
         }
@@ -365,12 +365,12 @@ public:
     }
 
     // Set current specified load case if it is in vector
-    virtual bool setCurrentLoadCase ( TrussLoadCase<N>& loadCase ) 
+    virtual bool setCurrentLoadCase ( TrussLoadCase<N>& loadCase )
     {
         // Make sure load case is in vector
-        TrussLoadCaseListIter iter = std::find( loadCases.begin(),
-                                                loadCases.end(),
-                                                &loadCase );
+        TrussLoadCaseListIter iter = qFind( loadCases.begin(),
+                                            loadCases.end(),
+                                            &loadCase );
         if ( iter == loadCases.end() )
             return false;
 
@@ -401,7 +401,7 @@ public:
         return 0;
     }
 
-    // Try to find load case by index. 
+    // Try to find load case by index.
     virtual TrussLoadCase<N>* findLoadCase ( int indx ) const
     {
         // Load cases index starts with 1, not 0
@@ -434,13 +434,13 @@ protected:
 private:
     TrussLoadCaseArray ( const TrussLoadCaseArray& );
     TrussLoadCaseArray& operator= ( const TrussLoadCaseArray& );
-    
+
 private:
     typedef QList<TrussLoadCase<N>*> TrussLoadCaseList;
     typedef typename TrussLoadCaseList::iterator TrussLoadCaseListIter;
     typedef typename TrussLoadCaseList::const_iterator TrussLoadCaseListConstIter;
 
-    TrussLoadCaseList loadCases;        
+    TrussLoadCaseList loadCases;
     TrussLoadCase<N>* currentLoadCase;
 };
 

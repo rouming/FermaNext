@@ -13,7 +13,7 @@
 
 AggToolBarButton::AggToolBarButton ( const QString& iconPath ) :
     fillCol( agg::rgba( 0, 0, 0, 0.3 ) ),
-    lineCol( agg::rgba( 0, 0, 0 ) ), 
+    lineCol( agg::rgba( 0, 0, 0 ) ),
     highlightFill( agg::rgba( 0, 0, 0, 0.15 ) ),
     highlightLine( agg::rgba( 0, 0, 0, 0.7 ) )
 {
@@ -28,7 +28,7 @@ AggToolBarButton::~AggToolBarButton ()
 void AggToolBarButton::paint ( ren_dynarow& baseRend ) const
 {
     scanline_rasterizer ras;
-    agg::scanline_p8 sl; 
+    agg::scanline_p8 sl;
     solidRenderer solidRend( baseRend );
     agg::trans_affine mtx;
 
@@ -42,25 +42,25 @@ void AggToolBarButton::paint ( ren_dynarow& baseRend ) const
     {
         primRend.fill_color ( fillCol );
         primRend.line_color ( lineCol );
-        primRend.outlined_rectangle ( pos.x() + 1, pos.y() + 1, 
-                                      pos.x() + width - 1, 
+        primRend.outlined_rectangle ( pos.x() + 1, pos.y() + 1,
+                                      pos.x() + width - 1,
                                       pos.y() + height - 1 );
-    }   
+    }
     else if ( isHighlighted() )
     {
         primRend.fill_color ( highlightFill );
         primRend.line_color ( highlightLine );
-        primRend.outlined_rectangle ( pos.x(), pos.y(), 
-                                      pos.x() + width, 
+        primRend.outlined_rectangle ( pos.x(), pos.y(),
+                                      pos.x() + width,
                                       pos.y() + height );
     }
 
     double scaleX = 0.2, scaleY = 0.2;
-    QPoint iconPos( int((pos.x() + width/4) / scaleX), 
+    QPoint iconPos( int((pos.x() + width/4) / scaleX),
                     int((pos.y() + height/8) / scaleY) );
 
-    drawSvg ( baseRend, ras, sl, pathRend, solidRend, mtx, 
-              iconPos.x(), iconPos.y(), scaleX, scaleY, 
+    drawSvg ( baseRend, ras, sl, pathRend, solidRend, mtx,
+              iconPos.x(), iconPos.y(), scaleX, scaleY,
               Global::svgExpand, Global::svgGamma );
 }
 
@@ -70,13 +70,13 @@ void AggToolBarButton::paint ( ren_dynarow& baseRend ) const
 
 AggToolBarHideButton::AggToolBarHideButton () :
     fillCol( agg::rgba( 65, 90, 110, 0.5 ) ),
-    lineCol( agg::rgba( 10, 10, 10 ) ), 
+    lineCol( agg::rgba( 10, 10, 10 ) ),
     highlightFill( agg::rgba( 1, 1, 1, 0.5 ) )
 {
     setHint( tr( "Hide tool bar" ) );
     setStatusTip( tr( "Hides or shows a tool bar" ) );
     setWidth( Global::buttonWidth * 3 );
-    setHeight( 6 );  
+    setHeight( 6 );
 }
 
 AggToolBarHideButton::~AggToolBarHideButton ()
@@ -89,7 +89,7 @@ void AggToolBarHideButton::paint ( ren_dynarow& baseRend ) const
     int height = getHeight ();
 
     scanline_rasterizer ras;
-    agg::scanline_p8 sl; 
+    agg::scanline_p8 sl;
     solidRenderer solidRend( baseRend );
     agg::trans_affine mtx;
     primitivesRenderer primRend ( baseRend );
@@ -97,12 +97,12 @@ void AggToolBarHideButton::paint ( ren_dynarow& baseRend ) const
     // draw button
     if ( ! isHighlighted() )
         primRend.fill_color ( fillCol );
-    else 
+    else
         primRend.fill_color ( highlightFill );
 
     primRend.line_color ( lineCol );
-    primRend.outlined_rectangle ( pos.x(), pos.y(), 
-                                  pos.x() + width, 
+    primRend.outlined_rectangle ( pos.x(), pos.y(),
+                                  pos.x() + width,
                                   pos.y() + height );
 
     // draw button icon
@@ -110,7 +110,7 @@ void AggToolBarHideButton::paint ( ren_dynarow& baseRend ) const
     QPoint pos2 ( pos.x() + width / 2 + 4, pos.y() + 4 );
     if ( ! isHighlighted() )
         primRend.fill_color ( lineCol );
-    else 
+    else
         primRend.fill_color (  agg::rgba( 120, 120, 120 ) );
     primRend.solid_rectangle ( pos1.x(), pos1.y(), pos2.x(), pos2.y() );
 }
@@ -211,7 +211,7 @@ void AggToolBar::resize ( int w, int h )
 {
     // Consider that we may need additional space (Global::bufferEmptyArea)
     // for the different agg effects
-    toolBarBuf->init( w  + 2 * Global::bufferEmptyArea, 
+    toolBarBuf->init( w  + 2 * Global::bufferEmptyArea,
                       h  + Global::bufferEmptyArea );
 
     clearToolBarRenderedFlag();
@@ -246,7 +246,7 @@ QPoint AggToolBar::fromGlobalPos ( int xpos, int ypos ) const
 
 QPoint AggToolBar::fromLocalPos ( int xpos, int ypos ) const
 {
-    QPoint globalPos( toolBarLeftTopPos + QPoint( xpos, ypos ) - 
+    QPoint globalPos( toolBarLeftTopPos + QPoint( xpos, ypos ) -
                       QPoint( Global::bufferEmptyArea, Global::bufferEmptyArea ) );
 
     return globalPos;
@@ -260,21 +260,21 @@ bool AggToolBar::inToolBarRect ( int x, int y, bool bordCheck /* = false */ ) co
     //TODO: define more accurately rounded boundaries of the tool bar
     if ( bordCheck )
     {
-        if ( x > toolBarLeftTopPos.x() + borderLeft && 
-             x < toolBarLeftTopPos.x() + toolBarWidth - borderRight - separator &&
-             y > toolBarLeftTopPos.y() + borderTop && 
-             y < toolBarLeftTopPos.y() + toolBarHeight - borderBottom ||
+        if ( (x > toolBarLeftTopPos.x() + borderLeft &&
+              x < toolBarLeftTopPos.x() + toolBarWidth - borderRight - separator &&
+              y > toolBarLeftTopPos.y() + borderTop &&
+              y < toolBarLeftTopPos.y() + toolBarHeight - borderBottom) ||
              hideButton->inButtonRect( bufPos.x(), bufPos.y() ) )
             return true;
         else
             return false;
     }
-    else 
+    else
     {
-        if ( x > toolBarLeftTopPos.x() && 
-             x < toolBarLeftTopPos.x() + toolBarWidth &&
-             y > toolBarLeftTopPos.y() && 
-             y < toolBarLeftTopPos.y() + toolBarHeight ||
+        if ( (x > toolBarLeftTopPos.x() &&
+              x < toolBarLeftTopPos.x() + toolBarWidth &&
+              y > toolBarLeftTopPos.y() &&
+              y < toolBarLeftTopPos.y() + toolBarHeight) ||
              hideButton->inButtonRect( bufPos.x(), bufPos.y() ) )
             return true;
         else
@@ -290,7 +290,7 @@ void AggToolBar::updateToolBarGeometry ()
 
 
     // Update tool bar size
-    toolBarWidth = borderLeft + borderRight; 
+    toolBarWidth = borderLeft + borderRight;
     int maxHeight = 0;
     foreach ( AggButton* b, buttons ) {
         toolBarWidth = toolBarWidth + b->getWidth() + separator;
@@ -308,11 +308,11 @@ void AggToolBar::updateToolBarGeometry ()
 
     toolBarHeight = maxHeight + borderTop + borderBottom;
 
-    resize( toolBarWidth, toolBarHeight );  
-    
-    
+    resize( toolBarWidth, toolBarHeight );
+
+
     // Update tool bar items position
-    QPoint nextPos = QPoint( borderLeft + Global::bufferEmptyArea, 
+    QPoint nextPos = QPoint( borderLeft + Global::bufferEmptyArea,
                              borderTop + Global::bufferEmptyArea );
     foreach ( AggButton* b, buttons ) {
         b->setPosition( nextPos );
@@ -322,18 +322,18 @@ void AggToolBar::updateToolBarGeometry ()
     // Update combobox position (in global coordinates)
     int cbXIndent = 6, cbYIndent = 4;
     foreach ( AggComboBox* cb, comboBoxes )
-        cb->setPosition( fromLocalPos( nextPos.x() + cbXIndent, 
+        cb->setPosition( fromLocalPos( nextPos.x() + cbXIndent,
                                        nextPos.y() + cbYIndent ) );
 
     // Update hide button position (in local coordinates)
-    int xPos = ( toolBarWidth - hideButton->getWidth() ) / 2 + 
+    int xPos = ( toolBarWidth - hideButton->getWidth() ) / 2 +
                Global::bufferEmptyArea;
     int yPos = Global::bufferEmptyArea - hideButton->getHeight() / 2;
     hideButton->setPosition( QPoint( xPos, yPos ) );
 
     // Centering tool bar (in global coordinates)
     toolBarLeftTopPos.setX( toolBarLeftTopPos.x() - ( toolBarWidth - oldWidth ) );
-    toolBarLeftTopPos.setY( toolBarLeftTopPos.y() - ( toolBarHeight - oldHeight ) ); 
+    toolBarLeftTopPos.setY( toolBarLeftTopPos.y() - ( toolBarHeight - oldHeight ) );
 }
 
 void AggToolBar::addButton ( AggButton& button )
@@ -409,7 +409,7 @@ void AggToolBar::addComboBox ( AggComboBox& combo )
     connect( &combo, SIGNAL( sizeChanged() ),
                        SLOT( updateToolBarGeometry() ) );
 
-    // Delegate status tip signals because combobox has its own 
+    // Delegate status tip signals because combobox has its own
     // mouse event handlers
     connect( &combo, SIGNAL( onShowStatusTip( const QString& ) ),
                      SIGNAL( onShowStatusTip( const QString& ) ) );
@@ -421,7 +421,7 @@ AggComboBox* AggToolBar::getComboBox ( int idx ) const
 {
     try {
         return comboBoxes.at( idx );
-    } 
+    }
     catch (...) {
         return 0;
     }
@@ -453,7 +453,7 @@ bool AggToolBar::isVisible () const
 
 void AggToolBar::setVisible ( bool status )
 {
-    if ( visible == status ) 
+    if ( visible == status )
         return;
     visible = status;
 
@@ -490,14 +490,14 @@ void AggToolBar::clearToolBarRenderedFlag ()
 void AggToolBar::showToolBar ()
 {
     if ( animTimer->isActive() )
-        animTimer->stop(); 
+        animTimer->stop();
 
     removeButtonHighlight();
 
     pixNumb = toolBarHeight - hideButton->getHeight();
 
     hideButton->setHint( tr( "Hide tool bar" ) );
-    
+
     enabled = false;
     visible = true;
 
@@ -537,10 +537,10 @@ void AggToolBar::timerEvent ( QTimerEvent* )
         pos.setY( pos.y() + Global::pixHideNumb );
 
         if ( pixNumb <= 0 ) {
-            pos.setY( designerWidget->height() - 
+            pos.setY( designerWidget->height() -
                       hideButton->getHeight() + indent );
 
-            animTimer->stop(); 
+            animTimer->stop();
 
             visible = false;
             enabled = true;
@@ -554,10 +554,10 @@ void AggToolBar::timerEvent ( QTimerEvent* )
         pos.setY( pos.y() - Global::pixHideNumb );
 
         if ( pixNumb <= 0 ) {
-            pos.setY( designerWidget->height() - 
+            pos.setY( designerWidget->height() -
                       getHeight() + indent );
 
-            animTimer->stop(); 
+            animTimer->stop();
 
             enabled = true;
 
@@ -572,7 +572,7 @@ void AggToolBar::setToolBarHinted ()
 {
     toolBarIsHinted = true;
     if ( currentHintedButton )
-        emit onHintShowsUp( currentHintedButton->getHint(), 
+        emit onHintShowsUp( currentHintedButton->getHint(),
                             hintCurrentPos, true );
 }
 
@@ -610,10 +610,10 @@ void AggToolBar::mouseMove ( int x, int y )
             {
                 currentHintedButton = button;
                 hintCurrentPos = QPoint( x, y );
-                emit onHintShowsUp( currentHintedButton->getHint(), 
+                emit onHintShowsUp( currentHintedButton->getHint(),
                                     hintCurrentPos, false );
             }
-        }   
+        }
         else
         {
             currentHintedButton = button;
@@ -629,7 +629,7 @@ void AggToolBar::mouseMove ( int x, int y )
             emit onHintHides( false );
         }
 
-        // This flag was introduced because comboboxes have their own mouse event 
+        // This flag was introduced because comboboxes have their own mouse event
         // handlers and we need to ensure that they wasn't mouse hovered.
         bool comboboxSelected = false;
         foreach ( AggComboBox* cb, comboBoxes ) {
@@ -694,7 +694,7 @@ void AggToolBar::drawButtons ( ren_dynarow& baseRend ) const
 
 void AggToolBar::paint ( base_renderer& baseRenderer ) const
 {
-    pixf_dynarow toolBarPixf( *toolBarBuf ); 
+    pixf_dynarow toolBarPixf( *toolBarBuf );
     ren_dynarow baseRend( toolBarPixf );
 
     if ( ! isRendered () )
@@ -718,21 +718,21 @@ void AggToolBar::paint ( base_renderer& baseRenderer ) const
             mtx *= agg::trans_affine_translation( 0, -10 );
             interpolator inter( mtx );
 
-            agg::rounded_rect bar( Global::bufferEmptyArea, 
-                                   Global::bufferEmptyArea, 
-                                   Global::bufferEmptyArea + toolBarWidth, 
-                                   Global::bufferEmptyArea + 
-                                   toolBarBuf->height(), 
+            agg::rounded_rect bar( Global::bufferEmptyArea,
+                                   Global::bufferEmptyArea,
+                                   Global::bufferEmptyArea + toolBarWidth,
+                                   Global::bufferEmptyArea +
+                                   toolBarBuf->height(),
                                    cornerRadius );
             ras.add_path( bar );
 
-            fillColorArray( gradColors, barFirstColor, barMiddleColor, 
+            fillColorArray( gradColors, barFirstColor, barMiddleColor,
                             barLastColor );
 
-            linear_gradient_span_gen gradSpanGen( gradSpan, inter, 
-                                                  gradFunc, gradColors, 
-                                                  Global::bufferEmptyArea, 
-                                                  Global::bufferEmptyArea + 
+            linear_gradient_span_gen gradSpanGen( gradSpan, inter,
+                                                  gradFunc, gradColors,
+                                                  Global::bufferEmptyArea,
+                                                  Global::bufferEmptyArea +
                                                   toolBarHeight );
 
             linear_gradient_renderer gradRend( baseRend, gradSpanGen );
@@ -745,7 +745,7 @@ void AggToolBar::paint ( base_renderer& baseRenderer ) const
         rendered = true;
     }
 
-    QPoint blendPos( toolBarLeftTopPos.x() - Global::bufferEmptyArea, 
+    QPoint blendPos( toolBarLeftTopPos.x() - Global::bufferEmptyArea,
                      toolBarLeftTopPos.y() - Global::bufferEmptyArea );
 
     blendBuffer( baseRenderer, toolBarPixf, blendPos );

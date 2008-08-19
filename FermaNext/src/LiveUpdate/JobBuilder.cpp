@@ -117,10 +117,10 @@ bool SortElements ( const QDomElement& fir,  const QDomElement& sec )
     //    Delete /a.dir/b.dir/c.dir
     //    Delete /a.dir/b.dir
     //    Delete /a.dir
-    // 
+    //
     // I.e. we should delete all subdirs firstly
 
-    if ( firTag == "Directory" && 
+    if ( firTag == "Directory" &&
          secTag == "Directory" &&
          secStatus.contains(DO_DELETE) &&
          firStatus.contains(DO_DELETE) ) {
@@ -154,7 +154,7 @@ bool Job::isError () const
 void Job::clearLastError ()
 { m_lastError.clear(); }
 
-void Job::setErrorString ( const QString& err ) 
+void Job::setErrorString ( const QString& err )
 { m_lastError = err; }
 
 Job::JobType Job::jobType () const
@@ -174,11 +174,11 @@ DownloadJob::DownloadJob ( const QString& url, const QString& fileToSave,
 {
     m_http.setHost( m_urlToDownload.host() );
 
-    QObject::connect( &m_http, SIGNAL(dataReadProgress(int,int)), 
+    QObject::connect( &m_http, SIGNAL(dataReadProgress(int,int)),
                                SLOT(httpReadProgress(int,int)) );
     QObject::connect( &m_http, SIGNAL(done(bool)),
                                SLOT(httpDone(bool)) );
-    QObject::connect( &m_http, 
+    QObject::connect( &m_http,
                    SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
                    SLOT(httpResponseHeader(const QHttpResponseHeader &)) );
 }
@@ -244,7 +244,7 @@ void DownloadJob::stopJob ()
     m_requestAborted = true;
 }
 
-void DownloadJob::getCurrentProgress ( JobProgressStatus& status, 
+void DownloadJob::getCurrentProgress ( JobProgressStatus& status,
                                        double& done )
 {
     status = m_progressStatus;
@@ -343,7 +343,7 @@ void RenameJob::stopJob ()
     // Nothing
 }
 
-void RenameJob::getCurrentProgress ( JobProgressStatus& status, 
+void RenameJob::getCurrentProgress ( JobProgressStatus& status,
                                      double& done )
 {
     status = m_progressStatus;
@@ -402,7 +402,7 @@ void DeleteJob::stopJob ()
     // Nothing
 }
 
-void DeleteJob::getCurrentProgress ( JobProgressStatus& status, 
+void DeleteJob::getCurrentProgress ( JobProgressStatus& status,
                                      double& done )
 {
     status = m_progressStatus;
@@ -425,7 +425,7 @@ void DeleteLiveUpdateBinaryJob::doJob ()
 {
 #ifdef Q_OS_WIN
     QString toRemove = QDir::toNativeSeparators(DeleteJob::pathToDelete());
-    QString tempFileName( QDir::tempPath() + "/" + 
+    QString tempFileName( QDir::tempPath() + "/" +
                           QUuid::createUuid().toString() + ".bat" );
     tempFileName = QDir::toNativeSeparators(tempFileName);
     QFile tempFile(tempFileName);
@@ -499,7 +499,7 @@ void CreateDirJob::stopJob ()
     // Nothing
 }
 
-void CreateDirJob::getCurrentProgress ( JobProgressStatus& status, 
+void CreateDirJob::getCurrentProgress ( JobProgressStatus& status,
                                         double& done )
 {
     status = m_progressStatus;
@@ -530,9 +530,9 @@ bool JobBuilder::isConflict () const
 { return m_isConflict; }
 
 void JobBuilder::resolveConflict ()
-{ 
+{
     m_conflictMsgs.clear();
-    m_isConflict = false; 
+    m_isConflict = false;
 }
 
 const QStringList& JobBuilder::conflictMessages () const
@@ -556,24 +556,24 @@ void JobBuilder::parseDocument ( const QDomElement& md5CmpElem,
                                  QList<QDomElement>& elements )
 {
     if ( md5CmpElem.isNull() ||
-         md5CmpElem.tagName() != "Directory" && 
-         md5CmpElem.tagName() != "File" && 
-         md5CmpElem.tagName() != "MD5" ) {
-        LOG4CXX_WARN(logger, 
+         (md5CmpElem.tagName() != "Directory" &&
+          md5CmpElem.tagName() != "File" &&
+          md5CmpElem.tagName() != "MD5") ) {
+        LOG4CXX_WARN(logger,
                      QString("Element is not a file or directory: %1").
                      arg(md5CmpElem.tagName()).toStdString() );
         return;
-    }  
+    }
 
     if ( md5CmpElem.tagName() != "MD5" ) {
         // Add if File or Directory
         elements.append( md5CmpElem );
- 
+
         LOG4CXX_INFO(logger, QString("Add element to list: %1").
                      arg(md5CmpElem.tagName()).toStdString() );
     }
 
-    if ( (md5CmpElem.tagName() == "Directory" || 
+    if ( (md5CmpElem.tagName() == "Directory" ||
           md5CmpElem.tagName() == "MD5" ) &&
          md5CmpElem.hasChildNodes() ) {
 
@@ -666,7 +666,7 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
         }
 
         if ( elem.tagName() == "File" ) {
-            
+
             bool exec = elem.hasAttribute( "permissions" );
 
             if ( status.contains(DO_GET) ) {
@@ -680,7 +680,7 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
                     conflictMsgs.append( msg.arg(name) );
                 }
 
-                firstSteps.append( 
+                firstSteps.append(
                           new DownloadJob( url + name, name + ".NEW", exec ) );
 
                 secondSteps.append(
@@ -688,7 +688,7 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
                 secondSteps.append(
                           new RenameJob( name + ".NEW", name ) );
 
-                // We can't just delete ourselfs. 
+                // We can't just delete ourselfs.
                 if ( name == Global::applicationName() ) {
                     thirdSteps.append(
                           new DeleteLiveUpdateBinaryJob( name + ".DELETE" ) );
@@ -705,10 +705,10 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
                     conflictMsgs.append( msg.arg(name) );
                 }
 
-                secondSteps.append( 
+                secondSteps.append(
                           new RenameJob( name, name + ".DELETE" ) );
 
-                // We can't just delete ourselfs. 
+                // We can't just delete ourselfs.
                 if ( name == Global::applicationName() ) {
                     thirdSteps.append(
                           new DeleteLiveUpdateBinaryJob( name + ".DELETE" ) );
@@ -717,7 +717,7 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
                     thirdSteps.append(
                           new DeleteJob( name + ".DELETE" ) );
             }
-            else 
+            else
                 // Ok, status is unknown
                 continue;
         }
@@ -736,11 +736,11 @@ void JobBuilder::createJobsList ( const QList<QDomElement>& elements )
             else if ( status.contains(DO_DELETE) ) {
                 thirdSteps.append( new DeleteJob( name ) );
             }
-            else 
+            else
                 // Ok, status is unknown
                 continue;
         }
-        else 
+        else
             // Unknown element
             continue;
     }
@@ -770,7 +770,7 @@ bool JobBuilder::doJobs ()
         return true;
 
     double percentsPerJob = 100.0 / m_jobs.size();
-  
+
     emit beforeDoJobs( m_jobs.size() );
 
     m_currentJob = 0;
@@ -811,7 +811,7 @@ bool JobBuilder::doJobs ()
             }
         }
         while ( status == Job::Running && ! m_jobsTerminated );
-        
+
         if ( status == Job::Failed ) {
             if ( m_jobsTerminated )
                 emit jobStopped( job->jobUuid() );
@@ -826,11 +826,11 @@ bool JobBuilder::doJobs ()
             return false;
         }
 
-        // Success        
+        // Success
         // Last element
         if ( i + 1 == m_jobs.size() )
             percentsDone = 100.0;
-        else 
+        else
             percentsDone = percentsPerJob * (i + 1);
 
         emit progress( job->jobUuid(), percentsDone );

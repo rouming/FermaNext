@@ -2,6 +2,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <QtGlobal>
 #include <QObject>
 #include <QVariant>
 #include <QPair>
@@ -11,6 +12,10 @@
 #include <QHash>
 #include <QFile>
 
+#if QT_VERSION >= 0x040400
+  #include <QAtomicPointer>
+#endif
+
 class QMutex;
 
 typedef QPair<QString, QString> NodeAttribute;
@@ -19,9 +24,9 @@ typedef QList<NodeAttribute> NodeAttributeList;
 /** Subsidiary class, which registers Config::Node */
 template < class Type >
 class ConfigNodeTypeRegistrator
-{ 
+{
 public:
-    ConfigNodeTypeRegistrator () 
+    ConfigNodeTypeRegistrator ()
     {  qRegisterMetaType< Type >( "Config::Node" ); }
 };
 
@@ -51,7 +56,7 @@ public:
         Node ( Node& parent, const QString& tagName );
         /** Parses xml node  */
         Node ( Node& parent, const QDomElement& );
-        
+
         /** Just a copy constructor */
         Node ( const Node& );
         /** Just an assignment operator */
@@ -63,8 +68,8 @@ public:
         /** Returns config, from which this node was created */
         Config* config () const;
 
-        /** 
-         * Returns parent node. 
+        /**
+         * Returns parent node.
          * Node is null (#isNull) if it is a root node
          */
         Node parentNode () const;
@@ -72,14 +77,14 @@ public:
         /** Removes this node from config */
         void remove ();
 
-        /** 
-         * Checks if this node was already removed 
+        /**
+         * Checks if this node was already removed
          * @return true if it is removed, false otherwise
          */
         bool isRemoved () const;
 
-        /** 
-         * Node can be null, if it was 
+        /**
+         * Node can be null, if it was
          * constructed with default constructor.
          */
         bool isNull () const;
@@ -89,7 +94,7 @@ public:
         /** Sets tag name */
         void setTagName ( const QString& );
 
-        /** 
+        /**
          * Config nodes can store child config nodes or text value.
          * So if this node has value, it doesn't have childs.
          * @see getValue
@@ -97,10 +102,10 @@ public:
          */
         bool hasValue () const;
 
-        /** 
-         * Returns value of this node. If this node 
+        /**
+         * Returns value of this node. If this node
          * has other config nodes or value has not been
-         * set before, returned string is empty 
+         * set before, returned string is empty
          * @see setValue
          * @see hasValue
          */
@@ -149,18 +154,22 @@ public:
          */
         void parse () const;
 
-        /** 
+        /**
          * Removes this node from config, but instead #remove, this method
          * is called from parent and it does nothing agains removing itself
          * from parent's child list, this should be done by parent.
          */
         void fromParentRemove ();
-        
+
     private:
+#if QT_VERSION >= 0x040400
+        QAtomicPointer< ConfigNodePrivate<Node> > data;
+#else
         ConfigNodePrivate<Node>* data;
+#endif
     };
 
-    // Inner Node class should be a friend of Config to have possibility 
+    // Inner Node class should be a friend of Config to have possibility
     // to notify directly about data changes
     friend class Node;
 
@@ -177,17 +186,17 @@ public:
     static Config& instance ( const QString& fileName )
         /*throw (OpenConfigException)*/;
 
-    /** 
+    /**
      * Destroys config instance by specified file name.
      * @param fileName config file name
      * @param removeConfigFile if true, file will be removed
      * @return returns true if success, false otherwise
      */
-    static bool destroyInstance ( const QString& fileName, 
+    static bool destroyInstance ( const QString& fileName,
                                   bool removeConfigFile = false );
 
-    /** 
-     * Destroys config instance. 
+    /**
+     * Destroys config instance.
      * This is an overloaded member function, provided for convenience.
      */
     static bool destroyInstance ( Config& cfg,
@@ -201,9 +210,9 @@ public:
 
 private:
     /**
-     * Is called from inner Node class before making some changes. 
-     * After all changes have been made, node should unlock Config 
-     * instance with #nodeHasBeenChanged, #nodeHasBeenCreated or 
+     * Is called from inner Node class before making some changes.
+     * After all changes have been made, node should unlock Config
+     * instance with #nodeHasBeenChanged, #nodeHasBeenCreated or
      * #nodeBeforeRemove call.
      */
     void lockBeforeChange ();
@@ -219,9 +228,9 @@ private:
      * Should be called often after #lockBeforeChange.
      */
     void nodeHasBeenCreated ( const Config::Node& );
-    
+
     /**
-     * Is called from inner Node class to notify about node removal. 
+     * Is called from inner Node class to notify about node removal.
      * Should be called often after #lockBeforeChange.
      */
     void nodeHasBeenRemoved ( const Config::Node& );
@@ -230,7 +239,7 @@ private:
     /** Flushes all changes to file */
     void flush ();
 
-    /** 
+    /**
      * Private constructor. Use #instance instead.
      * @throw OpenConfigException occurs when can't open file for read/write
      */
@@ -261,7 +270,7 @@ private:
     static HashInstances configInstances;
     static QMutex* instanceMutex;
     static QMutex* notificationMutex;
-    static NodeRegistrator registrator;/**< Registrator should be static to 
+    static NodeRegistrator registrator;/**< Registrator should be static to
                                             register #Config::Node only once */
 
     QDomDocument configDoc;

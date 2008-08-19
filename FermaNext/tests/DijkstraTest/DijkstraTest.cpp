@@ -5,7 +5,7 @@
 #include <math.h>
 #include <time.h>
 
-#include <QRegion> 
+#include <QRegion>
 #include <QPolygon>
 #include <QMap>
 
@@ -67,7 +67,7 @@ struct GraphPivot
 {
     GraphPivot ( GraphNode* first,
                  GraphNode* last,
-                 int c ) : firstNode(first), lastNode(last), cost(c) {}   
+                 int c ) : firstNode(first), lastNode(last), cost(c) {}
 
 
     GraphNode* firstNode;
@@ -82,18 +82,18 @@ struct PivotsSortAlg
 
     bool operator()( GraphPivot*& p1, GraphPivot*& p2 )
     {
-        float angle1 = angle(nodeToSort, 
-                             (p1->firstNode == nodeToSort ? 
+        float angle1 = angle(nodeToSort,
+                             (p1->firstNode == nodeToSort ?
                               p1->lastNode :
                               p1->firstNode) );
-        float angle2 = angle(nodeToSort, 
-                             (p2->firstNode == nodeToSort ? 
+        float angle2 = angle(nodeToSort,
+                             (p2->firstNode == nodeToSort ?
                               p2->lastNode :
                               p2->firstNode) );
 
         return angle1 < angle2;
     }
-    
+
     GraphNode* nodeToSort;
 };
 
@@ -103,18 +103,18 @@ typedef std::vector<GraphPivot*> Pivots;
 
 struct Segment
 {
-    Segment ( uint indx, GraphNode* c, GraphPivot* l, GraphPivot* r ) : 
+    Segment ( uint indx, GraphNode* c, GraphPivot* l, GraphPivot* r ) :
         index(indx), centerNode(c), left(l), right(r) {}
 
     GraphNode* leftNode () const
     {
-        return left->firstNode == centerNode ? left->lastNode : 
+        return left->firstNode == centerNode ? left->lastNode :
                                                left->firstNode;
     }
 
     GraphNode* rightNode () const
     {
-        return right->firstNode == centerNode ? right->lastNode : 
+        return right->firstNode == centerNode ? right->lastNode :
                                                 right->firstNode;
     }
 
@@ -160,10 +160,10 @@ struct Graph
             nIter = this->nodes.begin();
             for ( ; nIter != this->nodes.end(); ++nIter ) {
                 GraphNode* n = *nIter;
-                Nodes::iterator visited = std::find( visitedNodes.begin(), 
+                Nodes::iterator visited = std::find( visitedNodes.begin(),
                                                      visitedNodes.end(),
                                                      n );
-                if ( visited != visitedNodes.end() ) 
+                if ( visited != visitedNodes.end() )
                     continue;
 
                 if ( minNode == 0 )
@@ -176,37 +176,37 @@ struct Graph
                 }
             }
             visitedNodes.push_back(minNode);
-            
-            
+
+
             nIter = this->nodes.begin();
             for ( ; nIter != this->nodes.end(); ++nIter ) {
                 GraphNode* n = *nIter;
-                if ( !shortestPath.contains(n) ) 
+                if ( !shortestPath.contains(n) )
                     shortestPath[n] = begin;
-                Nodes::iterator visited = std::find( visitedNodes.begin(), 
+                Nodes::iterator visited = std::find( visitedNodes.begin(),
                                                      visitedNodes.end(),
                                                      n );
-                if ( visited != visitedNodes.end() ) 
+                if ( visited != visitedNodes.end() )
                     continue;
-                
+
                 int cost = currentCost[n];
                 int prevMinCost = currentCost[minNode];
-                
+
                 currentCost[n] = MIN(cost, prevMinCost + this->cost(minNode, n));
                 if ( (prevMinCost + this->cost(minNode, n)) < cost ) {
                     shortestPath[n] = minNode;
-                }            
-            }        
+                }
+            }
         }
-        
+
         GraphNode* prevNode = shortestPath[end];
         GraphPivot* p = this->pivot(prevNode, end);
         if ( p )
             path.push_back(p);
-        while ( prevNode != begin ) {        
+        while ( prevNode != begin ) {
             GraphNode* node = prevNode;
-            prevNode = shortestPath[prevNode];        
-            path.push_back(this->pivot(prevNode, node));        
+            prevNode = shortestPath[prevNode];
+            path.push_back(this->pivot(prevNode, node));
         }
         // Reverse the path.
         std::reverse( path.begin (), path.end () );
@@ -219,28 +219,28 @@ struct Graph
         Pivots::iterator iter = pivots.begin();
         for ( ; iter != pivots.end(); ++iter ) {
             GraphPivot* p = *iter;
-            if ( p->firstNode == begin &&
-                 p->lastNode == end ||
-                 p->firstNode == end &&
-                 p->lastNode == begin )
+            if ( (p->firstNode == begin &&
+                  p->lastNode == end) ||
+                 (p->firstNode == end &&
+                  p->lastNode == begin) )
                 return p->cost;
         }
         return MAX_INT;
-    }    
+    }
 
     GraphPivot* pivot ( GraphNode* begin, GraphNode* end )
     {
         Pivots::iterator iter = pivots.begin();
         for ( ; iter != pivots.end(); ++iter ) {
             GraphPivot* p = *iter;
-            if (  p->firstNode == begin &&
-                  p->lastNode == end || 
-                  p->firstNode == end && 
-                  p->lastNode == begin)
+            if (  (p->firstNode == begin &&
+                   p->lastNode == end) ||
+                  (p->firstNode == end &&
+                   p->lastNode == begin) )
                 return p;
         }
         return 0;
-    } 
+    }
 
     Pivots nodePivots ( GraphNode* node )
     {
@@ -248,11 +248,11 @@ struct Graph
         Pivots::iterator iter = pivots.begin();
         for ( ; iter != pivots.end(); ++iter ) {
             GraphPivot* p = *iter;
-            if (  p->firstNode == node || 
+            if (  p->firstNode == node ||
                   p->lastNode == node )
                 res.push_back(p);
         }
-        return res;        
+        return res;
     }
 
     Nodes neighborNodes ( GraphNode* node )
@@ -288,10 +288,10 @@ struct Graph
             Pivots::iterator rightIter = iter + 1;
             if ( rightIter == pivots.end() )
                 right = pivots.front();
-            else 
+            else
                 right = *rightIter;
             segments.push_back(Segment(indx, node, left, right));
-        }       
+        }
         return segments;
     }
 
@@ -306,14 +306,14 @@ struct Graph
             for ( ; innerIter != segments.end(); ++innerIter ) {
                 if ( (*innerIter).index == (*iter).index )
                     continue;
-                if ( left  == (*innerIter).left && 
-                     right == (*innerIter).right ||
-                     left  == (*innerIter).right && 
-                     right == (*innerIter).left) {
+                if ( (left  == (*innerIter).left &&
+                      right == (*innerIter).right) ||
+                     (left  == (*innerIter).right &&
+                      right == (*innerIter).left) ) {
                     segments.erase(iter);
                     erased = true;
                     break;
-                }                     
+                }
             }
             if ( !erased )
                 ++iter;
@@ -322,22 +322,22 @@ struct Graph
 
     bool segmentPathIsCorrect ( const Segment& seg, const Pivots& path )
     {
-        //TODO: path should be sorted by direction!! 
-        Nodes neighbors = neighborNodes( seg.centerNode ); 
+        //TODO: path should be sorted by direction!!
+        Nodes neighbors = neighborNodes( seg.centerNode );
 
         QPolygon points( path.size() + 2 );
         points.setPoint( 0, seg.centerNode->point() );
 
         Pivots::const_iterator iter = path.begin();
         size_t indx = 1;
-        for ( ; iter != path.end(); ++iter, ++indx ) {            
+        for ( ; iter != path.end(); ++iter, ++indx ) {
             GraphPivot* pivot = *iter;
 
             // Check first node of pivot
             if ( seg.leftNode() != pivot->firstNode &&
                  seg.rightNode() != pivot->firstNode ) {
-                Nodes::iterator nodeOnPath = std::find( neighbors.begin(), 
-                                                        neighbors.end(), 
+                Nodes::iterator nodeOnPath = std::find( neighbors.begin(),
+                                                        neighbors.end(),
                                                         pivot->firstNode );
             if ( nodeOnPath != neighbors.end() )
                 return false;
@@ -345,8 +345,8 @@ struct Graph
             // Check last node of pivot
             if ( seg.leftNode() != pivot->lastNode &&
                  seg.rightNode() != pivot->lastNode ) {
-                Nodes::iterator nodeOnPath = std::find( neighbors.begin(), 
-                                                        neighbors.end(), 
+                Nodes::iterator nodeOnPath = std::find( neighbors.begin(),
+                                                        neighbors.end(),
                                                         pivot->lastNode );
             if ( nodeOnPath != neighbors.end() )
                 return false;
@@ -368,14 +368,14 @@ struct Graph
                 continue;
             if ( region.contains( n->point() ) ) {
                 return false;
-            }            
+            }
         }
         return true;
     }
 
     Pivots nearestPivots ( const Segment& seg, const Pivots& path )
     {
-        //TODO: path should be sorted by direction!! 
+        //TODO: path should be sorted by direction!!
         QPolygon points( path.size() + 2 );
         Nodes pathNodes;
 
@@ -384,7 +384,7 @@ struct Graph
 
         Pivots::const_iterator iter = path.begin();
         size_t indx = 1;
-        for ( ; iter != path.end(); ++iter, ++indx ) {            
+        for ( ; iter != path.end(); ++iter, ++indx ) {
             GraphPivot* pivot = *iter;
             points.setPoint( indx, pivot->firstNode->point() );
             pathNodes.push_back(pivot->firstNode);
@@ -405,7 +405,7 @@ struct Graph
             if ( onPath != pathNodes.end() )
                 continue;
             if ( region.contains( n->point() ) )
-                nodesInSegment.push_back(n);            
+                nodesInSegment.push_back(n);
         }
 
         if ( nodesInSegment.size() == 0 )
@@ -425,10 +425,10 @@ struct Graph
                     nearest.push_back(p);
                     nodesInSegment.erase(i);
                     break;
-                }                    
+                }
             }
         }
-        return nearest;        
+        return nearest;
     }
 
     Pivots surroundingPivots ( GraphNode* node )
@@ -436,13 +436,13 @@ struct Graph
         Segments segments = clockwiseSegments(node);
         removeSimilarSegments(segments);
         size_t holesInSurroundings = 0;
-        
+
         Pivots pathBeforeHole;
         Pivots pathAfterHole;
 
         Segments::iterator iter = segments.begin();
         for ( ; iter != segments.end(); ++iter ) {
-            Segment seg = *iter;        
+            Segment seg = *iter;
             GraphNode* left = seg.leftNode();
             GraphNode* right = seg.rightNode();
 
@@ -466,7 +466,7 @@ struct Graph
             Pivots* tmpPath = 0;
             if ( holesInSurroundings )
                 tmpPath = &pathAfterHole;
-            else 
+            else
                 tmpPath = &pathBeforeHole;
 
             Pivots::iterator i = nearestPath.begin();
@@ -478,7 +478,7 @@ struct Graph
         std::merge( pathAfterHole.begin(), pathAfterHole.end(),
                     pathBeforeHole.begin(), pathBeforeHole.end(),
                     path.begin() );
-        
+
         return path;
     }
 
@@ -609,7 +609,7 @@ int main ()
     Segments segments = graph.clockwiseSegments( graph.nodes[3] );
     Segments::iterator iter = segments.begin();
     for ( ; iter != segments.end(); ++iter ) {
-        Segment seg = *iter;        
+        Segment seg = *iter;
         std::cout << seg.leftNode()->number << " , " <<
                      seg.rightNode()->number << "\n";
     }
@@ -620,7 +620,7 @@ int main ()
     Pivots pivotsOfNode = graph.sortNodePivotsByAngle( graph.nodes[3] );
     Pivots::iterator iter = pivotsOfNode.begin();
     for ( ; iter != pivotsOfNode.end(); ++iter ) {
-        GraphPivot* pivot = *iter;        
+        GraphPivot* pivot = *iter;
         std::cout << pivot->firstNode->number << " ( " << pivot->cost <<
             " ) " << pivot->lastNode->number << "\n";
     }
@@ -630,7 +630,7 @@ int main ()
     Pivots path = graph.shortestPath( graph.nodes[1], graph.nodes[6] );
     Pivots::iterator iter = path.begin();
     for ( ; iter != path.end(); ++iter ) {
-        GraphPivot* pivot = *iter;        
+        GraphPivot* pivot = *iter;
         std::cout << pivot->firstNode->number << " ( " << pivot->cost <<
             " ) " << pivot->lastNode->number << "\n";
     }
@@ -639,7 +639,7 @@ int main ()
     Pivots path = graph.surroundingPivots( graph.nodes[0] );
     Pivots::iterator iter = path.begin();
     for ( ; iter != path.end(); ++iter ) {
-        GraphPivot* pivot = *iter;        
+        GraphPivot* pivot = *iter;
         std::cout << pivot->firstNode->number << " ( " << pivot->cost <<
             " ) " << pivot->lastNode->number << "\n";
     }

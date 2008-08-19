@@ -42,10 +42,10 @@ QWidget* LoadTableDelegate::createEditor ( QWidget *parent,
     return editor;
 }
 
-void LoadTableDelegate::setEditorData ( QWidget* editor, 
+void LoadTableDelegate::setEditorData ( QWidget* editor,
                                         const QModelIndex& index ) const
 {
-    QString load = 
+    QString load =
         index.model()->data( index, Qt::DisplayRole ).toString();
     QLineEdit* loadEditor = dynamic_cast<QLineEdit*>( editor );
     Q_ASSERT( loadEditor );
@@ -54,8 +54,8 @@ void LoadTableDelegate::setEditorData ( QWidget* editor,
     return;
 }
 
-void LoadTableDelegate::setModelData ( QWidget* editor, 
-                                       QAbstractItemModel* model, 
+void LoadTableDelegate::setModelData ( QWidget* editor,
+                                       QAbstractItemModel* model,
                                        const QModelIndex& index ) const
 {
     QLineEdit* loadEditor = dynamic_cast<QLineEdit*>( editor );
@@ -67,9 +67,9 @@ void LoadTableDelegate::setModelData ( QWidget* editor,
     return;
 }
 
-void LoadTableDelegate::updateEditorGeometry ( 
+void LoadTableDelegate::updateEditorGeometry (
     QWidget* editor,
-    const QStyleOptionViewItem& option, 
+    const QStyleOptionViewItem& option,
     const QModelIndex& ) const
 {
     editor->setGeometry( option.rect );
@@ -87,12 +87,12 @@ void LoadTable::setLoad ( int row, const TrussLoad& load )
 {
     if ( row >= rowCount() )
         return;
-    
+
     QTableWidgetItem* cellX = item( row, 0 );
     if ( cellX )
         cellX->setText( QString("%1").arg( load.getXForce(),0,'f',2 ) );
     else {
-        QTableWidgetItem* cellX = new QTableWidgetItem( 
+        QTableWidgetItem* cellX = new QTableWidgetItem(
                         QString("%1").arg( load.getXForce(),0,'f',2 ) );
         cellX->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter );
         setItem( row, 0, cellX );
@@ -102,12 +102,12 @@ void LoadTable::setLoad ( int row, const TrussLoad& load )
     if ( cellY )
         cellY->setText( QString("%1").arg( load.getYForce(),0,'f',2 ) );
     else {
-        QTableWidgetItem* cellY = new QTableWidgetItem( 
+        QTableWidgetItem* cellY = new QTableWidgetItem(
                         QString("%1").arg( load.getYForce(),0,'f',2 ) );
         cellY->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter );
         setItem( row, 1, cellY );
     }
-    
+
     horizontalHeader()->resizeSection( 0, Global::loadColumnWidth );
     horizontalHeader()->resizeSection( 1, Global::loadColumnWidth );
 }
@@ -133,8 +133,8 @@ int LoadTable::getLoadedNodesNumber () const
     for ( int i = 0; i < rowCount(); ++i ) {
         cellX = item( i, 0 );
         cellY = item( i, 1 );
-        if ( cellX && cellX->text().toDouble() != 0 ||
-             cellY && cellY->text().toDouble() != 0 )
+        if ( (cellX && cellX->text().toDouble() != 0) ||
+             (cellY && cellY->text().toDouble() != 0) )
             ++loadedNumb;
     }
     return loadedNumb;
@@ -145,7 +145,7 @@ int LoadTable::getLoadedNodesNumber () const
  *****************************************************************************/
 
 
-MaterialTableItem::MaterialTableItem ( const TrussMaterial* m /* = 0 */, 
+MaterialTableItem::MaterialTableItem ( const TrussMaterial* m /* = 0 */,
                                        int type /* = Type */ ) :
     QTableWidgetItem( type )
 {
@@ -173,7 +173,7 @@ const TrussMaterial* MaterialTableItem::getMaterial () const
 
 void MaterialTableItem::updateMaterialItemName( const QString& )
 {
-    const TrussMaterial* senderMaterial = 
+    const TrussMaterial* senderMaterial =
         dynamic_cast<const TrussMaterial*>(sender());
     const TrussMaterial* m = getMaterial();
     if ( m == senderMaterial )
@@ -184,17 +184,17 @@ void MaterialTableItem::updateMaterialItemName( const QString& )
  * Pivot Property Table Delegate
  *****************************************************************************/
 
-PivotPropertyTableDelegate::PivotPropertyTableDelegate ( QWidget* parent ) : 
+PivotPropertyTableDelegate::PivotPropertyTableDelegate ( QWidget* parent ) :
     QItemDelegate( parent ),
     materialLib( 0 )
 {}
 
-QWidget* PivotPropertyTableDelegate::createEditor ( 
-    QWidget *parent, 
+QWidget* PivotPropertyTableDelegate::createEditor (
+    QWidget *parent,
     const QStyleOptionViewItem& ,
     const QModelIndex& index ) const
 {
-    
+
     if ( index.column() != 0 ) {
         // create editor for material cells
         MaterialComboBox *editor = new MaterialComboBox( parent, materialLib );
@@ -212,18 +212,18 @@ QWidget* PivotPropertyTableDelegate::createEditor (
     return editor;
 }
 
-void PivotPropertyTableDelegate::setEditorData ( 
+void PivotPropertyTableDelegate::setEditorData (
     QWidget *editor,
     const QModelIndex &index ) const
 {
     // fill editor of the material cell
     if ( index.column() != 0 ) {
-        MaterialComboBox *comboBox = 
+        MaterialComboBox *comboBox =
             dynamic_cast<MaterialComboBox*>(editor);
         Q_ASSERT( comboBox != 0 );
         QVariant material = index.model()->data( index, Qt::DisplayRole );
         Q_ASSERT( qVariantCanConvert<const TrussMaterial*>(material) );
-        const TrussMaterial* currentMaterial = 
+        const TrussMaterial* currentMaterial =
                   qVariantValue<const TrussMaterial*>(material);
         if ( currentMaterial )
             comboBox->setCurrentMaterial( *currentMaterial );
@@ -231,7 +231,7 @@ void PivotPropertyTableDelegate::setEditorData (
     }
 
     // fill editor of the thickness cell
-    QString thickness = 
+    QString thickness =
         index.model()->data( index, Qt::DisplayRole ).toString();
     QLineEdit* lineEdit = dynamic_cast<QLineEdit*>( editor );
     Q_ASSERT( editor != 0 );
@@ -240,9 +240,9 @@ void PivotPropertyTableDelegate::setEditorData (
     return;
 }
 
-void PivotPropertyTableDelegate::setModelData ( 
-    QWidget* editor, 
-    QAbstractItemModel* model, 
+void PivotPropertyTableDelegate::setModelData (
+    QWidget* editor,
+    QAbstractItemModel* model,
     const QModelIndex& index ) const
 {
     // set data for material cell
@@ -270,43 +270,43 @@ void PivotPropertyTableDelegate::setModelData (
     return;
 }
 
-void PivotPropertyTableDelegate::paint ( QPainter* painter, 
+void PivotPropertyTableDelegate::paint ( QPainter* painter,
                                          const QStyleOptionViewItem& option,
                                          const QModelIndex& index ) const
 {
     if ( index.column() != 1 ) {
         QStyleOptionViewItem opt = option;
         QItemDelegate::paint( painter, opt, index );
-    } 
-    else 
+    }
+    else
     {
-        QPalette::ColorGroup cg = option.state& QStyle::State_Enabled ? 
+        QPalette::ColorGroup cg = option.state& QStyle::State_Enabled ?
                                   QPalette::Normal : QPalette::Disabled;
         if ( option.state & QStyle::State_Selected )
-            painter->fillRect( option.rect, 
-                               option.palette.color( cg, 
+            painter->fillRect( option.rect,
+                               option.palette.color( cg,
                                                      QPalette::Highlight ) );
         QVariant material = index.model()->data( index, Qt::DisplayRole );
         Q_ASSERT( qVariantCanConvert<const TrussMaterial*>(material) );
-        const TrussMaterial* currentMaterial = 
+        const TrussMaterial* currentMaterial =
                   qVariantValue<const TrussMaterial*>(material);
         if ( currentMaterial )
-            drawDisplay( painter, option, option.rect, 
+            drawDisplay( painter, option, option.rect,
                          currentMaterial->getMaterialName() );
         // since we draw the grid ourselves
-        drawFocus( painter, option, option.rect ); 
+        drawFocus( painter, option, option.rect );
     }
 }
 
-void PivotPropertyTableDelegate::updateEditorGeometry ( 
+void PivotPropertyTableDelegate::updateEditorGeometry (
     QWidget* editor,
-    const QStyleOptionViewItem& option, 
+    const QStyleOptionViewItem& option,
     const QModelIndex& ) const
 {
     editor->setGeometry( option.rect );
 }
 
-void PivotPropertyTableDelegate::setMaterialLibrary ( 
+void PivotPropertyTableDelegate::setMaterialLibrary (
     const TrussMaterialLibrary& matLib )
 {
     materialLib = &matLib;
@@ -340,7 +340,7 @@ void PivotPropertyTable::setThickness ( int row, double thick )
         cell = new QTableWidgetItem( QString("%1").arg( thick,0,'f',2 ) );
         cell->setTextAlignment( Qt::AlignRight | Qt::AlignVCenter );
         setItem( row, 0, cell );
-    }    
+    }
     horizontalHeader()->resizeSection( 0, Global::thicknessColumnWidth );
 }
 
@@ -359,7 +359,7 @@ void PivotPropertyTable::setMaterial ( int row, const TrussMaterial* m )
     else {
         cell = new MaterialTableItem( m );
         setItem( row, 1, cell );
-    }   
+    }
     horizontalHeader()->resizeSection( 1, Global::materialColumnWidth );
 }
 
@@ -426,16 +426,16 @@ void TrussPropertyTabWidget::initLoadTab ()
                 *vertHeader = new TableHeader( Qt::Vertical );
     loadTable->setHorizontalHeader( horHeader );
     loadTable->setVerticalHeader( vertHeader );
-    
+
     LoadTableDelegate* delegate = new LoadTableDelegate;
     loadTable->setItemDelegate( delegate );
-    
+
     connect( delegate, SIGNAL(cellWasChanged(int, int)),
                        SLOT(updateTrussLoad(int, int)) );
 
-    QGroupBox* loadCaseGroupBox = 
+    QGroupBox* loadCaseGroupBox =
             new QGroupBox( tr( "Load cases" ), parentFrame );
-    QLabel* loadCaseNumb = 
+    QLabel* loadCaseNumb =
         new QLabel( tr( "Current: " ), loadCaseGroupBox );
     loadCaseNumb->hide();
     loadCaseComboBox = new QComboBox( loadCaseGroupBox );
@@ -501,7 +501,7 @@ void TrussPropertyTabWidget::initLoadTab ()
 void TrussPropertyTabWidget::initPivotPropertyTab ()
 {
     QFrame* parentFrame = new QFrame;
-    
+
     pivotsNumbLabel = new QLabel( tr( "Total pivots: " ), parentFrame );
     pivotsNumbLabel->hide();
     pivotPropTable = new PivotPropertyTable( parentFrame );
@@ -509,18 +509,18 @@ void TrussPropertyTabWidget::initPivotPropertyTab ()
                 *vertHeader = new TableHeader( Qt::Vertical );
     pivotPropTable->setHorizontalHeader( horHeader );
     pivotPropTable->setVerticalHeader( vertHeader );
-    
+
     PivotPropertyTableDelegate* delegate = new PivotPropertyTableDelegate;
     pivotPropTable->setItemDelegate( delegate );
 
     connect( delegate, SIGNAL(cellWasChanged(int, int)),
                        SLOT(updatePivotState(int, int)) );
-    connect( this, 
+    connect( this,
              SIGNAL(onMaterialLibraryChanged(const TrussMaterialLibrary&)),
-             delegate, 
+             delegate,
              SLOT(setMaterialLibrary(const TrussMaterialLibrary&)) );
 
-    QGroupBox* levelGroupBox = 
+    QGroupBox* levelGroupBox =
             new QGroupBox( tr( "Leveling" ), parentFrame );
     QComboBox* levelComboBox = new QComboBox( levelGroupBox );
     levelComboBox->addItem( "by Thickness" );
@@ -536,10 +536,10 @@ void TrussPropertyTabWidget::initPivotPropertyTab ()
 
     connect( levelComboBox, SIGNAL(currentIndexChanged(int)),
                             SLOT(changeLevelEditor(int)) );
-   
+
     connect( materialComboBox, SIGNAL(comboBoxIsEmpty(bool)),
                                SLOT(updateLevelButtonState(bool)) );
-    
+
     levelButton = new QPushButton( levelGroupBox );
     levelButton->setIcon( QIcon( Global::imagesPath() + "/tick.png" ) );
     levelButton->setFixedSize( QSize( 21, 21 ) );
@@ -592,20 +592,20 @@ void TrussPropertyTabWidget::initPivotPropertyTab ()
 
 
 // connect new truss unit window with geometry widget
-void TrussPropertyTabWidget::trussUnitWindowWasCreated ( 
+void TrussPropertyTabWidget::trussUnitWindowWasCreated (
     TrussUnitWindow& window )
 {
     changeFocusWindow( &window );
 
     TrussUnit::LoadCases& loadCases = window.getLoadCases();
-    
+
     // connections for load tab
     connect( &window, SIGNAL(afterNodeCreation(const Node&)),
                       SLOT(addLoadTableRow(const Node&)) );
 
     connect( &window, SIGNAL(afterNodeRevive(const Node&)),
                       SLOT(addLoadTableRow(const Node&)) );
-                    
+
     connect( &window, SIGNAL(beforeNodeDesist(const Node&)),
                       SLOT(removeLoadTableRow(const Node&)) );
 
@@ -642,12 +642,12 @@ void TrussPropertyTabWidget::trussUnitWindowWasCreated (
 
     connect( &window, SIGNAL(afterPivotRevive(const Node&, const Node&)),
                       SLOT(addPivotToTable(const Node&, const Node&)) );
-                    
+
     connect( &window, SIGNAL(beforePivotDesist(const Node&, const Node&)),
                       SLOT(removePivotFromTable(const Node&, const Node&)) );
 
 
-    // Check if truss was created in 'silence' mode 
+    // Check if truss was created in 'silence' mode
     // (see TrussUnitWindowManager.cpp)
     TrussUnit::PivotList pivots = window.getPivotList();
     if ( ! pivots.empty() ) {
@@ -658,12 +658,12 @@ void TrussPropertyTabWidget::trussUnitWindowWasCreated (
             connect( pivot, SIGNAL(onThicknessChange(double)),
                             SLOT(updateTableThickness()) );
             connect( pivot, SIGNAL(onMaterialChange()),
-                            SLOT(updateTableMaterial()) );            
+                            SLOT(updateTableMaterial()) );
         }
     }
 }
 
-void TrussPropertyTabWidget::changeFocusWindow ( 
+void TrussPropertyTabWidget::changeFocusWindow (
     TrussUnitWindow* newFocusWindow )
 {
     focusWindow = newFocusWindow;
@@ -683,7 +683,7 @@ void TrussPropertyTabWidget::changeFocusWindow (
     loadCaseComboBox->clear();
 }
 
-void TrussPropertyTabWidget::changeMaterialLibrary ( 
+void TrussPropertyTabWidget::changeMaterialLibrary (
     const TrussMaterialLibrary& lib )
 {
     materialComboBox->setMaterialLibrary( lib );
@@ -691,7 +691,7 @@ void TrussPropertyTabWidget::changeMaterialLibrary (
         updateLevelButtonState( true );
     else
         updateLevelButtonState( false );
-    
+
     emit onMaterialLibraryChanged( lib );
 }
 
@@ -709,7 +709,7 @@ void TrussPropertyTabWidget::fillLoadTab ()
         removeLoadCaseBtn->setEnabled( false );
     else
         removeLoadCaseBtn->setEnabled( true );
-    
+
     if ( loadCases.countLoadCases() >= Global::maxLoadCaseNumber )
         createLoadCaseBtn->setEnabled( false );
     else
@@ -720,7 +720,7 @@ void TrussPropertyTabWidget::fillLoadTab ()
 
     // clear table
     loadTable->setRowCount( 0 );
-    
+
     TrussUnit::NodeList nodeList = focusWindow->getNodeList();
     if ( nodeList.empty() ) {
         loadTable->hide();
@@ -732,16 +732,16 @@ void TrussPropertyTabWidget::fillLoadTab ()
 
     fillLoadTable( loadCases.getCurrentLoadCase() );
 
-    nodesNumbLabel->setText( "Total nodes: " + 
+    nodesNumbLabel->setText( "Total nodes: " +
                              QString::number(nodeList.size()) );
 }
 
-void TrussPropertyTabWidget::fillLoadTable ( 
+void TrussPropertyTabWidget::fillLoadTable (
     const TrussUnit::LoadCase* loadCase )
 {
     if ( ! focusWindow || ! loadCase )
         return;
-    
+
     TrussUnit::NodeList nodeList = focusWindow->getNodeList();
     TrussUnit::NodeListIter iter = nodeList.begin();
     for ( ; iter != nodeList.end(); ++iter ) {
@@ -757,9 +757,9 @@ void TrussPropertyTabWidget::fillLoadTable (
             loadTable->setLoad( row, zeroLoad );
         }
     }
-    
-    loadedNodesLabel->setText( "Loaded nodes: " + 
-                      QString::number(loadTable->getLoadedNodesNumber()) );   
+
+    loadedNodesLabel->setText( "Loaded nodes: " +
+                      QString::number(loadTable->getLoadedNodesNumber()) );
 }
 
 void TrussPropertyTabWidget::fillLoadCaseComboBox ()
@@ -798,7 +798,7 @@ void TrussPropertyTabWidget::addLoadTableRow ( const Node& node )
     if ( loadTable->isHidden() )
         loadTable->show();
 
-    TrussUnit::LoadCase* currentCase = 
+    TrussUnit::LoadCase* currentCase =
         focusWindow->getLoadCases().getCurrentLoadCase();
     if ( ! currentCase )
         return;
@@ -812,23 +812,23 @@ void TrussPropertyTabWidget::addLoadTableRow ( const Node& node )
         loadTable->setLoad( row, zeroLoad );
     }
 
-    nodesNumbLabel->setText( "Total nodes: " + 
+    nodesNumbLabel->setText( "Total nodes: " +
                           QString::number(focusWindow->getNodeList().size()) );
 }
 
 void TrussPropertyTabWidget::showLoadTableRow ( bool visible )
 {
-    try { 
+    try {
         const Node& node = dynamic_cast<const Node&>(*sender());
         int row = node.getNumber() - 1;
         if ( visible ) {
             loadTable->showRow( row );
-            nodesNumbLabel->setText( "Total nodes: " + 
+            nodesNumbLabel->setText( "Total nodes: " +
                 QString::number(focusWindow->getNodeList().size()) );
         }
         else {
             loadTable->hideRow( row );
-            nodesNumbLabel->setText( "Total nodes: " + 
+            nodesNumbLabel->setText( "Total nodes: " +
                 QString::number(focusWindow->getNodeList().size() - 1) );
         }
     }
@@ -839,14 +839,14 @@ void TrussPropertyTabWidget::removeLoadTableRow ( const Node& node )
 {
     if ( sender() != focusWindow )
         return;
-    
+
     if ( ! focusWindow->getLoadCases().countLoadCases() )
         return;
 
     loadTable->removeRow( node.getNumber() - 1 );
-    nodesNumbLabel->setText( "Total nodes: " + 
+    nodesNumbLabel->setText( "Total nodes: " +
                       QString::number(focusWindow->getNodeList().size() - 1) );
-    loadedNodesLabel->setText( "Loaded nodes: " + 
+    loadedNodesLabel->setText( "Loaded nodes: " +
                       QString::number(loadTable->getLoadedNodesNumber()) );
 
     if ( ! loadTable->rowCount() )
@@ -890,7 +890,7 @@ void TrussPropertyTabWidget::setCurrentLoadCase ( int indx )
 {
     if ( ! focusWindow )
         return;
-    
+
     // Load cases index starts with 1, not 0
     TrussUnit::LoadCases& loadCases = focusWindow->getLoadCases();
     TrussUnit::LoadCase* loadCase = loadCases.findLoadCase( indx + 1 );
@@ -901,13 +901,13 @@ void TrussPropertyTabWidget::setCurrentLoadCase ( int indx )
 void TrussPropertyTabWidget::updateTableLoad ( const Node& node )
 {
     if ( ! focusWindow )
-        return; 
+        return;
 
     int row = node.getNumber() - 1;
-    TrussUnit::LoadCase* currentCase = 
+    TrussUnit::LoadCase* currentCase =
         focusWindow->getLoadCases().getCurrentLoadCase();
-    try { 
-        const TrussNode& trussNode = 
+    try {
+        const TrussNode& trussNode =
             dynamic_cast<const TrussNode&>(node);
         TrussLoad* load = currentCase->findLoad( trussNode );
         if ( load )
@@ -919,18 +919,18 @@ void TrussPropertyTabWidget::updateTableLoad ( const Node& node )
     }
     catch ( ... ) { return; }
 
-    loadedNodesLabel->setText( "Loaded nodes: " + 
-                      QString::number(loadTable->getLoadedNodesNumber()) ); 
+    loadedNodesLabel->setText( "Loaded nodes: " +
+                      QString::number(loadTable->getLoadedNodesNumber()) );
 }
 
 void TrussPropertyTabWidget::updateTrussLoad ( int row, int col )
 {
     if ( ! focusWindow )
-        return; 
+        return;
 
-    TrussUnit::LoadCase* loadCase = 
+    TrussUnit::LoadCase* loadCase =
             focusWindow->getLoadCases().getCurrentLoadCase();
-    
+
     if ( loadCase ) {
         TrussNode *node = focusWindow->findNodeByNumber( row + 1 );
         if ( ! node )
@@ -941,7 +941,7 @@ void TrussPropertyTabWidget::updateTrussLoad ( int row, int col )
 
         TrussLoad* load = loadCase->findLoad( *node );
         if ( ! load )
-            loadCase->addLoad( *node, newXForce,newYForce );        
+            loadCase->addLoad( *node, newXForce,newYForce );
         else if ( col == 0 )
             load->setXForce( newXForce );
         else
@@ -973,11 +973,11 @@ void TrussPropertyTabWidget::fillPivotPropertyTab ()
     for ( ; iter != pivotList.end(); ++iter )
         pivotPropTable->addPivot( (const TrussPivot&)**iter );
 
-    pivotsNumbLabel->setText( "Total pivots: " + 
+    pivotsNumbLabel->setText( "Total pivots: " +
                               QString::number(pivotList.size()) );
 }
 
-void TrussPropertyTabWidget::addPivotToTable ( 
+void TrussPropertyTabWidget::addPivotToTable (
     const Node& first, const Node& last )
 {
     if ( sender() != focusWindow )
@@ -991,7 +991,7 @@ void TrussPropertyTabWidget::addPivotToTable (
             levelButton->setEnabled( isLevelButtonEnabled );
     }
 
-    try { 
+    try {
         const TrussNode& node1 = dynamic_cast<const TrussNode&>(first);
         const TrussNode& node2 = dynamic_cast<const TrussNode&>(last);
         TrussPivot* pivot = focusWindow->findPivotByNodes( node1, node2);
@@ -1005,17 +1005,17 @@ void TrussPropertyTabWidget::addPivotToTable (
                         SLOT(updateTableMaterial()) );
     } catch ( ... ) { return; }
 
-    pivotsNumbLabel->setText( "Total pivots: " + 
+    pivotsNumbLabel->setText( "Total pivots: " +
                      QString::number(focusWindow->getPivotList().size()) );
 }
 
-void TrussPropertyTabWidget::removePivotFromTable ( const Node& first, 
+void TrussPropertyTabWidget::removePivotFromTable ( const Node& first,
                                                     const Node& last )
 {
     if ( sender() != focusWindow )
         return;
 
-    try { 
+    try {
         const TrussNode& node1 = dynamic_cast<const TrussNode&>(first);
         const TrussNode& node2 = dynamic_cast<const TrussNode&>(last);
         TrussPivot* pivot = focusWindow->findPivotByNodes( node1, node2);
@@ -1028,8 +1028,8 @@ void TrussPropertyTabWidget::removePivotFromTable ( const Node& first,
         disconnect( pivot, SIGNAL(onMaterialChange()),
                      this, SLOT(updateTableMaterial()) );
     } catch ( ... ) { return; }
-    
-    pivotsNumbLabel->setText( "Total pivots: " + 
+
+    pivotsNumbLabel->setText( "Total pivots: " +
                      QString::number(focusWindow->getPivotList().size() - 1) );
 
     if ( ! pivotPropTable->rowCount() ) {
@@ -1040,17 +1040,17 @@ void TrussPropertyTabWidget::removePivotFromTable ( const Node& first,
 
 void TrussPropertyTabWidget::showPivotPropertyTableRow ( bool visible )
 {
-    try { 
+    try {
         const TrussPivot& pivot = dynamic_cast<const TrussPivot&>(*sender());
         int row = pivot.getNumber() - 1;
         if ( visible ) {
             pivotPropTable->showRow( row );
-            pivotsNumbLabel->setText( "Total pivots: " + 
+            pivotsNumbLabel->setText( "Total pivots: " +
                 QString::number(focusWindow->getPivotList().size()) );
         }
         else {
             pivotPropTable->hideRow( row );
-            pivotsNumbLabel->setText( "Total pivots: " + 
+            pivotsNumbLabel->setText( "Total pivots: " +
                 QString::number(focusWindow->getPivotList().size() - 1) );
         }
     }
@@ -1061,11 +1061,11 @@ void TrussPropertyTabWidget::updateTableMaterial ()
 {
     if ( ! focusWindow )
         return;
-    
-    try { 
+
+    try {
         const TrussPivot& pivot = dynamic_cast<const TrussPivot&>(*sender());
         if ( focusWindow->findPivotByNumber( pivot.getNumber() ) == &pivot )
-            pivotPropTable->setMaterial( pivot.getNumber() - 1, 
+            pivotPropTable->setMaterial( pivot.getNumber() - 1,
                                          pivot.getMaterial() );
     }
     catch ( ... ) { return; }
@@ -1073,9 +1073,9 @@ void TrussPropertyTabWidget::updateTableMaterial ()
 
 void TrussPropertyTabWidget::updateTableThickness ()
 {
-    try { 
+    try {
         const TrussPivot& pivot = dynamic_cast<const TrussPivot&>(*sender());
-        pivotPropTable->setThickness( pivot.getNumber() - 1, 
+        pivotPropTable->setThickness( pivot.getNumber() - 1,
                                       pivot.getThickness() );
     }
     catch ( ... ) { return; }

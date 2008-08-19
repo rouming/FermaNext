@@ -1169,8 +1169,8 @@ void TrussDesignerWidget::aggMouseMoveEvent ( QMouseEvent* me )
                             QWidget::setCursor ( Qt::ArrowCursor );
                         update();
                     }
-                    else if ( selectedPivot && designerBehaviour == onSelect ||
-                              selectedPivot && designerBehaviour == onErase )
+                    else if ( (selectedPivot && designerBehaviour == onSelect) ||
+                              (selectedPivot && designerBehaviour == onErase) )
                     {
                         removeTrussElemHighlight ();
                         clearAllCursorCoordFields ();

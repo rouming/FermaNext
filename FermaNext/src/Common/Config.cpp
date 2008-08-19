@@ -4,8 +4,13 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include <QMetaType>
-#include <QAtomic>
 #include <QMutex>
+
+#if QT_VERSION >= 0x040400
+  #include <QAtomicInt>
+#else
+  #include <QAtomic>
+#endif
 
 #include "Config.h"
 
@@ -18,12 +23,17 @@ class ConfigNodePrivate
 {
 public:
     ConfigNodePrivate () :
-        ref(1), parent(0),  cfg(0), 
+        ref(1), parent(0),  cfg(0),
         removedFlag(false),
         fullyParsed(false)
     {}
-        
+
+#if QT_VERSION >= 0x040400
+    QAtomicInt ref;
+#else
     QAtomic ref;
+#endif
+
     ConfigNodePrivate<N>* parent;
     Config* cfg;
     QDomElement xmlData;
@@ -47,7 +57,7 @@ Config::Node::~Node ()
         // Zeroes parents
         ConfigNodeList::Iterator it = data->childs.begin();
         for ( ; it != data->childs.end(); ++it )
-            it->data->parent = 0;            
+            it->data->parent = 0;
         delete data;
     }
 }
@@ -55,7 +65,7 @@ Config::Node::~Node ()
 Config::Node::Node ( Config& config_, const QDomElement& xmlData_ ) :
     data( new ConfigNodePrivate<Config::Node> )
 {
-    data->cfg = &config_;    
+    data->cfg = &config_;
     data->xmlData = xmlData_;
 }
 
@@ -98,7 +108,11 @@ Config::Node& Config::Node::operator= ( const Config::Node& node )
     ConfigNodePrivate<Config::Node>* p = node.data;
     if ( p )
         p->ref.ref();
+#if QT_VERSION >= 0x040400
+    p = data.fetchAndStoreOrdered( p );
+#else
     p = qAtomicSetPtr( &data, p );
+#endif
     if ( p && !p->ref.deref() )
         delete p;
     return *this;
@@ -114,13 +128,13 @@ Config::Node Config::Node::parentNode () const
 { return Config::Node( data->parent );  }
 
 void Config::Node::remove ()
-{ 
+{
     if ( isNull() || data->parent == 0 )
         return;
     QMutexLocker locker( data->cfg->notificationMutex );
     // Remove from child
     ConfigNodeList& parentChilds = data->parent->childs;
-    ConfigNodeList::Iterator it = qFind( parentChilds.begin(), 
+    ConfigNodeList::Iterator it = qFind( parentChilds.begin(),
                                          parentChilds.end(), *this );
 
     if ( it != parentChilds.end() )
@@ -136,7 +150,7 @@ void Config::Node::remove ()
 }
 
 void Config::Node::fromParentRemove ()
-{ 
+{
     if ( isNull() || data->parent == 0 )
         return;
     QMutexLocker locker( data->cfg->notificationMutex );
@@ -150,7 +164,7 @@ void Config::Node::fromParentRemove ()
 }
 
 bool Config::Node::isRemoved () const
-{ 
+{
     if ( isNull() )
         return true;
     return data->removedFlag;
@@ -160,10 +174,10 @@ bool Config::Node::isNull () const
 { return data == 0; }
 
 QString Config::Node::getTagName () const
-{ 
+{
     if ( isNull() )
         return QString();
-    return data->xmlData.tagName(); 
+    return data->xmlData.tagName();
 }
 
 void Config::Node::setTagName ( const QString& tagName )
@@ -177,10 +191,10 @@ void Config::Node::setTagName ( const QString& tagName )
 }
 
 bool Config::Node::hasValue () const
-{ 
+{
     if ( isNull() )
         return false;
-    return !data->textData.isNull(); 
+    return !data->textData.isNull();
 }
 
 QString Config::Node::getValue () const
@@ -228,7 +242,7 @@ void Config::Node::resetValue ()
 }
 
 NodeAttributeList Config::Node::getAttributes () const
-{    
+{
     NodeAttributeList resultList;
     if ( isNull() )
         return resultList;
@@ -240,7 +254,7 @@ NodeAttributeList Config::Node::getAttributes () const
             continue;
         QDomAttr attr = node.toAttr();
         resultList.append( NodeAttribute(attr.name(), attr.value()) );
-    }    
+    }
     return resultList;
 }
 
@@ -279,7 +293,7 @@ void Config::Node::clearAttributes ()
 
     QMutexLocker locker( data->cfg->notificationMutex );
 
-    for ( i = 0; i < size; ++i )        
+    for ( i = 0; i < size; ++i )
         data->xmlData.removeAttribute( attrNames.at(i) );
 
     // Notify about changes
@@ -319,9 +333,8 @@ bool Config::Node::removeChildNodes ( const QString& tagName )
             it = data->childs.erase( it );
             smthRemoved = true;
         }
-        else 
+        else
             ++it;
-        
     }
     return (smthRemoved ? true : false);
 }
@@ -341,7 +354,7 @@ void Config::Node::removeAllChildNodes ()
     }
 }
 
-QList<Config::Node> Config::Node::findChildNodes ( 
+QList<Config::Node> Config::Node::findChildNodes (
     const QString& tagName ) const
 {
     // Suspended parse
@@ -352,19 +365,19 @@ QList<Config::Node> Config::Node::findChildNodes (
     for ( ; iter < data->childs.end(); ++iter ) {
         const Config::Node& node = *iter;
         if ( node.getTagName() == tagName )
-            result.append( node );            
-    }    
+            result.append( node );
+    }
     return result;
 }
 
 QList<Config::Node> Config::Node::childNodes () const
-{ 
+{
     if ( isNull() )
         return QList<Config::Node>();
     // Suspended parse
     if ( !data->fullyParsed )
         parse();
-    return data->childs; 
+    return data->childs;
 }
 
 void Config::Node::parse () const
@@ -382,7 +395,7 @@ void Config::Node::parse () const
     bool hasValueParsed = false;
     QDomNode n = self->data->xmlData.firstChild();
     while( !n.isNull() ) {
-        if ( n.isText() ) { 
+        if ( n.isText() ) {
             hasValueParsed = true;
             self->setValue( n.toText().data() );
         }
@@ -522,7 +535,7 @@ void Config::nodeHasBeenCreated ( const Config::Node& node )
     // Notify everyone
     emit onNodeCreated( node );
 }
-    
+
 void Config::nodeHasBeenRemoved ( const Config::Node& node )
 {
     // Everything should be flushed

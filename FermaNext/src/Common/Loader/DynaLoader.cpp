@@ -36,8 +36,10 @@ const QString& DynaLoader::libExtension ()
     static QString extension = "dll";
 #elif _LIN_
     static QString extension = "so";
-#else _MAC_
+#elif _MAC_
     static QString extension = "dylib";
+#else
+    #error("Unknown compiler!");
 #endif
     return extension;
 }

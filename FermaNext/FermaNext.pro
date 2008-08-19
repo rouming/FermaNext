@@ -48,10 +48,10 @@ SUBDIRS += \
 
 # LiveUpdate
 SUBDIRS += src/LiveUpdate
-           
+
 
 # Plugin loaders
-SUBDIRS += src/Loaders/NativePluginLoader 
+SUBDIRS += src/Loaders/NativePluginLoader
 contains( HAS_ANT, TRUE ): SUBDIRS += src/Loaders/JavaPluginLoader
 else : warning( You should have 'Apache Ant' to build Java plugin loader. \
                 For now Java plugin loader (src/Loaders/JavaPluginLoader) \
@@ -68,7 +68,11 @@ SUBDIRS += \
           src/Plugins/Optimization.GA/GA.criteria/cpp.Force
 
 # Tests
-SUBDIRS += tests
+SUBDIRS += tests\ConfigTest \
+           tests\DijkstraTest \
+           tests\ObjectStateManagerTest \
+           tests\PathConversionTest \
+           tests\PluginExecutionTreeTest
 
 # Generates commands for Win32 to generate VS project files
 win32 {
