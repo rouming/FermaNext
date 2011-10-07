@@ -1,4 +1,4 @@
-#include "resultform.h"
+#include "resultForm.h"
 
 ResultForm::ResultForm(QWidget * parent, Qt::WindowFlags f)
 :QDialog(parent,f)

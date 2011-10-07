@@ -113,6 +113,8 @@ void Line::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     {
         painter->setPen(Qt::green);
     }
+	(void)option;
+	(void)widget;
 //    QGraphicsLineItem::paint(painter,option,widget);
 	painter->drawLine(line());
 }
