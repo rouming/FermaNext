@@ -10,7 +10,7 @@ CONFIG += staticlib warn_off
 QT -= core xml gui
 
 win32:DEFINES += COMPILED_FROM_DSP
-linux-g++:DEFINES += HAVE_EXPAT_CONFIG_H
+linux-*:DEFINES += HAVE_EXPAT_CONFIG_H
 mac:DEFINES += MACOS_CLASSIC
 
 INCLUDEPATH += lib

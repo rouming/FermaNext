@@ -1,9 +1,10 @@
 
+UI_DIR = $$PWD/ui
+
 INCLUDEPATH += $$PWD/.. \
                $$PWD \
-               $$PWD/Agg 
-
-UI_DIR = $$PWD/ui
+               $$PWD/Agg \
+               $$UI_DIR
 
 !contains ( TARGET, Gui ) {
   win32:LIBS += Gui.lib
