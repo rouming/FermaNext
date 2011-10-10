@@ -29,7 +29,7 @@ PROJECTS
     static model, its deformed shape and the axial-shear forces and moment
     diagrams
   . Truss unit structure optimization (genetic optimization is used for now)
-  . Plugins architecture
+  . Plugins architecture (with Java native bindings)
   . Portable to major of platforms: Windows, Linux, Mac OS (Wine support is
     required on Unix)
   . Live update support
@@ -46,7 +46,7 @@ PROJECTS
 
 AUTHOR
     FermaNext
-        Uriy Makarov
+        Yury Makarov
         Roman Peniaev
 
     LRSolver
