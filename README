@@ -1,12 +1,37 @@
-NAME
-    FermaNext -----
-    ---------------------------------------------------------------------------
-    ---------------------------------------------------------------------------
-    ---------------------------------------------------------------------------
-    ---------------------------------------------------------------------------
-    ---------------------------------------------------------------------------
-    ---------------------------------------------------------------------------
-    LRSolver ------
+PROJECTS
+  FermaNext -- educational CAD software which performs strength analysis of a 2d
+  structure made up by truss elements. Why is this software called educational?
+  Because it was developed in Russian Moscow Aviation Institute to be a part of
+  educational process. However, FermaNext does real 2d truss calculations and
+  has many its own CAD distinctive features:
+
+  · Analysis of 2D trusses
+  · Supports all major measure units
+  · Initial displacement conditions
+  · Extremely easy model creation, no need to first define nodes and then
+    elements, nodes are produced automatically
+  · Top quality graphics rendering
+  · Full GUI including
+  · Every user action can be undoed with full history of actions
+  · Immediate switch to other measure units
+  · Easy model creation (members, loads, supports etc) in a user friendly
+    environment with many graphical features
+  · Definition of custom materials
+  · Calculation and drawing of the deformed shape of the given model
+  · Analytical view of the results of analysis, the geometry, the static model,
+    the loads etc.
+  · High quality analysis reports with all analysis results, including stress,
+    internal forces and displacements diagrams, as well as drawings of the
+    static model, its deformed shape and the axial-shear forces and moment
+    diagrams
+  . Truss unit structure optimization (genetic optimization is used for now)
+  . Plugins architecture
+  . Portable to major of platforms: Windows, Linux, Mac OS (Wine support is
+    required on Unix)
+  . Live update support
+  . Absolutely open source software
+
+    LRSolver -- Laplace equation solver. TODO: full description
     ---------------------------------------------------------------------------
     ---------------------------------------------------------------------------
     ---------------------------------------------------------------------------
