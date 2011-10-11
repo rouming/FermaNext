@@ -30,8 +30,7 @@ PROJECTS
     diagrams
   . Truss unit structure optimization (genetic optimization is used for now)
   . Plugins architecture (with Java native bindings)
-  . Portable to major of platforms: Windows, Linux, Mac OS (Wine support is
-    required on Unix)
+  . Portable to major of platforms: Windows, Linux, Mac OS
   . Live update support
   . Absolutely open source software
 
