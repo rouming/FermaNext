@@ -9,17 +9,15 @@
 #include "FRMWriter.h"
 #include "VYVReader.h"
 
-#if defined _WIN32 || defined WIN32  
-  #include "win_SimpleCalc.h"
-#else
-  #include "unix_SimpleCalc.h"
-#endif
+#include "old_SimpleCalc.h"
+
+#include "simple_truss_calc.h"
 
 /*****************************************************************************
  * Old Simple Calculation plugin (main export routines)
  *****************************************************************************/
 
-FERMA_NEXT_PLUGIN(os_dependent_SimpleCalcPlugin)
+FERMA_NEXT_PLUGIN(SimpleCalcPlugin)
 
 /*****************************************************************************/
 
@@ -48,6 +46,14 @@ QString SimpleCalcPlugin::pluginStatusMsg () const
 void SimpleCalcPlugin::tryToAcceptParams ( 
     const PluginExecutionParams& ) const
 { /* nothing */ }
+
+void SimpleCalcPlugin::startCalculation (
+	const QString& fileNameIn,
+	const QString& fileNameOut ) const
+{
+	simple_truss_calc( fileNameIn.toAscii(),
+					   fileNameOut.toAscii() );
+}
 
 const PluginInfo& SimpleCalcPlugin::pluginInfo () const
 { 
@@ -170,7 +176,7 @@ Plugin::ExecutionResult SimpleCalcPlugin::specificExecute (
 
     FRMWriter frm(truss);
     frm.write( frmFile );
-    startCalculation( frmFile );
+    startCalculation( frmFile, vyvFile );
     VYVReader vyv;
     vyv.read( vyvFile );
 

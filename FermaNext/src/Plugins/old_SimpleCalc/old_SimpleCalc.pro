@@ -1,4 +1,3 @@
-
 TARGET = old_SimpleCalc.plg
 
 LEVEL = ../../..
@@ -17,22 +16,12 @@ TEMPLATE = lib
 CONFIG += plugin warn_on thread
 INCLUDEPATH += ./
 
-win32 {
-  HEADERS += win_SimpleCalc.h
-}
-unix {
-  HEADERS += unix_SimpleCalc.h
-}
-
 HEADERS += old_SimpleCalc.h \
            VYVReader.h \
-           FRMWriter.h
+           FRMWriter.h \
+           simple_truss_calc.h
 
 SOURCES += old_SimpleCalc.cpp \
            VYVReader.cpp \
-           FRMWriter.cpp
-
-
-# Copy dlls
-win32:QMAKE_POST_LINK = xcopy /y *.dll ..\..\..\plugins
-unix:QMAKE_POST_LINK = cp Simple_f.dll Simple_f.exe ../../../plugins
+           FRMWriter.cpp \
+           simple_truss_calc.c

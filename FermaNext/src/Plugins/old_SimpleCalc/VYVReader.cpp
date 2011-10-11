@@ -181,7 +181,7 @@ bool VYVReader::read ( const QString& fileName )
 //---------------------------------------------------------------------------//
     for ( it = lines.begin(); it != lines.end(); ++it ) {
         QString str = *it;
-        if ( str.contains("Массив топологий стержней") == 0 )
+        if ( str.contains("Massiv topologiy stergney") == 0 )
             continue;
         for (i = 0;i < Data.pivotsNum;i++) {
             ++it; if ( it == lines.end() ) break; str = *it;
@@ -196,7 +196,7 @@ bool VYVReader::read ( const QString& fileName )
 //---------------------------------------------------------------------------//
     for ( it = lines.begin(); it != lines.end(); ++it ) {
         QString str = *it;
-        if ( str.contains("Массив координат узлов") == 0 ) 
+        if ( str.contains("Massiv coordinat uzlov") == 0 ) 
             continue;
         for (i = 0;i < Data.nodesNum;i++) {
             ++it; if ( it == lines.end() ) break; str = *it;
@@ -213,7 +213,7 @@ bool VYVReader::read ( const QString& fileName )
 //---------------------------------------------------------------------------//
     for ( it = lines.begin(); it != lines.end(); ++it ) {
         QString str = *it;
-        if ( str.contains("Массив начальных площадей") == 0 ) 
+        if ( str.contains("Massiv nachalnih ploshadey") == 0 ) 
             continue;
         for (i = 0; i < Data.pivotsNum; i++) {
             ++it; if ( it == lines.end() ) break; str = *it;
@@ -239,7 +239,7 @@ bool VYVReader::read ( const QString& fileName )
 //---------------------------------------------------------------------------//
     for ( it = lines.begin(); it != lines.end(); ++it ) {
         QString str = *it;
-        if ( str.contains("Перемещения узлов") == 0 ) 
+        if ( str.contains("Peremeshenie uzlov") == 0 ) 
             continue;
         ++it; if ( it == lines.end() ) break; str = *it;
         for (i = 0; i < Data.loadsNum; i++) {
@@ -260,7 +260,7 @@ bool VYVReader::read ( const QString& fileName )
 //---------------------------------------------------------------------------//
     for ( it = lines.begin(); it != lines.end(); ++it ) {
         QString str = *it;
-        if ( str.contains("Напряжения в стержнях") == 0 ) 
+        if ( str.contains("Napryajenie v sterjnyah") == 0 ) 
             continue;
         ++it; if ( it == lines.end() ) break; str = *it;
         for (i = 0; i < Data.loadsNum; i++) {
@@ -291,7 +291,7 @@ bool VYVReader::read ( const QString& fileName )
 //---------------------------------------------------------------------------//
     for ( it = lines.begin(); it != lines.end(); ++it ) {
         QString str = *it;
-        if ( str.contains("Потребные площади стержней") ==0 ) 
+        if ( str.contains("Potrebnie ploshadi stergney") ==0 ) 
             continue;
         for (i = 0; i < Data.pivotsNum; i++) {
             ++it; if ( it == lines.end() ) break; str = *it;

@@ -27,9 +27,10 @@ public:
     virtual QString pluginStatusMsg () const;
     virtual void tryToAcceptParams ( const PluginExecutionParams& ) const;
 
-    virtual void startCalculation ( const QString& fileName ) const = 0;
+private:
+    void startCalculation ( const QString& fileNameIn,
+							const QString& fileNameOut ) const;
 
-protected:
     // Manages temp file
     void createTempFile ();
     void destroyTempFile ();
