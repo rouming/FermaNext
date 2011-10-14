@@ -74,8 +74,15 @@ Plugin::ExecutionResult SimpleCalcPlugin::specificExecute (
 
     if ( argsList.size() != 1 )
         throw WrongExecutionArgsException(getUUID());
-    
+
+#ifndef _MAC_
     TrussUnit* truss = dynamic_cast<TrussUnit*>(argsList[0]);
+#else
+    //TODO: I don't know how to link main FermaNext binary on MAC with exporting
+    //      all dynamic symbols. On real Unix '-export-dynamic' is used.
+    TrussUnit* truss = static_cast<TrussUnit*>(argsList[0]);
+#endif
+
     if ( truss == 0 )
         throw WrongExecutionArgsException(getUUID());
 

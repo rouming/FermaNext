@@ -46,7 +46,7 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
     if ( qApp) 
         appPath = qApp->applicationDirPath();
 
-#if defined _WIN32 || defined WIN32
+#ifdef _WIN_
     QString pathDelim = ";";
 #else
     QString pathDelim = ":";
@@ -118,14 +118,20 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
         return;
     } 
 
-#if defined _WIN32 || defined WIN32
+#ifdef _WIN_
     jvmLibi386Dir = jrePath + "/bin/client";
     jvmLibDir     = jvmLibi386Dir;
     jvmLibPath    = jvmLibDir + "/jvm.dll";
-#else
+#elif _LIN_
     jvmLibi386Dir = jrePath + "/lib/i386";
     jvmLibDir     = jvmLibi386Dir + "/client";
     jvmLibPath    = jvmLibDir + "/libjvm.so";
+#elif _MAC_
+    jvmLibi386Dir = "/System/Library/Frameworks/JavaVM.framework";
+    jvmLibDir     = jvmLibi386Dir + "/Versions/A";
+    jvmLibPath    = jvmLibDir + "/JavaVM";
+#else
+    #error Unsupported OS
 #endif
     if ( ! QFile::exists( jvmLibPath ) ) {
         LOG4CXX_ERROR(logger, "Can't find JVM lib. Java loader is disabled");
@@ -211,9 +217,14 @@ JavaPluginLoader::JavaPluginLoader ( PluginManager& plgMng,
                      0, QObject::tr("Can't start JVM"), 
                      QObject::tr("JVM \"%1\" can't be started!\n").
                          arg(jvmLibPath)
-#if !defined _WIN32 && !defined WIN32
+#ifdef _LIN_
                      + QObject::tr("Maybe you have forgot to specify "
                                    "LD_LIBRARY_PATH?\nIt should be set "
+                                   "to\n  1. %1\n  2. %2\n").
+                         arg(jvmLibi386Dir).arg(jvmLibDir)
+#eldef _MAC_
+                     + QObject::tr("Maybe you have forgot to specify "
+                                   "DYLD_LIBRARY_PATH?\nIt should be set "
                                    "to\n  1. %1\n  2. %2\n").
                          arg(jvmLibi386Dir).arg(jvmLibDir)
 #endif

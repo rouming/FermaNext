@@ -80,12 +80,15 @@ void DynaLoader::loadLibrary ( const QString& fileName )
     QString dlFileName = dlInfo.fileName();
 
     QString convertedFileName = fileName;
+//TODO: should load MAC frameworks with out .dyld postfix specified
+#ifndef _MAC_
     QRegExp regExp( "^" + libPrefix() + ".+\\." + libExtension() + "$" );
     if ( -1 == regExp.indexIn( dlFileName ) ) {
         dlFileName = libPrefix() + dlFileName + "." + libExtension();
-        convertedFileName = dlInfo.absolutePath() + QDir::separator() + 
+        convertedFileName = dlInfo.absolutePath() + QDir::separator() +
                             dlFileName;
     }
+#endif
     convertedFileName = QDir::convertSeparators( convertedFileName );
 #if defined UNICODE && (defined _WIN32 || defined WIN32)
     handle = dl_open(convertedFileName.toStdWString().data());

@@ -1066,9 +1066,14 @@ JObject JavaPlugin::dependenciesHashToJava (
 
             JObject jPlgInst = 0;
 
+#ifndef _MAC_
             // Try to cast to java plugin
             JavaPlugin* javaPlugin = dynamic_cast<JavaPlugin*>( plugin );
-
+#else
+            //TODO: I don't know how to link main FermaNext binary on MAC with exporting
+            //      all dynamic symbols. On real Unix '-export-dynamic' is used.
+            JavaPlugin* javaPlugin = static_cast<JavaPlugin*>( plugin );
+#endif
             if ( javaPlugin ) {
                 LOG4CXX_INFO(logger, QString("  plugin '%1' is java plugin").
                              arg(plugin->pluginInfo().name).toStdString() );
