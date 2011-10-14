@@ -57,6 +57,52 @@ isEmpty(DISABLE_LOGGING): DISABLE_LOGGING = $$(DISABLE_LOGGING)
      }
 }
 
+#
+# Global Java check!
+# Apache Ant and Java home should exist!
+#
+
+# Check 'JAVA_HOME' environment existence
+HAS_JAVA_HOME = TRUE
+JAVA_HOME = $$(JAVA_HOME)
+isEmpty( JAVA_HOME ) {
+    HAS_JAVA_HOME = FALSE
+}
+else {
+    # Check Jni existance
+    !exists( $$(JAVA_HOME)/include/jni.h ) {
+        HAS_JAVA_HOME = FALSE
+    }
+}
+
+# Check 'Apache Ant' existence
+HAS_ANT = TRUE
+ANT = ant
+ant_version = $$system( $$ANT -version )
+isEmpty( ant_version ) {
+    # Command does not exist. May be ANT_HOME is defined?!
+    ANT_HOME = $$(ANT_HOME)
+
+    # Check ANT_HOME environment
+    ANT_HOME = $$(ANT_HOME)
+    isEmpty(ANT_HOME) {
+        HAS_ANT = FALSE
+        ANT =
+    }
+    else {
+        ANT = $$ANT_HOME/bin/ant
+        ant_version = $$system( $$ANT -version )
+        isEmpty( ant_version ) {
+            HAS_ANT = FALSE
+            ANT =
+        }
+    }
+}
+
+# Final Java check
+HAS_JAVA = FALSE
+contains( HAS_ANT, TRUE ):contains( HAS_JAVA_HOME, TRUE): HAS_JAVA = TRUE
+
 !isEmpty(BUILD_NAME) {
      DESTDIR = $$join(BUILD_NAME, "", $$LEVEL/build/)
      QMAKE_LIBDIR += $$DESTDIR

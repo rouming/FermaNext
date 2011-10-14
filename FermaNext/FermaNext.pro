@@ -1,3 +1,6 @@
+LEVEL = .
+include($$LEVEL/FermaNext.pri)
+
 QMAKE_EXTRA_TARGETS = release debug release-clean debug-clean \
                       release-distclean debug-distclean vcproj
 
@@ -9,29 +12,6 @@ debug-clean.CONFIG = recursive
 
 release-distclean.CONFIG = recursive
 debug-distclean.CONFIG = recursive
-
-HAS_ANT = TRUE
-ANT = ant
-ant_version = $$system( $$ANT -version )
-isEmpty( ant_version ) {
-    # Command does not exist. May be ANT_HOME is defined?!
-    ANT_HOME = $$(ANT_HOME)
-
-    # Check ANT_HOME environment
-    ANT_HOME = $$(ANT_HOME)
-    isEmpty(ANT_HOME) {
-        HAS_ANT = FALSE
-        ANT =
-    }
-    else {
-        ANT = $$ANT_HOME/bin/ant
-        ant_version = $$system( $$ANT -version )
-        isEmpty( ant_version ) {
-            HAS_ANT = FALSE
-            ANT =
-        }
-    }
-}
 
 TEMPLATE = subdirs
 
@@ -52,20 +32,28 @@ SUBDIRS += src/LiveUpdate
 
 # Plugin loaders
 SUBDIRS += src/Loaders/NativePluginLoader
-contains( HAS_ANT, TRUE ): SUBDIRS += src/Loaders/JavaPluginLoader
-else : warning( You should have 'Apache Ant' to build Java plugin loader. \
-                For now Java plugin loader (src/Loaders/JavaPluginLoader) \
-                will not be included in general build. To solve this you \
-                should install 'Apache Ant' and then run 'qmake' again. )
 
 # Plugins
 SUBDIRS += \
           src/Plugins/old_SimpleCalc \
           # GA optimization
           src/Plugins/Optimization.GA/GA.algorithm/cpp.GAlib \
-          src/Plugins/Optimization.GA/GA.algorithm/java.JGAP \
           src/Plugins/Optimization.GA/GA.fitness.function/cpp.NodePosition \
           src/Plugins/Optimization.GA/GA.criteria/cpp.Force
+
+# Include Java sources
+contains( HAS_JAVA, TRUE ) {
+   # Java loaders
+   SUBDIRS += src/Loaders/JavaPluginLoader
+
+   # Java plugins
+   SUBDIRS += src/Plugins/Optimization.GA/GA.algorithm/java.JGAP
+}
+else : warning( You should have 'Apache Ant' and Java properly installed \
+                your system to build Java plugin loader. \
+                For now Java plugin loader (src/Loaders/JavaPluginLoader) \
+                will not be included in general build. To solve this you \
+                should install 'Apache Ant' or Java and then run 'qmake' again. )
 
 # Tests
 SUBDIRS += tests/ConfigTest \
