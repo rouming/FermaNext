@@ -68,11 +68,11 @@ SUBDIRS += \
           src/Plugins/Optimization.GA/GA.criteria/cpp.Force
 
 # Tests
-SUBDIRS += tests\ConfigTest \
-           tests\DijkstraTest \
-           tests\ObjectStateManagerTest \
-           tests\PathConversionTest \
-           tests\PluginExecutionTreeTest
+SUBDIRS += tests/ConfigTest \
+           tests/DijkstraTest \
+           tests/ObjectStateManagerTest \
+           tests/PathConversionTest \
+           tests/PluginExecutionTreeTest
 
 # Generates commands for Win32 to generate VS project files
 win32 {

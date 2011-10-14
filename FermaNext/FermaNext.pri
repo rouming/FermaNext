@@ -2,7 +2,7 @@
 FERMA_VERSION=0.3.1
 
 # Define your own build rules
-include(Subsidiary.pri)
+exists($$PWD/Subsidiary.pri):include(Subsidiary.pri)
 
 CONFIG += debug_and_release
 
