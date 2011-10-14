@@ -76,27 +76,16 @@ else {
 }
 
 # Check 'Apache Ant' existence
-HAS_ANT = TRUE
-ANT = ant
-ant_version = $$system( $$ANT -version )
-isEmpty( ant_version ) {
+HAS_ANT = FALSE
+win:SYS_NULL = nul
+unix:SYS_NULL = /dev/null
+system( ant -version > $$SYS_NULL 2>&1 ): HAS_ANT = TRUE
+contains( HAS_ANT, FALSE ) {
     # Command does not exist. May be ANT_HOME is defined?!
     ANT_HOME = $$(ANT_HOME)
 
-    # Check ANT_HOME environment
-    ANT_HOME = $$(ANT_HOME)
-    isEmpty(ANT_HOME) {
-        HAS_ANT = FALSE
-        ANT =
-    }
-    else {
-        ANT = $$ANT_HOME/bin/ant
-        ant_version = $$system( $$ANT -version )
-        isEmpty( ant_version ) {
-            HAS_ANT = FALSE
-            ANT =
-        }
-    }
+    # Check ANT_HOME environment and try to run ant
+    !isEmpty(ANT_HOME):system( $$ANT_HOME/bin/ant -version > $$SYS_NULL 2>&1 ): HAS_ANT = TRUE
 }
 
 # Final Java check
