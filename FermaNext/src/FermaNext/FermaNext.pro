@@ -16,6 +16,8 @@ QT += core gui xml
 CONFIG += qt warn_on thread uitools
 DESTDIR = $$LEVEL
 
+mac:CONFIG -= app_bundle
+
 unix {
   !mac:QMAKE_LFLAGS += -export-dynamic
 }
