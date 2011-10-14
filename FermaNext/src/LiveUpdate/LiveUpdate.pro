@@ -10,6 +10,9 @@ QT += core gui xml network
 CONFIG += qt warn_on thread
 DESTDIR = $$LEVEL
 
+# Turn off bundle build on Mac OS
+mac:CONFIG -= app_bundle
+
 UI_DIR = ./ui
 
 win32:LIBS += -lshell32

@@ -16,6 +16,7 @@ QT += core gui xml
 CONFIG += qt warn_on thread uitools
 DESTDIR = $$LEVEL
 
+# Turn off bundle build on Mac OS
 mac:CONFIG -= app_bundle
 
 unix {
