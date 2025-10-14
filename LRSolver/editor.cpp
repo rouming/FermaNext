@@ -34,7 +34,7 @@ Editor::Editor(QGraphicsScene * canvas, QWidget *parent)
     setResizeAnchor(QGraphicsView::NoAnchor);
     setAlignment(Qt::AlignLeft | Qt::AlignTop);
     //debug output
-    file=new QFile("/output/editor_out.txt");
+    file=new QFile("log.txt");
     file->open(QIODevice::WriteOnly);
     out.setDevice(file);
     createActions();
@@ -52,6 +52,100 @@ Editor::Editor(QGraphicsScene * canvas, QWidget *parent)
 	settingRootPoint=false;
 	setDemoMode(false);
 	result=0;
+
+	Line *line;
+	SPoint *srcNode, *dstNode;
+	QPointF pos;
+
+	select();
+
+	////1
+
+	line = new Line();
+	scene()->addItem(line);
+	srcNode = new SPoint(this, line);
+	srcNode->setActive(false);
+	scene()->addItem(srcNode);
+	dstNode = new SPoint(this, line);
+	dstNode->setActive(false);
+	scene()->addItem(dstNode);
+	line->setSourceNode(srcNode);
+	line->setDestNode(dstNode);
+	line->setBoundaryCondition("10");
+
+	pos = mapToScene(200, -200);
+	line->setSource(pos);
+	pos = mapToScene(300, -200);
+	line->setDest(pos);
+	setActiveItem(line);
+
+	/////2
+
+	line = new Line();
+	scene()->addItem(line);
+	srcNode = new SPoint(this, line);
+	srcNode->setActive(false);
+	scene()->addItem(srcNode);
+	dstNode = new SPoint(this, line);
+	dstNode->setActive(false);
+	scene()->addItem(dstNode);
+	line->setSourceNode(srcNode);
+	line->setDestNode(dstNode);
+	line->setBoundaryCondition("20");
+
+	pos = mapToScene(300, -200);
+	line->setSource(pos);
+	pos = mapToScene(300, -300);
+	line->setDest(pos);
+	setActiveItem(line);
+
+	/////3
+
+	line = new Line();
+	scene()->addItem(line);
+	srcNode = new SPoint(this, line);
+	srcNode->setActive(false);
+	scene()->addItem(srcNode);
+	dstNode = new SPoint(this, line);
+	dstNode->setActive(false);
+	scene()->addItem(dstNode);
+	line->setSourceNode(srcNode);
+	line->setDestNode(dstNode);
+	line->setBoundaryCondition("30");
+
+	pos = mapToScene(300, -300);
+	line->setSource(pos);
+	pos = mapToScene(200, -300);
+	line->setDest(pos);
+	setActiveItem(line);
+
+	/////4
+
+	line = new Line();
+	scene()->addItem(line);
+	srcNode = new SPoint(this, line);
+	srcNode->setActive(false);
+	scene()->addItem(srcNode);
+	dstNode = new SPoint(this, line);
+	dstNode->setActive(false);
+	scene()->addItem(dstNode);
+	line->setSourceNode(srcNode);
+	line->setDestNode(dstNode);
+	line->setBoundaryCondition("40");
+
+	pos = mapToScene(200, -300);
+	line->setSource(pos);
+	pos = mapToScene(200, -200);
+	line->setDest(pos);
+	setActiveItem(line);
+
+	//rootPoint = mapToScene(249, -244);
+	compliteSelection();
+	//meshArea();
+
+	//scene()->update();
+	//unSetStatus();
+
 }
 
 Editor::~Editor()
